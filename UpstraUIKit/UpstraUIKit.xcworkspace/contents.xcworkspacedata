@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:AmityUIKit4/AmityUIKit4.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:AmityUIKit.xcodeproj">
    </FileRef>
    <FileRef

@@ -14,6 +14,7 @@ public enum AmityImageViewState {
     case loading
 }
 
+// TEMP: Need to refactor this class
 public class AmityImageView: AmityView {
 
     @IBOutlet internal weak var imageView: UIImageView!

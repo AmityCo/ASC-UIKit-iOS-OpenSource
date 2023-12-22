@@ -8,6 +8,12 @@
 
 import UIKit
 import AmitySDK
+import SwiftUI
+#if canImport(AmityUIKit4)
+import AmityUIKit4
+#endif
+import Combine
+
 
 final class AmityCommunityProfileHeaderViewController: UIViewController {
     
@@ -28,6 +34,8 @@ final class AmityCommunityProfileHeaderViewController: UIViewController {
     @IBOutlet private var pendingPostsContainerView: UIView!
     @IBOutlet private var pendingPostsTitleLabel: UILabel!
     @IBOutlet private var pendingPostsDescriptionLabel: UILabel!
+    
+    @IBOutlet weak var storyTabView: UIView!
     
     // MARK: - Properties
     private var screenViewModel: AmityCommunityProfileScreenViewModelType!
@@ -50,6 +58,7 @@ final class AmityCommunityProfileHeaderViewController: UIViewController {
         setupDescription()
         setupActionButton()
         setupPendingPosts()
+        setupStory()
     }
     
     static func make(rootViewController: AmityCommunityProfilePageViewController?, viewModel: AmityCommunityProfileScreenViewModelType) -> AmityCommunityProfileHeaderViewController {
@@ -157,6 +166,121 @@ final class AmityCommunityProfileHeaderViewController: UIViewController {
         pendingPostsDescriptionLabel.textColor = AmityColorSet.base.blend(.shade1)
     }
     
+    
+    // TEMP: AmityUIKit v4 integration in Old UIKit for Story Target
+    // Need to refactor when global feed come in
+    #if canImport(AmityUIKit4)
+    var storyManager = StoryManager()
+    var storyTabViewController: AmityStoryTabViewController?
+    var storyTabComponent: AmityStoryTabComponent!
+    var storyTabComponentViewModel: AmityStoryTabComponentViewModel!
+    var storyCollection: AmityCollection<AmityStory>!
+    var storyTarget: StoryTarget!
+    var cancellable: AnyCancellable?
+    #endif
+   
+    
+    private func setupStory() {
+        #if canImport(AmityUIKit4)
+        storyTabComponentViewModel = AmityStoryTabComponentViewModel(storyTargets: [],
+                                                                     hideStoryCreation: true,
+                                                                     creatorAvatar: UIImage(),
+                                                                     isGlobalFeed: true,
+                                                                     storyCreationTargetId: "")
+        storyTabComponent = AmityStoryTabComponent(viewModel: storyTabComponentViewModel)
+        
+        let hostingController = SwiftUIHostingController(rootView: storyTabComponent)
+    
+        addChild(hostingController)
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        hostingController.view.frame = storyTabView.frame
+        storyTabView.addSubview(hostingController.view)
+        
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: storyTabView.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: storyTabView.trailingAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: storyTabView.topAnchor, constant: 3.0),
+            hostingController.view.bottomAnchor.constraint(equalTo: storyTabView.bottomAnchor, constant: 3.0),
+                ])
+        hostingController.didMove(toParent: self)
+        #endif
+    }
+    
+    func updateStoryViewController(community: AmityCommunityModel) {
+        #if canImport(AmityUIKit4)
+        storyCollection = storyManager.getActiveStories(in: community.communityId)
+        storyTabView.isHidden = storyCollection.count() == 0
+      
+        storyTarget = StoryTarget(targetName: community.displayName, isVerifiedTarget: community.isOfficial, placeholderImage: avatarView.image ?? avatarView.placeholder, stories: storyCollection, hasUnseen: false)
+        
+
+        storyTabComponentViewModel.storyCreationTargetId = community.communityId
+        storyTabComponentViewModel.creatorAvatar = avatarView.image ?? avatarView.placeholder
+        
+        StoryPermissionChecker.shared.setCommunity(id: community.communityId)
+        
+        StoryPermissionChecker.shared.checkUserHasManagePermission { [weak self] hasPermission in
+            self?.storyTabComponentViewModel.hideStoryCreation = !hasPermission
+        }
+        
+        // TEMP: Need to refactor when global target come in.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            // Just delay to give time for checkUserHasManagePermission function call
+            self.cancellable = nil
+            self.cancellable = self.storyCollection.$snapshots
+                .debounce(for: .milliseconds(200), scheduler: DispatchQueue.main)
+                .sink { [weak self] stories in
+                    Log.add("Story Count: \(stories.count)")
+                    
+                    let hasPermission = StoryPermissionChecker.shared.checkUserHasManagePermission()
+                    
+                    if hasPermission {
+                        self?.storyTabView.isHidden = false
+                    } else {
+                        self?.storyTabView.isHidden = stories.count == 0
+                    }
+                    
+                    if stories.count == 0 {
+                        self?.storyTabComponentViewModel.storyTargets = []
+                    } else if self?.storyTabComponentViewModel.storyTargets.count == 0 {
+                        if let self, let storyTarget {
+                            self.storyTabComponentViewModel.storyTargets = [storyTarget]
+                        }
+                    }
+                    
+                    // Determining hasUnseen for the target. We find the story which contains story target. Some failed story seems not to have target.
+                    // Note: This is workaround for bug on sdk. After its fixed, You can rely on `hasUnseen` value of story target for any story whose `syncState` is `synced`.
+                    if !stories.isEmpty {
+                        var isStoryTargetPresent = false
+                        var isAnyStoryUnseen = false
+                        
+                        for story in stories {
+                            if let hasUnseen = story.storyTarget?.hasUnseen, let uikitStoryTarget = self?.storyTabComponentViewModel.storyTargets.first {
+                                isStoryTargetPresent = true
+                                uikitStoryTarget.hasUnseen = hasUnseen
+                                break
+                            }
+                            
+                            // If any of the story is unseen, we set the flag.
+                            if !story.isSeen {
+                                isAnyStoryUnseen = true
+                            }
+                        }
+                        
+                        // Even after looping, if the story target is not present, we rely on isSeen property of the story.
+                        if !isStoryTargetPresent {
+                            let uikitStoryTarget = self?.storyTabComponentViewModel.storyTargets.first
+                            uikitStoryTarget?.hasUnseen = isAnyStoryUnseen
+                        }
+                    }
+                }
+        }
+        #else
+        storyTabView.isHidden = true
+        #endif
+    }
+    
+    
     // MARK: - Update views
     func updateView() {
         guard let community = screenViewModel.dataSource.community, !isUpdateInProgress else { return }
@@ -173,6 +297,8 @@ final class AmityCommunityProfileHeaderViewController: UIViewController {
         officialBadgeImageView.isHidden = !community.isOfficial
         updateActionButton()
         shouldShowPendingsPostBanner()
+        
+        updateStoryViewController(community: community)
     }
     
     func updatePostsCount() {

@@ -8,6 +8,10 @@
 
 import AmitySDK
 import AmityUIKit
+#if canImport(AmityUIKit4)
+import AmityUIKit4
+#endif
+import SwiftUI
 import UIKit
 
 class AppManager {
@@ -47,6 +51,10 @@ class AppManager {
         if let currentUserId = UserDefaults.standard.value(forKey: UserDefaultsKey.userId) as? String {
             register(withUserId: currentUserId)
         }
+        
+        // Share client to the new UIKit
+        AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
+        
     }
     
     func register(withUserId userId: String) {
@@ -136,6 +144,11 @@ class AppManager {
         } else {
             return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RegisterNavigationController")
         }
+
+//        var cameraPage = AmityCameraPage()
+//        let hostController = SwiftUIHostingController(rootView: cameraPage)
+//        
+//        return hostController
     }
     
 }
