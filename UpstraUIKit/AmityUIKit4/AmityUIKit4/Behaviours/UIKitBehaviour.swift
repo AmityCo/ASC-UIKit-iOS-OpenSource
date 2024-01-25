@@ -7,8 +7,8 @@
 
 import Foundation
 
-public class UIKitBehaviour {
-    var cameraPageBehaviour: CameraPageBehavior?
-    var storyCreationPageBehaviour: StoryCreationPageBehaviour?
-    var storyTabComponentBehaviour: StoryTabComponentBehaviour?
+open class UIKitBehaviour {
+    public var createStoryPageBehaviour: AmityCreateStoryPageBehaviour?
+    public var draftStoryPageBehaviour: AmityDraftStoryPageBehaviour?
+    public var storyTabComponentBehaviour: AmityStoryTabComponentBehaviour?
 }

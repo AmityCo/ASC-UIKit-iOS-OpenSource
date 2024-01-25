@@ -57,6 +57,15 @@ final class AmityCommunityNotificationSettingsScreenViewModel: AmityCommunityNot
             items.append(.navigationContent(content: commentItem))
         }
         
+        if notification.isEnabled && notification.isStoryNetworkEnabled {
+            let storyItem = AmitySettingsItem.NavigationContent(
+                identifier: AmityCommunityNotificationSettingsItem.storyNavigation.identifier,
+                icon: AmityCommunityNotificationSettingsItem.storyNavigation.icon,
+                title: AmityCommunityNotificationSettingsItem.storyNavigation.title,
+                description: AmityCommunityNotificationSettingsItem.storyNavigation.description)
+            items.append(.navigationContent(content: storyItem))
+        }
+        
         settingsItems = items
         delegate?.screenViewModel(self, didUpdateSettingItem: settingsItems)
     }

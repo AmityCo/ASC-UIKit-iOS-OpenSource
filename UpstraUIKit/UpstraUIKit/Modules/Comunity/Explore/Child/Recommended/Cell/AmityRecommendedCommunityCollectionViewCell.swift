@@ -41,7 +41,7 @@ final class AmityRecommendedCommunityCollectionViewCell: UICollectionViewCell, N
     }
     
     func display(with model: AmityCommunityModel) {
-        avatarView.setImage(withImageURL: model.avatarURL, placeholder: AmityIconSet.defaultCommunity)
+        avatarView.setImage(withImageURL: model.avatarURL, placeholder: AmityIconSet.defaultCommunityAvatar)
         displayNameLabel.text = model.displayName
         categoryLabel.text = model.category
         

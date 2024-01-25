@@ -8,6 +8,9 @@
 
 import UIKit
 import AmitySDK
+#if canImport(AmityUIKit4)
+import AmityUIKit4
+#endif
 
 /// Global event handler for function overriding
 ///
@@ -28,6 +31,7 @@ public enum AmityPostContentType {
     case post
     case poll
     case livestream
+    case story
 }
 
 open class AmityEventHandler {
@@ -144,7 +148,14 @@ open class AmityEventHandler {
                 completion(.livestream)
             }
         
+        #if canImport(AmityUIKit4)
+        let storyPostOption = ImageItemOption(title: AmityLocalizedStringSet.General.story.localizedString, image: AmityIconSet.CreatePost.iconStory) {
+            completion(.story)
+        }
+        AmityBottomSheet.present(options: [livestreamPost, postOption, storyPostOption , pollPostOption], from: source)
+        #else
         AmityBottomSheet.present(options: [livestreamPost, postOption, pollPostOption], from: source)
+        #endif
     }
     
     /// Event for post creator
@@ -168,6 +179,33 @@ open class AmityEventHandler {
             case .community(object: let community):
                 createLiveStreamPost(from: source, targetId: community.communityId, targetType: .community, destinationToUnwindBackAfterFinish: source.presentingViewController ?? source)
             }
+            return
+        case .story:
+            #if canImport(AmityUIKit4)
+            switch postTarget {
+            case .myFeed:
+                Log.add("Story in Feed!!!!")
+            case .community(object: let community):
+                Task { @MainActor in
+                    let avatar = try await AmityUIKitManagerInternal.shared.fileService.loadImage(imageURL: community.avatar?.fileURL ?? "", size: .medium)
+                    let createStoryPage = AmityCreateStoryPage(targetId: community.communityId, avatar: avatar)
+                    let viewController = SwiftUIHostingController(rootView: createStoryPage)
+                    
+                    if let vc = source.navigationController?.viewControllers.last, vc.isKind(of: AmityCommunityProfilePageViewController.self) {
+                        let navigationController = UINavigationController(rootViewController: viewController)
+                        navigationController.navigationBar.isHidden = true
+                        navigationController.modalPresentationStyle = .overFullScreen
+                        navigationController.modalTransitionStyle = .crossDissolve
+                        source.present(navigationController, animated: true, completion: nil)
+                    } else {
+                        source.navigationController?.navigationBar.isHidden = true
+                        source.navigationController?.modalPresentationStyle = .overFullScreen
+                        source.navigationController?.modalTransitionStyle = .crossDissolve
+                        source.navigationController?.pushViewController(viewController, animated: true)
+                    }
+                }
+            }
+            #endif
             return
         }
         

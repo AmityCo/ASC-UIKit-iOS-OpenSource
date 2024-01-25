@@ -100,7 +100,7 @@
 		684AE1292B0C609000FD7270 /* UIApplication+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1282B0C609000FD7270 /* UIApplication+Extension.swift */; };
 		684AE1482B0C9C6200FD7270 /* AmityViewIdentifiable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1472B0C9C6200FD7270 /* AmityViewIdentifiable.swift */; };
 		684AE14E2B0C9FC700FD7270 /* AmityViewId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE14D2B0C9FC700FD7270 /* AmityViewId.swift */; };
-		684AE1512B0DB4C700FD7270 /* StoryCreationPageBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1502B0DB4C700FD7270 /* StoryCreationPageBehaviour.swift */; };
+		684AE1512B0DB4C700FD7270 /* AmityDraftStoryPageBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1502B0DB4C700FD7270 /* AmityDraftStoryPageBehaviour.swift */; };
 		684AE1532B0DB4EE00FD7270 /* UIKitBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1522B0DB4EE00FD7270 /* UIKitBehaviour.swift */; };
 		684AE1592B0DEBC900FD7270 /* AmityPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1582B0DEBC900FD7270 /* AmityPageView.swift */; };
 		684AE15B2B0DEC2900FD7270 /* AmityComponentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE15A2B0DEC2900FD7270 /* AmityComponentView.swift */; };
@@ -110,9 +110,14 @@
 		684AE1682B10941C00FD7270 /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1672B10941C00FD7270 /* UIColor+Extension.swift */; };
 		684AE16A2B10A55E00FD7270 /* Dictionary+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1692B10A55E00FD7270 /* Dictionary+Extension.swift */; };
 		684AE16C2B10AB2D00FD7270 /* Codable+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE16B2B10AB2D00FD7270 /* Codable+Extension.swift */; };
-		6855C5602B17179B00B2D65B /* StoryTabComponentBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6855C55F2B17179B00B2D65B /* StoryTabComponentBehaviour.swift */; };
+		6855C5602B17179B00B2D65B /* AmityStoryTabComponentBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6855C55F2B17179B00B2D65B /* AmityStoryTabComponentBehaviour.swift */; };
 		6859F2242B33595F004AEB8C /* StoryCreationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6859F2232B33595F004AEB8C /* StoryCreationView.swift */; };
 		6859F2262B33597E004AEB8C /* StoryTargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6859F2252B33597E004AEB8C /* StoryTargetView.swift */; };
+		6859F2282B3DE052004AEB8C /* GestureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6859F2272B3DE052004AEB8C /* GestureView.swift */; };
+		6859F2B02B3EAE43004AEB8C /* RoundedCorner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6859F2AD2B3EAE43004AEB8C /* RoundedCorner.swift */; };
+		6859F2B12B3EAE43004AEB8C /* BottomSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6859F2AE2B3EAE43004AEB8C /* BottomSheet.swift */; };
+		6859F2B22B3EAE43004AEB8C /* ViewExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6859F2AF2B3EAE43004AEB8C /* ViewExtension.swift */; };
+		6859F2B42B452FE8004AEB8C /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6859F2B32B452FE8004AEB8C /* UIImage+Extension.swift */; };
 		686D173C2B1452A7007AEF59 /* AmityStoryTabComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D173B2B1452A7007AEF59 /* AmityStoryTabComponent.swift */; };
 		686D173E2B1496D2007AEF59 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 686D173D2B1496D2007AEF59 /* Assets.xcassets */; };
 		686D17402B149F63007AEF59 /* AmityIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D173F2B149F63007AEF59 /* AmityIcon.swift */; };
@@ -121,18 +126,24 @@
 		686D17462B15D099007AEF59 /* AmityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D17452B15D099007AEF59 /* AmityView.swift */; };
 		686D17482B15E397007AEF59 /* AmityColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D17472B15E397007AEF59 /* AmityColor.swift */; };
 		686E48922B1F8E6500591E2D /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686E48912B1F8E6500591E2D /* TimerManager.swift */; };
+		688051DF2B566EED00C9BBCB /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688051DD2B566EED00C9BBCB /* Toast.swift */; };
+		688051E02B566EED00C9BBCB /* Toast.xib in Resources */ = {isa = PBXBuildFile; fileRef = 688051DE2B566EED00C9BBCB /* Toast.xib */; };
+		688051E22B5694AD00C9BBCB /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688051E12B5694AC00C9BBCB /* String+Extension.swift */; };
+		688051E52B5695B900C9BBCB /* AmityLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 688051E42B5695B900C9BBCB /* AmityLocalizable.strings */; };
+		688051E72B56962A00C9BBCB /* AmityLocalizedStringSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688051E62B56962A00C9BBCB /* AmityLocalizedStringSet.swift */; };
+		688051E92B56CFC200C9BBCB /* Notification+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688051E82B56CFC200C9BBCB /* Notification+Extension.swift */; };
 		6880E6BA2B28110600F25C75 /* Story.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6880E6B92B28110600F25C75 /* Story.swift */; };
 		6880E6BD2B2811A600F25C75 /* StoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6880E6BC2B2811A600F25C75 /* StoryManager.swift */; };
 		6880E6BF2B28179700F25C75 /* StoryTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6880E6BE2B28179700F25C75 /* StoryTarget.swift */; };
-		688E2D912B2FE8AB003EB36D /* AmityStoryCreationPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688E2D902B2FE8AB003EB36D /* AmityStoryCreationPage.swift */; };
-		688E2D932B2FEF61003EB36D /* CameraPageBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688E2D922B2FEF61003EB36D /* CameraPageBehavior.swift */; };
+		688E2D912B2FE8AB003EB36D /* AmityDraftStoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688E2D902B2FE8AB003EB36D /* AmityDraftStoryPage.swift */; };
+		688E2D932B2FEF61003EB36D /* AmityCreateStoryPageBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688E2D922B2FEF61003EB36D /* AmityCreateStoryPageBehaviour.swift */; };
 		68B1F8D82B2CB09800B1484F /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B1F8D72B2CB09800B1484F /* CameraManager.swift */; };
-		68CC6A652B1733D10052B77E /* AmityStoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CC6A642B1733D10052B77E /* AmityStoryPage.swift */; };
+		68CC6A652B1733D10052B77E /* AmityViewStoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CC6A642B1733D10052B77E /* AmityViewStoryPage.swift */; };
 		68D11A342B2239C50046D0FB /* StoryCoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D11A332B2239C50046D0FB /* StoryCoreView.swift */; };
 		68D11A362B223A000046D0FB /* ProgressBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D11A352B223A000046D0FB /* ProgressBarView.swift */; };
-		68EB58A52B2C2CBD00F6F250 /* AmityCameraPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68EB58A42B2C2CBD00F6F250 /* AmityCameraPage.swift */; };
+		68EB58A52B2C2CBD00F6F250 /* AmityCreateStoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68EB58A42B2C2CBD00F6F250 /* AmityCreateStoryPage.swift */; };
 		68EB58A72B2C2D4700F6F250 /* SwiftUIHostWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68EB58A62B2C2D4700F6F250 /* SwiftUIHostWrapper.swift */; };
-		9250636E2B35C63C00DCCA5D /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9250636D2B35C63C00DCCA5D /* SharedFrameworks */; };
+		9260F35F2B627B86004867AE /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9260F35E2B627B86004867AE /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -246,7 +257,7 @@
 		684AE1352B0C968F00FD7270 /* RealmSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = ../Shared/RealmSwift.xcframework; sourceTree = "<group>"; };
 		684AE1472B0C9C6200FD7270 /* AmityViewIdentifiable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityViewIdentifiable.swift; sourceTree = "<group>"; };
 		684AE14D2B0C9FC700FD7270 /* AmityViewId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityViewId.swift; sourceTree = "<group>"; };
-		684AE1502B0DB4C700FD7270 /* StoryCreationPageBehaviour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCreationPageBehaviour.swift; sourceTree = "<group>"; };
+		684AE1502B0DB4C700FD7270 /* AmityDraftStoryPageBehaviour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityDraftStoryPageBehaviour.swift; sourceTree = "<group>"; };
 		684AE1522B0DB4EE00FD7270 /* UIKitBehaviour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIKitBehaviour.swift; sourceTree = "<group>"; };
 		684AE1582B0DEBC900FD7270 /* AmityPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityPageView.swift; sourceTree = "<group>"; };
 		684AE15A2B0DEC2900FD7270 /* AmityComponentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityComponentView.swift; sourceTree = "<group>"; };
@@ -256,9 +267,14 @@
 		684AE1672B10941C00FD7270 /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
 		684AE1692B10A55E00FD7270 /* Dictionary+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extension.swift"; sourceTree = "<group>"; };
 		684AE16B2B10AB2D00FD7270 /* Codable+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+Extension.swift"; sourceTree = "<group>"; };
-		6855C55F2B17179B00B2D65B /* StoryTabComponentBehaviour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryTabComponentBehaviour.swift; sourceTree = "<group>"; };
+		6855C55F2B17179B00B2D65B /* AmityStoryTabComponentBehaviour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityStoryTabComponentBehaviour.swift; sourceTree = "<group>"; };
 		6859F2232B33595F004AEB8C /* StoryCreationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCreationView.swift; sourceTree = "<group>"; };
 		6859F2252B33597E004AEB8C /* StoryTargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryTargetView.swift; sourceTree = "<group>"; };
+		6859F2272B3DE052004AEB8C /* GestureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureView.swift; sourceTree = "<group>"; };
+		6859F2AD2B3EAE43004AEB8C /* RoundedCorner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundedCorner.swift; sourceTree = "<group>"; };
+		6859F2AE2B3EAE43004AEB8C /* BottomSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BottomSheet.swift; sourceTree = "<group>"; };
+		6859F2AF2B3EAE43004AEB8C /* ViewExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewExtension.swift; sourceTree = "<group>"; };
+		6859F2B32B452FE8004AEB8C /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
 		686D173B2B1452A7007AEF59 /* AmityStoryTabComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityStoryTabComponent.swift; sourceTree = "<group>"; };
 		686D173D2B1496D2007AEF59 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		686D173F2B149F63007AEF59 /* AmityIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityIcon.swift; sourceTree = "<group>"; };
@@ -267,16 +283,22 @@
 		686D17452B15D099007AEF59 /* AmityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityView.swift; sourceTree = "<group>"; };
 		686D17472B15E397007AEF59 /* AmityColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityColor.swift; sourceTree = "<group>"; };
 		686E48912B1F8E6500591E2D /* TimerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManager.swift; sourceTree = "<group>"; };
+		688051DD2B566EED00C9BBCB /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
+		688051DE2B566EED00C9BBCB /* Toast.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = Toast.xib; sourceTree = "<group>"; };
+		688051E12B5694AC00C9BBCB /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		688051E42B5695B900C9BBCB /* AmityLocalizable.strings */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; path = AmityLocalizable.strings; sourceTree = "<group>"; };
+		688051E62B56962A00C9BBCB /* AmityLocalizedStringSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityLocalizedStringSet.swift; sourceTree = "<group>"; };
+		688051E82B56CFC200C9BBCB /* Notification+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+Extension.swift"; sourceTree = "<group>"; };
 		6880E6B92B28110600F25C75 /* Story.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Story.swift; sourceTree = "<group>"; };
 		6880E6BC2B2811A600F25C75 /* StoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryManager.swift; sourceTree = "<group>"; };
 		6880E6BE2B28179700F25C75 /* StoryTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryTarget.swift; sourceTree = "<group>"; };
-		688E2D902B2FE8AB003EB36D /* AmityStoryCreationPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityStoryCreationPage.swift; sourceTree = "<group>"; };
-		688E2D922B2FEF61003EB36D /* CameraPageBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPageBehavior.swift; sourceTree = "<group>"; };
+		688E2D902B2FE8AB003EB36D /* AmityDraftStoryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityDraftStoryPage.swift; sourceTree = "<group>"; };
+		688E2D922B2FEF61003EB36D /* AmityCreateStoryPageBehaviour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCreateStoryPageBehaviour.swift; sourceTree = "<group>"; };
 		68B1F8D72B2CB09800B1484F /* CameraManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraManager.swift; sourceTree = "<group>"; };
-		68CC6A642B1733D10052B77E /* AmityStoryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityStoryPage.swift; sourceTree = "<group>"; };
+		68CC6A642B1733D10052B77E /* AmityViewStoryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityViewStoryPage.swift; sourceTree = "<group>"; };
 		68D11A332B2239C50046D0FB /* StoryCoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCoreView.swift; sourceTree = "<group>"; };
 		68D11A352B223A000046D0FB /* ProgressBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBarView.swift; sourceTree = "<group>"; };
-		68EB58A42B2C2CBD00F6F250 /* AmityCameraPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCameraPage.swift; sourceTree = "<group>"; };
+		68EB58A42B2C2CBD00F6F250 /* AmityCreateStoryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCreateStoryPage.swift; sourceTree = "<group>"; };
 		68EB58A62B2C2D4700F6F250 /* SwiftUIHostWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIHostWrapper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -285,7 +307,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9250636E2B35C63C00DCCA5D /* SharedFrameworks in Frameworks */,
+				9260F35F2B627B86004867AE /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,6 +325,7 @@
 		684097582B30940100697E1B /* Extenral */ = {
 			isa = PBXGroup;
 			children = (
+				6859F2AC2B3EAE43004AEB8C /* BottomSheet */,
 				684097F22B313A5300697E1B /* VideoPlayer */,
 				684097ED2B30943500697E1B /* URLImage */,
 				68B1F8D72B2CB09800B1484F /* CameraManager.swift */,
@@ -684,12 +707,13 @@
 				6880E6B82B2810E900F25C75 /* Models */,
 				684AE1462B0C9C4B00FD7270 /* Protocols */,
 				684AE11B2B0C5E4E00FD7270 /* Extensions */,
+				688051E32B5694D200C9BBCB /* Localization */,
 				684AE1182B0C5DBA00FD7270 /* Utilities */,
 				684AE0F42B0C5B0200FD7270 /* AmityUIKit4.h */,
 				684AE0F52B0C5B0200FD7270 /* AmityUIKit4.docc */,
-				682C761A2B3302AB00018F80 /* AmityUIKitConfig.json */,
 				684AE10B2B0C5CFE00FD7270 /* AmityUIKit4.swift */,
 				686D173D2B1496D2007AEF59 /* Assets.xcassets */,
+				682C761A2B3302AB00018F80 /* AmityUIKitConfig.json */,
 			);
 			path = AmityUIKit4;
 			sourceTree = "<group>";
@@ -728,6 +752,7 @@
 				684AE1242B0C5F7D00FD7270 /* Log.swift */,
 				686D173F2B149F63007AEF59 /* AmityIcon.swift */,
 				686E48912B1F8E6500591E2D /* TimerManager.swift */,
+				688051E62B56962A00C9BBCB /* AmityLocalizedStringSet.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -741,6 +766,9 @@
 				684AE1672B10941C00FD7270 /* UIColor+Extension.swift */,
 				684AE1692B10A55E00FD7270 /* Dictionary+Extension.swift */,
 				684AE16B2B10AB2D00FD7270 /* Codable+Extension.swift */,
+				6859F2B32B452FE8004AEB8C /* UIImage+Extension.swift */,
+				688051E12B5694AC00C9BBCB /* String+Extension.swift */,
+				688051E82B56CFC200C9BBCB /* Notification+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -765,9 +793,8 @@
 		684AE1452B0C9C0A00FD7270 /* Elements */ = {
 			isa = PBXGroup;
 			children = (
-				686D17412B14BDFC007AEF59 /* AmityStoryRingElement.swift */,
-				686D17432B159CDA007AEF59 /* AmityCreateNewStoryButtonElement.swift */,
-				68124D9E2B1748DE009B5B4C /* AmityProgressBarElement.swift */,
+				6859F2B52B454A7F004AEB8C /* StoryTab */,
+				6859F2B62B454B81004AEB8C /* ViewStory */,
 			);
 			path = Elements;
 			sourceTree = "<group>";
@@ -804,10 +831,10 @@
 		684AE14F2B0DB4AE00FD7270 /* Behaviours */ = {
 			isa = PBXGroup;
 			children = (
-				684AE1502B0DB4C700FD7270 /* StoryCreationPageBehaviour.swift */,
+				684AE1502B0DB4C700FD7270 /* AmityDraftStoryPageBehaviour.swift */,
 				684AE1522B0DB4EE00FD7270 /* UIKitBehaviour.swift */,
-				6855C55F2B17179B00B2D65B /* StoryTabComponentBehaviour.swift */,
-				688E2D922B2FEF61003EB36D /* CameraPageBehavior.swift */,
+				6855C55F2B17179B00B2D65B /* AmityStoryTabComponentBehaviour.swift */,
+				688E2D922B2FEF61003EB36D /* AmityCreateStoryPageBehaviour.swift */,
 			);
 			path = Behaviours;
 			sourceTree = "<group>";
@@ -840,6 +867,41 @@
 			path = StoryTab;
 			sourceTree = "<group>";
 		};
+		6859F2AC2B3EAE43004AEB8C /* BottomSheet */ = {
+			isa = PBXGroup;
+			children = (
+				6859F2AD2B3EAE43004AEB8C /* RoundedCorner.swift */,
+				6859F2AE2B3EAE43004AEB8C /* BottomSheet.swift */,
+				6859F2AF2B3EAE43004AEB8C /* ViewExtension.swift */,
+			);
+			path = BottomSheet;
+			sourceTree = "<group>";
+		};
+		6859F2B52B454A7F004AEB8C /* StoryTab */ = {
+			isa = PBXGroup;
+			children = (
+				686D17412B14BDFC007AEF59 /* AmityStoryRingElement.swift */,
+				686D17432B159CDA007AEF59 /* AmityCreateNewStoryButtonElement.swift */,
+			);
+			path = StoryTab;
+			sourceTree = "<group>";
+		};
+		6859F2B62B454B81004AEB8C /* ViewStory */ = {
+			isa = PBXGroup;
+			children = (
+				68124D9E2B1748DE009B5B4C /* AmityProgressBarElement.swift */,
+			);
+			path = ViewStory;
+			sourceTree = "<group>";
+		};
+		688051E32B5694D200C9BBCB /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				688051E42B5695B900C9BBCB /* AmityLocalizable.strings */,
+			);
+			path = Localization;
+			sourceTree = "<group>";
+		};
 		6880E6B82B2810E900F25C75 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -863,6 +925,9 @@
 				683E57232B2C5BA000AF9187 /* SegmentedPickerView.swift */,
 				684097EE2B30B71000697E1B /* ActivityIndicatorView.swift */,
 				684098302B318B3C00697E1B /* ImageVideoPicker.swift */,
+				6859F2272B3DE052004AEB8C /* GestureView.swift */,
+				688051DD2B566EED00C9BBCB /* Toast.swift */,
+				688051DE2B566EED00C9BBCB /* Toast.xib */,
 			);
 			path = CustomViews;
 			sourceTree = "<group>";
@@ -870,7 +935,7 @@
 		68D11A312B2239440046D0FB /* ViewStory */ = {
 			isa = PBXGroup;
 			children = (
-				68CC6A642B1733D10052B77E /* AmityStoryPage.swift */,
+				68CC6A642B1733D10052B77E /* AmityViewStoryPage.swift */,
 				68D11A322B22399A0046D0FB /* ChildViews */,
 			);
 			path = ViewStory;
@@ -888,8 +953,8 @@
 		68EB58A32B2C2CB200F6F250 /* CreateStory */ = {
 			isa = PBXGroup;
 			children = (
-				68EB58A42B2C2CBD00F6F250 /* AmityCameraPage.swift */,
-				688E2D902B2FE8AB003EB36D /* AmityStoryCreationPage.swift */,
+				68EB58A42B2C2CBD00F6F250 /* AmityCreateStoryPage.swift */,
+				688E2D902B2FE8AB003EB36D /* AmityDraftStoryPage.swift */,
 			);
 			path = CreateStory;
 			sourceTree = "<group>";
@@ -923,7 +988,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				9250636D2B35C63C00DCCA5D /* SharedFrameworks */,
+				9260F35E2B627B86004867AE /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -989,8 +1054,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				688051E02B566EED00C9BBCB /* Toast.xib in Resources */,
 				686D173E2B1496D2007AEF59 /* Assets.xcassets in Resources */,
 				6840982F2B313A6F00697E1B /* .gitkeep in Resources */,
+				688051E52B5695B900C9BBCB /* AmityLocalizable.strings in Resources */,
 				682C761B2B3302AB00018F80 /* AmityUIKitConfig.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1017,21 +1084,22 @@
 				682C76172B3208CC00018F80 /* StoryPermissionChecker.swift in Sources */,
 				684097C12B30942F00697E1B /* URLImageFileStoreType.swift in Sources */,
 				684AE11A2B0C5E2500FD7270 /* AmityFileService.swift in Sources */,
-				68CC6A652B1733D10052B77E /* AmityStoryPage.swift in Sources */,
+				68CC6A652B1733D10052B77E /* AmityViewStoryPage.swift in Sources */,
 				684098212B313A6F00697E1B /* VideoCacheHandler.swift in Sources */,
 				684097B72B30942F00697E1B /* URLImageKey.swift in Sources */,
-				68EB58A52B2C2CBD00F6F250 /* AmityCameraPage.swift in Sources */,
+				68EB58A52B2C2CBD00F6F250 /* AmityCreateStoryPage.swift in Sources */,
 				684AE1632B0F322400FD7270 /* AmityUIKitConfigController.swift in Sources */,
 				684097D62B30942F00697E1B /* URLSessionCoordinator.swift in Sources */,
+				6859F2282B3DE052004AEB8C /* GestureView.swift in Sources */,
 				684097DF2B30942F00697E1B /* PlainDatabase.swift in Sources */,
 				684097D52B30942F00697E1B /* File.swift in Sources */,
 				684097DB2B30942F00697E1B /* Download.swift in Sources */,
 				684097DD2B30942F00697E1B /* DownloadPublisher.swift in Sources */,
 				684097C52B30942F00697E1B /* URLImageInMemoryStore.swift in Sources */,
 				684097E32B30942F00697E1B /* CoreDataAttributeDescription.swift in Sources */,
-				688E2D912B2FE8AB003EB36D /* AmityStoryCreationPage.swift in Sources */,
+				688E2D912B2FE8AB003EB36D /* AmityDraftStoryPage.swift in Sources */,
 				684097B52B30942F00697E1B /* TransientImage+SwiftUI.swift in Sources */,
-				6855C5602B17179B00B2D65B /* StoryTabComponentBehaviour.swift in Sources */,
+				6855C5602B17179B00B2D65B /* AmityStoryTabComponentBehaviour.swift in Sources */,
 				684098272B313A6F00697E1B /* VideoInfo.swift in Sources */,
 				684AE11D2B0C5E8400FD7270 /* Error+Extension.swift in Sources */,
 				684097B62B30942F00697E1B /* Synchronized.swift in Sources */,
@@ -1043,6 +1111,8 @@
 				684098232B313A6F00697E1B /* VideoDownloaderHandler.swift in Sources */,
 				686E48922B1F8E6500591E2D /* TimerManager.swift in Sources */,
 				684AE1482B0C9C6200FD7270 /* AmityViewIdentifiable.swift in Sources */,
+				6859F2B42B452FE8004AEB8C /* UIImage+Extension.swift in Sources */,
+				688051DF2B566EED00C9BBCB /* Toast.swift in Sources */,
 				684AE16A2B10A55E00FD7270 /* Dictionary+Extension.swift in Sources */,
 				684098312B318B3C00697E1B /* ImageVideoPicker.swift in Sources */,
 				684097E52B30942F00697E1B /* Database.swift in Sources */,
@@ -1060,8 +1130,10 @@
 				684AE1212B0C5F2C00FD7270 /* AmityMessageMediaService.swift in Sources */,
 				684AE1592B0DEBC900FD7270 /* AmityPageView.swift in Sources */,
 				6880E6BA2B28110600F25C75 /* Story.swift in Sources */,
+				688051E72B56962A00C9BBCB /* AmityLocalizedStringSet.swift in Sources */,
 				684097BB2B30942F00697E1B /* URLImageService+Decode.swift in Sources */,
 				6840981A2B313A6F00697E1B /* AVAssetResourceLoadingRequest+Extensions.swift in Sources */,
+				6859F2B22B3EAE43004AEB8C /* ViewExtension.swift in Sources */,
 				68B1F8D82B2CB09800B1484F /* CameraManager.swift in Sources */,
 				684098162B313A6F00697E1B /* GSAVPlayerViewController.swift in Sources */,
 				684097F12B3139C400697E1B /* VideoPlayer.swift in Sources */,
@@ -1074,6 +1146,7 @@
 				686D173C2B1452A7007AEF59 /* AmityStoryTabComponent.swift in Sources */,
 				684097B92B30942F00697E1B /* URLImage.swift in Sources */,
 				6840982C2B313A6F00697E1B /* VideoPlayerView.swift in Sources */,
+				688051E92B56CFC200C9BBCB /* Notification+Extension.swift in Sources */,
 				684098172B313A6F00697E1B /* Int+Extensions.swift in Sources */,
 				684097E02B30942F00697E1B /* CoreDataModelDescription.swift in Sources */,
 				686D17442B159CDA007AEF59 /* AmityCreateNewStoryButtonElement.swift in Sources */,
@@ -1081,6 +1154,7 @@
 				684097BD2B30942F00697E1B /* RemoteImageView.swift in Sources */,
 				684097BF2B30942F00697E1B /* URLImageInMemoryStoreType.swift in Sources */,
 				684097B12B30942F00697E1B /* URLImageOptions.swift in Sources */,
+				688051E22B5694AD00C9BBCB /* String+Extension.swift in Sources */,
 				684097E12B30942F00697E1B /* CoreDataEntityDescription.swift in Sources */,
 				686D17402B149F63007AEF59 /* AmityIcon.swift in Sources */,
 				684AE15B2B0DEC2900FD7270 /* AmityComponentView.swift in Sources */,
@@ -1096,12 +1170,13 @@
 				684AE1232B0C5F5900FD7270 /* AmityFileCache.swift in Sources */,
 				684AE1532B0DB4EE00FD7270 /* UIKitBehaviour.swift in Sources */,
 				684097BA2B30942F00697E1B /* URLImageService.swift in Sources */,
+				6859F2B12B3EAE43004AEB8C /* BottomSheet.swift in Sources */,
 				6840981D2B313A6F00697E1B /* Double+Extensions.swift in Sources */,
 				684097DE2B30942F00697E1B /* DownloadManager.swift in Sources */,
 				6880E6BD2B2811A600F25C75 /* StoryManager.swift in Sources */,
 				6859F2242B33595F004AEB8C /* StoryCreationView.swift in Sources */,
 				6840981E2B313A6F00697E1B /* VideoCacheAction.swift in Sources */,
-				684AE1512B0DB4C700FD7270 /* StoryCreationPageBehaviour.swift in Sources */,
+				684AE1512B0DB4C700FD7270 /* AmityDraftStoryPageBehaviour.swift in Sources */,
 				684098292B313A6F00697E1B /* VideoLoadManager.swift in Sources */,
 				684097C02B30942F00697E1B /* URLImageFileStoreType+Combine.swift in Sources */,
 				6840982A2B313A6F00697E1B /* VideoPreloadManager.swift in Sources */,
@@ -1116,10 +1191,11 @@
 				684097BC2B30942F00697E1B /* URLImageService+RemoteImage.swift in Sources */,
 				6840982D2B313A6F00697E1B /* VideoFullscreenTransitioner.swift in Sources */,
 				684097EA2B30942F00697E1B /* TransientImage.swift in Sources */,
+				6859F2B02B3EAE43004AEB8C /* RoundedCorner.swift in Sources */,
 				684097E22B30942F00697E1B /* CoreDataFetchIndexDescription.swift in Sources */,
 				684098252B313A6F00697E1B /* VideoDownloader.swift in Sources */,
 				684097D82B30942F00697E1B /* DownloadProgress.swift in Sources */,
-				688E2D932B2FEF61003EB36D /* CameraPageBehavior.swift in Sources */,
+				688E2D932B2FEF61003EB36D /* AmityCreateStoryPageBehaviour.swift in Sources */,
 				684AE1682B10941C00FD7270 /* UIColor+Extension.swift in Sources */,
 				684098192B313A6F00697E1B /* AVPlayer+Extensions.swift in Sources */,
 				6840982B2B313A6F00697E1B /* VideoLoader.swift in Sources */,
@@ -1302,10 +1378,10 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -1336,10 +1412,10 @@
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -1413,7 +1489,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9250636D2B35C63C00DCCA5D /* SharedFrameworks */ = {
+		9260F35E2B627B86004867AE /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

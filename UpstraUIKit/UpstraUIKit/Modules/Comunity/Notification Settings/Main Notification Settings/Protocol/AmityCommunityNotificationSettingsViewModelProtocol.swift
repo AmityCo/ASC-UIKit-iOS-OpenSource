@@ -12,6 +12,7 @@ enum AmityCommunityNotificationSettingsItem: String {
     case mainToggle
     case postNavigation
     case commentNavigation
+    case storyNavigation
     
     var identifier: String {
         return self.rawValue
@@ -25,6 +26,8 @@ enum AmityCommunityNotificationSettingsItem: String {
             return AmityLocalizedStringSet.CommunityNotificationSettings.post.localizedString
         case .commentNavigation:
             return AmityLocalizedStringSet.CommunityNotificationSettings.comment.localizedString
+        case .storyNavigation:
+            return AmityLocalizedStringSet.CommunityNotificationSettings.story.localizedString
         }
     }
     
@@ -35,6 +38,8 @@ enum AmityCommunityNotificationSettingsItem: String {
         case .postNavigation:
             return nil
         case .commentNavigation:
+            return nil
+        case .storyNavigation:
             return nil
         }
     }
@@ -47,6 +52,8 @@ enum AmityCommunityNotificationSettingsItem: String {
             return AmityIconSet.CommunitySettings.iconPostSetting
         case .commentNavigation:
             return AmityIconSet.CommunitySettings.iconCommentSetting
+        case .storyNavigation:
+            return AmityIconSet.CommunitySettings.iconStorySetting
         }
     }
     

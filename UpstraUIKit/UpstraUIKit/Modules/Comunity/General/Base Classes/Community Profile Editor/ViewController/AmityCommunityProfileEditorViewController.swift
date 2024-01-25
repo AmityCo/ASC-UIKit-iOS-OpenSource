@@ -144,7 +144,7 @@ public class AmityCommunityProfileEditorViewController: AmityViewController {
     }
     
     private func setupCommunityDisplay() {
-        avatarView.placeholder = AmityIconSet.defaultCommunityAvatar
+        avatarView.placeholder = AmityIconSet.defaultCommunity
         avatarView.contentMode = .scaleAspectFill
         
         overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.4)
@@ -434,7 +434,7 @@ private extension AmityCommunityProfileEditorViewController {
                 self?.communityNameTextfield.text = community?.displayName
                 self?.communityAboutTextView.text = community?.description
                 self?.updateCommunityCategoryName(community?.category)
-                self?.avatarView.setImage(withImageURL: community?.avatarURL ?? "", size: .medium, placeholder: AmityIconSet.defaultCommunityAvatar) {
+                self?.avatarView.setImage(withImageURL: community?.avatarURL ?? "", size: .medium, placeholder: AmityIconSet.defaultCommunity) {
                     self?.avatarView.state = .idle
                 }
             }

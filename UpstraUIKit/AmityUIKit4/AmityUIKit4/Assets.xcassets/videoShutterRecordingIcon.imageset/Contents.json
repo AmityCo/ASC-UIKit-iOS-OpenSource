@@ -1,17 +1,8 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "videoShutterRecordingIcon@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "video_recording_shutter_icon.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

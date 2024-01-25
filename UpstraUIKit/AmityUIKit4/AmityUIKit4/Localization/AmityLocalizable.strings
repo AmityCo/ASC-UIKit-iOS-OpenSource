@@ -1,0 +1,23 @@
+/* 
+  AmityLocalizable.strings
+  AmityUIKit
+
+  Created by Sarawoot Khunsri on 8/6/2563 BE.
+  Copyright © 2563 Amity Communication. All rights reserved.
+*/
+
+// MARK: - Story
+
+"cancel" = "Cancel";
+"delete" = "Delete";
+"discard" = "Discard";
+
+"created_story_successfully" = "Successfully shared story";
+"crated_story_failed" = "Failed to share story";
+"delete_story_title" = "Delete this story?";
+"delete_story_message" = "This story will be permanently deleted. You’ll no longer to see and find this story";
+
+"story_deleted_toast_message" = "Story deleted";
+"failed_story_banner_message" = "Failed to upload";
+"failed_story_alert_title" = "Failed to upload story";
+"failed_story_alert_message" = "Would you like to discard or retry uploading?";

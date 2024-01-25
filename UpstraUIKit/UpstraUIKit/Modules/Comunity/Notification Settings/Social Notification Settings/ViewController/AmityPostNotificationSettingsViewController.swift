@@ -35,7 +35,14 @@ class AmityPostNotificationSettingsViewController: AmityViewController {
     }
     
     private func setupView() {
-        title = screenViewModel.type == .post ? AmityLocalizedStringSet.CommunityNotificationSettings.post.localizedString : AmityLocalizedStringSet.CommunityNotificationSettings.comment.localizedString
+        switch screenViewModel.type {
+        case .post:
+            title = AmityLocalizedStringSet.CommunityNotificationSettings.post.localizedString
+        case .comment:
+            title = AmityLocalizedStringSet.CommunityNotificationSettings.comment.localizedString
+        case .story:
+            title = AmityLocalizedStringSet.CommunityNotificationSettings.story.localizedString
+        }
         saveButton = UIBarButtonItem(title: AmityLocalizedStringSet.General.save.localizedString, style: .done, target: self, action: #selector(saveButtonDidTap))
 
         saveButton.isEnabled = false

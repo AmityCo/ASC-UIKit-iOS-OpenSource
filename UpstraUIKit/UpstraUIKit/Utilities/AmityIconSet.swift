@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 
 // Note
 // See more: https://docs.sendbird.com/ios/ui_kit_common_components#3_iconset
@@ -108,8 +109,8 @@ public struct AmityIconSet {
     
     // MARK: - User Feed
     public static var privateUserFeed = UIImage(named: "private_user_feed", in: AmityUIKitManager.bundle, compatibleWith: nil)
-    public static var defaultCommunity = UIImage(named: "default_community", in: AmityUIKitManager.bundle, compatibleWith: nil)
-    public static var defaultCommunityAvatar = UIImage(named: "default_community", in: AmityUIKitManager.bundle, compatibleWith: nil)
+    public static var defaultCommunity = AmityIconSet.applyShadeColor(to: UIImage(named: "default_community", in: AmityUIKitManager.bundle, compatibleWith: nil) ?? UIImage(), shadeColor: AmityColorSet.secondary, luminance: 0.9)
+    public static var defaultCommunityAvatar = UIImage(named: "default_community_avatar", in: AmityUIKitManager.bundle, compatibleWith: nil)
     
     // MARK: - Message
     public static var defaultMessageImage = UIImage(named: "default_message_image", in: AmityUIKitManager.bundle, compatibleWith: nil)
@@ -142,6 +143,7 @@ public struct AmityIconSet {
         public static var iconItemPostReview = UIImage(named: "icon_item_post_review", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconCommentSetting = UIImage(named: "icon_community_setting_comment", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconPostSetting = UIImage(named: "icon_community_setting_post", in: AmityUIKitManager.bundle, compatibleWith: nil)
+        public static var iconStorySetting = UIImage(named: "icon_community_setting_story", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconCommunitySettingBanned = UIImage(named: "icon_community_setting_banned", in: AmityUIKitManager.bundle, compatibleWith: nil)
     }
         
@@ -166,5 +168,42 @@ public struct AmityIconSet {
     enum CreatePost {
         public static var iconPost = UIImage(named: "icon_post", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconPoll = UIImage(named: "icon_poll", in: AmityUIKitManager.bundle, compatibleWith: nil)
+        public static var iconStory = UIImage(named: "icon_story", in: AmityUIKitManager.bundle, compatibleWith: nil)
+    }
+    
+    static func applyShadeColor(to image: UIImage, shadeColor: UIColor, luminance: CGFloat) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+        
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return image
+        }
+        
+        // Draw the original image
+        image.draw(in: CGRect(origin: .zero, size: image.size))
+        
+        var hue: CGFloat = 0
+        var saturation: CGFloat = 0
+        var alpha: CGFloat = 0
+        
+        let color: UIColor
+        if shadeColor.getHue(&hue, saturation: &saturation, brightness: nil, alpha: &alpha) {
+            color = UIColor(hue: hue, saturation: saturation, brightness: luminance, alpha: alpha)
+        } else {
+            color = .clear
+        }
+        
+        // Apply shade color
+        context.setFillColor(color.cgColor)
+        context.setBlendMode(.sourceAtop)
+        context.fill(CGRect(origin: .zero, size: image.size))
+        
+        // Get the resulting image
+        guard let shadedImage = UIGraphicsGetImageFromCurrentImageContext() else {
+            return image
+        }
+        
+        UIGraphicsEndImageContext()
+        
+        return shadedImage
     }
 }

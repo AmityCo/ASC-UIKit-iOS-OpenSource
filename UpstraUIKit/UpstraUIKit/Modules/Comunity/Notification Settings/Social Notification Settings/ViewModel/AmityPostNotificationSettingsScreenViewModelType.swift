@@ -11,6 +11,7 @@ import AmitySDK
 enum AmityCommunityNotificationSettingsType {
     case post
     case comment
+    case story
 }
 
 protocol AmitySocialNotificationSettingsScreenViewModelDelgate: AnyObject {

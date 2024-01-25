@@ -67,6 +67,7 @@ public struct AmityLocalizedStringSet {
         static let generalPhoto = "general_photo";
         static let generalAttachment = "general_attachment";
         static let generalAll = "general_all";
+        static let story = "general_story"
     }
     
     static let communitySettings = "community_settings"
@@ -302,8 +303,15 @@ public struct AmityLocalizedStringSet {
         static let descriptionNewComments = "community_notification_settings_description_new_comments"
         static let titleReplies = "community_notification_settings_title_replies"
         static let descriptionReplies = "community_notification_settings_description_replies"
+        static let titleNewStory = "community_notification_settings_title_new_story"
+        static let descriptionNewStory = "community_notification_settings_description_new_story"
+        static let titleReactsStory = "community_notification_settings_title_reacts_story"
+        static let descriptionReactsStory = "community_notification_settings_description_reacts_story"
+        static let titleNewStoryComment = "community_notification_settings_title_new_story_comment"
+        static let descriptionNewStoryComment = "community_notification_settings_description_new_story_comment"
         static let post = "community_notification_settings_post"
         static let comment = "community_notification_settings_comment"
+        static let story = "community_notification_settings_story"
         static let everyone = "community_notification_settings_everyone"
         static let onlyModerator = "community_notification_settings_only_moderator"
     }

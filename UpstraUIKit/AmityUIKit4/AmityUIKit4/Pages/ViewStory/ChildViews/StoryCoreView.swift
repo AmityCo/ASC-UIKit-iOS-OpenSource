@@ -10,19 +10,21 @@ import AVKit
 import AmitySDK
 import Combine
 
-struct StoryCoreView: View {
-    
+struct StoryCoreView: View, AmityViewIdentifiable {
     var targetName: String
     var avatar: UIImage
     var isVerified: Bool
     
     @EnvironmentObject var host: SwiftUIHostWrapper
     @EnvironmentObject var storyCollection: AmityCollection<AmityStory>
-    @ObservedObject var storyCoreViewModel: StoryCoreViewModel
+    @EnvironmentObject var storyPageViewModel: AmityStoryPageViewModel
+    @EnvironmentObject var storyCoreViewModel: StoryCoreViewModel
     
     @Binding var storySegmentIndex: Int
     @Binding var totalDuration: CGFloat
     @State private var tabIndex: Int = 0
+    @State private var muteVideo: Bool = false
+    @State private var showRetryAlert: Bool = false
     
     // TEMP: Need to implement async/await func later and check to get the correct result
     @State private var hasStoryManagePermission: Bool = StoryPermissionChecker.shared.checkUserHasManagePermission()
@@ -30,13 +32,12 @@ struct StoryCoreView: View {
     var nextStorySegment: (() -> Void)?
     var previousStorySegment: (() -> Void)?
     
-    init(storyCoreViewModel: StoryCoreViewModel, storySegmentIndex: Binding<Int>, totalDuration: Binding<CGFloat>, targetName: String, avatar: UIImage, isVerified: Bool, nextStorySegment: (() -> Void)? = nil, previousStorySegment: (() -> Void)? = nil) {
+    init(storySegmentIndex: Binding<Int>, totalDuration: Binding<CGFloat>, targetName: String, avatar: UIImage, isVerified: Bool, nextStorySegment: (() -> Void)? = nil, previousStorySegment: (() -> Void)? = nil) {
         self._storySegmentIndex = storySegmentIndex
         self._totalDuration = totalDuration
         self.targetName = targetName
         self.avatar = avatar
         self.isVerified = isVerified
-        self.storyCoreViewModel = storyCoreViewModel
         self.nextStorySegment = nextStorySegment
         self.previousStorySegment = previousStorySegment
     }
@@ -44,18 +45,42 @@ struct StoryCoreView: View {
     var body: some View {
         TabView(selection: $tabIndex) {
             ForEach(Array(storyCollection.snapshots.enumerated()), id: \.element.storyId) { index, amityStory in
-               let storyModel = Story(story: amityStory)
+                let storyModel = Story(story: amityStory)
                 
                 VStack(spacing: 0) {
                     ZStack {
                         GeometryReader { geometry in
-                               if let imageURL = storyModel.imageURL {
-                                ImageView(imageURL: imageURL, totalDuration: $totalDuration)
-                                       .frame(width: geometry.size.width, height: geometry.size.height)
+                            if let imageURL = storyModel.imageURL {
+                                ImageView(imageURL: imageURL,
+                                          totalDuration: $totalDuration,
+                                          displayMode: storyModel.imageDisplayMode,
+                                          size: geometry.size)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .overlay(
+                                    storyModel.syncState == .error ? Color.black.opacity(0.5) : nil
+                                )
                             } else if let videoURLStr = storyModel.videoURLStr,
                                       let videoURL = URL(string: videoURLStr) {
-                                VideoView(videoURL: videoURL, totalDuration: $totalDuration)
-                                    .frame(width: geometry.size.width, height: geometry.size.height)
+                                VideoView(videoURL: videoURL,
+                                          totalDuration: $totalDuration,
+                                          muteVideo: $muteVideo)
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .overlay(
+                                    storyModel.syncState == .error ? Color.black.opacity(0.5) : nil
+                                )
+                                
+                                let muteIcon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "mute_icon", of: String.self) ?? "")
+                                let unmuteIcon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "unmute_icon", of: String.self) ?? "")
+                                let color = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "background_color", of: String.self) ?? ""))
+                                Image(muteVideo ? muteIcon
+                                      : unmuteIcon)
+                                .frame(width: 32, height: 32)
+                                .background(color)
+                                .clipShape(.circle)
+                                .offset(x: 16, y: 98)
+                                .onTapGesture {
+                                    muteVideo.toggle()
+                                }
                             }
                         }
                         
@@ -69,31 +94,49 @@ struct StoryCoreView: View {
                         .offset(y: 30) // height + padding top, bottom of progressBarView
                         
                         getGestureView()
-                            .offset(y: 80) // not to overlap gesture from metadata view
+                            .offset(y: 130) // not to overlap gesture from metadata view & muteVideo view
                     }
                     
-                    getAnalyticView()
+                    if storyModel.syncState == .error {
+                        getFailedStoryBanner(tapped: {
+                            showRetryAlert.toggle()
+                        })
+                        .alert(isPresented: $showRetryAlert, content: {
+                            Alert(title: Text(AmityLocalizedStringSet.Story.failedStoryAlertTitle.localizedString),
+                                  message: Text(AmityLocalizedStringSet.Story.failedStoryAlertMessage.localizedString),
+                                  primaryButton: .cancel(),
+                                  secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: {
+                                Task {
+                                    storyCoreViewModel.playVideo = false
+                                    try await storyCoreViewModel.storyManager.deleteStory(storyId: storyModel.storyId)
+                                }
+                            }))
+                        })
+                    } else {
+                        getAnalyticView(storyModel)
+                    }
                 }
                 .onAppear {
                     // Last story already appeared on screen
                     Log.add(event: .info, "Story index: \(index) total: \(storyCollection.snapshots.count)")
-                    if index == storyCollection.snapshots.count - 1 {
-                        Log.add(event: .info, "Last Story is seen")
-                        amityStory.analytics.markAsSeen()
-                    }
+                    amityStory.analytics.markAsSeen()
                 }
                 .tag(index)
             }
             .onChange(of: storySegmentIndex) { index in
                 tabIndex = index
             }
-            .gesture(DragGesture().onChanged{ _ in})
-            .animation(nil)
-            .tabViewStyle(.page(indexDisplayMode: .never))
         }
+        .onChange(of: showRetryAlert) { value in
+            storyPageViewModel.shouldRunTimer = !value
+            storyCoreViewModel.playVideo = !value
+        }
+        .gesture(DragGesture().onChanged{ _ in})
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .animation(nil)
     }
     
-
+    
     func getMetadataView(targetName: String, avatar: UIImage, isVerified: Bool, story: Story) -> some View {
         HStack {
             ZStack(alignment: .bottomTrailing) {
@@ -102,10 +145,10 @@ struct StoryCoreView: View {
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 45, height: 45)
                     .clipShape(Circle())
-                    .padding(.leading, 20)
+                    .padding(.leading, 16)
                 
                 if hasStoryManagePermission {
-                    AmityCreateNewStoryButtonElement(componentId: .storyTabComponentId)
+                    AmityCreateNewStoryButtonElement(componentId: .storyTabComponent)
                         .frame(width: 16.0, height: 16.0)
                 }
             }
@@ -151,73 +194,52 @@ struct StoryCoreView: View {
         }
     }
     
+    @State var orginalPoint: CGPoint = .zero
     
     func getGestureView() -> some View {
-        HStack(alignment: .center, spacing: 0) {
-            Rectangle()
-                .foregroundColor(.clear)
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture()
-                        .onChanged({ value in
-                            //
-                        })
-                        .onEnded({ value in
-                            //
-                        })
-                )
-                .onTapGesture {
-                    previousStorySegment?()
-                }
-        
-            Rectangle()
-                .foregroundColor(.clear)
-                .contentShape(Rectangle())
-                .gesture(
-                    DragGesture()
-                        .onChanged({ value in
-                            //
-                        })
-                        .onEnded({ value in
-                            //
-                        })
-                )
-                .onTapGesture {
-                    nextStorySegment?()
-                }
-    
-        }
+        GestureView(onLeftTap: {
+            previousStorySegment?()
+        }, onRightTap: {
+            nextStorySegment?()
+        }, onTouchAndHoldStart: {
+            storyPageViewModel.shouldRunTimer = false
+            storyCoreViewModel.playVideo = false
+        }, onTouchAndHoldEnd: {
+            storyPageViewModel.shouldRunTimer = true
+            storyCoreViewModel.playVideo = true
+        }, onDragEnded: { _ in
+            host.controller?.dismiss(animated: true)
+        })
     }
     
     
-    func getAnalyticView() -> some View {
-        HStack(spacing: 10) {
+    func getAnalyticView(_ story: Story) -> some View {
+        HStack(alignment: .center, spacing: 10) {
             Label {
-                Text("0")
+                Text("\(story.viewCount)")
                     .font(.system(size: 15))
             } icon: {
-                Image(AmityIcon.eyeIcon.getImageResource())
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
+                let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, componentId: nil, elementId: .impressionIconElement, key: "impression_icon", of: String.self) ?? "")
+                Image(icon)
                     .frame(width: 20, height: 16)
                     .padding(.trailing, -4)
             }
             .foregroundColor(.white)
             
             Spacer()
-    
+            
             ZStack {
+                let color = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .storyCommentButtonElement, key: "background_color", of: String.self) ?? "#FFFFFF"))
                 Capsule()
-                    .fill(Color(UIColor(hex: "#292B32")))
+                    .fill(color)
                     .frame(width: 56, height: 40)
                 Label {
                     Text("0")
                         .font(.system(size: 15))
-                        
+                    
                 } icon: {
-                    Image(AmityIcon.storyCommentIcon.getImageResource())
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                    let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .storyCommentButtonElement, key: "comment_icon", of: String.self) ?? "")
+                    Image(icon)
                         .frame(width: 20, height: 16)
                         .padding(.trailing, -4)
                 }
@@ -229,17 +251,17 @@ struct StoryCoreView: View {
             }
             
             ZStack {
+                let color = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .storyReactionButtonElement, key: "background_color", of: String.self) ?? ""))
                 Capsule()
-                    .fill(Color(UIColor(hex: "#292B32")))
+                    .fill(color)
                     .frame(width: 56, height: 40)
                 Label {
                     Text("0")
                         .font(.system(size: 15))
-                        
+                    
                 } icon: {
-                    Image(AmityIcon.storyLikeIcon.getImageResource())
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                    let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .storyReactionButtonElement, key: "reaction_icon", of: String.self) ?? "")
+                    Image(icon)
                         .frame(width: 20, height: 16)
                         .padding(.trailing, -4)
                 }
@@ -250,18 +272,39 @@ struct StoryCoreView: View {
                 Log.add(event: .info, "Like Tapped")
             }
         }
-        .padding(EdgeInsets(top: 8, leading: 12, bottom: 5, trailing: 12))
-        .frame(height: 50)
+        .frame(height: 56)
+        .padding(EdgeInsets(top: 0, leading: 12, bottom: 15, trailing: 12))
         .background(Color.black)
+    }
+    
+    
+    func getFailedStoryBanner(tapped: @escaping () -> Void) -> some View {
+        HStack(alignment: .center, spacing: 0) {
+            Image(AmityIcon.statusWarningIcon.getImageResource())
+                .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 8))
+            Text(AmityLocalizedStringSet.Story.failedStoryBannerMessage.localizedString)
+                .font(.system(size: 15))
+                .foregroundColor(Color.white)
+            Spacer()
+            Button(action: {
+                tapped()
+            }, label: {
+                Image(AmityIcon.threeDotIcon.getImageResource())
+                    .padding(.trailing, 16)
+            })
+        }
+        .frame(height: 44)
+        .background(Color.red)
+        .padding(.bottom, 27)
     }
     
     
     private func timeAgoString(from date: Date) -> String {
         let currentDate = Date()
         let calendar = Calendar.current
-
+        
         let components = calendar.dateComponents([.hour, .minute], from: date, to: currentDate)
-
+        
         if let hour = components.hour, hour > 0 {
             return "\(hour) h"
         } else if let minute = components.minute, minute > 0 {
@@ -272,8 +315,8 @@ struct StoryCoreView: View {
     }
     
     private func goToStoryCreationPage(targetId: String, avatar: UIImage?) {
-        let cameraPage = AmityCameraPage(targetId: targetId, avatar: avatar)
-        let controller = SwiftUIHostingController(rootView: cameraPage)
+        let createStoryPage = AmityCreateStoryPage(targetId: targetId, avatar: avatar)
+        let controller = SwiftUIHostingController(rootView: createStoryPage)
         
         host.controller?.navigationController?.setViewControllers([controller], animated: false)
     }
@@ -281,6 +324,9 @@ struct StoryCoreView: View {
 
 // TEMP: temporary solution for Caching
 class StoryCoreViewModel: ObservableObject {
+    
+    @Published var playVideo: Bool = true
+    let storyManager = StoryManager()
     
     var disposeBag: Set<AnyCancellable> = []
     
@@ -307,12 +353,16 @@ struct ImageView: View {
     
     @EnvironmentObject var storyPageViewModel: AmityStoryPageViewModel
     
-    let imageURL: URL
-    @Binding var totalDuration: CGFloat
+    private let imageURL: URL
+    private let displayMode: ContentMode
+    private let size: CGSize
+    @Binding private var totalDuration: CGFloat
     
-    init(imageURL: URL, totalDuration: Binding<CGFloat>) {
+    init(imageURL: URL, totalDuration: Binding<CGFloat>, displayMode: ContentMode, size: CGSize) {
         self.imageURL = imageURL
         self._totalDuration = totalDuration
+        self.displayMode = displayMode
+        self.size = size
     }
     
     var body: some View {
@@ -324,15 +374,24 @@ struct ImageView: View {
                 .onDisappear {
                     storyPageViewModel.shouldRunTimer = true
                 }
-                
-        } content: { image in
+            
+        } content: { image, imageInfo in
             image
                 .resizable()
-                .aspectRatio(contentMode: .fill)
+                .aspectRatio(contentMode: displayMode)
+                .frame(width: size.width, height: size.height)
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: UIImage(cgImage: imageInfo.cgImage).averageGradientColor ?? [.black]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
         }
         .onAppear {
             totalDuration = 4.0
-            Log.add(event: .info, "TotalDuration: \(totalDuration)")
+            Log.add(event: .info, "Story TotalDuration: \(totalDuration)")
+            Log.add(event: .info, "Story ImageDisplayMode: \(displayMode)")
         }
     }
 }
@@ -340,22 +399,25 @@ struct ImageView: View {
 struct VideoView: View {
     
     @EnvironmentObject var storyPageViewModel: AmityStoryPageViewModel
+    @EnvironmentObject var storyCoreViewModel: StoryCoreViewModel
     
     private let videoURL: URL
     @Binding var totalDuration: CGFloat
+    @Binding var muteVideo: Bool
     
-    @State private var playVideo: Bool = false
     @State private var showActivityIndicator: Bool = false
     @State private var time: CMTime = .zero
     
-    init(videoURL: URL, totalDuration: Binding<CGFloat>) {
+    init(videoURL: URL, totalDuration: Binding<CGFloat>, muteVideo: Binding<Bool>) {
         self.videoURL = videoURL
         self._totalDuration = totalDuration
+        self._muteVideo = muteVideo
     }
     
     var body: some View {
-        VideoPlayer(url: videoURL, play: $playVideo, time: $time)
+        VideoPlayer(url: videoURL, play: $storyCoreViewModel.playVideo, time: $time)
             .autoReplay(false)
+            .mute(muteVideo)
             .contentMode(.scaleToFill)
             .onStateChanged({ state in
                 switch state {
@@ -366,9 +428,10 @@ struct VideoView: View {
                     storyPageViewModel.shouldRunTimer = true
                     self.totalDuration = totalDuration
                     showActivityIndicator = false
+                    Log.add(event: .info, "Story TotalDuration: \(totalDuration)")
                 case .paused(playProgress: _, bufferProgress: _): break
                 case .error(_): break
-
+                    
                 }
             })
             .overlay(
@@ -376,10 +439,10 @@ struct VideoView: View {
             )
             .onAppear {
                 time = .zero
-                playVideo = true
+                storyCoreViewModel.playVideo = true
             }
             .onDisappear {
-                playVideo = false
+                storyCoreViewModel.playVideo = false
             }
     }
 }

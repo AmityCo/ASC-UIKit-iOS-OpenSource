@@ -14,7 +14,7 @@ struct StoryCreationView: View {
     var body: some View {
         VStack {
             ZStack {
-                AmityStoryRingElement(componentId: componentId, animateRing: viewModel.animateRing)
+                AmityStoryRingElement(componentId: componentId, showRing: viewModel.animateRing, animateRing: false, showErrorRing: false)
                     .frame(width: 64, height: 64)
                 
                 Image(uiImage: viewModel.avartar ?? UIImage())

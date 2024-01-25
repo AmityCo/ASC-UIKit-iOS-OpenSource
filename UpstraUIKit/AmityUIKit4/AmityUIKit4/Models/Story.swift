@@ -7,6 +7,7 @@
 
 import Foundation
 import AmitySDK
+import SwiftUI
 
 public struct Story: Identifiable, Equatable {
     
@@ -39,7 +40,9 @@ public struct Story: Identifiable, Equatable {
     var creatorName: String
     var creatorAvatarURLStr: String
     var imageURL: URL?
+    var imageDisplayMode: ContentMode = .fill
     var videoURLStr: String?
+    var viewCount: Int
     
     init(story: AmityStory) {
         storyObject = story
@@ -60,7 +63,14 @@ public struct Story: Identifiable, Equatable {
         creatorName = story.creator?.displayName ?? ""
         creatorAvatarURLStr = story.creator?.getAvatarInfo()?.fileURL ?? ""
         if let url = story.getImageInfo()?.fileURL {
-            imageURL = URL(string: url + "?size=large")
+            if syncState == .syncing || syncState == .error {
+                imageURL = URL(string: url)
+            } else {
+                imageURL = URL(string: url + "?size=large")
+            }
+            if let displayMode = story.getImageDisplayMode() {
+                imageDisplayMode = displayMode == .fill ? ContentMode.fill : ContentMode.fit
+            }
         }
         
         let resolutions = story.availableResolution()
@@ -69,7 +79,8 @@ public struct Story: Identifiable, Equatable {
         } else  {
             videoURLStr = story.getVideoInfo()?.fileURL
         }
-    
+        
+        viewCount = story.reach
     }
     
     

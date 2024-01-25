@@ -10,10 +10,13 @@ import UIKit
 enum AmityIcon: String {
     case verifiedBadge = "verifiedBadge"
     case createStoryIcon = "createStoryIcon"
+    case errorStoryIcon = "errorStoryIcon"
     case closeIcon = "closeIcon"
     case threeDotIcon = "threeDotIcon"
+    case statusSuccessIcon = "statusSuccessIcon"
+    case statusWarningIcon = "statusWarningIcon"
     
-    // AmityCameraPage Icons
+    // AmityCreateStoryPage Icons
     case backgroundedCloseIcon = "backgroundedCloseIcon"
     case galleryIcon = "galleryIcon"
     case flipCameraIcon = "flipCameraIcon"
@@ -23,29 +26,21 @@ enum AmityIcon: String {
     case videoShutterIcon = "videoShutterIcon"
     case videoShutterRecordingIcon = "videoShutterRecordingIcon"
     
-    // AmityStoryCreationPage Icons
+    // AmityDraftStoryPage Icons
     case backIcon = "backIcon"
     case nextIcon = "nextIcon"
+    case aspectRatioIcon = "aspectRatioIcon"
     
+    // AmityViewStoryPage Icons
     case verifiedWhiteBadge = "verifiedWhiteBadge"
     case eyeIcon = "eyeIcon"
     case storyLikeIcon = "storyLikeIcon"
     case storyCommentIcon = "storyCommentIcon"
     case avatarPlaceholder = "avatarPlaceholder"
     case defaultCommunity = "defaultCommunity"
-    
-    case demoImage1 = "demoImage1"
-    case demoImage2 = "demoImage2"
-    case demoImage3 = "demoImage3"
-    case demoImage4 = "demoImage4"
-    
-    case demoCat1 = "demoCat1"
-    case demoCat2 = "demoCat2"
-    case demoCat3 = "demoCat3"
-    
-    case demoColor1 = "demoColor1"
-    case demoColor2 = "demoColor2"
-    
+    case muteIcon = "muteIcon"
+    case unmuteIcon = "unmuteIcon"
+    case trashBinIcon = "trashBinIcon"
     
     func getImage() -> UIImage? {
         return UIImage(named: self.rawValue, in: AmityUIKit4Manager.bundle, compatibleWith: nil)

@@ -54,6 +54,7 @@
 "general_photo" = "Photo";
 "general_attachment" = "Attachment";
 "general_all" = "All";
+"general_story" = "Story";
 
 "title_placeholder" = "Title";
 "description_placeholder" = "Description";
@@ -282,8 +283,15 @@
 "community_notification_settings_description_new_comments" = "Receive notifications when someone comment to your posts in this community.";
 "community_notification_settings_title_replies" = "Replies";
 "community_notification_settings_description_replies" = "Receive notifications when someone comment to your comments in this community.";
+"community_notification_settings_title_new_story" = "New stories";
+"community_notification_settings_description_new_story" = "Receive notifications when someone creates a new story in this community.";
+"community_notification_settings_title_reacts_story" = "Story reactions";
+"community_notification_settings_description_reacts_story" = "Receive notifications when someone reacts to your story in this community.";
+"community_notification_settings_title_new_story_comment" = "Story comments";
+"community_notification_settings_description_new_story_comment" = "Receive notifications when someone comments on your story in this community.";
 "community_notification_settings_post" = "Posts";
 "community_notification_settings_comment" = "Comments";
+"community_notification_settings_story" = "Stories";
 "community_notification_settings_everyone" = "Everyone";
 "community_notification_settings_only_moderator" = "Only moderator";
 

@@ -28,18 +28,18 @@
         "resolution": "720p"
       },
       "camera_page/*/close_button": {
-        "close_icon": "close.png"
+        "close_icon": "backgroundedCloseIcon"
       },
 
 
       "create_story_page/*/*": { },
       "create_story_page/*/back_button": {
-        "back_icon": "back.png",
-        "background_color": "#1234DB"
+        "back_icon": "backIcon",
+        "background_color": "#6A6A6B"
       },
       "create_story_page/*/aspect_ratio_button": {
-        "aspect_ratio_icon": "aspect_ratio.png",
-        "background_color": "1234DB"
+        "aspect_ratio_icon": "aspectRatioIcon",
+        "background_color": "#6A6A6B"
       },
       "create_story_page/*/story_hyperlink_button": {
        "hyperlink_button_icon": "hyperlink_button.png",
@@ -50,42 +50,42 @@
         "background_color": "#1234DB"
        },
       "create_story_page/*/share_story_button": {
-        "share_icon": "share_story_button.png",
-        "background_color": "#1234DB",
+        "share_icon": "nextIcon",
+        "background_color": "#FFFFFF",
         "hide_avatar": false
       },
 
 
       "story_page/*/*": {},
       "story_page/*/progress_bar": {
-        "progress_color": "#UD1234",
-        "background_color": "#AB1234"
+        "progress_color": "#FFFFFF",
+        "background_color": "#FFFFFF"
       },
       "story_page/*/overflow_menu": {
-        "overflow_menu_icon": "threeDot.png"
+        "overflow_menu_icon": "threeDotIcon"
       },
       "story_page/*/close_button": {
-        "close_icon": "close.png"
+        "close_icon": "closeIcon"
       },
       "story_page/*/story_impression_button": {
-        "impression_icon": "impressionIcon.png"
+        "impression_icon": "eyeIcon"
       },
       "story_page/*/story_comment_button": {
-        "comment_icon": "comment.png",
-        "background_color": "#1234DD"
+        "comment_icon": "storyCommentIcon",
+        "background_color": "#292B32"
       },
       "story_page/*/story_reaction_button": {
-        "reaction_icon": "like.png",
-        "background_color": "#1243EE"
+        "reaction_icon": "storyLikeIcon",
+        "background_color": "#292B32"
       },
       "story_page/*/create_new_story_button": {
         "create_new_story_icon": "plus.png",
         "background_color": "#1243EE"
       },
       "story_page/*/speaker_button": {
-        "mute_icon": "mute.png",
-        "unmute_icon": "unmute.png",
-        "background_color": "#1243EE"
+        "mute_icon": "muteIcon",
+        "unmute_icon": "unmuteIcon",
+        "background_color": "#6A6A6B"
       },
 
       "*/edit_comment_component/*": {
@@ -148,7 +148,7 @@
       
       
       "*/*/close_button": {
-        "close_icon": "close.png"
+        "close_icon": "closeIcon"
       }
     }
   }

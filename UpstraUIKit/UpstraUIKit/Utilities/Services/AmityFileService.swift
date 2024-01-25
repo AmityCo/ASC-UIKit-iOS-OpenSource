@@ -137,6 +137,20 @@ class AmityFileService {
         
     }
     
+    @MainActor
+    func loadImage(imageURL: String, size: AmityMediaSize, optimisticLoad: Bool = false) async throws -> UIImage {
+        return try await withCheckedThrowingContinuation { continuation in
+            loadImage(imageURL: imageURL, size: size) { result in
+                switch result {
+                case .success(let image):
+                    continuation.resume(returning: image)
+                case .failure(let error):
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
+    }
+    
     func loadFile(fileURL: String, completion: ((Result<Data, Error>) -> Void)?) {
         
         guard let fileRepository = fileRepository else {

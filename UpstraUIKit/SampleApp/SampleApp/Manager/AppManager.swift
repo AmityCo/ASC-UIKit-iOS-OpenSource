@@ -53,8 +53,9 @@ class AppManager {
         }
         
         // Share client to the new UIKit
+        #if canImport(AmityUIKit4)
         AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
-        
+        #endif
     }
     
     func register(withUserId userId: String) {

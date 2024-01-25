@@ -11,6 +11,7 @@ import AmitySDK
 
 struct ProgressBarView: View {
     let spacing: CGFloat = 3.0
+    let pageId: PageId
     
     @ObservedObject var progressBarViewModel: ProgressBarViewModel
     
@@ -18,7 +19,7 @@ struct ProgressBarView: View {
         GeometryReader { geometry in
             HStack(spacing: spacing) {
                 ForEach(0..<progressBarViewModel.progressArray.count, id: \.self) { index in
-                    AmityProgressBarElement(progressBarViewModel: progressBarViewModel.progressArray[index])
+                    AmityProgressBarElement(pageId: pageId, progressBarViewModel: progressBarViewModel.progressArray[index])
                 }
                 .onAppear {
                     Log.add(event: .info, "ProgressBar Stack Appeared")

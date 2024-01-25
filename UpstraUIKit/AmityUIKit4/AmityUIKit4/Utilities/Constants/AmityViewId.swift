@@ -8,19 +8,32 @@
 import Foundation
 
 public enum PageId: String {
-    case storyCreationPage = "select_target_page"
+    case storyCreationPage = "create_story_page"
     case storyPage = "story_page"
     case cameraPage = "camera_page"
 }
 
 public enum ComponentId: String {
     case mock = "mock"
-    case storyTabComponentId = "story_tab_component"
+    case storyTabComponent = "story_tab_component"
 }
 
 public enum ElementId: String {
-    case storyRingElementId = "story_ring"
-    case createNewStoryButtonElementId = "create_new_story_button"
-    case progressBarElementId = "progress_bar"
+    // Story Tab Component
+    case storyRingElement = "story_ring"
+    case createNewStoryButtonElement = "create_new_story_button"
+    
+    // View Story Page
+    case progressBarElement = "progress_bar"
+    case closeButtonElement = "close_button"
+    case overflowMenuElement = "overflow_menu"
+    case impressionIconElement = "story_impression_button"
+    case storyCommentButtonElement = "story_comment_button"
+    case storyReactionButtonElement = "story_reaction_button"
+    case muteUnmuteButtonElement = "speaker_button"
+    
+    // Draft Story Page
+    case backButtonElement = "back_button"
+    case aspectRatioButtonElement = "aspect_ratio_button"
+    case shareStoryButtonElement = "share_story_button"
 }
-

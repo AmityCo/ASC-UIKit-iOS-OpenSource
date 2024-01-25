@@ -184,16 +184,16 @@ final class AmityUIKitManagerInternal: NSObject {
     }
     
     func setupUIKitBehaviour() {
-        // CameraPage
-        let cameraPageBehaviour = CameraPageBehavior()
-        behavior.cameraPageBehaviour = cameraPageBehaviour
+        // CreateStoryPage
+        let createStoryPageBehaviour = AmityCreateStoryPageBehaviour()
+        behavior.createStoryPageBehaviour = createStoryPageBehaviour
         
         // StoryCreationPage
-        let storyCreationPageBehaviour = StoryCreationPageBehaviour()
-        behavior.storyCreationPageBehaviour = storyCreationPageBehaviour
+        let draftStoryPageBehaviour = AmityDraftStoryPageBehaviour()
+        behavior.draftStoryPageBehaviour = draftStoryPageBehaviour
         
         // StoryTabComponent
-        let storyTabComponentBehaviour = StoryTabComponentBehaviour()
+        let storyTabComponentBehaviour = AmityStoryTabComponentBehaviour()
         behavior.storyTabComponentBehaviour = storyTabComponentBehaviour
     
     }

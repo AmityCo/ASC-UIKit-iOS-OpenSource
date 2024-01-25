@@ -1,17 +1,8 @@
 {
   "images" : [
     {
-      "idiom" : "iphone",
-      "scale" : "1x"
-    },
-    {
-      "idiom" : "iphone",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "Checkmark.png",
-      "idiom" : "iphone",
-      "scale" : "3x"
+      "filename" : "checkmark_icon.svg",
+      "idiom" : "iphone"
     }
   ],
   "info" : {

@@ -25,6 +25,14 @@ extension AmityCommunityNotificationSettings {
         return commentCreated || commentReacted || commentReplied
     }
     
+    // A flag for checking if story event on community level is enabled
+    var isStoryNetworkEnabled: Bool {
+        let storyCreated = events.first(where: { $0.eventType == .storyCreated })?.isNetworkEnabled ?? false
+        let storyReacted = events.first(where: { $0.eventType == .storyReacted })?.isNetworkEnabled ?? false
+        let storyCommentCreated = events.first(where: { $0.eventType == .storyCommentCreated })?.isNetworkEnabled ?? false
+        return storyCreated || storyReacted || storyCommentCreated
+    }
+    
     // A flag for checking if social module on community level is enabled
     var isSocialNetworkEnabled: Bool {
         return isPostNetworkEnabled || isCommentNetworkEnabled

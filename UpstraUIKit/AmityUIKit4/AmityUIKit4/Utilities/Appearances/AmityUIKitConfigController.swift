@@ -7,13 +7,6 @@
 
 import Foundation
 
-enum ConfigType {
-    case page(String)
-    case component(String)
-    case element(String)
-}
-
-
 class AmityUIKitConfigController {
     static let shared = AmityUIKitConfigController()
     private var config: [String: Any] = [:]
@@ -51,43 +44,28 @@ class AmityUIKitConfigController {
     }
     
     
-    func getConfig(ofType: ConfigType) -> [String: Any] {
-        let customizationConfig = config["customizations"] as? [String: Any]
+    func getConfig(configId: String) -> [String: Any] {
+        let id = configId.components(separatedBy: "/")
         
-        switch ofType {
-            
-        case .page(let configId):
-            if let customizationConfig,
-               let config = customizationConfig[configId] as? [String: Any] {
+        guard id.count == 3, let customizationConfig = config["customizations"] as? [String: Any] else {
+            return [:]
+        }
+        
+        // normal config
+        if let config = customizationConfig[configId] as? [String: Any] {
+            return config
+        }
+        
+        // wild card config
+        if id[1] != "*" {
+            // component wildcard config
+            if let config = customizationConfig["*/\(id[1])/*"] as? [String: Any] {
                 return config
             }
-        
-        case .component(let configId):
-            if let customizationConfig,
-               let config = customizationConfig[configId] as? [String: Any] {
+        } else if id[2] != "*" {
+            // element wildcard config
+            if let config = customizationConfig["*/*/\(id[2])"] as? [String: Any] {
                 return config
-            } else {
-                // Wildcard config
-                let id = configId.components(separatedBy: "/")
-                if id.count == 3,
-                   let customizationConfig,
-                   let config = customizationConfig[id[1]] as? [String: Any] {
-                    return config
-                }
-            }
-            
-        case .element(let configId):
-            if let customizationConfig,
-               let config = customizationConfig[configId] as? [String: Any] {
-                return config
-            } else {
-                // Wildcard config
-                let id = configId.components(separatedBy: "/")
-                if id.count == 3,
-                   let customizationConfig,
-                   let config = customizationConfig[id[2]] as? [String: Any] {
-                    return config
-                }
             }
         }
         

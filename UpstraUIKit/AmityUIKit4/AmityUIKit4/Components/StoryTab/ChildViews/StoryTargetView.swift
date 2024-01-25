@@ -10,23 +10,35 @@ import SwiftUI
 struct StoryTargetView<Content: View>: View {
     
     let componentId: ComponentId
-    @ViewBuilder let cornerImage: () -> Content
-    @ObservedObject var storyTarget: StoryTarget
+    @ViewBuilder private let cornerImage: () -> Content
+    @ObservedObject private var storyTarget: StoryTarget
+    private let storyTargetName: String
     
-    init(componentId: ComponentId, storyTarget: StoryTarget, @ViewBuilder cornerImage: @escaping () -> Content) {
+    init(componentId: ComponentId, storyTarget: StoryTarget, storyTargetName: String? = nil, @ViewBuilder cornerImage: @escaping () -> Content) {
         self.componentId = componentId
         self.storyTarget = storyTarget
         self.cornerImage = cornerImage
+        
+        if let storyTargetName {
+            self.storyTargetName = storyTargetName
+        } else {
+            self.storyTargetName = storyTarget.targetName
+        }
     }
     
     var body: some View {
-        getStoryView(avatar: storyTarget.placeholderImage, name: storyTarget.targetName, animateRing: storyTarget.hasUnseen, cornerImage: cornerImage)
+        getStoryView(avatar: storyTarget.avatar,
+                     name: storyTargetName,
+                     showRing: storyTarget.hasUnseenStory,
+                     animateRing: storyTarget.hasSyncingStory,
+                     showErrorRing: storyTarget.hasFailedStory,
+                     cornerImage: cornerImage)
     }
     
-    private func getStoryView(avatar: UIImage?, name: String, animateRing: Bool, cornerImage: () -> Content) -> some View {
+    private func getStoryView(avatar: UIImage?, name: String, showRing: Bool, animateRing: Bool, showErrorRing: Bool, cornerImage: () -> Content) -> some View {
         return VStack {
             ZStack {
-                AmityStoryRingElement(componentId: componentId, animateRing: animateRing)
+                AmityStoryRingElement(componentId: componentId, showRing: showRing, animateRing: animateRing, showErrorRing: showErrorRing)
                     .frame(width: 64, height: 64)
                 
                 Image(uiImage: avatar ?? UIImage())
@@ -34,8 +46,13 @@ struct StoryTargetView<Content: View>: View {
                     .frame(width: 56, height: 56)
                     .clipShape(Circle())
                 
-                cornerImage()
-                
+                if showErrorRing {
+                    Image(AmityIcon.errorStoryIcon.getImageResource())
+                        .frame(width: 22.0, height: 22.0)
+                        .offset(x: 22, y: 22)
+                } else {
+                    cornerImage()
+                }
             }
             
             Text(name)
