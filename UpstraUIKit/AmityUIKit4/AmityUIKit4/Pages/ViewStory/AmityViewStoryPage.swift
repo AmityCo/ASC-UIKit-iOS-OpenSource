@@ -60,7 +60,7 @@ public struct AmityViewStoryPage: AmityPageView {
                             StoryCoreView(storySegmentIndex: $storySegmentIndex,
                                           totalDuration: $totalDuration,
                                           targetName: storyTarget.targetName,
-                                          avatar: storyTarget.avatar ?? AmityIcon.defaultCommunity.getImage()!, 
+                                          avatar: storyTarget.avatar ?? AmityIcon.defaultCommunityAvatar.getImage()!, 
                                           isVerified: storyTarget.isVerifiedTarget,
                                           nextStorySegment: {moveStorySegment(direction: .forward)},
                                           previousStorySegment: {moveStorySegment(direction: .backward)})
@@ -166,6 +166,7 @@ public struct AmityViewStoryPage: AmityPageView {
         .environment(\.urlImageService, urlImageService)
         .environment(\.urlImageOptions, URLImageOptions(loadOptions: [ .loadImmediately ]))
         .background(Color.black.ignoresSafeArea())
+        .ignoresSafeArea(.keyboard)
     }
     
     
@@ -307,6 +308,18 @@ class AmityStoryPageViewModel: ObservableObject {
     func deleteStory(storyId: String) async throws {
         try await storyManager.deleteStory(storyId: storyId)
         toastMessage = AmityLocalizedStringSet.Story.storyDeletedToastMessage.localizedString
+    }
+    
+    @MainActor 
+    @discardableResult
+    func addReaction(storyId: String) async throws -> Bool {
+        try await storyManager.addReaction(storyId: storyId)
+    }
+    
+    @MainActor
+    @discardableResult
+    func removeReaction(storyId: String) async throws -> Bool {
+        try await storyManager.removeReaction(storyId: storyId)
     }
     
 }

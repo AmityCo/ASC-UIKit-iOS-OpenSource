@@ -27,6 +27,7 @@ struct AmityCommunityModel {
     var categoryId: String?
     let avatarURL: String
     let isPostReviewEnabled: Bool
+    let isStoryCommentsAllowed: Bool
     let participation: AmityCommunityParticipation
     
     var object: AmityCommunity
@@ -51,6 +52,7 @@ struct AmityCommunityModel {
         self.avatarURL = object.avatar?.fileURL ?? ""
         self.participation = object.participation
         self.isPostReviewEnabled = object.isPostReviewEnabled
+        self.isStoryCommentsAllowed = object.storySettings.allowComment
     }
     
     /// Returns pending post count.

@@ -151,7 +151,7 @@ class AmityStoryTabComponentViewModel: ObservableObject {
                     let avatar = try await AmityUIKitManagerInternal.shared.fileService.loadImage(imageURL: community.avatar?.fileURL ?? "", size: .medium)
                     await loadCommunityStoryTarget(community: community, avatar: avatar)
                 } catch {
-                    await loadCommunityStoryTarget(community: community, avatar: AmityIcon.defaultCommunity.getImage())
+                    await loadCommunityStoryTarget(community: community, avatar: AmityIcon.defaultCommunityAvatar.getImage())
                 }
                 
             }

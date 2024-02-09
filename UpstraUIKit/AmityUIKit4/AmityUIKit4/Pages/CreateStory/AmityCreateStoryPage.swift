@@ -164,6 +164,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                 .frame(width: 72, height: 72)
                 .offset(x: 0, y: -32)
         }
+        .buttonStyle(.plain)
     }
     
     

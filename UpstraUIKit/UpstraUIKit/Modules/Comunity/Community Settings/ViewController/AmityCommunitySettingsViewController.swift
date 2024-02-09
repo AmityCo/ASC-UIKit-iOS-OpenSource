@@ -81,6 +81,9 @@ final class AmityCommunitySettingsViewController: AmityViewController {
             case .postReview:
                 let vc = AmityPostReviewSettingsViewController.make(communityId: community.communityId)
                 navigationController?.pushViewController(vc, animated: true)
+            case .storyComment:
+                let vc = AmityStoryCommentSettingsViewController.make(communityId: community.communityId)
+                navigationController?.pushViewController(vc, animated: true)
             default:
                 break
             }

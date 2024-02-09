@@ -42,12 +42,12 @@
         "background_color": "#6A6A6B"
       },
       "create_story_page/*/story_hyperlink_button": {
-       "hyperlink_button_icon": "hyperlink_button.png",
-       "background_color": "#1234DB"
+       "hyperlink_button_icon": "hyperLinkIcon",
+       "background_color": "#6A6A6B"
       },
       "create_story_page/*/hyper_link": {
-        "hyper_link_icon": "hyper_link.png",
-        "background_color": "#1234DB"
+        "hyper_link_icon": "hyperLinkBlueIcon",
+        "background_color": "#EBECEF"
        },
       "create_story_page/*/share_story_button": {
         "share_icon": "nextIcon",

@@ -146,8 +146,8 @@ class AppManager {
             return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RegisterNavigationController")
         }
 
-//        var cameraPage = AmityCameraPage()
-//        let hostController = SwiftUIHostingController(rootView: cameraPage)
+//        var component = AmityCommentTrayComponent(referenceId: "65ba085a9e0c1cf2ee80cfcb", referenceType: .story)
+//        let hostController = SwiftUIHostingController(rootView: component)
 //        
 //        return hostController
     }

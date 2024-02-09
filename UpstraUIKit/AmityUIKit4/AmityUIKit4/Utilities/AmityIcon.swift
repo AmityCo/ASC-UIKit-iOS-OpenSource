@@ -12,9 +12,13 @@ enum AmityIcon: String {
     case createStoryIcon = "createStoryIcon"
     case errorStoryIcon = "errorStoryIcon"
     case closeIcon = "closeIcon"
+    case grayCloseIcon = "grayCloseIcon"
     case threeDotIcon = "threeDotIcon"
     case statusSuccessIcon = "statusSuccessIcon"
     case statusWarningIcon = "statusWarningIcon"
+    case defaultCommunityAvatar = "defaultCommunityAvatar"
+    case flagIcon = "flagIcon"
+    case lockIcon = "lockIcon"
     
     // AmityCreateStoryPage Icons
     case backgroundedCloseIcon = "backgroundedCloseIcon"
@@ -30,6 +34,10 @@ enum AmityIcon: String {
     case backIcon = "backIcon"
     case nextIcon = "nextIcon"
     case aspectRatioIcon = "aspectRatioIcon"
+    case hyperLinkIcon = "hyperLinkIcon"
+    case hyperLinkBlueIcon = "hyperLinkBlueIcon"
+    case trashBinRedIcon = "trashBinRedIcon"
+    case likeReactionIcon = "likeReactionIcon"
     
     // AmityViewStoryPage Icons
     case verifiedWhiteBadge = "verifiedWhiteBadge"
@@ -41,6 +49,20 @@ enum AmityIcon: String {
     case muteIcon = "muteIcon"
     case unmuteIcon = "unmuteIcon"
     case trashBinIcon = "trashBinIcon"
+    
+    
+    // AmityCommentTrayComponent Icons
+    case meetballIcon = "meetballIcon"
+    case replyArrowIcon = "replyArrowIcon"
+    case deletedMessageIcon = "deletedMessageIcon"
+    case editCommentIcon = "editCommentIcon"
+    case moderatorBadgeIcon = "moderatorBadgeIcon"
+    
+    
+    func getURL() -> URL {
+        let path = AmityUIKit4Manager.bundle.path(forResource: self.rawValue, ofType: ".svg")
+        return URL(fileURLWithPath: path ?? "")
+    }
     
     func getImage() -> UIImage? {
         return UIImage(named: self.rawValue, in: AmityUIKit4Manager.bundle, compatibleWith: nil)
@@ -57,4 +79,5 @@ enum AmityIcon: String {
     static func getImageResource(named: String) -> ImageResource {
         return ImageResource(name: named, bundle: AmityUIKit4Manager.bundle)
     }
+    
 }

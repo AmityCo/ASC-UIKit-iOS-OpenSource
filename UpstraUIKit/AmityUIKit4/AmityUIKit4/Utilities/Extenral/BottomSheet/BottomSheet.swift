@@ -12,11 +12,12 @@ import SwiftUI
 public struct BottomSheet<Content: View>: View {
     
     private var dragToDismissThreshold: CGFloat { height * 0.2 }
-    private var grayBackgroundOpacity: Double { isPresented ? (0.4 - Double(draggedOffset)/600) : 0 }
+    private var grayBackgroundOpacity: Double { isPresented ? showGrayBackground ? (0.4 - Double(draggedOffset)/600) : 0 : 0 }
     
     @State private var draggedOffset: CGFloat = 0
     @State private var previousDragValue: DragGesture.Value?
-
+    @State private var yOffset: CGFloat = UIScreen.main.bounds.height
+    
     @Binding var isPresented: Bool
     private let height: CGFloat
     private let topBarHeight: CGFloat
@@ -27,6 +28,7 @@ public struct BottomSheet<Content: View>: View {
     private let showTopIndicator: Bool
     private let animation: Animation
     private let onDismiss: (() -> Void)?
+    private let showGrayBackground: Bool
     
     public init(
         isPresented: Binding<Bool>,
@@ -38,6 +40,7 @@ public struct BottomSheet<Content: View>: View {
         showTopIndicator: Bool,
         animation: Animation = .easeInOut(duration: 0.3),
         onDismiss: (() -> Void)? = nil,
+        showGrayBackground: Bool = true,
         @ViewBuilder content: () -> Content
     ) {
         self.topBarBackgroundColor = topBarBackgroundColor
@@ -53,6 +56,7 @@ public struct BottomSheet<Content: View>: View {
         self.showTopIndicator = showTopIndicator
         self.animation = animation
         self.onDismiss = onDismiss
+        self.showGrayBackground = showGrayBackground
         self.content = content()
     }
     
@@ -61,6 +65,7 @@ public struct BottomSheet<Content: View>: View {
             if geometry.size != .zero {
                 ZStack {
                     self.fullScreenLightGrayOverlay()
+                        .offset(y: -50)
                     VStack(spacing: 0) {
                         self.topBar(geometry: geometry)
                         VStack(spacing: -8) {
@@ -73,12 +78,19 @@ public struct BottomSheet<Content: View>: View {
                     .background(self.contentBackgroundColor)
                     .cornerRadius(self.topBarCornerRadius, corners: [.topLeft, .topRight])
                     .animation(animation)
-                    .offset(y: self.isPresented ? (geometry.size.height/2 - sheetHeight(in: geometry)/2 + geometry.safeAreaInsets.bottom + self.draggedOffset) : (geometry.size.height/2 + sheetHeight(in: geometry)/2 + geometry.safeAreaInsets.bottom))
+                    .offset(y: yOffset)
+                }
+                .onChange(of: isPresented) { value in
+                    yOffset = getYOffset(geometry, value)
                 }
             } else {
                 EmptyView()
             }
         }
+    }
+    
+    fileprivate func getYOffset(_ geometry: GeometryProxy, _ isPresented: Bool) -> CGFloat {
+        return isPresented ? (geometry.size.height/2 - sheetHeight(in: geometry)/2 + geometry.safeAreaInsets.bottom + self.draggedOffset) : (geometry.size.height/2 + sheetHeight(in: geometry)/2 + geometry.safeAreaInsets.bottom)
     }
     
     fileprivate func sheetHeight(in geometry: GeometryProxy) -> CGFloat {

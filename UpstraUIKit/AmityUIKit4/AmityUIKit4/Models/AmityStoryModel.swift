@@ -1,5 +1,5 @@
 //
-//  AmityStory.swift
+//  AmityStoryModel.swift
 //  AmityUIKit4
 //
 //  Created by Zay Yar Htun on 12/12/23.
@@ -9,11 +9,11 @@ import Foundation
 import AmitySDK
 import SwiftUI
 
-public struct Story: Identifiable, Equatable {
+public struct AmityStoryModel: Identifiable, Equatable {
     
     let storyObject: AmityStory
     
-    public static func == (lhs: Story, rhs: Story) -> Bool {
+    public static func == (lhs: AmityStoryModel, rhs: AmityStoryModel) -> Bool {
         return lhs.id == rhs.id
     }
     
@@ -43,6 +43,15 @@ public struct Story: Identifiable, Equatable {
     var imageDisplayMode: ContentMode = .fill
     var videoURLStr: String?
     var viewCount: Int
+    var storyItems: [AmityStoryItem]
+    var myReactions: [ReactionType]
+    var reactionCount: Int
+    var commentCount: Int
+    var storyTarget: AmityStoryTarget?
+    
+    var isLiked: Bool {
+        myReactions.contains(.like)
+    }
     
     init(story: AmityStory) {
         storyObject = story
@@ -81,6 +90,11 @@ public struct Story: Identifiable, Equatable {
         }
         
         viewCount = story.reach
+        storyItems = story.items
+        myReactions = story.myReactions.compactMap(ReactionType.init)
+        reactionCount = story.reactionsCount
+        commentCount = story.commentsCount
+        storyTarget = story.storyTarget
     }
     
     

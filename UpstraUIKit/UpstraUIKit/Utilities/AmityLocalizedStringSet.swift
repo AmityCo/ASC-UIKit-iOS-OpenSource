@@ -274,6 +274,7 @@ public struct AmityLocalizedStringSet {
         static let itemTitleMembers = "community_settings_item_title_members"
         static let itemTitleNotifications = "community_settings_item_title_notifications"
         static let itemTitlePostReview = "community_settings_item_title_post_review"
+        static let itemTitleStoryComments = "community_settings_item_title_story_comments"
         static let itemTitleLeaveCommunity = "community_settings_item_title_leave_community"
         static let itemTitleCloseCommunity = "community_settings_item_title_close_community"
         static let itemDescCloseCommunity = "community_settings_item_desc_close_community"
@@ -407,6 +408,14 @@ public struct AmityLocalizedStringSet {
         static let hudTitleTurnOffPostReview = "post_review_settings_hud_title_turn_off_post_review"
         static let alertFailTitleTurnOn = "post_review_settings_alert_fail_title_turn_on"
         static let alertFailTitleTurnOff = "post_review_settings_alert_fail_title_turn_off"
+    }
+    
+    enum StoryCommentSettings {
+        static let title = "story_comment_settings_title"
+        static let itemTitleStoryComment = "story_comment_settings_item_title_allow_comments"
+        static let itemDescStoryComment = "story_comment_settings_item_desc_allow_comments"
+        static let alertFailTitleTurnOn = "story_comment_settings_allow_comments_alert_fail_title_turn_on"
+        static let alertFailTitleTurnOff = "story_comment_settings_allow_comments_alert_fail_title_turn_off"
     }
     
     // MARK: - Modal

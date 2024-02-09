@@ -15,6 +15,7 @@ enum AmityCommunitySettingsItem: String {
     case notification
     case communityPermissionHeader
     case postReview
+    case storyComment
     case leaveCommunity
     case closeCommunity
     
@@ -36,6 +37,8 @@ enum AmityCommunitySettingsItem: String {
             return AmityLocalizedStringSet.CommunitySettings.itemHeaderCommunityPermissions.localizedString
         case .postReview:
             return AmityLocalizedStringSet.CommunitySettings.itemTitlePostReview.localizedString
+        case .storyComment:
+            return AmityLocalizedStringSet.CommunitySettings.itemTitleStoryComments.localizedString
         case .leaveCommunity:
             return AmityLocalizedStringSet.CommunitySettings.itemTitleLeaveCommunity.localizedString
         case .closeCommunity:
@@ -62,6 +65,8 @@ enum AmityCommunitySettingsItem: String {
             return AmityIconSet.CommunitySettings.iconItemNotification
         case .postReview:
             return AmityIconSet.CommunitySettings.iconItemPostReview
+        case .storyComment:
+            return AmityIconSet.CommunitySettings.iconStorySetting
         default:
             return nil
         }

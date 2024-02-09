@@ -26,6 +26,7 @@ public struct AmityDraftStoryPage: AmityPageView {
     @State private var animateActivityIndicator: Bool = false
     @State private var userInteractionEnabled: Bool = true
     @State private var isAlertShown = false
+    @State private var showHyperLinkSheet: Bool = false
     
     public init(targetId: String, avatar: UIImage?, mediaType: StoryMediaType) {
         self._viewModel = StateObject(wrappedValue: AmityDraftStoryPageViewModel(targetId: targetId, avatar: avatar, mediaType: mediaType))
@@ -44,41 +45,76 @@ public struct AmityDraftStoryPage: AmityPageView {
                             )
                     }
                     
-                    HStack {
-                        Button(action: {
-                            isAlertShown = true
-                        }, label: {
-                            Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .backButtonElement, key: "back_icon", of: String.self) ?? ""))
-                                .frame(width: 32, height: 32)
-                                .background(Color(UIColor(hex: getElementConfig(elementId: .backButtonElement, key: "background_color", of: String.self) ?? "")))
-                                .clipShape(.circle)
-                        })
-                        .buttonStyle(.plain)
-                        .alert(isPresented: $isAlertShown, content: {
-                            Alert(title: Text("Discard this story?"), message: Text("The story will be permanently deleted. It cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Discard"), action: {
-                                host.controller?.navigationController?.popViewController(animated: true)
-                            }))
-                        })
-                        Spacer()
-                        
-                        if case .image = viewModel.storyMediaType {
+                    VStack(alignment: .center) {
+                        HStack {
+                            Button(action: {
+                                isAlertShown = true
+                            }, label: {
+                                Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .backButtonElement, key: "back_icon", of: String.self) ?? ""))
+                                    .frame(width: 32, height: 32)
+                                    .background(Color(UIColor(hex: getElementConfig(elementId: .backButtonElement, key: "background_color", of: String.self) ?? "")))
+                                    .clipShape(.circle)
+                            })
+                            .buttonStyle(.plain)
+                    
+                            Spacer()
+                            
+                            if case .image = viewModel.storyMediaType {
+                                Button {
+                                    previewDisplayMode = previewDisplayMode == .fill ? .fit : .fill
+                                } label: {
+                                    Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .aspectRatioButtonElement, key: "aspect_ratio_icon", of: String.self) ?? ""))
+                                        .frame(width: 32, height: 32)
+                                        .background(Color(UIColor(hex: getElementConfig(elementId: .aspectRatioButtonElement, key: "background_color", of: String.self) ?? "")))
+                                        .clipShape(.circle)
+                                }
+                            }
+                            
                             Button {
-                                previewDisplayMode = previewDisplayMode == .fill ? .fit : .fill
+                                guard viewModel.hyperLinkConfigModel.url.isEmpty else {
+                                    Toast.showToast(style: .warning, message: "Can’t add more than one link to your story.")
+                                    return
+                                }
+                                showHyperLinkSheet = true
                             } label: {
-                                Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .aspectRatioButtonElement, key: "aspect_ratio_icon", of: String.self) ?? ""))
+                                Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .hyperLinkButtonElement, key: "hyperlink_button_icon", of: String.self) ?? ""))
                                     .frame(width: 32, height: 32)
                                     .background(Color(UIColor(hex: getElementConfig(elementId: .aspectRatioButtonElement, key: "background_color", of: String.self) ?? "")))
                                     .clipShape(.circle)
                             }
                         }
+                        .padding(16)
+                        
+                        Spacer()
+                        
+                        if !viewModel.hyperLinkConfigModel.url.isEmpty {
+                            HStack(spacing: 0) {
+                                Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .hyperLinkElement, key: "hyper_link_icon", of: String.self) ?? ""))
+                                    .frame(width: 20, height: 20)
+                                    .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))
+                                let title = viewModel.hyperLinkConfigModel.getCustomName().isEmpty ? viewModel.hyperLinkConfigModel.getDomainName() ?? "" : viewModel.hyperLinkConfigModel.getCustomName()
+                                Text(title)
+                                    .lineLimit(1)
+                                    .font(.system(size: 15))
+                                    .padding(.trailing, 16)
+                            }
+                            .frame(height: 40)
+                            .background(Color(UIColor(hex: getElementConfig(elementId: .hyperLinkElement, key: "background_color", of: String.self) ?? "")).opacity(0.8))
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                            .padding(EdgeInsets(top: 0, leading: 24, bottom: 32, trailing: 24))
+                            .onTapGesture {
+                                showHyperLinkSheet = true
+                            }
+                        }
                     }
-                    .padding(16)
+                    
                 }
                 
                 getShareStoryButtonView()
                     .cornerRadius(24.0)
-                    .padding([.top, .bottom, .trailing], 16)
+                    .padding(EdgeInsets(top: 16, leading: 0, bottom: 25, trailing: 16))
                     .onTapGesture {
+                        ImpactFeedbackGenerator.impactFeedback(style: .light)
                         Task {
                             host.controller?.navigationController?.dismiss(animated: true)
                             
@@ -87,14 +123,23 @@ public struct AmityDraftStoryPage: AmityPageView {
                                 Toast.showToast(style: .success, message: AmityLocalizedStringSet.Story.createdStorySuccessfully.localizedString)
                             } catch {
                                 Log.add(event: .error, "StoryCreation: Failed - Error \(error)")
-                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Story.createdStoryFailed.localizedString)
+                                Toast.showToast(style: .warning, message: error.localizedDescription)
                             }
                         }
                     }
                 
             }
         }
+        .bottomSheet(isPresented: $showHyperLinkSheet, height: .infinity, animation: .easeInOut(duration: 0.25), content: {
+            AmityHyperLinkConfigComponent(isPresented: $showHyperLinkSheet, data: $viewModel.hyperLinkConfigModel)
+        })
+        .alert(isPresented: $isAlertShown, content: {
+            Alert(title: Text("Discard this story?"), message: Text("The story will be permanently deleted. It cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Discard"), action: {
+                host.controller?.navigationController?.popViewController(animated: true)
+            }))
+        })
         .allowsHitTesting(userInteractionEnabled)
+        .ignoresSafeArea(.keyboard)
         .background(Color.black.ignoresSafeArea())
     }
     
@@ -153,6 +198,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                     .frame(width: 32, height: 32)
                     .background(Color.yellow)
                     .clipShape(Circle())
+                    .padding(.leading, 4)
             }
             
             Text("Share Story")
@@ -161,9 +207,9 @@ public struct AmityDraftStoryPage: AmityPageView {
             
             Image(shareIcon)
                 .frame(width: 20, height: 20)
+                .padding(.trailing, 8)
         }
-        .padding(EdgeInsets(top: 6, leading: 6, bottom: 6, trailing: 8))
-        .frame(height: 44)
+        .frame(height: 40)
         .background(backgroundColor)
     }
 }
@@ -173,6 +219,7 @@ class AmityDraftStoryPageViewModel: ObservableObject {
     let storyManager = StoryManager()
     var targetId: String
     var avatar: UIImage?
+    @Published var hyperLinkConfigModel: HyperLinkModel = HyperLinkModel(url: "", urlName: "")
     
     init(targetId: String, avatar: UIImage?, mediaType: StoryMediaType) {
         self.targetId = targetId
@@ -190,7 +237,16 @@ class AmityDraftStoryPageViewModel: ObservableObject {
             }
             
             let storyImageDisplayMode = displayMode == .fill ? AmityStoryImageDisplayMode.fill : AmityStoryImageDisplayMode.fit
-            let createOption = AmityImageStoryCreateOptions(targetType: .community, tartgetId: targetId, imageFileURL: imageURL, items: [], imageDisplayMode: storyImageDisplayMode)
+            
+            let items: [AmityStoryItem]
+            if !hyperLinkConfigModel.url.isEmpty {
+                let hyperLinkItem = AmityHyperLinkItem(url: hyperLinkConfigModel.url, customText: hyperLinkConfigModel.urlName.isEmpty ? nil : hyperLinkConfigModel.urlName)
+                items = [hyperLinkItem]
+            } else {
+                items = []
+            }
+            
+            let createOption = AmityImageStoryCreateOptions(targetType: .community, tartgetId: targetId, imageFileURL: imageURL, items: items, imageDisplayMode: storyImageDisplayMode)
             
             try await storyManager.createImageStory(in: targetId, createOption: createOption)
             
@@ -199,7 +255,16 @@ class AmityDraftStoryPageViewModel: ObservableObject {
                 Log.add(event: .error, "VideoURL should not be nil.")
                 return
             }
-            let createOption = AmityVideoStoryCreateOptions(targetType: .community, tartgetId: targetId, videoFileURL: videoURL, items: [])
+            
+            let items: [AmityStoryItem]
+            if !hyperLinkConfigModel.url.isEmpty {
+                let hyperLinkItem = AmityHyperLinkItem(url: hyperLinkConfigModel.url, customText: hyperLinkConfigModel.urlName.isEmpty ? nil : hyperLinkConfigModel.urlName)
+                items = [hyperLinkItem]
+            } else {
+                items = []
+            }
+            
+            let createOption = AmityVideoStoryCreateOptions(targetType: .community, tartgetId: targetId, videoFileURL: videoURL, items: items)
             
             try await storyManager.createVideoStory(in: targetId, createOption: createOption)
         }

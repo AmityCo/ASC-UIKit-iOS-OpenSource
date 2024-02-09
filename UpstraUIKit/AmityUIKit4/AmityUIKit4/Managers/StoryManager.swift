@@ -10,9 +10,11 @@ import AmitySDK
 
 public class StoryManager {
     let repository: AmityStoryRepository
+    let reactionManager: ReactionManager
     
     public init() {
         repository = AmityStoryRepository(client: AmityUIKitManagerInternal.shared.client)
+        reactionManager = ReactionManager()
     }
     
     @MainActor
@@ -35,5 +37,15 @@ public class StoryManager {
     @MainActor
     public func deleteStory(storyId: String) async throws {
         return try await repository.softDeleteStory(storyId: storyId)
+    }
+    
+    @MainActor
+    public func addReaction(storyId: String) async throws -> Bool {
+        return try await reactionManager.addReaction(.like, referenceId: storyId, referenceType: .story)
+    }
+    
+    @MainActor
+    public func removeReaction(storyId: String) async throws -> Bool {
+        return try await reactionManager.removeReaction(.like, referenceId: storyId, referenceType: .story)
     }
 }

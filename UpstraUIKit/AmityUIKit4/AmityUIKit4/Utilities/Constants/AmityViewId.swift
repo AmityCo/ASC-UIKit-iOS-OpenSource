@@ -16,6 +16,7 @@ public enum PageId: String {
 public enum ComponentId: String {
     case mock = "mock"
     case storyTabComponent = "story_tab_component"
+    case hyperLinkConfigComponent = "hyper_link_config_component"
 }
 
 public enum ElementId: String {
@@ -36,4 +37,6 @@ public enum ElementId: String {
     case backButtonElement = "back_button"
     case aspectRatioButtonElement = "aspect_ratio_button"
     case shareStoryButtonElement = "share_story_button"
+    case hyperLinkButtonElement = "story_hyperlink_button"
+    case hyperLinkElement = "hyper_link"
 }

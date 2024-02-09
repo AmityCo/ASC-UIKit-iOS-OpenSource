@@ -23,15 +23,17 @@ public struct ToastView: View {
     }
     
     public var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             Image(getIcon(style: style))
-                .padding(EdgeInsets(top: 16, leading: 12, bottom: 16, trailing: 0))
+                .padding(EdgeInsets(top: 16, leading: 12, bottom: 16, trailing: 8))
             Text(message)
+                .lineLimit(2)
                 .font(.system(size: 14))
                 .foregroundColor(.white)
+                .padding(.trailing, 8)
             Spacer()
         }
-        .background(Color.black)
+        .background(Color(UIColor(hex: "#292B32")))
         .cornerRadius(6.0)
         .padding([.leading, .trailing], 16)
     }
@@ -123,12 +125,12 @@ public class Toast: UIViewController {
         return vc.view
     }
     
-    public static func showToast(style: ToastStyle, message: String) {
+    public static func showToast(style: ToastStyle, message: String, bottomPadding: CGFloat = 0.0) {
         let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
         guard let window = keyWindow else { return }
         
         let toastView = Toast.makeView(style: style, message: message)
-        toastView.frame = CGRect(x: 0, y: CGFloat(UIScreen.main.bounds.height - (60 * UIScreen.main.scale)), width: UIScreen.main.bounds.width, height: toastView.frame.height)
+        toastView.frame = CGRect(x: 0, y: CGFloat(UIScreen.main.bounds.height - ((70 + bottomPadding) * UIScreen.main.scale)), width: UIScreen.main.bounds.width, height: toastView.frame.height)
         toastView.alpha = 0.0
         
         window.addSubview(toastView)

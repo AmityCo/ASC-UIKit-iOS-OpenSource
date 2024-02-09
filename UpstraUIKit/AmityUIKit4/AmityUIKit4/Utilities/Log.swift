@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 class Log {
     
@@ -27,6 +28,16 @@ class Log {
     // Prints message on console. Use this if you want client to see the message on console.
     static func warn(_ info: Any) {
         print("› [AmityUIKit]: \(info)")
+    }
+    
+    static func printChanges(_ type: any View.Type) {
+        #if DEBUG
+        if #available(iOS 15.0, *) {
+            type._printChanges()
+        } else {
+            Log.add(event: .info, "Debugging SwiftUI view changes only works in iOS 15+.")
+        }
+        #endif
     }
 }
 

@@ -18,7 +18,9 @@ public extension View {
         contentBackgroundColor: Color = Color(.systemBackground),
         topBarBackgroundColor: Color = Color(.systemBackground),
         showTopIndicator: Bool = true,
+        animation: Animation = .easeInOut(duration: 0.3),
         onDismiss: (() -> Void)? = nil,
+        showGrayBackground: Bool = true,
         @ViewBuilder content: @escaping () -> Content
     ) -> some View {
         ZStack {
@@ -30,7 +32,9 @@ public extension View {
                         topBarBackgroundColor: topBarBackgroundColor,
                         contentBackgroundColor: contentBackgroundColor,
                         showTopIndicator: showTopIndicator,
+                        animation: animation,
                         onDismiss: onDismiss,
+                        showGrayBackground: showGrayBackground,
                         content: content)
         }
     }
