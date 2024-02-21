@@ -145,6 +145,8 @@ struct TestRing: View {
     }
 }
 
+#if DEBUG
 #Preview {
     TestRing()
 }
+#endif

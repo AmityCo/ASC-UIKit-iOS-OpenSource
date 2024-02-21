@@ -168,7 +168,7 @@
 		68DECBA52B5F9844006F034C /* InfoTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68DECBA42B5F9844006F034C /* InfoTextField.swift */; };
 		68EB58A52B2C2CBD00F6F250 /* AmityCreateStoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68EB58A42B2C2CBD00F6F250 /* AmityCreateStoryPage.swift */; };
 		68EB58A72B2C2D4700F6F250 /* SwiftUIHostWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68EB58A62B2C2D4700F6F250 /* SwiftUIHostWrapper.swift */; };
-		9216AB332B762EB300499346 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9216AB322B762EB300499346 /* SharedFrameworks */; };
+		921552702B85A8820099C6A3 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9215526F2B85A8820099C6A3 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -357,7 +357,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9216AB332B762EB300499346 /* SharedFrameworks in Frameworks */,
+				921552702B85A8820099C6A3 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1103,7 +1103,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				9216AB322B762EB300499346 /* SharedFrameworks */,
+				9215526F2B85A8820099C6A3 /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -1494,6 +1494,7 @@
 		684AE1062B0C5B0200FD7270 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1528,6 +1529,7 @@
 		684AE1072B0C5B0200FD7270 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1629,7 +1631,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9216AB322B762EB300499346 /* SharedFrameworks */ = {
+		9215526F2B85A8820099C6A3 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

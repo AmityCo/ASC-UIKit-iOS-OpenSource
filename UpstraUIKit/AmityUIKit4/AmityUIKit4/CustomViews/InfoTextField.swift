@@ -85,7 +85,8 @@ fileprivate struct PreviewView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     PreviewView()
 }
-
+#endif

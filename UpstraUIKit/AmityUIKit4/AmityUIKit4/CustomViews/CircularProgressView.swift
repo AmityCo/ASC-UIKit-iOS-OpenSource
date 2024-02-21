@@ -63,7 +63,9 @@ public struct CircularProgressView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     CircularProgressView()
         .frame(width: 20, height: 20)
 }
+#endif

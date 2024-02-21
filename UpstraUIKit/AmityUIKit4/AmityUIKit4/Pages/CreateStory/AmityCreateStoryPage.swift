@@ -302,10 +302,11 @@ public struct AmityCreateStoryPage: AmityPageView {
     
 }
 
+#if DEBUG
 #Preview {
     AmityCreateStoryPage(targetId: "", avatar: nil)
 }
-
+#endif
 
 struct CameraPreviewView: UIViewRepresentable {
     

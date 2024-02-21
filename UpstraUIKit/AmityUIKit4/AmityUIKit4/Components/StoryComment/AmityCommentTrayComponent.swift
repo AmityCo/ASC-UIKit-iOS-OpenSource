@@ -291,6 +291,8 @@ class AmityCommentTrayComponentViewModel: ObservableObject {
     }
 }
 
+#if DEBUG
 #Preview {
     AmityCommentTrayComponent(referenceId: "", referenceType: .story)
 }
+#endif

@@ -272,6 +272,8 @@ class AmityDraftStoryPageViewModel: ObservableObject {
     }
 }
 
+#if DEBUG
 #Preview {
     AmityDraftStoryPage(targetId: "", avatar: nil, mediaType: .image(nil, nil))
 }
+#endif

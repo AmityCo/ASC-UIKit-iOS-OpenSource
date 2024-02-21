@@ -166,6 +166,8 @@ fileprivate struct Preview: View {
     
 }
 
+#if DEBUG
 #Preview {
     Preview()
 }
+#endif
