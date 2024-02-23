@@ -207,14 +207,8 @@ final class AmityCommunityProfileHeaderViewController: UIViewController {
         }
         storyCollection = storyManager.getActiveStories(in: community.communityId)
         
-        StoryPermissionChecker.shared.setCommunity(id: community.communityId)
-        StoryPermissionChecker.shared.checkUserHasManagePermission { [weak self] hasPermsion in
-            self?.hasStoryManagePermission = hasPermsion
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-            // Just delay to give time to check story manage permission
-            
+        Task {
+            hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: community.communityId)
             self.cancellable = nil
             self.cancellable = self.storyCollection.$snapshots
                 .debounce(for: .milliseconds(200), scheduler: DispatchQueue.main)
@@ -228,7 +222,7 @@ final class AmityCommunityProfileHeaderViewController: UIViewController {
                     }
                 }
         }
-       
+        
         #else
         storyTabView.isHidden = true
         #endif

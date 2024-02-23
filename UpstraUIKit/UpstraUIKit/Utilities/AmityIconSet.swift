@@ -109,7 +109,7 @@ public struct AmityIconSet {
     
     // MARK: - User Feed
     public static var privateUserFeed = UIImage(named: "private_user_feed", in: AmityUIKitManager.bundle, compatibleWith: nil)
-    public static var defaultCommunity = AmityIconSet.applyShadeColor(to: UIImage(named: "default_community", in: AmityUIKitManager.bundle, compatibleWith: nil) ?? UIImage(), shadeColor: AmityColorSet.secondary, luminance: 0.9)
+    public static var defaultCommunity = AmityIconSet.getColorImage(color: AmityColorSet.primary.blend(.shade2))
     public static var defaultCommunityAvatar = UIImage(named: "default_community_avatar", in: AmityUIKitManager.bundle, compatibleWith: nil)
     
     // MARK: - Message
@@ -159,10 +159,12 @@ public struct AmityIconSet {
         public static var iconItemUnfollowUser = UIImage(named: "icon_item_unfollow_user", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconItemReportUser = UIImage(named: "icon_item_report_user", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconItemEditProfile = UIImage(named: "icon_item_edit_profile", in: AmityUIKitManager.bundle, compatibleWith: nil)
+        public static var iconItemBlockUser = UIImage(named: "icon_item_block_unblock", in: AmityUIKitManager.bundle, compatibleWith: nil)
     }
     
     enum Follow {
         public static var iconFollowPendingRequest = UIImage(named: "icon_follow_pending_request", in: AmityUIKitManager.bundle, compatibleWith: nil)
+        public static var iconUnblockUser = UIImage(named: "icon_user_unblock_button", in: AmityUIKitManager.bundle, compatibleWith: nil)
     }
     
     enum CreatePost {
@@ -171,39 +173,17 @@ public struct AmityIconSet {
         public static var iconStory = UIImage(named: "icon_story", in: AmityUIKitManager.bundle, compatibleWith: nil)
     }
     
-    static func applyShadeColor(to image: UIImage, shadeColor: UIColor, luminance: CGFloat) -> UIImage {
-        UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
-        
-        guard let context = UIGraphicsGetCurrentContext() else {
-            return image
-        }
-        
-        // Draw the original image
-        image.draw(in: CGRect(origin: .zero, size: image.size))
-        
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        var alpha: CGFloat = 0
-        
-        let color: UIColor
-        if shadeColor.getHue(&hue, saturation: &saturation, brightness: nil, alpha: &alpha) {
-            color = UIColor(hue: hue, saturation: saturation, brightness: luminance, alpha: alpha)
-        } else {
-            color = .clear
-        }
-        
-        // Apply shade color
-        context.setFillColor(color.cgColor)
-        context.setBlendMode(.sourceAtop)
-        context.fill(CGRect(origin: .zero, size: image.size))
-        
-        // Get the resulting image
-        guard let shadedImage = UIGraphicsGetImageFromCurrentImageContext() else {
-            return image
-        }
-        
+    static func getColorImage(color: UIColor) -> UIImage? {
+        let rect = CGRect(origin: .zero, size: CGSize(width: 100, height: 100))
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0)
+        color.setFill()
+        UIRectFill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        return shadedImage
+        guard let cgImage = image?.cgImage else { 
+            Log.add("Color to Image failed!")
+            return nil }
+        return UIImage(cgImage: cgImage)
     }
 }

@@ -187,8 +187,7 @@ open class AmityEventHandler {
                 Log.add("Story in Feed!!!!")
             case .community(object: let community):
                 Task { @MainActor in
-                    let avatar = try await AmityUIKitManagerInternal.shared.fileService.loadImage(imageURL: community.avatar?.fileURL ?? "", size: .medium)
-                    let createStoryPage = AmityCreateStoryPage(targetId: community.communityId, avatar: avatar)
+                    let createStoryPage = AmityCreateStoryPage(targetId: community.communityId, avatar: URL(string: community.avatar?.fileURL ?? ""))
                     let viewController = SwiftUIHostingController(rootView: createStoryPage)
                     
                     if let vc = source.navigationController?.viewControllers.last, vc.isKind(of: AmityCommunityProfilePageViewController.self) {

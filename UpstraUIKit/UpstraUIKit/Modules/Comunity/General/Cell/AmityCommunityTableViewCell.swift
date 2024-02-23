@@ -46,7 +46,7 @@ class AmityCommunityTableViewCell: UITableViewCell, Nibbable {
             badgeImageView.isHidden = true
             privateBadgeImageView.isHidden = true
         case .community(let community):
-            avatarView.setImage(withImageURL: community.avatarURL, placeholder: AmityIconSet.defaultCommunity)
+            avatarView.setImage(withImageURL: community.avatarURL, placeholder: AmityIconSet.defaultCommunityAvatar)
             avatarView.placeholderPostion = .fullSize
             titleLabel.text = community.displayName
             badgeImageView.isHidden = !community.isOfficial

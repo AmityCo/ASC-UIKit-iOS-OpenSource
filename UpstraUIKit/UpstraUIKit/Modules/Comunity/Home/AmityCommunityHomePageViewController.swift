@@ -13,6 +13,7 @@ public class AmityCommunityHomePageViewController: AmityPageViewController {
     // MARK: - Properties
     public let newsFeedVC = AmityNewsfeedViewController.make()
     public let exploreVC = AmityCommunityExplorerViewController.make()
+    public let myCommunityVC = AmityMyCommunityViewController.make()
     
     private init() {
         super.init(nibName: AmityCommunityHomePageViewController.identifier, bundle: AmityUIKitManager.bundle)
@@ -35,7 +36,8 @@ public class AmityCommunityHomePageViewController: AmityPageViewController {
     override func viewControllers(for pagerTabStripController: AmityPagerTabViewController) -> [UIViewController] {
         newsFeedVC.pageTitle = AmityLocalizedStringSet.newsfeedTitle.localizedString
         exploreVC.pageTitle = AmityLocalizedStringSet.exploreTitle.localizedString
-        return [newsFeedVC, exploreVC]
+        myCommunityVC.pageTitle = "My Communities"
+        return [newsFeedVC, exploreVC, myCommunityVC]
     }
     
     // MARK: - Setup view

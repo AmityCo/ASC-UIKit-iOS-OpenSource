@@ -55,6 +55,10 @@ class AppManager {
         // Share client to the new UIKit
         #if canImport(AmityUIKit4)
         AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
+        
+        // override AmityViewStoryPageBehaviour
+        let customViewStoryPageBehaviour = CustomViewStoryPageBehaviour()
+        AmityUIKit4Manager.behaviour.viewStoryPageBehaviour = customViewStoryPageBehaviour
         #endif
     }
     
@@ -153,3 +157,18 @@ class AppManager {
     }
     
 }
+
+
+#if canImport(AmityUIKit4)
+class CustomViewStoryPageBehaviour: AmityViewStoryPageBehaviour {
+    
+    override func goToCommunityPage(context: AmityViewStoryPageBehaviour.Context) {
+        let viewController = AmityCommunityProfilePageViewController.make(withCommunityId: context.community.communityId)
+        if let navigationController = context.page.host.controller?.navigationController {
+            navigationController.navigationBar.isHidden = false
+            navigationController.pushViewController(viewController, animated: true)
+        }
+        
+    }
+}
+#endif

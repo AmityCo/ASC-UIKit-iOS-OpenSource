@@ -9,8 +9,14 @@
 import UIKit
 
 /// A view controller for providing all community list.
-public final class AmityMyCommunityViewController: AmityViewController {
-
+public final class AmityMyCommunityViewController: AmityViewController, IndicatorInfoProvider {
+    func indicatorInfo(for pagerTabStripController: AmityPagerTabViewController) -> IndicatorInfo {
+        return IndicatorInfo(title: pageTitle)
+    }
+    
+    // MARK: - Properties
+    var pageTitle: String?
+    
     // MARK: - IBOutlet Properties
     @IBOutlet private var tableView: UITableView!
     
@@ -26,6 +32,7 @@ public final class AmityMyCommunityViewController: AmityViewController {
         setupSearchController()
         setupTableView()
         setupScreenViewModel()
+        Log.add("Parent: \(self.parent)")
     }
 
     public override func viewWillAppear(_ animated: Bool) {

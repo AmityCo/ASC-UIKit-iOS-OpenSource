@@ -114,7 +114,7 @@ public final class AmityUIKit4Manager {
         return AmityUIKitManagerInternal.shared.client
     }
     
-    public static var behaviour: UIKitBehaviour {
+    public static var behaviour: AmityUIKitBehaviour {
         set {
             AmityUIKitManagerInternal.shared.behavior = newValue
         } get {
@@ -151,7 +151,7 @@ final class AmityUIKitManagerInternal: NSObject {
     
     var env: [String: Any] = [:]
     
-    var behavior: UIKitBehaviour = UIKitBehaviour()
+    var behavior: AmityUIKitBehaviour = AmityUIKitBehaviour()
     
     // MARK: - Initializer
     
@@ -196,6 +196,9 @@ final class AmityUIKitManagerInternal: NSObject {
         let storyTabComponentBehaviour = AmityStoryTabComponentBehaviour()
         behavior.storyTabComponentBehaviour = storyTabComponentBehaviour
     
+        // ViewStoryPage
+        let viewStoryPageBehaviour = AmityViewStoryPageBehaviour()
+        behavior.viewStoryPageBehaviour = viewStoryPageBehaviour
     }
     
     func registerDevice(_ userId: String,

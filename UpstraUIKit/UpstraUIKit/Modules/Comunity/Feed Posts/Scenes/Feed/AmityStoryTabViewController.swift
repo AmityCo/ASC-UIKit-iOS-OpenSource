@@ -14,60 +14,54 @@ import SwiftUI
 
 // TEMP: This controller will be used for Global Feed in the future.
 #if canImport(AmityUIKit4)
-//class AmityStoryTabViewController: AmityViewController {
-//    var storyTabComponent: AmityStoryTabComponent!
-//    var storyTabComponentViewModel: AmityStoryTabComponentViewModel!
-//    
-//
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        storyTabComponentViewModel = AmityStoryTabComponentViewModel(storyTargets: [],
-//                                                                     hideStoryCreation: true, 
-//                                                                     creatorAvatar: UIImage(),
-//                                                                     isGlobalFeed: true,
-//                                                                     storyCreationTargetId: "")
-//        
-//        storyTabComponent = AmityStoryTabComponent(viewModel: storyTabComponentViewModel)
-//        let hostController = SwiftUIHostingController(rootView: storyTabComponent)
-//        
-//        addChild(hostController)
-//        hostController.view.translatesAutoresizingMaskIntoConstraints = false
-//        view.addSubview(hostController.view)
-//        
-//        NSLayoutConstraint.activate([
-//            hostController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            hostController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            hostController.view.topAnchor.constraint(equalTo: view.topAnchor, constant: 10.0),
-//            hostController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 10.0),
-//                ])
-//        hostController.didMove(toParent: self)
-//    }
-//    
-//    
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//    }
-//
-//
-//    static func make() -> AmityStoryTabViewController {
-//        let vc = AmityStoryTabViewController(nibName: AmityStoryTabViewController.identifier, bundle: AmityUIKitManager.bundle)
-//        return vc
-//    }
-//    
-//    func updateStoryTargets(storyTargets: [StoryTarget]) {
-//        //storyTabComponent.viewModel.storyTargets = storyTargets
-//    }
-//
-//}
-//
-//extension AmityStoryTabViewController: FeedHeaderPresentable {
-//    public var headerView: UIView {
-//        return view
-//    }
-//    
-//    public var height: CGFloat {
-//        return 103
-//    }
-//}
+class AmityStoryTabViewController: AmityViewController {
+    var storyTabComponent: AmityStoryTabComponent!
+    
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+      
+        storyTabComponent = AmityStoryTabComponent(storyFeedType: .global)
+        let hostController = SwiftUIHostingController(rootView: storyTabComponent)
+        
+        addChild(hostController)
+        hostController.view.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(hostController.view)
+        
+        NSLayoutConstraint.activate([
+            hostController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hostController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hostController.view.topAnchor.constraint(equalTo: view.topAnchor),
+            hostController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+                ])
+        hostController.didMove(toParent: self)
+    }
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+
+
+    static func make() -> AmityStoryTabViewController {
+        let vc = AmityStoryTabViewController(nibName: AmityStoryTabViewController.identifier, bundle: AmityUIKitManager.bundle)
+        return vc
+    }
+    
+    func updateStoryTargets(storyTargets: [AmityStoryTargetModel]) {
+        //storyTabComponent.viewModel.storyTargets = storyTargets
+    }
+
+}
+
+extension AmityStoryTabViewController: FeedHeaderPresentable {
+    public var headerView: UIView {
+        return view
+    }
+    
+    public var height: CGFloat {
+        return 115
+    }
+}
 
 #endif
