@@ -85,6 +85,9 @@ final public class LiveStreamBroadcastViewController: UIViewController {
     @IBOutlet weak var descriptionTextView: AmityTextView!
     
     @IBOutlet weak var goLiveButton: UIButton!
+    @IBOutlet weak var streamCreatingStackView: UIStackView!
+    @IBOutlet weak var streamCreateActivityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var streamCreateLabel: UILabel!
     
     // MARK: - UI Container Streaming Components
     @IBOutlet weak var uiContainerStreaming: UIView!
@@ -108,6 +111,8 @@ final public class LiveStreamBroadcastViewController: UIViewController {
     var keyboardIsHidden = true
     var keyboardHeight: CGFloat = 0
     var keyboardObservationTokens: [NSObjectProtocol] = []
+    
+    var isStartStreaming = false
     
     // MARK: - Init / Deinit
     
@@ -312,6 +317,7 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         finishButton.layer.cornerRadius = 4
         finishButton.layer.borderColor = UIColor.white.cgColor
         finishButton.layer.borderWidth = 1
+        finishButton.isHidden = true
         
         streamingContainer.clipsToBounds = true
         streamingContainer.layer.cornerRadius = 4
@@ -319,6 +325,8 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         streamingStatusLabel.textColor = .white
         streamingStatusLabel.font = AmityFontSet.captionBold
         setupMentionTableView()
+        
+        streamCreatingStackView.isHidden = true
     }
     
     private func trySetupBroadcaster() {
