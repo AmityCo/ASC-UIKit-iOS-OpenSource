@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="19455" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19454"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -22,6 +22,9 @@
                 <outlet property="overlayView" destination="EQI-Pf-pby" id="FLT-tP-0cQ"/>
                 <outlet property="renderingContainer" destination="WoG-th-p7m" id="Zgg-Wo-ySh"/>
                 <outlet property="selectCoverButton" destination="OY1-jm-R20" id="jWS-5f-tAg"/>
+                <outlet property="streamCreateActivityIndicator" destination="lnT-R1-fV5" id="ZIp-pp-ipU"/>
+                <outlet property="streamCreateLabel" destination="MXm-kA-qKw" id="ywz-Zb-6Lw"/>
+                <outlet property="streamCreatingStackView" destination="Zgs-J3-0Yx" id="iWc-wx-kfa"/>
                 <outlet property="streamEndActivityIndicator" destination="QuL-4c-hIl" id="CUw-Kf-wLE"/>
                 <outlet property="streamEndLabel" destination="aEB-qR-Pd5" id="45w-wx-ZOK"/>
                 <outlet property="streamingContainer" destination="5gV-fy-gT7" id="AdJ-Bu-LM9"/>
@@ -41,15 +44,15 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WoG-th-p7m" userLabel="Rendering Container">
-                    <rect key="frame" x="0.0" y="44" width="414" height="746"/>
+                    <rect key="frame" x="0.0" y="48" width="414" height="742"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                 </view>
                 <view alpha="0.40000000000000002" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="EQI-Pf-pby" userLabel="Video Overlay View">
-                    <rect key="frame" x="0.0" y="44" width="414" height="746"/>
+                    <rect key="frame" x="0.0" y="48" width="414" height="742"/>
                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iHk-wc-pYa" userLabel="Top Black Bar">
-                    <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="48"/>
                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cf8-B2-QuA" userLabel="Bottom Black Bar">
@@ -64,10 +67,10 @@
                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6ic-9A-lyj" userLabel="UI Container (Streaming)">
-                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <rect key="frame" x="0.0" y="48" width="414" height="814"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hb4-4n-9QZ" userLabel="Finish Button">
-                            <rect key="frame" x="325" y="763" width="73" height="38"/>
+                            <rect key="frame" x="325" y="759" width="73" height="38"/>
                             <inset key="contentEdgeInsets" minX="16" minY="10" maxX="16" maxY="10"/>
                             <state key="normal" title="Finish"/>
                             <connections>
@@ -75,7 +78,7 @@
                             </connections>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xoP-1u-M6Z" userLabel="Switch Camera Button">
-                            <rect key="frame" x="10" y="758" width="48" height="48"/>
+                            <rect key="frame" x="10" y="754" width="48" height="48"/>
                             <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                             <state key="normal" image="switch_camera"/>
                             <connections>
@@ -112,7 +115,7 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="upf-ZY-xH0" userLabel="UI Container (Create)">
-                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <rect key="frame" x="0.0" y="48" width="414" height="814"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Gcy-TZ-EG4" userLabel="Close Button">
                             <rect key="frame" x="8" y="15" width="48" height="48"/>
@@ -163,7 +166,7 @@
                             </subviews>
                         </stackView>
                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="w7A-pv-4b8" userLabel="Detail Stack View">
-                            <rect key="frame" x="16" y="88" width="382" height="193.5"/>
+                            <rect key="frame" x="16" y="88" width="382" height="205"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="11" translatesAutoresizingMaskIntoConstraints="NO" id="u2Y-OI-N78">
                                     <rect key="frame" x="0.0" y="0.0" width="382" height="28"/>
@@ -205,19 +208,19 @@
                                     </constraints>
                                 </view>
                                 <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Title" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="tos-Jq-m56" customClass="AmityTextField" customModule="AmityUIKit">
-                                    <rect key="frame" x="0.0" y="58" width="382" height="31.5"/>
+                                    <rect key="frame" x="0.0" y="58" width="382" height="43"/>
                                     <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                     <textInputTraits key="textInputTraits"/>
                                 </textField>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BQO-Ja-wdY" userLabel="Spacer">
-                                    <rect key="frame" x="0.0" y="89.5" width="382" height="4"/>
+                                    <rect key="frame" x="0.0" y="101" width="382" height="4"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="4" id="WAt-ok-hxX"/>
                                     </constraints>
                                 </view>
                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="aOG-gM-Pbh" userLabel="Description Text View" customClass="AmityTextView" customModule="AmityUIKit">
-                                    <rect key="frame" x="0.0" y="93.5" width="382" height="100"/>
+                                    <rect key="frame" x="0.0" y="105" width="382" height="100"/>
                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="100" id="pg3-m5-Kws"/>
@@ -230,7 +233,7 @@
                             </subviews>
                         </stackView>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xLF-im-up6">
-                            <rect key="frame" x="16" y="762" width="382" height="40"/>
+                            <rect key="frame" x="16" y="758" width="382" height="40"/>
                             <color key="backgroundColor" systemColor="linkColor"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="40" id="oKi-3x-zsF"/>
@@ -242,10 +245,25 @@
                                 <action selector="goLiveButtonDidTouch" destination="-1" eventType="touchUpInside" id="PyO-2b-Dm5"/>
                             </connections>
                         </button>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="18" translatesAutoresizingMaskIntoConstraints="NO" id="Zgs-J3-0Yx">
+                            <rect key="frame" x="10" y="369.5" width="394" height="75.5"/>
+                            <subviews>
+                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="lnT-R1-fV5" userLabel="Stream Create Activity Indicator">
+                                    <rect key="frame" x="178.5" y="0.0" width="37" height="37"/>
+                                </activityIndicatorView>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Creating Live Stream" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MXm-kA-qKw" userLabel="Stream Create Label">
+                                    <rect key="frame" x="117.5" y="55" width="159" height="20.5"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                        </stackView>
                     </subviews>
                     <viewLayoutGuide key="safeArea" id="QSE-HE-6Qp"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     <constraints>
+                        <constraint firstItem="Zgs-J3-0Yx" firstAttribute="leading" secondItem="QSE-HE-6Qp" secondAttribute="leading" constant="10" id="J8e-db-LFM"/>
                         <constraint firstAttribute="trailing" secondItem="w7A-pv-4b8" secondAttribute="trailing" constant="16" id="JZx-Hu-nZc"/>
                         <constraint firstItem="xLF-im-up6" firstAttribute="leading" secondItem="upf-ZY-xH0" secondAttribute="leading" constant="16" id="KlF-Nu-CdU"/>
                         <constraint firstAttribute="trailing" secondItem="xLF-im-up6" secondAttribute="trailing" constant="16" id="KyN-E6-x9t"/>
@@ -253,17 +271,19 @@
                         <constraint firstItem="xig-em-oET" firstAttribute="top" secondItem="upf-ZY-xH0" secondAttribute="top" constant="15" id="SBF-wl-kDZ"/>
                         <constraint firstItem="Gcy-TZ-EG4" firstAttribute="top" secondItem="upf-ZY-xH0" secondAttribute="top" constant="15" id="Uco-My-LMr"/>
                         <constraint firstItem="w7A-pv-4b8" firstAttribute="top" secondItem="Gcy-TZ-EG4" secondAttribute="bottom" constant="25" id="VS3-QO-BJc"/>
+                        <constraint firstItem="QSE-HE-6Qp" firstAttribute="trailing" secondItem="Zgs-J3-0Yx" secondAttribute="trailing" constant="10" id="bMW-5i-jxF"/>
                         <constraint firstItem="Gcy-TZ-EG4" firstAttribute="leading" secondItem="upf-ZY-xH0" secondAttribute="leading" constant="8" id="gBS-PI-4AV"/>
                         <constraint firstAttribute="trailing" secondItem="xig-em-oET" secondAttribute="trailing" constant="10" id="gvd-2p-Fvk"/>
+                        <constraint firstItem="Zgs-J3-0Yx" firstAttribute="centerY" secondItem="QSE-HE-6Qp" secondAttribute="centerY" id="wWe-RH-say"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aoJ-cp-xbY" userLabel="UI Container (End)">
-                    <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                    <rect key="frame" x="0.0" y="48" width="414" height="814"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="18" translatesAutoresizingMaskIntoConstraints="NO" id="xd6-dz-yNU">
-                            <rect key="frame" x="10" y="371.5" width="394" height="75.5"/>
+                            <rect key="frame" x="10" y="369.5" width="394" height="75.5"/>
                             <subviews>
-                                <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="QuL-4c-hIl" userLabel="Stream End Activity Indicator">
+                                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="QuL-4c-hIl" userLabel="Stream End Activity Indicator">
                                     <rect key="frame" x="178.5" y="0.0" width="37" height="37"/>
                                 </activityIndicatorView>
                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Ending Live Stream" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aEB-qR-Pd5" userLabel="Stream End Label">
@@ -282,7 +302,7 @@
                         <constraint firstItem="xd6-dz-yNU" firstAttribute="leading" secondItem="aoJ-cp-xbY" secondAttribute="leading" constant="10" id="mUD-AM-hIE"/>
                     </constraints>
                 </view>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="ndJ-d5-Nzh" customClass="AmityMentionTableView" customModule="AmityUIKit" customModuleProvider="target">
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="ndJ-d5-Nzh" customClass="AmityMentionTableView" customModule="AmityUIKitLiveStream" customModuleProvider="target">
                     <rect key="frame" x="0.0" y="656" width="414" height="240"/>
                     <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     <constraints>
@@ -341,13 +361,13 @@
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="linkColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

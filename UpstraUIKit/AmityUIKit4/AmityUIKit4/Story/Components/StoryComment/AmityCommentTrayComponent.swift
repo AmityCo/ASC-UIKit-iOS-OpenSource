@@ -36,6 +36,8 @@ public struct AmityCommentTrayComponent: View {
             Text(AmityLocalizedStringSet.Comment.commentTrayComponentTitle.localizedString)
                 .font(.system(size: 17, weight: .medium))
                 .padding(.bottom, 17)
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.titleTextView)
+            
             Rectangle()
                 .frame(height: 1)
                 .foregroundColor(Color(UIColor(hex: "#EBECEF")))
@@ -93,6 +95,7 @@ public struct AmityCommentTrayComponent: View {
                     .frame(width: 32, height: 32)
                     .clipShape(.circle)
                     .padding(.leading, 12)
+                    .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.avatarImageView)
                 
                 TextField(AmityLocalizedStringSet.Comment.commentTextFieldPlacholder.localizedString, text: $text)
                     .font(.system(size: 15))
@@ -102,6 +105,7 @@ public struct AmityCommentTrayComponent: View {
                     .background(RoundedRectangle(cornerRadius: 30)
                         .fill(Color(UIColor(hex: "#EBECEF")))
                     )
+                    .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.textField)
                 
                 Button {
                     Task {
@@ -109,7 +113,7 @@ public struct AmityCommentTrayComponent: View {
                             let parentId = replyState.showToReply ? replyState.comment?.commentId : nil
                             try await viewModel.createComment(referenceId: referenceId, referenceType: referenceType, text: text, parentId: parentId)
                         } catch {
-                            Toast.showToast(style: .warning, message: error.localizedDescription)
+                            Toast.showToast(style: .warning, message: error.isAmityErrorCode(.banWordFound) ? AmityLocalizedStringSet.Comment.commentWithBannedWordsErrorMessage.localizedString : error.localizedDescription)
                         }
                         replyState = (false, nil)
                         text.removeAll()
@@ -121,6 +125,7 @@ public struct AmityCommentTrayComponent: View {
                 }
                 .padding(.trailing, 12)
                 .disabled(text.isEmpty)
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.postButton)
             }
             .frame(height: 56)
             .padding(.bottom, 10)
@@ -134,6 +139,7 @@ public struct AmityCommentTrayComponent: View {
                 Text(AmityLocalizedStringSet.Comment.disableCreateCommentText.localizedString)
                     .font(.system(size: 15))
                     .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                    .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.disableTextView)
                 Spacer()
             }
             .frame(height: 20)
@@ -160,6 +166,8 @@ public struct AmityCommentTrayComponent: View {
                         .foregroundColor(Color.black)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
+                
                 Spacer()
             }
             .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
@@ -189,6 +197,8 @@ public struct AmityCommentTrayComponent: View {
                         }
                     }))
                 })
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.deleteCommentButton)
+                
                 Spacer()
             }
             .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
@@ -232,6 +242,8 @@ public struct AmityCommentTrayComponent: View {
                         .foregroundColor(Color.black)
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.reportCommentButton)
+                
                 Spacer()
             }
             .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))

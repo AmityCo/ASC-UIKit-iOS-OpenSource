@@ -9,7 +9,7 @@ import UIKit
 import SwiftUI
 
 enum DragGestureDirection {
-    case rightward, leftward, vertical
+    case rightward, leftward, downward, upward
 }
 
 struct GestureView: UIViewRepresentable {
@@ -103,7 +103,13 @@ class GestureUIView: UIView {
             }
         } else {
             // Vertical movement
-            direction = .vertical
+            if velocity.y > 0 {
+                // Downward movement
+                direction = .downward
+            } else {
+                // Upward movement
+                direction = .upward
+            }
         }
         
         switch gesture.state {

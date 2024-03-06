@@ -52,5 +52,6 @@ public struct AmityLocalizedStringSet {
         static let editedText = "comment_edited_text"
         static let viewMoreReplyText = "view_more_reply_text"
         static let disableCreateCommentText = "disable_create_comment_text"
+        static let commentWithBannedWordsErrorMessage = "comment_with_banned_words_error_message"
     }
 }

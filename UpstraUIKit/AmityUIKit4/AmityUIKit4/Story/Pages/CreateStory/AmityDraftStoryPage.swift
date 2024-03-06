@@ -56,6 +56,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                                     .clipShape(.circle)
                             })
                             .buttonStyle(.plain)
+                            .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.backButton)
                     
                             Spacer()
                             
@@ -68,6 +69,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                                         .background(Color(UIColor(hex: getElementConfig(elementId: .aspectRatioButtonElement, key: "background_color", of: String.self) ?? "")))
                                         .clipShape(.circle)
                                 }
+                                .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.aspectRatioButton)
                             }
                             
                             Button {
@@ -82,6 +84,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                                     .background(Color(UIColor(hex: getElementConfig(elementId: .aspectRatioButtonElement, key: "background_color", of: String.self) ?? "")))
                                     .clipShape(.circle)
                             }
+                            .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperLinkButton)
                         }
                         .padding(16)
                         
@@ -97,6 +100,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                                     .lineLimit(1)
                                     .font(.system(size: 15))
                                     .padding(.trailing, 16)
+                                    .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperlinkTextView)
                             }
                             .frame(height: 40)
                             .background(Color(UIColor(hex: getElementConfig(elementId: .hyperLinkElement, key: "background_color", of: String.self) ?? "")).opacity(0.8))
@@ -105,6 +109,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                             .onTapGesture {
                                 showHyperLinkSheet = true
                             }
+                            .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperlinkView)
                         }
                     }
                     
@@ -127,6 +132,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                             }
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.shareStoryButton)
                 
             }
         }
@@ -164,12 +170,13 @@ public struct AmityDraftStoryPage: AmityPageView {
                         )
                     )
                     .cornerRadius(14.0)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.storyImageView)
             }
         case .video(let url):
             if let url {
                 VideoPlayer(url: url, play: $playVideo)
                     .autoReplay(true)
-                    .contentMode(.scaleToFill)
+                    .contentMode(.scaleAspectFit)
                     .allowsHitTesting(false)
                     .frame(width: size.width, height: size.height)
                     .cornerRadius(14.0)
@@ -179,6 +186,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                     .onDisappear {
                         playVideo.toggle()
                     }
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.storyVideoView)
             }
             
         }
@@ -196,6 +204,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                     .frame(width: 32, height: 32)
                     .clipShape(Circle())
                     .padding(.leading, 4)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.shareStoryButtonAvatar)
             }
             
             Text("Share Story")

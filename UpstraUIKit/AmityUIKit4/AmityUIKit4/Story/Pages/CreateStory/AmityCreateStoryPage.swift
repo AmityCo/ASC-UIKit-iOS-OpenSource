@@ -47,6 +47,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                 ZStack(alignment: .top) {
                     CameraPreviewView(cameraManager: cameraManager)
                         .cornerRadius(14.0)
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.cameraPreviewView)
                     
                     if cameraMode == .videoWithMic && videoCaptureButtonSelected {
                         Text("\(formatDuration(videoCaputreDuration))")
@@ -69,8 +70,10 @@ public struct AmityCreateStoryPage: AmityPageView {
                                 .onTapGesture {
                                     host.controller?.dismiss(animated: true)
                                 }
+                                .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.closeButton)
                             
                             Spacer()
+                            
                             Image(cameraFlashMode == .auto ? AmityIcon.flashOnIcon.getImageResource()
                                   : AmityIcon.flashOffIcon.getImageResource())
                             .setModifier(offset: (x: -16, y: 16),
@@ -79,6 +82,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                             .onTapGesture {
                                 toggleFlash()
                             }
+                            .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.flashLightButton)
                         }
                         Spacer()
                         HStack{
@@ -94,6 +98,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                                 ImageVideoPicker(viewModel: pickerViewModel)
                             }
                             .buttonStyle(.plain)
+                            .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.mediaPickerButton)
                             
                             Spacer()
                             
@@ -115,6 +120,8 @@ public struct AmityCreateStoryPage: AmityPageView {
                                                  frame: CGSize(width: 40, height: 40))
                             }
                             .buttonStyle(.plain)
+                            .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.switchCameraButton)
+                            
                         }
                     }
                 }
@@ -164,6 +171,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                 .offset(x: 0, y: -32)
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.cameraShutterButton)
     }
     
     
@@ -200,6 +208,7 @@ public struct AmityCreateStoryPage: AmityPageView {
         .onChange(of: videoCaptureButtonSelected) { isSelected in
             isSelected ? startRecordingVideo() : stopRecordingVideo()
         }
+        .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.cameraShutterButton)
     }
     
     

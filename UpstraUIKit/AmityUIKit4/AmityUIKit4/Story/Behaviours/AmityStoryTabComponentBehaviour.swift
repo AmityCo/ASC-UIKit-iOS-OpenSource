@@ -46,7 +46,6 @@ open class AmityStoryTabComponentBehaviour {
         let navigationController = UINavigationController(rootViewController: SwiftUIHostingController(rootView: viewStoryPage))
         navigationController.navigationBar.isHidden = true
         navigationController.modalPresentationStyle = .overFullScreen
-        navigationController.modalTransitionStyle = .crossDissolve
         
         let sourceController = context.component.host.controller
         sourceController?.present(navigationController, animated: true)

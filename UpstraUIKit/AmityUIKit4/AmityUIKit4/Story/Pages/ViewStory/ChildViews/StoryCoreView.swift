@@ -53,7 +53,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     var body: some View {
         Pager(page: page, data: storyTarget.stories, id: \.storyId) { storyModel in
             VStack(spacing: 0) {
-                ZStack {
+                ZStack(alignment: .topLeading) {
                     GeometryReader { geometry in
                         if let imageURL = storyModel.imageURL {
                             StoryImageView(imageURL: imageURL,
@@ -73,24 +73,14 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                             .overlay(
                                 storyModel.syncState == .error || storyModel.syncState == .syncing ? Color.black.opacity(0.5) : nil
                             )
-                            
-                            let muteIcon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "mute_icon", of: String.self) ?? "")
-                            let unmuteIcon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "unmute_icon", of: String.self) ?? "")
-                            let color = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "background_color", of: String.self) ?? ""))
-                            Image(muteVideo ? muteIcon
-                                  : unmuteIcon)
-                            .frame(width: 32, height: 32)
-                            .background(color)
-                            .clipShape(.circle)
-                            .offset(x: 16, y: 98)
-                            .onTapGesture {
-                                muteVideo.toggle()
-                            }
                         }
                     }
                     
                     getGestureView()
-                        .offset(y: 130) // not to overlap gesture from metadata view & muteVideo view
+                    
+                    getMuteButton()
+                        .offset(x: 16, y: 98)
+                        .isHidden(storyModel.storyType != .video)
                     
                     VStack(alignment: .center) {
                         getMetadataView(targetName: targetName,
@@ -142,9 +132,6 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             // Handle the case going back from Community Page
             host.controller?.navigationController?.navigationBar.isHidden = true
         }
-        .onDisappear {
-            storyPageViewModel.shouldRunTimer = false
-        }
         .onChange(of: storySegmentIndex) { value in
             page.update(.new(index: value))
         }
@@ -161,12 +148,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             }
         }
         .sheet(isPresented: $showCommentTray) {
-            BottomSheetDragIndicator()
-            if let story = storyTarget.stories.element(at: storySegmentIndex) {
-                let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
-                let allowCreateComment = story.storyTarget?.community?.storySettings.allowComment ?? false
-                AmityCommentTrayComponent(referenceId: story.storyId, referenceType: .story, hideCommentButtons: !isCommunityMember, allowCreateComment: allowCreateComment)
-            }
+            getCommentSheetView()
         }
         .gesture(DragGesture().onChanged{ _ in})
         .animation(nil)
@@ -180,10 +162,12 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     .frame(width: 45, height: 45)
                     .clipShape(Circle())
                     .padding(.leading, 16)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.communityAvatar)
                 
                 AmityCreateNewStoryButtonElement(componentId: .storyTabComponent)
                     .frame(width: 16.0, height: 16.0)
                     .isHidden(!hasStoryManagePermission)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.createStoryIcon)
             }
             .onTapGesture {
                 if hasStoryManagePermission {
@@ -208,6 +192,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                             let context = AmityViewStoryPageBehaviour.Context(page: viewStoryPage, community: community)
                             AmityUIKit4Manager.behaviour.viewStoryPageBehaviour?.goToCommunityPage(context: context)
                         }
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.communityDisplayNameTextView)
                     
                     Image(AmityIcon.verifiedWhiteBadge.getImageResource())
                         .resizable()
@@ -219,18 +204,35 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     Text(story.createdAt.timeAgoString)
                         .font(.system(size: 13))
                         .foregroundColor(.white)
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.createdAtTextView)
                     Text("•")
                         .font(.system(size: 13))
                         .foregroundColor(.white)
                     Text("By \(story.creatorName)")
                         .font(.system(size: 13))
                         .foregroundColor(.white)
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.creatorDisplayNameTextView)
                 }
                 
             }
             
             Spacer()
         }
+    }
+    
+    func getMuteButton() -> some View {
+        let muteIcon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "mute_icon", of: String.self) ?? "")
+        let unmuteIcon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "unmute_icon", of: String.self) ?? "")
+        let color = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "background_color", of: String.self) ?? ""))
+        return Image(muteVideo ? muteIcon
+              : unmuteIcon)
+        .frame(width: 32, height: 32)
+        .background(color)
+        .clipShape(.circle)
+        .onTapGesture {
+            muteVideo.toggle()
+        }
+        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.muteButton)
     }
     
     
@@ -245,6 +247,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 .lineLimit(1)
                 .font(.system(size: 15))
                 .padding(.trailing, 16)
+                .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.hyperlinkTextView)
         }
         .frame(height: 40)
         .background(Color(UIColor(hex: "#EBECEF")).opacity(0.8))
@@ -259,6 +262,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 UIApplication.shared.open(url)
             }
         }
+        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.hyperlinkView)
     }
     
     
@@ -273,17 +277,36 @@ struct StoryCoreView: View, AmityViewIdentifiable {
         }, onTouchAndHoldEnd: {
             storyPageViewModel.shouldRunTimer = true
             storyCoreViewModel.playVideo = true
-        }, onDragEnded: { direction, _ in
-            switch direction {
-            case .leftward: break
-//                moveStoryTarget?(.forward)
-            case .rightward: break
-//                moveStoryTarget?(.backward)
-            case .vertical:
+        },onDragChanged: { direction, translation in
+            guard let view = host.controller?.view else { return }
+            
+            if translation.y < 0 || (translation.y > 0 && translation.y <= 50) { return }
+            
+            storyPageViewModel.shouldRunTimer = false
+            storyCoreViewModel.playVideo = false
+            
+            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
+                view.transform = CGAffineTransform(translationX: 0, y: translation.y)
+            })
+            
+        }, onDragEnded: { direction, translation in
+            guard let view = host.controller?.view else { return }
+            
+            storyPageViewModel.shouldRunTimer = true
+            storyCoreViewModel.playVideo = true
+            
+            if translation.y <= 200 {
+                UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
+                    if view.transform == .identity && direction == .upward {
+                        showCommentTray = true
+                    }
+                    
+                    view.transform = .identity
+                })
+            } else {
                 host.controller?.dismiss(animated: true)
             }
-            
-        })
+    })
     }
     
     
@@ -292,6 +315,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             Label {
                 Text("\(story.viewCount)")
                     .font(.system(size: 15))
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reachButtonTextView)
             } icon: {
                 let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, componentId: nil, elementId: .impressionIconElement, key: "impression_icon", of: String.self) ?? "")
                 Image(icon)
@@ -299,6 +323,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     .padding(.trailing, -4)
             }
             .foregroundColor(.white)
+            .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reachButton)
             
             Spacer()
             
@@ -317,6 +342,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         .font(.system(size: 15).monospacedDigit())
                         .foregroundColor(.white)
                         .padding(.trailing, 10)
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.commentButtonTextView)
                 }
                 .frame(minWidth: 56)
                 .frame(height: 40)
@@ -324,6 +350,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 .background(color)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
             }
+            .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.commentButton)
             
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
             Button(feedbackStyle: .light) {
@@ -353,6 +380,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         .font(.system(size: 15).monospacedDigit())
                         .foregroundColor(.white)
                         .padding(.trailing, 10)
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reactionButtonTextView)
                 }
                 .frame(minWidth: 56)
                 .frame(height: 40)
@@ -360,6 +388,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 .background(color)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
             }
+            .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reactionButton)
         }
         .frame(height: 56)
         .padding(EdgeInsets(top: 0, leading: 12, bottom: 25, trailing: 12))
@@ -466,6 +495,29 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     }
     
     
+    
+    @ViewBuilder
+    func getCommentSheetView() -> some View {
+        if #available(iOS 16.0, *) {
+            getCommentSheetContentView()
+            .presentationDetents([.fraction(0.65)])
+        } else {
+            getCommentSheetContentView()
+        }
+    }
+    
+    
+    @ViewBuilder
+    func getCommentSheetContentView() -> some View {
+        BottomSheetDragIndicator()
+        if let story = storyTarget.stories.element(at: storySegmentIndex) {
+            let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
+            let allowCreateComment = story.storyTarget?.community?.storySettings.allowComment ?? false
+            AmityCommentTrayComponent(referenceId: story.storyId, referenceType: .story, hideCommentButtons: !isCommunityMember, allowCreateComment: allowCreateComment)
+        }
+    }
+    
+    
     private func goToStoryCreationPage(targetId: String, avatar: URL?) {
         let createStoryPage = AmityCreateStoryPage(targetId: targetId, avatar: avatar)
         let controller = SwiftUIHostingController(rootView: createStoryPage)
@@ -521,6 +573,7 @@ struct StoryImageView: View {
                 .onAppear {
                     storyPageViewModel.shouldRunTimer = true
                 }
+                .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.storyImageView)
         }
         .onAppear {
             totalDuration = 4.0
@@ -553,7 +606,7 @@ struct StoryVideoView: View {
         VideoPlayer(url: videoURL, play: $playVideo, time: $time)
             .autoReplay(false)
             .mute(muteVideo)
-            .contentMode(.scaleToFill)
+            .contentMode(.scaleAspectFit)
             .onStateChanged({ state in
                 switch state {
                 case .loading:
@@ -574,8 +627,10 @@ struct StoryVideoView: View {
             )
             .onAppear {
                 time = .zero
+                storyPageViewModel.shouldRunTimer = true
             }
             .onDisappear {
             }
+            .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.storyVideoView)
     }
 }

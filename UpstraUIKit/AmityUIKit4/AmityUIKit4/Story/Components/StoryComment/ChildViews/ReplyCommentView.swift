@@ -67,6 +67,7 @@ struct ReplyCommentView: View {
                 Spacer()
             }
         }
+        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.viewReplyButton)
     }
     
     

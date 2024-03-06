@@ -145,7 +145,7 @@ final public class AmityUserProfileEditorViewController: AmityViewController {
             let cameraPicker = UIImagePickerController()
             cameraPicker.sourceType = .camera
             cameraPicker.delegate = self
-            self?.present(cameraPicker, animated: true, completion: nil)
+            self?.displayCamera(cameraPicker: cameraPicker)
         }
         
         // Show image picker

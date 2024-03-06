@@ -34,6 +34,11 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
     @State private var isRemoveLinkAlertShown: Bool = false
     @State private var isUnsavedAlertShown: Bool = false
     
+    @State private var showActivityIndicator: Bool = false
+    
+    @State private var urlTextFieldModel = InfoTextFieldModel(title: "URL", placeholder: "https://example.com", isMandatory: true, errorMessage: "Please enter a valid URL.")
+    @State private var urlNameTextFieldModel = InfoTextFieldModel(title: "Customize link text", placeholder: "Name your link", isMandatory: false, infoMessage: "This text will show on the link instead of URL.", errorMessage: "Your text contains a blocklisted word.", maxCharCount: 30)
+    
     public init(isPresented: Binding<Bool>, data: Binding<HyperLinkModel>) {
         self._isPresented = isPresented
         self._data = data
@@ -45,12 +50,34 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                 Rectangle()
                     .frame(height: 1)
                     .foregroundColor(Color(UIColor(hex: "#EBECEF")))
-                let urlModel = InfoTextFieldModel(title: "URL", placeholder: "https://example.com", isMandatory: true, errorMessage: "Please enter a valid URL.")
                 
-                InfoTextField(data: urlModel, text: $viewModel.urlText, isValid: $viewModel.urlIsValid)
+                InfoTextField(data: $urlTextFieldModel,
+                              text: $viewModel.urlText,
+                              isValid: $viewModel.isURLValid,
+                              titleTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkURLTitleTextView,
+                              textFieldAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkURLTextField,
+                              descriptionTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkErrorTextView)
+                .onChange(of: viewModel.urlText) { text in
+                    viewModel.isURLValid = text.isEmpty ? true : text.isValidURL
+                    
+                    if !text.isValidURL {
+                        urlTextFieldModel.errorMessage = "Please enter a valid URL."
+                    }
+                }
                 
-                let linkNameModel = InfoTextFieldModel(title: "Customize link text", placeholder: "Name your link", isMandatory: false, infoMessage: "This text will show on the link instead of URL.", errorMessage: "", maxCharCount: 30)
-                InfoTextField(data: linkNameModel, text: $viewModel.urlNameText, isValid: $viewModel.urlNameIsValid)
+                InfoTextField(data: $urlNameTextFieldModel,
+                              text: $viewModel.urlNameText,
+                              isValid: $viewModel.isURLNameValid,
+                              titleTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkTitleTextView,
+                              textFieldAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkTextField,
+                              descriptionTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkDescriptionTextView,
+                              charCountTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkCharacterLimitTextView)
+                .onChange(of: viewModel.urlNameText) { text in
+                    if text.isEmpty {
+                        viewModel.isURLNameValid = true
+                    }
+                }
+                              
                 
                 if !data.url.isEmpty {
                     getRemoveLinkButton()
@@ -58,6 +85,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                 Spacer()
             }
             .navigationTitle("Add link")
+            .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.titleTextView)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -76,16 +104,22 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                             isPresented.toggle()
                         }))
                     }
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.cancelButton)
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") {
-                        data.url = viewModel.urlText
-                        data.urlName = viewModel.urlNameText
-                        isPresented.toggle()
+                        Task { @MainActor in
+                            guard await checkValidation(urlStr: viewModel.urlText, word: viewModel.urlNameText) else { return }
+                            
+                            data.url = viewModel.urlText
+                            data.urlName = viewModel.urlNameText
+                            isPresented.toggle()
+                        }
                     }
                     .buttonStyle(.plain)
-                    .disabled(viewModel.isDoneButtonDisabled)
+                    .disabled(!viewModel.isURLValid || viewModel.urlText.isEmpty)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.doneButton)
                 }
             }
             .onChange(of: isPresented) { value in
@@ -94,25 +128,35 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                 if value {
                     viewModel.urlText = data.url
                     viewModel.urlNameText = data.urlName
+                    
+                    viewModel.isURLValid = true
+                    viewModel.isURLNameValid = true
                 }
             }
+            .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.componentContaier)
         }
+        .overlay(
+            ProgressView().progressViewStyle(.circular)
+                .isHidden(!showActivityIndicator)
+        )
     }
     
     func getRemoveLinkButton() -> some View {
         VStack(alignment: .leading) {
-            HStack(spacing: 0) {
-                Image(AmityIcon.trashBinRedIcon.getImageResource())
-                    .frame(width: 20, height: 20)
-                    .padding(.trailing, 6)
-                Text("Remove link")
-                    .font(.system(size: 15))
-                    .foregroundColor(.red)
-                Spacer()
-            }
-            .onTapGesture {
+            Button(action: {
                 isRemoveLinkAlertShown.toggle()
-            }
+            }, label: {
+                HStack(spacing: 0) {
+                    Image(AmityIcon.trashBinRedIcon.getImageResource())
+                        .frame(width: 20, height: 20)
+                        .padding(.trailing, 6)
+                    Text("Remove link")
+                        .font(.system(size: 15))
+                        .foregroundColor(.red)
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.removeLinkButtonTextView)
+                    Spacer()
+                }
+            })
             .alert(isPresented: $isRemoveLinkAlertShown) {
                 Alert(title: Text("Remove link?"),
                       message: Text("This link will be removed from story."),
@@ -123,6 +167,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                     isPresented.toggle()
                 }))
             }
+            .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.removeLinkButton)
             
             Rectangle()
                 .frame(height: 1)
@@ -132,27 +177,38 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
         
         
     }
+    
+    private func checkValidation(urlStr: String, word: String) async -> Bool {
+        showActivityIndicator = true
+        
+        do {
+            urlTextFieldModel.errorMessage = "Please enter a whitelisted URL."
+            let isWhitelistedURL = try await AmityUIKitManagerInternal.shared.client.validateUrls(urls: [urlStr])
+            viewModel.isURLValid = isWhitelistedURL
+        } catch {
+            viewModel.isURLValid = false
+        }
+        
+        if !word.isEmpty {
+            do {
+                let isValidWord = try await AmityUIKitManagerInternal.shared.client.validateTexts(texts: [word])
+                viewModel.isURLNameValid = isValidWord
+            } catch {
+                viewModel.isURLNameValid = false
+            }
+        }
+        
+        showActivityIndicator = false
+        
+        return viewModel.isURLValid && viewModel.isURLNameValid
+    }
 }
 
 public class AmityHyperLinkConfigComponentViewModel: ObservableObject {
     @Published var urlText: String = ""
-    @Published var urlIsValid: Bool = true
+    @Published var isURLValid: Bool = true
     @Published var urlNameText: String = ""
-    @Published var urlNameIsValid: Bool = true
-    @Published var isDoneButtonDisabled: Bool = false
-    
-    private var cancellables: Set<AnyCancellable> = []
-
-    init() {
-        Publishers.CombineLatest3($urlText, $urlIsValid, $urlNameIsValid)
-            .map { urlText, urlIsValid, urlNameIsValid in
-                let value = urlIsValid && urlNameIsValid && !urlText.isEmpty
-                return !value
-            }
-            .assign(to: \.isDoneButtonDisabled, on: self)
-            .store(in: &cancellables)
-    }
-        
+    @Published var isURLNameValid: Bool = true
 }
 
 

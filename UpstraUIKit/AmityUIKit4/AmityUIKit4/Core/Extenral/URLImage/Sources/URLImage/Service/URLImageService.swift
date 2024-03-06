@@ -11,7 +11,7 @@ import Combine
 
 @available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 public class URLImageService {
-    public static let defaultImageService = URLImageService(fileStore: URLImageFileStore())
+    public static let defaultImageService = URLImageService(fileStore: URLImageFileStore(), inMemoryStore: URLImageInMemoryStore())
     
     
     public init(fileStore: URLImageFileStoreType? = nil, inMemoryStore: URLImageInMemoryStoreType? = nil) {

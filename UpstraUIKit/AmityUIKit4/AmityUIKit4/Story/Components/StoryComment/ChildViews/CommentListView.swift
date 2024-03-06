@@ -87,6 +87,7 @@ struct CommentListView: View {
                 .font(.system(size: 15))
                 .foregroundColor(Color(UIColor(hex: "#898E9E")))
                 .isHidden(collection.snapshots.count != 0 || isReply)
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.emptyTextView)
         }
     }
     
@@ -109,5 +110,6 @@ struct CommentListView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 4))
             Spacer()
         }
+        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.deletedComment)
     }
 }

@@ -10,7 +10,6 @@ import UIKit
 extension LiveStreamBroadcastViewController {
     
     func startLiveDurationTimer() {
-        startedAt = Date()
         updateStreamingStatusText()
         liveDurationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
             #if DEBUG
@@ -26,20 +25,35 @@ extension LiveStreamBroadcastViewController {
     }
     
     func updateStreamingStatusText() {
-        guard let startedAt = startedAt,
-              let durationText = liveDurationFormatter.string(from: startedAt, to: Date()),
-              let broadcaster = broadcaster else {
+        guard let broadcaster = broadcaster else {
             streamingStatusLabel.text = "LIVE"
             return
         }
+        var streamingStatus = ""
         switch broadcaster.state {
         case .connected:
-            streamingStatusLabel.text = "LIVE \(durationText)"
+            if !isStartStreaming {
+                startedAt = Date()
+                isStartStreaming = true
+            }
+            streamingStatus = "LIVE"
         case .connecting, .disconnected, .idle:
-            streamingStatusLabel.text = "CONNECTING \(durationText)"
+            streamingStatus = "CONNECTING"
         @unknown default:
-            streamingStatusLabel.text = "LIVE \(durationText)"
+            streamingStatus = "LIVE"
         }
+        
+        guard let startedAt = startedAt,
+              let durationText = liveDurationFormatter.string(from: startedAt, to: Date()) else {
+            streamingStatusLabel.text = streamingStatus
+            return
+        }
+        
+        /// Display finish button after streaming for 2 or more seconds, to prevent no streaming data being sent to server side.
+        if finishButton.isHidden, Date().timeIntervalSince(startedAt) > 2 {
+            finishButton.isHidden = false
+        }
+        streamingStatusLabel.text = "\(streamingStatus) \(durationText)"
     }
     
 }

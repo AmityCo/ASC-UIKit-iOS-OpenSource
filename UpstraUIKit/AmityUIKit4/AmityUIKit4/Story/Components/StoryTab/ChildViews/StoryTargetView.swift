@@ -40,10 +40,12 @@ struct StoryTargetView<Content: View>: View {
             ZStack {
                 AmityStoryRingElement(componentId: componentId, showRing: showRing, animateRing: animateRing, showErrorRing: showErrorRing)
                     .frame(width: 64, height: 64)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.storyRingView)
                 
                 AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: avatar)
                     .frame(width: 56, height: 56)
                     .clipShape(Circle())
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.avatarImageView)
                 
                 if showErrorRing {
                     Image(AmityIcon.errorStoryIcon.getImageResource())
@@ -51,6 +53,7 @@ struct StoryTargetView<Content: View>: View {
                         .offset(x: 22, y: 22)
                 } else {
                     cornerImage()
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.createStoryButton)
                 }
             }
             
@@ -63,6 +66,7 @@ struct StoryTargetView<Content: View>: View {
                 Text(name)
                     .font(.system(size: 13))
                     .frame(height: 20, alignment: .leading)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.targetNameTextView)
             }
         }
     }

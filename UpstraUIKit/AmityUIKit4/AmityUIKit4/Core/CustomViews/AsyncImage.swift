@@ -14,25 +14,22 @@ struct AsyncImage: View {
     
     var body: some View {
         GeometryReader { proxy in
-            VStack {
-                if let url {
-                    URLImage(url, empty: {
-                        Image(placeholder)
-                            .resizable()
-                            .clipped()
-                    }, inProgress: {_ in }, failure: {_,_  in}, content: { image in
-                        image
-                            .resizable()
-                            .frame(width: proxy.size.width, height: proxy.size.height)
-                            .clipped()
-                    })
-                } else {
-                    Image(placeholder)
-                        .resizable()
-                        .clipped()
-                }
-            }
-            .frame(width: proxy.size.width, height: proxy.size.height)
+            Image(placeholder)
+                .resizable()
+                .frame(width: proxy.size.width, height: proxy.size.height)
+                .clipped()
+                .overlay(
+                    VStack {
+                        if let url {
+                            URLImage(url, content: { image in
+                                image
+                                    .resizable()
+                                    .frame(width: proxy.size.width, height: proxy.size.height)
+                                    .clipped()
+                            })
+                        }
+                    }
+                )
         }
     }
 }

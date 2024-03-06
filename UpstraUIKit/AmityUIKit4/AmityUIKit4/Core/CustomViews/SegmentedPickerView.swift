@@ -50,6 +50,7 @@ struct SegmentedPickerView: View {
                             .onTapGesture {
                                 withAnimation(.easeInOut(duration: 0.1)) { currentIndex = i }
                             }
+                            .accessibilityIdentifier(i == 0 ? AccessibilityID.Story.AmityCreateStoryPage.switchPhotoButton : AccessibilityID.Story.AmityCreateStoryPage.switchVideoButton)
                     }
                 }
             }

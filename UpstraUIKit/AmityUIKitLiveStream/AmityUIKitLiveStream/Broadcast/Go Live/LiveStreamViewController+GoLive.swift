@@ -7,6 +7,7 @@
 
 import Foundation
 import AmitySDK
+import AmityUIKit
 
 extension LiveStreamBroadcastViewController {
     
@@ -21,7 +22,8 @@ extension LiveStreamBroadcastViewController {
         case .success:
             break
         }
-        
+        streamCreatingStackView.isHidden = false
+        streamCreateActivityIndicator.startAnimating()
         // This will turn back on again when the operation complete (either fail or success.)
         goLiveButton.isEnabled = false
         
@@ -102,6 +104,8 @@ extension LiveStreamBroadcastViewController {
         
         // Either fail or success, we enable this button back again.
         goLiveButton.isEnabled = true
+        streamCreateActivityIndicator.stopAnimating()
+        streamCreatingStackView.isHidden = true
         
         switch result {
         case .success(let post):

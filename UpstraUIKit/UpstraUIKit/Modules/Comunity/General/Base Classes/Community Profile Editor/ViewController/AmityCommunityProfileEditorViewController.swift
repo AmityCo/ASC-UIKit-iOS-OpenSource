@@ -339,7 +339,7 @@ private extension AmityCommunityProfileEditorViewController {
             let cameraPicker = UIImagePickerController()
             cameraPicker.sourceType = .camera
             cameraPicker.delegate = self
-            self?.present(cameraPicker, animated: true, completion: nil)
+            self?.displayCamera(cameraPicker: cameraPicker)
         }
         
         var galleryOption = TextItemOption(title: AmityLocalizedStringSet.General.imageGallery.localizedString)

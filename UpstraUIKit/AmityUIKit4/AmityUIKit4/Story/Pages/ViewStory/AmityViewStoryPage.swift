@@ -75,6 +75,10 @@ public struct AmityViewStoryPage: AmityPageView {
                                     Log.add(event: .info, "Story Segment Changed: \(count) - \(storyTarget.targetName)")
                                     updateProgressSegmentWidth(totalWidth: geometry.size.width, numberOfStories: count)
                                     
+                                    if storyTarget.hasUnseenStory {
+                                        storySegmentIndex = storyTarget.unseenStoryIndex
+                                    }
+                                    
                                     progressBarViewModel.progressArray = (0..<count).map({ index in
                                         // If a story is deleted and story count is changed, this block will trigger again.
                                         // All segments till storySegmentIndex need to be filled.
@@ -85,22 +89,6 @@ public struct AmityViewStoryPage: AmityPageView {
                                         }
                                         return AmityProgressBarElementViewModel()
                                     })
-                                }
-                                .onReceive(storyTarget.$unseenStoryIndex) { index in
-                                    if storyTarget.hasUnseenStory  && index != 0 {
-                                        storySegmentIndex = index
-                                        updateProgressSegmentWidth(totalWidth: geometry.size.width, numberOfStories: storyTarget.storyCount)
-                                        
-                                        progressBarViewModel.progressArray = (0...index).map({ index in
-                                            // All segments till storySegmentIndex need to be filled if segment are skipped.
-                                            if index < storySegmentIndex && storySegmentIndex != 0 {
-                                                let model = AmityProgressBarElementViewModel()
-                                                model.progress = progressSegmentWidth
-                                                return model
-                                            }
-                                            return AmityProgressBarElementViewModel()
-                                        })
-                                    }
                                 }
 
                             HStack(spacing: 0) {
@@ -121,6 +109,7 @@ public struct AmityViewStoryPage: AmityPageView {
                                     }
                                 }
                                 .isHidden(!(hasStoryManagePermission && AmityUIKitManagerInternal.shared.currentUserId == storyCreatorId), remove: false)
+                                .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.meatballsButton)
                                 
                                 Button {
                                     Log.add(event: .info, "Tapped Closed!!!")
@@ -131,6 +120,7 @@ public struct AmityViewStoryPage: AmityPageView {
                                         .frame(width: 24, height: 18)
                                         .padding(.trailing, 25)
                                 }
+                                .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.closeButton)
                             }
                             
                             Spacer()
@@ -214,6 +204,7 @@ public struct AmityViewStoryPage: AmityPageView {
                         }
                     }))
                 })
+                .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.BottomSheet.deleteButton)
                 Spacer()
             }
             .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
@@ -341,6 +332,7 @@ class AmityStoryPageViewModel: ObservableObject {
     
     deinit {
         timer.upstream.connect().cancel()
+        URLImageService.defaultImageService.inMemoryStore?.removeAllImages()
     }
     
     @MainActor

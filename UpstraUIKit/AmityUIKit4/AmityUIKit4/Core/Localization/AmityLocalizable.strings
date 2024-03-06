@@ -51,4 +51,5 @@
 "comment_edited_text" = "(edited)";
 "view_more_reply_text" = "View more reply";
 "disable_create_comment_text" = "Comments are disabled for this story";
+"comment_with_banned_words_error_message" = "Your comment wasn’t created as it contained blocked words. Only you can see this.";
 

@@ -18,11 +18,13 @@ public typealias AmityCommentButtonAction = (AmityCommentButtonActionType) -> Vo
 
 public struct AmityCommentView: View {
     private let reactionManager: ReactionManager = ReactionManager()
+    private let commentManager: CommentManager = CommentManager()
     
     let comment: AmityCommentModel
     let hideReplyButton: Bool
     let hideButtonView: Bool
     let commentButtonAction: AmityCommentButtonAction
+    @State var showSheet: Bool = false
     
     public init(comment: AmityCommentModel, hideReplyButton: Bool = false, hideButtonView: Bool = false, commentButtonAction: @escaping AmityCommentButtonAction) {
         self.comment = comment
@@ -37,35 +39,62 @@ public struct AmityCommentView: View {
                 .frame(width: 32, height: 32)
                 .clipShape(.circle)
                 .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.avatarImageView)
             
             VStack(alignment: .leading, spacing: 12) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(comment.displayName)
-                        .font(.system(size: 13, weight: .semibold))
-                        .padding([.top, .leading, .trailing], 12)
+                HStack(alignment: .bottom) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(comment.displayName)
+                            .font(.system(size: 13, weight: .semibold))
+                            .padding([.top, .leading, .trailing], 12)
+                            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.nameTextView)
+                        
+                        getModeratorBadgeView()
+                            .padding([.leading, .trailing], 12)
+                            .isHidden(!comment.isModerator)
+                            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.badgeImageView)
+                        
+                        ExpandableText(comment.text, metadata: comment.metadata, mentionees: comment.mentionees)
+                            .lineLimit(8)
+                            .moreButtonText("...more")
+                            .font(.system(size: 13.5))
+                            .expandAnimation(.easeOut(duration: 0.25))
+                            .lineSpacing(5)
+                            .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
+                            .padding([.leading, .bottom, .trailing], 12)
+                            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentTextView)
                     
-                    getModeratorBadgeView()
-                        .padding([.leading, .trailing], 12)
-                        .isHidden(!comment.isModerator)
+                    }
+                    .background(Color(UIColor(hex: "#EBECEF")))
+                    .clipShape(RoundedCorner(radius: 12, corners: [.topRight, .bottomLeft, .bottomRight]))
                     
-                    ExpandableText(comment.text, metadata: comment.metadata, mentionees: comment.mentionees)
-                        .lineLimit(8)
-                        .moreButtonText("...more")
-                        .font(.system(size: 13.5))
-                        .expandAnimation(.easeOut(duration: 0.25))
-                        .lineSpacing(5)
-                        .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
-                        .padding([.leading, .bottom, .trailing], 12)
-                
+                    Button {
+                        showSheet.toggle()
+                    } label: {
+                        Image(AmityIcon.commentFailedIcon.getImageResource())
+                            .resizable()
+                            .frame(width: 15, height: 15)
+                            .padding(.bottom, 5)
+                            .isHidden(comment.syncState != .error)
+                    }
+                    .actionSheet(isPresented: $showSheet) {
+                        ActionSheet(title: Text(AmityLocalizedStringSet.Comment.deleteCommentTitle.localizedString), buttons: [
+                            .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
+                                Task {
+                                    try await commentManager.deleteComment(withId: comment.id)
+                                }
+                            }),
+                            .cancel()
+                        ])
+                    }
                 }
-                .background(Color(UIColor(hex: "#EBECEF")))
-                .clipShape(RoundedCorner(radius: 12, corners: [.topRight, .bottomLeft, .bottomRight]))
                 
                 HStack {
                     HStack(spacing: 12) {
                         Text(comment.isEdited ? "\(comment.createdAt.timeAgoString) \(AmityLocalizedStringSet.Comment.editedText.localizedString)" : comment.createdAt.timeAgoString)
                             .font(.system(size: 13))
                             .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.timestampTextView)
                         
                         Button(feedbackStyle: .light) {
                             // Reaction action cannot be decoupled since it is having rendering orchestration issue.
@@ -82,6 +111,7 @@ public struct AmityCommentView: View {
                                 .font(.system(size: 13))
                                 .foregroundColor(comment.isLiked ? .accentColor : Color(UIColor(hex: "#898E9E")))
                         }
+                        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.reactionButton)
 
                         Button {
                             commentButtonAction(.reply(comment))
@@ -90,6 +120,7 @@ public struct AmityCommentView: View {
                                 .font(.system(size: 13))
                                 .foregroundColor(Color(UIColor(hex: "#898E9E")))
                         }
+                        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.replyButton)
                         .isHidden(hideReplyButton)
                         
                         Button {
@@ -100,13 +131,17 @@ public struct AmityCommentView: View {
                         }
                         
                         Spacer()
-                    }.isHidden(hideButtonView)
+                    }
+                    .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.meatballsButton)
+                    .isHidden(hideButtonView)
 
                     
                     HStack(spacing: 4) {
                         Text(comment.reactionsCount.formattedCountString)
                             .font(.system(size: 13))
                             .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.reactionCountTextView)
+                        
                         Image(AmityIcon.likeReactionIcon.getImageResource())
                             .resizable()
                             .frame(width: 17, height: 17)

@@ -36,6 +36,7 @@ public struct AmityCommentModel: Identifiable, Equatable  {
     let mentionees: [AmityMentionees]?
     let reactions: [String: Int]
     var isModerator: Bool = false
+    let syncState: AmitySyncState
     
     // Due to AmityChat 4.0.0 requires comment object for editing and deleting
     // So, this is a workaroud for passing the original object.
@@ -68,6 +69,8 @@ public struct AmityCommentModel: Identifiable, Equatable  {
         default:
             break
         }
+        
+        syncState = comment.syncState
     }
     
     var isChildrenExisted: Bool {

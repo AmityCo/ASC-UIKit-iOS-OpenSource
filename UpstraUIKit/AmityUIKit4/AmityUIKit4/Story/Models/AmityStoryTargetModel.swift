@@ -76,10 +76,6 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
             .sink(receiveValue: { [weak self] stories in
                 guard let self else { return }
                 
-                if self.storyCount != stories.count {
-                    self.storyCount = stories.count
-                }
-                
                 if let hasUnseen = stories.first?.storyTarget?.hasUnseen {
                     self.hasUnseenStory = hasUnseen
                 }
@@ -97,6 +93,10 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
                     if let unseenIndice = stories.firstIndex(where: { $0.isSeen == false }) {
                         self.unseenStoryIndex = unseenIndice
                     }
+                }
+                
+                if self.storyCount != stories.count {
+                    self.storyCount = stories.count
                 }
                 
                 let newSnapshot = self.mapToModel(stories)

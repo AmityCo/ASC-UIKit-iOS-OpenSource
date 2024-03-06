@@ -58,6 +58,7 @@ enum AmityIcon: String {
     case deletedMessageIcon = "deletedMessageIcon"
     case editCommentIcon = "editCommentIcon"
     case moderatorBadgeIcon = "moderatorBadgeIcon"
+    case commentFailedIcon = "failedCommentIcon"
     
     
     func getURL() -> URL {

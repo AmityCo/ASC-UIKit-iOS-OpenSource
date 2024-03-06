@@ -140,7 +140,7 @@ private extension AmityMessageListViewController {
         let cameraPicker = UIImagePickerController()
         cameraPicker.sourceType = .camera
         cameraPicker.delegate = self
-        present(cameraPicker, animated: true, completion: nil)
+        displayCamera(cameraPicker: cameraPicker)
     }
     
     func albumTap() {
