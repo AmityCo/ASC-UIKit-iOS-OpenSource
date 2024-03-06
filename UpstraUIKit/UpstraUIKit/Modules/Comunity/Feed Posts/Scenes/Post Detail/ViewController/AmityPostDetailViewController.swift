@@ -742,6 +742,27 @@ extension AmityPostDetailViewController: AmityCommentTableViewCellDelegate {
         }
     }
     
+    func commentCellDidTapStatus(_ cell: AmityCommentTableViewCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        switch screenViewModel.item(at: indexPath) {
+        case .comment(let comment), .replyComment(let comment):
+            let deleteOptionTitle = comment.isParent ? AmityLocalizedStringSet.PostDetail.deleteComment.localizedString : AmityLocalizedStringSet.PostDetail.deleteReply.localizedString
+            
+            let alertViewController = UIAlertController(title: deleteOptionTitle,
+                                                        message: nil, preferredStyle: .actionSheet)
+            let cancel = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel, handler: nil)
+            let delete = UIAlertAction(title: AmityLocalizedStringSet.General.delete.localizedString, style: .destructive, handler: { [weak self] _ in
+                self?.screenViewModel.action.deleteComment(with: comment)
+            })
+            alertViewController.addAction(cancel)
+            alertViewController.addAction(delete)
+            present(alertViewController, animated: true)
+
+        case .post, .loadMoreReply:
+            break
+        }
+    }
+    
     func commentCellDidTapReactionDetails(_ cell: AmityCommentTableViewCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         

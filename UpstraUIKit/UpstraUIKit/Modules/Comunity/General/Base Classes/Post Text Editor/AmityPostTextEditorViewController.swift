@@ -577,7 +577,7 @@ public class AmityPostTextEditorViewController: AmityViewController {
             Log.add("Type mismatch")
         }
         
-        present(cameraPicker, animated: true, completion: nil)
+        displayCamera(cameraPicker: cameraPicker)
         
     }
     

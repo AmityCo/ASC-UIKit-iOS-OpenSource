@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 public enum AmityNavigationBarType {
     /// Style for root view controller, align-left title.
@@ -192,4 +193,44 @@ extension AmityViewController: UIGestureRecognizerDelegate {
         return isSystemSwipeToBackEnabled && isThereStackedViewControllers
     }
     
+}
+
+extension AmityViewController {
+    
+    func displayCamera(cameraPicker: UIImagePickerController) {
+        requestCameraPermission(completion: { [weak self] success in
+            DispatchQueue.main.async {
+                if success {
+                    self?.present(cameraPicker, animated: true)
+                } else {
+                    self?.showNoCameraPermissionAlert()
+                }
+            }
+        })
+    }
+    
+    func requestCameraPermission(completion: ((Bool) -> Void)?) {
+        
+        if AVCaptureDevice.authorizationStatus(for: .video) == .authorized {
+            completion?(true)
+        } else {
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                if granted {
+                    completion?(true)
+                } else {
+                    completion?(false)
+                }
+            }
+        }
+
+    }
+    
+    func showNoCameraPermissionAlert() {
+        let title = "Permission Required!!"
+        let message = "Please grant camera permission in iOS settings."
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "OK", style: .default)
+        alertController.addAction(ok)
+        self.present(alertController, animated: true)
+    }
 }

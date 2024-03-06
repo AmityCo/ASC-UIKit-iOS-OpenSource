@@ -16,6 +16,7 @@ enum AmityCommentViewAction {
     case option
     case viewReply
     case reactionDetails
+    case status
 }
 
 protocol AmityCommentViewDelegate: AnyObject {
@@ -46,6 +47,7 @@ class AmityCommentView: AmityView {
     @IBOutlet private var badgeStackView: UIStackView!
     @IBOutlet private var badgeIconImageView: UIImageView!
     @IBOutlet private var badgeLabel: UILabel!
+    @IBOutlet private weak var commentStatusButton: UIButton!
     
     weak var delegate: AmityCommentViewDelegate?
     private(set) var comment: AmityCommentModel?
@@ -120,6 +122,8 @@ class AmityCommentView: AmityView {
         badgeLabel.textColor = AmityColorSet.base.blend(.shade1)
         badgeIconImageView.image = AmityIconSet.iconBadgeModerator
 
+        commentStatusButton.isHidden = true
+        commentStatusButton.addTarget(self, action: #selector(onStatusButtonTap), for: .touchUpInside)
     }
     
     func configure(with comment: AmityCommentModel, layout: AmityCommentView.Layout) {
@@ -171,6 +175,9 @@ class AmityCommentView: AmityView {
         viewReplyButton.isHidden = !layout.shouldShowViewReplyButton(for: comment)
         leadingAvatarImageViewConstraint.constant = layout.space.avatarLeading
         topAvatarImageViewConstraint.constant = layout.space.aboveAvatar
+        
+        commentStatusButton.isHidden = comment.syncState != .error
+        commentStatusButton.isEnabled = comment.syncState == .error
     }
     
     func toggleActionVisibility(comment: AmityCommentModel, layout: AmityCommentView.Layout) {
@@ -188,6 +195,10 @@ class AmityCommentView: AmityView {
                 actionStackView.isHidden = true
             }
         }
+    }
+    
+    @objc private func onStatusButtonTap() {
+        delegate?.commentView(self, didTapAction: .status)
     }
     
     @IBAction func displaynameTap(_ sender: Any) {

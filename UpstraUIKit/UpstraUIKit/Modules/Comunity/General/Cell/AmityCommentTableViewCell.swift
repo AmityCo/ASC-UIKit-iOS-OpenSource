@@ -15,6 +15,7 @@ protocol AmityCommentTableViewCellDelegate: AnyObject {
     func commentCellDidTapOption(_ cell: AmityCommentTableViewCell)
     func commentCellDidTapAvatar(_ cell: AmityCommentTableViewCell, userId: String)
     func commentCellDidTapReactionDetails(_ cell: AmityCommentTableViewCell)
+    func commentCellDidTapStatus(_ cell: AmityCommentTableViewCell)
 }
 
 class AmityCommentTableViewCell: UITableViewCell, Nibbable {
@@ -68,6 +69,8 @@ extension AmityCommentTableViewCell: AmityCommentViewDelegate {
             actionDelegate?.commentCellDidTapReply(self)
         case .reactionDetails:
             actionDelegate?.commentCellDidTapReactionDetails(self)
+        case .status:
+            actionDelegate?.commentCellDidTapStatus(self)
         }
     }
     

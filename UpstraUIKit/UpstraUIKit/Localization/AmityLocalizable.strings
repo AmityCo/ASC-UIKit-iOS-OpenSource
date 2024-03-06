@@ -230,7 +230,7 @@
 "post_detail_discard_edited_comment_message" = "Do you want to discard edited comment?";
 "post_detail_delete_post_title" = "Delete this post";
 "post_detail_delete_post_message" = "This post will be permanently deleted. You’ll no longer to see and find this post";
-"post_detail_banned_comment_error_message" = "Sorry, your comment has been deleted due to containing inappropriate words.\nPlease contact the administrator for more information.";
+"post_detail_banned_comment_error_message" = "Your comment wasn’t created as it contained blocked words. Only you can see this.";
 "post_detail_comment_edited" = "%@ • Edited";
 
 // MARK: - Post to

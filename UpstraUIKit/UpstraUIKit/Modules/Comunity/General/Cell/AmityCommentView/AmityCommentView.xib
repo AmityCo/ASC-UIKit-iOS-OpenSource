@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -18,6 +18,7 @@
                 <outlet property="badgeStackView" destination="zWY-HO-6ff" id="YNs-mM-V1a"/>
                 <outlet property="bannedImageView" destination="30j-zx-d2A" id="jEy-aE-606"/>
                 <outlet property="bannedImageViewWidthConstraint" destination="ufK-o4-Q45" id="NeJ-al-Dvx"/>
+                <outlet property="commentStatusButton" destination="TUA-4u-J0C" id="qB8-dP-FLG"/>
                 <outlet property="contentLabel" destination="3js-u5-f3w" id="fAk-QB-jih"/>
                 <outlet property="labelContainerView" destination="hZ6-HJ-hVz" id="it3-aK-Syp"/>
                 <outlet property="leadingAvatarImageViewConstraint" destination="QQS-Sp-FlV" id="8ej-7a-Hj3"/>
@@ -201,19 +202,29 @@
                         <constraint firstAttribute="height" constant="1" id="6lm-n6-IwM"/>
                     </constraints>
                 </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TUA-4u-J0C">
+                    <rect key="frame" x="141" y="74" width="25" height="25"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="25" id="RN8-vb-Kwa"/>
+                        <constraint firstAttribute="width" constant="25" id="eO9-kG-yji"/>
+                    </constraints>
+                    <state key="normal" image="icon_message_failed"/>
+                </button>
             </subviews>
             <viewLayoutGuide key="safeArea" id="hZz-Ef-ceS"/>
             <color key="backgroundColor" systemColor="systemBackgroundColor"/>
             <constraints>
+                <constraint firstItem="hZz-Ef-ceS" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="TUA-4u-J0C" secondAttribute="trailing" constant="8" id="21v-Nv-vOI"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="30j-zx-d2A" secondAttribute="trailing" constant="16" id="3Dw-oz-mOs"/>
-                <constraint firstItem="hZz-Ef-ceS" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="hZ6-HJ-hVz" secondAttribute="trailing" constant="16" id="3zW-q0-sdF"/>
                 <constraint firstItem="cA7-hE-AlO" firstAttribute="leading" secondItem="QYJ-Ve-4l1" secondAttribute="leading" id="4cw-BB-q8U"/>
                 <constraint firstItem="dTi-yd-Jpy" firstAttribute="leading" secondItem="VRn-3N-7LU" secondAttribute="trailing" constant="8" id="6dm-oQ-f90"/>
                 <constraint firstItem="Kdn-rR-lNj" firstAttribute="trailing" secondItem="W8H-Za-fho" secondAttribute="trailing" id="7dx-dH-2Az"/>
                 <constraint firstItem="Kdn-rR-lNj" firstAttribute="bottom" secondItem="W8H-Za-fho" secondAttribute="bottom" id="9c0-wV-z2f"/>
+                <constraint firstItem="TUA-4u-J0C" firstAttribute="bottom" secondItem="hZ6-HJ-hVz" secondAttribute="bottom" constant="-2" id="BOw-d4-0CS"/>
                 <constraint firstItem="W8H-Za-fho" firstAttribute="centerY" secondItem="VRn-3N-7LU" secondAttribute="centerY" id="OXy-dy-e3q"/>
                 <constraint firstItem="VRn-3N-7LU" firstAttribute="leading" secondItem="QYJ-Ve-4l1" secondAttribute="leading" constant="16" id="QQS-Sp-FlV"/>
                 <constraint firstItem="hZz-Ef-ceS" firstAttribute="bottom" secondItem="dTi-yd-Jpy" secondAttribute="bottom" priority="999" constant="12" id="TWW-YR-AbN"/>
+                <constraint firstItem="TUA-4u-J0C" firstAttribute="leading" secondItem="hZ6-HJ-hVz" secondAttribute="trailing" constant="4" id="VZK-oz-vPb"/>
                 <constraint firstItem="Kdn-rR-lNj" firstAttribute="leading" secondItem="W8H-Za-fho" secondAttribute="leading" id="aBh-BR-K6n"/>
                 <constraint firstAttribute="trailing" secondItem="cA7-hE-AlO" secondAttribute="trailing" id="bkr-kY-9Ks"/>
                 <constraint firstItem="W8H-Za-fho" firstAttribute="leading" secondItem="VRn-3N-7LU" secondAttribute="trailing" constant="8" id="cFy-Fn-KiE"/>
@@ -239,10 +250,11 @@
         <image name="icon_arrow_right" width="24" height="24"/>
         <image name="icon_like" width="12" height="12"/>
         <image name="icon_like_button" width="20" height="20"/>
+        <image name="icon_message_failed" width="16" height="16"/>
         <image name="icon_option" width="16" height="4"/>
         <image name="icon_reply" width="14" height="12"/>
         <systemColor name="labelColor">
-            <color red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
