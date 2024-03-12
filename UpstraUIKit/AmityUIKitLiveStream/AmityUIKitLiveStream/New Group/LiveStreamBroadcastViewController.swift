@@ -113,6 +113,7 @@ final public class LiveStreamBroadcastViewController: UIViewController {
     var keyboardObservationTokens: [NSObjectProtocol] = []
     
     var isStartStreaming = false
+    var currentAppIdleTimerDisabled = false
     
     // MARK: - Init / Deinit
     
@@ -154,6 +155,11 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         liveObjectQueryToken = nil
         unobserveKeyboardFrame()
         stopLiveDurationTimer()
+        
+        /// Disable app idle timer if it was previously disabled.
+        if !currentAppIdleTimerDisabled {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -173,6 +179,12 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         // Observe app life cycle notfications
         NotificationCenter.default.addObserver(self, selector: #selector(suspendLiveStream), name: UIApplication.didEnterBackgroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(resumeLiveStream), name: UIApplication.willEnterForegroundNotification, object: nil)
+        
+        if !UIApplication.shared.isIdleTimerDisabled {
+            currentAppIdleTimerDisabled = true
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        
     }
     
     public override func viewDidAppear(_ animated: Bool) {
