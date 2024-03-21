@@ -17,6 +17,8 @@ public struct AmityLocalizedStringSet {
         static let retry = "retry"
         static let discard = "discard"
         static let anonymous = "general_anonymous"
+        static let permissionRequired = "permission_required"
+        static let cameraAccessDenied = "camera_access_denied"
     }
     
     public enum Story {

@@ -25,6 +25,7 @@ public struct AmityCommentView: View {
     let hideButtonView: Bool
     let commentButtonAction: AmityCommentButtonAction
     @State var showSheet: Bool = false
+    @State var showReactionSheet: Bool = false
     
     public init(comment: AmityCommentModel, hideReplyButton: Bool = false, hideButtonView: Bool = false, commentButtonAction: @escaping AmityCommentButtonAction) {
         self.comment = comment
@@ -146,6 +147,12 @@ public struct AmityCommentView: View {
                             .resizable()
                             .frame(width: 17, height: 17)
                     }
+                    .onTapGesture {
+                        showReactionSheet.toggle()
+                    }
+                    .sheet(isPresented: $showReactionSheet, content: {
+                        ReactionListPage(referenceId: comment.id, referenceType: .comment)
+                    })
                     .isHidden(comment.reactionsCount == 0)
                 }
                 .isHidden(hideButtonView && comment.reactionsCount == 0)

@@ -9,7 +9,6 @@ import SwiftUI
 import AmitySDK
 
 public struct AmityCommentTrayComponent: View {
-    @State private var text: String = ""
     @StateObject private var viewModel: AmityCommentTrayComponentViewModel = AmityCommentTrayComponentViewModel()
     @State private var replyState: (showToReply: Bool, comment: AmityCommentModel?) = (false, nil)
     @State private var bottomSheetState: (isShown: Bool, comment: AmityCommentModel?) = (false, nil)
@@ -18,14 +17,19 @@ public struct AmityCommentTrayComponent: View {
     @StateObject private var commentCoreViewModel: CommentCoreViewModel
     private let avatarURL: URL? = URL(string: AmityUIKitManagerInternal.shared.client.user?.snapshot?.getAvatarInfo()?.fileURL ?? "")
     
+    @State private var text: String = ""
+    @State private var mentionData: MentionData = MentionData()
+    
     let referenceId: String
     let referenceType: AmityCommentReferenceType
+    let communityId: String?
     let hideCommentButton: Bool
     let allowCreateComment: Bool
     
-    public init(referenceId: String, referenceType: AmityCommentReferenceType, hideCommentButtons: Bool = false, allowCreateComment: Bool = false) {
+    public init(referenceId: String, referenceType: AmityCommentReferenceType, communityId: String? = nil, hideCommentButtons: Bool = false, allowCreateComment: Bool = false) {
         self.referenceId = referenceId
         self.referenceType = referenceType
+        self.communityId = communityId
         self.hideCommentButton = hideCommentButtons
         self.allowCreateComment = allowCreateComment
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: referenceId, referenceType: referenceType))
@@ -97,9 +101,10 @@ public struct AmityCommentTrayComponent: View {
                     .padding(.leading, 12)
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.avatarImageView)
                 
-                TextField(AmityLocalizedStringSet.Comment.commentTextFieldPlacholder.localizedString, text: $text)
-                    .font(.system(size: 15))
-                    .frame(height: 20)
+                
+                AmityTextEditorView(.comment(communityId: communityId ?? ""), text: $text, mentionData: $mentionData, textViewHeight: 20.0)
+                    .placeholder(AmityLocalizedStringSet.Comment.commentTextFieldPlacholder.localizedString)
+                    .maxExpandableHeight(120.0)
                     .padding([.leading, .trailing], 12)
                     .padding([.top, .bottom], 10)
                     .background(RoundedRectangle(cornerRadius: 30)
@@ -111,7 +116,7 @@ public struct AmityCommentTrayComponent: View {
                     Task {
                         do {
                             let parentId = replyState.showToReply ? replyState.comment?.commentId : nil
-                            try await viewModel.createComment(referenceId: referenceId, referenceType: referenceType, text: text, parentId: parentId)
+                            try await viewModel.createComment(referenceId: referenceId, referenceType: referenceType, text: text, parentId: parentId, mentionData: mentionData)
                         } catch {
                             Toast.showToast(style: .warning, message: error.isAmityErrorCode(.banWordFound) ? AmityLocalizedStringSet.Comment.commentWithBannedWordsErrorMessage.localizedString : error.localizedDescription)
                         }
@@ -127,8 +132,7 @@ public struct AmityCommentTrayComponent: View {
                 .disabled(text.isEmpty)
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.postButton)
             }
-            .frame(height: 56)
-            .padding(.bottom, 10)
+            .padding([.bottom, .top], 10)
             .isHidden(hideCommentButton)
         } else {
             HStack(spacing: 16) {
@@ -260,6 +264,8 @@ public struct AmityCommentTrayComponent: View {
         case .reply(let comment):
             replyState = (true, comment)
         case .meatball(let comment):
+            hideKeyboard() 
+            
             bottomSheetState.isShown.toggle()
             bottomSheetState.comment = comment
         }
@@ -277,8 +283,8 @@ class AmityCommentTrayComponentViewModel: ObservableObject {
     private let commentManager = CommentManager()
     
     @MainActor
-    func createComment(referenceId: String, referenceType: AmityCommentReferenceType, text: String, parentId: String? = nil) async throws {
-        let createOptions = AmityCommentCreateOptions(referenceId: referenceId, referenceType: referenceType, text: text, parentId: parentId)
+    func createComment(referenceId: String, referenceType: AmityCommentReferenceType, text: String, parentId: String? = nil, mentionData: MentionData?) async throws {
+        let createOptions = AmityCommentCreateOptions(referenceId: referenceId, referenceType: referenceType, text: text, parentId: parentId, metadata: mentionData?.metadata, mentioneeBuilder: mentionData?.mentionee)
         try await commentManager.createComment(createOptions: createOptions)
     }
     

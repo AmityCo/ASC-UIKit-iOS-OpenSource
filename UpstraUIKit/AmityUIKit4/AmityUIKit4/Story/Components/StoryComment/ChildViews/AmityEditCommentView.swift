@@ -10,9 +10,11 @@ import SwiftUI
 public struct AmityEditCommentView: View {
     
     @State private var text: String = ""
+    @State private var mentionData: MentionData = MentionData()
     private let comment: AmityCommentModel
     private let cancelAction: () -> Void
     private let saveAction: (AmityCommentModel) -> Void
+    @State private var bottomPadding: CGFloat = 0.0
     
     public init(comment: AmityCommentModel, cancelAction: @escaping () -> Void, saveAction: @escaping (AmityCommentModel) -> Void) {
         self.comment = comment
@@ -45,17 +47,18 @@ public struct AmityEditCommentView: View {
             
             VStack(alignment: .trailing, spacing: 10) {
             
-                ZStack {
-                    TextEditor(text: $text)
-                        .font(.system(size: 13.5))
-                        .lineSpacing(5)
-                        .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
-                        .frame(height: 120)
-                        .colorMultiply(Color(UIColor(hex: "#EBECEF")))
-                        .padding(12)
-                }
-                .background(Color(UIColor(hex: "#EBECEF")))
-                .clipShape(RoundedCorner(radius: 12, corners: [.topRight, .bottomLeft, .bottomRight]))
+                AmityTextEditorView(.comment(communityId: comment.communityId), text: $text, mentionData: $mentionData, textViewHeight: 120.0)
+                    .maxExpandableHeight(120)
+                    .mentionListPosition(.bottom(20.0))
+                    .autoFocus(true)
+                    .willShowMentionList { listHeight in
+                        bottomPadding = listHeight
+                    }
+                    .padding(12)
+                    .background(
+                        RoundedCorner(radius: 12, corners: [.topRight, .bottomLeft, .bottomRight])
+                            .fill(Color(UIColor(hex: "#EBECEF")))
+                    )
                 
                 HStack(spacing: 8) {
                     Button {
@@ -74,6 +77,9 @@ public struct AmityEditCommentView: View {
                     Button {
                         var editedComment = comment
                         editedComment.text = text
+                        editedComment.metadata = mentionData.metadata
+                        editedComment.mentioneeBuilder = mentionData.mentionee
+                        
                         saveAction(editedComment)
                     } label: {
                         Text(AmityLocalizedStringSet.General.save.localizedString)
@@ -87,13 +93,14 @@ public struct AmityEditCommentView: View {
                     )
                     .clipShape(RoundedCorner(radius: 4))
                     .disabled(text.isEmpty || comment.text == text)
-                    
                 }
+                .padding(.top, bottomPadding)
             }
             Spacer(minLength: 16)
         }
         .onAppear {
             text = comment.text
+            mentionData.metadata = comment.metadata
         }
 
     }

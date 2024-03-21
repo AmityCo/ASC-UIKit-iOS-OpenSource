@@ -92,7 +92,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         if let firstItem = storyModel.storyItems.first, let hyperlinkItem = firstItem as? AmityHyperLinkItem {
                             let data = hyperlinkItem.getData()
                             let model = HyperLinkModel(url: data["url"] as? String ?? "", urlName: data["customText"] as? String ?? "")
-                            getHyperLinkView(data: model)
+                            getHyperLinkView(data: model, story: storyModel)
                         }
                     }
                     .offset(y: 30) // height + padding top, bottom of progressBarView
@@ -236,7 +236,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     }
     
     
-    func getHyperLinkView(data: HyperLinkModel) -> some View {
+    func getHyperLinkView(data: HyperLinkModel, story: AmityStoryModel) -> some View {
         HStack(spacing: 0) {
             Image(AmityIcon.hyperLinkBlueIcon.getImageResource())
                 .frame(width: 20, height: 20)
@@ -254,6 +254,8 @@ struct StoryCoreView: View, AmityViewIdentifiable {
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .padding(EdgeInsets(top: 0, leading: 24, bottom: 62, trailing: 24))
         .onTapGesture {
+            story.analytics.markLinkAsClicked()
+            
             guard let url = URLHelper.concatProtocolIfNeeded(urlStr: data.url) else {
                 return
             }
@@ -327,37 +329,59 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             
             Spacer()
             
-            Button {
+            let commentBtnBgColor = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .storyCommentButtonElement, key: "background_color", of: String.self) ?? "#FFFFFF"))
+            HStack(spacing: 0) {
+                let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .storyCommentButtonElement, key: "comment_icon", of: String.self) ?? "")
+                Image(icon)
+                    .frame(width: 20, height: 16)
+                    .padding(.leading, 10)
+                    .padding(.trailing, 4)
+                Text(story.commentCount.formattedCountString)
+                    .lineLimit(1)
+                    .font(.system(size: 15).monospacedDigit())
+                    .foregroundColor(.white)
+                    .padding(.trailing, 10)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.commentButtonTextView)
+            }
+            .frame(minWidth: 56)
+            .frame(height: 40)
+            .fixedSize()
+            .background(commentBtnBgColor)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .onTapGesture {
+                ImpactFeedbackGenerator.impactFeedback(style: .light)
                 showCommentTray.toggle()
-            } label: {
-                let color = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .storyCommentButtonElement, key: "background_color", of: String.self) ?? "#FFFFFF"))
-                HStack(spacing: 0) {
-                    let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .storyCommentButtonElement, key: "comment_icon", of: String.self) ?? "")
-                    Image(icon)
-                        .frame(width: 20, height: 16)
-                        .padding(.leading, 10)
-                        .padding(.trailing, 4)
-                    Text(story.commentCount.formattedCountString)
-                        .lineLimit(1)
-                        .font(.system(size: 15).monospacedDigit())
-                        .foregroundColor(.white)
-                        .padding(.trailing, 10)
-                        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.commentButtonTextView)
-                }
-                .frame(minWidth: 56)
-                .frame(height: 40)
-                .fixedSize()
-                .background(color)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
             }
             .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.commentButton)
             
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
-            Button(feedbackStyle: .light) {
+            let reactionBtnBgColor = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .storyReactionButtonElement, key: "background_color", of: String.self) ?? ""))
+            HStack(spacing: 0) {
+                let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .storyReactionButtonElement, key: "reaction_icon", of: String.self) ?? "")
+                let likedIcon = AmityIcon.likeReactionIcon.getImageResource()
+                Image(story.isLiked ? likedIcon : icon)
+                    .frame(width: 20, height: 16)
+                    .padding(.leading, 10)
+                    .padding(.trailing, 4)
+                Text(story.reactionCount.formattedCountString)
+                    .lineLimit(1)
+                    .font(.system(size: 15).monospacedDigit())
+                    .foregroundColor(.white)
+                    .padding(.trailing, 10)
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reactionButtonTextView)
+            }
+            .frame(minWidth: 56)
+            .frame(height: 40)
+            .fixedSize()
+            .background(reactionBtnBgColor)
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .onTapGesture {
                 guard isCommunityMember else {
                     Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Story.nonMemberReactStoryMessage.localizedString)
                     return
                 }
+                
+                ImpactFeedbackGenerator.impactFeedback(style: .light)
                 
                 Task {
                     if story.isLiked {
@@ -366,27 +390,6 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         try await storyPageViewModel.addReaction(storyId: story.storyId)
                     }
                 }
-            } label: {
-                let color = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .storyReactionButtonElement, key: "background_color", of: String.self) ?? ""))
-                HStack(spacing: 0) {
-                    let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .storyReactionButtonElement, key: "reaction_icon", of: String.self) ?? "")
-                    let likedIcon = AmityIcon.likeReactionIcon.getImageResource()
-                    Image(story.isLiked ? likedIcon : icon)
-                        .frame(width: 20, height: 16)
-                        .padding(.leading, 10)
-                        .padding(.trailing, 4)
-                    Text(story.reactionCount.formattedCountString)
-                        .lineLimit(1)
-                        .font(.system(size: 15).monospacedDigit())
-                        .foregroundColor(.white)
-                        .padding(.trailing, 10)
-                        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reactionButtonTextView)
-                }
-                .frame(minWidth: 56)
-                .frame(height: 40)
-                .fixedSize()
-                .background(color)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
             }
             .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reactionButton)
         }
@@ -500,7 +503,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     func getCommentSheetView() -> some View {
         if #available(iOS 16.0, *) {
             getCommentSheetContentView()
-            .presentationDetents([.fraction(0.65)])
+            .presentationDetents([.fraction(0.75)])
         } else {
             getCommentSheetContentView()
         }
@@ -513,7 +516,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
         if let story = storyTarget.stories.element(at: storySegmentIndex) {
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
             let allowCreateComment = story.storyTarget?.community?.storySettings.allowComment ?? false
-            AmityCommentTrayComponent(referenceId: story.storyId, referenceType: .story, hideCommentButtons: !isCommunityMember, allowCreateComment: allowCreateComment)
+            AmityCommentTrayComponent(referenceId: story.storyId, referenceType: .story, communityId: story.storyTarget?.community?.communityId, hideCommentButtons: !isCommunityMember, allowCreateComment: allowCreateComment)
         }
     }
     

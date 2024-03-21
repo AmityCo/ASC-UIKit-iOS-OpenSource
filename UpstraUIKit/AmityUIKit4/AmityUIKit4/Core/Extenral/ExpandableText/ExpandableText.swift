@@ -106,8 +106,8 @@ public struct ExpandableText: View {
     @ViewBuilder
     private var content: some View {
         if #available(iOS 15, *) {
-            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 13.5))
-            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 13.5))
+            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 14, weight: .bold))
+            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 14, weight: .bold))
             
             Text(trimMultipleNewlinesWhenTruncated
                  ? (shouldShowMoreButton ? trimmedText : text)
@@ -145,7 +145,7 @@ extension ExpandableText {
         let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
         
-        let attributes = MentionManager.getAttributes(fromText: text, withMetadata: metadata, mentionees: mentionees, highlightColor: .blue, highlightFont: font)
+        let attributes = MentionManager.getAttributes(fromText: text, withMetadata: metadata, mentionees: mentionees, highlightColor: .systemBlue, highlightFont: font)
 
         for attribute in attributes {
             attributedString.addAttributes(attribute.attributes, range: attribute.range)

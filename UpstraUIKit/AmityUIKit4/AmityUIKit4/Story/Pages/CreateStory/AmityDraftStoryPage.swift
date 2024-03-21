@@ -30,6 +30,12 @@ public struct AmityDraftStoryPage: AmityPageView {
     
     public init(targetId: String, avatar: URL?, mediaType: StoryMediaType) {
         self._viewModel = StateObject(wrappedValue: AmityDraftStoryPageViewModel(targetId: targetId, avatar: avatar, mediaType: mediaType))
+        
+        if case .image(_, let image) = mediaType {
+            if let image {
+                self._previewDisplayMode = State(initialValue: image.orientation == .portrait ? .fill : .fit)
+            }
+        }
     }
     
     public var body: some View {

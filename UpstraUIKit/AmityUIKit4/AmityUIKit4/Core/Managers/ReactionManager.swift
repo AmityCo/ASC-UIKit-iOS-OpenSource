@@ -27,4 +27,8 @@ class ReactionManager {
     func removeReaction(_ reactionType: ReactionType, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
         return try await reactionRepository.removeReaction(reactionType.rawValue, referenceId: referenceId, referenceType: referenceType)
     }
+    
+    func getReactions(_ reactionType: ReactionType, referenceId: String, referenceType: AmityReactionReferenceType) -> AmityCollection<AmityReaction> {
+        return reactionRepository.getReactions(referenceId, referenceType: referenceType, reactionName: reactionType.rawValue)
+    }
 }

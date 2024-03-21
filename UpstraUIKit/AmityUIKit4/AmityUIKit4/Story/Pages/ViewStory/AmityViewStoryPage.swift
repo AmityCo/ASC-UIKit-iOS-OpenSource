@@ -128,7 +128,7 @@ public struct AmityViewStoryPage: AmityPageView {
                     }
                 }
                 .contentLoadingPolicy(.lazy(recyclingRatio: 1))
-                .bottomSheet(isPresented: $showBottomSheet, height: 148) {
+                .bottomSheet(isPresented: $showBottomSheet, height: 148, animation: .easeIn(duration: 0.1)) {
                     getBottomSheetView()
                 }
                 .onAppear {

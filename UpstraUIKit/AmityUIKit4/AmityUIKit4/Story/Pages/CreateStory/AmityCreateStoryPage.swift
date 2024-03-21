@@ -37,6 +37,9 @@ public struct AmityCreateStoryPage: AmityPageView {
     public init(targetId: String, avatar: URL?) {
         self.targetId = targetId
         self.avatar = avatar
+        
+        cameraManager.shouldRespondToOrientationChanges = false
+        cameraManager.shouldFlipFrontCameraImage = true
     }
     
     public var body: some View {
@@ -47,6 +50,21 @@ public struct AmityCreateStoryPage: AmityPageView {
                 ZStack(alignment: .top) {
                     CameraPreviewView(cameraManager: cameraManager)
                         .cornerRadius(14.0)
+                        .onAppear {
+                            let cameraStatus = cameraManager.currentCameraStatus()
+                            
+                            if cameraStatus == .notDetermined || cameraStatus == .accessDenied {
+                                let alertController = UIAlertController(title: AmityLocalizedStringSet.General.permissionRequired.localizedString, message: AmityLocalizedStringSet.General.cameraAccessDenied.localizedString, preferredStyle: .alert)
+                                
+                                let action = UIAlertAction(title: "OK", style: .default) { _ in
+                                    alertController.dismiss(animated: true)
+                                }
+                                alertController.addAction(action)
+                                
+                                host.controller?.present(alertController, animated: true)
+                            }
+                        }
+                        
                         .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.cameraPreviewView)
                     
                     if cameraMode == .videoWithMic && videoCaptureButtonSelected {

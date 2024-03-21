@@ -32,11 +32,13 @@ public struct AmityCommentModel: Identifiable, Equatable  {
     let userId: String
     let isAuthorGlobalBanned: Bool
     private let myReactions: [String]
-    let metadata: [String: Any]?
+    var metadata: [String: Any]?
+    var mentioneeBuilder: AmityMentioneesBuilder?
     let mentionees: [AmityMentionees]?
     let reactions: [String: Int]
     var isModerator: Bool = false
     let syncState: AmitySyncState
+    var communityId: String?
     
     // Due to AmityChat 4.0.0 requires comment object for editing and deleting
     // So, this is a workaroud for passing the original object.
@@ -63,6 +65,7 @@ public struct AmityCommentModel: Identifiable, Equatable  {
         reactions = comment.reactions as? [String: Int] ?? [:]
         switch comment.target {
         case .community(let communityId, let communityMember):
+            self.communityId = communityId
             if let communityMember {
                 isModerator = communityMember.hasModeratorRole
             }

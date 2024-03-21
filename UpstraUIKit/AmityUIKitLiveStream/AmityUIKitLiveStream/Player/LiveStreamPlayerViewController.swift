@@ -119,7 +119,7 @@ public class LiveStreamPlayerViewController: UIViewController {
         statusContainer.backgroundColor = UIColor(red: 1, green: 0.188, blue: 0.353, alpha: 1)
         statusLabel.textColor = .white
         statusLabel.font = AmityFontSet.captionBold
-        statusLabel.text = "LIVE"
+        statusLabel.text = "CONNECTING"
         
         // We show "LIVE" static label while playing.
         statusContainer.isHidden = true
@@ -172,8 +172,10 @@ public class LiveStreamPlayerViewController: UIViewController {
                 playButton.isHidden = false
                 stopButton.isHidden = true
                 statusContainer.isHidden = true
-            @unknown default:
-                assertionFailure("Unexpected state")
+            case .streamAdded:
+                statusLabel.text = "LIVE"
+            default:
+                break
             }
         }
     }

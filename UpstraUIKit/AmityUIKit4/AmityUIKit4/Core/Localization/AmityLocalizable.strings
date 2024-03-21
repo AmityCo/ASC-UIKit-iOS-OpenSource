@@ -15,6 +15,8 @@
 "delete" = "Delete";
 "discard" = "Discard";
 "general_anonymous" = "Anonymous";
+"permission_required" = "Permission Required!!";
+"camera_access_denied" = "Please grant camera permission in iOS settings.";
 
 // Create Story
 "created_story_successfully" = "Successfully shared story";

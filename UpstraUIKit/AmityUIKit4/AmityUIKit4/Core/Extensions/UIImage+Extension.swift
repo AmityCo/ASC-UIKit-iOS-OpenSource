@@ -8,6 +8,10 @@
 import UIKit
 import SwiftUI
 
+enum ImageOrientation {
+    case portrait, landscape
+}
+
 extension UIImage {
     var averageGradientColor: [Color]? {
         guard let inputImage = CIImage(image: self) else { return nil }
@@ -23,5 +27,9 @@ extension UIImage {
         let startColor = UIColor(red: CGFloat(bitmap[0]) / 255, green: CGFloat(bitmap[1]) / 255, blue: CGFloat(bitmap[2]) / 255, alpha: CGFloat(bitmap[3]) / 255)
         let stopColor = UIColor(red: CGFloat(bitmap[2]) / 255, green: CGFloat(bitmap[1]) / 255, blue: CGFloat(bitmap[0]) / 255, alpha: CGFloat(bitmap[3]) / 255)
         return [Color(startColor), Color(stopColor)]
+    }
+    
+    var orientation: ImageOrientation {
+        return self.size.height > self.size.width ? .portrait : .landscape
     }
 }

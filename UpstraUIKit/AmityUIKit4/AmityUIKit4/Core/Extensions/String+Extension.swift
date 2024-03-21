@@ -5,7 +5,7 @@
 //  Created by Zay Yar Htun on 1/16/24.
 //
 
-import Foundation
+import UIKit
 
 extension String {
     public var localizedString: String {
@@ -20,5 +20,12 @@ extension String {
         } else {
             return false
         }
+    }
+    
+    public func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
+        let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
+        let boundingBox = self.boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
+    
+        return ceil(boundingBox.height)
     }
 }

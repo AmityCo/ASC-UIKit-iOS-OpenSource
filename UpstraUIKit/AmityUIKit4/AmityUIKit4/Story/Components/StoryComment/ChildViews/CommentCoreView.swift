@@ -57,7 +57,7 @@ class CommentCoreViewModel: ObservableObject {
     
     @MainActor
     func editComment(comment: AmityCommentModel) async throws {
-        let updateOptions = AmityCommentUpdateOptions(text: comment.text)
+        let updateOptions = AmityCommentUpdateOptions(text: comment.text, metadata: comment.metadata, mentioneesBuilder: comment.mentioneeBuilder)
         try await commentManager.editComment(withId: comment.id, options: updateOptions)
     }
     
