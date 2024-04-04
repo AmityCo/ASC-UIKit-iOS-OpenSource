@@ -15,7 +15,7 @@ final class AmityCommunitySearchViewController: AmityViewController, IndicatorIn
     
     // MARK: - Properties
     private var screenViewModel: AmityCommunitySearchScreenViewModelType!
-    private var emptyView = AmitySearchEmptyView()
+    private var emptyResultsView = AmitySearchEmptyView()
     
     private var pageTitle: String?
     
@@ -95,30 +95,30 @@ extension AmityCommunitySearchViewController: AmitySearchCommunityTableViewCellD
 }
 
 extension AmityCommunitySearchViewController: AmityCommunitySearchScreenViewModelDelegate {
-    func screenViewModelDidSearch(_ viewModel: AmityCommunitySearchScreenViewModelType) {
-        emptyView.removeFromSuperview()
-    }
     
-    func screenViewModelDidClearText(_ viewModel: AmityCommunitySearchScreenViewModelType) {
-        emptyView.removeFromSuperview()
-    }
-    
-    func screenViewModelDidSearchNotFound(_ viewModel: AmityCommunitySearchScreenViewModelType) {
-        tableView.setEmptyView(view: emptyView)
-    }
-    
-    func screenViewModel(_ viewModel: AmityCommunitySearchScreenViewModelType, loadingState: AmityLoadingState) {
-        switch loadingState {
+    func screenViewModelDidSearch(_ viewModel: AmityCommunitySearchScreenViewModelType, state: AmityCommunitySearchScreenViewModel.SearchState) {
+        
+        switch state {
         case .initial:
-            break
+            emptyResultsView.removeFromSuperview()
+            
+            tableView.tableFooterView = UIView() // Hides loading indicator
         case .loading:
-            emptyView.removeFromSuperview()
+            emptyResultsView.removeFromSuperview()
+            
             tableView.showLoadingIndicator()
-            tableView.reloadData()
-        case .loaded:
-            tableView.tableFooterView = UIView()
-            tableView.reloadData()
+        case .loaded(let success):
+            if success {
+                emptyResultsView.removeFromSuperview()
+            } else {
+                tableView.setEmptyView(view: emptyResultsView)
+            }
+            
+            tableView.tableFooterView = UIView() // Hides loading indicator
         }
+        
+        // Reload tableview
+        tableView.reloadData()
     }
 }
 

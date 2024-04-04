@@ -9,13 +9,20 @@
 import UIKit
 
 final class AmityCommunitySearchScreenViewModel: AmityCommunitySearchScreenViewModelType {
+    
+    enum SearchState {
+        case initial
+        case loading
+        case loaded(success: Bool)
+    }
+    
     weak var delegate: AmityCommunitySearchScreenViewModelDelegate?
     
     // MARK: - Manager
     private let communityListRepositoryManager: AmityCommunityListRepositoryManagerProtocol
     
     // MARK: - Properties
-    private let debouncer = Debouncer(delay: 0.3)
+    private let debouncer = Debouncer(delay: 0.2)
     private var communityList: [AmityCommunityModel] = []
     
     init(communityListRepositoryManager: AmityCommunityListRepositoryManagerProtocol) {
@@ -43,27 +50,24 @@ extension AmityCommunitySearchScreenViewModel {
     func search(withText text: String?) {
         communityList = []
         guard let text = text, !text.isEmpty else {
-            delegate?.screenViewModelDidClearText(self)
-            delegate?.screenViewModel(self, loadingState: .loaded)
+            debouncer.cancel()
+            communityListRepositoryManager.invalidate()
+            delegate?.screenViewModelDidSearch(self, state: .initial)
             return
         }
 
-        delegate?.screenViewModel(self, loadingState: .loading)
-        communityListRepositoryManager.search(withText: text, filter: .all) { [weak self] (communityList) in
-            self?.debouncer.run {
-                self?.prepareData(communityList: communityList)
-            }
+        delegate?.screenViewModelDidSearch(self, state: .loading)
+        debouncer.run { [weak self] in
+            self?.searchCommunities(with: text)
         }
     }
     
-    private func prepareData(communityList: [AmityCommunityModel]) {
-        self.communityList = communityList
-        if communityList.isEmpty {
-            delegate?.screenViewModelDidSearchNotFound(self)
-        } else {
-            delegate?.screenViewModelDidSearch(self)
+    private func searchCommunities(with text: String) {
+        self.communityListRepositoryManager.search(withText: text, filter: .all) { [weak self] (communityList) in
+            guard let self else { return }
+            self.communityList = communityList
+            self.delegate?.screenViewModelDidSearch(self, state: .loaded(success: !communityList.isEmpty))
         }
-        delegate?.screenViewModel(self, loadingState: .loaded)
     }
     
     func loadMore() {

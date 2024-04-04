@@ -9,10 +9,7 @@
 import UIKit
 
 protocol AmityCommunitySearchScreenViewModelDelegate: AnyObject {
-    func screenViewModelDidSearch(_ viewModel: AmityCommunitySearchScreenViewModelType)
-    func screenViewModelDidClearText(_ viewModel: AmityCommunitySearchScreenViewModelType)
-    func screenViewModelDidSearchNotFound(_ viewModel: AmityCommunitySearchScreenViewModelType)
-    func screenViewModel(_ viewModel: AmityCommunitySearchScreenViewModelType, loadingState: AmityLoadingState)
+    func screenViewModelDidSearch(_ viewModel: AmityCommunitySearchScreenViewModelType, state: AmityCommunitySearchScreenViewModel.SearchState)
 }
 
 protocol AmityCommunitySearchScreenViewModelDataSource {

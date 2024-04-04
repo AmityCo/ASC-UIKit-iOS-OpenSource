@@ -22,4 +22,8 @@ class Debouncer {
         workItem = DispatchWorkItem(block: action)
         DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: workItem!)
     }
+    
+    public func cancel() {
+        workItem?.cancel()
+    }
 }
