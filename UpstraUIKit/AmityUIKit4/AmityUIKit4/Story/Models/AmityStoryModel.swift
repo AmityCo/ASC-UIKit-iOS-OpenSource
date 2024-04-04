@@ -57,6 +57,9 @@ public struct AmityStoryModel: Identifiable, Equatable {
     var analytics: AmityStoryAnalytics
     let storyType: AmityStoryType
     
+    var isModerator: Bool = false
+    var isCreator: Bool = false
+    
     var isLiked: Bool {
         myReactions.contains(.like)
     }
@@ -107,6 +110,12 @@ public struct AmityStoryModel: Identifiable, Equatable {
         community = story.storyTarget?.community
         analytics = story.analytics
         storyType = imageURL != nil ? .image : .video
+        
+        if let communityMember = story.storyTarget?.community?.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
+            isModerator = communityMember.hasModeratorRole
+        }
+        
+        isCreator = creatorId == AmityUIKitManagerInternal.shared.currentUserId
     }
     
     

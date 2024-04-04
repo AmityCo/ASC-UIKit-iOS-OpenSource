@@ -16,6 +16,8 @@ struct ReplyCommentView: View {
     private let commentButtonAction: AmityCommentButtonAction
     private let hideCommentButtons: Bool
     
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    
     init(_ viewModel: ReplyCommentViewModel, hideCommentButtons: Bool = false, commentButtonAction: @escaping AmityCommentButtonAction) {
         self.viewModel = viewModel
         self.commentButtonAction = commentButtonAction
@@ -56,13 +58,13 @@ struct ReplyCommentView: View {
                     
                     Text("View \(parentComment.childrenNumber) Reply")
                         .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Color(UIColor(hex: "#636878")))
+                        .foregroundColor(Color(viewConfig.theme.secondaryColor.blend(.shade1)))
                         .padding(.trailing, 8)
                 }
                 .frame(height: 28, alignment: .leading)
                 .overlay(
                     RoundedRectangle(cornerRadius: 4)
-                        .stroke(.gray, lineWidth: 0.4)
+                        .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 0.4)
                 )
                 Spacer()
             }

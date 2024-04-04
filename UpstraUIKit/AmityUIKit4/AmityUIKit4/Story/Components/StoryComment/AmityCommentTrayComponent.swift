@@ -8,7 +8,14 @@
 import SwiftUI
 import AmitySDK
 
-public struct AmityCommentTrayComponent: View {
+public struct AmityCommentTrayComponent: AmityComponentView {
+    
+    public var pageId: PageId?
+    
+    public var id: ComponentId {
+        .commentTrayComponent
+    }
+    
     @StateObject private var viewModel: AmityCommentTrayComponentViewModel = AmityCommentTrayComponentViewModel()
     @State private var replyState: (showToReply: Bool, comment: AmityCommentModel?) = (false, nil)
     @State private var bottomSheetState: (isShown: Bool, comment: AmityCommentModel?) = (false, nil)
@@ -20,40 +27,50 @@ public struct AmityCommentTrayComponent: View {
     @State private var text: String = ""
     @State private var mentionData: MentionData = MentionData()
     
+    @StateObject private var viewConfig: AmityViewConfigController
+    @Environment(\.colorScheme) private var colorScheme
+    
     let referenceId: String
     let referenceType: AmityCommentReferenceType
     let communityId: String?
     let hideCommentButton: Bool
     let allowCreateComment: Bool
     
-    public init(referenceId: String, referenceType: AmityCommentReferenceType, communityId: String? = nil, hideCommentButtons: Bool = false, allowCreateComment: Bool = false) {
+    public init(referenceId: String, referenceType: AmityCommentReferenceType, communityId: String? = nil, hideCommentButtons: Bool = false, allowCreateComment: Bool = false, pageId: PageId? = nil) {
         self.referenceId = referenceId
         self.referenceType = referenceType
         self.communityId = communityId
         self.hideCommentButton = hideCommentButtons
         self.allowCreateComment = allowCreateComment
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: referenceId, referenceType: referenceType))
+        self.pageId = pageId
+        
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .commentTrayComponent))
     }
     
     public var body: some View {
         VStack(alignment: .center, spacing: 0) {
+            BottomSheetDragIndicator()
+                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade3))
+            
             Text(AmityLocalizedStringSet.Comment.commentTrayComponentTitle.localizedString)
-                .font(.system(size: 17, weight: .medium))
+                .font(.system(size: 17, weight: .semibold))
                 .padding(.bottom, 17)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.titleTextView)
             
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(Color(UIColor(hex: "#EBECEF")))
+                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
             
             CommentCoreView(commentButtonAction: commentButtonAction, hideCommentButtons: hideCommentButton, viewModel: commentCoreViewModel)
             
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(Color(UIColor(hex: "#EBECEF")))
+                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
             getBottomView()
         }
-        .bottomSheet(isPresented: $bottomSheetState.isShown, height: bottomSheetState.comment?.isOwner ?? false ? 204 : 148) {
+        .bottomSheet(isPresented: $bottomSheetState.isShown, height: bottomSheetState.comment?.isOwner ?? false ? 204 : 148, topBarBackgroundColor: Color(viewConfig.theme.backgroundColor)) {
             if let comment = bottomSheetState.comment, comment.isOwner {
                 getOwnerBottomSheetView()
             } else {
@@ -67,6 +84,11 @@ public struct AmityCommentTrayComponent: View {
                 updateIsCommentFlagged(comment)
             }
         }
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .environmentObject(viewConfig)
+        .onChange(of: colorScheme) { value in
+            viewConfig.updateTheme()
+        }
     }
     
     
@@ -76,11 +98,11 @@ public struct AmityCommentTrayComponent: View {
             HStack(spacing: 0) {
                 Text("Replying to")
                     .font(.system(size: 15))
-                    .foregroundColor(Color(UIColor(hex: "#636878")))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .padding(.leading, 16)
                 Text(" \(replyState.comment?.displayName ?? AmityLocalizedStringSet.General.anonymous)")
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(UIColor(hex: "#636878")))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                 Spacer()
                 Button {
                     replyState.showToReply.toggle()
@@ -91,7 +113,7 @@ public struct AmityCommentTrayComponent: View {
                 }
             }
             .frame(height: 40)
-            .background(Color(UIColor(hex: "#EBECEF")))
+            .background(Color(viewConfig.theme.backgroundColor))
             .isHidden(!replyState.showToReply)
             
             HStack(spacing: 8) {
@@ -105,10 +127,13 @@ public struct AmityCommentTrayComponent: View {
                 AmityTextEditorView(.comment(communityId: communityId ?? ""), text: $text, mentionData: $mentionData, textViewHeight: 20.0)
                     .placeholder(AmityLocalizedStringSet.Comment.commentTextFieldPlacholder.localizedString)
                     .maxExpandableHeight(120.0)
+                    .textColor(viewConfig.theme.baseColor)
+                    .backgroundColor(viewConfig.theme.backgroundColor)
+                    .hightlightColor(viewConfig.theme.primaryColor)
                     .padding([.leading, .trailing], 12)
                     .padding([.top, .bottom], 10)
                     .background(RoundedRectangle(cornerRadius: 30)
-                        .fill(Color(UIColor(hex: "#EBECEF")))
+                        .fill(Color(viewConfig.theme.baseColorShade4))
                     )
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.textField)
                 
@@ -137,12 +162,15 @@ public struct AmityCommentTrayComponent: View {
         } else {
             HStack(spacing: 16) {
                 Image(AmityIcon.lockIcon.getImageResource())
+                    .renderingMode(.template)
                     .resizable()
                     .frame(width: 20, height: 20)
                     .padding(.leading, 16)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                
                 Text(AmityLocalizedStringSet.Comment.disableCreateCommentText.localizedString)
                     .font(.system(size: 15))
-                    .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.disableTextView)
                 Spacer()
             }
@@ -157,9 +185,11 @@ public struct AmityCommentTrayComponent: View {
         VStack {
             HStack(spacing: 12) {
                 Image(AmityIcon.editCommentIcon.getImageResource())
+                    .renderingMode(.template)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 20, height: 24)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Button {
                     commentCoreViewModel.editingComment = bottomSheetState.comment
@@ -167,7 +197,7 @@ public struct AmityCommentTrayComponent: View {
                 } label: {
                     Text(AmityLocalizedStringSet.Comment.editCommentBottomSheetTitle.localizedString)
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color.black)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
@@ -178,9 +208,11 @@ public struct AmityCommentTrayComponent: View {
             
             HStack(spacing: 12) {
                 Image(AmityIcon.trashBinIcon.getImageResource())
+                    .renderingMode(.template)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 20, height: 24)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Button {
                     isAlertShown.toggle()
@@ -188,7 +220,7 @@ public struct AmityCommentTrayComponent: View {
                 } label: {
                     Text(AmityLocalizedStringSet.Comment.deleteCommentBottomSheetTitle.localizedString)
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color.black)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                 }
                 .buttonStyle(.plain)
                 .alert(isPresented: $isAlertShown, content: {
@@ -208,6 +240,7 @@ public struct AmityCommentTrayComponent: View {
             .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
             Spacer()
         }
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
     }
     
     
@@ -216,9 +249,11 @@ public struct AmityCommentTrayComponent: View {
         VStack {
             HStack(spacing: 12) {
                 Image(AmityIcon.flagIcon.getImageResource())
+                    .renderingMode(.template)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 20, height: 24)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Button {
                     guard let comment = bottomSheetState.comment else {
@@ -243,7 +278,7 @@ public struct AmityCommentTrayComponent: View {
                 } label: {
                     Text(isCommentFlaggedByMe ? AmityLocalizedStringSet.Comment.unReportCommentBottomSheetTitle.localizedString : AmityLocalizedStringSet.Comment.reportCommentBottomSheetTitle.localizedString)
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color.black)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.reportCommentButton)
@@ -254,6 +289,7 @@ public struct AmityCommentTrayComponent: View {
             
             Spacer()
         }
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
     }
     
     

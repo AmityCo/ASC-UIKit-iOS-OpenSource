@@ -39,9 +39,13 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
     @State private var urlTextFieldModel = InfoTextFieldModel(title: "URL", placeholder: "https://example.com", isMandatory: true, errorMessage: "Please enter a valid URL.")
     @State private var urlNameTextFieldModel = InfoTextFieldModel(title: "Customize link text", placeholder: "Name your link", isMandatory: false, infoMessage: "This text will show on the link instead of URL.", errorMessage: "Your text contains a blocklisted word.", maxCharCount: 30)
     
-    public init(isPresented: Binding<Bool>, data: Binding<HyperLinkModel>) {
+    @StateObject private var viewConfig: AmityViewConfigController
+    @Environment(\.colorScheme) private var colorScheme
+    
+    public init(isPresented: Binding<Bool>, data: Binding<HyperLinkModel>, pageId: PageId?) {
         self._isPresented = isPresented
         self._data = data
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .hyperLinkConfigComponent))
     }
     
     public var body: some View {
@@ -49,7 +53,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
             VStack {
                 Rectangle()
                     .frame(height: 1)
-                    .foregroundColor(Color(UIColor(hex: "#EBECEF")))
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 
                 InfoTextField(data: $urlTextFieldModel,
                               text: $viewModel.urlText,
@@ -57,6 +61,10 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                               titleTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkURLTitleTextView,
                               textFieldAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkURLTextField,
                               descriptionTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkErrorTextView)
+                .alertColor(viewConfig.theme.alertColor)
+                .dividerColor(viewConfig.theme.baseColorShade4)
+                .infoTextColor(viewConfig.theme.baseColorShade2)
+                .textFieldTextColor(viewConfig.theme.baseColor)
                 .onChange(of: viewModel.urlText) { text in
                     viewModel.isURLValid = text.isEmpty ? true : text.isValidURL
                     
@@ -72,6 +80,10 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                               textFieldAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkTextField,
                               descriptionTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkDescriptionTextView,
                               charCountTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkCharacterLimitTextView)
+                .alertColor(viewConfig.theme.alertColor)
+                .dividerColor(viewConfig.theme.baseColorShade4)
+                .infoTextColor(viewConfig.theme.baseColorShade2)
+                .textFieldTextColor(viewConfig.theme.baseColor)
                 .onChange(of: viewModel.urlNameText) { text in
                     if text.isEmpty {
                         viewModel.isURLNameValid = true
@@ -84,6 +96,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                 }
                 Spacer()
             }
+            .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
             .navigationTitle("Add link")
             .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.titleTextView)
             .navigationBarTitleDisplayMode(.inline)
@@ -93,7 +106,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                         isUnsavedAlertShown.toggle()
                     }
                     .buttonStyle(.plain)
-                    .foregroundColor(.black)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .alert(isPresented: $isUnsavedAlertShown) {
                         Alert(title: Text("Unsaved changes"),
                               message: Text("Are you sure you want to cancel? Your changes won't be saved."),
@@ -118,6 +131,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                         }
                     }
                     .buttonStyle(.plain)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .disabled(!viewModel.isURLValid || viewModel.urlText.isEmpty)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.doneButton)
                 }
@@ -139,6 +153,9 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
             ProgressView().progressViewStyle(.circular)
                 .isHidden(!showActivityIndicator)
         )
+        .onChange(of: colorScheme) { value in
+            viewConfig.updateTheme()
+        }
     }
     
     func getRemoveLinkButton() -> some View {
@@ -152,7 +169,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                         .padding(.trailing, 6)
                     Text("Remove link")
                         .font(.system(size: 15))
-                        .foregroundColor(.red)
+                        .foregroundColor(Color(viewConfig.theme.alertColor))
                         .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.removeLinkButtonTextView)
                     Spacer()
                 }
@@ -171,7 +188,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
             
             Rectangle()
                 .frame(height: 1)
-                .foregroundColor(Color(UIColor(hex: "#EBECEF")))
+                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
         }
         .padding(EdgeInsets(top: 40, leading: 16, bottom: 0, trailing: 16))
         
@@ -217,7 +234,7 @@ fileprivate struct Preview: View {
     @State var data = HyperLinkModel(url: "www.youtube.com", urlName: "")
     
     var body: some View {
-        AmityHyperLinkConfigComponent(isPresented: $isPresented, data: $data)
+        AmityHyperLinkConfigComponent(isPresented: $isPresented, data: $data, pageId: nil)
     }
     
 }

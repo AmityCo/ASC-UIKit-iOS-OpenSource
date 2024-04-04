@@ -45,7 +45,7 @@ struct SegmentedPickerView: View {
                     ForEach(Array(titles.enumerated()), id: \.element) { i, element in
                         Text("\(element)")
                             .font(.system(size: 15))
-                            .foregroundColor(AmityColor.secondaryColor.getColor())
+                            .foregroundColor(Color(UIColor(hex: "#898E9E")))
                             .frame(maxWidth: .infinity)
                             .onTapGesture {
                                 withAnimation(.easeInOut(duration: 0.1)) { currentIndex = i }

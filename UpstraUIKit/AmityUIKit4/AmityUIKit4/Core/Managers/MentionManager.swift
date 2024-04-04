@@ -56,8 +56,8 @@ final public class MentionManager {
     private let communityId: String?
     private var font: UIFont = .systemFont(ofSize: 15)
     private var highlightFont: UIFont = .systemFont(ofSize: 15, weight: .bold)
-    private var foregroundColor = UIColor(hex: "#000000")
-    private var highlightColor: UIColor = .systemBlue
+    var foregroundColor: UIColor = .black
+    var highlightColor: UIColor = .systemBlue
     
     // Private community
     private lazy var privateCommunityRepository: AmityCommunityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)

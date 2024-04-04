@@ -15,6 +15,8 @@ struct CommentListView: View {
     private let commentButtonAction: AmityCommentButtonAction
     private let hideCommentButtons: Bool
     
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    
     init(_ collection: AmityCollection<AmityComment>, isReply: Bool = false, hideCommentButtons: Bool = false, commentButtonAction: @escaping AmityCommentButtonAction) {
         self.collection = collection
         self.isReply = isReply
@@ -98,15 +100,17 @@ struct CommentListView: View {
             HStack(spacing: 8) {
                     Image(AmityIcon.deletedMessageIcon.getImageResource())
                         .resizable()
+                        .renderingMode(.template)
                         .frame(width: 16, height: 16)
                         .padding(.leading, 8)
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 Text(isReply ? AmityLocalizedStringSet.Comment.deletedReplyCommentMessage.localizedString : AmityLocalizedStringSet.Comment.deletedCommentMessage.localizedString)
                         .font(.system(size: 13))
-                        .foregroundColor(Color(UIColor(hex: "#636878")))
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                         .padding(.trailing, 16)
                 }
                 .frame(height: 28)
-                .background(Color(UIColor(hex: "#EBECEF")))
+                .background(Color(viewConfig.theme.baseColorShade4))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
             Spacer()
         }

@@ -7,11 +7,19 @@
 
 import SwiftUI
 
+extension TabBarView: AmityViewBuildable {
+    func selectedTabColor(_ value: UIColor) -> Self {
+        self.mutating(keyPath: \.selectedTabColor, value: value)
+    }
+}
+
 struct TabBarView: View {
     @Binding var currentTab: Int
     @Namespace var namespace
     
     @Binding var tabBarOptions: [String]
+    
+    private var selectedTabColor: UIColor = .blue
     
     init(currentTab: Binding<Int>, tabBarOptions: Binding<[String]>) {
         self._currentTab = currentTab
@@ -29,13 +37,13 @@ struct TabBarView: View {
                     TabBarItem(currentTab: self.$currentTab,
                                namespace: namespace.self,
                                tabBarItemName: name,
-                               tab: index)
+                               tab: index, 
+                               selectedTabColor: selectedTabColor)
                     
                 })
             }
             .padding(.horizontal)
         }
-        .background(Color.white)
     }
 }
 
@@ -45,6 +53,7 @@ struct TabBarItem: View {
     
     var tabBarItemName: String
     var tab: Int
+    var selectedTabColor: UIColor
     
     var body: some View {
         Button {
@@ -53,7 +62,7 @@ struct TabBarItem: View {
             VStack(spacing: 7) {
                 Text(tabBarItemName)
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(currentTab == tab ? .blue : .gray)
+                    .foregroundColor(currentTab == tab ? Color(selectedTabColor) : .gray)
                 
                 if currentTab == tab {
                     Color.blue

@@ -36,6 +36,18 @@ extension AmityTextEditorView: AmityViewBuildable {
     public func autoFocus(_ value: Bool) -> Self {
         mutating(keyPath: \.autoFocusTextEditor, value: value)
     }
+    
+    public func textColor(_ value: UIColor) -> Self {
+        mutating(keyPath: \.textColor, value: value)
+    }
+    
+    public func backgroundColor(_ value: UIColor) -> Self {
+        mutating(keyPath: \.backgroundColor, value: value)
+    }
+    
+    public func hightlightColor(_ value: UIColor) -> Self {
+        mutating(keyPath: \.hightlightColor, value: value)
+    }
 }
 
 
@@ -64,6 +76,12 @@ public struct AmityTextEditorView: View {
     private var willShowMentionList: ((CGFloat) -> Void)?
     
     private var autoFocusTextEditor: Bool = false
+    
+    private var textColor: UIColor = .black
+    
+    private var backgroundColor: UIColor = .white
+    
+    private var hightlightColor: UIColor = .blue
 
     public init(_ mentionManagerType: MentionManagerType, text: Binding<String>, mentionData: Binding<MentionData>, textViewHeight: CGFloat) {
         self._text = text
@@ -78,7 +96,7 @@ public struct AmityTextEditorView: View {
     public var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                TextEditorView(viewModel, $text, $mentionedUsers)
+                TextEditorView(viewModel, $text, $mentionedUsers, textColor, hightlightColor)
                     .onAppear {
                         textEditorInitialHeight = geometry.size.height
                         
@@ -116,6 +134,7 @@ public struct AmityTextEditorView: View {
                                                     .clipShape(Circle())
                                                 
                                                 Text(user.displayName)
+                                                    .foregroundColor(Color(textColor))
                                                                                             
                                                 Spacer()
                                             }
@@ -140,7 +159,7 @@ public struct AmityTextEditorView: View {
                                 }
                             }
                             .frame(width: UIScreen.main.bounds.width, height: listHeight)
-                            .background(Color.white)
+                            .background(Color(backgroundColor))
                             .offset(y: getOverlayOffset(size: geometry.size, listHeight: listHeight, position: mentionListPosition))
                             .isHidden(mentionedUsers.count == 0)
                         }
@@ -185,16 +204,22 @@ private struct TextEditorView: UIViewRepresentable {
     @ObservedObject var viewModel: AmityTextEditorViewModel
     @Binding var text: String
     @Binding var mentionedUsers: [AmityMentionUserModel]
+    let textColor: UIColor
+    let hightlightColor: UIColor
     
-    init(_ viewModel: AmityTextEditorViewModel, _ text: Binding<String>, _ mentionedUsers: Binding<[AmityMentionUserModel]>) {
+    init(_ viewModel: AmityTextEditorViewModel, _ text: Binding<String>, _ mentionedUsers: Binding<[AmityMentionUserModel]>, _ textColor: UIColor, _ hightlightColor: UIColor) {
         self.viewModel = viewModel
         self._text = text
         self._mentionedUsers = mentionedUsers
+        self.textColor = textColor
+        self.hightlightColor = hightlightColor
     }
     
     func makeCoordinator() -> Coordinator {
         let coordinator = Coordinator(self)
         viewModel.mentionManager.delegate = coordinator
+        viewModel.mentionManager.foregroundColor = textColor
+        viewModel.mentionManager.highlightColor = hightlightColor
         return coordinator
     }
     
@@ -203,6 +228,7 @@ private struct TextEditorView: UIViewRepresentable {
         textView.delegate = context.coordinator
         textView.font = .systemFont(ofSize: 15)
         textView.backgroundColor = .clear
+        textView.textColor = textColor
         return textView
     }
     
@@ -242,7 +268,7 @@ private struct TextEditorView: UIViewRepresentable {
         
         func didCreateAttributedString(attributedString: NSAttributedString) {
             parentView.viewModel.textView.attributedText = attributedString
-            parentView.viewModel.textView.typingAttributes = [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: UIColor(hex: "#000000")]
+            parentView.viewModel.textView.typingAttributes = [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: parentView.textColor]
         }
         
         func didMentionsReachToMaximumLimit() {

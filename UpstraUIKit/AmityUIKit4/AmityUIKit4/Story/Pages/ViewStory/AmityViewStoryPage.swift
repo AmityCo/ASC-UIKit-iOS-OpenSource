@@ -34,10 +34,13 @@ public struct AmityViewStoryPage: AmityPageView {
     @StateObject private var storyCoreViewModel: StoryCoreViewModel = StoryCoreViewModel()
         
     @State private var page: Page = Page.first()
+    @StateObject private var viewConfig: AmityViewConfigController
+    @Environment(\.colorScheme) private var colorScheme
     
     public init(storyTargets: [AmityStoryTargetModel], startFromTargetIndex: Int) {
         _viewModel = StateObject(wrappedValue: AmityStoryPageViewModel(storyTargets: storyTargets))
         _storyTargetIndex = State(initialValue: startFromTargetIndex)
+        _viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .storyPage))
         
         // preload the first stories from the staring story target
         preloadStoryTargets(startFromTargetIndex, storyTargets)
@@ -92,7 +95,6 @@ public struct AmityViewStoryPage: AmityPageView {
                                 }
 
                             HStack(spacing: 0) {
-                                let storyCreatorId = viewModel.storyTargets[storyTargetIndex].stories.element(at: storySegmentIndex)?.creatorId
                                 let storyTargetId = viewModel.storyTargets[storyTargetIndex].targetId
                                 
                                 Button {
@@ -108,7 +110,7 @@ public struct AmityViewStoryPage: AmityPageView {
                                         hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: storyTargetId)
                                     }
                                 }
-                                .isHidden(!(hasStoryManagePermission && AmityUIKitManagerInternal.shared.currentUserId == storyCreatorId), remove: false)
+                                .isHidden(!hasStoryManagePermission, remove: false)
                                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.meatballsButton)
                                 
                                 Button {
@@ -128,7 +130,7 @@ public struct AmityViewStoryPage: AmityPageView {
                     }
                 }
                 .contentLoadingPolicy(.lazy(recyclingRatio: 1))
-                .bottomSheet(isPresented: $showBottomSheet, height: 148, animation: .easeIn(duration: 0.1)) {
+                .bottomSheet(isPresented: $showBottomSheet, height: 148, topBarBackgroundColor: Color(viewConfig.theme.backgroundColor), animation: .easeIn(duration: 0.1)) {
                     getBottomSheetView()
                 }
                 .onAppear {
@@ -169,8 +171,12 @@ public struct AmityViewStoryPage: AmityPageView {
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
+        .environmentObject(viewConfig)
         .background(Color.black.ignoresSafeArea())
         .ignoresSafeArea(.keyboard)
+        .onChange(of: colorScheme) { value in
+            viewConfig.updateTheme()
+        }
     }
     
     
@@ -179,9 +185,11 @@ public struct AmityViewStoryPage: AmityPageView {
         VStack {
             HStack(spacing: 12) {
                 Image(AmityIcon.trashBinIcon.getImageResource())
+                    .renderingMode(.template)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 20, height: 24)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Button {
                     isAlertShown.toggle()
@@ -189,7 +197,7 @@ public struct AmityViewStoryPage: AmityPageView {
                 } label: {
                     Text("Delete story")
                         .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color.black)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                 }
                 .buttonStyle(.plain)
                 .alert(isPresented: $isAlertShown, content: {
@@ -210,6 +218,7 @@ public struct AmityViewStoryPage: AmityPageView {
             .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
             Spacer()
         }
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
     }
     
     func preloadStoryTargets(_ index: Int, _ storyTargets: [AmityStoryTargetModel]) {

@@ -18,6 +18,8 @@ struct ReactionListPage: View {
     private let referenceId: String
     private let referenceType: AmityReactionReferenceType
     
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
+    
     init(referenceId: String, referenceType: AmityReactionReferenceType) {
         self.referenceId = referenceId
         self.referenceType = referenceType
@@ -26,11 +28,17 @@ struct ReactionListPage: View {
     var body: some View {
         VStack {
             BottomSheetDragIndicator()
+                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade3))
             
             ZStack(alignment: .bottom) {
                 TabBarView(currentTab: self.$currentTab, tabBarOptions: $tabBarOptions)
+                    .selectedTabColor(viewConfig.theme.primaryColor)
                     .frame(height: 30)
-                Divider()
+                    .zIndex(1)
+                
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                     .offset(y: -1)
             }
             
@@ -49,6 +57,7 @@ struct ReactionListPage: View {
                                         
                                         Text(user.displayName)
                                             .font(.system(size: 15, weight: .semibold))
+                                            .foregroundColor(Color(viewConfig.theme.baseColor))
                                         
                                         Spacer()
                                     }
@@ -68,6 +77,7 @@ struct ReactionListPage: View {
             .edgesIgnoringSafeArea(.all)
             
         }
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .onReceive(viewModel.$reactedUsers) { users in
             if users.count != 0 {
                 tabBarOptions[currentTab] = "All \(users.count)"

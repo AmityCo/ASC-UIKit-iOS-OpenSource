@@ -12,6 +12,7 @@ import AmitySDK
 protocol AmityCommunityListRepositoryManagerProtocol {
     func search(withText text: String?, filter: AmityCommunityQueryFilter, _ completion: (([AmityCommunityModel]) -> Void)?)
     func loadMore()
+    func invalidate()
 }
 
 final class AmityCommunityListRepositoryManager: AmityCommunityListRepositoryManagerProtocol {
@@ -39,6 +40,12 @@ final class AmityCommunityListRepositoryManager: AmityCommunityListRepositoryMan
                 completion?(communityList)
             }
         }
+    }
+    
+    func invalidate() {
+        token?.invalidate()
+        token = nil
+        collection = nil
     }
     
     func loadMore() {

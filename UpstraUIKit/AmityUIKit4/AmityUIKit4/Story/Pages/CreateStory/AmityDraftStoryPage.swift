@@ -28,8 +28,12 @@ public struct AmityDraftStoryPage: AmityPageView {
     @State private var isAlertShown = false
     @State private var showHyperLinkSheet: Bool = false
     
+    @StateObject private var viewConfig: AmityViewConfigController
+    @Environment(\.colorScheme) private var colorScheme
+    
     public init(targetId: String, avatar: URL?, mediaType: StoryMediaType) {
         self._viewModel = StateObject(wrappedValue: AmityDraftStoryPageViewModel(targetId: targetId, avatar: avatar, mediaType: mediaType))
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .storyCreationPage))
         
         if case .image(_, let image) = mediaType {
             if let image {
@@ -105,6 +109,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                                 Text(title)
                                     .lineLimit(1)
                                     .font(.system(size: 15))
+                                    .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
                                     .padding(.trailing, 16)
                                     .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperlinkTextView)
                             }
@@ -142,8 +147,10 @@ public struct AmityDraftStoryPage: AmityPageView {
                 
             }
         }
-        .bottomSheet(isPresented: $showHyperLinkSheet, height: .infinity, animation: .easeInOut(duration: 0.25), content: {
-            AmityHyperLinkConfigComponent(isPresented: $showHyperLinkSheet, data: $viewModel.hyperLinkConfigModel)
+        .bottomSheet(isPresented: $showHyperLinkSheet, height: .infinity,
+                     topBarBackgroundColor: Color(viewConfig.theme.backgroundColor),
+                     animation: .easeInOut(duration: 0.25), content: {
+            AmityHyperLinkConfigComponent(isPresented: $showHyperLinkSheet, data: $viewModel.hyperLinkConfigModel, pageId: id)
         })
         .alert(isPresented: $isAlertShown, content: {
             Alert(title: Text("Discard this story?"), message: Text("The story will be permanently deleted. It cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Discard"), action: {
@@ -153,6 +160,9 @@ public struct AmityDraftStoryPage: AmityPageView {
         .allowsHitTesting(userInteractionEnabled)
         .ignoresSafeArea(.keyboard)
         .background(Color.black.ignoresSafeArea())
+        .onChange(of: colorScheme) { value in
+            viewConfig.updateTheme()
+        }
     }
     
     @State private var playVideo: Bool = false
@@ -214,6 +224,7 @@ public struct AmityDraftStoryPage: AmityPageView {
             }
             
             Text("Share Story")
+                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
                 .font(Font.system(size: 14))
                 .fontWeight(.medium)
             

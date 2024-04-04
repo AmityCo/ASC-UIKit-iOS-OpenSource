@@ -32,7 +32,6 @@ public final class AmityMyCommunityViewController: AmityViewController, Indicato
         setupSearchController()
         setupTableView()
         setupScreenViewModel()
-        Log.add("Parent: \(self.parent)")
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -57,11 +56,6 @@ public final class AmityMyCommunityViewController: AmityViewController, Indicato
     // MARK: - Setup views
     private func setupView() {
         title = AmityLocalizedStringSet.myCommunityTitle.localizedString
-        if communityCreationButtonVisible() {
-            let rightItem = UIBarButtonItem(image: AmityIconSet.iconAdd, style: .plain, target: self, action: #selector(createCommunityTap))
-            rightItem.tintColor = AmityColorSet.base
-            navigationItem.rightBarButtonItem = rightItem
-        }
     }
     
     private func communityCreationButtonVisible() -> Bool {
@@ -112,10 +106,7 @@ public final class AmityMyCommunityViewController: AmityViewController, Indicato
         emptyView.topMargin = 100
     }
     
-}
-
-private extension AmityMyCommunityViewController {
-    @objc func createCommunityTap() {
+    func createCommunityTap() {
         let vc = AmityCommunityCreatorViewController.make()
         vc.delegate = self
         let nav = UINavigationController(rootViewController: vc)

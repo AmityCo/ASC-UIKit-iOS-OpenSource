@@ -33,6 +33,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     var moveStorySegment: ((MoveDirection) -> Void)?
     
     @State private var page: Page = Page.first()
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     init(_ viewStoryPage: AmityViewStoryPage, storyTarget: AmityStoryTargetModel,
          storySegmentIndex: Binding<Int>,
@@ -246,6 +247,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             Text(title)
                 .lineLimit(1)
                 .font(.system(size: 15))
+                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
                 .padding(.trailing, 16)
                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.hyperlinkTextView)
         }
@@ -325,6 +327,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     .padding(.trailing, -4)
             }
             .foregroundColor(.white)
+            .isHidden(!(story.isModerator || story.isCreator))
             .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reachButton)
             
             Spacer()
@@ -512,7 +515,6 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     
     @ViewBuilder
     func getCommentSheetContentView() -> some View {
-        BottomSheetDragIndicator()
         if let story = storyTarget.stories.element(at: storySegmentIndex) {
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
             let allowCreateComment = story.storyTarget?.community?.storySettings.allowComment ?? false

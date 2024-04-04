@@ -27,6 +27,8 @@ public struct AmityCommentView: View {
     @State var showSheet: Bool = false
     @State var showReactionSheet: Bool = false
     
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    
     public init(comment: AmityCommentModel, hideReplyButton: Bool = false, hideButtonView: Bool = false, commentButtonAction: @escaping AmityCommentButtonAction) {
         self.comment = comment
         self.hideReplyButton = hideReplyButton
@@ -48,6 +50,7 @@ public struct AmityCommentView: View {
                         Text(comment.displayName)
                             .font(.system(size: 13, weight: .semibold))
                             .padding([.top, .leading, .trailing], 12)
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.nameTextView)
                         
                         getModeratorBadgeView()
@@ -59,6 +62,7 @@ public struct AmityCommentView: View {
                             .lineLimit(8)
                             .moreButtonText("...more")
                             .font(.system(size: 13.5))
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
                             .expandAnimation(.easeOut(duration: 0.25))
                             .lineSpacing(5)
                             .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
@@ -66,7 +70,7 @@ public struct AmityCommentView: View {
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentTextView)
                     
                     }
-                    .background(Color(UIColor(hex: "#EBECEF")))
+                    .background(Color(viewConfig.theme.baseColorShade4))
                     .clipShape(RoundedCorner(radius: 12, corners: [.topRight, .bottomLeft, .bottomRight]))
                     
                     Button {
@@ -94,7 +98,7 @@ public struct AmityCommentView: View {
                     HStack(spacing: 12) {
                         Text(comment.isEdited ? "\(comment.createdAt.timeAgoString) \(AmityLocalizedStringSet.Comment.editedText.localizedString)" : comment.createdAt.timeAgoString)
                             .font(.system(size: 13))
-                            .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.timestampTextView)
                         
                         Button(feedbackStyle: .light) {
@@ -109,8 +113,8 @@ public struct AmityCommentView: View {
                             }
                         } label: {
                             Text(comment.isLiked ? AmityLocalizedStringSet.Comment.reactedButtonText.localizedString : AmityLocalizedStringSet.Comment.reactButtonText.localizedString)
-                                .font(.system(size: 13))
-                                .foregroundColor(comment.isLiked ? .accentColor : Color(UIColor(hex: "#898E9E")))
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(comment.isLiked ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.baseColorShade2))
                         }
                         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.reactionButton)
 
@@ -118,8 +122,8 @@ public struct AmityCommentView: View {
                             commentButtonAction(.reply(comment))
                         } label: {
                             Text(AmityLocalizedStringSet.Comment.replyButtonText.localizedString)
-                                .font(.system(size: 13))
-                                .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                         }
                         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.replyButton)
                         .isHidden(hideReplyButton)
@@ -140,7 +144,7 @@ public struct AmityCommentView: View {
                     HStack(spacing: 4) {
                         Text(comment.reactionsCount.formattedCountString)
                             .font(.system(size: 13))
-                            .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.reactionCountTextView)
                         
                         Image(AmityIcon.likeReactionIcon.getImageResource())
@@ -171,11 +175,11 @@ public struct AmityCommentView: View {
                 .padding(.leading, 6)
             Text("Moderator")
                 .font(.system(size: 10))
-                .foregroundColor(.blue)
+                .foregroundColor(Color(viewConfig.theme.primaryColor))
                 .padding(.trailing, 6)
         }
         .frame(height: 20)
-        .background(Color(UIColor(hex: "#D9E5FC")))
+        .background(Color(viewConfig.theme.primaryColor.blend(.shade2)))
         .clipShape(RoundedCorner(radius: 10))
     }
 }

@@ -1,9 +1,28 @@
 {
-    "global_theme": {
-      "light_theme": {
-          "primary_color": "#fffdfc",
-          "secondary_color": "#27ba64"
-      }
+    "preferred_theme": "default",
+    "theme": {
+        "light": {
+          "primary_color": "#1054DE",
+          "secondary_color": "#292B32",
+          "base_color": "#292B32",
+          "base_shade1_color": "#636878",
+          "base_shade2_color": "#898E9E",
+          "base_shade3_color": "#A5A9b5",
+          "base_shade4_color": "#EBECEF",
+          "alert_color": "#FA4D30",
+          "background_color": "#FFFFFF",
+        },
+        "dark": {
+          "primary_color": "#1054DE",
+          "secondary_color": "#292B32",
+          "base_color": "#EBECEF",
+          "base_shade1_color": "#A5A9B5",
+          "base_shade2_color": "#6E7487",
+          "base_shade3_color": "#40434E",
+          "base_shade4_color": "#292B32",
+          "alert_color": "#FA4D30",
+          "background_color": "#191919",
+        }
     },
     "excludes": [
 
@@ -11,12 +30,6 @@
     "customizations": {
   
       "select_target_page/*/*": {
-        "page_theme": {
-            "light_theme": {
-                "primary_color": "#fffdfc",
-                "secondary_color": "#27ba64"
-            }
-        },
         "title": "Share to"
       },
       "select_target_page/*/back_button": {
@@ -89,12 +102,6 @@
       },
 
       "*/edit_comment_component/*": {
-        "component_theme": {
-            "light_theme": {
-                "primary_color": "#UD1234",
-                "secondary_color": "#AB1234"
-            }
-        }
       },
       "*/edit_comment_component/cancel_button": {
         "cancel_icon": "",

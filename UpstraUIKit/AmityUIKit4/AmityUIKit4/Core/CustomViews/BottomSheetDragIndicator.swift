@@ -10,7 +10,6 @@ import SwiftUI
 struct BottomSheetDragIndicator: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 6)
-            .fill(Color.secondary)
             .frame(width: 40, height: 6)
             .padding([.top, .bottom], 10)
     }

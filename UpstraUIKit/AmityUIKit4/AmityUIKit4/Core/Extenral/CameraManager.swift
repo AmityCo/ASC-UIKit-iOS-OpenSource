@@ -899,6 +899,8 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
                     PHPhotoLibrary.requestAuthorization { autorizationStatus in
                         if autorizationStatus == .authorized {
                             self._saveVideoToLibrary(outputFileURL)
+                        } else {
+                            self._executeVideoCompletionWithURL(outputFileURL, error: nil)
                         }
                     }
                 }

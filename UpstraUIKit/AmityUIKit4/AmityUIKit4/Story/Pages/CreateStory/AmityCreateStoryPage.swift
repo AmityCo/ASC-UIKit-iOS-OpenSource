@@ -146,7 +146,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                 
                 SegmentedPickerView(titles: segmentedPickerTitles, currentIndex: $selectedPickerIndex)
                     .frame(width: 244, height: 44)
-                    .background(AmityColor.darkGray.getColor())
+                    .background(Color(UIColor(hex: "#292B32")))
                     .clipShape(RoundedRectangle(cornerRadius: 24.0))
                     .padding([.bottom, .top], 16)
                 

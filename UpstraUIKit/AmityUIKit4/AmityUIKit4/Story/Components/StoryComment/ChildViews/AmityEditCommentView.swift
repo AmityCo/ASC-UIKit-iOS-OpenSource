@@ -16,6 +16,8 @@ public struct AmityEditCommentView: View {
     private let saveAction: (AmityCommentModel) -> Void
     @State private var bottomPadding: CGFloat = 0.0
     
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    
     public init(comment: AmityCommentModel, cancelAction: @escaping () -> Void, saveAction: @escaping (AmityCommentModel) -> Void) {
         self.comment = comment
         self.cancelAction = cancelAction
@@ -51,13 +53,16 @@ public struct AmityEditCommentView: View {
                     .maxExpandableHeight(120)
                     .mentionListPosition(.bottom(20.0))
                     .autoFocus(true)
+                    .textColor(viewConfig.theme.baseColor)
+                    .backgroundColor(viewConfig.theme.backgroundColor)
+                    .hightlightColor(viewConfig.theme.primaryColor)
                     .willShowMentionList { listHeight in
                         bottomPadding = listHeight
                     }
                     .padding(12)
                     .background(
                         RoundedCorner(radius: 12, corners: [.topRight, .bottomLeft, .bottomRight])
-                            .fill(Color(UIColor(hex: "#EBECEF")))
+                            .fill(Color(viewConfig.theme.baseColorShade4))
                     )
                 
                 HStack(spacing: 8) {

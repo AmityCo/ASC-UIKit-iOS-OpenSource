@@ -28,6 +28,7 @@ extension AmityViewIdentifiable {
         
         return config[key] as? T
     }
+    
 }
 
 // MARK: AmityPageIdentifiable Protocol

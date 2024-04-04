@@ -149,7 +149,7 @@
 		686D17422B14BDFC007AEF59 /* AmityStoryRingElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D17412B14BDFC007AEF59 /* AmityStoryRingElement.swift */; };
 		686D17442B159CDA007AEF59 /* AmityCreateNewStoryButtonElement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D17432B159CDA007AEF59 /* AmityCreateNewStoryButtonElement.swift */; };
 		686D17462B15D099007AEF59 /* AmityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D17452B15D099007AEF59 /* AmityView.swift */; };
-		686D17482B15E397007AEF59 /* AmityColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D17472B15E397007AEF59 /* AmityColor.swift */; };
+		686D17482B15E397007AEF59 /* AmityViewConfigController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D17472B15E397007AEF59 /* AmityViewConfigController.swift */; };
 		686E48922B1F8E6500591E2D /* TimerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686E48912B1F8E6500591E2D /* TimerManager.swift */; };
 		687A69C62B5F77ED00C17B6D /* AmityHyperLinkConfigComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 687A69C52B5F77ED00C17B6D /* AmityHyperLinkConfigComponent.swift */; };
 		688051DF2B566EED00C9BBCB /* Toast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688051DD2B566EED00C9BBCB /* Toast.swift */; };
@@ -162,7 +162,6 @@
 		6880E6BD2B2811A600F25C75 /* StoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6880E6BC2B2811A600F25C75 /* StoryManager.swift */; };
 		688E2D912B2FE8AB003EB36D /* AmityDraftStoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688E2D902B2FE8AB003EB36D /* AmityDraftStoryPage.swift */; };
 		688E2D932B2FEF61003EB36D /* AmityCreateStoryPageBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688E2D922B2FEF61003EB36D /* AmityCreateStoryPageBehaviour.swift */; };
-		6893DEF22BAC5D15003BBD41 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 6893DEF12BAC5D15003BBD41 /* SharedFrameworks */; };
 		68B1F8D82B2CB09800B1484F /* CameraManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B1F8D72B2CB09800B1484F /* CameraManager.swift */; };
 		68CC6A652B1733D10052B77E /* AmityViewStoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68CC6A642B1733D10052B77E /* AmityViewStoryPage.swift */; };
 		68D11A342B2239C50046D0FB /* StoryCoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D11A332B2239C50046D0FB /* StoryCoreView.swift */; };
@@ -197,6 +196,7 @@
 		68FF77D82B81C4A300B8F561 /* Buildable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FF77C52B81C4A300B8F561 /* Buildable.swift */; };
 		68FF77D92B81C4A300B8F561 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FF77C62B81C4A300B8F561 /* Page.swift */; };
 		68FF77DB2B81DEC900B8F561 /* AmityStoryTargetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FF77DA2B81DEC900B8F561 /* AmityStoryTargetModel.swift */; };
+		9256CB4A2BBEC8B500383C27 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9256CB492BBEC8B500383C27 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -359,7 +359,7 @@
 		686D17412B14BDFC007AEF59 /* AmityStoryRingElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityStoryRingElement.swift; sourceTree = "<group>"; };
 		686D17432B159CDA007AEF59 /* AmityCreateNewStoryButtonElement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCreateNewStoryButtonElement.swift; sourceTree = "<group>"; };
 		686D17452B15D099007AEF59 /* AmityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityView.swift; sourceTree = "<group>"; };
-		686D17472B15E397007AEF59 /* AmityColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityColor.swift; sourceTree = "<group>"; };
+		686D17472B15E397007AEF59 /* AmityViewConfigController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityViewConfigController.swift; sourceTree = "<group>"; };
 		686E48912B1F8E6500591E2D /* TimerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerManager.swift; sourceTree = "<group>"; };
 		687A69C52B5F77ED00C17B6D /* AmityHyperLinkConfigComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityHyperLinkConfigComponent.swift; sourceTree = "<group>"; };
 		688051DD2B566EED00C9BBCB /* Toast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Toast.swift; sourceTree = "<group>"; };
@@ -413,7 +413,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6893DEF22BAC5D15003BBD41 /* SharedFrameworks in Frameworks */,
+				9256CB4A2BBEC8B500383C27 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -841,8 +841,8 @@
 		684AE1182B0C5DBA00FD7270 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				684AE1642B0F42B200FD7270 /* ConfigControllers */,
 				680204652B88527D00CC0CD0 /* AccessibilityID.swift */,
-				684AE1642B0F42B200FD7270 /* Appearances */,
 				684AE14C2B0C9FAA00FD7270 /* Constants */,
 				684AE14B2B0C9F8C00FD7270 /* Services */,
 				682C76162B3208CC00018F80 /* StoryPermissionChecker.swift */,
@@ -947,14 +947,14 @@
 			path = Behaviours;
 			sourceTree = "<group>";
 		};
-		684AE1642B0F42B200FD7270 /* Appearances */ = {
+		684AE1642B0F42B200FD7270 /* ConfigControllers */ = {
 			isa = PBXGroup;
 			children = (
 				684AE1622B0F322400FD7270 /* AmityUIKitConfigController.swift */,
 				684AE1652B0F42C700FD7270 /* AmityTheme.swift */,
-				686D17472B15E397007AEF59 /* AmityColor.swift */,
+				686D17472B15E397007AEF59 /* AmityViewConfigController.swift */,
 			);
-			path = Appearances;
+			path = ConfigControllers;
 			sourceTree = "<group>";
 		};
 		6859F2212B33590E004AEB8C /* ChildViews */ = {
@@ -1243,7 +1243,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				6893DEF12BAC5D15003BBD41 /* SharedFrameworks */,
+				9256CB492BBEC8B500383C27 /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -1393,7 +1393,7 @@
 				684097B82B30942F00697E1B /* Image_Orientation+CGImagePropertyOrientation.swift in Sources */,
 				684098182B313A6F00697E1B /* String+Extensions.swift in Sources */,
 				68FF77D42B81C4A300B8F561 /* PagerContent.swift in Sources */,
-				686D17482B15E397007AEF59 /* AmityColor.swift in Sources */,
+				686D17482B15E397007AEF59 /* AmityViewConfigController.swift in Sources */,
 				68FF77D72B81C4A300B8F561 /* CGPoint+Angle.swift in Sources */,
 				684AE0F62B0C5B0200FD7270 /* AmityUIKit4.docc in Sources */,
 				684097EC2B30942F00697E1B /* ImageDecoder.swift in Sources */,
@@ -1799,7 +1799,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6893DEF12BAC5D15003BBD41 /* SharedFrameworks */ = {
+		9256CB492BBEC8B500383C27 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
