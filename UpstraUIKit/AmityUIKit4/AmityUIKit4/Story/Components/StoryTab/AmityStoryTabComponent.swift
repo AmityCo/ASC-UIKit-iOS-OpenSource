@@ -9,13 +9,13 @@ import SwiftUI
 import AmitySDK
 import Combine
 
-public enum StoryFeedType {
-    case global
-    case community(AmityCommunity)
+public enum AmityStoryTabComponentType {
+    case globalFeed
+    case communityFeed(String)
 }
 
 public struct AmityStoryTabComponent: AmityComponentView {
-    @EnvironmentObject public var host: SwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var pageId: PageId?
     
@@ -24,13 +24,13 @@ public struct AmityStoryTabComponent: AmityComponentView {
     }
     
     @StateObject private var viewModel: AmityStoryTabComponentViewModel
-    private let storyFeedType: StoryFeedType
+    private let storyFeedType: AmityStoryTabComponentType
     
     // MARK: - Initializer
-    public init(pageId: PageId? = nil, storyFeedType: StoryFeedType) {
+    public init(type: AmityStoryTabComponentType, pageId: PageId? = nil) {
         self.pageId = pageId
-        self.storyFeedType = storyFeedType
-        self._viewModel = StateObject(wrappedValue: AmityStoryTabComponentViewModel(storyFeedType: storyFeedType))
+        self.storyFeedType = type
+        self._viewModel = StateObject(wrappedValue: AmityStoryTabComponentViewModel(type: type))
     }
     
     
@@ -43,15 +43,15 @@ public struct AmityStoryTabComponent: AmityComponentView {
         }) { config in
             switch storyFeedType {
                 
-            case .global:
+            case .globalFeed:
                 StoryGlobalFeedView(id: id, viewModel: viewModel, storyTabComponent: self)
                 
-            case .community(_):
+            case .communityFeed(_):
                 if let storyTarget = viewModel.communityFeedStoryTarget {
                     HStack {
-                        StoryTargetView(componentId: id, storyTarget: storyTarget, storyTargetName: "Story", cornerImage: {
+                        StoryTargetView(componentId: id, storyTarget: storyTarget, storyTargetName: "Story", hideLockIcon: true, cornerImage: {
                             viewModel.hasManagePermission ? AmityCreateNewStoryButtonElement(componentId: id)
-                                .frame(width: 22.0, height: 22.0)
+                                .frame(width: 20.0, height: 20.0)
                                 .offset(x: 22, y: 22) : nil
                             
                         })
@@ -60,22 +60,20 @@ public struct AmityStoryTabComponent: AmityComponentView {
                         .onTapGesture {
                             if storyTarget.storyCount == 0 && viewModel.hasManagePermission {
                                 let context = AmityStoryTabComponentBehaviour.Context(component: self, 
-                                                                                 storyTargets: [],
-                                                                                 storyCreationTargetId: storyTarget.targetId,
-                                                                                 storyCreationAvatar: storyTarget.avatar,
-                                                                                 startFromTargetIndex: 0)
+                                                                                      storyFeedType: .communityFeed(storyTarget.targetId),
+                                                                                      targetId: storyTarget.targetId,
+                                                                                      targetType: .community)
                                 AmityUIKitManagerInternal.shared.behavior.storyTabComponentBehaviour?.goToCreateStoryPage(context: context)
                             } else {
                                 let context = AmityStoryTabComponentBehaviour.Context(component: self, 
-                                                                                 storyTargets: [storyTarget],
-                                                                                 storyCreationTargetId: storyTarget.targetId,
-                                                                                 storyCreationAvatar: storyTarget.avatar,
-                                                                                 startFromTargetIndex: 0)
+                                                                                      storyFeedType: .communityFeed(storyTarget.targetId),
+                                                                                      targetId: storyTarget.targetId,
+                                                                                      targetType: .community)
                                 AmityUIKitManagerInternal.shared.behavior.storyTabComponentBehaviour?.goToViewStoryPage(context: context)
                             }
                         }
                         .onAppear {
-                            Log.add(event: .info, "StoryTab appeared!!!")
+                            viewModel.communityFeedStoryTarget?.fetchStory()
                         }
                         Spacer()
                     }
@@ -96,7 +94,7 @@ struct StoryGlobalFeedView: View {
             LazyHStack(spacing: 16) {
                 ForEach(Array(viewModel.globalFeedStoryTargets.enumerated()), id: \.element.targetId)  { index, storyTarget in
                     
-                    StoryTargetView(componentId: id, storyTarget: storyTarget, cornerImage: {
+                    StoryTargetView(componentId: id, storyTarget: storyTarget, hideLockIcon: storyTarget.isPublicTarget, cornerImage: {
                         storyTarget.isVerifiedTarget ? Image(AmityIcon.verifiedBadge.getImageResource())
                             .frame(width: 22.0, height: 22.0)
                             .offset(x: 22, y: 22) : nil
@@ -106,10 +104,9 @@ struct StoryGlobalFeedView: View {
                     .onTapGesture {
                         Log.add(event: .info, "Tapped StoryTargetIndex: \(index)")
                         let context = AmityStoryTabComponentBehaviour.Context(component: storyTabComponent,
-                                                                         storyTargets: viewModel.globalFeedStoryTargets,
-                                                                         storyCreationTargetId: storyTarget.targetId,
-                                                                         storyCreationAvatar: storyTarget.avatar,
-                                                                         startFromTargetIndex: index)
+                                                                         storyFeedType: .globalFeed,
+                                                                         targetId: storyTarget.targetId,
+                                                                         targetType: .community)
                         AmityUIKitManagerInternal.shared.behavior.storyTabComponentBehaviour?.goToViewStoryPage(context: context)
                     }
                     .onAppear {
@@ -128,22 +125,25 @@ struct StoryGlobalFeedView: View {
 class AmityStoryTabComponentViewModel: ObservableObject {
     @Published var globalFeedStoryTargets: [AmityStoryTargetModel] = []
     private var globalFeedCollection: AmityCollection<AmityStoryTarget>?
+    
     @Published var communityFeedStoryTarget: AmityStoryTargetModel?
+    private var storyTargetObject: AmityObject<AmityStoryTarget>?
+    
     @Published var hasManagePermission: Bool = true
     
-    private var storyFeedType: StoryFeedType
+    private var storyFeedType: AmityStoryTabComponentType
     private let storyManager = StoryManager()
     private var cancellable: AnyCancellable?
     
-    public init(storyFeedType: StoryFeedType) {
-        self.storyFeedType = storyFeedType
+    public init(type: AmityStoryTabComponentType) {
+        self.storyFeedType = type
         
         switch storyFeedType {
-        case .global:
+        case .globalFeed:
             loadGlobalFeedStoryTargets()
             
-        case .community(let community):
-            loadCommunityStoryTarget(community: community)
+        case .communityFeed(let communityId):
+            loadCommunityStoryTarget(communityId)
         }
     }
     
@@ -153,30 +153,30 @@ class AmityStoryTabComponentViewModel: ObservableObject {
         cancellable = globalFeedCollection?.$snapshots
             .map { targets in
                 return targets.compactMap { target -> AmityStoryTargetModel? in
-                    guard let community = target.community else { return nil }
-                    return AmityStoryTargetModel(storyTarget: target, 
-                                       targetId: community.communityId,
-                                       targetName: community.displayName,
-                                       isVerifiedTarget: community.isOfficial,
-                                       isPublicTarget: community.isPublic,
-                                       avatar: URL(string: community.avatar?.fileURL ?? ""))
+                    return AmityStoryTargetModel(target)
                 }.removeDuplicates()
             }
             .assign(to: \.globalFeedStoryTargets, on: self)
     }
     
-    
-    private func loadCommunityStoryTarget(community: AmityCommunity) {
-        let storyTarget = AmityStoryTargetModel(targetId: community.communityId,
-                                      targetName: community.displayName,
-                                      isVerifiedTarget: community.isOfficial,
-                                      isPublicTarget: community.isPublic,
-                                      avatar: URL(string: community.avatar?.fileURL ?? ""))
-        storyTarget.fetchStory()
-        self.communityFeedStoryTarget = storyTarget
+    private func loadCommunityStoryTarget(_ communityId: String) {
         Task { @MainActor in
-            self.hasManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: storyTarget.targetId)
+            self.hasManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: communityId)
         }
+        
+        storyTargetObject = storyManager.getStoryTarget(targetType: .community, targetId: communityId)
+        cancellable = nil
+        cancellable = storyTargetObject?.$snapshot
+            .sink(receiveValue: { [weak self] target in
+                guard let target else { return }
+                
+                if let existingModel = self?.communityFeedStoryTarget {
+                    existingModel.updateModel(target)
+                } else {
+                    self?.communityFeedStoryTarget = AmityStoryTargetModel(target)
+                    self?.communityFeedStoryTarget?.fetchStory()
+                }
+            })
     }
     
     func loadMoreGlobalFeedTargetIfHas(_ index: Int) {

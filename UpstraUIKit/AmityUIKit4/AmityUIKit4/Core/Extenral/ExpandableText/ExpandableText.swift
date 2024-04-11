@@ -141,16 +141,13 @@ public struct ExpandableText: View {
 extension ExpandableText {
     @available(iOS 15, *)
     func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], font: UIFont) -> AttributedString {
-        let attributedString = NSMutableAttributedString(string: text)
+        
+        let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(hex: "#1054DE"), .font: UIFont.systemFont(ofSize: 15, weight: .bold)]
+        
         let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
         
-        let attributes = MentionManager.getAttributes(fromText: text, withMetadata: metadata, mentionees: mentionees, highlightColor: .systemBlue, highlightFont: font)
-
-        for attribute in attributes {
-            attributedString.addAttributes(attribute.attributes, range: attribute.range)
-        }
-        
-        return AttributedString(attributedString)
+        let attributes = MentionTextHighlighter.getAttributedText(for: text, metadata: metadata, mentionees: mentionees, highlightAttributes: highlightAttributes)
+        return attributes
     }
 }

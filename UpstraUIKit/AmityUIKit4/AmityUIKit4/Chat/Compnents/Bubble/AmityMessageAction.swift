@@ -1,0 +1,21 @@
+//
+//  AmityMessageAction.swift
+//  AmityUIKit4
+//
+//  Created by Manuchet Rungraksa on 10/4/2567 BE.
+//
+
+public class AmityMessageAction {
+    
+    public typealias MessageAction = (MessageModel) -> Void
+    
+    var onCopy: MessageAction?
+    var onReply: MessageAction?
+    var onDelete: MessageAction?
+    
+    public init(onCopy: MessageAction?, onReply: MessageAction?, onDelete: MessageAction?) {
+        self.onCopy = onCopy
+        self.onReply = onReply
+        self.onDelete = onDelete
+    }
+}

@@ -16,7 +16,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     var avatar: URL?
     var isVerified: Bool
     
-    @EnvironmentObject var host: SwiftUIHostWrapper
+    @EnvironmentObject var host: AmitySwiftUIHostWrapper
     @ObservedObject var storyTarget: AmityStoryTargetModel
     @EnvironmentObject var storyPageViewModel: AmityStoryPageViewModel
     @EnvironmentObject var storyCoreViewModel: StoryCoreViewModel
@@ -82,6 +82,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     getMuteButton()
                         .offset(x: 16, y: 98)
                         .isHidden(storyModel.storyType != .video)
+                        .isHidden(viewConfig.isHidden(elementId: .muteUnmuteButtonElement))
                     
                     VStack(alignment: .center) {
                         getMetadataView(targetName: targetName,
@@ -169,10 +170,12 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     .frame(width: 16.0, height: 16.0)
                     .isHidden(!hasStoryManagePermission)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.createStoryIcon)
+                    .isHidden(viewConfig.isHidden(elementId: .createNewStoryButtonElement), remove: false)
             }
             .onTapGesture {
                 if hasStoryManagePermission {
-                    goToStoryCreationPage(targetId: story.targetId, avatar: avatar)
+                    let context = AmityViewStoryPageBehaviour.Context(page: viewStoryPage, targetId: storyTarget.targetId, targetType: .community)
+                    AmityUIKit4Manager.behaviour.viewStoryPageBehaviour?.goToCreateStoryPage(context: context)
                 }
             }
             .onAppear {
@@ -190,7 +193,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         .foregroundColor(.white)
                         .onTapGesture {
                             guard let community = story.community else { return }
-                            let context = AmityViewStoryPageBehaviour.Context(page: viewStoryPage, community: community)
+                            let context = AmityViewStoryPageBehaviour.Context(page: viewStoryPage, targetId: community.communityId, targetType: .community)
                             AmityUIKit4Manager.behaviour.viewStoryPageBehaviour?.goToCommunityPage(context: context)
                         }
                         .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.communityDisplayNameTextView)
@@ -200,6 +203,8 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         .frame(width: 20, height: 20)
                         .offset(x: -5)
                         .isHidden(!isVerified)
+                    
+                    Spacer(minLength: 80)
                 }
                 HStack {
                     Text(story.createdAt.timeAgoString)
@@ -321,7 +326,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     .font(.system(size: 15))
                     .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reachButtonTextView)
             } icon: {
-                let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, componentId: nil, elementId: .impressionIconElement, key: "impression_icon", of: String.self) ?? "")
+                let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .impressionIconElement, key: "impression_icon", of: String.self) ?? "")
                 Image(icon)
                     .frame(width: 20, height: 16)
                     .padding(.trailing, -4)
@@ -329,12 +334,13 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             .foregroundColor(.white)
             .isHidden(!(story.isModerator || story.isCreator))
             .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reachButton)
+            .isHidden(viewConfig.isHidden(elementId: .impressionIconElement), remove: false)
             
             Spacer()
             
-            let commentBtnBgColor = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .storyCommentButtonElement, key: "background_color", of: String.self) ?? "#FFFFFF"))
+            let commentBtnBgColor = Color(UIColor(hex: viewConfig.getConfig(elementId: .storyCommentButtonElement, key: "background_color", of: String.self) ?? "#FFFFFF"))
             HStack(spacing: 0) {
-                let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .storyCommentButtonElement, key: "comment_icon", of: String.self) ?? "")
+                let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .storyCommentButtonElement, key: "comment_icon", of: String.self) ?? "")
                 Image(icon)
                     .frame(width: 20, height: 16)
                     .padding(.leading, 10)
@@ -356,11 +362,12 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 showCommentTray.toggle()
             }
             .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.commentButton)
+            .isHidden(viewConfig.isHidden(elementId: .storyCommentButtonElement))
             
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
-            let reactionBtnBgColor = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .storyReactionButtonElement, key: "background_color", of: String.self) ?? ""))
+            let reactionBtnBgColor = Color(UIColor(hex: viewConfig.getConfig(elementId: .storyReactionButtonElement, key: "background_color", of: String.self) ?? ""))
             HStack(spacing: 0) {
-                let icon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .storyReactionButtonElement, key: "reaction_icon", of: String.self) ?? "")
+                let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .storyReactionButtonElement, key: "reaction_icon", of: String.self) ?? "")
                 let likedIcon = AmityIcon.likeReactionIcon.getImageResource()
                 Image(story.isLiked ? likedIcon : icon)
                     .frame(width: 20, height: 16)
@@ -395,6 +402,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 }
             }
             .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reactionButton)
+            .isHidden(viewConfig.isHidden(elementId: .storyReactionButtonElement))
         }
         .frame(height: 56)
         .padding(EdgeInsets(top: 0, leading: 12, bottom: 25, trailing: 12))
@@ -518,16 +526,13 @@ struct StoryCoreView: View, AmityViewIdentifiable {
         if let story = storyTarget.stories.element(at: storySegmentIndex) {
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
             let allowCreateComment = story.storyTarget?.community?.storySettings.allowComment ?? false
-            AmityCommentTrayComponent(referenceId: story.storyId, referenceType: .story, communityId: story.storyTarget?.community?.communityId, hideCommentButtons: !isCommunityMember, allowCreateComment: allowCreateComment)
+            
+            AmityCommentTrayComponent(referenceId: story.storyId,
+                                      referenceType: .story,
+                                      community: story.storyTarget?.community,
+                                      shouldAllowInteraction: isCommunityMember,
+                                      shouldAllowCreation: allowCreateComment)
         }
-    }
-    
-    
-    private func goToStoryCreationPage(targetId: String, avatar: URL?) {
-        let createStoryPage = AmityCreateStoryPage(targetId: targetId, avatar: avatar)
-        let controller = SwiftUIHostingController(rootView: createStoryPage)
-        
-        host.controller?.navigationController?.setViewControllers([controller], animated: false)
     }
 }
 
@@ -581,7 +586,7 @@ struct StoryImageView: View {
                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.storyImageView)
         }
         .onAppear {
-            totalDuration = 4.0
+            totalDuration = STORY_DURATION
             Log.add(event: .info, "Story TotalDuration: \(totalDuration)")
         }
     }

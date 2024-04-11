@@ -8,7 +8,6 @@
 import Foundation
 import AmitySDK
 
-// TEMP: Refactor this class
 public class StoryPermissionChecker {
     
     public static func checkUserHasManagePermission(communityId: String) async -> Bool {

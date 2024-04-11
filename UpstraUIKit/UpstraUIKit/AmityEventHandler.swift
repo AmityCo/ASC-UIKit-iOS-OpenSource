@@ -149,8 +149,15 @@ open class AmityEventHandler {
             }
         
         #if canImport(AmityUIKit4)
+        let storyCompletion: ((AmityPostContentType) -> Void) = { postContentType in
+            let targetSelectionPage = AmityTargetSelectionPage(type: .story)
+            let navPostTargetVC = UINavigationController(rootViewController: AmitySwiftUIHostingController(rootView: targetSelectionPage))
+            navPostTargetVC.isNavigationBarHidden = true
+            navPostTargetVC.modalPresentationStyle = .fullScreen
+            source.present(navPostTargetVC, animated: true, completion: nil)
+        }
         let storyPostOption = ImageItemOption(title: AmityLocalizedStringSet.General.story.localizedString, image: AmityIconSet.CreatePost.iconStory) {
-            completion(.story)
+            storyCompletion(.story)
         }
         AmityBottomSheet.present(options: [livestreamPost, postOption, storyPostOption , pollPostOption], from: source)
         #else
@@ -187,8 +194,8 @@ open class AmityEventHandler {
                 Log.add("Story in Feed!!!!")
             case .community(object: let community):
                 Task { @MainActor in
-                    let createStoryPage = AmityCreateStoryPage(targetId: community.communityId, avatar: URL(string: community.avatar?.fileURL ?? ""))
-                    let viewController = SwiftUIHostingController(rootView: createStoryPage)
+                    let createStoryPage = AmityCreateStoryPage(targetId: community.communityId, targetType: .community)
+                    let viewController = AmitySwiftUIHostingController(rootView: createStoryPage)
                     
                     if let vc = source.navigationController?.viewControllers.last, vc.isKind(of: AmityCommunityProfilePageViewController.self) {
                         let navigationController = UINavigationController(rootViewController: viewController)

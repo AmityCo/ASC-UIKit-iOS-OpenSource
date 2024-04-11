@@ -180,9 +180,9 @@ final class AmityCommunityProfileHeaderViewController: UIViewController {
     private func setupStory(community: AmityCommunity) {
         #if canImport(AmityUIKit4)
 
-        storyTabComponent = AmityStoryTabComponent(storyFeedType: .community(community))
+        storyTabComponent = AmityStoryTabComponent(type: .communityFeed(community.communityId))
         
-        let hostingController = SwiftUIHostingController(rootView: storyTabComponent)
+        let hostingController = AmitySwiftUIHostingController(rootView: storyTabComponent)
     
         addChild(hostingController)
         hostingController.view.translatesAutoresizingMaskIntoConstraints = false

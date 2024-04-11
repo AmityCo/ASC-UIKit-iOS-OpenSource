@@ -118,4 +118,63 @@ struct AccessibilityID {
             static let reportCommentButton = "comment_tray_component/bottom_sheet_report_comment_button"
         }
     }
+    
+    struct Chat {
+        
+        struct MessageList {
+            static let container = "message_list/*"
+            static let senderTextView = "message_list/message_bubble_sender_text_text_view"
+            static let senderText = "message_list/message_bubble_sender_text"
+            static let senderReplyText = "message_list/message_bubble_sender_text_reply_text"
+            static let senderReplyTextView = "message_list/message_bubble_sender_text_reply_text_text_view"
+            
+            static let receiverTextView = "message_list/message_bubble_receiver_text_text_view"
+            static let receiverText = "message_list/message_bubble_receiver_text"
+            static let receiverReplyText = "message_list/message_bubble_receiver_text_reply_text"
+            static let receiverReplyTextView = "message_list/message_bubble_receiver_text_reply_text_text_view"
+            
+            static let emptyStateContainer = "message_list/fail_to_load_message"
+            static let emptyStateTitleText = "message_list/fail_to_load_message_title"
+            static let emptyStateSubtitleText = "message_list/fail_to_load_message_subtitle"
+            static let emptyStateIcon = "message_list/fail_to_load_message_icon"
+            
+            static let bubbleContainer = "message_list/message_bubble"
+            static let bubbleTimestamp = "message_list/message_bubble_timestamp"
+            static let bubbleSenderAvatar = "message_list/message_bubble_sender_avatar"
+            static let bubbleReceiverAvatar = "message_list/message_bubble_receiver_avatar"
+            static let bubbleSenderDisplayName = "message_list/message_bubble_sender_display_name"
+            static let bubbleReceiverDisplayName = "message_list/message_bubble_receiver_display_name"
+            static let bubbleSendingStatus = "message_list/message_bubble_sending_status"
+            static let bubbleReaction = "message_list/message_bubble_reaction"
+        }
+        
+        struct LiveChatHeader {
+            static let container = "live_chat_header/*"
+            static let avatar = "live_chat_header/avatar"
+            static let headerTitle = "live_chat_header/title"
+            static let memberCount = "live_chat_header/member_count"
+            static let connectivity = "live_chat_header/conectivity"
+        }
+        
+        struct MessageComposer {
+            static let container = "message_composer/*"
+            static let sendButton = "message_composer/send_button"
+            static let textField = "message_composer/text_field"
+        }
+        
+        struct MentionList {
+            static let container = "mention_list/*"
+            static let userAvatar = "mention_list/user_avatar"
+            static let userDisplayName = "mention_list/user_display_name"
+        }
+        
+        struct ReplyPanel {
+            static let container = "reply_panel/*"
+            static let userAvatar = "reply_panel/user_avatar"
+            static let userDisplayName = "reply_panel/user_display_name"
+            static let close_button = "reply_panel/close_button"
+        }
+    }
 }
+
+

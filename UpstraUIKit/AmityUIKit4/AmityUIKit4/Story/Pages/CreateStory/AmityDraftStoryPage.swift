@@ -8,14 +8,15 @@
 import SwiftUI
 import AVKit
 import AmitySDK
+import Combine
 
-public enum StoryMediaType {
-    case image(URL?, UIImage?)
-    case video(URL?)
+public enum AmityStoryMediaType {
+    case image(URL)
+    case video(URL)
 }
 
 public struct AmityDraftStoryPage: AmityPageView {
-    @EnvironmentObject public var host: SwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var id: PageId {
         .storyCreationPage
@@ -31,12 +32,12 @@ public struct AmityDraftStoryPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     @Environment(\.colorScheme) private var colorScheme
     
-    public init(targetId: String, avatar: URL?, mediaType: StoryMediaType) {
-        self._viewModel = StateObject(wrappedValue: AmityDraftStoryPageViewModel(targetId: targetId, avatar: avatar, mediaType: mediaType))
+    public init(targetId: String, targetType: AmityStoryTargetType, mediaType: AmityStoryMediaType) {
+        self._viewModel = StateObject(wrappedValue: AmityDraftStoryPageViewModel(targetId: targetId, targetType: targetType, mediaType: mediaType))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .storyCreationPage))
         
-        if case .image(_, let image) = mediaType {
-            if let image {
+        if case .image(let url) = mediaType {
+            if let image = UIImage(contentsOfFile: url.path) {
                 self._previewDisplayMode = State(initialValue: image.orientation == .portrait ? .fill : .fit)
             }
         }
@@ -60,13 +61,14 @@ public struct AmityDraftStoryPage: AmityPageView {
                             Button(action: {
                                 isAlertShown = true
                             }, label: {
-                                Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .backButtonElement, key: "back_icon", of: String.self) ?? ""))
+                                Image(AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .backButtonElement, key: "back_icon", of: String.self) ?? ""))
                                     .frame(width: 32, height: 32)
-                                    .background(Color(UIColor(hex: getElementConfig(elementId: .backButtonElement, key: "background_color", of: String.self) ?? "")))
+                                    .background(Color(UIColor(hex: viewConfig.getConfig(elementId: .backButtonElement, key: "background_color", of: String.self) ?? "").withAlphaComponent(0.5)))
                                     .clipShape(.circle)
                             })
                             .buttonStyle(.plain)
                             .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.backButton)
+                            .isHidden(viewConfig.isHidden(elementId: .backButtonElement), remove: false)
                     
                             Spacer()
                             
@@ -74,12 +76,13 @@ public struct AmityDraftStoryPage: AmityPageView {
                                 Button {
                                     previewDisplayMode = previewDisplayMode == .fill ? .fit : .fill
                                 } label: {
-                                    Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .aspectRatioButtonElement, key: "aspect_ratio_icon", of: String.self) ?? ""))
+                                    Image(AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .aspectRatioButtonElement, key: "aspect_ratio_icon", of: String.self) ?? ""))
                                         .frame(width: 32, height: 32)
-                                        .background(Color(UIColor(hex: getElementConfig(elementId: .aspectRatioButtonElement, key: "background_color", of: String.self) ?? "")))
+                                        .background(Color(UIColor(hex: viewConfig.getConfig(elementId: .aspectRatioButtonElement, key: "background_color", of: String.self) ?? "").withAlphaComponent(0.5)))
                                         .clipShape(.circle)
                                 }
                                 .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.aspectRatioButton)
+                                .isHidden(viewConfig.isHidden(elementId: .aspectRatioButtonElement), remove: false)
                             }
                             
                             Button {
@@ -89,12 +92,13 @@ public struct AmityDraftStoryPage: AmityPageView {
                                 }
                                 showHyperLinkSheet = true
                             } label: {
-                                Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .hyperLinkButtonElement, key: "hyperlink_button_icon", of: String.self) ?? ""))
+                                Image(AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .hyperLinkButtonElement, key: "hyperlink_button_icon", of: String.self) ?? ""))
                                     .frame(width: 32, height: 32)
-                                    .background(Color(UIColor(hex: getElementConfig(elementId: .aspectRatioButtonElement, key: "background_color", of: String.self) ?? "")))
+                                    .background(Color(UIColor(hex: viewConfig.getConfig(elementId: .hyperLinkButtonElement, key: "background_color", of: String.self) ?? "").withAlphaComponent(0.5)))
                                     .clipShape(.circle)
                             }
                             .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperLinkButton)
+                            .isHidden(viewConfig.isHidden(elementId: .hyperLinkButtonElement), remove: false)
                         }
                         .padding(16)
                         
@@ -102,7 +106,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                         
                         if !viewModel.hyperLinkConfigModel.url.isEmpty {
                             HStack(spacing: 0) {
-                                Image(AmityIcon.getImageResource(named: getElementConfig(elementId: .hyperLinkElement, key: "hyper_link_icon", of: String.self) ?? ""))
+                                Image(AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .hyperLinkElement, key: "hyper_link_icon", of: String.self) ?? ""))
                                     .frame(width: 20, height: 20)
                                     .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))
                                 let title = viewModel.hyperLinkConfigModel.getCustomName().isEmpty ? viewModel.hyperLinkConfigModel.getDomainName() ?? "" : viewModel.hyperLinkConfigModel.getCustomName()
@@ -114,13 +118,14 @@ public struct AmityDraftStoryPage: AmityPageView {
                                     .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperlinkTextView)
                             }
                             .frame(height: 40)
-                            .background(Color(UIColor(hex: getElementConfig(elementId: .hyperLinkElement, key: "background_color", of: String.self) ?? "")).opacity(0.8))
+                            .background(Color(UIColor(hex: viewConfig.getConfig(elementId: .hyperLinkElement, key: "background_color", of: String.self) ?? "")).opacity(0.8))
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             .padding(EdgeInsets(top: 0, leading: 24, bottom: 32, trailing: 24))
                             .onTapGesture {
                                 showHyperLinkSheet = true
                             }
                             .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperlinkView)
+                            .isHidden(viewConfig.isHidden(elementId: .hyperLinkElement), remove: false)
                         }
                     }
                     
@@ -144,6 +149,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                         }
                     }
                     .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.shareStoryButton)
+                    .isHidden(viewConfig.isHidden(elementId: .shareStoryButtonElement), remove: false)
                 
             }
         }
@@ -171,9 +177,8 @@ public struct AmityDraftStoryPage: AmityPageView {
     func getPreviewView(size: CGSize) -> some View {
         
         switch viewModel.storyMediaType {
-        case .image(_, let image):
-            if let image {
-                
+        case .image(let url):
+            if let image = UIImage(contentsOfFile: url.path) {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(contentMode: previewDisplayMode)
@@ -189,30 +194,27 @@ public struct AmityDraftStoryPage: AmityPageView {
                     .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.storyImageView)
             }
         case .video(let url):
-            if let url {
-                VideoPlayer(url: url, play: $playVideo)
-                    .autoReplay(true)
-                    .contentMode(.scaleAspectFit)
-                    .allowsHitTesting(false)
-                    .frame(width: size.width, height: size.height)
-                    .cornerRadius(14.0)
-                    .onAppear {
-                        playVideo.toggle()
-                    }
-                    .onDisappear {
-                        playVideo.toggle()
-                    }
-                    .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.storyVideoView)
-            }
-            
+            VideoPlayer(url: url, play: $playVideo)
+                .autoReplay(true)
+                .contentMode(.scaleAspectFit)
+                .allowsHitTesting(false)
+                .frame(width: size.width, height: size.height)
+                .cornerRadius(14.0)
+                .onAppear {
+                    playVideo.toggle()
+                }
+                .onDisappear {
+                    playVideo.toggle()
+                }
+                .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.storyVideoView)
         }
     }
     
     @ViewBuilder
     func getShareStoryButtonView() -> some View {
-        let shareIcon = AmityIcon.getImageResource(named: getElementConfig(elementId: .shareStoryButtonElement, key: "share_icon", of: String.self) ?? "")
-        let hideAvatar = getElementConfig(elementId: .shareStoryButtonElement, key: "hide_avatar", of: Bool.self) ?? false
-        let backgroundColor = Color(UIColor(hex: getElementConfig(elementId: .shareStoryButtonElement, key: "background_color", of: String.self) ?? ""))
+        let shareIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .shareStoryButtonElement, key: "share_icon", of: String.self) ?? "")
+        let hideAvatar = viewConfig.getConfig(elementId: .shareStoryButtonElement, key: "hide_avatar", of: Bool.self) ?? false
+        let backgroundColor = Color(UIColor(hex: viewConfig.getConfig(elementId: .shareStoryButtonElement, key: "background_color", of: String.self) ?? ""))
         
         HStack(spacing: 8) {
             if !hideAvatar {
@@ -238,27 +240,32 @@ public struct AmityDraftStoryPage: AmityPageView {
 }
 
 class AmityDraftStoryPageViewModel: ObservableObject {
-    var storyMediaType: StoryMediaType
+    var storyMediaType: AmityStoryMediaType
     let storyManager = StoryManager()
     var targetId: String
-    var avatar: URL?
+    var targetType: AmityStoryTargetType
+    @Published var avatar: URL?
+    
+    private var cancellable: AnyCancellable?
+    private var communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
     @Published var hyperLinkConfigModel: HyperLinkModel = HyperLinkModel(url: "", urlName: "")
     
-    init(targetId: String, avatar: URL?, mediaType: StoryMediaType) {
+    init(targetId: String, targetType: AmityStoryTargetType, mediaType: AmityStoryMediaType) {
         self.targetId = targetId
         self.storyMediaType = mediaType
-        self.avatar = avatar
+        self.targetType = targetType
+        
+        let communityObject = communityRepository.getCommunity(withId: targetId)
+        cancellable = communityObject.$snapshot
+            .sink { [weak self] community in
+                self?.avatar = URL(string: community?.avatar?.fileURL ?? "")
+            }
     }
     
     func createStory(displayMode: ContentMode) async throws {
         switch storyMediaType {
             
-        case .image(let imageURL, _):
-            guard let imageURL else {
-                Log.add(event: .error, "ImageURL should not be nil.")
-                return
-            }
-            
+        case .image(let imageURL):
             let storyImageDisplayMode = displayMode == .fill ? AmityStoryImageDisplayMode.fill : AmityStoryImageDisplayMode.fit
             
             let items: [AmityStoryItem]
@@ -274,10 +281,6 @@ class AmityDraftStoryPageViewModel: ObservableObject {
             try await storyManager.createImageStory(in: targetId, createOption: createOption)
             
         case .video(let videoURL):
-            guard let videoURL else {
-                Log.add(event: .error, "VideoURL should not be nil.")
-                return
-            }
             
             let items: [AmityStoryItem]
             if !hyperLinkConfigModel.url.isEmpty {
@@ -294,9 +297,3 @@ class AmityDraftStoryPageViewModel: ObservableObject {
         
     }
 }
-
-#if DEBUG
-#Preview {
-    AmityDraftStoryPage(targetId: "", avatar: nil, mediaType: .image(nil, nil))
-}
-#endif

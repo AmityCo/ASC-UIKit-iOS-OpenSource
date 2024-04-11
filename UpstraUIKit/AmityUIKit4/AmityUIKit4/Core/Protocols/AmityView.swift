@@ -19,10 +19,9 @@ struct AmityView<Content: View, Config>: View {
         configDict = AmityUIKitConfigController.shared.getConfig(configId: configId)
         self.config = config
     }
-    
+
     var body: some View {
         let config = config(configDict)
         content(config)
     }
-    
 }

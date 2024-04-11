@@ -13,10 +13,12 @@ struct StoryTargetView<Content: View>: View {
     @ViewBuilder private let cornerImage: () -> Content
     @ObservedObject private var storyTarget: AmityStoryTargetModel
     private let storyTargetName: String
+    private let hideLockIcon: Bool
     
-    init(componentId: ComponentId, storyTarget: AmityStoryTargetModel, storyTargetName: String? = nil, @ViewBuilder cornerImage: @escaping () -> Content) {
+    init(componentId: ComponentId, storyTarget: AmityStoryTargetModel, storyTargetName: String? = nil, hideLockIcon: Bool, @ViewBuilder cornerImage: @escaping () -> Content) {
         self.componentId = componentId
         self.storyTarget = storyTarget
+        self.hideLockIcon = hideLockIcon
         self.cornerImage = cornerImage
         
         if let storyTargetName {
@@ -61,7 +63,7 @@ struct StoryTargetView<Content: View>: View {
                 Image(AmityIcon.lockBlackIcon.getImageResource())
                     .frame(width: 20, height: 12)
                     .offset(y: -1)
-                    .isHidden(!storyTarget.isGlobalFeedTarget || storyTarget.isPublicTarget)
+                    .isHidden(hideLockIcon)
                     
                 Text(name)
                     .font(.system(size: 13))

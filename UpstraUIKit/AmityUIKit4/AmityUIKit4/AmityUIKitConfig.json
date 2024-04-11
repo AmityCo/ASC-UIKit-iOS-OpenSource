@@ -1,161 +1,158 @@
 {
-    "preferred_theme": "default",
-    "theme": {
-        "light": {
-          "primary_color": "#1054DE",
-          "secondary_color": "#292B32",
-          "base_color": "#292B32",
-          "base_shade1_color": "#636878",
-          "base_shade2_color": "#898E9E",
-          "base_shade3_color": "#A5A9b5",
-          "base_shade4_color": "#EBECEF",
-          "alert_color": "#FA4D30",
-          "background_color": "#FFFFFF",
-        },
-        "dark": {
-          "primary_color": "#1054DE",
-          "secondary_color": "#292B32",
-          "base_color": "#EBECEF",
-          "base_shade1_color": "#A5A9B5",
-          "base_shade2_color": "#6E7487",
-          "base_shade3_color": "#40434E",
-          "base_shade4_color": "#292B32",
-          "alert_color": "#FA4D30",
-          "background_color": "#191919",
-        }
+  "preferred_theme": "default",
+  "theme": {
+    "light": {
+      "primary_color": "#1054DE",
+      "secondary_color": "#292B32",
+      "base_color": "#292B32",
+      "base_shade1_color": "#636878",
+      "base_shade2_color": "#898E9E",
+      "base_shade3_color": "#A5A9b5",
+      "base_shade4_color": "#EBECEF",
+      "alert_color": "#FA4D30",
+      "background_color": "#FFFFFF"
     },
-    "excludes": [
-
-    ],
-    "customizations": {
-  
-      "select_target_page/*/*": {
-        "title": "Share to"
-      },
-      "select_target_page/*/back_button": {
-        "back_icon": "back.png"
-      },
-
-
-      "camera_page/*/*": {
-        "resolution": "720p"
-      },
-      "camera_page/*/close_button": {
-        "close_icon": "backgroundedCloseIcon"
-      },
-
-
-      "create_story_page/*/*": { },
-      "create_story_page/*/back_button": {
-        "back_icon": "backIcon",
-        "background_color": "#6A6A6B"
-      },
-      "create_story_page/*/aspect_ratio_button": {
-        "aspect_ratio_icon": "aspectRatioIcon",
-        "background_color": "#6A6A6B"
-      },
-      "create_story_page/*/story_hyperlink_button": {
-       "hyperlink_button_icon": "hyperLinkIcon",
-       "background_color": "#6A6A6B"
-      },
-      "create_story_page/*/hyper_link": {
-        "hyper_link_icon": "hyperLinkBlueIcon",
-        "background_color": "#EBECEF"
-       },
-      "create_story_page/*/share_story_button": {
-        "share_icon": "nextIcon",
-        "background_color": "#FFFFFF",
-        "hide_avatar": false
-      },
-
-
-      "story_page/*/*": {},
-      "story_page/*/progress_bar": {
-        "progress_color": "#FFFFFF",
-        "background_color": "#FFFFFF"
-      },
-      "story_page/*/overflow_menu": {
-        "overflow_menu_icon": "threeDotIcon"
-      },
-      "story_page/*/close_button": {
-        "close_icon": "closeIcon"
-      },
-      "story_page/*/story_impression_button": {
-        "impression_icon": "eyeIcon"
-      },
-      "story_page/*/story_comment_button": {
-        "comment_icon": "storyCommentIcon",
-        "background_color": "#292B32"
-      },
-      "story_page/*/story_reaction_button": {
-        "reaction_icon": "storyLikeIcon",
-        "background_color": "#292B32"
-      },
-      "story_page/*/create_new_story_button": {
-        "create_new_story_icon": "plus.png",
-        "background_color": "#1243EE"
-      },
-      "story_page/*/speaker_button": {
-        "mute_icon": "muteIcon",
-        "unmute_icon": "unmuteIcon",
-        "background_color": "#6A6A6B"
-      },
-
-      "*/edit_comment_component/*": {
-      },
-      "*/edit_comment_component/cancel_button": {
-        "cancel_icon": "",
-        "cancel_button_text": "cancel",
-        "background_color": "#1243EE"
-      },
-      "*/edit_comment_component/save_button": {
-        "save_icon": "",
-        "save_button_text": "Save",
-        "background_color": "#1243EE"
-      },
-      
-      "*/hyper_link_config_component/*": {
-        "component_theme": {
-            "light_theme": {
-                "primary_color": "#UD1234",
-                "secondary_color": "#AB1234"
-            }
+    "dark": {
+      "primary_color": "#1054DE",
+      "secondary_color": "#292B32",
+      "base_color": "#EBECEF",
+      "base_shade1_color": "#A5A9B5",
+      "base_shade2_color": "#6E7487",
+      "base_shade3_color": "#40434E",
+      "base_shade4_color": "#292B32",
+      "alert_color": "#FA4D30",
+      "background_color": "#191919"
+    }
+  },
+  "excludes": [],
+  "customizations": {
+    "select_target_page/*/*": {
+      "title": "Share to"
+    },
+    "select_target_page/*/back_button": {
+      "back_icon": "back.png"
+    },
+    "camera_page/*/*": {
+      "resolution": "720p"
+    },
+    "camera_page/*/close_button": {
+      "close_icon": "backgroundedCloseIcon"
+    },
+    "create_story_page/*/*": {},
+    "create_story_page/*/back_button": {
+      "back_icon": "backArrowIcon",
+      "background_color": "#000000"
+    },
+    "create_story_page/*/aspect_ratio_button": {
+      "aspect_ratio_icon": "aspectRatioIcon",
+      "background_color": "#000000"
+    },
+    "create_story_page/*/story_hyperlink_button": {
+      "hyperlink_button_icon": "hyperLinkIcon",
+      "background_color": "#000000"
+    },
+    "create_story_page/*/hyper_link": {
+      "hyper_link_icon": "hyperLinkBlueIcon",
+      "background_color": "#EBECEF"
+    },
+    "create_story_page/*/share_story_button": {
+      "share_icon": "nextIcon",
+      "background_color": "#FFFFFF",
+      "hide_avatar": false
+    },
+    "story_page/*/*": {},
+    "story_page/*/progress_bar": {
+      "progress_color": "#FFFFFF",
+      "background_color": "#FFFFFF"
+    },
+    "story_page/*/overflow_menu": {
+      "overflow_menu_icon": "threeDotIcon"
+    },
+    "story_page/*/close_button": {
+      "close_icon": "closeIcon"
+    },
+    "story_page/*/story_impression_button": {
+      "impression_icon": "eyeIcon"
+    },
+    "story_page/*/story_comment_button": {
+      "comment_icon": "storyCommentIcon",
+      "background_color": "#292B32"
+    },
+    "story_page/*/story_reaction_button": {
+      "reaction_icon": "storyLikeIcon",
+      "background_color": "#292B32"
+    },
+    "story_page/*/create_new_story_button": {
+      "create_new_story_icon": "plus.png",
+      "background_color": "#1243EE"
+    },
+    "story_page/*/speaker_button": {
+      "mute_icon": "muteIcon",
+      "unmute_icon": "unmuteIcon",
+      "background_color": "#6A6A6B"
+    },
+    "*/edit_comment_component/*": {},
+    "*/edit_comment_component/cancel_button": {
+      "cancel_icon": "",
+      "cancel_button_text": "cancel",
+      "background_color": "#1243EE"
+    },
+    "*/edit_comment_component/save_button": {
+      "save_icon": "",
+      "save_button_text": "Save",
+      "background_color": "#1243EE"
+    },
+    "*/hyper_link_config_component/*": {
+      "component_theme": {
+        "light_theme": {
+          "primary_color": "#UD1234",
+          "secondary_color": "#AB1234"
         }
-      },
-      "*/hyper_link_config_component/done_button": {
-        "done_icon": "",
-        "done_button_text": "Done",
-        "background_color": "#1243EE"
-      },
-      "*/hyper_link_config_component/cancel_button": {
-        "cancel_icon": "",
-        "cancel_button_text": "Cancel"
-      },
-      
-
-      "*/comment_tray_component/*": {
-        "component_theme": {
-            "light_theme": {
-                "primary_color": "#UD1234",
-                "secondary_color": "#AB1234"
-            }
-        }
-      },
-
-      
-      "*/story_tab_component/*": {},
-      "*/story_tab_component/story_ring": {
-        "progress_color": ["#339AF9", "#78FA58"],
-        "background_color": "#EBECEF"
-      },
-      "*/story_tab_component/create_new_story_button": {
-        "create_new_story_icon": "createStoryIcon",
-        "background_color": "#FFFFFF"
-      },
-      
-      
-      "*/*/close_button": {
-        "close_icon": "closeIcon"
       }
+    },
+    "*/hyper_link_config_component/done_button": {
+      "done_icon": "",
+      "done_button_text": "Done",
+      "background_color": "#1243EE"
+    },
+    "*/hyper_link_config_component/cancel_button": {
+      "cancel_icon": "",
+      "cancel_button_text": "Cancel"
+    },
+    "*/comment_tray_component/*": {},
+    "*/story_tab_component/*": {},
+    "*/story_tab_component/story_ring": {
+      "progress_color": [
+        "#339AF9",
+        "#78FA58"
+      ],
+      "background_color": "#EBECEF"
+    },
+    "*/story_tab_component/create_new_story_button": {
+      "create_new_story_icon": "createStoryIcon",
+      "background_color": "#FFFFFF"
+    },
+    "*/*/close_button": {
+      "close_icon": "closeIcon"
+    },
+    
+    
+    "live_chat/*/*": {},
+    "live_chat/chat_header/*": {},
+    "live_chat/message_list/*": {},
+    "live_chat/message_composer/*": {
+      "theme": {},
+      "message_limit": 200,
+      "placeholder_text": "Write a message"
+    },
+    "live_chat/mesage_list/sender_message_bubble": {
+      "alignment": ""
+    },
+    "live_chat/mesage_list/receiver_message_bubble": {
+      "alignment": ""
+    },
+    "live_chat/message_composer/send_button": {
+      "send_icon": "sendIconEnable"
     }
   }
+}

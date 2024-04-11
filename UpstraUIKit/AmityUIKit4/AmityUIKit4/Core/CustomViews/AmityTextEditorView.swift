@@ -14,7 +14,6 @@ public enum MentionListPosition {
     case bottom(CGFloat)
 }
 
-
 extension AmityTextEditorView: AmityViewBuildable {
     
     public func placeholder(_ value: String) -> Self {
@@ -25,6 +24,8 @@ extension AmityTextEditorView: AmityViewBuildable {
         mutating(keyPath: \.textEditorMaxHeight, value: value)
     }
     
+    /// Will show mention list with provided height
+    /// - Parameter value: Height of mention list
     public func willShowMentionList(_ value:((CGFloat) -> Void)?) -> Self {
         mutating(keyPath: \.willShowMentionList, value: value)
     }
@@ -53,6 +54,8 @@ extension AmityTextEditorView: AmityViewBuildable {
 
 public struct AmityTextEditorView: View {
     
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
+    
     @Binding private var text: String
     
     @Binding private var mentionData: MentionData
@@ -61,7 +64,7 @@ public struct AmityTextEditorView: View {
     
     @State private var textEditorHeight: CGFloat = 0.0
     
-    @State private var textEditorInitialHeight: CGFloat = 0.0
+    @State private var textEditorInitialHeight: CGFloat = 24
     
     @State private var hidePlaceholder: Bool = false
     
@@ -96,7 +99,7 @@ public struct AmityTextEditorView: View {
     public var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
-                TextEditorView(viewModel, $text, $mentionedUsers, textColor, hightlightColor)
+                TextEditorView(viewModel, $text, $mentionedUsers)
                     .onAppear {
                         textEditorInitialHeight = geometry.size.height
                         
@@ -111,9 +114,12 @@ public struct AmityTextEditorView: View {
                     .onChange(of: text) { value in
                         hidePlaceholder = !text.isEmpty
                         let textHeight = viewModel.textView.text.height(withConstrainedWidth: geometry.size.width, font: .systemFont(ofSize: 15))
-                        textEditorHeight = min(max(textHeight, textEditorInitialHeight), textEditorMaxHeight)
+                        let paddedHeight = textHeight + 4
+                        textEditorHeight = min(max(paddedHeight, textEditorInitialHeight), textEditorMaxHeight)
                     }
                     .onReceive(viewModel.textView.textPublisher, perform: { text in
+                        self.mentionData.metadata = viewModel.mentionManager.getMetadata()
+                        self.mentionData.mentionee = viewModel.mentionManager.getMentionees()
                         self.text = text
                     })
                     .onChange(of: mentionedUsers.count) { count in
@@ -135,7 +141,6 @@ public struct AmityTextEditorView: View {
                                                 
                                                 Text(user.displayName)
                                                     .foregroundColor(Color(textColor))
-                                                                                            
                                                 Spacer()
                                             }
                                             .padding([.leading, .trailing], 15)
@@ -151,7 +156,7 @@ public struct AmityTextEditorView: View {
                                             }
                                             .onAppear {
                                                 if index == mentionedUsers.count - 1  {
-                                                    viewModel.mentionManager.loadMore()
+                                                    viewModel.mentionManager.mentionProvider.loadMore()
                                                 }
                                             }
                                         }
@@ -175,6 +180,9 @@ public struct AmityTextEditorView: View {
                     .isHidden(hidePlaceholder)
             }
         }
+        .onReceive(viewConfig.$theme) { value in
+            viewModel.updateAttributes(hightlightColor: value.primaryColor, textColor: value.baseColor)
+        }
         .frame(height: textEditorHeight)
     }
     
@@ -189,37 +197,90 @@ public struct AmityTextEditorView: View {
     }
 }
 
-private class AmityTextEditorViewModel: ObservableObject {
+public class AmityTextEditorViewModel: ObservableObject {
     let textView: UITextView = UITextView(frame: .zero)
     let mentionManager: MentionManager
     
+    // TODO: Load from configuration
+    // Attributes used to highlight mentions
+    var highlightAttributes: [NSAttributedString.Key: Any] = [
+        .font: UIFont.systemFont(ofSize: 15, weight: .bold),
+        .foregroundColor: UIColor.systemBlue]
+    
+    // TODO: Load from configuration
+    // Attributes used for text while typing
+    var typingAttributes: [NSAttributedString.Key: Any] = [
+        .font: UIFont.systemFont(ofSize: 15),
+        .foregroundColor: UIColor(hex: "#ffffff")]
+    
     init(mentionManager: MentionManager) {
         self.mentionManager = mentionManager
+        let existingInset = textView.textContainerInset
+        
+        self.textView.textContainerInset = UIEdgeInsets(top: 8, left: existingInset.left, bottom: 8, right: existingInset.right)
+        self.textView.typingAttributes = typingAttributes
+
+        self.mentionManager.typingAttributes = typingAttributes
+        self.mentionManager.highlightAttributes = highlightAttributes
+    }
+    
+    func updateAttributes(hightlightColor: UIColor, textColor: UIColor) {
+        self.highlightAttributes = [
+            .font: UIFont.systemFont(ofSize: 15, weight: .bold),
+            .foregroundColor: hightlightColor]
+        
+        self.typingAttributes = [
+            .font: UIFont.systemFont(ofSize: 15),
+            .foregroundColor: textColor]
+        
+        self.textView.typingAttributes = typingAttributes
+
+        self.mentionManager.typingAttributes = typingAttributes
+        self.mentionManager.highlightAttributes = highlightAttributes
     }
 }
 
+// TextEditor + Mention
+extension AmityTextEditorViewModel {
+    
+    func loadMoreMentions() {
+        mentionManager.mentionProvider.loadMore()
+    }
+    
+    func selectMentionUser(user: AmityMentionUserModel) {
+        guard mentionManager.isMentionWithinLimit(limit: MentionManager.maximumMentionsCount) else { return }
+        
+        self.mentionManager.addMention(from: textView, in: textView.text, member: user)
+    }
+}
 
-private struct TextEditorView: UIViewRepresentable {
+// Text View
+extension AmityTextEditorViewModel {
+    
+    func reset() {
+        textView.attributedText = NSAttributedString(string: "")
+        textView.typingAttributes = self.typingAttributes
+        
+        // Reset mention state
+        mentionManager.resetState()
+    }
+}
+
+internal struct TextEditorView: UIViewRepresentable {
     
     @ObservedObject var viewModel: AmityTextEditorViewModel
     @Binding var text: String
     @Binding var mentionedUsers: [AmityMentionUserModel]
-    let textColor: UIColor
-    let hightlightColor: UIColor
     
-    init(_ viewModel: AmityTextEditorViewModel, _ text: Binding<String>, _ mentionedUsers: Binding<[AmityMentionUserModel]>, _ textColor: UIColor, _ hightlightColor: UIColor) {
+    init(_ viewModel: AmityTextEditorViewModel, _ text: Binding<String>, _ mentionedUsers: Binding<[AmityMentionUserModel]>) {
         self.viewModel = viewModel
         self._text = text
         self._mentionedUsers = mentionedUsers
-        self.textColor = textColor
-        self.hightlightColor = hightlightColor
     }
     
     func makeCoordinator() -> Coordinator {
         let coordinator = Coordinator(self)
         viewModel.mentionManager.delegate = coordinator
-        viewModel.mentionManager.foregroundColor = textColor
-        viewModel.mentionManager.highlightColor = hightlightColor
         return coordinator
     }
     
@@ -228,13 +289,20 @@ private struct TextEditorView: UIViewRepresentable {
         textView.delegate = context.coordinator
         textView.font = .systemFont(ofSize: 15)
         textView.backgroundColor = .clear
-        textView.textColor = textColor
+        textView.textColor =  viewModel.typingAttributes[.foregroundColor] as? UIColor
+        textView.typingAttributes = context.coordinator.parentView.viewModel.typingAttributes
+        //textView.textColor = textColor
         return textView
     }
     
     func updateUIView(_ uiView: UITextView, context: Context) {
+        // Note: Hack to place cursor in same position while editing attributed text.
+        let cursorRange = uiView.selectedTextRange
         guard !text.isEmpty else {
             uiView.text.removeAll()
+            uiView.attributedText = NSAttributedString(string: "") // Set it empty
+            // Reset typing attributes so that it starts displaying normal text
+            uiView.typingAttributes = context.coordinator.parentView.viewModel.typingAttributes
             return
         }
         
@@ -243,9 +311,11 @@ private struct TextEditorView: UIViewRepresentable {
         if !(attributedText?.string.isEmpty ?? false) {
             uiView.attributedText = attributedText
         }
+        uiView.selectedTextRange = cursorRange
     }
     
     class Coordinator: NSObject, UITextViewDelegate, MentionManagerDelegate {
+        
         let parentView: TextEditorView
         
         init(_ parentView: TextEditorView) {
@@ -262,22 +332,21 @@ private struct TextEditorView: UIViewRepresentable {
         }
         
         // MARK: AmityMentionManagerDelegate
-        func didGetUsers(users: [AmityMentionUserModel]) {
+        
+        func didUpdateMentionUsers(users: [AmityMentionUserModel]) {
             parentView.mentionedUsers = users
+            
+            // Also reset typing attributes if we stop showing mention users.
+            if users.isEmpty {
+                parentView.viewModel.textView.typingAttributes = parentView.viewModel.typingAttributes
+            }
         }
         
         func didCreateAttributedString(attributedString: NSAttributedString) {
             parentView.viewModel.textView.attributedText = attributedString
-            parentView.viewModel.textView.typingAttributes = [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: parentView.textColor]
+            parentView.viewModel.textView.typingAttributes = parentView.viewModel.typingAttributes
         }
-        
-        func didMentionsReachToMaximumLimit() {
-            //
-        }
-        
-        func didCharactersReachToMaximumLimit() {
-            //
-        }
+
     }
 }
 

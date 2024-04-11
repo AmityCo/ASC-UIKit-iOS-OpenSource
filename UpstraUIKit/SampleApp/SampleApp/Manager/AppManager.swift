@@ -163,7 +163,7 @@ class AppManager {
 class CustomViewStoryPageBehaviour: AmityViewStoryPageBehaviour {
     
     override func goToCommunityPage(context: AmityViewStoryPageBehaviour.Context) {
-        let viewController = AmityCommunityProfilePageViewController.make(withCommunityId: context.community.communityId)
+        let viewController = AmityCommunityProfilePageViewController.make(withCommunityId: context.targetId)
         if let navigationController = context.page.host.controller?.navigationController {
             navigationController.navigationBar.isHidden = false
             navigationController.pushViewController(viewController, animated: true)

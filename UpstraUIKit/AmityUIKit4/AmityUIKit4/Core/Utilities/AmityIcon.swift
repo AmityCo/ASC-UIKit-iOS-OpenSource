@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum AmityIcon: String {
+enum AmityIcon: String, ImageResourceProvider {
     case verifiedBadge = "verifiedBadge"
     case createStoryIcon = "createStoryIcon"
     case errorStoryIcon = "errorStoryIcon"
@@ -16,6 +16,7 @@ enum AmityIcon: String {
     case threeDotIcon = "threeDotIcon"
     case statusSuccessIcon = "statusSuccessIcon"
     case statusWarningIcon = "statusWarningIcon"
+    case statusLoadingIcon = "statusLoadingIcon"
     case defaultCommunityAvatar = "defaultCommunityAvatar"
     case flagIcon = "flagIcon"
     case lockIcon = "lockIcon"
@@ -32,7 +33,7 @@ enum AmityIcon: String {
     case videoShutterRecordingIcon = "videoShutterRecordingIcon"
     
     // AmityDraftStoryPage Icons
-    case backIcon = "backIcon"
+    case backArrowIcon = "backArrowIcon"
     case nextIcon = "nextIcon"
     case aspectRatioIcon = "aspectRatioIcon"
     case hyperLinkIcon = "hyperLinkIcon"
@@ -60,6 +61,25 @@ enum AmityIcon: String {
     case moderatorBadgeIcon = "moderatorBadgeIcon"
     case commentFailedIcon = "failedCommentIcon"
     
+    // AmityTargetSelectionPage Icons
+    case backIcon = "backIcon"
+    // AmityMessageListBubble Icons
+    case trashBinWhiteIcon = "trashBinWhiteIcon"
+    
+    enum Chat: String, ImageResourceProvider {
+        case sendMessage = "sendIconEnable"
+        case closeReply = "grayCloseIcon"
+        case membersCount = "membersCountIcon"
+        
+        case emptyStateMessage = "emptyStateMessage"
+        case greyRetryIcon = "greyRetryIcon"
+        case chatAvatarProfilePlaceholder = "chatAvatarProfilePlaceholder"
+        case mentionAll = "mentionAll"
+        case messageBubbleAddReactionIcon = "messageBubbleAddReactionIcon"
+        case heartReactionIcon = "heartReactionIcon"
+        case chatAvatarPlaceholder = "chatAvatarPlaceholder"
+        case messageErrorIcon = "messageErrorIcon"
+    }
     
     func getURL() -> URL {
         let path = AmityUIKit4Manager.bundle.path(forResource: self.rawValue, ofType: ".svg")
@@ -82,4 +102,16 @@ enum AmityIcon: String {
         return ImageResource(name: named, bundle: AmityUIKit4Manager.bundle)
     }
     
+}
+
+protocol ImageResourceProvider: RawRepresentable {
+    
+    var imageResource: ImageResource { get }
+}
+
+extension ImageResourceProvider where Self.RawValue == String {
+    
+    var imageResource: ImageResource {
+        ImageResource(name: self.rawValue, bundle: AmityUIKit4Manager.bundle)
+    }
 }

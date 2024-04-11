@@ -68,20 +68,20 @@ class AmityUIKitConfigController {
             return [:]
         }
         
-        // normal config
+        // If its an exact match, return it
         if let config = customizationConfig[configId] as? [String: Any] {
             return config
         }
         
-        // wild card config
-        if id[1] != "*" {
-            // component wildcard config
-            if let config = customizationConfig["*/\(id[1])/*"] as? [String: Any] {
-                return config
-            }
-        } else if id[2] != "*" {
-            // element wildcard config
-            if let config = customizationConfig["*/*/\(id[2])"] as? [String: Any] {
+        // #1. We find obvious variation
+        let variations = [
+            "*/\(id[1])/\(id[2])", // */<component>/<element>
+            "*/\(id[1])/*", // */<component>/* i.e any component
+            "*/*/\(id[2])" // */*/<element> i.e any element
+        ]
+        
+        for variation in variations {
+            if let config = customizationConfig[variation] as? [String: Any] {
                 return config
             }
         }

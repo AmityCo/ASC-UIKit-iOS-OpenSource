@@ -10,10 +10,14 @@ import SwiftUI
 
 
 public enum ToastStyle {
-    case success, warning
+    case success
+    case warning
+    case loading
 }
 
 public struct ToastView: View {
+    @State private var rotatingDegree = 0.0
+    
     var message: String
     var style: ToastStyle
     
@@ -22,10 +26,24 @@ public struct ToastView: View {
         self.style = style
     }
     
+
     public var body: some View {
         HStack(spacing: 0) {
-            Image(getIcon(style: style))
-                .padding(EdgeInsets(top: 16, leading: 12, bottom: 16, trailing: 8))
+            if style == .loading {
+                Image(getIcon(style: style))
+                    .frame(width: 20, height: 20)
+                    .padding(EdgeInsets(top: 16, leading: 12, bottom: 16, trailing: 12))                    
+                    .rotationEffect(.degrees(rotatingDegree))
+                    .onAppear {
+                        withAnimation(.linear(duration: 1).speed(1).repeatForever(autoreverses: false)) {
+                            rotatingDegree = 360.0
+                        }
+                    }
+                
+            } else {
+                Image(getIcon(style: style))
+                    .padding(EdgeInsets(top: 16, leading: 12, bottom: 16, trailing: 8))
+            }
             Text(message)
                 .lineLimit(2)
                 .font(.system(size: 14))
@@ -44,6 +62,8 @@ public struct ToastView: View {
             return AmityIcon.statusSuccessIcon.getImageResource()
         case .warning:
             return AmityIcon.statusWarningIcon.getImageResource()
+        case .loading:
+            return AmityIcon.statusLoadingIcon.getImageResource()
         }
     }
 }
@@ -53,6 +73,7 @@ struct ToastModifier: ViewModifier {
     @Binding var showToast: Bool
     var message: String
     var style: ToastStyle
+    var bottomPadding: CGFloat
     
     func body(content: Content) -> some View {
         content
@@ -62,7 +83,7 @@ struct ToastModifier: ViewModifier {
                         Spacer()
                         withAnimation {
                             ToastView(message: message, style: style)
-                                .padding(.bottom, 60)
+                                .padding(.bottom, bottomPadding)
                         }
                     }
                 }
@@ -80,8 +101,8 @@ struct ToastModifier: ViewModifier {
 }
 
 extension View {
-    public func showToast(isPresented: Binding<Bool>, style: ToastStyle, message: String) -> some View {
-        self.modifier(ToastModifier(showToast: isPresented, message: message, style: style))
+    public func showToast(isPresented: Binding<Bool>, style: ToastStyle, message: String, bottomPadding: CGFloat = 60) -> some View {
+        self.modifier(ToastModifier(showToast: isPresented, message: message, style: style, bottomPadding: bottomPadding))
     }
 }
 

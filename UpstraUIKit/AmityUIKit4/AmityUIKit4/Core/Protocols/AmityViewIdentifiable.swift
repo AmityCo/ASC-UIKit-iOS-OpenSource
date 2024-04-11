@@ -97,3 +97,31 @@ extension AmityElementIdentifiable {
         return "\(pageId)/\(componentId)/\(elementId)"
     }
 }
+
+protocol UIKitConfigurable {
+    var pageId: PageId? { get set }
+    var componentId: ComponentId? { get set }
+    var elementId: ElementId? { get set }
+    var configId: String { get }
+        
+    func getElementConfig(elementId: ElementId) -> [String: Any]
+}
+
+extension UIKitConfigurable {
+    
+    var configId: String {
+        let pageId = pageId?.rawValue ?? "*"
+        let componentId = componentId?.rawValue ?? "*"
+        let elementId = elementId?.rawValue ?? "*"
+        return "\(pageId)/\(componentId)/\(elementId)"
+    }
+    
+    func getElementConfig(elementId: ElementId) -> [String: Any] {
+        let pageId = pageId?.rawValue ?? "*"
+        let componentId = componentId?.rawValue ?? "*"
+        let elementId = elementId.rawValue
+        let configId = "\(pageId)/\(componentId)/\(elementId)"
+        
+        return AmityUIKitConfigController.shared.getConfig(configId: configId)
+    }
+}

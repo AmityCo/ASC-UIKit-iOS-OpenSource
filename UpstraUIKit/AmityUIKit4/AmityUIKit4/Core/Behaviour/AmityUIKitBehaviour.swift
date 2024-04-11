@@ -12,4 +12,5 @@ open class AmityUIKitBehaviour {
     public var draftStoryPageBehaviour: AmityDraftStoryPageBehaviour?
     public var storyTabComponentBehaviour: AmityStoryTabComponentBehaviour?
     public var viewStoryPageBehaviour: AmityViewStoryPageBehaviour?
+    public var targetSelectionPageBehaviour: AmityTargetSelectionPageBehaviour?
 }

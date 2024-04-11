@@ -55,3 +55,30 @@
 "disable_create_comment_text" = "Comments are disabled for this story";
 "comment_with_banned_words_error_message" = "Your comment wasn’t created as it contained blocked words. Only you can see this.";
 
+// Toast
+"chat_toast_loading" = "Loading chat...";
+"chat_toast_copied" = "Copied";
+"chat_toast_delete_error" = "Unable to delete message. Please try again.";
+"chat_toast_link_not_allow" = "Your message wasn’t sent as it contained a link that’s not allowed.";
+"chat_toast_banned_word" = "Your message wasn’t sent as it contained a blocked word.";
+
+// Button
+"chat_deleted_message_text" = "This message was deleted";
+
+"chat_button_reply" = "Reply";
+"chat_button_copy" = "Copy";
+"chat_button_delete" = "Delete";
+"chat_button_ok" = "OK";
+
+// Error
+"chat_error_loading_chat_title" = "Couldn't load chat";
+
+"chat_char_limit_alert_title" = "Unable to send message";
+"chat_char_limit_alert_message" = "Your message is too long. Please shorten your message and try again.";
+"chat_delete_alert_title" = "Delete this message?";
+"chat_delete_alert_message" = "This message will also be removed from your friend’s devices.";
+
+"chat_sending_status" = "sending...";
+"network_connectivity_status" = "Waiting for network...";
+
+"chat_mention_everyone" = "Notify everyone";

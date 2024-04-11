@@ -199,6 +199,10 @@ final class AmityUIKitManagerInternal: NSObject {
         // ViewStoryPage
         let viewStoryPageBehaviour = AmityViewStoryPageBehaviour()
         behavior.viewStoryPageBehaviour = viewStoryPageBehaviour
+        
+        // TargetSelectionPage
+        let targetSelectionPageBehaviour = AmityTargetSelectionPageBehaviour()
+        behavior.targetSelectionPageBehaviour = targetSelectionPageBehaviour
     }
     
     func registerDevice(_ userId: String,

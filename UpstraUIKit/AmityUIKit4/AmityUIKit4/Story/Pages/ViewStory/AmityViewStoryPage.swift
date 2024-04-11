@@ -10,8 +10,18 @@ import AVKit
 import AmitySDK
 import Combine
 
+let STORY_DURATION: CGFloat = 4.0
+
+public enum AmityViewStoryPageType {
+      case communityFeed(String)
+      // User can start viewing any specific story target in Global Feed.
+      // It will be the communityId of story target that user clicked on AmityStoryTabComponent
+      // in our UI flow.
+      case globalFeed(String)
+}
+
 public struct AmityViewStoryPage: AmityPageView {
-    @EnvironmentObject public var host: SwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var id: PageId {
         .storyPage
@@ -19,7 +29,7 @@ public struct AmityViewStoryPage: AmityPageView {
 
     @StateObject var viewModel: AmityStoryPageViewModel
     
-    @State private var totalDuration: CGFloat = 4.0
+    @State private var totalDuration: CGFloat = STORY_DURATION
     
     @State private var storyTargetIndex = 0
     @State private var storySegmentIndex: Int = 0
@@ -33,17 +43,16 @@ public struct AmityViewStoryPage: AmityPageView {
     @StateObject private var progressBarViewModel: ProgressBarViewModel = ProgressBarViewModel(progressArray: [])
     @StateObject private var storyCoreViewModel: StoryCoreViewModel = StoryCoreViewModel()
         
+    private let storyPageType: AmityViewStoryPageType
+    
     @State private var page: Page = Page.first()
     @StateObject private var viewConfig: AmityViewConfigController
     @Environment(\.colorScheme) private var colorScheme
     
-    public init(storyTargets: [AmityStoryTargetModel], startFromTargetIndex: Int) {
-        _viewModel = StateObject(wrappedValue: AmityStoryPageViewModel(storyTargets: storyTargets))
-        _storyTargetIndex = State(initialValue: startFromTargetIndex)
+    public init(type: AmityViewStoryPageType) {
+        self.storyPageType = type
+        _viewModel = StateObject(wrappedValue: AmityStoryPageViewModel(type: type))
         _viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .storyPage))
-        
-        // preload the first stories from the staring story target
-        preloadStoryTargets(startFromTargetIndex, storyTargets)
     }
     
    
@@ -93,6 +102,7 @@ public struct AmityViewStoryPage: AmityPageView {
                                         return AmityProgressBarElementViewModel()
                                     })
                                 }
+                                .isHidden(viewConfig.isHidden(elementId: .progressBarElement), remove: false)
 
                             HStack(spacing: 0) {
                                 let storyTargetId = viewModel.storyTargets[storyTargetIndex].targetId
@@ -100,7 +110,7 @@ public struct AmityViewStoryPage: AmityPageView {
                                 Button {
                                     showBottomSheet.toggle()
                                 } label: {
-                                    let icon = AmityIcon.getImageResource(named: getElementConfig(elementId: .overflowMenuElement, key: "overflow_menu_icon", of: String.self) ?? "")
+                                    let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .overflowMenuElement, key: "overflow_menu_icon", of: String.self) ?? "")
                                     Image(icon)
                                         .frame(width: 24, height: 20)
                                         .padding(.trailing, 20)
@@ -112,17 +122,19 @@ public struct AmityViewStoryPage: AmityPageView {
                                 }
                                 .isHidden(!hasStoryManagePermission, remove: false)
                                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.meatballsButton)
+                                .isHidden(viewConfig.isHidden(elementId: .overflowMenuElement), remove: false)
                                 
                                 Button {
                                     Log.add(event: .info, "Tapped Closed!!!")
                                     host.controller?.dismiss(animated: true)
                                 } label: {
-                                    let icon = AmityIcon.getImageResource(named: getElementConfig(elementId: .closeButtonElement, key: "close_icon", of: String.self) ?? "")
+                                    let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .closeButtonElement, key: "close_icon", of: String.self) ?? "")
                                     Image(icon)
                                         .frame(width: 24, height: 18)
                                         .padding(.trailing, 25)
                                 }
                                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.closeButton)
+                                .isHidden(viewConfig.isHidden(elementId: .closeButtonElement), remove: false)
                             }
                             
                             Spacer()
@@ -135,7 +147,6 @@ public struct AmityViewStoryPage: AmityPageView {
                 }
                 .onAppear {
                     page.update(.new(index: storyTargetIndex))
-                    updateProgressSegmentWidth(totalWidth: geometry.size.width, numberOfStories: viewModel.storyTargets[storyTargetIndex].stories.count)
                 }
                 .onDisappear {
                     viewModel.shouldRunTimer =  false
@@ -155,8 +166,13 @@ public struct AmityViewStoryPage: AmityPageView {
                 .onChange(of: showToast) { value in
                     Toast.showToast(style: viewModel.toastStyle, message: viewModel.toastMessage)
                 }
+                .onReceive(viewModel.$storyTargets) { value in
+                    if case .globalFeed(let communityId) = storyPageType {
+                        storyTargetIndex = value.firstIndex { $0.targetId == communityId } ?? 0
+                    }
+                }
                 .onChange(of: storyTargetIndex) { value in
-                    preloadStoryTargets(value, viewModel.storyTargets)
+                    viewModel.preloadStoryTargets(value, viewModel.storyTargets)
                     storySegmentIndex = 0
                     page.update(.new(index: value))
                     updateProgressSegmentWidth(totalWidth: geometry.size.width, numberOfStories: viewModel.storyTargets[value].stories.count)
@@ -219,23 +235,6 @@ public struct AmityViewStoryPage: AmityPageView {
             Spacer()
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
-    }
-    
-    func preloadStoryTargets(_ index: Int, _ storyTargets: [AmityStoryTargetModel]) {
-        let nextStoryTargetIndex = index + 1
-        let previousStoryTargetIndex = index - 1
-        
-        storyTargets[index].fetchStory()
-        
-        if nextStoryTargetIndex <= storyTargets.count - 1 {
-            Log.add(event: .info, "Preloaded next index: \(nextStoryTargetIndex)")
-            storyTargets[nextStoryTargetIndex].fetchStory()
-        }
-        
-        if previousStoryTargetIndex >= 0 {
-            Log.add(event: .info, "Preloaded previous index: \(nextStoryTargetIndex)")
-            storyTargets[previousStoryTargetIndex].fetchStory()
-        }
     }
     
     
@@ -331,17 +330,71 @@ class AmityStoryPageViewModel: ObservableObject {
     @Published var toastMessage: String = ""
     @Published var toastStyle: ToastStyle = .success
     
+    private var cancellable: AnyCancellable?
+    private var storyTargetObject: AmityObject<AmityStoryTarget>?
+    private var storyTargetCollection: AmityCollection<AmityStoryTarget>?
+    
     let storyManager = StoryManager()
     let timer = Timer.publish(every: 0.001, on: .main, in: .common).autoconnect()
     var shouldRunTimer: Bool = false
     
-    init(storyTargets: [AmityStoryTargetModel]) {
-        self.storyTargets = storyTargets
+    init(type: AmityViewStoryPageType) {
+        
+        switch type {
+        case .communityFeed(let communityId):
+            storyTargetObject = storyManager.getStoryTarget(targetType: .community, targetId: communityId)
+            cancellable = nil
+            cancellable = storyTargetObject?.$snapshot
+                .first { [weak self] _ in
+                    self?.storyTargetObject?.dataStatus == .fresh
+                }
+                .sink { [weak self] target in
+                    guard let target else { return }
+                    
+                    let storyTarget = AmityStoryTargetModel(target)
+                    storyTarget.fetchStory()
+                    
+                    self?.storyTargets = [storyTarget]
+                }
+            
+        case .globalFeed(let communityId):
+            storyTargetCollection = storyManager.getGlobaFeedStoryTargets(options: .smart)
+            cancellable = nil
+            cancellable = storyTargetCollection?.$snapshots
+                .first { !$0.isEmpty }
+                .sink { [weak self] targets in
+                    let storyTargets = targets.compactMap { target -> AmityStoryTargetModel? in
+                        return AmityStoryTargetModel(target)
+                    }.removeDuplicates()
+                    self?.preloadStoryTargets(storyTargets.firstIndex { $0.targetId == communityId } ?? 0, storyTargets)
+                    
+                    self?.storyTargets = storyTargets
+                }
+        }
     }
     
     deinit {
         timer.upstream.connect().cancel()
         URLImageService.defaultImageService.inMemoryStore?.removeAllImages()
+    }
+    
+    func preloadStoryTargets(_ index: Int, _ storyTargets: [AmityStoryTargetModel]) {
+        let nextStoryTargetIndex = index + 1
+        let previousStoryTargetIndex = index - 1
+        
+        if index <= storyTargets.count - 1 {
+            storyTargets[index].fetchStory()
+        }
+        
+        if nextStoryTargetIndex <= storyTargets.count - 1 {
+            Log.add(event: .info, "Preloaded next index: \(nextStoryTargetIndex)")
+            storyTargets[nextStoryTargetIndex].fetchStory()
+        }
+        
+        if previousStoryTargetIndex >= 0 {
+            Log.add(event: .info, "Preloaded previous index: \(nextStoryTargetIndex)")
+            storyTargets[previousStoryTargetIndex].fetchStory()
+        }
     }
     
     @MainActor

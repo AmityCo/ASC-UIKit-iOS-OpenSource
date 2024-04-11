@@ -32,16 +32,21 @@ public struct AmityCommentTrayComponent: AmityComponentView {
     
     let referenceId: String
     let referenceType: AmityCommentReferenceType
-    let communityId: String?
+    let community: AmityCommunity?
     let hideCommentButton: Bool
     let allowCreateComment: Bool
     
-    public init(referenceId: String, referenceType: AmityCommentReferenceType, communityId: String? = nil, hideCommentButtons: Bool = false, allowCreateComment: Bool = false, pageId: PageId? = nil) {
+    public init(referenceId: String, 
+                referenceType: AmityCommentReferenceType,
+                community: AmityCommunity? = nil,
+                shouldAllowInteraction: Bool = false,
+                shouldAllowCreation: Bool = false,
+                pageId: PageId? = nil) {
         self.referenceId = referenceId
         self.referenceType = referenceType
-        self.communityId = communityId
-        self.hideCommentButton = hideCommentButtons
-        self.allowCreateComment = allowCreateComment
+        self.community = community
+        self.hideCommentButton = !shouldAllowInteraction
+        self.allowCreateComment = shouldAllowCreation
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: referenceId, referenceType: referenceType))
         self.pageId = pageId
         
@@ -123,8 +128,7 @@ public struct AmityCommentTrayComponent: AmityComponentView {
                     .padding(.leading, 12)
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.avatarImageView)
                 
-                
-                AmityTextEditorView(.comment(communityId: communityId ?? ""), text: $text, mentionData: $mentionData, textViewHeight: 20.0)
+                AmityTextEditorView(.comment(communityId: community?.communityId ?? ""), text: $text, mentionData: $mentionData, textViewHeight: 20.0)
                     .placeholder(AmityLocalizedStringSet.Comment.commentTextFieldPlacholder.localizedString)
                     .maxExpandableHeight(120.0)
                     .textColor(viewConfig.theme.baseColor)

@@ -26,6 +26,17 @@ class AmityViewConfigController: NSObject, ObservableObject {
         self.defaultLightTheme = AmityThemeColor(primaryColor: lightTheme.primaryColor!, secondaryColor: lightTheme.secondaryColor!, baseColor: lightTheme.baseColor!, baseColorShade1: lightTheme.baseColorShade1!, baseColorShade2: lightTheme.baseColorShade2!, baseColorShade3: lightTheme.baseColorShade3!, baseColorShade4: lightTheme.baseColorShade4!, alertColor: lightTheme.alertColor!, backgroundColor: lightTheme.backgroundColor!)
     }
     
+    // MARK: Private functions
+    private func constructConfigId(pageId: PageId?, componentId: ComponentId?, elementId: ElementId?) -> String {
+        let pageId = pageId?.rawValue ?? "*"
+        let componentId = componentId?.rawValue ?? "*"
+        let elementId = elementId?.rawValue ?? "*"
+        let configId = "\(pageId)/\(componentId)/\(elementId)"
+        
+        return configId
+    }
+    
+    // MARK: Public functions
     public func updateTheme() {
         let configId = "\(pageId?.rawValue ?? "*")/\(componentId?.rawValue ?? "*")/*"
         self.theme = AmityUIKitConfigController.shared.getTheme(configId: configId)
@@ -34,13 +45,14 @@ class AmityViewConfigController: NSObject, ObservableObject {
     public func getConfig<T>(elementId: ElementId? = nil,
                              key: String,
                              of type: T.Type) -> T? {
-        let pageId = pageId?.rawValue ?? "*"
-        let componentId = componentId?.rawValue ?? "*"
-        let elementId = elementId?.rawValue ?? "*"
-        let configId = "\(pageId)/\(componentId)/\(elementId)"
-        
+        let configId = constructConfigId(pageId: pageId, componentId: componentId, elementId: elementId)
         let config = AmityUIKitConfigController.shared.getConfig(configId: configId)
         
         return config[key] as? T
+    }
+    
+    public func isHidden(elementId: ElementId? = nil) -> Bool {
+        let configId = constructConfigId(pageId: pageId, componentId: componentId, elementId: elementId)
+        return AmityUIKitConfigController.shared.isExcluded(configId: configId)
     }
 }

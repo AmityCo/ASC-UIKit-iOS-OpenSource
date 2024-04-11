@@ -21,6 +21,9 @@ public class StoryManager {
         repository.getGlobalStoryTargets(option: options)
     }
     
+    public func getStoryTarget(targetType: AmityStoryTargetType, targetId: String) -> AmityObject<AmityStoryTarget> {
+        repository.getStoryTarget(targetType: targetType, targetId: targetId)
+    }
     
     public func getActiveStoriesByTarget(targetType: String, targetId: String, sortOption: AmityStoryQuerySortOption) -> AmityCollection<AmityStory> {
         let type = AmityStoryTargetType(rawValue: targetType) ?? .community

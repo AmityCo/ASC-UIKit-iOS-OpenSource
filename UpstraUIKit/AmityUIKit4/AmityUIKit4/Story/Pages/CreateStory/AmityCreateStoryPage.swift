@@ -7,18 +7,19 @@
 
 import SwiftUI
 import AVKit
+import AmitySDK
 
 public struct AmityCreateStoryPage: AmityPageView {
-    @EnvironmentObject public var host: SwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var id: PageId {
         .cameraPage
     }
     
     let targetId: String
-    var avatar: URL?
+    let targetType: AmityStoryTargetType
     
-    private let allowedCaptureVideoLength = 60.0
+    @State private var allowedCaptureVideoLength = 60.0
     private let cameraManager = CameraManager()
     private let segmentedPickerTitles: [String] = ["Photo", "Video"]
     
@@ -34,9 +35,11 @@ public struct AmityCreateStoryPage: AmityPageView {
     @State private var videoCaputreDuration: TimeInterval = 0
     @State private var videoCaptureTimer: Timer?
     
-    public init(targetId: String, avatar: URL?) {
+    @StateObject private var viewModel = AmityCreateStoryPageViewModel()
+    
+    public init(targetId: String, targetType: AmityStoryTargetType) {
         self.targetId = targetId
-        self.avatar = avatar
+        self.targetType = targetType
         
         cameraManager.shouldRespondToOrientationChanges = false
         cameraManager.shouldFlipFrontCameraImage = true
@@ -51,17 +54,21 @@ public struct AmityCreateStoryPage: AmityPageView {
                     CameraPreviewView(cameraManager: cameraManager)
                         .cornerRadius(14.0)
                         .onAppear {
-                            let cameraStatus = cameraManager.currentCameraStatus()
-                            
-                            if cameraStatus == .notDetermined || cameraStatus == .accessDenied {
-                                let alertController = UIAlertController(title: AmityLocalizedStringSet.General.permissionRequired.localizedString, message: AmityLocalizedStringSet.General.cameraAccessDenied.localizedString, preferredStyle: .alert)
-                                
-                                let action = UIAlertAction(title: "OK", style: .default) { _ in
-                                    alertController.dismiss(animated: true)
+                            cameraManager.askUserForCameraPermission { isAllowed in
+                                if !isAllowed {
+                                    let cameraStatus = cameraManager.currentCameraStatus()
+                                    
+                                    if cameraStatus == .notDetermined || cameraStatus == .accessDenied {
+                                        let alertController = UIAlertController(title: AmityLocalizedStringSet.General.permissionRequired.localizedString, message: AmityLocalizedStringSet.General.cameraAccessDenied.localizedString, preferredStyle: .alert)
+                                        
+                                        let action = UIAlertAction(title: "OK", style: .default) { _ in
+                                            alertController.dismiss(animated: true)
+                                        }
+                                        alertController.addAction(action)
+                                        
+                                        host.controller?.present(alertController, animated: true)
+                                    }
                                 }
-                                alertController.addAction(action)
-                                
-                                host.controller?.present(alertController, animated: true)
                             }
                         }
                         
@@ -165,12 +172,15 @@ public struct AmityCreateStoryPage: AmityPageView {
             }
             
             if selectedMedia == UTType.image.identifier {
-                let context = AmityCreateStoryPageBehaviour.Context(page: self, targetId: targetId, avatar: avatar, outputImage: (pickerViewModel.selectedImage, pickerViewModel.selectedMediaURL))
+                let context = AmityCreateStoryPageBehaviour.Context(page: self, targetId: targetId, targetType: targetType, outputImage: (pickerViewModel.selectedImage, pickerViewModel.selectedMediaURL))
                 AmityUIKitManagerInternal.shared.behavior.createStoryPageBehaviour?.goToDraftStoryPage(context: context)
             } else if selectedMedia == UTType.movie.identifier {
-                let context = AmityCreateStoryPageBehaviour.Context(page: self, targetId: targetId, avatar: avatar, outputVideo: pickerViewModel.selectedMediaURL)
+                let context = AmityCreateStoryPageBehaviour.Context(page: self, targetId: targetId, targetType: targetType, outputVideo: pickerViewModel.selectedMediaURL)
                 AmityUIKitManagerInternal.shared.behavior.createStoryPageBehaviour?.goToDraftStoryPage(context: context)
             }
+        }
+        .onChange(of: viewModel.maxVideoDuration) { value in
+            allowedCaptureVideoLength = value
         }
         .background(Color.black.ignoresSafeArea())
         
@@ -220,6 +230,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                 videoCaptureButtonSelected.toggle()
             },
             onTouchAndHoldEnd: {
+                guard cameraManager.cameraIsReady else { return }
                 videoCaptureButtonSelected.toggle()
             })
         )
@@ -243,7 +254,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                     Log.add(event: .info, "Captured Image: \(capturedImage)")
                     Log.add(event: .info, "Captured ImageURL: \(capturedImageURL)")
                     
-                    let context = AmityCreateStoryPageBehaviour.Context(page: self, targetId: targetId, avatar: avatar, outputImage: (capturedImage, capturedImageURL))
+                    let context = AmityCreateStoryPageBehaviour.Context(page: self, targetId: targetId, targetType: targetType, outputImage: (capturedImage, capturedImageURL))
                     AmityUIKitManagerInternal.shared.behavior.createStoryPageBehaviour?.goToDraftStoryPage(context: context)
                 }
             }
@@ -270,7 +281,7 @@ public struct AmityCreateStoryPage: AmityPageView {
             Log.add(event: .info, "Recored Video File URL: \(url)")
             
             DispatchQueue.main.async {
-                let context = AmityCreateStoryPageBehaviour.Context(page: self, targetId: targetId, avatar: avatar, outputVideo: url)
+                let context = AmityCreateStoryPageBehaviour.Context(page: self, targetId: targetId, targetType: targetType, outputVideo: url)
                 AmityUIKitManagerInternal.shared.behavior.createStoryPageBehaviour?.goToDraftStoryPage(context: context)
             }
         }
@@ -279,12 +290,14 @@ public struct AmityCreateStoryPage: AmityPageView {
     
     
     func startVideoCaptureTimer() {
-        videoCaptureTimer = Timer.scheduledTimer(withTimeInterval: 0.001, repeats: true) { timer in
-            if videoCaputreDuration >= allowedCaptureVideoLength {
+        videoCaptureTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+            if videoCaputreDuration + 0.3 >= allowedCaptureVideoLength {
                 videoCaptureButtonSelected.toggle()
             } else {
-                videoCaptureProgress += 1.0 / CGFloat(allowedCaptureVideoLength / 0.001)
-                videoCaputreDuration += 0.001
+                videoCaputreDuration += 0.1
+                withAnimation {
+                    videoCaptureProgress += 1.0 / CGFloat(allowedCaptureVideoLength / 0.1)
+                }
             }
         }
     }
@@ -317,11 +330,19 @@ public struct AmityCreateStoryPage: AmityPageView {
     
 }
 
-#if DEBUG
-#Preview {
-    AmityCreateStoryPage(targetId: "", avatar: nil)
+class AmityCreateStoryPageViewModel: ObservableObject {
+    @Published var maxVideoDuration: CGFloat = 60.0
+    
+    init() {
+        Task { @MainActor in
+            let contentSettings = try await AmityUIKitManagerInternal.shared.client.getContentSettings()
+            if let duration = contentSettings.story?.videoSettings?.maxDurationSeconds {
+                maxVideoDuration = duration
+            }
+        }
+    }
 }
-#endif
+
 
 struct CameraPreviewView: UIViewRepresentable {
     

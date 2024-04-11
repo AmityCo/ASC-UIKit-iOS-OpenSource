@@ -26,8 +26,8 @@ final class AmityCommunityListRepositoryManager: AmityCommunityListRepositoryMan
     }
     
     func search(withText text: String?, filter: AmityCommunityQueryFilter, _ completion: (([AmityCommunityModel]) -> Void)?) {
-        let queryOptions = AmityCommunityQueryOptions(displayName: text, filter: filter, sortBy: .displayName, categoryId: nil, includeDeleted: false)
-        collection = repository.getCommunities(with: queryOptions)
+        let queryOptions = AmityCommunitySearchOptions(keyword: text, filter: filter, sortBy: .displayName, categoryId: nil, includeDeleted: false)
+        collection = repository.searchCommunities(with: queryOptions)
         token?.invalidate()
         token = collection?.observe { (collection, change, error) in
             if collection.dataStatus == .fresh {

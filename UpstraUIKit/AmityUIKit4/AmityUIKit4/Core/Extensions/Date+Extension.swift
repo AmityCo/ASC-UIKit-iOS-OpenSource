@@ -8,6 +8,13 @@
 import Foundation
 
 extension Date {
+    
+    static var calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = Locale(identifier: "en_US")
+        return calendar
+    }()
+    
     public var timeAgoString: String {
         let currentDate = Date()
         let calendar = Calendar.current
@@ -22,4 +29,5 @@ extension Date {
             return "Just now"
         }
     }
+    
 }

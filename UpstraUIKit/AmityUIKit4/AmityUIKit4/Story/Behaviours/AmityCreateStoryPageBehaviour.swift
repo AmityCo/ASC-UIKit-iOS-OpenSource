@@ -7,19 +7,20 @@
 
 import Foundation
 import SwiftUI
+import AmitySDK
 
 open class AmityCreateStoryPageBehaviour {
     open class Context {
         public let page: AmityCreateStoryPage
         public var targetId: String
-        public var avatar: URL?
+        public var targetType: AmityStoryTargetType
         public var outputImage: (UIImage?, URL?)
         public var outputVideo: URL?
         
-        init(page: AmityCreateStoryPage, targetId: String, avatar: URL?, outputImage: (UIImage?, URL?) = (nil, nil), outputVideo: URL? = nil) {
+        init(page: AmityCreateStoryPage, targetId: String, targetType: AmityStoryTargetType, outputImage: (UIImage?, URL?) = (nil, nil), outputVideo: URL? = nil) {
             self.page = page
             self.targetId = targetId
-            self.avatar = avatar
+            self.targetType = targetType
             self.outputImage = outputImage
             self.outputVideo = outputVideo
         }
@@ -29,21 +30,20 @@ open class AmityCreateStoryPageBehaviour {
     
     open func goToDraftStoryPage(context: AmityCreateStoryPageBehaviour.Context) {
         
-        var mediaType: StoryMediaType?
+        var mediaType: AmityStoryMediaType?
         
         if let videoURL = context.outputVideo {
             mediaType = .video(videoURL)
-        } else if let image = context.outputImage.0,
-                  let imageURL = context.outputImage.1 {
-            mediaType = .image(imageURL, image)
+        } else if let imageURL = context.outputImage.1 {
+            mediaType = .image(imageURL)
         }
         
         guard let mediaType else {
             return
         }
         
-        let draftStoryPage = AmityDraftStoryPage(targetId: context.targetId, avatar: context.avatar, mediaType: mediaType)
-        let controller = SwiftUIHostingController(rootView: draftStoryPage)
+        let draftStoryPage = AmityDraftStoryPage(targetId: context.targetId, targetType: context.targetType, mediaType: mediaType)
+        let controller = AmitySwiftUIHostingController(rootView: draftStoryPage)
         
         let sourceController = context.page.host.controller?.navigationController
         sourceController?.pushViewController(controller, animated: true)

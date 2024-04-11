@@ -7,30 +7,29 @@
 
 import Foundation
 import SwiftUI
+import AmitySDK
 
 open class AmityStoryTabComponentBehaviour {
     open class Context {
         public let component: AmityStoryTabComponent
-        public let storyTargets: [AmityStoryTargetModel]
-        public let storyCreationTargetId: String
-        public let storyCreationAvatar: URL?
-        public let startFromTargetIndex: Int
+        public let storyFeedType: AmityStoryTabComponentType
+        public let targetId: String
+        public let targetType: AmityStoryTargetType
         
-        init(component: AmityStoryTabComponent, storyTargets: [AmityStoryTargetModel], storyCreationTargetId: String, storyCreationAvatar: URL?, startFromTargetIndex: Int) {
+        init(component: AmityStoryTabComponent, storyFeedType: AmityStoryTabComponentType, targetId: String, targetType: AmityStoryTargetType) {
             self.component = component
-            self.storyTargets = storyTargets
-            self.storyCreationTargetId = storyCreationTargetId
-            self.storyCreationAvatar = storyCreationAvatar
-            self.startFromTargetIndex = startFromTargetIndex
+            self.storyFeedType = storyFeedType
+            self.targetId = targetId
+            self.targetType = targetType
         }
     }
     
     public init() {}
     
     open func goToCreateStoryPage(context: AmityStoryTabComponentBehaviour.Context) {
-        let createStoryPage = AmityCreateStoryPage(targetId: context.storyCreationTargetId, avatar: context.storyCreationAvatar)
+        let createStoryPage = AmityCreateStoryPage(targetId: context.targetId, targetType: context.targetType)
 
-        let navigationController = UINavigationController(rootViewController: SwiftUIHostingController(rootView: createStoryPage))
+        let navigationController = UINavigationController(rootViewController: AmitySwiftUIHostingController(rootView: createStoryPage))
         navigationController.navigationBar.isHidden = true
         navigationController.modalPresentationStyle = .overFullScreen
         navigationController.modalTransitionStyle = .crossDissolve
@@ -40,10 +39,18 @@ open class AmityStoryTabComponentBehaviour {
     }
     
     open func goToViewStoryPage(context: AmityStoryTabComponentBehaviour.Context) {
-
-        let viewStoryPage = AmityViewStoryPage(storyTargets: context.storyTargets, startFromTargetIndex: context.startFromTargetIndex)
+        let storyPageType: AmityViewStoryPageType
         
-        let navigationController = UINavigationController(rootViewController: SwiftUIHostingController(rootView: viewStoryPage))
+        switch context.storyFeedType {
+        case .globalFeed:
+            storyPageType = .globalFeed(context.targetId)
+        case .communityFeed(let string):
+            storyPageType = .communityFeed(context.targetId)
+        }
+        
+        let viewStoryPage = AmityViewStoryPage(type: storyPageType)
+        
+        let navigationController = UINavigationController(rootViewController: AmitySwiftUIHostingController(rootView: viewStoryPage))
         navigationController.navigationBar.isHidden = true
         navigationController.modalPresentationStyle = .overFullScreen
         

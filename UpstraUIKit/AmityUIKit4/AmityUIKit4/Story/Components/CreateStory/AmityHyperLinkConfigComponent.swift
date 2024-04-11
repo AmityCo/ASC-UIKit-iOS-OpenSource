@@ -102,9 +102,12 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") {
+                    Button(action: {
                         isUnsavedAlertShown.toggle()
-                    }
+                    }, label: {
+                        Text(viewConfig.getConfig(elementId: .cancelButtonElement, key: "cancel_button_text", of: String.self) ?? "Cancel")
+                            .font(.system(size: 15))
+                    })
                     .buttonStyle(.plain)
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .alert(isPresented: $isUnsavedAlertShown) {
@@ -118,10 +121,11 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                         }))
                     }
                     .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.cancelButton)
+                    .isHidden(viewConfig.isHidden(elementId: .cancelButtonElement))
                 }
                 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") {
+                    Button(action: {
                         Task { @MainActor in
                             guard await checkValidation(urlStr: viewModel.urlText, word: viewModel.urlNameText) else { return }
                             
@@ -129,11 +133,15 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                             data.urlName = viewModel.urlNameText
                             isPresented.toggle()
                         }
-                    }
+                    }, label: {
+                        Text(viewConfig.getConfig(elementId: .doneButtonElement, key: "done_button_text", of: String.self) ?? "Done")
+                            .font(.system(size: 15))
+                    })
                     .buttonStyle(.plain)
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .disabled(!viewModel.isURLValid || viewModel.urlText.isEmpty)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.doneButton)
+                    .isHidden(viewConfig.isHidden(elementId: .doneButtonElement))
                 }
             }
             .onChange(of: isPresented) { value in

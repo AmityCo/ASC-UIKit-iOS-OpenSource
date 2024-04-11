@@ -21,8 +21,8 @@ class AmityStoryTabViewController: AmityViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
       
-        storyTabComponent = AmityStoryTabComponent(storyFeedType: .global)
-        let hostController = SwiftUIHostingController(rootView: storyTabComponent)
+        storyTabComponent = AmityStoryTabComponent(type: .globalFeed)
+        let hostController = AmitySwiftUIHostingController(rootView: storyTabComponent)
         
         addChild(hostController)
         hostController.view.translatesAutoresizingMaskIntoConstraints = false

@@ -24,7 +24,6 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
     let targetName: String
     let isVerifiedTarget: Bool
     let avatar: URL?
-    var isGlobalFeedTarget: Bool
     let isPublicTarget: Bool
     
     @Published var stories: [AmityStoryModel] = []
@@ -32,7 +31,6 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
     @Published var hasUnseenStory: Bool = false
     @Published var hasFailedStory: Bool = false
     @Published var hasSyncingStory: Bool = false
-    @Published var storyLoadingStatus: AmityLoadingStatus = .notLoading
     @Published var unseenStoryIndex: Int = 0
     
     private var storyCollection: AmityCollection<AmityStory>?
@@ -42,30 +40,23 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
     
     private let storyManager = StoryManager()
     
-    // Use this initializer for GlobalFeed.
-    // StoryCoreView need to load story before this target is rendered.
-    public convenience init(storyTarget: AmityStoryTarget, targetId: String, targetName: String, isVerifiedTarget: Bool, isPublicTarget: Bool, avatar: URL?) {
-        self.init(targetId: targetId, targetName: targetName, isVerifiedTarget: isVerifiedTarget, isPublicTarget: isPublicTarget, avatar: avatar)
-        
-        self.storyTarget = storyTarget
-        self.isGlobalFeedTarget = true
+
+    public init(_ storyTarget: AmityStoryTarget) {
+        self.targetId = storyTarget.targetId
+        self.targetName = storyTarget.community?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
+        self.isVerifiedTarget = storyTarget.community?.isOfficial ?? false
+        self.isPublicTarget = storyTarget.community?.isPublic ?? true
+        self.avatar = URL(string: storyTarget.community?.avatar?.fileURL ?? "")
         self.hasUnseenStory = storyTarget.hasUnseen
         self.hasFailedStory = storyTarget.failedStoriesCount != 0
         self.hasSyncingStory = storyTarget.syncingStoriesCount != 0
     }
     
-    // Use this initializer for CommunityFeed.
-    // Since it needs to prefetch active stories in target to check storyCount before AmityViewStoryPage is opened.
-    // StoryCoreView does not need to load story again for this target since it already preloaded.
-    public init(targetId: String, targetName: String, isVerifiedTarget: Bool, isPublicTarget: Bool, avatar: URL?) {
-        self.targetId = targetId
-        self.targetName = targetName
-        self.isVerifiedTarget = isVerifiedTarget
-        self.isPublicTarget = isPublicTarget
-        self.avatar = avatar
-        self.isGlobalFeedTarget = false
+    func updateModel(_ storyTarget: AmityStoryTarget) {
+        self.hasUnseenStory = storyTarget.hasUnseen
+        self.hasFailedStory = storyTarget.failedStoriesCount != 0
+        self.hasSyncingStory = storyTarget.syncingStoriesCount != 0
     }
-    
     
     func fetchStory() {
         guard storyCollection == nil else { return }

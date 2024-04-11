@@ -56,4 +56,35 @@ public struct AmityLocalizedStringSet {
         static let disableCreateCommentText = "disable_create_comment_text"
         static let commentWithBannedWordsErrorMessage = "comment_with_banned_words_error_message"
     }
+    
+    public enum Chat {
+        
+        // Toast
+        static let toastLoading = "chat_toast_loading"
+        static let toastDeleteErrorMessage = "chat_toast_delete_error"
+        static let toastCopied = "chat_toast_copied"
+        static let toastLinkNotAllow = "chat_toast_link_not_allow"
+        static let toastBannedWord = "chat_toast_banned_word"
+        
+        // Button
+        static let deletedMessage = "chat_deleted_message_text"
+        
+        static let replyButton = "chat_button_reply"
+        static let copyButton = "chat_button_copy"
+        static let deleteButton = "chat_button_delete"
+        static let okButton = "chat_button_ok"
+        
+        // Error
+        static let errorLoadingChat = "chat_error_loading_chat_title"
+        
+        static let charLimitAlertTitle = "chat_char_limit_alert_title"
+        static let charLimitAlertMessage = "chat_char_limit_alert_message"
+        static let deleteAlertTitle = "chat_delete_alert_title"
+        static let deleteAlertMessage = "chat_delete_alert_message"
+        
+        static let statusSending = "chat_sending_status"
+        static let connectivityStatusWaiting = "network_connectivity_status"
+        
+        static let mentionEveryone = "chat_mention_everyone"
+    }
 }

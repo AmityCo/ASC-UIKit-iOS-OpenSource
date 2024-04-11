@@ -12,15 +12,24 @@ open class AmityViewStoryPageBehaviour {
     
     open class Context {
         public let page: AmityViewStoryPage
-        public let community: AmityCommunity
+        public let targetId: String
+        public let targetType: AmityStoryTargetType
         
-        init(page: AmityViewStoryPage, community: AmityCommunity) {
+        init(page: AmityViewStoryPage, targetId: String, targetType: AmityStoryTargetType) {
             self.page = page
-            self.community = community
+            self.targetId = targetId
+            self.targetType = targetType
         }
     }
     
     public init() {}
     
     open func goToCommunityPage(context: Context) {}
+    
+    open func goToCreateStoryPage(context: Context) {
+        let createStoryPage = AmityCreateStoryPage(targetId: context.targetId, targetType: context.targetType)
+        let controller = AmitySwiftUIHostingController(rootView: createStoryPage)
+        
+        context.page.host.controller?.navigationController?.setViewControllers([controller], animated: false)
+    }
 }

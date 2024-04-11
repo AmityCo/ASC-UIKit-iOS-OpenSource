@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import OSLog
 
 class Log {
     
@@ -41,3 +42,11 @@ class Log {
     }
 }
 
+extension Log {
+
+    static let uikit = "AmityUIKit4"
+    
+    static var chat = Logger(subsystem: uikit, category: "Chat")
+    
+    static var story = Logger(subsystem: uikit, category: "Story")
+}
