@@ -147,7 +147,7 @@ extension ExpandableText {
         let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
         
-        let attributes = MentionTextHighlighter.getAttributedText(for: text, metadata: metadata, mentionees: mentionees, highlightAttributes: highlightAttributes)
+        let attributes = TextHighlighter.highlightMentions(for: text, metadata: metadata, mentionees: mentionees, highlightAttributes: highlightAttributes)
         return attributes
     }
 }

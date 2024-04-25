@@ -71,8 +71,9 @@ class TestLiveChatListViewModel: ObservableObject {
     let channelRepo = AmityChannelRepository(client: AmityUIKit4Manager.client)
 
     @Published var channels = [TestChannelModel]()
-    private var disposeBag: Set<AnyCancellable> = []
     private var channelCollection: AmityCollection<AmityChannel>?
+    
+    var token: AmityNotificationToken?
 
     func queryChannel() {
         let query = AmityChannelQuery()
@@ -81,8 +82,9 @@ class TestLiveChatListViewModel: ObservableObject {
         query.includeDeleted = false
         channelCollection = channelRepo.getChannels(with: query)
         
-        channelCollection?.$snapshots.sink { [weak self] channels in
-            if self?.channelCollection?.dataStatus == .fresh {
+        token = channelCollection?.observe({ [weak self] collection, _, error in
+            let channels = collection.snapshots
+            if collection.dataStatus == .fresh {
 
                 var channelModels = [TestChannelModel]()
                 for channel in channels {
@@ -90,8 +92,9 @@ class TestLiveChatListViewModel: ObservableObject {
                 }
 
                 self?.channels = channelModels
+                self?.token?.invalidate()
             }
-        }.store(in: &disposeBag)
+        })
     }
     
 }
@@ -136,13 +139,12 @@ public struct TestLiveChatView: View {
                         Capsule()
                             .fill(.gray)
                             .frame(width: 35, height: 5)
-                            .padding(10)
-                        let safeAreaHeight = proxy.safeAreaInsets.bottom
+                            .padding(.top, 10)
+                            .padding(.bottom, 6)
                         AmityLiveChatPage(channelId: channelId)
                             .presentationDetents([.height(proxy.size.height - 190), .large])
                             .presentationDragIndicator(.hidden)
                             .presentationBackgroundInteraction(.enabled)
-                            .preferredColorScheme(.dark)
                             .interactiveDismissDisabled(true)
                         
                     }
@@ -175,7 +177,6 @@ public struct TestLiveChatView: View {
                             .frame(width: 35, height: 5)
                             .padding(10)
                         AmityLiveChatPage(channelId: channelId)
-                            .preferredColorScheme(.dark)
                     }
                 }
             }

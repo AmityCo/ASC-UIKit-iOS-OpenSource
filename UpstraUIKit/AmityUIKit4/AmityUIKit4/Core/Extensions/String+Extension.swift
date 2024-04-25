@@ -12,6 +12,12 @@ extension String {
             return NSLocalizedString(self, tableName: "AmityLocalizable", bundle: AmityUIKit4Manager.bundle, value: "", comment: "")
     }
     
+    func localized(arguments: CVarArg...) -> String {
+        let localizedText = NSLocalizedString(self, tableName: "AmityLocalizable", bundle: AmityUIKit4Manager.bundle, value: "", comment: "")
+        let formattedText = String(format: localizedText, arguments: arguments)
+        return formattedText
+    }
+    
     var isValidURL: Bool {
         let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         if let match = detector.firstMatch(in: self, options: [], range: NSRange(location: 0, length: self.utf16.count)) {

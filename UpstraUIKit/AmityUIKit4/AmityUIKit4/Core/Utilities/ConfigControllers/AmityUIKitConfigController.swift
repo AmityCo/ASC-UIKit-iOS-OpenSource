@@ -110,7 +110,8 @@ class AmityUIKitConfigController {
                                baseColorShade3: theme.baseColorShade3 ?? fallbackTheme.baseColorShade3!,
                                baseColorShade4: theme.baseColorShade4 ?? fallbackTheme.baseColorShade4!,
                                alertColor: theme.alertColor ?? fallbackTheme.alertColor!,
-                               backgroundColor: theme.backgroundColor ?? fallbackTheme.backgroundColor!)
+                               backgroundColor: theme.backgroundColor ?? fallbackTheme.backgroundColor!, 
+                               baseInverseColor: theme.baseInverseColor ?? fallbackTheme.baseInverseColor!)
     }
     
     

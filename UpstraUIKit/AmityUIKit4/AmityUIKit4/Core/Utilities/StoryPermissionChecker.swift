@@ -19,6 +19,13 @@ public class StoryPermissionChecker {
             }
         }
     }
+}
+
+class ChatPermissionChecker {
     
-    
+    static func hasModeratorPermission(for channel: String, _ completion: @escaping (Bool) -> Void) {
+        AmityUIKitManagerInternal.shared.client.hasPermission(.muteChannel, forChannel: channel) { status in
+            completion(status)
+        }
+    }
 }

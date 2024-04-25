@@ -10,6 +10,11 @@ import Combine
 import AmitySDK
 import OSLog
 
+struct ToastState {
+    let style: ToastStyle
+    let message: String
+}
+
 public class AmityMessageListViewModel: ObservableObject {
     let subChannelId: String
     let chatManager = ChatManager()
@@ -17,24 +22,49 @@ public class AmityMessageListViewModel: ObservableObject {
     @Published var messages = [MessageModel]()
     // Query state when message list is queried for the first time
     @Published var initialQueryState: QueryState = .loading
-    
+    @Published var muteState: MuteState = .none
     @Published var pagination: ScrollViewPagination = ScrollViewPagination()
+        
+    // Current toast state
+    @Published var toastState: ToastState?
     
     var hasModeratorPermission = false
+    var delegate: AmityClientDelegate?
     
     enum QueryState {
         case loading
         case success
         case error
+        case banned
+    }
+    
+    enum MuteState {
+        case channel
+        case user
+        case none
+        
+        var localizedString: String {
+            switch self {
+            case .channel:
+                 return AmityLocalizedStringSet.Chat.channelIsMuted.localizedString
+            case .user:
+                return AmityLocalizedStringSet.Chat.userIsMuted.localizedString
+            case .none:
+                return ""
+            }
+        }
     }
     
     private var messageCollection: AmityCollection<AmityMessage>?
     
     public init(subChannelId: String) {
         self.subChannelId = subChannelId
-        AmityUIKitManagerInternal.shared.client.hasPermission(.editChannelUser, forChannel: subChannelId) { hasPermission in
+        
+        ChatPermissionChecker.hasModeratorPermission(for: subChannelId) { hasPermission in
             self.hasModeratorPermission = hasPermission
         }
+        
+        self.delegate = AmityUIKit4Manager.client.delegate
     }
     
     var messageAction: AmityMessageAction?
@@ -67,7 +97,25 @@ public class AmityMessageListViewModel: ObservableObject {
                 
                 if self.initialQueryState == .loading {
                     // Failed to load chat for first time
-                    self.initialQueryState = .error
+                    if error.isAmityErrorCode(.userIsBanned) {
+                        self.initialQueryState = .banned
+                        
+                    } else {
+                        self.initialQueryState = .error
+                    }
+                }
+                return
+            }
+            
+            if let channel = chatManager.getChannel(channelId: subChannelId), channel.isMuted {
+                muteState = .channel
+            } else if let currentMember = chatManager.getCurrentUserChannelMember(channelId: subChannelId) {
+                if currentMember.isBanned {
+                    /// Display banned empty state if current user is banned
+                    self.initialQueryState = .banned
+                    return
+                } else if currentMember.isMuted {
+                    muteState = .user
                 }
             }
             
@@ -78,7 +126,7 @@ public class AmityMessageListViewModel: ObservableObject {
                 /// Need to modify.
                 var messageModels = [MessageModel]()
                 for message in messages {
-                    var messageModel = MessageModel(message: message, hasModeratorPermission: hasModeratorPermission)
+                    let messageModel = MessageModel(message: message, hasModeratorPermission: hasModeratorPermission)
                     messageModels.append(messageModel)
                 }
                 messageModels.reverse()
@@ -106,8 +154,14 @@ public class AmityMessageListViewModel: ObservableObject {
     }
     
     @MainActor
-    public func deleteMessage(messageId: String) async throws {
-        let _ = try await chatManager.deleteMessage(messageId: messageId)
+    public func deleteMessage(messageId: String) {
+        Task {
+            do {
+                let _ = try await chatManager.deleteMessage(messageId: messageId)
+            } catch {
+                toastState = .init(style: .warning, message: AmityLocalizedStringSet.Chat.toastDeleteErrorMessage.localizedString)
+            }
+        }
     }
     
     func updateQueryState(loadingStatus: AmityLoadingStatus) {
@@ -124,16 +178,47 @@ public class AmityMessageListViewModel: ObservableObject {
         let loadingStatus = messageCollection.loadingStatus
         return messageCollection.count() >= 20 && messageCollection.hasNext && loadingStatus != .error
     }
-}
-
-class MessageReplyCache {
     
-    static var shared = MessageReplyCache()
+    @MainActor
+    public func reportMessage(messageId: String) {
+        Task {
+            do {
+                let _ = try await chatManager.flagMessage(messageId: messageId)
+                
+                // Add this value to cache
+                MessageCache.shared.setFlagStatus(messageId: messageId, value: true)
+                
+                updateLocalMessageModel(messageId: messageId, isReported: true)
+                
+                toastState = .init(style: .success, message: AmityLocalizedStringSet.Chat.toastReportMessage.localizedString)
+            } catch {
+                toastState = .init(style: .warning, message: AmityLocalizedStringSet.Chat.toastReportMessageError.localizedString)
+            }
+        }
+    }
     
-    var cachedParentMessage = [String: MessageModel]()
+    @MainActor
+    public func unReportMessage(messageId: String) {
+        Task {
+            do {
+                let _ = try await chatManager.unflagMessage(messageId: messageId)
+                
+                // Add this value to cache
+                MessageCache.shared.setFlagStatus(messageId: messageId, value: false)
+                
+                updateLocalMessageModel(messageId: messageId, isReported: false)
+                
+                toastState = .init(style: .success, message: AmityLocalizedStringSet.Chat.toastUnReportMessage.localizedString)
+            } catch {
+                toastState = .init(style: .warning, message: AmityLocalizedStringSet.Chat.toastUnReportMessageError.localizedString)
+            }
+        }
+    }
     
-    func appendMessage(message: MessageModel) {
-        cachedParentMessage[message.id] = message
+    private func updateLocalMessageModel(messageId: String, isReported: Bool) {
+        if let firstIndex = messages.firstIndex(where: { $0.id == messageId }) {
+            messages[firstIndex].isFlaggedByMe = isReported
+        }
     }
 }
 
@@ -160,5 +245,13 @@ class ScrollViewPagination: ObservableObject {
         self.pagination = 0
         self.isInProgress = false
         self.currentItemsCount = 0
+    }
+}
+
+extension AmityMessageListViewModel: AmityClientDelegate {
+    public func didReceiveError(error: Error) {
+        if error.isAmityErrorCode(.globalBan) {
+            self.initialQueryState = .banned
+        }
     }
 }

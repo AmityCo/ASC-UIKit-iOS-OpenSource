@@ -15,10 +15,12 @@ public struct AmityLiveChatHeader: AmityComponentView {
     
     @StateObject var networkMonitor = NetworkMonitor()
     @StateObject var viewModel: AmityLiveChatHeaderViewModel
+    @StateObject private var viewConfig: AmityViewConfigController
 
     public init(viewModel: AmityLiveChatPageViewModel, pageId: PageId? = .liveChatPage) {
         self.pageId = pageId
         self._viewModel = StateObject(wrappedValue: viewModel.header)
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .liveChatHeader))
     }
     
     public var body: some View {
@@ -31,7 +33,7 @@ public struct AmityLiveChatHeader: AmityComponentView {
                 VStack(alignment: .leading, spacing: 0) {
                     Text(viewModel.displayName)
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(Color(hex: "FFFFFF"))
+                        .foregroundColor(Color(viewConfig.theme.baseInverseColor))
                         .lineLimit(1)
                         .accessibilityIdentifier(AccessibilityID.Chat.LiveChatHeader.headerTitle)
                     
@@ -54,13 +56,14 @@ public struct AmityLiveChatHeader: AmityComponentView {
             .padding(.horizontal, 16)
             
             Rectangle()
-                .fill(Color(UIColor(hex: "#292B32"))) // Light Theme: EBECEF
+                .fill(Color(viewConfig.theme.baseColorShade4)) // Light Theme: EBECEF
                 .frame(height: 1)
         }
-        .background(Color(hex: "191919"))
+        .background(Color(viewConfig.theme.backgroundColor))
         .onAppear {
             viewModel.loadChannelInfo()
         }
+        .updateTheme(with: viewConfig)
     }
 }
 
@@ -74,6 +77,9 @@ public extension AmityLiveChatHeader {
     
     // Move these elements out of extension if its reused anywhere else.
     struct AmityMemberCountView: AmityElementView {
+        
+        @EnvironmentObject var viewConfig: AmityViewConfigController
+        
         public var pageId: PageId?
         public var componentId: ComponentId?
         public var id: ElementId {
@@ -91,12 +97,14 @@ public extension AmityLiveChatHeader {
         public var body: some View {
             HStack(alignment: .center, spacing: 0) {
                 Image(AmityIcon.Chat.membersCount.imageResource)
+                    .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 14, height: 14)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                 
-                Text("\(memberCount.formattedCountString) members")
-                    .foregroundColor(Color(hex: "EBECEF"))
+                Text(AmityLocalizedStringSet.Chat.memberCount.localized(arguments: memberCount.formattedCountString))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .font(.system(size: 13))
                     .padding(.leading, 4)
                 
@@ -106,6 +114,8 @@ public extension AmityLiveChatHeader {
     }
     
     struct AmityConnectivityView: AmityElementView {
+        
+        @EnvironmentObject var viewConfig: AmityViewConfigController
         
         public var pageId: PageId?
         public var componentId: ComponentId?
@@ -123,11 +133,11 @@ public extension AmityLiveChatHeader {
             HStack(alignment: .center, spacing: 0) {
                 ProgressView()
                     .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
-                    .accentColor(Color(hex: "FFFFFF"))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .scaleEffect(0.8)
                 
                 Text(AmityLocalizedStringSet.Chat.connectivityStatusWaiting.localizedString)
-                    .foregroundColor(Color(hex: "EBECEF"))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .font(.system(size: 13))
                     .padding(.leading, 4)
                 

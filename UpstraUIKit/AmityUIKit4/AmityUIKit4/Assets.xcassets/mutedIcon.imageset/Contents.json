@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "mutedIcon.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

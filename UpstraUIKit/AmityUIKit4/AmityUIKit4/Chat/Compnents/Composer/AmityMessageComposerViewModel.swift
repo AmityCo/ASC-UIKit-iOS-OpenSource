@@ -44,7 +44,7 @@ class AmityMessageComposerViewModel: ObservableObject {
         guard case let .reply(message) = action, !sanitizedText.isEmpty else { return }
         let createOptions = AmityTextMessageCreateOptions(subChannelId: subChannelId, text: sanitizedText, parentId: message.id, metadata: mentionData.metadata, mentioneesBuilder: mentionData.mentionee)
         
-        MessageReplyCache.shared.appendMessage(message: message)
+        MessageCache.shared.appendMessage(message: message)
         
         // Reset action first so that reply panel is removed before message list is scrolled.
         self.resetAction()

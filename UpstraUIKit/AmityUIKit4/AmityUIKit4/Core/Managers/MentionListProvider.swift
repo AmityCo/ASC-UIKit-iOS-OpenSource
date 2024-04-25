@@ -60,7 +60,7 @@ class MentionListProvider {
     
     func checkMentionPermission() {
         if case let .message(subChannelId)  = mentionType {
-            AmityUIKitManagerInternal.shared.client.hasPermission(.editChannelUser, forChannel: subChannelId ?? "") { hasPermission in
+            ChatPermissionChecker.hasModeratorPermission(for: subChannelId ?? "") { hasPermission in
                 self.canMentionAll = hasPermission
             }
         }

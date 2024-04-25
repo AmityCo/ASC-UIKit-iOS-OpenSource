@@ -9,6 +9,8 @@ import SwiftUI
 
 struct AmityMentionUserListView: View {
         
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    
     @Binding var mentionedUsers: [AmityMentionUserModel]
     let selection: (AmityMentionUserModel) -> Void
     let paginate: () -> Void
@@ -34,7 +36,7 @@ struct AmityMentionUserListView: View {
             }
         }
         .frame(height: listHeight)
-        .background(Color(hex: "292B32"))
+        .background(Color(viewConfig.theme.baseColorShade4))
     }
     
     struct Configuration: UIKitConfigurable {
@@ -51,6 +53,8 @@ struct AmityMentionUserListView: View {
 #endif
 
 struct AmityMentionUserItemView: View {
+    
+    @EnvironmentObject var viewConfig: AmityViewConfigController
     
     let user: AmityMentionUserModel
     let action: DefaultTapAction?
@@ -69,7 +73,7 @@ struct AmityMentionUserItemView: View {
                 Text(user.displayName)
                     .font(.system(size: 15, weight: .semibold))
                     .padding(.leading, 8)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .accessibilityIdentifier(AccessibilityID.Chat.MentionList.userDisplayName)
                 
                 Spacer()
@@ -77,7 +81,7 @@ struct AmityMentionUserItemView: View {
                 if user.isChannelMention {
                     Text(AmityLocalizedStringSet.Chat.mentionEveryone.localizedString)
                         .font(.system(size: 13))
-                        .foregroundColor(Color(hex: "#898E9E"))
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                         .padding(.trailing, 8)
                 }
             }

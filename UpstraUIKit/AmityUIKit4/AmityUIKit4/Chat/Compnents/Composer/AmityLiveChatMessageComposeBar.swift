@@ -24,12 +24,15 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
     @State private var showingLongMessageAlert = false
     private var chatPageViewModel: AmityLiveChatPageViewModel
     
+    @StateObject private var viewConfig: AmityViewConfigController
+    
     public init(viewModel: AmityLiveChatPageViewModel, pageId: PageId? = .liveChatPage) {
         self.pageId = pageId
         self.chatPageViewModel = viewModel
         self.config = Configuration.init(pageId: pageId, componentId: .messageComposer)
         self._viewModel = StateObject(wrappedValue: viewModel.composer)
         self._textEditorViewModel = StateObject(wrappedValue: AmityTextEditorViewModel(mentionManager: MentionManager(withType: .message(subChannelId: viewModel.channelId))))
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .messageComposer))
     }
     
     // Text that user types
@@ -72,7 +75,7 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
             }
             
             Rectangle()
-                .fill(Color(UIColor(hex: "#292B32"))) // Light Theme: EBECEF
+                .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 1)
             
             HStack(alignment: .bottom) {
@@ -84,9 +87,10 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
                     .padding([.horizontal], 12)
                     .padding([.vertical], 6)
                     .background(RoundedRectangle(cornerRadius: 22) // Initial height is
-                        .fill(Color(UIColor(hex: "#292B32")))
+                        .fill(Color(viewConfig.theme.baseColorShade4))
                     )
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.textField)
+                    .disabled(chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission)
                 
                 Button(action: {
                     let currentAction = viewModel.action
@@ -146,11 +150,12 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
             }
             .padding(.vertical, 10)
             .padding(.horizontal)
-            .background(Color(hex: config.color.background))
+            .background(Color(viewConfig.theme.backgroundColor))
             .alert(isPresented: $showingLongMessageAlert, content: {
                 Alert(title: Text(AmityLocalizedStringSet.Chat.charLimitAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Chat.charLimitAlertMessage.localizedString), dismissButton: .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString)))
             })
         }
+        .updateTheme(with: viewConfig)
     }
     
     struct Configuration: UIKitConfigurable {
@@ -162,7 +167,6 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
         var messageLimit = 200
         var text: TextConfig = .init(config: [:])
         var image: ImageConfig = .init(config: [:])
-        var color: ColorConfig = .init()
         
         init(pageId: PageId?, componentId: ComponentId?) {
             self.pageId = pageId
@@ -190,10 +194,6 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
             init(config: [String: Any]) {
                 self.placeholder = config["placeholder_text"] as? String ?? ""
             }
-        }
-        
-        struct ColorConfig {
-            let background: String = "191919"
         }
     }
 }

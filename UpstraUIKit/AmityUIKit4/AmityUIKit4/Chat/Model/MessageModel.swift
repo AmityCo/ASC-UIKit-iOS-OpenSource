@@ -26,28 +26,8 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     public let reactions: [String: Any]?
     public let syncState: AmitySyncState
     public let hasModeratorPermissionInChannel: Bool
-    
-    public var repliedMessageDisplayName: String = ""
-    public var repliedMessageText: String = ""
-        
-    internal init(id: String, text: String, type: AmityMessageType, hasReaction: Bool, parentId: String?) {
-        self.id = id
-        self.text = text
-        self.type = type
-        self.hasReaction = hasReaction
-        self.parentId = parentId
-        self.displayName = ""
-        self.avatarURL = nil
-        self.isEdited = false
-        self.createdAt = Date()
-        self.userId = ""
-        self.isDeleted = false
-        self.metadata = [:]
-        self.mentionees = []
-        self.reactions = [:]
-        self.syncState = .default
-        self.hasModeratorPermissionInChannel = false
-    }
+    public let flagCount: Int
+    public var isFlaggedByMe: Bool?
     
     public init(message: AmityMessage, hasModeratorPermission: Bool = false) {
         self.id = message.messageId
@@ -66,6 +46,8 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         self.reactions = message.reactions       
         self.syncState = message.syncState
         self.hasModeratorPermissionInChannel = hasModeratorPermission
+        self.flagCount = message.flagCount
+        self.isFlaggedByMe = message.flagCount > 0 ? MessageCache.shared.isFlaggedByMe(messageId: message.messageId) : false
     }
     
     public var isOwner: Bool {
@@ -76,8 +58,11 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         return "Id: \(self.id) | Text: \(self.text) | Metadata: \(String(describing: self.metadata)) | Mentionees: \(self.mentionees)"
     }
     
-    static let preview = MessageModel.init(id: UUID().uuidString, text: "Let's catch up!", type: .text, hasReaction: false, parentId: nil)
-    static let previewWithParent = MessageModel.init(id: UUID().uuidString, text: "Let's catch up! Its been a long time since we met", type: .text, hasReaction: false, parentId: "1234")
+    // Replied message
+    struct RepliedMessage {
+        let displayName: String
+        let text: String
+    }
 }
 
 fileprivate extension AmityMessageType {
@@ -98,4 +83,32 @@ fileprivate extension AmityMessageType {
             return "-"
         }
     }
+}
+
+// For Preview Purposes
+extension MessageModel {
+    
+    internal init(id: String, text: String, type: AmityMessageType, hasReaction: Bool, parentId: String?) {
+        self.id = id
+        self.text = text
+        self.type = type
+        self.hasReaction = hasReaction
+        self.parentId = parentId
+        self.displayName = ""
+        self.avatarURL = nil
+        self.isEdited = false
+        self.createdAt = Date()
+        self.userId = ""
+        self.isDeleted = false
+        self.metadata = [:]
+        self.mentionees = []
+        self.reactions = [:]
+        self.syncState = .default
+        self.hasModeratorPermissionInChannel = false
+        self.flagCount = 0
+        self.isFlaggedByMe = false
+    }
+    
+    static let preview = MessageModel.init(id: UUID().uuidString, text: "Let's catch up!", type: .text, hasReaction: false, parentId: nil)
+    static let previewWithParent = MessageModel.init(id: UUID().uuidString, text: "Let's catch up! Its been a long time since we met", type: .text, hasReaction: false, parentId: "1234")
 }

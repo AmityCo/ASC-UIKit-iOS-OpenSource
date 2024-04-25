@@ -14,9 +14,7 @@ public struct AmityLiveChatMessageSenderView: AmityElementView {
     public var id: ElementId {
         return .senderMessageBubble
     }
-    
-    private let config = Configuration.init()
-    
+        
     let message: MessageModel
     let messageAction: AmityMessageAction
     
@@ -29,28 +27,27 @@ public struct AmityLiveChatMessageSenderView: AmityElementView {
     
     public var body: some View {
         LiveChatMessageBubbleView(message: message, messageAction: messageAction) {
-            VStack (alignment: .leading, spacing: 4) {
-                if #available(iOS 15, *) {
-                    let attributedText = MentionTextHighlighter.getAttributedText(from: message)
-                    Text(attributedText)
-                        .accessibilityIdentifier(AccessibilityID.Chat.MessageList.senderText)
-                } else {
-                    Text(message.text)
-                        .accessibilityIdentifier(AccessibilityID.Chat.MessageList.senderText)
-                }
+            VStack(alignment: .leading, spacing: 4) {
+                textContent
+                    .accessibilityIdentifier(AccessibilityID.Chat.MessageList.senderText)
             }
         }
     }
     
-    struct Configuration {
-        // Load sender text message bubble
+    @ViewBuilder
+    var textContent: some View {
+        if #available(iOS 15, *) {
+            let attributedText = TextHighlighter.getAttributedText(from: message)
+            Text(attributedText)
+        } else {
+            Text(message.text)
+        }
     }
-
 }
 
 
 #if DEBUG
 #Preview {
-    AmityLiveChatMessageSenderView(message: MessageModel.preview, messageAction: AmityMessageAction(onCopy: nil, onReply: nil, onDelete: nil))
+    AmityLiveChatMessageSenderView(message: MessageModel.preview, messageAction: AmityMessageAction(onCopy: nil, onReply: nil, onDelete: nil, onReport: nil, onUnReport: nil))
 }
 #endif

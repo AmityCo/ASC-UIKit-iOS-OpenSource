@@ -11,6 +11,7 @@ import SwiftUI
 let lightTheme = AmityTheme(primaryColor: UIColor(hex: "#1054DE"),
                             secondaryColor: UIColor(hex: "#292B32"),
                             baseColor: UIColor(hex: "#292B32"),
+                            baseInverseColor: UIColor(hex: "#292B32"),
                             baseColorShade1: UIColor(hex: "#636878"),
                             baseColorShade2: UIColor(hex: "#898E9E"),
                             baseColorShade3: UIColor(hex: "#A5A9b5"),
@@ -21,6 +22,7 @@ let lightTheme = AmityTheme(primaryColor: UIColor(hex: "#1054DE"),
 let darkTheme = AmityTheme(primaryColor: UIColor(hex: "#1054DE"),
                            secondaryColor: UIColor(hex: "#292B32"),
                            baseColor: UIColor(hex: "#EBECEF"),
+                           baseInverseColor: UIColor(hex: "#FFFFFF"),
                            baseColorShade1: UIColor(hex: "#A5A9B5"),
                            baseColorShade2: UIColor(hex: "#6E7487"),
                            baseColorShade3: UIColor(hex: "#40434E"),
@@ -38,6 +40,7 @@ struct AmityTheme: Codable {
     var primaryColor: UIColor?
     var secondaryColor: UIColor?
     var baseColor: UIColor?
+    var baseInverseColor: UIColor?
     var baseColorShade1: UIColor?
     var baseColorShade2: UIColor?
     var baseColorShade3: UIColor?
@@ -48,6 +51,7 @@ struct AmityTheme: Codable {
     public init(primaryColor: UIColor, 
                 secondaryColor: UIColor,
                 baseColor: UIColor,
+                baseInverseColor: UIColor,
                 baseColorShade1: UIColor,
                 baseColorShade2: UIColor,
                 baseColorShade3: UIColor,
@@ -57,6 +61,7 @@ struct AmityTheme: Codable {
         self.primaryColor = primaryColor
         self.secondaryColor = secondaryColor
         self.baseColor = baseColor
+        self.baseInverseColor = baseInverseColor
         self.baseColorShade1 = baseColorShade1
         self.baseColorShade2 = baseColorShade2
         self.baseColorShade3 = baseColorShade3
@@ -75,6 +80,7 @@ struct AmityTheme: Codable {
         case baseColorShade4 = "base_shade4_color"
         case alertColor = "alert_color"
         case backgroundColor = "background_color"
+        case baseInverseColor = "base_inverse_color"
     }
     
     public init(from decoder: Decoder) throws {
@@ -88,6 +94,7 @@ struct AmityTheme: Codable {
         baseColorShade4 = try? container.decodeUIColor(forKey: .baseColorShade4)
         alertColor = try? container.decodeUIColor(forKey: .alertColor)
         backgroundColor = try? container.decodeUIColor(forKey: .backgroundColor)
+        baseInverseColor = try? container.decodeUIColor(forKey: .baseInverseColor)
     }
     
     public func encode(to encoder: Encoder) throws {}
@@ -103,5 +110,6 @@ struct AmityThemeColor {
     var baseColorShade4: UIColor
     var alertColor: UIColor
     var backgroundColor: UIColor
+    var baseInverseColor: UIColor
 }
 

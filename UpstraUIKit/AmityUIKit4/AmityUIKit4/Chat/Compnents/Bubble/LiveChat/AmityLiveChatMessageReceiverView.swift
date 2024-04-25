@@ -33,7 +33,7 @@ public struct AmityLiveChatMessageReceiverView: AmityElementView {
         LiveChatMessageBubbleView(message: message, messageAction: messageAction) {
             VStack (alignment: .leading, spacing: 4) {
                 if #available(iOS 15, *) {
-                    let attributedText = MentionTextHighlighter.getAttributedText(from: message)
+                    let attributedText = TextHighlighter.getAttributedText(from: message)
                     Text(attributedText)
                         .accessibilityIdentifier(AccessibilityID.Chat.MessageList.receiverText)
                 } else {
@@ -53,6 +53,6 @@ public struct AmityLiveChatMessageReceiverView: AmityElementView {
 
 #if DEBUG
 #Preview {
-    AmityLiveChatMessageReceiverView(message: MessageModel.preview, messageAction: AmityMessageAction(onCopy: nil, onReply: nil, onDelete: nil))
+    AmityLiveChatMessageReceiverView(message: MessageModel.preview, messageAction: AmityMessageAction(onCopy: nil, onReply: nil, onDelete: nil, onReport: nil, onUnReport: nil))
 }
 #endif

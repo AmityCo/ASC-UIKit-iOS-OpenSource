@@ -8,20 +8,30 @@
 import Foundation
 import AmitySDK
 import UIKit
+import SwiftUI
 
-/// Highlights mention text and returns as SwiftUI AttributedString
+/// Highlights mentions & links and returns AttributedString
 @available(iOS 15, *)
-class MentionTextHighlighter {
+class TextHighlighter {
     
     // Helper Method
     public static func getAttributedText(from message: MessageModel, highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemBlue, .font: UIFont.systemFont(ofSize: 15)]) -> AttributedString {
         let messageText = message.text
         
-        guard let metadata = message.metadata else {
-            return AttributedString(messageText)
+        var highlightedText = AttributedString(messageText)
+        
+        // If mention is present, highlight mentions first.
+        if let metadata = message.metadata {
+            highlightedText = highlightMentions(for: messageText, metadata: metadata, mentionees: message.mentionees, highlightAttributes: highlightAttributes)
         }
         
-        return getAttributedText(for: messageText, metadata: metadata, mentionees: message.mentionees, highlightAttributes: highlightAttributes)
+        // If links is present, highlight links
+        let links = detectLinks(in: messageText)
+        if !links.isEmpty {
+            highlightedText = highlightLinks(links: links, in: highlightedText)
+        }
+        
+        return highlightedText
     }
     
     public static func getAttributedText(from comment: AmityCommentModel, highlightAttributes: [NSAttributedString.Key: Any]) -> AttributedString {
@@ -31,21 +41,61 @@ class MentionTextHighlighter {
             return AttributedString(commentText)
         }
         
-        return getAttributedText(for: commentText, metadata: metadata, mentionees: comment.mentionees ?? [], highlightAttributes: highlightAttributes)
+        return highlightMentions(for: commentText, metadata: metadata, mentionees: comment.mentionees ?? [], highlightAttributes: highlightAttributes)
     }
     
     /// Returns attributed text where mentions are highlighted.
-    public static func getAttributedText(for text: String, metadata: [String: Any], mentionees: [AmityMentionees], highlightAttributes: [NSAttributedString.Key: Any]) -> AttributedString {
+    public static func highlightMentions(for text: String, metadata: [String: Any], mentionees: [AmityMentionees], highlightAttributes: [NSAttributedString.Key: Any]) -> AttributedString {
         // AmityMention array should not be empty
         let mentions = AmityMentionMapper.mentions(fromMetadata: metadata)
         guard !mentions.isEmpty else { return AttributedString(text) }
         
         // Create attributed string
-        let highlightedText = highlightMentions(in: text, mentions: mentions, mentionees: mentionees, highlightAttributes: highlightAttributes)
+        let highlightedText = getMentionHighlightedAttributedText(in: text, mentions: mentions, mentionees: mentionees, highlightAttributes: highlightAttributes)
         return AttributedString(highlightedText)
     }
     
-    private static func highlightMentions(in text: String, mentions: [AmityMention], mentionees: [AmityMentionees], highlightAttributes: [NSAttributedString.Key: Any]) -> NSMutableAttributedString {
+    private static func detectLinks(in text: String) -> [String] {
+        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
+            return []
+        }
+        
+        let stringRange = NSRange(location: 0, length: text.count)
+        let linkMatches = detector.matches(in: text, options: [], range: stringRange)
+        
+        // Get all links
+        var links = [String]()
+        for linkMatch in linkMatches {
+            guard let swiftRange = Range(linkMatch.range, in: text) else { continue }
+            links.append(String(text[swiftRange]))
+        }
+        
+        return links
+    }
+    
+    static func highlightLinks(links: [String], in string: AttributedString) -> AttributedString {
+        var finalStr = string
+        
+        for link in links {
+            let linkRange = finalStr.range(of: link)! // Get attributed link here.
+            
+            // Note:
+            // Link without scheme does not get opened when tapping on it.
+            // So we modify the scheme when tapping upon link.
+            var finalLink = link
+            if !link.hasPrefix("http") && !link.hasPrefix("https://") {
+                finalLink = "https://" + link
+            }
+            
+            finalStr[linkRange].link = URL(string: finalLink)
+            finalStr[linkRange].underlineStyle = Text.LineStyle(pattern: .solid)
+            finalStr[linkRange].foregroundColor = .blue
+        }
+        
+        return finalStr
+    }
+        
+    private static func getMentionHighlightedAttributedText(in text: String, mentions: [AmityMention], mentionees: [AmityMentionees], highlightAttributes: [NSAttributedString.Key: Any]) -> NSMutableAttributedString {
         
         let attributedString = NSMutableAttributedString(string: text)
         

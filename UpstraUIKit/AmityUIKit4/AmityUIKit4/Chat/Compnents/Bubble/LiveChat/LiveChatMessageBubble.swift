@@ -15,12 +15,13 @@ struct LiveChatMessageBubble: ViewModifier {
     let message: MessageModel
     
     @ObservedObject var viewModel: LiveChatMessageBubbleViewModel
+    
+    @EnvironmentObject var viewConfig: AmityViewConfigController
 
     init(isBubbleEnabled: Bool = true, message: MessageModel, viewModel: LiveChatMessageBubbleViewModel) {
         self.isBubbleEnabled = isBubbleEnabled
         self.message = message
         self.viewModel = viewModel
-        
     }
     
     func body(content: Content) -> some View {
@@ -32,13 +33,13 @@ struct LiveChatMessageBubble: ViewModifier {
                             Text(repliedMessage.displayName)
                                 .font(.system(size: 13, weight: .bold))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(viewConfig.theme.baseInverseColor))
                                 .lineLimit(1)
                             
                             Text(repliedMessage.text)
                                 .font(.system(size: 13))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(Color(hex: "#EBECEF"))
+                                .foregroundColor(Color(viewConfig.theme.baseColor))
                                 .lineLimit(1)
                                 .accessibilityIdentifier(message.isOwner ? AccessibilityID.Chat.MessageList.senderReplyText : AccessibilityID.Chat.MessageList.receiverReplyText)
                         } else {
@@ -57,7 +58,7 @@ struct LiveChatMessageBubble: ViewModifier {
                     .padding(.horizontal, 12)
                     .padding(.vertical, 12)
                     .frame(maxWidth: .infinity, minHeight: 60 , alignment: .leading)
-                    .background(Color(hex: "#434650"))
+                    .background(Color(viewConfig.theme.baseColorShade3))
                     .accessibilityIdentifier(message.isOwner ? AccessibilityID.Chat.MessageList.senderReplyTextView : AccessibilityID.Chat.MessageList.receiverReplyTextView)
                     
                     content
@@ -65,8 +66,8 @@ struct LiveChatMessageBubble: ViewModifier {
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(hex: "292B32"))
-                        .foregroundColor(.white)
+                        .background(Color(viewConfig.theme.baseColorShade4))
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                 }
                 .clipShape(RoundedCorner(radius: 11, corners: .allCorners))
                 
@@ -75,8 +76,8 @@ struct LiveChatMessageBubble: ViewModifier {
                     .font(.system(size: 13))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
-                    .background(Color(hex: "292B32"))
-                    .foregroundColor(Color(hex: "#EBECEF"))
+                    .background(Color(viewConfig.theme.baseColorShade4))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .clipShape(RoundedCorner(radius: 11, corners: .allCorners))
             
             } else {
@@ -84,8 +85,8 @@ struct LiveChatMessageBubble: ViewModifier {
                     .font(.system(size: 15))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
-                    .background(Color(hex: "292B32"))
-                    .foregroundColor(.white)
+                    .background(Color(viewConfig.theme.baseColorShade4))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .clipShape(RoundedCorner(radius: 11, corners: [.bottomLeft, .bottomRight, .topRight]))
             }
         } else {

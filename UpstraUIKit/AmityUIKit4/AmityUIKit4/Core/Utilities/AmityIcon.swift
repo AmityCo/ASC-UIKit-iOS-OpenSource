@@ -79,6 +79,12 @@ enum AmityIcon: String, ImageResourceProvider {
         case heartReactionIcon = "heartReactionIcon"
         case chatAvatarPlaceholder = "chatAvatarPlaceholder"
         case messageErrorIcon = "messageErrorIcon"
+        
+        case redTrashIcon = "redTrashIcon"
+        case replyIcon = "replyIcon"
+        case copyIcon = "copyIcon"
+        case redFlagIcon = "redFlagIcon"
+        case mutedIcon = "mutedIcon"
     }
     
     func getURL() -> URL {

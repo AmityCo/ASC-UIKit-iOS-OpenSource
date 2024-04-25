@@ -11,6 +11,8 @@ import Combine
 
 struct LiveChatMessageBubbleView<Content: View>: View {
     
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
+    
     let message: MessageModel
     let messageAction: AmityMessageAction
     let content: () -> Content
@@ -36,7 +38,7 @@ struct LiveChatMessageBubbleView<Content: View>: View {
                 // User Info
                 Text(message.displayName)
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color(hex: "#A5A9B5"))
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                     .accessibilityIdentifier(message.isOwner ? AccessibilityID.Chat.MessageList.bubbleSenderDisplayName : AccessibilityID.Chat.MessageList.bubbleReceiverDisplayName)
                 
                 HStack(alignment: .bottom, spacing: 0) {
@@ -50,14 +52,20 @@ struct LiveChatMessageBubbleView<Content: View>: View {
                                         let replyModel = message
                                         messageAction.onReply?(replyModel)
                                     } label: {
-                                        Label(AmityLocalizedStringSet.Chat.replyButton.localizedString, systemImage: "arrowshape.turn.up.left")
+                                        Label(
+                                            title: { Text(AmityLocalizedStringSet.Chat.replyButton.localizedString) },
+                                            icon: { Image(AmityIcon.Chat.replyIcon.imageResource) }
+                                        )
                                     }
                                     .isHidden(message.syncState == .error)
                                     
                                     Button {
                                         messageAction.onCopy?(message)
                                     } label: {
-                                        Label(AmityLocalizedStringSet.Chat.copyButton.localizedString, systemImage: "doc.on.doc")
+                                        Label(
+                                            title: { Text(AmityLocalizedStringSet.Chat.copyButton.localizedString) },
+                                            icon: { Image(AmityIcon.Chat.copyIcon.imageResource) }
+                                        )
                                     }
                                     
                                     if message.isOwner || message.hasModeratorPermissionInChannel {
@@ -67,15 +75,56 @@ struct LiveChatMessageBubbleView<Content: View>: View {
                                             Button(role: .destructive) {
                                                 messageAction.onDelete?(message)
                                             } label: {
-                                                Label(AmityLocalizedStringSet.Chat.deleteButton.localizedString, systemImage: "trash")
+                                                Label(
+                                                    title: { Text(AmityLocalizedStringSet.Chat.deleteButton.localizedString) },
+                                                    icon: { Image(AmityIcon.Chat.redTrashIcon.imageResource) }
+                                                )
                                             }
                                         } else {
                                             
                                             Button {
                                                 messageAction.onDelete?(message)
                                             } label: {
-                                                Label(AmityLocalizedStringSet.Chat.deleteButton.localizedString, systemImage: "trash")
-                                                    .foregroundColor(.red)
+                                                Label(
+                                                    title: { Text(AmityLocalizedStringSet.Chat.deleteButton.localizedString) },
+                                                    icon: { Image(AmityIcon.Chat.redTrashIcon.imageResource) }
+                                                )
+                                                .foregroundColor(.red)
+                                            }
+                                        }
+                                    }
+                                    
+                                    if !message.isOwner {
+                                        let isFlaggedByOwner = message.isFlaggedByMe ?? viewModel.isReportedByMe
+                                                                                
+                                        if #available(iOS 15.0, *) {
+
+                                            Button(role: .destructive) {
+                                                if isFlaggedByOwner {
+                                                    messageAction.onUnReport?(message)
+                                                } else {
+                                                    messageAction.onReport?(message)
+                                                }
+                                            } label: {
+                                                Label(
+                                                    title: { Text(isFlaggedByOwner ? AmityLocalizedStringSet.Chat.unReportButton.localizedString : AmityLocalizedStringSet.Chat.reportButton.localizedString) },
+                                                    icon: { Image(AmityIcon.Chat.redFlagIcon.imageResource) }
+                                                )
+                                            }
+                                        } else {
+                                            Button {
+                                                
+                                                if isFlaggedByOwner {
+                                                    messageAction.onUnReport?(message)
+                                                } else {
+                                                    messageAction.onReport?(message)
+                                                }
+                                            } label: {
+                                                Label(
+                                                    title: { Text(isFlaggedByOwner ? AmityLocalizedStringSet.Chat.unReportButton.localizedString : AmityLocalizedStringSet.Chat.reportButton.localizedString) },
+                                                    icon: { Image(AmityIcon.Chat.redFlagIcon.imageResource) }
+                                                )
+                                                .foregroundColor(.red)
                                             }
                                         }
                                     }
@@ -90,13 +139,17 @@ struct LiveChatMessageBubbleView<Content: View>: View {
                         .padding(.bottom, 0)
                         .padding(.trailing, 6)
                         
-                        MessageStatusView(message: message, dateFormat: config.timestampConfig.dateFormatter)
+                        MessageStatusView(message: message, dateFormat: config.timestampConfig.dateFormatter, viewModel: viewModel, messageAction: messageAction)
                         
                     } else {
                         HStack(spacing: 4) {
                             Image(AmityIcon.trashBinWhiteIcon.getImageResource())
+                                .renderingMode(.template)
                                 .frame(width: 12, height: 16)
+                                .foregroundColor(Color(viewConfig.theme.baseColor))
+                            
                             Text(AmityLocalizedStringSet.Chat.deletedMessage.localizedString)
+                                .foregroundColor(Color(viewConfig.theme.baseColor))
                         }
                         .modifier(LiveChatMessageBubble(isBubbleEnabled: config.isBubbleEnabled(messageType: message.type), message: message, viewModel: viewModel))
                     }
@@ -165,32 +218,63 @@ struct LiveChatMessageBubbleView<Content: View>: View {
     }
 }
 
-struct RepliedMessage {
-    let displayName: String
-    let text: String
-}
-
 class LiveChatMessageBubbleViewModel: ObservableObject {
     let message: MessageModel
     let messageRepo = AmityMessageRepository(client: AmityUIKit4Manager.client)
     let reactionRepo = AmityReactionRepository(client: AmityUIKit4Manager.client)
     
-    @Published var repliedMessage: RepliedMessage?
+    @Published var repliedMessage: MessageModel.RepliedMessage?
+    @Published var isReportedByMe: Bool = false
     var token: AmityNotificationToken?
     
     init(message: MessageModel) {
         self.message = message
+        
+        updateParentMessageForReply(message: message)
+        
+        // Update flag status for new messages
+        updateReportStatus(message: message)
+    }
+    
+    func updateParentMessageForReply(message: MessageModel) {
         if let parentId = message.parentId {
-            if let cacheMessage = MessageReplyCache.shared.cachedParentMessage[parentId] {
-                repliedMessage = RepliedMessage(displayName: cacheMessage.displayName , text: cacheMessage.text)
+            if let cacheMessage = MessageCache.shared.cachedParentMessage[parentId] {
+                repliedMessage = MessageModel.RepliedMessage(displayName: cacheMessage.displayName , text: cacheMessage.text)
             } else {
                 token = messageRepo.getMessage(parentId).observeOnce({ [weak self] message, error in
-                    
                     let snapshot = message.snapshot
-                    
-                    self?.repliedMessage = RepliedMessage(displayName: snapshot?.user?.displayName ?? "", text: snapshot?.data?["text"] as? String ?? "")
+                    self?.repliedMessage = MessageModel.RepliedMessage(displayName: snapshot?.user?.displayName ?? "", text: snapshot?.data?["text"] as? String ?? "")
                 })
             }
+        }
+    }
+    
+    func updateReportStatus(message: MessageModel) {
+        if message.flagCount > 0 {
+            if let isFlaggedByMe = MessageCache.shared.isFlaggedByMe(messageId: message.id) {
+                isReportedByMe = isFlaggedByMe
+            } else {
+                // If its not present in cache, we fetch status
+                fetchOwnerReportStatus(message: message)
+            }
+        } else {
+            // Reset cache
+            MessageCache.shared.setFlagStatus(messageId: message.id, value: false)
+        }
+    }
+    
+    func fetchOwnerReportStatus(message: MessageModel) {
+        let messageId = message.id
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            
+            let reportStatus = try await self.messageRepo.isMessageFlaggedByMe(withId: messageId)
+            
+            // Add to cache
+            MessageCache.shared.setFlagStatus(messageId: messageId, value: reportStatus)
+            
+            // Update report status immediately.
+            self.isReportedByMe = reportStatus
         }
     }
     

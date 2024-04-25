@@ -65,26 +65,40 @@ public struct AmityLocalizedStringSet {
         static let toastCopied = "chat_toast_copied"
         static let toastLinkNotAllow = "chat_toast_link_not_allow"
         static let toastBannedWord = "chat_toast_banned_word"
-        
+        static let toastReportMessage = "chat_toast_report_message"
+        static let toastReportMessageError = "chat_toast_report_message_error"
+        static let toastUnReportMessage = "chat_toast_un_report_message"
+        static let toastUnReportMessageError = "chat_toast_un_report_message_error"
         // Button
         static let deletedMessage = "chat_deleted_message_text"
         
         static let replyButton = "chat_button_reply"
         static let copyButton = "chat_button_copy"
         static let deleteButton = "chat_button_delete"
+        static let reportButton = "chat_button_report"
+        static let unReportButton = "chat_button_un_report"
         static let okButton = "chat_button_ok"
         
         // Error
         static let errorLoadingChat = "chat_error_loading_chat_title"
+        static let errorBannedTitleChat = "chat_error_banned_chat_title"
+        static let errorBannedSubTitleInChat = "chat_error_banned_chat_sub_title"
         
         static let charLimitAlertTitle = "chat_char_limit_alert_title"
         static let charLimitAlertMessage = "chat_char_limit_alert_message"
         static let deleteAlertTitle = "chat_delete_alert_title"
         static let deleteAlertMessage = "chat_delete_alert_message"
+       
+        static let deleteActionSheetTitle = "chat_delete_action_sheet_title"
+        
+        static let userIsMuted = "chat_user_is_muted"
+        static let channelIsMuted = "chat_channel_is_muted"
         
         static let statusSending = "chat_sending_status"
         static let connectivityStatusWaiting = "network_connectivity_status"
         
         static let mentionEveryone = "chat_mention_everyone"
+        static let replyMessagePreview = "chat_reply_preview"
+        static let memberCount = "chat_member_count"
     }
 }

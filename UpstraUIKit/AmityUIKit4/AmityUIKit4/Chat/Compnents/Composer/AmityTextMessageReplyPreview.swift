@@ -14,6 +14,8 @@ struct AmityTextMessageReplyPreview: View {
     let message: MessageModel
     let closeAction: DefaultTapAction
     
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    
     init(message: MessageModel, closeAction: @escaping DefaultTapAction) {
         self.message = message
         self.closeAction = closeAction
@@ -29,14 +31,14 @@ struct AmityTextMessageReplyPreview: View {
                 .accessibilityIdentifier(AccessibilityID.Chat.ReplyPanel.userAvatar)
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("Replying to \(message.displayName)")
+                Text(AmityLocalizedStringSet.Chat.replyMessagePreview.localized(arguments: message.displayName))
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color.white)
+                    .foregroundColor(Color(viewConfig.theme.baseInverseColor))
                     .accessibilityIdentifier(AccessibilityID.Chat.ReplyPanel.userDisplayName)
                 Text(message.text)
                     .font(.system(size: 13, weight: .regular))
                     .lineLimit(1)
-                    .foregroundColor(Color(hex: "EBECEF"))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
             }
             .padding(.horizontal, 12)
             
@@ -53,7 +55,7 @@ struct AmityTextMessageReplyPreview: View {
         
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(minHeight: 62)
-        .background(Color(hex: "292B32")) // Light: F5F5F5
+        .background(Color(viewConfig.theme.baseColorShade4)) // Light: F5F5F5
     }
 }
 

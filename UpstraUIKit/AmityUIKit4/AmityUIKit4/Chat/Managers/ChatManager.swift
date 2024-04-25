@@ -11,9 +11,11 @@ import OSLog
 
 class ChatManager {
     let repository: AmityMessageRepository
+    let channelRepository: AmityChannelRepository
     
     init() {
         self.repository = AmityMessageRepository(client: AmityUIKitManagerInternal.shared.client)
+        self.channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
     }
     
     func queryMessages(options: AmityMessageQueryOptions) -> AmityCollection<AmityMessage> {
@@ -43,5 +45,13 @@ class ChatManager {
     @MainActor
     func unflagMessage(messageId: String) async throws -> Bool {
         return try await repository.unflagMessage(withId: messageId)
+    }
+    
+    func getChannel(channelId: String) -> AmityChannel? {
+        return channelRepository.getChannel(channelId).snapshot
+    }
+    
+    func getCurrentUserChannelMember(channelId: String) -> AmityChannelMember? {
+        return channelRepository.getChannel(channelId).snapshot?.currentMembership
     }
 }

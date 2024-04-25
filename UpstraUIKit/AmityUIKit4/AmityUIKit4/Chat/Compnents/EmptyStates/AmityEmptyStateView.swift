@@ -9,6 +9,8 @@ import SwiftUI
 
 public struct AmityEmptyStateView: View {
     
+    @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: nil)
+    
     public let configuration: EmptyStateConfiguration
     
     public init(configuration: EmptyStateConfiguration) {
@@ -19,22 +21,24 @@ public struct AmityEmptyStateView: View {
         VStack(spacing: 0) {
             if let icon = configuration.image {
                 Image(ImageResource(name: icon, bundle: AmityUIKit4Manager.bundle))
+                    .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 28, height: 24)
+                    .frame(size: configuration.iconSize)
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
             }
             
             if let title = configuration.title {
                 Text(title)
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(hex: "#898E9E"))
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                     .padding(.top, 24)
             }
             
             if let subtitle = configuration.subtitle {
                 Text(subtitle)
                     .font(.system(size: 15))
-                    .foregroundColor(Color(hex: "#898E9E"))
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                     .multilineTextAlignment(.center)
                     .padding(.top, configuration.title == nil ? 24 : 4)
             }
@@ -45,17 +49,19 @@ public struct AmityEmptyStateView: View {
         }
     }
     
-    public struct EmptyStateConfiguration {        
+    public struct EmptyStateConfiguration {
         public let image: String?
         public let title: String?
         public let subtitle: String?
         public let tapAction: DefaultTapAction?
+        public let iconSize: CGSize
         
-        public init(image: String?, title: String?, subtitle: String?, tapAction: DefaultTapAction?) {
+        public init(image: String?, title: String?, subtitle: String?, iconSize: CGSize = CGSize(width: 28, height: 24), tapAction: DefaultTapAction?) {
             self.image = image
             self.title = title
             self.subtitle = subtitle
             self.tapAction = tapAction
+            self.iconSize = iconSize
         }
         
         internal static let previewWithoutTitle = EmptyStateConfiguration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: nil, subtitle: "Couldn't load chat", tapAction: nil)

@@ -61,6 +61,10 @@
 "chat_toast_delete_error" = "Unable to delete message. Please try again.";
 "chat_toast_link_not_allow" = "Your message wasn’t sent as it contained a link that’s not allowed.";
 "chat_toast_banned_word" = "Your message wasn’t sent as it contained a blocked word.";
+"chat_toast_report_message" = "Message reported.";
+"chat_toast_un_report_message" = "Message unreported.";
+"chat_toast_report_message_error" = "This message failed to be reported. Please try again.";
+"chat_toast_un_report_message_error" = "This message failed to be unreported. Please try again.";
 
 // Button
 "chat_deleted_message_text" = "This message was deleted";
@@ -68,17 +72,27 @@
 "chat_button_reply" = "Reply";
 "chat_button_copy" = "Copy";
 "chat_button_delete" = "Delete";
+"chat_button_report" = "Report";
+"chat_button_un_report" = "Unreport";
 "chat_button_ok" = "OK";
 
 // Error
 "chat_error_loading_chat_title" = "Couldn't load chat";
+"chat_error_banned_chat_title" = "You are banned from chat";
+"chat_error_banned_chat_sub_title" = "You won’t be able to participate in this chat until you’ve been unbanned.";
 
 "chat_char_limit_alert_title" = "Unable to send message";
 "chat_char_limit_alert_message" = "Your message is too long. Please shorten your message and try again.";
 "chat_delete_alert_title" = "Delete this message?";
 "chat_delete_alert_message" = "This message will also be removed from your friend’s devices.";
+"chat_delete_action_sheet_title" = "Your message wasn’t sent.";
+
+"chat_user_is_muted" = "You’ve been muted by the channel moderator.";
+"chat_channel_is_muted" = "This channel has been set to read-only by the channel moderator.";
 
 "chat_sending_status" = "sending...";
 "network_connectivity_status" = "Waiting for network...";
 
 "chat_mention_everyone" = "Notify everyone";
+"chat_reply_preview" = "Replying to %@";
+"chat_member_count" = "%@ members";

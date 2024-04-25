@@ -42,6 +42,7 @@ public struct AmityMessageTextEditorView: View {
     @State private var hidePlaceholder: Bool = false
     
     @StateObject private var viewModel: AmityTextEditorViewModel
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     private var placeholder: String = ""
     private var textEditorMaxHeight: CGFloat = 106 // 5 lines (18 px per line) + textContainerInset.top + textContainerInset.bottom
@@ -91,7 +92,7 @@ public struct AmityMessageTextEditorView: View {
                 
                 Text(placeholder)
                     .font(.system(size: 15))
-                    .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                     .padding(.leading, 5)
                     .onTapGesture {
                         viewModel.textView.becomeFirstResponder()
@@ -99,6 +100,9 @@ public struct AmityMessageTextEditorView: View {
                     .isHidden(hidePlaceholder)
             }
         }
+        .onReceive(viewConfig.$theme, perform: { value in
+            viewModel.updateAttributes(hightlightColor: value.primaryColor, textColor: value.baseColor)
+        })
         .frame(height: textEditorHeight)
     }
 }

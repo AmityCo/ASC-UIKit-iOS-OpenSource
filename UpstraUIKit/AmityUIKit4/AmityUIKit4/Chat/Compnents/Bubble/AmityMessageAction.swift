@@ -12,10 +12,15 @@ public class AmityMessageAction {
     var onCopy: MessageAction?
     var onReply: MessageAction?
     var onDelete: MessageAction?
+    /// Should we conbine report and unreport together?
+    var onReport: MessageAction?
+    var onUnReport: MessageAction?
     
-    public init(onCopy: MessageAction?, onReply: MessageAction?, onDelete: MessageAction?) {
+    public init(onCopy: MessageAction?, onReply: MessageAction?, onDelete: MessageAction?, onReport: MessageAction?, onUnReport: MessageAction?) {
         self.onCopy = onCopy
         self.onReply = onReply
         self.onDelete = onDelete
+        self.onReport = onReport
+        self.onUnReport = onUnReport
     }
 }

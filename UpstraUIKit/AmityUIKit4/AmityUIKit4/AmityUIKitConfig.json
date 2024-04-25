@@ -10,7 +10,8 @@
       "base_shade3_color": "#A5A9b5",
       "base_shade4_color": "#EBECEF",
       "alert_color": "#FA4D30",
-      "background_color": "#FFFFFF"
+      "background_color": "#FFFFFF",
+      "base_inverse_color": "#000000"
     },
     "dark": {
       "primary_color": "#1054DE",
@@ -21,7 +22,8 @@
       "base_shade3_color": "#40434E",
       "base_shade4_color": "#292B32",
       "alert_color": "#FA4D30",
-      "background_color": "#191919"
+      "background_color": "#191919",
+      "base_inverse_color": "#FFFFFF"
     }
   },
   "excludes": [],
@@ -136,23 +138,40 @@
       "close_icon": "closeIcon"
     },
     
-    
-    "live_chat/*/*": {},
+    "live_chat/*/*": {
+        "theme": {
+          "light": {
+            "primary_color": "#1054DE",
+            "secondary_color": "#292B32",
+            "base_color": "#292B32",
+            "base_shade1_color": "#636878",
+            "base_shade2_color": "#898E9E",
+            "base_shade3_color": "#A5A9b5",
+            "base_shade4_color": "#EBECEF",
+            "alert_color": "#FA4D30",
+            "background_color": "#FFFFFF",
+            "base_inverse_color": "#000000"
+          },
+          "dark": {
+            "primary_color": "#1054DE",
+            "secondary_color": "#292B32",
+            "base_color": "#EBECEF",
+            "base_shade1_color": "#A5A9B5",
+            "base_shade2_color": "#6E7487",
+            "base_shade3_color": "#40434E",
+            "base_shade4_color": "#292B32",
+            "alert_color": "#FA4D30",
+            "background_color": "#191919",
+            "base_inverse_color": "#FFFFFF"
+          }
+        }
+    },
     "live_chat/chat_header/*": {},
     "live_chat/message_list/*": {},
     "live_chat/message_composer/*": {
       "theme": {},
       "message_limit": 200,
       "placeholder_text": "Write a message"
-    },
-    "live_chat/mesage_list/sender_message_bubble": {
-      "alignment": ""
-    },
-    "live_chat/mesage_list/receiver_message_bubble": {
-      "alignment": ""
-    },
-    "live_chat/message_composer/send_button": {
-      "send_icon": "sendIconEnable"
     }
   }
 }

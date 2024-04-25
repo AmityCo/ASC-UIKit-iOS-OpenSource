@@ -34,11 +34,11 @@ public struct AmityLiveChatPage: AmityPageView {
                 // List & composer
                 VStack(spacing: 0) {
                     AmityLiveChatMessageList(viewModel: viewModel, pageId: .liveChatPage)
-                        .accessibilityIdentifier(AccessibilityID.Chat.MessageList.container)
-                    
+                        .accessibilityIdentifier(AccessibilityID.Chat.MessageList.container)                    
+
                     // Hide only in case of error in first load
                     AmityLiveChatMessageComposeBar(viewModel: viewModel)
-                        .opacity(messageViewModel.initialQueryState != .success ? 0 : 1)
+                        .isHidden(messageViewModel.initialQueryState != .success)
                         .accessibilityIdentifier(AccessibilityID.Chat.MessageComposer.container)
                 }
                 .showToast(isPresented: $viewModel.showToast, style: viewModel.toastMessage.style, message: viewModel.toastMessage.message, bottomPadding: 80)

@@ -201,13 +201,11 @@ public class AmityTextEditorViewModel: ObservableObject {
     let textView: UITextView = UITextView(frame: .zero)
     let mentionManager: MentionManager
     
-    // TODO: Load from configuration
     // Attributes used to highlight mentions
     var highlightAttributes: [NSAttributedString.Key: Any] = [
         .font: UIFont.systemFont(ofSize: 15, weight: .bold),
         .foregroundColor: UIColor.systemBlue]
     
-    // TODO: Load from configuration
     // Attributes used for text while typing
     var typingAttributes: [NSAttributedString.Key: Any] = [
         .font: UIFont.systemFont(ofSize: 15),
