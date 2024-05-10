@@ -181,8 +181,8 @@ class AmityStoryTabComponentViewModel: ObservableObject {
     
     func loadMoreGlobalFeedTargetIfHas(_ index: Int) {
         guard let collection = globalFeedCollection else { return }
-        if index == collection.snapshots.count - 1 && collection.hasPrevious {
-            collection.previousPage()
+        if index == collection.snapshots.count - 1 && collection.hasNext {
+            collection.nextPage()
         }
     }
 }

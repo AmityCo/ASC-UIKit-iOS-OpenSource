@@ -96,3 +96,6 @@
 "chat_mention_everyone" = "Notify everyone";
 "chat_reply_preview" = "Replying to %@";
 "chat_member_count" = "%@ members";
+
+"reach_mention_limit_title" = "Unable to mention user";
+"chat_reach_mention_limit_Message" = "You have reached maximum 30 mentioned users in a chat.";

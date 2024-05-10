@@ -28,6 +28,8 @@ public class AmityMessageListViewModel: ObservableObject {
     // Current toast state
     @Published var toastState: ToastState?
     
+    var selectedMessage: MessageModel?
+    
     var hasModeratorPermission = false
     var delegate: AmityClientDelegate?
     

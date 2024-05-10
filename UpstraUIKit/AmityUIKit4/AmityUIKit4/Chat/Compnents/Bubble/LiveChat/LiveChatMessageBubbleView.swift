@@ -19,6 +19,7 @@ struct LiveChatMessageBubbleView<Content: View>: View {
     let config: Configuration = .init()
     
     @StateObject var viewModel: LiveChatMessageBubbleViewModel
+    @Namespace var overlayAnimationNamespace
     
     init(message: MessageModel, messageAction: AmityMessageAction, @ViewBuilder content: @escaping () -> Content) {
         self.message = message
@@ -45,95 +46,23 @@ struct LiveChatMessageBubbleView<Content: View>: View {
                     if !message.isDeleted {
                         ZStack(alignment: .bottomLeading) {
                             content()
+                                .matchedGeometryEffect(id: message.id, in: overlayAnimationNamespace)
                                 .modifier(LiveChatMessageBubble(isBubbleEnabled: config.isBubbleEnabled(messageType: message.type), message: message, viewModel: viewModel))
-                                .contextMenu(menuItems: {
-                                    
-                                    Button {
-                                        let replyModel = message
-                                        messageAction.onReply?(replyModel)
-                                    } label: {
-                                        Label(
-                                            title: { Text(AmityLocalizedStringSet.Chat.replyButton.localizedString) },
-                                            icon: { Image(AmityIcon.Chat.replyIcon.imageResource) }
-                                        )
+                                .background(GeometryReader { geometry -> Color in
+                                    let rect = geometry.frame(in: .global)
+                                    DispatchQueue.main.async {
+                                        viewModel.currentPosition = rect.origin
                                     }
-                                    .isHidden(message.syncState == .error)
-                                    
-                                    Button {
-                                        messageAction.onCopy?(message)
-                                    } label: {
-                                        Label(
-                                            title: { Text(AmityLocalizedStringSet.Chat.copyButton.localizedString) },
-                                            icon: { Image(AmityIcon.Chat.copyIcon.imageResource) }
-                                        )
-                                    }
-                                    
-                                    if message.isOwner || message.hasModeratorPermissionInChannel {
-                                        
-                                        if #available(iOS 15.0, *) {
-                                            
-                                            Button(role: .destructive) {
-                                                messageAction.onDelete?(message)
-                                            } label: {
-                                                Label(
-                                                    title: { Text(AmityLocalizedStringSet.Chat.deleteButton.localizedString) },
-                                                    icon: { Image(AmityIcon.Chat.redTrashIcon.imageResource) }
-                                                )
-                                            }
-                                        } else {
-                                            
-                                            Button {
-                                                messageAction.onDelete?(message)
-                                            } label: {
-                                                Label(
-                                                    title: { Text(AmityLocalizedStringSet.Chat.deleteButton.localizedString) },
-                                                    icon: { Image(AmityIcon.Chat.redTrashIcon.imageResource) }
-                                                )
-                                                .foregroundColor(.red)
-                                            }
-                                        }
-                                    }
-                                    
-                                    if !message.isOwner {
-                                        let isFlaggedByOwner = message.isFlaggedByMe ?? viewModel.isReportedByMe
-                                                                                
-                                        if #available(iOS 15.0, *) {
-
-                                            Button(role: .destructive) {
-                                                if isFlaggedByOwner {
-                                                    messageAction.onUnReport?(message)
-                                                } else {
-                                                    messageAction.onReport?(message)
-                                                }
-                                            } label: {
-                                                Label(
-                                                    title: { Text(isFlaggedByOwner ? AmityLocalizedStringSet.Chat.unReportButton.localizedString : AmityLocalizedStringSet.Chat.reportButton.localizedString) },
-                                                    icon: { Image(AmityIcon.Chat.redFlagIcon.imageResource) }
-                                                )
-                                            }
-                                        } else {
-                                            Button {
-                                                
-                                                if isFlaggedByOwner {
-                                                    messageAction.onUnReport?(message)
-                                                } else {
-                                                    messageAction.onReport?(message)
-                                                }
-                                            } label: {
-                                                Label(
-                                                    title: { Text(isFlaggedByOwner ? AmityLocalizedStringSet.Chat.unReportButton.localizedString : AmityLocalizedStringSet.Chat.reportButton.localizedString) },
-                                                    icon: { Image(AmityIcon.Chat.redFlagIcon.imageResource) }
-                                                )
-                                                .foregroundColor(.red)
-                                            }
-                                        }
-                                    }
+                                    return Color.clear
                                 })
+                                .onLongPressGesture {
+                                    MessageOverlay.showOverlay(message: message, messageAction: messageAction, nameSpace: overlayAnimationNamespace, position: viewModel.currentPosition)
+                                    
+                                }
                             
-                            /// For Reaction
-                            //                            MessageReactionBubble(message: message)
-                            //                                .offset(x: 0, y: 18)
-                            //                                .isHidden(message.hasReaction ? false : true)
+                            AmityLiveChatMessageReactionPreview(message: message)
+                                .offset(x: 0, y: 20)
+                                .opacity(message.hasReaction ? 1 : 0)
                         }
                         .padding(.top, 4)
                         .padding(.bottom, 0)
@@ -159,6 +88,7 @@ struct LiveChatMessageBubbleView<Content: View>: View {
             }
         }
         .padding(.top, 4)
+        .padding(.bottom, message.hasReaction ? 16 : 0)
         
     }
     
@@ -227,6 +157,8 @@ class LiveChatMessageBubbleViewModel: ObservableObject {
     @Published var isReportedByMe: Bool = false
     var token: AmityNotificationToken?
     
+    var currentPosition: CGPoint = CGPoint(x: 0, y: 0)
+    
     init(message: MessageModel) {
         self.message = message
         
@@ -287,3 +219,4 @@ class LiveChatMessageBubbleViewModel: ObservableObject {
     }
     
 }
+

@@ -22,7 +22,7 @@ public struct AmityLiveChatMessageList: AmityComponentView {
     @State private var deletingMessageId: String = ""
     @State private var showDeleteAlert: Bool = false
     @StateObject private var viewConfig: AmityViewConfigController
-    
+        
     public init(viewModel: AmityLiveChatPageViewModel, pageId: PageId? = .liveChatPage) {
         self.pageId = pageId
         self.chatViewModel = viewModel

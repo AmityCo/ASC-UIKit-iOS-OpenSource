@@ -24,16 +24,19 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     public let metadata: [String: Any]?
     public let mentionees: [AmityMentionees]
     public let reactions: [String: Any]?
+    public let myReactions: [String]
     public let syncState: AmitySyncState
     public let hasModeratorPermissionInChannel: Bool
     public let flagCount: Int
     public var isFlaggedByMe: Bool?
+    public var reactionCount: Int
     
     public init(message: AmityMessage, hasModeratorPermission: Bool = false) {
         self.id = message.messageId
         self.type = message.messageType
         self.text = message.data?["text"] as? String ?? type.description
         self.hasReaction = message.reactionCount > 0
+        self.reactionCount = message.reactionCount
         self.parentId = message.parentId
         self.displayName = message.user?.displayName ?? ""
         self.avatarURL = URL(string: message.user?.getAvatarInfo()?.fileURL ?? "")
@@ -43,7 +46,8 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         self.isDeleted = message.isDeleted
         self.metadata = message.metadata
         self.mentionees = message.mentionees ?? []
-        self.reactions = message.reactions       
+        self.reactions = message.reactions
+        self.myReactions = message.myReactions
         self.syncState = message.syncState
         self.hasModeratorPermissionInChannel = hasModeratorPermission
         self.flagCount = message.flagCount
@@ -107,6 +111,8 @@ extension MessageModel {
         self.hasModeratorPermissionInChannel = false
         self.flagCount = 0
         self.isFlaggedByMe = false
+        self.myReactions = []
+        self.reactionCount = 0
     }
     
     static let preview = MessageModel.init(id: UUID().uuidString, text: "Let's catch up!", type: .text, hasReaction: false, parentId: nil)

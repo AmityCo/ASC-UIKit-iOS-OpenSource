@@ -60,4 +60,7 @@ public enum ElementId: String {
     case memberCount = "member_count"
     case connectivity = "conectivity"
     case avatar = "avatar"
+    
+    // Reaction
+    case messageReactionPicker = "message_reaction_picker"
 }

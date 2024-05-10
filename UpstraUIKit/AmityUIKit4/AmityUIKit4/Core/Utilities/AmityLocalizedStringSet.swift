@@ -100,5 +100,8 @@ public struct AmityLocalizedStringSet {
         static let mentionEveryone = "chat_mention_everyone"
         static let replyMessagePreview = "chat_reply_preview"
         static let memberCount = "chat_member_count"
+        
+        static let reachMentionLimitTitle = "reach_mention_limit_title"
+        static let reachMentionLimitMessage = "chat_reach_mention_limit_Message"
     }
 }

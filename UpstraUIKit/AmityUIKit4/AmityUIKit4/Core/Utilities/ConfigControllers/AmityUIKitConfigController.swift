@@ -8,11 +8,17 @@
 import Foundation
 import UIKit
 
+struct AmityReactionType: Identifiable {
+    let id: String = UUID().uuidString
+    let name: String
+    let image: ImageResource
+}
+
 class AmityUIKitConfigController {
     static let shared = AmityUIKitConfigController()
-    private var config: [String: Any] = [:]
+    private(set) var config: [String: Any] = [:]
     private var excludedList: Set<String> = []
-    
+
     private init() {
         configParser(configFile: "AmityUIKitConfig")
     }
@@ -134,4 +140,5 @@ class AmityUIKitConfigController {
         }
         return [:]
     }
+    
 }

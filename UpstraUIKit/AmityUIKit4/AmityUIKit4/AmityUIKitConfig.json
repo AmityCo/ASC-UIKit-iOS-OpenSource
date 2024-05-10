@@ -27,6 +27,13 @@
     }
   },
   "excludes": [],
+  "message_reactions": [
+    { "name": "heart", "image": "messageReactionHeart"},
+    { "name": "like", "image": "messageReactionLike"},
+    { "name": "fire", "image": "messageReactionFire"},
+    { "name": "grinning", "image": "messageReactionGrinning"},
+    { "name": "sad", "image": "messageReactionSad"}
+  ],
   "customizations": {
     "select_target_page/*/*": {
       "title": "Share to"
@@ -172,6 +179,19 @@
       "theme": {},
       "message_limit": 200,
       "placeholder_text": "Write a message"
-    }
+    },
+    "live_chat_page/mesage_list/message_reaction_preview": { },
+    "live_chat_page/mesage_list/message_quick_reaction": {
+      "reactions": "heart",
+      "reaction_icon": "amity_ic_message_quick_reaction.png"
+    },
+    "live_chat_page/mesage_list/message_reaction_picker": { },
+    "message_reaction_list_page/*/*": { },
+    "message_reaction_list_page/message_reaction_list_header/*": { },
+    "message_reaction_list_page/message_reaction_list_header/message_reaction_list_tab": { },
+    "message_reaction_list_page/message_reaction_list/*": { },
+    "message_reaction_list_page/message_reaction_list/user_avatar_view": { },
+    "message_reaction_list_page/message_reaction_list/user_display_name": { },
+    "message_reaction_list_page/message_reaction_list/reaction_image_view": { }
   }
 }

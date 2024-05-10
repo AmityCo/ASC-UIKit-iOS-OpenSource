@@ -154,6 +154,10 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
             .alert(isPresented: $showingLongMessageAlert, content: {
                 Alert(title: Text(AmityLocalizedStringSet.Chat.charLimitAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Chat.charLimitAlertMessage.localizedString), dismissButton: .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString)))
             })
+            .alert(isPresented: $textEditorViewModel.reachMentionLimit) {
+                return Alert(title: Text(AmityLocalizedStringSet.Chat.reachMentionLimitTitle.localizedString), message: Text(AmityLocalizedStringSet.Chat.reachMentionLimitMessage.localizedString), dismissButton: .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString), action: {
+                }))
+            }
         }
         .updateTheme(with: viewConfig)
     }

@@ -200,6 +200,7 @@ public struct AmityTextEditorView: View {
 public class AmityTextEditorViewModel: ObservableObject {
     let textView: UITextView = UITextView(frame: .zero)
     let mentionManager: MentionManager
+    @Published var reachMentionLimit = false
     
     // Attributes used to highlight mentions
     var highlightAttributes: [NSAttributedString.Key: Any] = [
@@ -246,7 +247,10 @@ extension AmityTextEditorViewModel {
     }
     
     func selectMentionUser(user: AmityMentionUserModel) {
-        guard mentionManager.isMentionWithinLimit(limit: MentionManager.maximumMentionsCount) else { return }
+        guard mentionManager.isMentionWithinLimit(limit: MentionManager.maximumMentionsCount) else {
+            reachMentionLimit = true
+            return
+        }
         
         self.mentionManager.addMention(from: textView, in: textView.text, member: user)
     }

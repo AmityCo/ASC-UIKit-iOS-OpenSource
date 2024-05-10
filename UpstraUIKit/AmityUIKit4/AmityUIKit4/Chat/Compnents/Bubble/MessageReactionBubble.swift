@@ -8,50 +8,93 @@
 import SwiftUI
 
 // Placeholder reactions for now. Refactor this later.
-struct MessageReactionBubble: View {
+struct AmityLiveChatMessageReactionPreview: View {
     
-    @State var message: MessageModel
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
+
+    var message: MessageModel
+    let viewModel: AmityLiveChatMessageReactionPreviewViewModel
+    
+    init(message: MessageModel) {
+        self.message = message
+        self.viewModel = AmityLiveChatMessageReactionPreviewViewModel(message: message)
+    }
     
     var body: some View {
         Button(action: {
             
         }, label: {
             HStack(spacing: 2) {
-                if let heartReactionCount = message.reactions?["heart"] as? Int {
-                    ReactionLabel(count: "\(heartReactionCount)")
-                        .padding(EdgeInsets(top: 4, leading: 6, bottom: 4, trailing: 0))
+
+                ForEach(Array(viewModel.topThreeReactions.enumerated()), id: \.element) { index, reactionName in
+                    
+                    if let reaction = MessageReactionConfiguration.shared.getMessageRactions().first(where: {$0.name == reactionName}) {
+                        
+                        ReactionLabel(image: reaction.image)
+                            .padding(EdgeInsets(top: 4, leading: index == 0 ? 6 : -12, bottom: 4, trailing: 0))
+                            .zIndex(Double(viewModel.topThreeReactions.count - index))
+                    }
                 }
+                
+                Text("\(message.reactionCount)")
+                    .font(.caption2)
+                    .padding(.trailing, 6)
             }
-            .frame(height: 30)
-            .padding(.horizontal, 4)
+            .frame(height: 28)
+            .background(Color(viewConfig.theme.baseColorShade3))
             .clipped()
-            .cornerRadius(20)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(.white, lineWidth: 1)
+                    .opacity(!message.myReactions.isEmpty ? 1 : 0)
+            )
         })
         .buttonStyle(.plain)
+        
+        
     }
     
     struct ReactionLabel: View {
         
-        let count: String
+        let image: ImageResource
         
         var body: some View {
             HStack(spacing: 2) {
-                AsyncImage(placeholder: ImageResource(name: AmityIcon.Chat.heartReactionIcon.rawValue, bundle: AmityUIKit4Manager.bundle), url: nil)
+                
+                Image(image)
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 20, height: 20)
 
-                Text(count)
-                    .font(.caption2)
             }
-            .frame(height: 28)
-            .padding(.horizontal, 6)
-            .background(Color(hex: "#40434E"))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
+        }
+    }
+}
+
+class AmityLiveChatMessageReactionPreviewViewModel {
+    var topThreeReactions: [String] = []
+    
+    init(message: MessageModel) {
+        
+        if let reactions = message.reactions as? [String: Int] {
+            let filteredReactions = reactions.filter { $0.value > 0 }
+            let sortedReactions = filteredReactions.sorted {
+                // Sort keys alphabetically if values are the same
+                if $0.value == $1.value {
+                    return $0.key < $1.key
+                }
+                return $0.value > $1.value
+            }.prefix(3).map { ($0.key) }
+            
+            topThreeReactions = sortedReactions
+            
         }
     }
 }
 
 #if DEBUG
 #Preview {
-    MessageReactionBubble(message: MessageModel.preview)
+    AmityLiveChatMessageReactionPreview(message: MessageModel.preview)
 }
 #endif

@@ -139,7 +139,7 @@ final public class MentionManager: MentionTextEditorDelegate {
     }
     
     func isMentionWithinLimit(limit: Int) -> Bool {
-        return mentionEditor.mentions.count <= limit
+        return mentionEditor.mentions.count < limit
     }
     
     func addMention(from textInput: UITextInput, in text: String, member: AmityMentionUserModel) {
