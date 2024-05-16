@@ -80,8 +80,10 @@
 		68251A632ADEA16200395696 /* AmityPreviewLinkCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68251A612ADEA16200395696 /* AmityPreviewLinkCell.swift */; };
 		68251A642ADEA16200395696 /* AmityPreviewLinkCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 68251A622ADEA16200395696 /* AmityPreviewLinkCell.xib */; };
 		6860B01B2ADE3D650042ED45 /* AmityPreviewLinkWizard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6860B01A2ADE3D650042ED45 /* AmityPreviewLinkWizard.swift */; };
-		6861A0AC2BC803C700274653 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 6861A0AB2BC803C700274653 /* SharedFrameworks */; };
 		6895D9262975359000E377F1 /* AmityAsyncAwaitTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6895D9252975359000E377F1 /* AmityAsyncAwaitTransformer.swift */; };
+		68AE49A029CC04BB00FACD7B /* AmitySDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D45D459F26203D57008F7C2C /* AmitySDK.xcframework */; };
+		68AE49A229CC04BB00FACD7B /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A052EAD42577A0FF00FF9312 /* Realm.xcframework */; };
+		68AE49A429CC04BB00FACD7B /* RealmSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68EF84A529B077CF00C7EDEC /* RealmSwift.xcframework */; };
 		68FEE2F72BC7A1060055FEC0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 68FEE2F62BC7A1050055FEC0 /* PrivacyInfo.xcprivacy */; };
 		720D599A2525BDB1009734EF /* DispatchGroupWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 720D59992525BDB1009734EF /* DispatchGroupWrapper.swift */; };
 		7211553E25505D180081CC23 /* AmityCategoryPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7211553C25505D180081CC23 /* AmityCategoryPickerViewController.swift */; };
@@ -1311,7 +1313,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6861A0AC2BC803C700274653 /* SharedFrameworks in Frameworks */,
+				68AE49A029CC04BB00FACD7B /* AmitySDK.xcframework in Frameworks */,
+				68AE49A429CC04BB00FACD7B /* RealmSwift.xcframework in Frameworks */,
+				68AE49A229CC04BB00FACD7B /* Realm.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4422,7 +4426,6 @@
 			);
 			name = AmityUIKit;
 			packageProductDependencies = (
-				6861A0AB2BC803C700274653 /* SharedFrameworks */,
 			);
 			productName = UpstraUIKit;
 			productReference = 72A3503024EA811500DA9D46 /* AmityUIKit.framework */;
@@ -5423,13 +5426,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		6861A0AB2BC803C700274653 /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SharedFrameworks;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 72A3502724EA811500DA9D46 /* Project object */;
 }

@@ -18,7 +18,18 @@
 		0D73ACA825DB9423000D73CA /* NewJoinerPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73ACA725DB9423000D73CA /* NewJoinerPostComponent.swift */; };
 		0D8FFC2925DCBFD900943538 /* AmityCustomFooterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2725DCBFD900943538 /* AmityCustomFooterTableViewCell.swift */; };
 		0D8FFC2A25DCBFD900943538 /* AmityCustomFooterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2825DCBFD900943538 /* AmityCustomFooterTableViewCell.xib */; };
-		6861A0B02BC803E000274653 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 6861A0AF2BC803E000274653 /* SharedFrameworks */; };
+		68AE49B029CC054F00FACD7B /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */; };
+		68AE49B129CC055000FACD7B /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		68AE49B229CC055000FACD7B /* AmitySDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D45D45B726204253008F7C2C /* AmitySDK.xcframework */; };
+		68AE49B329CC055000FACD7B /* AmitySDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45D45B726204253008F7C2C /* AmitySDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		68AE49B429CC055000FACD7B /* AmityVideoPlayerKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */; };
+		68AE49B529CC055000FACD7B /* AmityVideoPlayerKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		68AE49B829CC055000FACD7B /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D45B3A93264A840300F6FF52 /* Realm.xcframework */; };
+		68AE49B929CC055000FACD7B /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45B3A93264A840300F6FF52 /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		68AE49BA29CC055000FACD7B /* RealmSwift.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */; };
+		68AE49BB29CC055000FACD7B /* RealmSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		68B3B1F02A000ECD00519C5B /* MobileVLCKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */; };
+		68B3B1F12A000ECD00519C5B /* MobileVLCKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7214C9CB2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */; };
 		7214C9D72632C0AD00192BB3 /* NotificationModuleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9D62632C0AD00192BB3 /* NotificationModuleTableViewCell.swift */; };
 		7214C9DB2632C0D500192BB3 /* SwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9DA2632C0D500192BB3 /* SwitchTableViewCell.swift */; };
@@ -165,6 +176,12 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A0BD0B4926DDE0E30054088B /* AmityUIKitLiveStream.framework in Embed Frameworks */,
+				68AE49B329CC055000FACD7B /* AmitySDK.xcframework in Embed Frameworks */,
+				68AE49B129CC055000FACD7B /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */,
+				68AE49BB29CC055000FACD7B /* RealmSwift.xcframework in Embed Frameworks */,
+				68B3B1F12A000ECD00519C5B /* MobileVLCKit.xcframework in Embed Frameworks */,
+				68AE49B529CC055000FACD7B /* AmityVideoPlayerKit.xcframework in Embed Frameworks */,
+				68AE49B929CC055000FACD7B /* Realm.xcframework in Embed Frameworks */,
 				D478D16A26240A5E006EA140 /* AmityUIKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -262,8 +279,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
+				68AE49B229CC055000FACD7B /* AmitySDK.xcframework in Frameworks */,
+				68AE49B029CC054F00FACD7B /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */,
+				68AE49BA29CC055000FACD7B /* RealmSwift.xcframework in Frameworks */,
+				68B3B1F02A000ECD00519C5B /* MobileVLCKit.xcframework in Frameworks */,
+				68AE49B429CC055000FACD7B /* AmityVideoPlayerKit.xcframework in Frameworks */,
+				68AE49B829CC055000FACD7B /* Realm.xcframework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
-				6861A0B02BC803E000274653 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -579,7 +601,6 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				6861A0AF2BC803E000274653 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -1254,10 +1275,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6861A0AF2BC803E000274653 /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SharedFrameworks;
-		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
