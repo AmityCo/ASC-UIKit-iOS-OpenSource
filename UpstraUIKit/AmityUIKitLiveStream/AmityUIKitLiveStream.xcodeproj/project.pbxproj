@@ -3,14 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		68AE49A729CC04FD00FACD7B /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B2326DCE5310054088B /* AmityLiveVideoBroadcastKit.xcframework */; };
-		68AE49A929CC04FD00FACD7B /* AmitySDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3726DDDE880054088B /* AmitySDK.xcframework */; };
-		68AE49AB29CC04FD00FACD7B /* AmityVideoPlayerKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B2126DCE5310054088B /* AmityVideoPlayerKit.xcframework */; };
-		68AE49AD29CC04FD00FACD7B /* MobileVLCKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B2226DCE5310054088B /* MobileVLCKit.xcframework */; };
+		920EF84C2C007D9500F31097 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 920EF84B2C007D9500F31097 /* SharedFrameworks */; };
 		A0B68B3026E07278007D7B5B /* LiveStreamViewController+GoLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B2F26E07278007D7B5B /* LiveStreamViewController+GoLive.swift */; };
 		A0B68B3626E07824007D7B5B /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B3526E07824007D7B5B /* AsyncOperation.swift */; };
 		A0B68B3F26E07912007D7B5B /* CreatePost.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B3E26E07912007D7B5B /* CreatePost.swift */; };
@@ -72,11 +69,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68AE49A929CC04FD00FACD7B /* AmitySDK.xcframework in Frameworks */,
+				920EF84C2C007D9500F31097 /* SharedFrameworks in Frameworks */,
 				A0BD0B3426DDD9820054088B /* AmityUIKit.framework in Frameworks */,
-				68AE49AB29CC04FD00FACD7B /* AmityVideoPlayerKit.xcframework in Frameworks */,
-				68AE49A729CC04FD00FACD7B /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */,
-				68AE49AD29CC04FD00FACD7B /* MobileVLCKit.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,6 +245,7 @@
 			);
 			name = AmityUIKitLiveStream;
 			packageProductDependencies = (
+				920EF84B2C007D9500F31097 /* SharedFrameworks */,
 			);
 			productName = AmityUIKitLiveStream;
 			productReference = A0BD0B1526DCE4F50054088B /* AmityUIKitLiveStream.framework */;
@@ -532,6 +527,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		920EF84B2C007D9500F31097 /* SharedFrameworks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SharedFrameworks;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A0BD0B0C26DCE4F50054088B /* Project object */;
 }
