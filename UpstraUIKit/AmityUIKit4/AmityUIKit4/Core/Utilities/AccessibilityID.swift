@@ -146,6 +146,10 @@ struct AccessibilityID {
             static let bubbleReceiverDisplayName = "message_list/message_bubble_receiver_display_name"
             static let bubbleSendingStatus = "message_list/message_bubble_sending_status"
             static let bubbleReaction = "message_list/message_bubble_reaction"
+            
+            static let reactionPicker = "message_list/message_reaction_picker"
+            static let quickReaction = "message_list/message_quick_reaction"
+            static let reactionPreview = "message_list/message_reaction_preview"
         }
         
         struct LiveChatHeader {
@@ -173,6 +177,13 @@ struct AccessibilityID {
             static let userAvatar = "reply_panel/user_avatar"
             static let userDisplayName = "reply_panel/user_display_name"
             static let close_button = "reply_panel/close_button"
+        }
+        
+        struct ReactionList {
+            static let reactionListTab = "reaction_list_header/reaction_list_tab"
+            static let userAvatarView = "reaction_list/user_avatar_view"
+            static let userDisplayName = "reaction_list/user_display_name"
+            static let reactionImageView = "reaction_list/reaction_image_view"
         }
     }
 }

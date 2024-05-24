@@ -18,42 +18,29 @@ private extension Double {
 }
 
 extension Int {
-    // Investigate & remove this to use method below
-    public var formattedCountString: String {
-        if self < 1000 {
-            return "\(self)"
-        } else {
-            let kCount = Double(self) / 1000.0
-            return String(format: "%.1fK", kCount)
-        }
-    }
     
-    func formattedCompactString() -> String {
+    public var formattedCountString: String {
         let n = self
         let num = abs(Double(n))
-        let sign = (n < 0) ? "-" : ""
 
         switch num {
         case 1_000_000_000...:
-            var formatted = num / 1_000_000_000
-            formatted = formatted.reduceScale(to: 1)
-            return "\(sign)\(formatted)B"
+            let kCount = Double(self) / 1_000_000_000
+            return String(format: "%.1fB", kCount)
 
         case 1_000_000...:
-            var formatted = num / 1_000_000
-            formatted = formatted.reduceScale(to: 1)
-            return "\(sign)\(formatted)M"
+            let kCount = Double(self) / 1_000_000
+            return String(format: "%.1fM", kCount)
 
         case 1_000...:
-            var formatted = num / 1_000
-            formatted = formatted.reduceScale(to: 1)
-            return "\(sign)\(formatted)K"
+            let kCount = Double(self) / 1000.0
+            return String(format: "%.1fK", kCount)
 
         case 0...:
             return "\(n)"
 
         default:
-            return "\(sign)\(n)"
+            return "\(n)"
         }
     }
 }

@@ -23,7 +23,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     public let isDeleted: Bool
     public let metadata: [String: Any]?
     public let mentionees: [AmityMentionees]
-    public let reactions: [String: Any]?
+    public let reactions: [String: Int]?
     public let myReactions: [String]
     public let syncState: AmitySyncState
     public let hasModeratorPermissionInChannel: Bool
@@ -31,7 +31,10 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     public var isFlaggedByMe: Bool?
     public var reactionCount: Int
     
+    var message: AmityMessage?
+    
     public init(message: AmityMessage, hasModeratorPermission: Bool = false) {
+        self.message = message
         self.id = message.messageId
         self.type = message.messageType
         self.text = message.data?["text"] as? String ?? type.description
@@ -46,7 +49,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         self.isDeleted = message.isDeleted
         self.metadata = message.metadata
         self.mentionees = message.mentionees ?? []
-        self.reactions = message.reactions
+        self.reactions = message.reactions as? [String: Int]
         self.myReactions = message.myReactions
         self.syncState = message.syncState
         self.hasModeratorPermissionInChannel = hasModeratorPermission

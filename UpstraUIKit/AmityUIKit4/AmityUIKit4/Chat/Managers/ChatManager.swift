@@ -22,6 +22,10 @@ class ChatManager {
         return repository.getMessages(options: options)
     }
     
+    func getMessage(messageId: String) -> AmityObject<AmityMessage> {
+        return repository.getMessage(messageId)
+    }
+    
     @MainActor
     func createTextMessage(options: AmityTextMessageCreateOptions) async throws -> AmityMessage {
         return try await repository.createTextMessage(options: options)

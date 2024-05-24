@@ -92,7 +92,7 @@ public struct AmityEditCommentView: View {
                             .foregroundColor(.white)
                             .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     }
-                    .background(Color.blue)
+                    .background(Color(viewConfig.theme.highlightColor))
                     .overlay(
                         text.isEmpty || text == comment.text ? Color.white.opacity(0.5) : nil
                     )

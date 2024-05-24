@@ -11,7 +11,9 @@
       "base_shade4_color": "#EBECEF",
       "alert_color": "#FA4D30",
       "background_color": "#FFFFFF",
-      "base_inverse_color": "#000000"
+      "base_inverse_color": "#000000",
+      "background_shade1_color": "#F6F7F8",
+      "highlight_color": "#1054DE"
     },
     "dark": {
       "primary_color": "#1054DE",
@@ -23,7 +25,9 @@
       "base_shade4_color": "#292B32",
       "alert_color": "#FA4D30",
       "background_color": "#191919",
-      "base_inverse_color": "#FFFFFF"
+      "base_inverse_color": "#FFFFFF",
+      "background_shade1_color": "#40434E",
+      "highlight_color": "#1054DE"
     }
   },
   "excludes": [],
@@ -157,7 +161,9 @@
             "base_shade4_color": "#EBECEF",
             "alert_color": "#FA4D30",
             "background_color": "#FFFFFF",
-            "base_inverse_color": "#000000"
+            "base_inverse_color": "#000000",
+            "background_shade1_color": "#F6F7F8",
+            "highlight_color": "#1054DE"
           },
           "dark": {
             "primary_color": "#1054DE",
@@ -169,7 +175,9 @@
             "base_shade4_color": "#292B32",
             "alert_color": "#FA4D30",
             "background_color": "#191919",
-            "base_inverse_color": "#FFFFFF"
+            "base_inverse_color": "#FFFFFF",
+            "background_shade1_color": "#40434E",
+            "highlight_color": "#1054DE"
           }
         }
     },
@@ -180,12 +188,15 @@
       "message_limit": 200,
       "placeholder_text": "Write a message"
     },
-    "live_chat_page/mesage_list/message_reaction_preview": { },
-    "live_chat_page/mesage_list/message_quick_reaction": {
-      "reactions": "heart",
-      "reaction_icon": "amity_ic_message_quick_reaction.png"
+    "live_chat/message_list/message_reaction_preview": { },
+    "live_chat/message_list/message_quick_reaction": {
+      "reactions": "heart"
     },
-    "live_chat_page/mesage_list/message_reaction_picker": { },
+    "live_chat/message_list/message_reaction_picker": { },
+    "live_chat_page/reaction_list/*": { },
+    "live_chat_page/reaction_list/user_avatar_view": { },
+    "live_chat_page/reaction_list/user_display_name": { },
+    "live_chat_page/reaction_list/reaction_image_view": { },
     "message_reaction_list_page/*/*": { },
     "message_reaction_list_page/message_reaction_list_header/*": { },
     "message_reaction_list_page/message_reaction_list_header/message_reaction_list_tab": { },

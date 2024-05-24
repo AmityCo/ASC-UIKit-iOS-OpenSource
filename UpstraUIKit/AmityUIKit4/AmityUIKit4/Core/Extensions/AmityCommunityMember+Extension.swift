@@ -21,9 +21,6 @@ enum AmityCommunityRole: String {
 extension AmityCommunityMember {
     
     var communityRoles: [AmityCommunityRole] {
-        guard let roles = roles as? [String] else {
-            return []
-        }
         return roles.map { AmityCommunityRole(rawValue: $0) ?? .member }
     }
 

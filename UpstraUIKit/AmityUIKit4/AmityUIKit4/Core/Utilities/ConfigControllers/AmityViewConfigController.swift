@@ -23,7 +23,7 @@ class AmityViewConfigController: NSObject, ObservableObject {
         
         self.theme = AmityUIKitConfigController.shared.getTheme(configId: configId)
         
-        self.defaultLightTheme = AmityThemeColor(primaryColor: lightTheme.primaryColor!, secondaryColor: lightTheme.secondaryColor!, baseColor: lightTheme.baseColor!, baseColorShade1: lightTheme.baseColorShade1!, baseColorShade2: lightTheme.baseColorShade2!, baseColorShade3: lightTheme.baseColorShade3!, baseColorShade4: lightTheme.baseColorShade4!, alertColor: lightTheme.alertColor!, backgroundColor: lightTheme.backgroundColor!, baseInverseColor: lightTheme.baseInverseColor!)
+        self.defaultLightTheme = AmityThemeColor(primaryColor: lightTheme.primaryColor!, secondaryColor: lightTheme.secondaryColor!, baseColor: lightTheme.baseColor!, baseColorShade1: lightTheme.baseColorShade1!, baseColorShade2: lightTheme.baseColorShade2!, baseColorShade3: lightTheme.baseColorShade3!, baseColorShade4: lightTheme.baseColorShade4!, alertColor: lightTheme.alertColor!, backgroundColor: lightTheme.backgroundColor!, baseInverseColor: lightTheme.baseInverseColor!, backgroundShade1Color: lightTheme.backgroundShade1Color!, highlightColor: lightTheme.highlightColor!)
     }
     
     // MARK: Private functions
@@ -54,5 +54,9 @@ class AmityViewConfigController: NSObject, ObservableObject {
     public func isHidden(elementId: ElementId? = nil) -> Bool {
         let configId = constructConfigId(pageId: pageId, componentId: componentId, elementId: elementId)
         return AmityUIKitConfigController.shared.isExcluded(configId: configId)
+    }
+    
+    var currentStyle: AmityThemeStyle {
+        return AmityUIKitConfigController.shared.getCurrentThemeStyle()
     }
 }

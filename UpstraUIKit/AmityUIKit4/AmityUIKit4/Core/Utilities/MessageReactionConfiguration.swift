@@ -7,18 +7,36 @@
 
 class MessageReactionConfiguration {
     
-    static var shared = MessageReactionConfiguration()
+    static let shared = MessageReactionConfiguration()
     
-    func getMessageRactions() -> [AmityReactionType] {
-
-        if let reactionsConfig = AmityUIKitConfigController.shared.config["message_reactions"] as? [[String: String]] {
-            var reactionType = [AmityReactionType]()
-            for reaction in reactionsConfig {
-                reactionType.append(AmityReactionType(name: reaction["name"] ?? "", image: ImageResource(name: reaction["image"] ?? "", bundle: AmityUIKit4Manager.bundle)))
-            }
-            return reactionType
-        } else {
-            return []
+    // Keep hashmap of available reactions
+    private(set) var availableReactions = [String: AmityReactionType]()
+    
+    public var allReactions = [AmityReactionType]()
+    
+    private init() {
+        let reactionsDict = AmityUIKitConfigController.shared.config["message_reactions"] as? [[String: String]] ?? [[:]]
+        
+        var reactionList = [AmityReactionType]()
+        reactionsDict.forEach { item in
+            let name = item["name"] ?? ""
+            let image = ImageResource(name: item["image"] ?? "", bundle: AmityUIKit4Manager.bundle)
+            
+            let item = AmityReactionType(name: name, image: image)
+            reactionList.append(item)
+            availableReactions[name] = item
         }
+        
+        allReactions = reactionList
     }
+    
+    func getReaction(withName name: String) -> AmityReactionType {
+        return availableReactions[name] ?? AmityReactionType(name: name, image: AmityIcon.Chat.unknownReaction.imageResource)
+    }
+}
+
+struct AmityReactionType: Identifiable {
+    let id: UUID = UUID()
+    let name: String
+    let image: ImageResource
 }

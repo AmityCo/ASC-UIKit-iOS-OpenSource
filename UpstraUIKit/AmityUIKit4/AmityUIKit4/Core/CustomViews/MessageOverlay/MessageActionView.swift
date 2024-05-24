@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct MessageActionView: View {
     
     @EnvironmentObject var viewConfig: AmityViewConfigController
@@ -38,10 +37,12 @@ struct MessageActionView: View {
                     Spacer()
                     
                     Image(image)
+                        .renderingMode(.template)
+                        .frame(width: 20, height: 20)
                 }
             }
             .padding(.horizontal, 22)
-            .padding(.vertical, 13)
+            .padding(.vertical, 12)
         }
     }
     
@@ -67,23 +68,6 @@ struct MessageActionView: View {
             }
             .foregroundColor(Color(viewConfig.theme.baseInverseColor))
             
-            
-            if message.isOwner || message.hasModeratorPermissionInChannel {
-                
-                Divider()
-                    .frame(maxWidth: .infinity)
-
-
-                ActionButton(title: AmityLocalizedStringSet.Chat.deleteButton.localizedString, image: AmityIcon.Chat.redTrashIcon.imageResource) {
-                    
-                    messageAction.onDelete?(message)
-                    dismissAction()
-                }
-                .foregroundColor(Color.red)
-                
-            }
-            
-            
             if !message.isOwner {
                 let isFlaggedByOwner = message.isFlaggedByMe ?? viewModel.isReportedByMe
 
@@ -99,6 +83,19 @@ struct MessageActionView: View {
                     }
                     dismissAction()
 
+                }
+                .foregroundColor(Color.red)
+            }
+            
+            if message.isOwner || message.hasModeratorPermissionInChannel {
+                
+                Divider()
+                    .frame(maxWidth: .infinity)
+
+                ActionButton(title: AmityLocalizedStringSet.Chat.deleteButton.localizedString, image: AmityIcon.Chat.redTrashIcon.imageResource) {
+                    
+                    messageAction.onDelete?(message)
+                    dismissAction()
                 }
                 .foregroundColor(Color.red)
                 

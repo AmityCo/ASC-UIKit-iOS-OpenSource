@@ -155,7 +155,7 @@ public struct AmityCommentView: View {
                         showReactionSheet.toggle()
                     }
                     .sheet(isPresented: $showReactionSheet, content: {
-                        ReactionListPage(referenceId: comment.id, referenceType: .comment)
+                        AmityReactionList(comment: comment.comment, pageId: self.viewConfig.pageId)
                     })
                     .isHidden(comment.reactionsCount == 0)
                 }

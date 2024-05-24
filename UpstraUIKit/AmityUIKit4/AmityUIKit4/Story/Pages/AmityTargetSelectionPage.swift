@@ -115,7 +115,7 @@ class AmityTargetSelectionPageViewModel: ObservableObject {
     private let communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
     
     init() {
-        let queryOptions = AmityCommunityQueryOptions(displayName: "", filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
+        let queryOptions = AmityCommunityQueryOptions(filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
         communityCollection = communityRepository.getCommunities(with: queryOptions)
         cancellable = communityCollection?.$snapshots
             .map { communities -> [AmityCommunityModel] in

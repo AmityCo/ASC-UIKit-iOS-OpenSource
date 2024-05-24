@@ -49,4 +49,6 @@ extension Log {
     static var chat = Logger(subsystem: uikit, category: "Chat")
     
     static var story = Logger(subsystem: uikit, category: "Story")
+    
+    static var reaction = Logger(subsystem: uikit, category: "Reaction")
 }

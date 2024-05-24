@@ -8,12 +8,6 @@
 import Foundation
 import UIKit
 
-struct AmityReactionType: Identifiable {
-    let id: String = UUID().uuidString
-    let name: String
-    let image: ImageResource
-}
-
 class AmityUIKitConfigController {
     static let shared = AmityUIKitConfigController()
     private(set) var config: [String: Any] = [:]
@@ -28,7 +22,6 @@ class AmityUIKitConfigController {
     func isExcluded(configId: String) -> Bool {
         return excludedList.contains(configId)
     }
-    
     
     func getTheme(configId: String? = nil) -> AmityThemeColor {
         let systemStyle = UIScreen.main.traitCollection.userInterfaceStyle
@@ -117,7 +110,10 @@ class AmityUIKitConfigController {
                                baseColorShade4: theme.baseColorShade4 ?? fallbackTheme.baseColorShade4!,
                                alertColor: theme.alertColor ?? fallbackTheme.alertColor!,
                                backgroundColor: theme.backgroundColor ?? fallbackTheme.backgroundColor!, 
-                               baseInverseColor: theme.baseInverseColor ?? fallbackTheme.baseInverseColor!)
+                               baseInverseColor: theme.baseInverseColor ?? fallbackTheme.baseInverseColor!,
+                               backgroundShade1Color: theme.backgroundShade1Color ?? fallbackTheme.backgroundShade1Color!,
+                               highlightColor: theme.highlightColor ?? fallbackTheme.highlightColor!
+        )
     }
     
     
@@ -141,4 +137,10 @@ class AmityUIKitConfigController {
         return [:]
     }
     
+    public func getCurrentThemeStyle() -> AmityThemeStyle {
+        let configStyle = AmityThemeStyle(rawValue: config["preferred_theme"] as? String ?? "light") ?? .light
+        let systemStyle = UIScreen.main.traitCollection.userInterfaceStyle
+        let style: AmityThemeStyle = configStyle == .system ? (systemStyle == .light ? .light : .dark) : (configStyle == .light ? .light : .dark)
+        return style
+    }
 }

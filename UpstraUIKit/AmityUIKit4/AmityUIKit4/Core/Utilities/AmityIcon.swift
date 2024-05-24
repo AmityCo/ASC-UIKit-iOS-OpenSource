@@ -66,6 +66,8 @@ enum AmityIcon: String, ImageResourceProvider {
     // AmityMessageListBubble Icons
     case trashBinWhiteIcon = "trashBinWhiteIcon"
     
+    case emptyReaction = "emptyReactionIcon"
+    
     enum Chat: String, ImageResourceProvider {
         case sendMessage = "sendIconEnable"
         case closeReply = "grayCloseIcon"
@@ -76,6 +78,7 @@ enum AmityIcon: String, ImageResourceProvider {
         case chatAvatarProfilePlaceholder = "chatAvatarProfilePlaceholder"
         case mentionAll = "mentionAll"
         case messageBubbleAddReactionIcon = "messageBubbleAddReactionIcon"
+        case messageReactionNotFound = "messageReactionNotFound"
         case heartReactionIcon = "heartReactionIcon"
         case chatAvatarPlaceholder = "chatAvatarPlaceholder"
         case messageErrorIcon = "messageErrorIcon"
@@ -85,6 +88,7 @@ enum AmityIcon: String, ImageResourceProvider {
         case copyIcon = "copyIcon"
         case redFlagIcon = "redFlagIcon"
         case mutedIcon = "mutedIcon"
+        case unknownReaction = "reactionUnknown"
     }
     
     func getURL() -> URL {

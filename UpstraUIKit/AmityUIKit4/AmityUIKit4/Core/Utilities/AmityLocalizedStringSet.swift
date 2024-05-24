@@ -10,7 +10,7 @@ import Foundation
 public struct AmityLocalizedStringSet {
     private init() { }
     
-    public enum General {
+    public struct General {
         static let delete = "delete"
         static let cancel = "cancel"
         static let save = "save"
@@ -21,7 +21,7 @@ public struct AmityLocalizedStringSet {
         static let cameraAccessDenied = "camera_access_denied"
     }
     
-    public enum Story {
+    public struct Story {
         static let creatingStory = "creating_story"
         static let createdStorySuccessfully = "created_story_successfully"
         static let createdStoryFailed = "crated_story_failed"
@@ -34,7 +34,7 @@ public struct AmityLocalizedStringSet {
         static let nonMemberReactStoryMessage = "non_member_react_story_message"
     }
     
-    public enum Comment {
+    public struct Comment {
         static let commentTrayComponentTitle = "comment_tray_component_title"
         static let commentTextFieldPlacholder = "comment_text_field_placeholder"
         static let noCommentAvailable = "no_comment_available"
@@ -57,7 +57,7 @@ public struct AmityLocalizedStringSet {
         static let commentWithBannedWordsErrorMessage = "comment_with_banned_words_error_message"
     }
     
-    public enum Chat {
+    public struct Chat {
         
         // Toast
         static let toastLoading = "chat_toast_loading"
@@ -103,5 +103,14 @@ public struct AmityLocalizedStringSet {
         
         static let reachMentionLimitTitle = "reach_mention_limit_title"
         static let reachMentionLimitMessage = "chat_reach_mention_limit_Message"
+    }
+    
+    public struct Reaction {
+        static let unableToLoadTitle = "reaction_list_unable_to_load_title"
+        static let unableToLoadSubtitle = "reaction_list_unrable_to_load_subtitle"
+        static let noReactionTitle = "reaction_list_no_reactions_title"
+        static let noReactionSubtitle = "reaction_list_no_reactions_subtitle"
+        static let tapToRemove = "reaction_list_tap_to_remove"
+        static let allTab = "All"
     }
 }

@@ -69,7 +69,7 @@ public class AmityMessageListViewModel: ObservableObject {
         self.delegate = AmityUIKit4Manager.client.delegate
     }
     
-    var messageAction: AmityMessageAction?
+    var messageAction: AmityMessageAction = .init()
     
     var token: AmityNotificationToken?
     

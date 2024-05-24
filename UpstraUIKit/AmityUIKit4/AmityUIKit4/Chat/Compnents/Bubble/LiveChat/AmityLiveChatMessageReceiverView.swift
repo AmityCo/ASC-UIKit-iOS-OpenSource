@@ -16,12 +16,10 @@ public struct AmityLiveChatMessageReceiverView: AmityElementView {
     public var id: ElementId {
         return .receiverMessageBubble
     }
-    
-    private let config = Configuration.init()
-    
+        
     let message: MessageModel
     let messageAction: AmityMessageAction
-    
+        
     public init(message: MessageModel, messageAction: AmityMessageAction, pageId: PageId? = .liveChatPage, componentId: ComponentId? = .messageList) {
         self.message = message
         self.messageAction = messageAction
@@ -43,11 +41,6 @@ public struct AmityLiveChatMessageReceiverView: AmityElementView {
             }
         }
     }
-    
-    struct Configuration {
-        // Load sender text message bubble
-    }
-
 }
 
 

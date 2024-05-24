@@ -13,7 +13,7 @@ class TimerManager {
     var timerAction: (() -> Void)?
     
     func setTimerAction(timerAction: @escaping () -> Void) {
-        self.timerAction = { [weak self] in
+        self.timerAction = {
             timerAction()
         }
     }

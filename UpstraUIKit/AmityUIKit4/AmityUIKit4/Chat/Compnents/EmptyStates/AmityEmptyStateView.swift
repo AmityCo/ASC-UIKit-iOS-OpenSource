@@ -11,9 +11,9 @@ public struct AmityEmptyStateView: View {
     
     @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: nil)
     
-    public let configuration: EmptyStateConfiguration
+    public let configuration: Configuration
     
-    public init(configuration: EmptyStateConfiguration) {
+    public init(configuration: Configuration) {
         self.configuration = configuration
     }
     
@@ -45,11 +45,14 @@ public struct AmityEmptyStateView: View {
         }
         .padding(.horizontal, 16)
         .onTapGesture {
+            // Haptic feedback
+            ImpactFeedbackGenerator.impactFeedback(style: .light)
+            
             configuration.tapAction?()
         }
     }
     
-    public struct EmptyStateConfiguration {
+    public struct Configuration {
         public let image: String?
         public let title: String?
         public let subtitle: String?
@@ -64,14 +67,14 @@ public struct AmityEmptyStateView: View {
             self.iconSize = iconSize
         }
         
-        internal static let previewWithoutTitle = EmptyStateConfiguration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: nil, subtitle: "Couldn't load chat", tapAction: nil)
-        internal static let previewWithTitle = EmptyStateConfiguration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: "You are banned from chat", subtitle: "You won’t be able to participate in this chat until you’ve been unbanned.", tapAction: { })
+        internal static let previewWithoutTitle = Configuration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: nil, subtitle: "Couldn't load chat", tapAction: nil)
+        internal static let previewWithTitle = Configuration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: "You are banned from chat", subtitle: "You won’t be able to participate in this chat until you’ve been unbanned.", tapAction: { })
     }
 }
 
 #if DEBUG
 #Preview {
-    AmityEmptyStateView(configuration: AmityEmptyStateView.EmptyStateConfiguration.previewWithoutTitle)
+    AmityEmptyStateView(configuration: AmityEmptyStateView.Configuration.previewWithoutTitle)
         .preferredColorScheme(.dark)
         .colorScheme(.dark)
 }

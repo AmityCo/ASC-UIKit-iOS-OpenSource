@@ -22,6 +22,7 @@ public enum ComponentId: String {
     case messageList = "message_list"
     case liveChatHeader = "live_chat_header"
     case commentTrayComponent = "comment_tray_component"
+    case reactionList = "reaction_list"
 }
 
 public enum ElementId: String {
@@ -63,4 +64,5 @@ public enum ElementId: String {
     
     // Reaction
     case messageReactionPicker = "message_reaction_picker"
+    case messageQuickReaction = "message_quick_reaction"
 }

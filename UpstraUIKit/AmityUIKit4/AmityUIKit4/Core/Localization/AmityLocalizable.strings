@@ -97,5 +97,11 @@
 "chat_reply_preview" = "Replying to %@";
 "chat_member_count" = "%@ members";
 
+"reaction_list_unable_to_load_title" = "Unable to load reactions";
+"reaction_list_unrable_to_load_subtitle" = "Reactions aren't available for this message";
+"reaction_list_no_reactions_title" = "No reactions yet";
+"reaction_list_no_reactions_subtitle" = "Be the first to react to this message!";
+"reaction_list_tap_to_remove" = "Tap to remove reaction";
+"reaction_tab_all" = "All";
 "reach_mention_limit_title" = "Unable to mention user";
 "chat_reach_mention_limit_Message" = "You have reached maximum 30 mentioned users in a chat.";

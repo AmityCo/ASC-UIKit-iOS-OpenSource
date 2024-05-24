@@ -46,19 +46,18 @@ struct LiveChatMessageBubble: ViewModifier {
                             Text("")
                                 .font(.system(size: 13, weight: .bold))
                                 .frame(width: 100, alignment: .leading)
-                                .shimmerEffect(cornerRadius: 16)
+                                .shimmerEffect(cornerRadius: 16, color: viewConfig.theme.baseInverseColor)
 
                             Text("")
                                 .font(.system(size: 13))
                                 .frame(width: 150, alignment: .leading)
-                                .shimmerEffect(cornerRadius: 16)
-                            
+                                .shimmerEffect(cornerRadius: 16, color: viewConfig.theme.baseInverseColor)
                         }
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 12)
                     .frame(maxWidth: .infinity, minHeight: 60 , alignment: .leading)
-                    .background(Color(viewConfig.theme.baseColorShade3))
+                    .background(Color(viewConfig.theme.backgroundShade1Color))
                     .accessibilityIdentifier(message.isOwner ? AccessibilityID.Chat.MessageList.senderReplyTextView : AccessibilityID.Chat.MessageList.receiverReplyTextView)
                     
                     content
@@ -97,24 +96,37 @@ struct LiveChatMessageBubble: ViewModifier {
 
 extension View {
     
-    func shimmerEffect(cornerRadius: CGFloat) -> some View {
-        modifier(ShimeringModifier(cornerRadius: cornerRadius))
-            .shimmering()
+    // Deprecate this: Use text shimmer effect
+    func shimmerEffect(cornerRadius: CGFloat, color: UIColor) -> some View {
+        modifier(AmityTextShimmer(isActive: true, cornerRadius: cornerRadius, color: color))
     }
     
+    /// Applies rounded rectange overlay with corner radius and then apply shimmering effect.
+    /// Note: This might not produce the require result when applied on circular image.
+    func textShimmerEffect(cornerRadius: CGFloat, isActive: Bool, color: UIColor) -> some View {
+        modifier(AmityTextShimmer(isActive: isActive, cornerRadius: cornerRadius, color: color))
+    }
 }
 
-struct ShimeringModifier: ViewModifier {
+/// Adds shimmering effect to text with rounded corner radius
+struct AmityTextShimmer: ViewModifier {
     
+    let isActive: Bool
     let cornerRadius: CGFloat
+    let color: UIColor
     
     func body(content: Content) -> some View {
-        content
-            .opacity(0)
-            .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .fill(Color.white.opacity(0.1))
-                    .padding(.vertical, 3)
-            )
+        if !isActive {
+            content
+        } else {
+            content
+                .opacity(0)
+                .overlay(
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(Color(color).opacity(0.1))
+                        .padding(.vertical, 3)
+                )
+                .shimmering()
+        }
     }
 }

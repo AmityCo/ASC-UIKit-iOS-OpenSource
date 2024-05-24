@@ -17,35 +17,39 @@ public struct AmityLiveChatMessageReactionPicker: AmityElementView {
     public var id: ElementId {
         return .messageReactionPicker
     }
-    let dismissAction: () -> Void
+    let dismissAction: DefaultTapAction?
     
     let message: MessageModel
     
     @StateObject var viewModel: AmityLiveChatMessageReactionPickerViewModel
     
-    public init(message: MessageModel, pageId: PageId? = .liveChatPage, componentId: ComponentId? = .messageList, dismissAction: @escaping () -> Void) {
+    public init(message: MessageModel, pageId: PageId? = .liveChatPage, componentId: ComponentId? = .messageList, tapAction: DefaultTapAction? = nil) {
         self.message = message
         self.pageId = pageId
         self.componentId = componentId
         self._viewModel = StateObject(wrappedValue: AmityLiveChatMessageReactionPickerViewModel(message: message))
-        self.dismissAction = dismissAction
+        self.dismissAction = tapAction
     }
-    
     
     public var body: some View {
         HStack(spacing: 4) {
-            ForEach(MessageReactionConfiguration.shared.getMessageRactions(), id: \.id) { reaction in
+            ForEach(MessageReactionConfiguration.shared.allReactions, id: \.id) { reaction in
                 
                 Button(action: {
+                    ImpactFeedbackGenerator.impactFeedback(style: .medium)
+                    
+                    // Message should be synced before adding reaction
+                    guard message.syncState == .synced else { return }
+                    
                     if viewModel.message.myReactions.contains(where: {$0 == reaction.name}) {
                         viewModel.removeRaction(reaction: reaction.name)
                     } else {
                         viewModel.addReaction(reaction: reaction.name)
                     }
-                    dismissAction()
+                    dismissAction?()
                 }, label: {
                     ZStack {
-                        Color(viewConfig.theme.baseColorShade1)
+                        Color(viewConfig.theme.baseColorShade2)
                             .frame(width: 42, height: 42)
                             .clipShape(Circle())
                             .opacity(viewModel.message.myReactions.contains(where: {$0 == reaction.name}) ? 1 : 0)
@@ -59,7 +63,8 @@ public struct AmityLiveChatMessageReactionPicker: AmityElementView {
             }
         }
         .font(.title)
-        .padding(.all, 6)
+        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
         .background(Color(viewConfig.theme.baseColorShade4))
         .cornerRadius(30)
         

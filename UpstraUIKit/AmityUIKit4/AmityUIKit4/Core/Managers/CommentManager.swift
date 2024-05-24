@@ -16,6 +16,10 @@ class CommentManager {
         return commentRepository.getComments(with: queryOptions)
     }
     
+    func getComment(commentId: String) -> AmityObject<AmityComment> {
+        return commentRepository.getComment(withId: commentId)
+    }
+    
     @MainActor
     @discardableResult
     func createComment(createOptions: AmityCommentCreateOptions) async throws -> AmityComment {

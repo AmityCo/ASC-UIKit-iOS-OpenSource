@@ -81,3 +81,12 @@ struct ThemeUpdater: ViewModifier {
             }
     }
 }
+
+struct UpsideDown: ViewModifier {
+    
+    func body(content: Content) -> some View {
+        content
+            .rotationEffect(Angle(degrees: 180))
+            .scaleEffect(x: -1.0, y: 1.0, anchor: .center)
+    }
+}

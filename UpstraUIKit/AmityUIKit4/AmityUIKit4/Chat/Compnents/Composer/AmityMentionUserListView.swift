@@ -64,7 +64,7 @@ struct AmityMentionUserItemView: View {
             action?()
         }, label: {
             HStack(spacing: 0) {
-                AsyncImage(placeholder: user.isChannelMention ? AmityIcon.Chat.mentionAll.imageResource : AmityIcon.defaultCommunityAvatar.imageResource, url: URL(string: user.avatarURL))
+                AsyncImage(placeholder: user.isChannelMention ? AmityIcon.Chat.mentionAll.imageResource : AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: user.avatarURL))
                     .frame(width: 28, height: 28)
                     .clipped()
                     .clipShape(Circle())

@@ -52,17 +52,21 @@ struct LiveChatMessageBubbleView<Content: View>: View {
                                     let rect = geometry.frame(in: .global)
                                     DispatchQueue.main.async {
                                         viewModel.currentPosition = rect.origin
+                                        viewModel.currentFrame = rect
                                     }
                                     return Color.clear
                                 })
-                                .onLongPressGesture {
-                                    MessageOverlay.showOverlay(message: message, messageAction: messageAction, nameSpace: overlayAnimationNamespace, position: viewModel.currentPosition)
+                                .onLongPressGesture(minimumDuration: 0.3) {
+                                    ImpactFeedbackGenerator.impactFeedback(style: .medium)
                                     
+                                    ReactionOverlayController.showOverlay(message: message, messageAction: messageAction, nameSpace: overlayAnimationNamespace, messageFrame: viewModel.currentFrame, content: content)
                                 }
                             
-                            AmityLiveChatMessageReactionPreview(message: message)
-                                .offset(x: 0, y: 20)
-                                .opacity(message.hasReaction ? 1 : 0)
+                            AmityLiveChatMessageReactionPreview(message: message, tapAction: {
+                                messageAction.showReaction?(message)
+                            })
+                            .offset(x: 0, y: 20)
+                            .opacity(message.hasReaction ? 1 : 0)
                         }
                         .padding(.top, 4)
                         .padding(.bottom, 0)
@@ -71,16 +75,7 @@ struct LiveChatMessageBubbleView<Content: View>: View {
                         MessageStatusView(message: message, dateFormat: config.timestampConfig.dateFormatter, viewModel: viewModel, messageAction: messageAction)
                         
                     } else {
-                        HStack(spacing: 4) {
-                            Image(AmityIcon.trashBinWhiteIcon.getImageResource())
-                                .renderingMode(.template)
-                                .frame(width: 12, height: 16)
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
-                            
-                            Text(AmityLocalizedStringSet.Chat.deletedMessage.localizedString)
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
-                        }
-                        .modifier(LiveChatMessageBubble(isBubbleEnabled: config.isBubbleEnabled(messageType: message.type), message: message, viewModel: viewModel))
+                        deletedMessageView
                     }
                     
                     Spacer()
@@ -88,10 +83,22 @@ struct LiveChatMessageBubbleView<Content: View>: View {
             }
         }
         .padding(.top, 4)
-        .padding(.bottom, message.hasReaction ? 16 : 0)
-        
+        .padding(.bottom, (message.hasReaction && !message.isDeleted) ? 16 : 0)
     }
     
+    var deletedMessageView: some View {
+        HStack(spacing: 4) {
+            Image(AmityIcon.trashBinWhiteIcon.getImageResource())
+                .renderingMode(.template)
+                .frame(width: 12, height: 16)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
+            
+            Text(AmityLocalizedStringSet.Chat.deletedMessage.localizedString)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
+        }
+        .modifier(LiveChatMessageBubble(isBubbleEnabled: config.isBubbleEnabled(messageType: message.type), message: message, viewModel: viewModel))
+    }
+        
     struct Configuration: UIKitConfigurable {
         // Load message_bubble config + sender bubble config
         
@@ -158,6 +165,7 @@ class LiveChatMessageBubbleViewModel: ObservableObject {
     var token: AmityNotificationToken?
     
     var currentPosition: CGPoint = CGPoint(x: 0, y: 0)
+    var currentFrame: CGRect = CGRect(x: 0, y: 0, width: 0, height: 0)
     
     init(message: MessageModel) {
         self.message = message
@@ -207,14 +215,6 @@ class LiveChatMessageBubbleViewModel: ObservableObject {
             
             // Update report status immediately.
             self.isReportedByMe = reportStatus
-        }
-    }
-    
-    func addRaction() async {
-        do {
-            let _ = try await reactionRepo.addReaction("heart", referenceId: message.id, referenceType: .message)
-        } catch {
-            Log.chat.debug("Error while adding reaction \(error)")
         }
     }
     

@@ -8,7 +8,7 @@
 import Foundation
 import AmitySDK
 
-enum ReactionType: String {
+public enum ReactionType: String {
     case like
 }
 
@@ -28,7 +28,13 @@ class ReactionManager {
         return try await reactionRepository.removeReaction(reactionType.rawValue, referenceId: referenceId, referenceType: referenceType)
     }
     
-    func getReactions(_ reactionType: ReactionType, referenceId: String, referenceType: AmityReactionReferenceType) -> AmityCollection<AmityReaction> {
-        return reactionRepository.getReactions(referenceId, referenceType: referenceType, reactionName: reactionType.rawValue)
+    @MainActor
+    @discardableResult
+    func removeReaction(_ reactionType: String, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
+        return try await reactionRepository.removeReaction(reactionType, referenceId: referenceId, referenceType: referenceType)
+    }
+    
+    func getReactions(_ reactionType: String?, referenceId: String, referenceType: AmityReactionReferenceType) -> AmityCollection<AmityReaction> {
+        return reactionRepository.getReactions(referenceId, referenceType: referenceType, reactionName: reactionType)
     }
 }

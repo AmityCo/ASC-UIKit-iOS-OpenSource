@@ -17,7 +17,10 @@ let lightTheme = AmityTheme(primaryColor: UIColor(hex: "#1054DE"),
                             baseColorShade3: UIColor(hex: "#A5A9b5"),
                             baseColorShade4: UIColor(hex: "#EBECEF"),
                             alertColor: UIColor(hex: "#FA4D30"),
-                            backgroundColor: UIColor(hex: "#FFFFFF"))
+                            backgroundColor: UIColor(hex: "#FFFFFF"),
+                            backgroundShade1Color: UIColor(hex: "#F6F7F8"),
+                            highlightColor: UIColor(hex: "1054DE")
+)
 
 let darkTheme = AmityTheme(primaryColor: UIColor(hex: "#1054DE"),
                            secondaryColor: UIColor(hex: "#292B32"),
@@ -28,7 +31,10 @@ let darkTheme = AmityTheme(primaryColor: UIColor(hex: "#1054DE"),
                            baseColorShade3: UIColor(hex: "#40434E"),
                            baseColorShade4: UIColor(hex: "#292B32"),
                            alertColor: UIColor(hex: "#FA4D30"),
-                           backgroundColor: UIColor(hex: "#191919"))
+                           backgroundColor: UIColor(hex: "#191919"),
+                           backgroundShade1Color: UIColor(hex: "#40434E"),
+                           highlightColor: UIColor(hex: "1054DE")
+)
 
 enum AmityThemeStyle: String {
     case system = "default"
@@ -37,16 +43,18 @@ enum AmityThemeStyle: String {
 }
 
 struct AmityTheme: Codable {
-    var primaryColor: UIColor?
-    var secondaryColor: UIColor?
-    var baseColor: UIColor?
-    var baseInverseColor: UIColor?
-    var baseColorShade1: UIColor?
-    var baseColorShade2: UIColor?
-    var baseColorShade3: UIColor?
-    var baseColorShade4: UIColor?
-    var alertColor: UIColor?
-    var backgroundColor: UIColor?
+    let primaryColor: UIColor?
+    let secondaryColor: UIColor?
+    let baseColor: UIColor?
+    let baseInverseColor: UIColor?
+    let baseColorShade1: UIColor?
+    let baseColorShade2: UIColor?
+    let baseColorShade3: UIColor?
+    let baseColorShade4: UIColor?
+    let alertColor: UIColor?
+    let backgroundColor: UIColor?
+    let backgroundShade1Color: UIColor?
+    let highlightColor: UIColor?
     
     public init(primaryColor: UIColor, 
                 secondaryColor: UIColor,
@@ -57,7 +65,10 @@ struct AmityTheme: Codable {
                 baseColorShade3: UIColor,
                 baseColorShade4: UIColor,
                 alertColor: UIColor,
-                backgroundColor: UIColor) {
+                backgroundColor: UIColor,
+                backgroundShade1Color: UIColor,
+                highlightColor: UIColor
+    ) {
         self.primaryColor = primaryColor
         self.secondaryColor = secondaryColor
         self.baseColor = baseColor
@@ -68,6 +79,8 @@ struct AmityTheme: Codable {
         self.baseColorShade4 = baseColorShade4
         self.alertColor = alertColor
         self.backgroundColor = backgroundColor
+        self.backgroundShade1Color = backgroundShade1Color
+        self.highlightColor = highlightColor
     }
     
     enum CodingKeys: String, CodingKey {
@@ -81,6 +94,8 @@ struct AmityTheme: Codable {
         case alertColor = "alert_color"
         case backgroundColor = "background_color"
         case baseInverseColor = "base_inverse_color"
+        case backgroundShade1Color = "background_shade1_color"
+        case highlightColor = "highlight_color"
     }
     
     public init(from decoder: Decoder) throws {
@@ -95,6 +110,8 @@ struct AmityTheme: Codable {
         alertColor = try? container.decodeUIColor(forKey: .alertColor)
         backgroundColor = try? container.decodeUIColor(forKey: .backgroundColor)
         baseInverseColor = try? container.decodeUIColor(forKey: .baseInverseColor)
+        backgroundShade1Color = try? container.decodeUIColor(forKey: .backgroundShade1Color)
+        highlightColor = try? container.decodeUIColor(forKey: .highlightColor)
     }
     
     public func encode(to encoder: Encoder) throws {}
@@ -111,5 +128,7 @@ struct AmityThemeColor {
     var alertColor: UIColor
     var backgroundColor: UIColor
     var baseInverseColor: UIColor
+    var backgroundShade1Color: UIColor
+    var highlightColor: UIColor
 }
 

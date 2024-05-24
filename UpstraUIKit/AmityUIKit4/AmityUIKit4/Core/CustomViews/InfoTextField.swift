@@ -71,7 +71,7 @@ struct InfoTextField: View {
 
     
     var body: some View {
-        var textFieldLineColor = isValid ? dividerColor : alertColor
+        let textFieldLineColor = isValid ? dividerColor : alertColor
         
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 0) {

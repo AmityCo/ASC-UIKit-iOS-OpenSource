@@ -22,6 +22,8 @@ public struct AmityLiveChatMessageList: AmityComponentView {
     @State private var deletingMessageId: String = ""
     @State private var showDeleteAlert: Bool = false
     @StateObject private var viewConfig: AmityViewConfigController
+    
+    @State private var showReactionSheet = false
         
     public init(viewModel: AmityLiveChatPageViewModel, pageId: PageId? = .liveChatPage) {
         self.pageId = pageId
@@ -35,7 +37,6 @@ public struct AmityLiveChatMessageList: AmityComponentView {
             VStack(spacing: 0) {
                 ScrollViewReader { scrollViewProxy in
                     ScrollView {
-                        // need adjust padding
                         LazyVStack (spacing: 8) {
                             ForEach(Array(messageListViewModel.messages.enumerated()), id: \.element.id) { index, message in
                                 if let firstMessage = messageListViewModel.messages.first, message.id == firstMessage.id, messageListViewModel.isPaginationAvailable() {
@@ -47,16 +48,14 @@ public struct AmityLiveChatMessageList: AmityComponentView {
                                 
                                 Group {
                                     if message.isOwner {
-                                        // Remove this explict unwrap later.
-                                        AmityLiveChatMessageSenderView(message: message, messageAction: messageListViewModel.messageAction!)
+                                        AmityLiveChatMessageSenderView(message: message, messageAction: messageListViewModel.messageAction)
                                     } else {
-                                        AmityLiveChatMessageReceiverView(message: message, messageAction: messageListViewModel.messageAction!)
+                                        AmityLiveChatMessageReceiverView(message: message, messageAction: messageListViewModel.messageAction)
                                     }
                                 }
                                 .id(message.id)
                                 .padding(.bottom, message.id == messageListViewModel.messages.last?.id ? 8 : 0)
                                 .accessibilityIdentifier(AccessibilityID.Chat.MessageList.bubbleContainer)
-                                
                             }
                         }
                         .padding(.top, 8)
@@ -131,7 +130,7 @@ public struct AmityLiveChatMessageList: AmityComponentView {
             .opacity(messageListViewModel.initialQueryState == .success ? 1 : 0)
             
             /// Display general empty state
-            AmityEmptyStateView(configuration: AmityEmptyStateView.EmptyStateConfiguration(image: AmityIcon.Chat.greyRetryIcon.rawValue, title: nil, subtitle: AmityLocalizedStringSet.Chat.errorLoadingChat
+            AmityEmptyStateView(configuration: AmityEmptyStateView.Configuration(image: AmityIcon.Chat.greyRetryIcon.rawValue, title: nil, subtitle: AmityLocalizedStringSet.Chat.errorLoadingChat
                 .localizedString, tapAction: {
                     
                     messageListViewModel.queryMessages()
@@ -141,12 +140,17 @@ public struct AmityLiveChatMessageList: AmityComponentView {
             .opacity(messageListViewModel.initialQueryState == .error ? 1 : 0)
             
             /// Display banned empty state
-            AmityEmptyStateView(configuration: AmityEmptyStateView.EmptyStateConfiguration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: AmityLocalizedStringSet.Chat.errorBannedTitleChat
+            AmityEmptyStateView(configuration: AmityEmptyStateView.Configuration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: AmityLocalizedStringSet.Chat.errorBannedTitleChat
                 .localizedString, subtitle: AmityLocalizedStringSet.Chat.errorBannedSubTitleInChat
                 .localizedString, iconSize: CGSize(width: 48, height: 48), tapAction: nil))
             .accessibilityIdentifier(AccessibilityID.Chat.MessageList.emptyStateContainer)
             .opacity(messageListViewModel.initialQueryState == .banned ? 1 : 0)
         }
+        .sheet(isPresented: $showReactionSheet, content: {
+            if let selectedMessage = messageListViewModel.selectedMessage?.message {
+                AmityReactionList(message: selectedMessage, pageId: self.pageId)
+            }
+        })
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea(.all))
         .onReceive(messageListViewModel.$toastState, perform: { state in
             if let state {
@@ -178,6 +182,11 @@ public struct AmityLiveChatMessageList: AmityComponentView {
             messageListViewModel.unReportMessage(messageId: message.id)
         })
         
+        defaultActions.showReaction = { message in
+            self.messageListViewModel.selectedMessage = message
+            self.showReactionSheet.toggle()
+        }
+        
         messageListViewModel.messageAction = defaultActions
     }
 }
@@ -193,14 +202,5 @@ struct ViewOffsetKey: PreferenceKey {
     static var defaultValue = CGFloat.zero
     static func reduce(value: inout Value, nextValue: () -> Value) {
         value += nextValue()
-    }
-}
-
-struct UpsideDown: ViewModifier {
-    
-    func body(content: Content) -> some View {
-        content
-            .rotationEffect(Angle(degrees: 180))
-            .scaleEffect(x: -1.0, y: 1.0, anchor: .center)
     }
 }

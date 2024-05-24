@@ -16,7 +16,7 @@ public struct AmityLiveChatHeader: AmityComponentView {
     @StateObject var networkMonitor = NetworkMonitor()
     @StateObject var viewModel: AmityLiveChatHeaderViewModel
     @StateObject private var viewConfig: AmityViewConfigController
-
+    
     public init(viewModel: AmityLiveChatPageViewModel, pageId: PageId? = .liveChatPage) {
         self.pageId = pageId
         self._viewModel = StateObject(wrappedValue: viewModel.header)

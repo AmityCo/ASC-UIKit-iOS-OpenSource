@@ -10,13 +10,14 @@ import SwiftUI
 // Status (Flag / Unflag / Sent / Timestamp blabla)
 struct MessageStatusView: View {
     
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
+
     let message: MessageModel
     let dateFormat: DateFormatter
     @ObservedObject var viewModel: LiveChatMessageBubbleViewModel
     let messageAction: AmityMessageAction
 
     @State private var showSheet = false
-    @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     init(message: MessageModel, dateFormat: DateFormatter, viewModel: LiveChatMessageBubbleViewModel, messageAction: AmityMessageAction) {
         self.message = message
@@ -27,15 +28,8 @@ struct MessageStatusView: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            Button {
+            StatusButton(icon: AmityIcon.Chat.messageErrorIcon.imageResource) {
                 showSheet.toggle()
-            } label: {
-                Image(AmityIcon.Chat.messageErrorIcon.imageResource)
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
             }
             .padding(.bottom, 4)
             .isHidden(message.syncState != .error)
@@ -57,23 +51,20 @@ struct MessageStatusView: View {
                     .padding(.bottom, 6)
                     .padding(.leading, 6)
                     .frame(width: 20, height: 20)
+            } else {
+                AmityLiveChatMessageQuickReaction(message: message)
             }
 
             Text(dateFormat.string(from: message.createdAt))
-                .font(.system(size: 9))
-                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .modifier(StatusStyle(viewConfig: viewConfig))
                 .isHidden(message.syncState != .synced)
                 .accessibilityIdentifier(AccessibilityID.Chat.MessageList.bubbleTimestamp)
-                .padding(.leading, 6)
-                .padding(.bottom, 10)
+                
 
             Text(AmityLocalizedStringSet.Chat.statusSending.localizedString)
-                .font(.system(size: 9))
-                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .modifier(StatusStyle(viewConfig: viewConfig))
                 .isHidden(message.syncState != .syncing)
                 .accessibilityIdentifier(AccessibilityID.Chat.MessageList.bubbleSendingStatus)
-                .padding(.leading, 6)
-                .padding(.bottom, 10)
         }
     }
 }
@@ -83,3 +74,39 @@ struct MessageStatusView: View {
     MessageStatusView(message: MessageModel.preview, dateFormat: DateFormatter(), viewModel: LiveChatMessageBubbleViewModel(message: MessageModel.preview), messageAction: AmityMessageAction(onCopy: nil, onReply: nil, onDelete: nil, onReport: nil, onUnReport: nil))
 }
 #endif
+
+extension MessageStatusView {
+    
+    struct StatusStyle: ViewModifier {
+        
+        let viewConfig: AmityViewConfigController
+        
+        func body(content: Content) -> some View {
+            content
+                .font(.system(size: 9))
+                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .padding(.leading, 6)
+                .padding(.bottom, 10)
+        }
+    }
+    
+    struct StatusButton: View {
+        @EnvironmentObject private var viewConfig: AmityViewConfigController
+        
+        let icon: ImageResource
+        let action: DefaultTapAction
+        
+        var body: some View {
+            Button {
+                action()
+            } label: {
+                Image(icon)
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+            }
+        }
+    }
+}
