@@ -33,8 +33,8 @@ let package = Package(
                 ),
          .binaryTarget(
                     name: "RealmSwift",
-                    url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/3.20.5/RealmSwift.xcframework.zip",
-                    checksum: "8201dbc3e85e3462d74b39d9d942ebbb854fb617c938b486dffc6a888781e263"
+                    url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/3.20.6-beta-1/RealmSwift.xcframework.zip",
+                    checksum: "27adaed521b2f504183a0c08c84215f280de1c0f7efd909d96274c9cd710e8fa"
                 ),
         .binaryTarget(
                     name: "AmityLiveVideoBroadcastKit",
