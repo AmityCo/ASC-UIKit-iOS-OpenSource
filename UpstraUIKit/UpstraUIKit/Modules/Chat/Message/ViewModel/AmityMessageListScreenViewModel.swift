@@ -441,6 +441,9 @@ private extension AmityMessageListScreenViewModel {
             // If this screen is opened for first time, we want to scroll to bottom.
             shouldScrollToBottom(force: true)
             isFirstTimeLoaded = false
+            
+            // Set last message hash
+            lastMessageHash = messages.last?.last?.hashValue ?? -1
         } else if let lastMessage = messages.last?.last,
                   lastMessageHash != lastMessage.hashValue {
             // Compare message hash

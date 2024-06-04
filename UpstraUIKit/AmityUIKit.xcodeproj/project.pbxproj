@@ -361,7 +361,6 @@
 		78DA0323263C715C007C11CE /* AmityMyCommunityPreviewScreenViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DA031E263C715C007C11CE /* AmityMyCommunityPreviewScreenViewModel.swift */; };
 		78DA0324263C715C007C11CE /* AmityMyCommunityPreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 78DA0320263C715C007C11CE /* AmityMyCommunityPreviewViewController.xib */; };
 		78DA0325263C715C007C11CE /* AmityMyCommunityPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DA0321263C715C007C11CE /* AmityMyCommunityPreviewViewController.swift */; };
-		920EF84A2C007D4700F31097 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 920EF8492C007D4700F31097 /* SharedFrameworks */; };
 		970E784726429FA500E5FCEE /* ChatSettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970E784526429FA500E5FCEE /* ChatSettingsTableViewCell.swift */; };
 		970E784826429FA500E5FCEE /* ChatSettingsTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 970E784626429FA500E5FCEE /* ChatSettingsTableViewCell.xib */; };
 		970E784E26429FB300E5FCEE /* AmityChatSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970E784C26429FB300E5FCEE /* AmityChatSettingsViewController.swift */; };
@@ -481,6 +480,7 @@
 		A0B68B6126E7238E007D7B5B /* AmityPostLiveStreamTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = A0B68B5F26E7238E007D7B5B /* AmityPostLiveStreamTableViewCell.xib */; };
 		A0E2B23226B7B68200F1C4D5 /* AmityPostGalleryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0E2B23026B7B68200F1C4D5 /* AmityPostGalleryViewController.swift */; };
 		A0E2B23326B7B68200F1C4D5 /* AmityPostGalleryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A0E2B23126B7B68200F1C4D5 /* AmityPostGalleryViewController.xib */; };
+		A9843F152C0F43F90064795A /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = A9843F142C0F43F90064795A /* SharedFrameworks */; };
 		A98B3BC12914BD7700C0A56D /* AmityCommentViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98B3BC02914BD7700C0A56D /* AmityCommentViewLayout.swift */; };
 		A9E890F529F8F43C00A22B35 /* AmityReactionUsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9E890F429F8F43C00A22B35 /* AmityReactionUsersViewController.swift */; };
 		A9E890F729F933D900A22B35 /* AmityReactionUsersViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = A9E890F629F933D900A22B35 /* AmityReactionUsersViewController.xib */; };
@@ -1311,7 +1311,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				920EF84A2C007D4700F31097 /* SharedFrameworks in Frameworks */,
+				A9843F152C0F43F90064795A /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4422,7 +4422,7 @@
 			);
 			name = AmityUIKit;
 			packageProductDependencies = (
-				920EF8492C007D4700F31097 /* SharedFrameworks */,
+				A9843F142C0F43F90064795A /* SharedFrameworks */,
 			);
 			productName = UpstraUIKit;
 			productReference = 72A3503024EA811500DA9D46 /* AmityUIKit.framework */;
@@ -5425,7 +5425,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		920EF8492C007D4700F31097 /* SharedFrameworks */ = {
+		A9843F142C0F43F90064795A /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
