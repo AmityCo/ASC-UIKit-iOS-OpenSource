@@ -463,17 +463,7 @@ extension AmityMessageListViewController: AmityMessageListScreenViewModelDelegat
     func screenViewModelEvents(for events: AmityMessageListScreenViewModel.Events) {
         switch events {
         case .updateMessages:
-            
-            let offset = messageViewController.tableView.contentOffset.y
-            let contentHeight = messageViewController.tableView.contentSize.height
-
             messageViewController.tableView.reloadData()
-            messageViewController.tableView.layoutIfNeeded()
-            
-            let newcontentHeight = self.messageViewController.tableView.contentSize.height
-            let newOffset = (newcontentHeight - contentHeight) + offset
-            self.messageViewController.tableView.setContentOffset(CGPoint(x: 0, y: newOffset), animated: false)
-            
         case .didSendText:
             screenViewModel.shouldScrollToBottom(force: true)
         case .didEditText:
