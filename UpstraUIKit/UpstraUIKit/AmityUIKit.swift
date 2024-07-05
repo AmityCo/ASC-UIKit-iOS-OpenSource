@@ -29,7 +29,7 @@ public final class AmityUIKitManager {
     /// - Parameters:
     ///   - apiKey: ApiKey provided by Amity
     ///   - region: The region to which this UIKit connects to. By default, region is .global
-    public static func setup(apiKey: String, region: AmityRegion = .global) {
+    public static func setup(apiKey: String, region: AmityRegion = .SG) {
         AmityUIKitManagerInternal.shared.setup(apiKey, region: region)
     }
     
