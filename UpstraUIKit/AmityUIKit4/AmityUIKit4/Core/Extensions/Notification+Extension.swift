@@ -8,5 +8,7 @@
 import Foundation
 
 extension Notification.Name {
-    public static let didStoryCreate = Notification.Name("didStoryCreate")
+    public static let didPostCreated = Notification.Name("didPostCreated")
+    public static let didPostDeleted = Notification.Name("didPostDeleted")
+    public static let didPostReacted = Notification.Name("didPostReacted")
 }

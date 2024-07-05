@@ -60,9 +60,11 @@ public struct AmityCommentView: View {
                         
                         ExpandableText(comment.text, metadata: comment.metadata, mentionees: comment.mentionees)
                             .lineLimit(8)
-                            .moreButtonText("...more")
+                            .moreButtonText("...See more")
                             .font(.system(size: 13.5))
                             .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .attributedColor(viewConfig.theme.primaryColor)
+                            .moreButtonColor(Color(viewConfig.theme.primaryColor))
                             .expandAnimation(.easeOut(duration: 0.25))
                             .lineSpacing(5)
                             .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
@@ -96,7 +98,7 @@ public struct AmityCommentView: View {
                 
                 HStack {
                     HStack(spacing: 12) {
-                        Text(comment.isEdited ? "\(comment.createdAt.timeAgoString) \(AmityLocalizedStringSet.Comment.editedText.localizedString)" : comment.createdAt.timeAgoString)
+                        Text(comment.isEdited ? "\(comment.createdAt.relativeTime) \(AmityLocalizedStringSet.Comment.editedText.localizedString)" : comment.createdAt.relativeTime)
                             .font(.system(size: 13))
                             .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.timestampTextView)

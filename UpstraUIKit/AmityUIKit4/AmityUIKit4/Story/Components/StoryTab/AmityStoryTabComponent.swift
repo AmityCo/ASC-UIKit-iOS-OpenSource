@@ -24,6 +24,7 @@ public struct AmityStoryTabComponent: AmityComponentView {
     }
     
     @StateObject private var viewModel: AmityStoryTabComponentViewModel
+    @StateObject private var viewConfig: AmityViewConfigController
     private let storyFeedType: AmityStoryTabComponentType
     
     // MARK: - Initializer
@@ -31,6 +32,7 @@ public struct AmityStoryTabComponent: AmityComponentView {
         self.pageId = pageId
         self.storyFeedType = type
         self._viewModel = StateObject(wrappedValue: AmityStoryTabComponentViewModel(type: type))
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .storyTabComponent))
     }
     
     
@@ -58,7 +60,7 @@ public struct AmityStoryTabComponent: AmityComponentView {
                         .frame(width: 64, height: 64)
                         .padding(EdgeInsets(top: 13, leading: 2, bottom: 13, trailing: 0))
                         .onTapGesture {
-                            if storyTarget.storyCount == 0 && viewModel.hasManagePermission {
+                            if storyTarget.itemCount == 0 && viewModel.hasManagePermission {
                                 let context = AmityStoryTabComponentBehaviour.Context(component: self, 
                                                                                       storyFeedType: .communityFeed(storyTarget.targetId),
                                                                                       targetId: storyTarget.targetId,
@@ -80,7 +82,8 @@ public struct AmityStoryTabComponent: AmityComponentView {
                 }
             }
         }
-        .background(Color.white)
+        .background(Color(viewConfig.theme.backgroundColor))
+        .updateTheme(with: viewConfig)
     }
 }
 

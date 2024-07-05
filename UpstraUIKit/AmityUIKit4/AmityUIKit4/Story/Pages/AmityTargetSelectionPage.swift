@@ -24,7 +24,6 @@ public struct AmityTargetSelectionPage: AmityPageIdentifiable, View {
         .targetSelectionPage
     }
     
-    @StateObject private var viewModel: AmityTargetSelectionPageViewModel = AmityTargetSelectionPageViewModel()
     @StateObject private var viewConfig: AmityViewConfigController
     private let contentType: AmityTargetSelectionPageType
     
@@ -36,7 +35,7 @@ public struct AmityTargetSelectionPage: AmityPageIdentifiable, View {
     public var body: some View {
         VStack {
             HStack {
-                Image(AmityIcon.backIcon.getImageResource())
+                Image(AmityIcon.closeIcon.getImageResource())
                     .renderingMode(.template)
                     .frame(width: 24, height: 24)
                     .foregroundColor(Color(viewConfig.theme.baseColor))
@@ -59,75 +58,14 @@ public struct AmityTargetSelectionPage: AmityPageIdentifiable, View {
             )
             .frame(height: 58)
             
-            ScrollViewReader { scrollViewReader in
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        Text("My Communities")
-                            .font(.system(size: 15))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade3))
-                            .padding([.leading, .top], 16)
-                            .padding(.bottom, 8)
-                        
-                        ForEach(Array(viewModel.communities.enumerated()), id: \.element.communityId) { index, community in
-                            Section {
-                                HStack(spacing: 0) {
-                                    AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: URL(string: community.avatarURL))
-                                        .frame(width: 40, height: 40)
-                                        .clipShape(Circle())
-                                        .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 12))
-                                        
-                                    
-                                    Text(community.displayName)
-                                        .font(.system(size: 15, weight: .semibold))
-                                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                                    
-                                    Spacer()
-                                }
-                            }
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                let context = AmityTargetSelectionPageBehaviour.Context(page: self, community: community.object, targetType: .community)
-                                AmityUIKitManagerInternal.shared.behavior.targetSelectionPageBehaviour?.selectTargetAction(context: context)
-                            }
-                            .onAppear {
-                                if index == viewModel.communities.count - 1 {
-                                    viewModel.loadMore()
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            TargetSelectionView(communityOnTapAction: { communityModel in
+                
+                let context = AmityTargetSelectionPageBehaviour.Context(page: self, community: communityModel.object, targetType: .community)
+                AmityUIKitManagerInternal.shared.behavior.targetSelectionPageBehaviour?.goToCreateStoryPage(context: context)
+                
+            })
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
-        .onChange(of: colorScheme) { _ in
-            viewConfig.updateTheme()
-        }
-    }
-}
-
-
-class AmityTargetSelectionPageViewModel: ObservableObject {
-    @Published var communities: [AmityCommunityModel] = []
-    private var communityCollection: AmityCollection<AmityCommunity>?
-    private var cancellable: AnyCancellable?
-    
-    private let communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
-    
-    init() {
-        let queryOptions = AmityCommunityQueryOptions(filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
-        communityCollection = communityRepository.getCommunities(with: queryOptions)
-        cancellable = communityCollection?.$snapshots
-            .map { communities -> [AmityCommunityModel] in
-                communities.map { community in
-                    AmityCommunityModel(object: community)
-                }
-            }
-            .assign(to: \.communities, on: self)
-    }
-    
-    func loadMore() {
-        guard let collection = communityCollection, collection.hasNext else { return }
-        collection.nextPage()
+        .updateTheme(with: viewConfig)
     }
 }

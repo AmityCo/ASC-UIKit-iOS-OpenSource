@@ -18,6 +18,8 @@ class FeatureViewController: UIViewController {
         case community
         case data
         case chatUIKit
+        case socialUIKit
+        case socialUIKitV4Comaptible
         
         var text: String {
             switch self {
@@ -29,6 +31,10 @@ class FeatureViewController: UIViewController {
                 return "Data"
             case .chatUIKit:
                 return "Chat UIKit 4"
+            case .socialUIKit:
+                return "Social UIKit 4"
+            case .socialUIKitV4Comaptible:
+                return "Social UIKit 4 Compatible"
             }
         }
     }
@@ -57,7 +63,7 @@ class FeatureViewController: UIViewController {
 extension FeatureViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-
+        
         switch FeatureList.allCases[indexPath.row] {
         case .chatFeature:
             let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ChatFeatureViewController")
@@ -75,16 +81,29 @@ extension FeatureViewController: UITableViewDelegate {
             let view = LiveChatListView()
             let hostingController = AmitySwiftUIHostingController(rootView: view)
             
-//            if #available(iOS 15.0, *) {
-//                if let sheet = hostingController.sheetPresentationController {
-//                    sheet.detents = [.large()]
-//                    sheet.prefersGrabberVisible = true
-//                }
-//            }
-//            navigationController?.present(hostingController, animated: true)
+            //            if #available(iOS 15.0, *) {
+            //                if let sheet = hostingController.sheetPresentationController {
+            //                    sheet.detents = [.large()]
+            //                    sheet.prefersGrabberVisible = true
+            //                }
+            //            }
+            //            navigationController?.present(hostingController, animated: true)
             navigationController?.pushViewController(hostingController, animated: true)
+        case .socialUIKit:
+            let pageView = SocialUIKitPage()
+            let hostingController = AmitySwiftUIHostingNavigationController(rootView: pageView)
+            hostingController.isNavigationBarHidden = true
+            hostingController.modalPresentationStyle = .overFullScreen
+            navigationController?.present(hostingController, animated: true)
+        case .socialUIKitV4Comaptible:
+            let homepage = AmitySocialV4Compatible.make()
+            let navigationController = UINavigationController(rootViewController: homepage)
+            navigationController.modalPresentationStyle = .fullScreen
+            present(navigationController, animated: true, completion: nil)
         }
+
     }
+
 }
 
 extension FeatureViewController: UITableViewDataSource {
@@ -137,5 +156,27 @@ extension Color {
         Scanner(string: cString).scanHexInt64(&rgbValue)
         
         self.init(.sRGB, red: Double(((rgbValue & 0xFF0000) >> 16)) / 255.0, green: Double((rgbValue & 0x00FF00) >> 8) / 255.0, blue: Double(rgbValue & 0x0000FF) / 255.0, opacity: 1.0)
+    }
+}
+
+
+struct SocialUIKitPage: View {
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Button(action: {
+                    host.controller?.dismiss(animated: true)
+                }) {
+                    Image(uiImage: UIImage(named: "closeIcon") ?? UIImage())
+                        .frame(width: 32, height: 32)
+                }
+                Spacer()
+            }
+            .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 15))
+            
+            AmitySocialHomePage()
+        }
     }
 }

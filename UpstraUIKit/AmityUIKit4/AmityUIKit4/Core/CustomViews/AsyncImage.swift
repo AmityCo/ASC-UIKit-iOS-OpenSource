@@ -21,24 +21,19 @@ struct AsyncImage: View {
     
     var body: some View {
         GeometryReader { proxy in
-            Image(placeholder)
+            KFImage.url(url)
+                .placeholder {
+                    Image(placeholder)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                }
                 .resizable()
+                .fromMemoryCacheOrRefresh()
+                .startLoadingBeforeViewAppear()
+                .fade(duration: 0.1)
                 .modifier(ImageScaleMode(mode: contentMode))
                 .frame(width: proxy.size.width, height: proxy.size.height)
                 .clipped()
-                .overlay(
-                    VStack {
-                        if let url {
-                            URLImage(url, content: { image in
-                                image
-                                    .resizable()
-                                    .modifier(ImageScaleMode(mode: contentMode))
-                                    .frame(width: proxy.size.width, height: proxy.size.height)
-                                    .clipped()
-                            })
-                        }
-                    }
-                )
         }
     }
 }
@@ -55,7 +50,7 @@ struct ImageScaleMode: ViewModifier {
             content
                 .scaledToFill()
                 .clipped()
-                .clipShape(Circle())
+//                .clipShape(Circle())
         }
     }
 }

@@ -26,17 +26,17 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
     let avatar: URL?
     let isPublicTarget: Bool
     
-    @Published var stories: [AmityStoryModel] = []
-    @Published var storyCount: Int = 0
+    @Published var items: [PaginatedItem<AmityStoryModel>] = []
+    @Published var itemCount: Int = 0
     @Published var hasUnseenStory: Bool = false
     @Published var hasFailedStory: Bool = false
     @Published var hasSyncingStory: Bool = false
     @Published var unseenStoryIndex: Int = 0
     
     private var storyCollection: AmityCollection<AmityStory>?
-    private var storyCollectionCancellable: AnyCancellable?
-    private var storyTargetStateCancellable: AnyCancellable?
-    
+    private var cancellable: Set<AnyCancellable> = Set()
+    private var paginator: UIKitPaginator<AmityStory>?
+    private var paginatorCancellable: AnyCancellable?
     
     private let storyManager = StoryManager()
     
@@ -58,14 +58,29 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
         self.hasSyncingStory = storyTarget.syncingStoriesCount != 0
     }
     
-    func fetchStory() {
-        guard storyCollection == nil else { return }
+    func fetchStory(totalSeenStoryCount: Int = 0) {
         storyCollection = storyManager.getActiveStories(in: targetId)
-        storyCollectionCancellable = nil
         
-        storyCollectionCancellable = storyCollection?.$snapshots
-            .sink(receiveValue: { [weak self] stories in
-                guard let self else { return }
+        prepareDatasource(totalSeenStoryCount)
+    }
+    
+    func prepareDatasource(_ totalSeenStoryCount: Int) {
+        guard let storyCollection else { return }
+        
+        var surplus = 0
+        if let adFrequency = AdEngine.shared.getAdFrequency(at: .story), adFrequency.value > 0 {
+            surplus = totalSeenStoryCount % adFrequency.value
+        }
+        
+        paginatorCancellable = nil
+        
+        paginator = UIKitStoryPaginator(liveCollection: storyCollection, surplus: surplus, modelIdentifier: { $0.storyId })
+        paginator?.load()
+        
+        paginatorCancellable = paginator?.$snapshots
+            .debounce(for: .milliseconds(100), scheduler: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] items in
+                guard let self, let stories = self.storyCollection?.snapshots else { return }
                 
                 if let hasUnseen = stories.first?.storyTarget?.hasUnseen {
                     self.hasUnseenStory = hasUnseen
@@ -79,20 +94,24 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
                     self.hasSyncingStory = syncingStoryCount != 0
                 }
                 
+                let newSnapshot = self.mapToModel(items)
+                
                 // Search the first index of unseen story if present
                 if self.hasUnseenStory {
-                    if let unseenIndice = stories.firstIndex(where: { $0.isSeen == false }) {
-                        self.unseenStoryIndex = unseenIndice
+                    for (index, item) in newSnapshot.items.enumerated() {
+                        if case let .content(story) = item.type, story.isSeen == false {
+                            self.unseenStoryIndex = index
+                        }
                     }
                 }
                 
-                if self.storyCount != stories.count {
-                    self.storyCount = stories.count
-                }
+                self.items = newSnapshot.items
                 
-                let newSnapshot = self.mapToModel(stories)
-                self.stories = newSnapshot.stories
+                if self.itemCount != newSnapshot.items.count {
+                    self.itemCount = newSnapshot.items.count
+                }
                 VideoPlayer.preload(urls: newSnapshot.videoURLs)
+                
                 
                 if stories.count == 0 {
                     self.hasUnseenStory = false
@@ -103,18 +122,23 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
 
     }
     
-    func mapToModel(_ stories: [AmityStory]) -> (stories: [AmityStoryModel], videoURLs: [URL]) {
+    private func mapToModel(_ items: [PaginatedItem<AmityStory>]) -> (items: [PaginatedItem<AmityStoryModel>], videoURLs: [URL]) {
         var videoURLs: [URL] = []
         
-        let storyModels = stories.map { story in
-            if let videoURLStr = story.getVideoInfo()?.getVideo(resolution: .res_720p), let videoURL = URL(string: videoURLStr) {
-                videoURLs.append(videoURL)
+        let mappedItems = items.map { item in
+            switch item.type {
+            case .ad(let ad):
+                return PaginatedItem<AmityStoryModel>(id: ad.adId, type: .ad(ad))
+                
+            case .content(let story):
+                if let videoURLStr = story.getVideoInfo()?.getVideo(resolution: .res_720p), let videoURL = URL(string: videoURLStr) {
+                    videoURLs.append(videoURL)
+                }
+                return PaginatedItem<AmityStoryModel>(id: story.storyId, type: .content(AmityStoryModel(story: story)))
             }
-            
-            return AmityStoryModel(story: story)
         }
         
-        return (storyModels, videoURLs)
+        return (mappedItems, videoURLs)
     }
     
 }

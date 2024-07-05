@@ -33,6 +33,17 @@ public extension ExpandableText {
     }
     
     /**
+     Sets the color for the attributed string in the `ExpandableText` instance.
+     - Parameter color: The color to use for attributed string. Defaults to `UIColor.systemBlue`
+     - Returns: A new `ExpandableText` instance with the specified color applied.
+     */
+    func attributedColor(_ color: UIColor) -> Self {
+        var copy = self
+        copy.attributedColor = color
+        return copy
+    }
+    
+    /**
      Sets the maximum number of lines to use for rendering the text in the `ExpandableText` instance.
      - Parameter limit: The maximum number of lines to use for rendering the text. Defaults to `3`
      - Returns: A new `ExpandableText` instance with the specified line limit applied.

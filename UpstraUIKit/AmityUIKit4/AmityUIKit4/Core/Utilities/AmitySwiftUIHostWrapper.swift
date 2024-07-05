@@ -29,3 +29,10 @@ public class AmitySwiftUIHostingController<Content>: HostingController<ModifiedC
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+public class AmitySwiftUIHostingNavigationController<Content>: UINavigationController where Content: View {
+    public convenience init(rootView: Content) {
+        let hostingController = AmitySwiftUIHostingController(rootView: rootView)
+        self.init(rootViewController: hostingController)
+    }
+}

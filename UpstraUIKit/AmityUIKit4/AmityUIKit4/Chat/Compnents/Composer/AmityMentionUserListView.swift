@@ -36,7 +36,6 @@ struct AmityMentionUserListView: View {
             }
         }
         .frame(height: listHeight)
-        .background(Color(viewConfig.theme.baseColorShade4))
     }
     
     struct Configuration: UIKitConfigurable {

@@ -20,7 +20,13 @@ class AmityUIKitConfigController {
     // MARK: Public Functions
     
     func isExcluded(configId: String) -> Bool {
-        return excludedList.contains(configId)
+        let id = configId.components(separatedBy: "/")
+        guard id.count == 3 else { return false }
+        
+        return excludedList.contains(configId) ||
+            excludedList.contains("*/\(id[1])/*") ||
+            excludedList.contains("*/\(id[1])/\(id[2])") ||
+            excludedList.contains("*/*/\(id[2])")
     }
     
     func getTheme(configId: String? = nil) -> AmityThemeColor {

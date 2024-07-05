@@ -59,6 +59,8 @@ class AppManager {
         // override AmityViewStoryPageBehaviour
         let customViewStoryPageBehaviour = CustomViewStoryPageBehaviour()
         AmityUIKit4Manager.behaviour.viewStoryPageBehaviour = customViewStoryPageBehaviour
+        let customPostContentComponenetBehaviour = CustomPostContentComponenetBehaviour()
+        AmityUIKit4Manager.behaviour.postContentComponentBehavior = customPostContentComponenetBehaviour
         #endif
     }
     
@@ -170,5 +172,28 @@ class CustomViewStoryPageBehaviour: AmityViewStoryPageBehaviour {
         }
         
     }
+    
+}
+
+class CustomPostContentComponenetBehaviour: AmityPostContentComponentBehavior {
+    
+    override func goToCommunityProfilePage(context: AmityPostContentComponentBehavior.Context) {
+        let viewController = AmityCommunityProfilePageViewController.make(withCommunityId: context.component.post.targetId)
+        if let navigationController = context.component.host.controller?.navigationController {
+            
+            navigationController.isNavigationBarHidden = false
+            navigationController.pushViewController(viewController, animated: true)
+        }
+        
+    }
+    override func goToUserProfilePage(context: AmityPostContentComponentBehavior.Context) {
+        let viewController = AmityUserProfilePageViewController.make(withUserId: context.component.post.postedUserId)
+        if let navigationController = context.component.host.controller?.navigationController {
+            navigationController.isNavigationBarHidden = false
+            navigationController.pushViewController(viewController, animated: true)
+        }
+        
+    }
+    
 }
 #endif

@@ -8,6 +8,7 @@
 import UIKit
 
 enum AmityIcon: String, ImageResourceProvider {
+    // MARK: Story
     case verifiedBadge = "verifiedBadge"
     case createStoryIcon = "createStoryIcon"
     case errorStoryIcon = "errorStoryIcon"
@@ -68,6 +69,7 @@ enum AmityIcon: String, ImageResourceProvider {
     
     case emptyReaction = "emptyReactionIcon"
     
+    // MARK: Chat
     enum Chat: String, ImageResourceProvider {
         case sendMessage = "sendIconEnable"
         case closeReply = "grayCloseIcon"
@@ -90,6 +92,35 @@ enum AmityIcon: String, ImageResourceProvider {
         case mutedIcon = "mutedIcon"
         case unknownReaction = "reactionUnknown"
     }
+    
+    // MARK: Social
+    case searchIcon = "searchIcon"
+    case plusIcon = "plusIcon"
+    case emptyNewsFeedIcon = "emptyNewsFeedIcon"
+    case exploreIcon = "exploreIcon"
+    case arrowIcon = "arrowIcon"
+    case likeActionIcon = "likeActionIcon"
+    case commentActionIcon = "commentActionIcon"
+    case shareActionIcon = "shareActionIcon"
+    case videoControlIcon = "videoControlIcon"
+    case circleCloseIcon = "circleCloseIcon"
+    case previewLinkDefaultIcon = "previewLinkDefaultIcon"
+    case previewLinkErrorIcon = "previewLinkErrorIcon"
+    case createPostMenuIcon = "createPostMenuIcon"
+    case createStoryMenuIcon = "createStoryMenuIcon"
+    case createPollMenuIcon = "createPollMenuIcon"
+    case createLivestreamMenuIcon = "createLivestreamMenuIcon"
+    case cameraAttatchmentIcon = "cameraAttatchmentIcon"
+    case photoAttatchmentIcon = "photoAttatchmentIcon"
+    case videoAttatchmentIcon = "videoAttatchmentIcon"
+    case attatchmentIcon = "attatchmentIcon"
+    case downArrowIcon = "downArrowIcon"
+    case noSearchableIcon = "noSearchableIcon"
+    case mediaUploadErrorIcon = "mediaUploadErrorIcon"
+    case starIcon = "starIcon"
+    case infoIcon = "infoIcon"
+    case adAvatarPlaceholder = "adAvatarPlaceholder"
+    case upArrowIcon = "upArrowIcon"
     
     func getURL() -> URL {
         let path = AmityUIKit4Manager.bundle.path(forResource: self.rawValue, ofType: ".svg")

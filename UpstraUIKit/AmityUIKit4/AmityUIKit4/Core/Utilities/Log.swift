@@ -51,4 +51,10 @@ extension Log {
     static var story = Logger(subsystem: uikit, category: "Story")
     
     static var reaction = Logger(subsystem: uikit, category: "Reaction")
+    
+    static var ads = Logger(subsystem: uikit, category: "Ads")
+    
+    static var adAssets = Logger(subsystem: uikit, category: "Ads.Asset")
+    
+    static var adInjector = Logger(subsystem: uikit, category: "Ads.Injector")
 }

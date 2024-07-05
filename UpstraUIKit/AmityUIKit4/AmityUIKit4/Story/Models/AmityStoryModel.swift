@@ -13,9 +13,13 @@ enum AmityStoryType {
     case image, video
 }
 
-public struct AmityStoryModel: Identifiable, Equatable {
+public struct AmityStoryModel: Identifiable, Equatable, Hashable {
     
     let storyObject: AmityStory
+    
+    public var hashValue: Int {
+        return storyId.hashValue
+    }
     
     public static func == (lhs: AmityStoryModel, rhs: AmityStoryModel) -> Bool {
         return lhs.id == rhs.id

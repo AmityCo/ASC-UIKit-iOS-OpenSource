@@ -52,81 +52,19 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     }
     
     var body: some View {
-        Pager(page: page, data: storyTarget.stories, id: \.storyId) { storyModel in
-            VStack(spacing: 0) {
-                ZStack(alignment: .topLeading) {
-                    GeometryReader { geometry in
-                        if let imageURL = storyModel.imageURL {
-                            StoryImageView(imageURL: imageURL,
-                                      totalDuration: $totalDuration,
-                                      displayMode: storyModel.imageDisplayMode,
-                                      size: geometry.size)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                            .overlay(
-                                storyModel.syncState == .error || storyModel.syncState == .syncing ? Color.black.opacity(0.5) : nil
-                            )
-                        } else if let videoURL = storyModel.videoURL {
-                            StoryVideoView(videoURL: videoURL,
-                                      totalDuration: $totalDuration,
-                                      muteVideo: $muteVideo,
-                                      playVideo: $storyCoreViewModel.playVideo)
-                            .frame(width: geometry.size.width, height: geometry.size.height)
-                            .overlay(
-                                storyModel.syncState == .error || storyModel.syncState == .syncing ? Color.black.opacity(0.5) : nil
-                            )
-                        }
-                    }
-                    
-                    getGestureView()
-                    
-                    getMuteButton()
-                        .offset(x: 16, y: 98)
-                        .isHidden(storyModel.storyType != .video)
-                        .isHidden(viewConfig.isHidden(elementId: .muteUnmuteButtonElement))
-                    
-                    VStack(alignment: .center) {
-                        getMetadataView(targetName: targetName,
-                                        avatar: avatar,
-                                        isVerified: isVerified,
-                                        story: storyModel)
-                        Spacer()
-                        
-                        if let firstItem = storyModel.storyItems.first, let hyperlinkItem = firstItem as? AmityHyperLinkItem {
-                            let data = hyperlinkItem.getData()
-                            let model = HyperLinkModel(url: data["url"] as? String ?? "", urlName: data["customText"] as? String ?? "")
-                            getHyperLinkView(data: model, story: storyModel)
-                        }
-                    }
-                    .offset(y: 30) // height + padding top, bottom of progressBarView
-                    
-                    
-                }
-                
-                if storyModel.syncState == .error {
-                    getFailedStoryBanner(storyModel)
-
-                } else if storyModel.syncState == .syncing {
-                    getSyncingStoryBanner()
-                } else {
-                    getAnalyticView(storyModel)
-                }
-            }
-            .onAppear {
-                storyModel.analytics.markAsSeen()
-                
-                switch storyModel.storyType {
-                case .image:
-                    storyCoreViewModel.playVideo = false
-                case .video:
-                    storyCoreViewModel.playVideo = true
-                }
+        Pager(page: page, data: storyTarget.items, id: \.id) { item in
+            switch item.type {
+            case .ad(let ad):
+                StoryAdView(ad: ad, gestureView: getGestureView)
+            case .content(let storyModel):
+                getStoryView(storyModel)
             }
         }
         .contentLoadingPolicy(.lazy(recyclingRatio: 1))
         .overlay (
             ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
                 .offset(y: -40)
-                .isHidden(storyTarget.stories.count != 0, remove: false)
+                .isHidden(storyTarget.items.count != 0, remove: false)
         )
         .onAppear {
             page.update(.new(index: storySegmentIndex))
@@ -153,7 +91,80 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             getCommentSheetView()
         }
         .gesture(DragGesture().onChanged{ _ in})
+        .environmentObject(viewConfig)
         .animation(nil)
+    }
+    
+    
+    func getStoryView(_ storyModel: AmityStoryModel) -> some View {
+        VStack(spacing: 0) {
+            ZStack(alignment: .topLeading) {
+                GeometryReader { geometry in
+                    if let imageURL = storyModel.imageURL {
+                        StoryImageView(imageURL: imageURL,
+                                  totalDuration: $totalDuration,
+                                  displayMode: storyModel.imageDisplayMode,
+                                  size: geometry.size)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .overlay(
+                            storyModel.syncState == .error || storyModel.syncState == .syncing ? Color.black.opacity(0.5) : nil
+                        )
+                    } else if let videoURL = storyModel.videoURL {
+                        StoryVideoView(videoURL: videoURL,
+                                  totalDuration: $totalDuration,
+                                  muteVideo: $muteVideo,
+                                  playVideo: $storyCoreViewModel.playVideo)
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .overlay(
+                            storyModel.syncState == .error || storyModel.syncState == .syncing ? Color.black.opacity(0.5) : nil
+                        )
+                    }
+                }
+                
+                getGestureView()
+                
+                getMuteButton()
+                    .offset(x: 16, y: 98)
+                    .isHidden(storyModel.storyType != .video)
+                    .isHidden(viewConfig.isHidden(elementId: .muteUnmuteButtonElement))
+                
+                VStack(alignment: .center) {
+                    getMetadataView(targetName: targetName,
+                                    avatar: avatar,
+                                    isVerified: isVerified,
+                                    story: storyModel)
+                    Spacer()
+                    
+                    if let firstItem = storyModel.storyItems.first, let hyperlinkItem = firstItem as? AmityHyperLinkItem {
+                        let data = hyperlinkItem.getData()
+                        let model = HyperLinkModel(url: data["url"] as? String ?? "", urlName: data["customText"] as? String ?? "")
+                        getHyperLinkView(data: model, story: storyModel)
+                    }
+                }
+                .offset(y: 30) // height + padding top, bottom of progressBarView
+                
+                
+            }
+            
+            if storyModel.syncState == .error {
+                getFailedStoryBanner(storyModel)
+
+            } else if storyModel.syncState == .syncing {
+                getSyncingStoryBanner()
+            } else {
+                getAnalyticView(storyModel)
+            }
+        }
+        .onAppear {
+            storyPageViewModel.markAsSeen(storyModel)
+            
+            switch storyModel.storyType {
+            case .image:
+                storyCoreViewModel.playVideo = false
+            case .video:
+                storyCoreViewModel.playVideo = true
+            }
+        }
     }
     
     
@@ -523,7 +534,8 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     
     @ViewBuilder
     func getCommentSheetContentView() -> some View {
-        if let story = storyTarget.stories.element(at: storySegmentIndex) {
+        if let item = storyTarget.items.element(at: storySegmentIndex),
+           case let .content(story) = item.type {
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
             let allowCreateComment = story.storyTarget?.community?.storySettings.allowComment ?? false
             
@@ -585,6 +597,7 @@ struct StoryImageView: View {
                 }
                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.storyImageView)
         }
+        .environment(\.urlImageOptions, URLImageOptions.amityOptions)
         .onAppear {
             totalDuration = STORY_DURATION
             Log.add(event: .info, "Story TotalDuration: \(totalDuration)")

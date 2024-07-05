@@ -42,6 +42,7 @@ public struct ExpandableText: View {
     internal var moreButtonText: String = "more"
     internal var moreButtonFont: Font?
     internal var moreButtonColor: Color = .accentColor
+    internal var attributedColor: UIColor = UIColor.systemBlue
     internal var expandAnimation: Animation = .default
     internal var collapseEnabled: Bool = false
     internal var trimMultipleNewlinesWhenTruncated: Bool = true
@@ -142,12 +143,23 @@ extension ExpandableText {
     @available(iOS 15, *)
     func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], font: UIFont) -> AttributedString {
         
-        let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(hex: "#1054DE"), .font: UIFont.systemFont(ofSize: 15, weight: .bold)]
+        let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: UIFont.systemFont(ofSize: 15, weight: .semibold)]
         
         //let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         //let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
         
-        let attributes = TextHighlighter.highlightMentions(for: text, metadata: metadata, mentionees: mentionees, highlightAttributes: highlightAttributes)
-        return attributes
+        let contentText = text
+        var highlightedText = AttributedString(contentText)
+        
+        // If mention is present, highlight mentions first.
+        highlightedText = TextHighlighter.highlightMentions(for: contentText, metadata: metadata, mentionees: mentionees, highlightAttributes: highlightAttributes)
+        
+        // If links is present, highlight links
+        let links = TextHighlighter.detectLinks(in: contentText)
+        if !links.isEmpty {
+            highlightedText = TextHighlighter.highlightLinks(links: links, in: highlightedText, attributes: [.foregroundColor : attributedColor])
+        }
+        
+        return highlightedText
     }
 }

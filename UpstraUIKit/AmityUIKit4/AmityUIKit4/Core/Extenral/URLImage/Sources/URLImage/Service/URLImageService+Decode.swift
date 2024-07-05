@@ -11,7 +11,7 @@ import Foundation
 @available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 extension URLImageService {
 
-    func decode(result: DownloadResult, download: Download, identifier: String?, options: URLImageOptions) throws -> TransientImage {
+    func decode(result: DownloadManager.DownloadResult, download: Download, identifier: String?, options: URLImageOptions) throws -> TransientImage {
         switch result {
             case .data(let data):
 

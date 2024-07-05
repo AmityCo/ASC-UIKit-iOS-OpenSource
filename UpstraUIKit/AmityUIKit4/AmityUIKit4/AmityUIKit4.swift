@@ -203,6 +203,10 @@ final class AmityUIKitManagerInternal: NSObject {
         // TargetSelectionPage
         let targetSelectionPageBehaviour = AmityTargetSelectionPageBehaviour()
         behavior.targetSelectionPageBehaviour = targetSelectionPageBehaviour
+        
+        // GlobalFeedComponent
+        let globalFeedComponentBehavior = AmityGlobalFeedComponentBehavior()
+        behavior.globalFeedComponentBehavior = globalFeedComponentBehavior
     }
     
     func registerDevice(_ userId: String,
@@ -283,6 +287,20 @@ final class AmityUIKitManagerInternal: NSObject {
         // Update file repository to use in file service.
         fileService.fileRepository = AmityFileRepository(client: client)
         messageMediaService.fileRepository = AmityFileRepository(client: client)
+        
+        let accessToken = self.client.accessToken ?? ""
+        let authenticatedRequest = AnyModifier { request in
+            var r = request
+            r.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            return r
+        }
+        
+        KingfisherManager.shared.defaultOptions = [
+            .requestModifier(authenticatedRequest)
+        ]
+        
+        // Initialize AdEngine so that we can start fetching ad settings here
+        let _ = AdEngine.shared
     }
     
 }

@@ -120,7 +120,7 @@ open class AmityEventHandler {
     ///
     /// If there is a `postTarget` passing into, immediately calls `postTargetDidSelect(:)`.
     /// If there isn't , navigate to `AmityPostTargetSelectionViewController`.
-    open func createPostBeingPrepared(from source: AmityViewController, postTarget: AmityPostTarget? = nil) {
+    open func createPostBeingPrepared(from source: AmityViewController, postTarget: AmityPostTarget? = nil, postOption: Set<AmityPostContentType> = [.post, .story, .livestream, .poll]) {
         let completion: ((AmityPostContentType) -> Void) = { postContentType in
             if let postTarget = postTarget {
                 // show create post
@@ -134,21 +134,29 @@ open class AmityEventHandler {
             }
         }
         
+        var imageOptions: [ImageItemOption] = []
         // present bottom sheet
-        let postOption = ImageItemOption(title: AmityLocalizedStringSet.General.post.localizedString, image: AmityIconSet.CreatePost.iconPost) {
-            completion(.post)
+        if postOption.contains(.post) {
+            imageOptions.append(ImageItemOption(title: AmityLocalizedStringSet.General.post.localizedString, image: AmityIconSet.CreatePost.iconPost) {
+                completion(.post)
+            })
         }
-        let pollPostOption = ImageItemOption(title: AmityLocalizedStringSet.General.poll.localizedString, image: AmityIconSet.CreatePost.iconPoll) {
-            completion(.poll)
+        if postOption.contains(.poll) {
+            imageOptions.append(ImageItemOption(title: AmityLocalizedStringSet.General.poll.localizedString, image: AmityIconSet.CreatePost.iconPoll) {
+                completion(.poll)
+            })
         }
         
-        let livestreamPost = ImageItemOption(
-            title: "Livestream",
-            image: UIImage(named: "icon_create_livestream_post", in: AmityUIKitManager.bundle, compatibleWith: nil)) {
-                completion(.livestream)
-            }
+        if postOption.contains(.poll) {
+            imageOptions.append(ImageItemOption(
+                title: "Livestream",
+                image: UIImage(named: "icon_create_livestream_post", in: AmityUIKitManager.bundle, compatibleWith: nil)) {
+                    completion(.livestream)
+                })
+        }
         
         #if canImport(AmityUIKit4)
+        
         let storyCompletion: ((AmityPostContentType) -> Void) = { postContentType in
             let targetSelectionPage = AmityTargetSelectionPage(type: .story)
             let navPostTargetVC = UINavigationController(rootViewController: AmitySwiftUIHostingController(rootView: targetSelectionPage))
@@ -156,12 +164,15 @@ open class AmityEventHandler {
             navPostTargetVC.modalPresentationStyle = .fullScreen
             source.present(navPostTargetVC, animated: true, completion: nil)
         }
-        let storyPostOption = ImageItemOption(title: AmityLocalizedStringSet.General.story.localizedString, image: AmityIconSet.CreatePost.iconStory) {
-            storyCompletion(.story)
+        if postOption.contains(.story) {
+            
+            imageOptions.append(ImageItemOption(title: AmityLocalizedStringSet.General.story.localizedString, image: AmityIconSet.CreatePost.iconStory) {
+                storyCompletion(.story)
+            })
         }
-        AmityBottomSheet.present(options: [livestreamPost, postOption, storyPostOption , pollPostOption], from: source)
+        AmityBottomSheet.present(options: imageOptions, from: source)
         #else
-        AmityBottomSheet.present(options: [livestreamPost, postOption, pollPostOption], from: source)
+        AmityBottomSheet.present(options: imageOptions, from: source)
         #endif
     }
     

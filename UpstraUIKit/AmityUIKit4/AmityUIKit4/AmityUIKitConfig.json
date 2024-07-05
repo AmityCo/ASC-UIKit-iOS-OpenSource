@@ -30,7 +30,7 @@
       "highlight_color": "#1054DE"
     }
   },
-  "excludes": [],
+  "excludes": ["*/post_content/share_button"],
   "message_reactions": [
     { "name": "heart", "image": "messageReactionHeart"},
     { "name": "like", "image": "messageReactionLike"},
@@ -197,6 +197,103 @@
     "live_chat_page/reaction_list/user_avatar_view": { },
     "live_chat_page/reaction_list/user_display_name": { },
     "live_chat_page/reaction_list/reaction_image_view": { },
+    
+    "social_home_page/top_navigation/header_label": {
+        "text": "Community"
+    },
+    "social_home_page/top_navigation/global_search_button": {
+        "icon": "searchIcon"
+    },
+    "social_home_page/top_navigation/post_creation_button": {
+        "icon": "plusIcon"
+    },
+    "social_home_page/*/newsfeed_button": {
+        "text": "Newsfeed"
+    },
+    "social_home_page/*/explore_button": {
+        "text": "Explore"
+    },
+    "social_home_page/*/my_communities_button": {
+        "text": "My Communities"
+    },
+    "social_home_page/empty_newsfeed/illustration": {
+        "icon": "emptyNewsFeedIcon"
+    },
+    "social_home_page/empty_newsfeed/title": {
+        "text": "Your Feed is empty"
+    },
+    "social_home_page/empty_newsfeed/description": {
+        "text": "Find community or create your own"
+    },
+    "social_home_page/empty_newsfeed/explore_communitties_button": {
+        "icon": "exploreIcon",
+        "text": "Explore Community"
+    },
+    "social_home_page/empty_newsfeed/create_community_button": {
+        "icon": "createCommunityIcon"
+    },
+    "social_home_page/my_communities/community_avatar": {},
+    "social_home_page/my_communities/community_display_name": {},
+    "social_home_page/my_communities/community_private_badge": {
+        "icon": "lockBlackIcon"
+    },
+    "social_home_page/my_communities/community_official_badge": {
+        "icon": "verifiedBadge"
+    },
+    "social_home_page/my_communities/community_category_name": {},
+    "social_home_page/my_communities/community_members_count": {},
+    "social_home_page/newsfeed_component/*": {},
+    "social_home_page/global_feed_component/*": {},
+    "post_detail_page/*/back_button": {
+        "icon": "backIcon"
+    },
+    "post_detail_page/*/menu_button": {
+        "icon": "threeDotIcon"
+    },
+    "*/post_content/moderator_badge": {
+        "icon": "moderatorBadgeIcon",
+        "text": "Moderator"
+    },
+    "*/post_content/timestamp": {},
+    "*/post_content/menu_button": {
+        "icon": "threeDotIcon"
+    },
+    "*/post_content/post_content_view_count": {},
+    "*/post_content/reaction_button": {
+        "icon": "likeActionIcon",
+        "text": "Like"
+    },
+    "*/post_content/comment_button": {
+        "icon": "commentActionIcon",
+        "text": "Comment"
+    },
+    "*/post_content/share_button": {
+        "icon": "shareActionIcon",
+        "text": "Share"
+    },
+    "social_global_search_page/*/*": {},
+    "social_global_search_page/top_search_bar/*": {},
+    "social_global_search_page/top_search_bar/search_icon": {
+        "icon": "searchIcon"
+    },
+    "social_global_search_page/top_search_bar/clear_button": {
+        "icon": "backgroundedCloseIcon"
+    },
+    "social_global_search_page/top_search_bar/cancel_button": {
+        "text": "Cancel"
+    },
+    "social_global_search_page/community_search_result/community_avatar": {},
+    "social_global_search_page/community_search_result/community_display_name": {},
+    "social_global_search_page/community_search_result/community_private_badge": {
+        "icon": "lockBlackIcon"
+    },
+    "social_global_search_page/community_search_result/community_official_badge": {
+        "icon": "verifiedBadge"
+    },
+    "social_global_search_page/community_search_result/community_category_name": {},
+    "social_global_search_page/community_search_result/community_members_count": {},
+    "social_global_search_page/user_search_result/*": {},
+
     "message_reaction_list_page/*/*": { },
     "message_reaction_list_page/message_reaction_list_header/*": { },
     "message_reaction_list_page/message_reaction_list_header/message_reaction_list_tab": { },

@@ -17,6 +17,7 @@ public struct AmityLiveChatMessageReactionPicker: AmityElementView {
     public var id: ElementId {
         return .messageReactionPicker
     }
+
     let dismissAction: DefaultTapAction?
     
     let message: MessageModel

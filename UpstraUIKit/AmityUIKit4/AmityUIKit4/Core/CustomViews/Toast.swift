@@ -17,6 +17,7 @@ public enum ToastStyle {
 
 public struct ToastView: View {
     @State private var rotatingDegree = 0.0
+    static let toastViewTag: Int = 101010
     
     var message: String
     var style: ToastStyle
@@ -146,11 +147,12 @@ public class Toast: UIViewController {
         return vc.view
     }
     
-    public static func showToast(style: ToastStyle, message: String, bottomPadding: CGFloat = 0.0) {
+    public static func showToast(style: ToastStyle, message: String, bottomPadding: CGFloat = 0.0, autoHide: Bool = true) {
         let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
         guard let window = keyWindow else { return }
         
         let toastView = Toast.makeView(style: style, message: message)
+        toastView.tag = ToastView.toastViewTag
         toastView.frame = CGRect(x: 0, y: CGFloat(UIScreen.main.bounds.height - ((70 + bottomPadding) * UIScreen.main.scale)), width: UIScreen.main.bounds.width, height: toastView.frame.height)
         toastView.alpha = 0.0
         
@@ -159,6 +161,21 @@ public class Toast: UIViewController {
         UIView.animate(withDuration: 0.5, delay: 0.0, options: .curveEaseInOut, animations: {
             toastView.alpha = 1.0
         }) { _ in
+            if autoHide {
+                UIView.animate(withDuration: 0.5, delay: 3.0, options: .curveEaseInOut, animations: {
+                    toastView.alpha = 0.0
+                }, completion: { _ in
+                    toastView.removeFromSuperview()
+                })
+            }
+        }
+    }
+    
+    public static func removeToastIfPresented() {
+        let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
+        guard let window = keyWindow else { return }
+        
+        if let toastView = window.subviews.first(where: { $0.tag == ToastView.toastViewTag }) {
             UIView.animate(withDuration: 0.5, delay: 3.0, options: .curveEaseInOut, animations: {
                 toastView.alpha = 0.0
             }, completion: { _ in

@@ -13,6 +13,12 @@ struct ImageVideoPicker: UIViewControllerRepresentable {
     @Environment(\.presentationMode) private var presentationMode
     
     @ObservedObject var viewModel: ImageVideoPickerViewModel
+    private let mediaType: [UTType]
+    
+    init(viewModel: ImageVideoPickerViewModel, mediaType: [UTType] = [UTType.image, UTType.movie]) {
+        self.viewModel = viewModel
+        self.mediaType = mediaType
+    }
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<ImageVideoPicker>) -> UIImagePickerController {
         
@@ -20,7 +26,7 @@ struct ImageVideoPicker: UIViewControllerRepresentable {
         imagePicker.allowsEditing = false
         imagePicker.sourceType = .photoLibrary
         imagePicker.delegate = context.coordinator
-        imagePicker.mediaTypes = [UTType.image.identifier, UTType.movie.identifier]
+        imagePicker.mediaTypes = mediaType.map { $0.identifier }
         imagePicker.videoQuality = .typeHigh
         
         return imagePicker
@@ -81,7 +87,9 @@ class ImageVideoPickerViewModel: ObservableObject, Identifiable, Equatable {
     @Published var selectedMedia: String? = nil
     @Published var selectedImage: UIImage? = nil
     @Published var selectedMediaURL: URL? = nil
-    
+    @Published var selectedVidoesURLs: [URL] = []
+    @Published var selectedImages: [UIImage] = []
+
     static func == (lhs: ImageVideoPickerViewModel, rhs: ImageVideoPickerViewModel) -> Bool {
         lhs.id == rhs.id
     }

@@ -53,6 +53,14 @@ public struct AmityReactionList: AmityComponentView {
         self._tabBarItems = State(wrappedValue: setupTabItems(reactions: comment.reactions as? [String: Int] ?? [:], reactionCount: comment.reactionsCount))
     }
     
+    /// Convenience initializer
+    public init(post: AmityPost, pageId: PageId? = nil) {
+        self.pageId = pageId
+        self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: post.postId, referenceType: .post))
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
+        self._tabBarItems = State(wrappedValue: setupTabItems(reactions: post.reactions as? [String: Int] ?? [:], reactionCount: post.reactionsCount))
+    }
+    
     public var body: some View {
         VStack {
             BottomSheetDragIndicator()
@@ -139,7 +147,6 @@ public struct AmityReactionList: AmityComponentView {
             // Remove handled reactions
             availableReactions.remove(item.name)
         }
-        
         let isAllTabPresent = tabBarItems[0].isAllReactionTab()
         let isMoreThanOneReaction = filteredReactions.count > 1
         

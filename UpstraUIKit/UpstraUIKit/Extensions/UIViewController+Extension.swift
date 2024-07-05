@@ -9,6 +9,7 @@
 import UIKit
 import AVKit
 import AmitySDK
+import AVFoundation
 
 extension UIViewController {
     
@@ -47,12 +48,18 @@ extension UIViewController {
     }
     
     func presentVideoPlayer(at url: URL) {
-        let player = AVPlayer(url: url)
+        let headers = [
+            "Authorization": "Bearer \(AmityUIKitManager.client.accessToken ?? "")"
+        ]
+        
+        let asset = AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": headers])
+        let playerItem = AVPlayerItem(asset: asset)
+        let player = AVPlayer(playerItem: playerItem)
+        
         let playerViewController = AVPlayerViewController()
         playerViewController.player = player
         present(playerViewController, animated: true) { [weak player] in
             player?.play()
         }
     }
-
 }

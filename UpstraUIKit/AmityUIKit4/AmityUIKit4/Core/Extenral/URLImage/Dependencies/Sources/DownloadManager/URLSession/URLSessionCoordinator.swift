@@ -132,7 +132,7 @@ final class URLSessionCoordinator {
                 return
             }
 
-            let observer = DownloadTask.Observer(download: download, receiveResponse: receiveResponse, receiveData: receiveData, reportProgress: reportProgress, completion: completion)
+            let observer = DownloadManager.DownloadTask.Observer(download: download, receiveResponse: receiveResponse, receiveData: receiveData, reportProgress: reportProgress, completion: completion)
 
             let downloadTask = self.makeDownloadTask(for: download, withObserver: observer)
             self.registry[downloadTaskID] = downloadTask
@@ -160,7 +160,7 @@ final class URLSessionCoordinator {
 
     private let urlSession: URLSession
 
-    private func makeDownloadTask(for download: Download, withObserver observer: DownloadTask.Observer) -> DownloadTask {
+    private func makeDownloadTask(for download: Download, withObserver observer: DownloadManager.DownloadTask.Observer) -> DownloadManager.DownloadTask {
         let urlSessionTask: URLSessionTask
 
         var request = URLRequest(url: download.url)
@@ -175,12 +175,12 @@ final class URLSessionCoordinator {
 
         urlSessionTask.taskDescription = download.id.uuidString
 
-        return DownloadTask(download: download, urlSessionTask: urlSessionTask, observer: observer)
+        return DownloadManager.DownloadTask(download: download, urlSessionTask: urlSessionTask, observer: observer)
     }
 
     private typealias DownloadTaskID = String
 
-    private var registry: [DownloadTaskID: DownloadTask] = [:]
+    private var registry: [DownloadTaskID: DownloadManager.DownloadTask] = [:]
 
     private let serialQueue = DispatchQueue(label: "URLSessionCoordinator.serialQueue")
 

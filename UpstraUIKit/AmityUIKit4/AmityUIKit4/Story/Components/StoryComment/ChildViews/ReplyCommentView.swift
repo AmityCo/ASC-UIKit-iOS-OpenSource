@@ -33,11 +33,15 @@ struct ReplyCommentView: View {
                 .isHidden(hideViewReplyCommentButton)
             
             if let collection {
-                CommentListView(collection, isReply: true, hideCommentButtons: hideCommentButtons, commentButtonAction: commentButtonAction)
+                ReplyCommentListView(collection: collection,
+                                hideCommentButtons: hideCommentButtons,
+                                commentButtonAction: commentButtonAction)
+                
                 getViewMoreReplyCommentButton()
                     .padding([.top, .bottom], 3)
                     .padding(.leading, 52)
                     .isHidden(!collection.hasPrevious)
+                
             }
             
         }

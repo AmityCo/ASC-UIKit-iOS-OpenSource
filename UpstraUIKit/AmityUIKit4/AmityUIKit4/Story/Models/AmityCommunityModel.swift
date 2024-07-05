@@ -8,7 +8,7 @@
 import UIKit
 import AmitySDK
 
-struct AmityCommunityModel {
+public struct AmityCommunityModel {
     let communityId: String
     let description: String
     let displayName: String
@@ -23,6 +23,7 @@ struct AmityCommunityModel {
     let userId: String
     let tags: [String]
     let category: String
+    let categories: [String]
     var categoryId: String?
     let avatarURL: String
     let isPostReviewEnabled: Bool
@@ -47,6 +48,7 @@ struct AmityCommunityModel {
         self.userId = object.userId
         self.tags = object.tags ?? []
         self.category = object.categories.first?.name ?? AmityLocalizedStringSet.General.anonymous.localizedString
+        self.categories = object.categories.map { $0.name }
         self.categoryId = object.categoryIds.first
         self.avatarURL = object.avatar?.fileURL ?? ""
         self.participation = object.membership

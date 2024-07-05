@@ -83,7 +83,7 @@ public struct AmityViewStoryPage: AmityPageView {
                                 .onAppear {
                                     Log.add(event: .info, "ProgressBar Appeared")
                                 }
-                                .onReceive(storyTarget.$storyCount) { count in
+                                .onReceive(storyTarget.$itemCount) { count in                                    
                                     Log.add(event: .info, "Story Segment Changed: \(count) - \(storyTarget.targetName)")
                                     updateProgressSegmentWidth(totalWidth: geometry.size.width, numberOfStories: count)
                                     
@@ -105,24 +105,28 @@ public struct AmityViewStoryPage: AmityPageView {
                                 .isHidden(viewConfig.isHidden(elementId: .progressBarElement), remove: false)
 
                             HStack(spacing: 0) {
-                                let storyTargetId = viewModel.storyTargets[storyTargetIndex].targetId
-                                
-                                Button {
-                                    showBottomSheet.toggle()
-                                } label: {
-                                    let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .overflowMenuElement, key: "overflow_menu_icon", of: String.self) ?? "")
-                                    Image(icon)
-                                        .frame(width: 24, height: 20)
-                                        .padding(.trailing, 20)
-                                }
-                                .onAppear {
-                                    Task {
-                                        hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: storyTargetId)
+                                /// Show overflow menu if item is the story
+                                /// Hide it if item is ads
+                                if let item = viewModel.storyTargets[storyTargetIndex].items.element(at: storySegmentIndex),
+                                   case let .content(_) = item.type {
+                                    Button {
+                                        showBottomSheet.toggle()
+                                    } label: {
+                                        let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .overflowMenuElement, key: "overflow_menu_icon", of: String.self) ?? "")
+                                        Image(icon)
+                                            .frame(width: 24, height: 20)
+                                            .padding(.trailing, 20)
                                     }
+                                    .onAppear {
+                                        Task {
+                                            let storyTargetId = viewModel.storyTargets[storyTargetIndex].targetId
+                                            hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: storyTargetId)
+                                        }
+                                    }
+                                    .isHidden(!hasStoryManagePermission, remove: false)
+                                    .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.meatballsButton)
+                                    .isHidden(viewConfig.isHidden(elementId: .overflowMenuElement), remove: false)
                                 }
-                                .isHidden(!hasStoryManagePermission, remove: false)
-                                .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.meatballsButton)
-                                .isHidden(viewConfig.isHidden(elementId: .overflowMenuElement), remove: false)
                                 
                                 Button {
                                     Log.add(event: .info, "Tapped Closed!!!")
@@ -175,7 +179,7 @@ public struct AmityViewStoryPage: AmityPageView {
                     viewModel.preloadStoryTargets(value, viewModel.storyTargets)
                     storySegmentIndex = 0
                     page.update(.new(index: value))
-                    updateProgressSegmentWidth(totalWidth: geometry.size.width, numberOfStories: viewModel.storyTargets[value].stories.count)
+                    updateProgressSegmentWidth(totalWidth: geometry.size.width, numberOfStories: viewModel.storyTargets[value].items.count)
                     
                 }
                 .onChange(of: totalDuration) { value in
@@ -218,7 +222,8 @@ public struct AmityViewStoryPage: AmityPageView {
                 .buttonStyle(.plain)
                 .alert(isPresented: $isAlertShown, content: {
                     Alert(title: Text(AmityLocalizedStringSet.Story.deleteStoryTitle.localizedString), message: Text(AmityLocalizedStringSet.Story.deleteStoryMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
-                        if let story = viewModel.storyTargets[storyTargetIndex].stories.element(at: storySegmentIndex) {
+                        if let item = viewModel.storyTargets[storyTargetIndex].items.element(at: storySegmentIndex),
+                            case let .content(story) = item.type {
                             Task { @MainActor in
                                 try await viewModel.deleteStory(storyId: story.storyId)
                                 storyCoreViewModel.playVideo = false
@@ -254,7 +259,7 @@ public struct AmityViewStoryPage: AmityPageView {
         if progressBarViewModel.progressArray[storySegmentIndex].progress == progressSegmentWidth {
             
             let lastStoryTargetIndex = viewModel.storyTargets.count - 1
-            let lastStorySegmentIndex = viewModel.storyTargets[storyTargetIndex].stories.count - 1
+            let lastStorySegmentIndex = viewModel.storyTargets[storyTargetIndex].items.count - 1
             
             
             if storySegmentIndex != lastStorySegmentIndex {
@@ -287,7 +292,7 @@ public struct AmityViewStoryPage: AmityPageView {
             progressBarViewModel.progressArray[storySegmentIndex].progress = progressSegmentWidth
             
             let lastStoryTargetIndex = viewModel.storyTargets.count - 1
-            let lastStorySegmentIndex = viewModel.storyTargets[storyTargetIndex].stories.count - 1
+            let lastStorySegmentIndex = viewModel.storyTargets[storyTargetIndex].items.count - 1
             
             if storySegmentIndex != lastStorySegmentIndex {
                 storySegmentIndex += 1
@@ -329,10 +334,12 @@ class AmityStoryPageViewModel: ObservableObject {
     @Published var storyTargets: [AmityStoryTargetModel] = []
     @Published var toastMessage: String = ""
     @Published var toastStyle: ToastStyle = .success
+    private var seenStoryCount: Int = 0
     
     private var cancellable: AnyCancellable?
     private var storyTargetObject: AmityObject<AmityStoryTarget>?
     private var storyTargetCollection: AmityCollection<AmityStoryTarget>?
+    private var seenStoryModels: Set<AmityStoryModel> = Set()
     
     let storyManager = StoryManager()
     let timer = Timer.publish(every: 0.001, on: .main, in: .common).autoconnect()
@@ -374,6 +381,7 @@ class AmityStoryPageViewModel: ObservableObject {
     }
     
     deinit {
+        seenStoryModels.forEach { $0.analytics.markAsSeen() }
         timer.upstream.connect().cancel()
         URLImageService.defaultImageService.inMemoryStore?.removeAllImages()
     }
@@ -383,18 +391,23 @@ class AmityStoryPageViewModel: ObservableObject {
         let previousStoryTargetIndex = index - 1
         
         if index <= storyTargets.count - 1 {
-            storyTargets[index].fetchStory()
+            storyTargets[index].fetchStory(totalSeenStoryCount: seenStoryCount)
         }
         
         if nextStoryTargetIndex <= storyTargets.count - 1 {
             Log.add(event: .info, "Preloaded next index: \(nextStoryTargetIndex)")
-            storyTargets[nextStoryTargetIndex].fetchStory()
+            storyTargets[nextStoryTargetIndex].fetchStory(totalSeenStoryCount: seenStoryCount)
         }
         
         if previousStoryTargetIndex >= 0 {
-            Log.add(event: .info, "Preloaded previous index: \(nextStoryTargetIndex)")
-            storyTargets[previousStoryTargetIndex].fetchStory()
+            Log.add(event: .info, "Preloaded previous index: \(previousStoryTargetIndex)")
+            storyTargets[previousStoryTargetIndex].fetchStory(totalSeenStoryCount: seenStoryCount)
         }
+    }
+    
+    func markAsSeen(_ storyModel: AmityStoryModel) {
+        seenStoryModels.insert(storyModel)
+        seenStoryCount += 1
     }
     
     @MainActor

@@ -56,6 +56,7 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
             }, paginate: {
                 textEditorViewModel.loadMoreMentions()
             })
+            .background(Color(viewConfig.theme.baseColorShade4))
             .isHidden(mentionedUsers.count == 0)
             .accessibilityIdentifier(AccessibilityID.Chat.MentionList.container)
             

@@ -24,7 +24,7 @@ open class AmityTargetSelectionPageBehaviour {
     
     public init() {}
     
-    open func selectTargetAction(context: Context) {
+    open func goToCreateStoryPage(context: Context) {
         let createStoryPage = AmityCreateStoryPage(targetId: context.community.communityId, targetType: context.targetType)
         let controller = AmitySwiftUIHostingController(rootView: createStoryPage)
         

@@ -34,4 +34,9 @@ extension String {
     
         return ceil(boundingBox.height)
     }
+    
+    func size(usingFont font: UIFont) -> CGSize {
+        let fontAttributes = [NSAttributedString.Key.font: font]
+        return self.size(withAttributes: fontAttributes)
+    }
 }

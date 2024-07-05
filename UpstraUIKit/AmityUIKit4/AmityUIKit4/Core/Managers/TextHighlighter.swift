@@ -55,7 +55,7 @@ class TextHighlighter {
         return AttributedString(highlightedText)
     }
     
-    private static func detectLinks(in text: String) -> [String] {
+    public static func detectLinks(in text: String) -> [String] {
         guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
             return []
         }
@@ -73,7 +73,7 @@ class TextHighlighter {
         return links
     }
     
-    static func highlightLinks(links: [String], in string: AttributedString) -> AttributedString {
+    public static func highlightLinks(links: [String], in string: AttributedString, attributes: [NSAttributedString.Key: Any] = [.underlineStyle: Text.LineStyle(pattern: .solid), .foregroundColor : UIColor.systemBlue]) -> AttributedString {
         var finalStr = string
         
         for link in links {
@@ -88,8 +88,8 @@ class TextHighlighter {
             }
             
             finalStr[linkRange].link = URL(string: finalLink)
-            finalStr[linkRange].underlineStyle = Text.LineStyle(pattern: .solid)
-            finalStr[linkRange].foregroundColor = .blue
+            finalStr[linkRange].underlineStyle = attributes[.underlineStyle] as? Text.LineStyle
+            finalStr[linkRange].foregroundColor = attributes[.foregroundColor] as? UIColor
         }
         
         return finalStr

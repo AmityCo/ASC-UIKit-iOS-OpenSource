@@ -19,4 +19,10 @@ extension View {
         AnyView(self)
     }
 
+    func debugBorder(_ color: Color = .red) -> some View {
+        self
+            .border(color, width: 1)
+    }
+    
 }
+

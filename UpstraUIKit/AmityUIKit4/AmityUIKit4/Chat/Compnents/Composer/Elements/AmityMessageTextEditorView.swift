@@ -104,5 +104,9 @@ public struct AmityMessageTextEditorView: View {
             viewModel.updateAttributes(hightlightColor: value.primaryColor, textColor: value.baseColor)
         })
         .frame(height: textEditorHeight)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            viewModel.textView.becomeFirstResponder()
+        }
     }
 }

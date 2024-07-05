@@ -217,6 +217,5 @@ class LiveChatMessageBubbleViewModel: ObservableObject {
             self.isReportedByMe = reportStatus
         }
     }
-    
 }
 

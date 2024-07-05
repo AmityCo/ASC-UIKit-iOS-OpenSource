@@ -26,26 +26,10 @@ public struct AmityEditCommentView: View {
     
     public var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            Image(AmityIcon.defaultCommunityAvatar.getImageResource())
-                .resizable()
+            AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: URL(string: comment.fileURL))
                 .frame(width: 32, height: 32)
                 .clipShape(.circle)
                 .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))
-                .overlay(
-                    VStack {
-                        if let avatarURL = URL(string: comment.fileURL) {
-                            URLImage(avatarURL) { progress in
-                                
-                            } content: { image in
-                                image
-                                    .resizable()
-                                    .frame(width: 32, height: 32)
-                                    .clipShape(.circle)
-                            }
-                        }
-                    }
-                )
-
             
             VStack(alignment: .trailing, spacing: 10) {
             
@@ -107,6 +91,8 @@ public struct AmityEditCommentView: View {
             text = comment.text
             mentionData.metadata = comment.metadata
         }
-
+        .onDisappear {
+            text = ""
+        }
     }
 }

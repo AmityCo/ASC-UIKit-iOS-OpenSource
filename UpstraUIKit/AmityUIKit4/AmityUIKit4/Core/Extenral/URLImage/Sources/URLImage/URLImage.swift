@@ -136,7 +136,7 @@ public extension URLImage where Empty == EmptyView {
 
 @available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 public extension URLImage where Empty == EmptyView,
-                                InProgress == ActivityIndicator {
+                                InProgress == URLImageActivityIndicator {
 
     init(_ url: URL,
          identifier: String? = nil,
@@ -146,7 +146,7 @@ public extension URLImage where Empty == EmptyView,
         self.init(url,
                   identifier: identifier,
                   empty: { EmptyView() },
-                  inProgress: { _ in ActivityIndicator() },
+                  inProgress: { _ in URLImageActivityIndicator() },
                   failure: failure,
                   content: content)
     }
@@ -159,7 +159,7 @@ public extension URLImage where Empty == EmptyView,
         self.init(url,
                   identifier: identifier,
                   empty: { EmptyView() },
-                  inProgress: { _ in ActivityIndicator() },
+                  inProgress: { _ in URLImageActivityIndicator() },
                   failure: failure,
                   content: content)
     }
@@ -200,7 +200,7 @@ public extension URLImage where Empty == EmptyView,
 
 @available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 public extension URLImage where Empty == EmptyView,
-                                InProgress == ActivityIndicator,
+                                InProgress == URLImageActivityIndicator,
                                 Failure == EmptyView {
 
     init(_ url: URL,
@@ -210,7 +210,7 @@ public extension URLImage where Empty == EmptyView,
         self.init(url,
                   identifier: identifier,
                   empty: { EmptyView() },
-                  inProgress: { _ in ActivityIndicator() },
+                  inProgress: { _ in URLImageActivityIndicator() },
                   failure: { _, _ in EmptyView() },
                   content: content)
     }
@@ -222,7 +222,7 @@ public extension URLImage where Empty == EmptyView,
         self.init(url,
                   identifier: identifier,
                   empty: { EmptyView() },
-                  inProgress: { _ in ActivityIndicator() },
+                  inProgress: { _ in URLImageActivityIndicator() },
                   failure: { _, _ in EmptyView() },
                   content: content)
     }

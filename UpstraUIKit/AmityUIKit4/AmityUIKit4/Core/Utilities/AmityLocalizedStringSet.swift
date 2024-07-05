@@ -113,4 +113,20 @@ public struct AmityLocalizedStringSet {
         static let tapToRemove = "reaction_list_tap_to_remove"
         static let allTab = "All"
     }
+    
+    public enum Social {
+        static let emptyNewsFeedTitle = "empty_newsfeed_title"
+        static let emptyNewsFeedDescription = "empty_newsfeed_description"
+        static let editPostBottomSheetTitle = "edit_post_bottom_sheet_title"
+        static let deletePostBottomSheetTitle = "delete_post_bottom_sheet_title"
+        static let reportPostBottomSheetTitle = "report_post_bottom_sheet_title"
+        static let unreportPostBottomSheetTitle = "unreport_post_bottom_sheet_title"
+        static let deletePostTitle = "delete_post_title"
+        static let deletePostMessage = "delete_post_message"
+        static let postReportedMessage = "post_reported_message"
+        static let postUnReportedMessage = "post_unreported_message"
+        static let postDeletedToastMessage = "post_deleted_toast_message"
+        static let postDetailPageTitle = "post_detail_page_title"
+        
+    }
 }

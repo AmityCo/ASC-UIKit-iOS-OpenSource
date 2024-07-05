@@ -9,9 +9,11 @@ import Foundation
 import SwiftUI
 import Combine
 
-public enum MentionListPosition {
+public enum MentionListPosition: Equatable {
     case top(CGFloat)
     case bottom(CGFloat)
+    /// case where mention list should be out of TextEditor
+    case none
 }
 
 extension AmityTextEditorView: AmityViewBuildable {
@@ -114,8 +116,14 @@ public struct AmityTextEditorView: View {
                     .onChange(of: text) { value in
                         hidePlaceholder = !text.isEmpty
                         let textHeight = viewModel.textView.text.height(withConstrainedWidth: geometry.size.width, font: .systemFont(ofSize: 15))
-                        let paddedHeight = textHeight + 4
-                        textEditorHeight = min(max(paddedHeight, textEditorInitialHeight), textEditorMaxHeight)
+                        
+                        let defaultInset = viewModel.textView.textContainerInset
+                        
+                        // Note:
+                        // Max 5 lines = 90 (18px per line) | Top + Bottom Inset: 16 | ~ Max height: 106
+                        
+                        let paddedHeight = textHeight + defaultInset.top + defaultInset.bottom
+                        textEditorHeight = min(paddedHeight, textEditorMaxHeight)
                     }
                     .onReceive(viewModel.textView.textPublisher, perform: { text in
                         self.mentionData.metadata = viewModel.mentionManager.getMetadata()
@@ -128,45 +136,47 @@ public struct AmityTextEditorView: View {
                     }
                     .overlay(
                         VStack {
-                            let listHeight = mentionedUsers.count < 5 ? CGFloat(mentionedUsers.count) * 50.0 : 250.0
-                            
-                            ScrollViewReader { scrollViewReader in
-                                ScrollView {
-                                    LazyVStack {
-                                        ForEach(Array(mentionedUsers.enumerated()), id: \.element.userId) { index, user in
-                                            HStack {
-                                                AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: URL(string: user.avatarURL))
-                                                    .frame(width: 30, height: 30)
-                                                    .clipShape(Circle())
-                                                
-                                                Text(user.displayName)
-                                                    .foregroundColor(Color(textColor))
-                                                Spacer()
-                                            }
-                                            .padding([.leading, .trailing], 15)
-                                            .padding([.top, .bottom], 10)
-                                            .contentShape(Rectangle())
-                                            .onTapGesture {
-                                                let indexPath = IndexPath(row: index, section: 0)
-                                                viewModel.mentionManager.addMention(from: viewModel.textView, in: viewModel.textView.text, at: indexPath)
-                                                
-                                                self.text = viewModel.textView.text
-                                                mentionData.metadata = viewModel.mentionManager.getMetadata()
-                                                mentionData.mentionee = viewModel.mentionManager.getMentionees()
-                                            }
-                                            .onAppear {
-                                                if index == mentionedUsers.count - 1  {
-                                                    viewModel.mentionManager.mentionProvider.loadMore()
+                            if mentionListPosition != MentionListPosition.none {
+                                let listHeight = mentionedUsers.count < 5 ? CGFloat(mentionedUsers.count) * 50.0 : 250.0
+                                
+                                ScrollViewReader { scrollViewReader in
+                                    ScrollView {
+                                        LazyVStack {
+                                            ForEach(Array(mentionedUsers.enumerated()), id: \.element.userId) { index, user in
+                                                HStack {
+                                                    AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: URL(string: user.avatarURL))
+                                                        .frame(width: 30, height: 30)
+                                                        .clipShape(Circle())
+                                                    
+                                                    Text(user.displayName)
+                                                        .foregroundColor(Color(textColor))
+                                                    Spacer()
+                                                }
+                                                .padding([.leading, .trailing], 15)
+                                                .padding([.top, .bottom], 10)
+                                                .contentShape(Rectangle())
+                                                .onTapGesture {
+                                                    let indexPath = IndexPath(row: index, section: 0)
+                                                    viewModel.mentionManager.addMention(from: viewModel.textView, in: viewModel.textView.text, at: indexPath)
+                                                    
+                                                    self.text = viewModel.textView.text
+                                                    mentionData.metadata = viewModel.mentionManager.getMetadata()
+                                                    mentionData.mentionee = viewModel.mentionManager.getMentionees()
+                                                }
+                                                .onAppear {
+                                                    if index == mentionedUsers.count - 1  {
+                                                        viewModel.mentionManager.mentionProvider.loadMore()
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
+                                .frame(width: UIScreen.main.bounds.width, height: listHeight)
+                                .background(Color(backgroundColor))
+                                .offset(y: getOverlayOffset(size: geometry.size, listHeight: listHeight, position: mentionListPosition))
+                                .isHidden(mentionedUsers.count == 0)
                             }
-                            .frame(width: UIScreen.main.bounds.width, height: listHeight)
-                            .background(Color(backgroundColor))
-                            .offset(y: getOverlayOffset(size: geometry.size, listHeight: listHeight, position: mentionListPosition))
-                            .isHidden(mentionedUsers.count == 0)
                         }
                     )
                 
@@ -193,6 +203,8 @@ public struct AmityTextEditorView: View {
             -(listHeight / 2 + size.height / 2 + padding)
         case .bottom(let padding):
             listHeight / 2 + size.height / 2 + padding
+        case .none:
+            0.0
         }
     }
 }
@@ -236,6 +248,12 @@ public class AmityTextEditorViewModel: ObservableObject {
 
         self.mentionManager.typingAttributes = typingAttributes
         self.mentionManager.highlightAttributes = highlightAttributes
+        
+        // Apply attribute to existing text
+        let attributedText = NSMutableAttributedString(attributedString: self.textView.attributedText)
+        attributedText.addAttributes(typingAttributes, range: NSRange(location: 0, length: attributedText.length))
+        self.textView.attributedText = attributedText
+        
     }
 }
 
