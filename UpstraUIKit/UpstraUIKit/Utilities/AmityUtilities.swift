@@ -19,3 +19,20 @@ struct AmityUtilities {
         return UINib(nibName: nibName, bundle: AmityUIKitManager.bundle)
     }
 }
+
+class AlertController {
+    
+    struct DismissConfig {
+        let title: String
+        let action: (() -> Void)?
+    }
+    
+    static func showAlert(in vc: UIViewController, title: String, message: String, dismiss: DismissConfig = .init(title: AmityLocalizedStringSet.General.ok.localizedString, action: nil)) {
+        let cancelAction = UIAlertAction(title: dismiss.title, style: .cancel, handler: { _ in dismiss.action?() })
+        
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(cancelAction)
+
+        vc.present(alertController, animated: true, completion: nil)
+    }
+}

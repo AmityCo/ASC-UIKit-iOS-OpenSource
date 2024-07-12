@@ -9,20 +9,7 @@
 import AmitySDK
 import UIKit
 
-public struct AmityMentionUserModel {
-    let userId: String
-    let displayName: String
-    let avatarURL: String
-    let isGlobalBan: Bool
-    
-    init(user: AmityUser) {
-        self.userId = user.userId
-        self.displayName = user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
-        self.avatarURL = user.getAvatarInfo()?.fileURL ?? ""
-        self.isGlobalBan = user.isGlobalBanned
-    }
-}
-
+@available(*, deprecated, message: "This class has been deprecated. Use ASCMentionManager instead")
 public protocol AmityMentionManagerDelegate: AnyObject {
     func didGetUsers(users: [AmityMentionUserModel])
     func didCreateAttributedString(attributedString: NSAttributedString)
@@ -30,12 +17,7 @@ public protocol AmityMentionManagerDelegate: AnyObject {
     func didCharactersReachToMaximumLimit()
 }
 
-public enum AmityMentionManagerType {
-    case post(communityId: String?)
-    case comment(communityId: String?)
-    case message(channelId: String?)
-}
-
+@available(*, deprecated, message: "This class has been deprecated. Use ASCMentionManager instead")
 final public class AmityMentionManager {
     // Properties
     private let type: AmityMentionManagerType
@@ -544,6 +526,7 @@ private extension AmityMentionManager {
 }
 
 extension AmityMentionManager {
+    
     static func getAttributes(fromText text: String, withMetadata metadata: [String: Any], mentionees: [AmityMentionees], shift: Int = 0, highlightColor: UIColor = AmityColorSet.primary, highlightFont: UIFont = AmityFontSet.bodyBold) -> [MentionAttribute] {
         var attributes = [MentionAttribute]()
         

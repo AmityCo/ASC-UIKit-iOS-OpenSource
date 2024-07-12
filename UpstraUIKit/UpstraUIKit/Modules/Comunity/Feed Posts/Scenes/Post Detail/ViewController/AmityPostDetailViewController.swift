@@ -32,7 +32,7 @@ open class AmityPostDetailViewController: AmityViewController {
     private var referenceId: String?
     private var expandedIds: Set<String> = []
     private var showReplyIds: [String] = []
-    private var mentionManager: AmityMentionManager?
+    private var mentionManager: ASCMentionManager?
     
     private var parentComment: AmityCommentModel? {
         didSet {
@@ -79,8 +79,6 @@ open class AmityPostDetailViewController: AmityViewController {
         navigationController?.setBackgroundColor(with: .white)
         AmityKeyboardService.shared.delegate = self
         mentionManager?.delegate = self
-        mentionManager?.setColor(AmityColorSet.base, highlightColor: AmityColorSet.primary)
-        mentionManager?.setFont(AmityFontSet.body, highlightFont: AmityFontSet.bodyBold)
     }
     
     public override func viewWillDisappear(_ animated: Bool) {
@@ -216,21 +214,12 @@ open class AmityPostDetailViewController: AmityViewController {
         
     }
     
-    private func showAlertForMaximumCharacters() {
-        let title = parentComment == nil ? AmityLocalizedStringSet.postUnableToCommentTitle.localizedString : AmityLocalizedStringSet.postUnableToReplyTitle.localizedString
-        let message = parentComment == nil ? AmityLocalizedStringSet.postUnableToCommentDescription.localizedString : AmityLocalizedStringSet.postUnableToReplyDescription.localizedString
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.done.localizedString, style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion: nil)
-    }
-    
     private func setupMentionManager() {
         if mentionManager != nil { return }
         let community = screenViewModel.community
         let isPublic = community?.isPublic ?? false
         let communityId: String? = isPublic ? nil : community?.communityId
-        mentionManager = AmityMentionManager(withType: .comment(communityId: communityId))
+        mentionManager = ASCMentionManager(withType: .comment(communityId: communityId))
         mentionManager?.delegate = self
     }
     
@@ -628,8 +617,8 @@ extension AmityPostDetailViewController: AmityPostDetailCompostViewDelegate {
     }
     
     func composeView(_ view: AmityPostDetailCompostView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if view.textView.text.count > AmityMentionManager.maximumCharacterCountForPost {
-            showAlertForMaximumCharacters()
+        if view.textView.text.count > ASCMentionManager.maximumCharacterCountForPost {
+            didReachMaxCharacterCountLimit()
             return false
         }
         return mentionManager?.shouldChangeTextIn(view.textView, inRange: range, replacementText: text, currentText: view.textView.text) ?? true
@@ -832,22 +821,24 @@ extension AmityPostDetailViewController: AmityCommentTableViewCellDelegate {
     }
 }
 
-// MARK: - UITableViewDataSource
-extension AmityPostDetailViewController: UITableViewDataSource {
+// MARK: - Mention TableView DataSource & Delegate
+extension AmityPostDetailViewController: UITableViewDataSource, UITableViewDelegate {
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return mentionManager?.users.count ?? 0
+        return mentionManager?.mentionProvider.mentionList.count ?? 0
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell else { return UITableViewCell() }
         
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell, let model = mentionManager?.item(at: indexPath) else { return UITableViewCell() }
-        cell.display(with: model)
+        if let provider = mentionManager?.mentionProvider, indexPath.row < provider.mentionList.count {
+            let model = provider.mentionList[indexPath.row]
+            cell.display(with: model)
+        }
+        
         return cell
     }
-}
 
-// MARK: - UITableViewDelegate
-extension AmityPostDetailViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return AmityMentionTableViewCell.height
     }
@@ -857,25 +848,35 @@ extension AmityPostDetailViewController: UITableViewDelegate {
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == (mentionManager?.users.count ?? 0) - 4 {
-            mentionManager?.loadMore()
+        let usersCount = mentionManager?.mentionProvider.mentionList.count ?? 0
+        if indexPath.row == usersCount - 4 {
+            mentionManager?.mentionProvider.loadMore()
         }
     }
 }
 
-// MARK: - AmityMentionManagerDelegate
-extension AmityPostDetailViewController: AmityMentionManagerDelegate {
-    public func didCreateAttributedString(attributedString: NSAttributedString) {
-        commentComposeBarView.textView.attributedText = attributedString
-        commentComposeBarView.textView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: AmityColorSet.base]
+extension AmityPostDetailViewController: ASCMentionManagerDelegate {
+    
+    public func didReachMaxMentionLimit() {
+        let title = AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString
+        let message = parentComment == nil ? AmityLocalizedStringSet.Mention.unableToMentionCommentDescription.localizedString : AmityLocalizedStringSet.Mention.unableToMentionReplyDescription.localizedString
+
+        AlertController.showAlert(in: self, title: title, message: message)
     }
     
-    public func didGetUsers(users: [AmityMentionUserModel]) {
+    public func didReachMaxCharacterCountLimit() {
+        let title = parentComment == nil ? AmityLocalizedStringSet.postUnableToCommentTitle.localizedString : AmityLocalizedStringSet.postUnableToReplyTitle.localizedString
+        let message = parentComment == nil ? AmityLocalizedStringSet.postUnableToCommentDescription.localizedString : AmityLocalizedStringSet.postUnableToReplyDescription.localizedString
+        
+        AlertController.showAlert(in: self, title: title, message: message)
+    }
+    
+    public func didUpdateMentionUsers(users: [AmityMentionUserModel]) {
         if users.isEmpty {
             mentionTableViewHeightConstraint.constant = 0
             mentionTableView.isHidden = true
         } else {
-            var heightConstant:CGFloat = 240.0
+            var heightConstant: CGFloat = 240.0
             if users.count < 5 {
                 heightConstant = CGFloat(users.count) * 52.0
             }
@@ -885,15 +886,8 @@ extension AmityPostDetailViewController: AmityMentionManagerDelegate {
         }
     }
     
-    public func didMentionsReachToMaximumLimit() {
-        let message = parentComment == nil ? AmityLocalizedStringSet.Mention.unableToMentionCommentDescription.localizedString : AmityLocalizedStringSet.Mention.unableToMentionReplyDescription.localizedString
-        let alertController = UIAlertController(title: AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString, message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.done.localizedString, style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion: nil)
-    }
-    
-    public func didCharactersReachToMaximumLimit() {
-        showAlertForMaximumCharacters()
+    public func didCreateAttributedString(attributedString: NSAttributedString) {
+        commentComposeBarView.textView.attributedText = attributedString
+        commentComposeBarView.textView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: AmityColorSet.base]
     }
 }

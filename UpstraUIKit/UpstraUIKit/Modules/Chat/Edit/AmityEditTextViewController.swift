@@ -36,7 +36,7 @@ public class AmityEditTextViewController: AmityViewController {
     private let message: String
     var editHandler: ((String, [String: Any]?, AmityMentioneesBuilder?) -> Void)?
     var dismissHandler: (() -> Void)?
-    private let mentionManager: AmityMentionManager
+    private let mentionManager: ASCMentionManager
     private var metadata: [String: Any]? = nil
     
     // MARK: - View lifecycle
@@ -47,11 +47,11 @@ public class AmityEditTextViewController: AmityViewController {
         self.editMode = editMode
         switch editMode {
         case .editMessage:
-            mentionManager = AmityMentionManager(withType: .message(channelId: nil))
+            mentionManager = ASCMentionManager(withType: .message(channelId: nil))
         case .create(let communityId, _):
-            mentionManager = AmityMentionManager(withType: .comment(communityId: communityId))
+            mentionManager = ASCMentionManager(withType: .comment(communityId: communityId))
         case .edit(let communityId, let metadata, _):
-            mentionManager = AmityMentionManager(withType: .comment(communityId: communityId))
+            mentionManager = ASCMentionManager(withType: .comment(communityId: communityId))
             self.metadata = metadata
         }
         super.init(nibName: AmityEditTextViewController.identifier, bundle: AmityUIKitManager.bundle)
@@ -72,8 +72,7 @@ public class AmityEditTextViewController: AmityViewController {
         setupMentionTableView()
         
         mentionManager.delegate = self
-        mentionManager.setColor(AmityColorSet.base, highlightColor: AmityColorSet.primary)
-        mentionManager.setFont(AmityFontSet.body, highlightFont: AmityFontSet.bodyBold)
+        
         if let metadata = metadata {
             mentionManager.setMentions(metadata: metadata, inText: message)
         }
@@ -138,22 +137,6 @@ public class AmityEditTextViewController: AmityViewController {
             strongSelf.editHandler?(strongSelf.textView.text ?? "", metadata, mentionees)
         }
     }
-    
-    private func showAlertForMaximumCharacters() {
-        var title = AmityLocalizedStringSet.postUnableToCommentTitle.localizedString
-        var message = AmityLocalizedStringSet.postUnableToCommentDescription.localizedString
-        switch editMode {
-        case .edit(_, _, let isReply), .create(_, let isReply):
-            title = isReply ? AmityLocalizedStringSet.postUnableToReplyTitle.localizedString : AmityLocalizedStringSet.postUnableToCommentTitle.localizedString
-            message = isReply ? AmityLocalizedStringSet.postUnableToReplyDescription.localizedString : AmityLocalizedStringSet.postUnableToCommentDescription.localizedString
-        default:
-            break
-        }
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.done.localizedString, style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion: nil)
-    }
 }
 
 extension AmityEditTextViewController: AmityKeyboardServiceDelegate {
@@ -183,30 +166,33 @@ extension AmityEditTextViewController: AmityTextViewDelegate {
     }
     
     public func textView(_ textView: AmityTextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if textView.text.count > AmityMentionManager.maximumCharacterCountForPost {
-            showAlertForMaximumCharacters()
+        if textView.text.count > ASCMentionManager.maximumCharacterCountForPost {
+            didReachMaxCharacterCountLimit()
             return false
         }
         return mentionManager.shouldChangeTextIn(textView, inRange: range, replacementText: text, currentText: textView.text)
     }
 }
 
-// MARK: - UITableViewDataSource
-extension AmityEditTextViewController: UITableViewDataSource {
+// MARK: - Mention TableView UITableViewDataSource & UITableViewDelegate
+extension AmityEditTextViewController: UITableViewDataSource, UITableViewDelegate {
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return mentionManager.users.count
+        return mentionManager.mentionProvider.mentionList.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell else { return UITableViewCell() }
         
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell, let model = mentionManager.item(at: indexPath) else { return UITableViewCell() }
-        cell.display(with: model)
+        let provider = mentionManager.mentionProvider
+        if indexPath.row < provider.mentionList.count {
+            let model = provider.mentionList[indexPath.row]
+            cell.display(with: model)
+        }
+        
         return cell
     }
-}
 
-// MARK: - UITableViewDelegate
-extension AmityEditTextViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return AmityMentionTableViewCell.height
     }
@@ -217,19 +203,15 @@ extension AmityEditTextViewController: UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if tableView.isBottomReached {
-            mentionManager.loadMore()
+            mentionManager.mentionProvider.loadMore()
         }
     }
 }
 
-// MARK: - AmityMentionManagerDelegate
-extension AmityEditTextViewController: AmityMentionManagerDelegate {
-    public func didCreateAttributedString(attributedString: NSAttributedString) {
-        textView.attributedText = attributedString
-        textView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: AmityColorSet.base]
-    }
+// MARK: - ASCMentionManagerDelegate
+extension AmityEditTextViewController: ASCMentionManagerDelegate {
     
-    public func didGetUsers(users: [AmityMentionUserModel]) {
+    public func didUpdateMentionUsers(users: [AmityMentionUserModel]) {
         if users.isEmpty {
             mentionTableViewHeightConstraint.constant = 0
             mentionTableView.isHidden = true
@@ -244,14 +226,26 @@ extension AmityEditTextViewController: AmityMentionManagerDelegate {
         }
     }
     
-    public func didMentionsReachToMaximumLimit() {
-        let alertController = UIAlertController(title: AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString, message: AmityLocalizedStringSet.Mention.unableToMentionReplyDescription.localizedString, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.done.localizedString, style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion: nil)
+    public func didReachMaxMentionLimit() {
+        AlertController.showAlert(in: self, title: AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString, message: AmityLocalizedStringSet.Mention.unableToMentionReplyDescription.localizedString)
     }
     
-    public func didCharactersReachToMaximumLimit() {
-        showAlertForMaximumCharacters()
+    public func didReachMaxCharacterCountLimit() {
+        var title = AmityLocalizedStringSet.postUnableToCommentTitle.localizedString
+        var message = AmityLocalizedStringSet.postUnableToCommentDescription.localizedString
+        switch editMode {
+        case .edit(_, _, let isReply), .create(_, let isReply):
+            title = isReply ? AmityLocalizedStringSet.postUnableToReplyTitle.localizedString : AmityLocalizedStringSet.postUnableToCommentTitle.localizedString
+            message = isReply ? AmityLocalizedStringSet.postUnableToReplyDescription.localizedString : AmityLocalizedStringSet.postUnableToCommentDescription.localizedString
+        default:
+            break
+        }
+        
+        AlertController.showAlert(in: self, title: title, message: message)
+    }
+    
+    public func didCreateAttributedString(attributedString: NSAttributedString) {
+        textView.attributedText = attributedString
+        textView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: AmityColorSet.base]
     }
 }

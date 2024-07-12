@@ -37,7 +37,7 @@ final public class LiveStreamBroadcastViewController: UIViewController {
     let liveDurationFormatter = DateComponentsFormatter()
     
     // MARK: - Private Const Properties
-    private let mentionManager: AmityMentionManager
+    private let mentionManager: ASCMentionManager
     // MARK: - States
     
     private var hasSetupBroadcaster = false
@@ -129,7 +129,7 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         streamRepository = AmityStreamRepository(client: client)
         postRepository = AmityPostRepository(client: client)
         broadcaster = AmityVideoBroadcaster(client: client)
-        mentionManager = AmityMentionManager(withType: .post(communityId: targetId))
+        mentionManager = ASCMentionManager(withType: .post(communityId: targetId))
         
         let bundle = Bundle(for: type(of: self))
         super.init(nibName: "LiveStreamBroadcastViewController", bundle: bundle)
@@ -173,8 +173,8 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         updateCoverImageSelection()
         switchToUIState(.create)
         mentionManager.delegate = self
-        mentionManager.setFont(AmityFontSet.body, highlightFont: AmityFontSet.bodyBold)
-        mentionManager.setColor(.white, highlightColor: .white)
+        mentionManager.highlightAttributes = [.font: AmityFontSet.bodyBold, .foregroundColor: UIColor.white]
+        mentionManager.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: UIColor.white]
         
         // Observe app life cycle notfications
         NotificationCenter.default.addObserver(self, selector: #selector(suspendLiveStream), name: UIApplication.didEnterBackgroundNotification, object: nil)
@@ -418,15 +418,6 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         mentionTableView.register(AmityMentionTableViewCell.nib, forCellReuseIdentifier: AmityMentionTableViewCell.identifier)
     }
     
-    private func showAlertForMaximumCharacters() {
-        let title = "Unable to post"
-        let message = "Unable message"
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Done", style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion: nil)
-    }
-    
     // MARK: - IBActions
     
     @IBAction private func switchCameraButtonDidTouch() {
@@ -494,8 +485,8 @@ extension LiveStreamBroadcastViewController: AmityTextViewDelegate {
     }
     
     public func textView(_ textView: AmityTextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if textView.text?.count ?? 0 > AmityMentionManager.maximumCharacterCountForPost {
-            showAlertForMaximumCharacters()
+        if textView.text?.count ?? 0 > ASCMentionManager.maximumCharacterCountForPost {
+            didReachMaxCharacterCountLimit()
             return false
         }
         return mentionManager.shouldChangeTextIn(textView, inRange: range, replacementText: text, currentText: textView.text ?? "")
@@ -528,9 +519,10 @@ extension LiveStreamBroadcastViewController: AmityVideoBroadcasterDelegate {
     
 }
 
-// MARK: - AmityMentionManagerDelegate
-extension LiveStreamBroadcastViewController: AmityMentionManagerDelegate {
-    public func didGetUsers(users: [AmityMentionUserModel]) {
+// MARK: - ASCMentionManagerDelegate
+extension LiveStreamBroadcastViewController: ASCMentionManagerDelegate {
+    
+    public func didUpdateMentionUsers(users: [AmityUIKit.AmityMentionUserModel]) {
         if users.isEmpty {
             mentionTableViewHeightConstraint.constant = 0
             mentionTableView.isHidden = true
@@ -545,32 +537,41 @@ extension LiveStreamBroadcastViewController: AmityMentionManagerDelegate {
         }
     }
     
-    public func didCreateAttributedString(attributedString: NSAttributedString) {
-        descriptionTextView.attributedText = attributedString
-        descriptionTextView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: UIColor.white]
-    }
-    
-    public func didMentionsReachToMaximumLimit() {
+    public func didReachMaxMentionLimit() {
         let alertController = UIAlertController(title: AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString, message: AmityLocalizedStringSet.Mention.unableToMentionReplyDescription.localizedString, preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.done.localizedString, style: .cancel, handler: nil)
         alertController.addAction(cancelAction)
         present(alertController, animated: true, completion: nil)
     }
     
-    public func didCharactersReachToMaximumLimit() {
-        showAlertForMaximumCharacters()
+    public func didReachMaxCharacterCountLimit() {
+        let title = "Unable to post"
+        let message = "Unable message"
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Done", style: .cancel, handler: nil)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    public func didCreateAttributedString(attributedString: NSAttributedString) {
+        descriptionTextView.attributedText = attributedString
+        descriptionTextView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: UIColor.white]
     }
 }
 
 // MARK: - UITableViewDataSource
 extension LiveStreamBroadcastViewController: UITableViewDataSource {
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return mentionManager.users.count
+        return mentionManager.mentionProvider.mentionList.count
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell else { return UITableViewCell() }
-        if let model = mentionManager.item(at: indexPath) {
+        
+        let provider = mentionManager.mentionProvider
+        if indexPath.row < provider.mentionList.count {
+            let model = provider.mentionList[indexPath.row]
             cell.display(with: model)
         }
         
@@ -597,7 +598,7 @@ extension LiveStreamBroadcastViewController: UITableViewDelegate {
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if tableView.isBottomReached {
-            mentionManager.loadMore()
+            mentionManager.mentionProvider.loadMore()
         }
     }
 }

@@ -56,7 +56,7 @@ public class AmityPostTextEditorViewController: AmityViewController {
     private var filePicker: AmityFilePicker!
     private var mentionTableView: AmityMentionTableView
     private var mentionTableViewHeightConstraint: NSLayoutConstraint!
-    private var mentionManager: AmityMentionManager?
+    private var mentionManager: ASCMentionManager?
     
     private var isValueChanged: Bool {
         return !textView.text.isEmpty || !galleryView.medias.isEmpty || !fileView.files.isEmpty
@@ -85,7 +85,7 @@ public class AmityPostTextEditorViewController: AmityViewController {
                 communityId = community.isPublic ? nil : community.communityId
             default: break
             }
-            mentionManager = AmityMentionManager(withType: .post(communityId: communityId))
+            mentionManager = ASCMentionManager(withType: .post(communityId: communityId))
         }
         
         super.init(nibName: nil, bundle: nil)
@@ -401,7 +401,6 @@ public class AmityPostTextEditorViewController: AmityViewController {
                 self?.showUploadFailureAlert()
             }
         }
-        
     }
     
     private func uploadVideos() {
@@ -668,8 +667,8 @@ extension AmityPostTextEditorViewController: AmityTextViewDelegate {
     }
     
     public func textView(_ textView: AmityTextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if textView.text.count > AmityMentionManager.maximumCharacterCountForPost {
-            showAlertForMaximumCharacters()
+        if textView.text.count > ASCMentionManager.maximumCharacterCountForPost {
+            didReachMaxCharacterCountLimit()
             return false
         }
         return mentionManager?.shouldChangeTextIn(textView, inRange: range, replacementText: text, currentText: textView.text) ?? true
@@ -903,13 +902,6 @@ extension AmityPostTextEditorViewController: AmityPostTextEditorMenuViewDelegate
         }
         updateConstraints()
     }
-    
-    private func showAlertForMaximumCharacters() {
-        let alertController = UIAlertController(title: AmityLocalizedStringSet.postUnableToPostTitle.localizedString, message: AmityLocalizedStringSet.postUnableToPostDescription.localizedString, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.done.localizedString, style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion: nil)
-    }
 }
 
 extension AmityPostTextEditorViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -968,7 +960,10 @@ extension AmityPostTextEditorViewController: UIImagePickerControllerDelegate, UI
 extension AmityPostTextEditorViewController {
     
     public override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        guard isValueChanged, !(mentionManager?.isSearchingStarted ?? false) else {
+        // Note:
+        // I'm not sure why we are checking if mention search is started or not before showing a popup. Removing this line for now
+        // isValueChanged, !(mentionManager?.isSearchingStarted ?? false)
+        guard isValueChanged else {
             return super.gestureRecognizerShouldBegin(gestureRecognizer)
         }
             
@@ -994,7 +989,8 @@ extension AmityPostTextEditorViewController {
 }
 
 // MARK: - UITableViewDelegate
-extension AmityPostTextEditorViewController: UITableViewDelegate {
+extension AmityPostTextEditorViewController: UITableViewDelegate, UITableViewDataSource {
+    
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return AmityMentionTableViewCell.height
     }
@@ -1004,33 +1000,32 @@ extension AmityPostTextEditorViewController: UITableViewDelegate {
     }
     
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == (mentionManager?.users.count ?? 0) - 4 {
-            mentionManager?.loadMore()
+        let usersCount = mentionManager?.mentionProvider.mentionList.count ?? 0
+        if indexPath.row == usersCount - 4 {
+            mentionManager?.mentionProvider.loadMore()
         }
     }
-}
-
-// MARK: - UITableViewDataSource
-extension AmityPostTextEditorViewController: UITableViewDataSource {
+    
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return mentionManager?.users.count ?? 0
+        return mentionManager?.mentionProvider.mentionList.count ?? 0
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell, let model = mentionManager?.item(at: indexPath) else { return UITableViewCell() }
-        cell.display(with: model)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell else { return UITableViewCell() }
+        
+        if let provider = mentionManager?.mentionProvider, indexPath.row < provider.mentionList.count {
+            let model = provider.mentionList[indexPath.row]
+            cell.display(with: model)
+        }
+        
         return cell
     }
 }
 
-// MARK: - AmityMentionManagerDelegate
-extension AmityPostTextEditorViewController: AmityMentionManagerDelegate {
-    public func didCreateAttributedString(attributedString: NSAttributedString) {
-        textView.attributedText = attributedString
-        textView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: AmityColorSet.base]
-    }
+// MARK: - ASCMentionManagerDelegate
+extension AmityPostTextEditorViewController: ASCMentionManagerDelegate {
     
-    public func didGetUsers(users: [AmityMentionUserModel]) {
+    public func didUpdateMentionUsers(users: [AmityMentionUserModel]) {
         if users.isEmpty {
             mentionTableViewHeightConstraint.constant = 0
             mentionTableView.isHidden = true
@@ -1045,27 +1040,28 @@ extension AmityPostTextEditorViewController: AmityMentionManagerDelegate {
         }
     }
     
-    public func didMentionsReachToMaximumLimit() {
-        let alertController = UIAlertController(title: AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString, message: AmityLocalizedStringSet.Mention.unableToMentionPostDescription.localizedString, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.done.localizedString, style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion: nil)
+    public func didReachMaxMentionLimit() {
+        AlertController.showAlert(in: self, title: AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString, message: AmityLocalizedStringSet.Mention.unableToMentionPostDescription.localizedString)
     }
     
-    public func didCharactersReachToMaximumLimit() {
-        showAlertForMaximumCharacters()
+    public func didReachMaxCharacterCountLimit() {
+        AlertController.showAlert(in: self, title: AmityLocalizedStringSet.postUnableToPostTitle.localizedString, message: AmityLocalizedStringSet.postUnableToPostDescription.localizedString)
+    }
+    
+    public func didCreateAttributedString(attributedString: NSAttributedString) {
+        textView.attributedText = attributedString
+        textView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: AmityColorSet.base]
     }
 }
 
 // MARK: - Private methods
 private extension AmityPostTextEditorViewController {
+    
     func setupMentionManager(withPost post: AmityPostModel) {
         guard mentionManager == nil else { return }
         let communityId: String? = (currentPost?.targetCommunity?.isPublic ?? true) ? nil : currentPost?.targetCommunity?.communityId
-        mentionManager = AmityMentionManager(withType: .post(communityId: communityId))
+        mentionManager = ASCMentionManager(withType: .post(communityId: communityId))
         mentionManager?.delegate = self
-        mentionManager?.setColor(AmityColorSet.base, highlightColor: AmityColorSet.primary)
-        mentionManager?.setFont(AmityFontSet.body, highlightFont: AmityFontSet.bodyBold)
         
         if let metadata = post.metadata {
             mentionManager?.setMentions(metadata: metadata, inText: post.text)
