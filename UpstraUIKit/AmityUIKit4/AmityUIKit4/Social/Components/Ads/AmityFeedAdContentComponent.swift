@@ -50,23 +50,7 @@ struct AmityFeedAdContentComponent: View {
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .padding(.bottom, 2)
                     
-                    HStack(spacing: 0) {
-                        Image(AmityIcon.starIcon.imageResource)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 12, height: 12)
-                            .foregroundColor(Color(viewConfig.theme.backgroundColor))
-                            .padding(.leading, 4)
-                        
-                        Text("Premium Sponsored")
-                            .font(.system(size: 11, weight: .regular))
-                            .foregroundColor(Color(viewConfig.theme.backgroundColor))
-                            .padding(.leading, 2)
-                            .padding(.trailing, 6)
-                    }
-                    .frame(height: 18)
-                    .background(Color(viewConfig.theme.baseColorShade1.withAlphaComponent(0.5)))
-                    .clipShape(Capsule())
+                    AdSponsorLabel()
                 }
             }
             
@@ -91,6 +75,7 @@ struct AmityFeedAdContentComponent: View {
                 Text(ad.description)
                     .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                     .font(.system(size: 11, weight: .regular))
+                    .lineLimit(1)
                 
                 Text(ad.headline)
                     .foregroundColor(Color(viewConfig.theme.baseColor))
@@ -107,6 +92,7 @@ struct AmityFeedAdContentComponent: View {
                     handleTapOnAd()
                 }, label: {
                     Text(ad.callToAction)
+                        .lineLimit(1)
                         .font(.system(size: 13, weight: .semibold))
                         .contentShape(Rectangle())
                 })

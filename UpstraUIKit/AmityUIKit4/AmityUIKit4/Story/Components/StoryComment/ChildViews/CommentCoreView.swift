@@ -28,11 +28,11 @@ struct CommentCoreView<Content>: View where Content:View {
                             commentButtonAction: commentButtonAction ?? { _ in })
                 .environmentObject(viewModel)
             
-            if !viewModel.hideEmptyText {
+            if !viewModel.hideEmptyText && viewModel.commentItems.isEmpty && viewModel.loadingStatus == .loaded {
                 Text(AmityLocalizedStringSet.Comment.noCommentAvailable.localizedString)
                     .font(.system(size: 15))
                     .foregroundColor(Color(UIColor(hex: "#898E9E")))
-                    .isHidden(viewModel.commentCollection.snapshots.count != 0)
+                    .isHidden(viewModel.commentItems.count != 0)
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.emptyTextView)
             }
 
@@ -42,19 +42,20 @@ struct CommentCoreView<Content>: View where Content:View {
 
 
 class CommentCoreViewModel: ObservableObject {
-    @Published var commentCollection: AmityCollection<AmityComment>
     @Published var editingComment: AmityCommentModel?
     @Published var commentItems: [PaginatedItem<AmityCommentModel>] = []
     @Published var adSeetState: (isShown: Bool, ad: AmityAd?) = (false, nil)
-    var paginator: UIKitPaginator<AmityComment>
-
+    @Published var loadingStatus: AmityLoadingStatus = .notLoading
+    private var commentCollection: AmityCollection<AmityComment>
     private let commentManager = CommentManager()
+    var paginator: UIKitPaginator<AmityComment>
+    
     let referenceId: String
     let referenceType: AmityCommentReferenceType
     let hideEmptyText: Bool
     let hideCommentButtons: Bool
     
-    var cancellable: AnyCancellable?
+    private var paginatorCancellable: AnyCancellable?
     
     init(referenceId: String, referenceType: AmityCommentReferenceType, hideEmptyText: Bool, hideCommentButtons: Bool) {
         self.referenceId = referenceId
@@ -73,9 +74,10 @@ class CommentCoreViewModel: ObservableObject {
         })
         paginator.load()
         
-        cancellable = paginator.$snapshots.sink { items in
+        paginatorCancellable = paginator.$snapshots.sink { [weak self] items in
+            self?.loadingStatus = self?.commentCollection.loadingStatus ?? .error
                         
-            self.commentItems = items.map {
+            self?.commentItems = items.map {
                 switch $0.type {
                 case .content(let comment):
                     return PaginatedItem(id: $0.id, type: .content(AmityCommentModel(comment: comment)))

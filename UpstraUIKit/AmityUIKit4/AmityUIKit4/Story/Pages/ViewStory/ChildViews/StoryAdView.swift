@@ -55,6 +55,7 @@ struct StoryAdView<Content: View>: View {
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 30, height: 10)
+                            .foregroundColor(Color(viewConfig.defaultLightTheme.backgroundColor.withAlphaComponent(0.8)))
                         
                         HStack(spacing: 0) {
                             Text(ad.callToAction)
@@ -64,7 +65,7 @@ struct StoryAdView<Content: View>: View {
                                 .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                         }
                         .frame(height: 40)
-                        .background(Color(viewConfig.defaultLightTheme.baseColorShade4))
+                        .background(Color(viewConfig.defaultLightTheme.backgroundColor.withAlphaComponent(0.8)))
                         .clipShape(RoundedRectangle(cornerRadius: 20))
                         .padding([.bottom, .leading, .trailing], 30)
                     }
@@ -77,7 +78,6 @@ struct StoryAdView<Content: View>: View {
                         }
                     }
                 }
-                
                 
                 /// Info button view
                 HStack {
@@ -95,11 +95,10 @@ struct StoryAdView<Content: View>: View {
                 }
                 .padding([.bottom, .trailing], 5)
 
-
                 /// Avatar and name view
                 VStack(alignment: .center) {
                     HStack {
-                        AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: URL(string: ad.advertiser?.avatar?.largeFileURL ?? ""))
+                        AsyncImage(placeholder: AmityIcon.adAvatarPlaceholder.getImageResource(), url: URL(string: ad.advertiser?.avatar?.largeFileURL ?? ""))
                             .frame(width: 45, height: 45)
                             .clipShape(Circle())
                             .padding(.leading, 16)
@@ -115,23 +114,8 @@ struct StoryAdView<Content: View>: View {
                                 Spacer(minLength: 80)
                             }
                             
-                            HStack(spacing: 0) {
-                                Image(AmityIcon.starIcon.imageResource)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 12, height: 12)
-                                    .foregroundColor(Color(viewConfig.defaultLightTheme.backgroundColor))
-                                    .padding(.leading, 4)
-                                
-                                Text("Premium Sponsored")
-                                    .font(.system(size: 11, weight: .regular))
-                                    .foregroundColor(Color(viewConfig.defaultLightTheme.backgroundColor))
-                                    .padding(.leading, 2)
-                                    .padding(.trailing, 6)
-                            }
-                            .frame(height: 18)
-                            .background(Color(viewConfig.defaultLightTheme.baseColorShade1.withAlphaComponent(0.5)))
-                            .clipShape(Capsule())
+                            AdSponsorLabel()
+                            
                         }
                         
                         Spacer()

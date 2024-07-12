@@ -200,13 +200,61 @@ final class AmityUIKitManagerInternal: NSObject {
         let viewStoryPageBehaviour = AmityViewStoryPageBehaviour()
         behavior.viewStoryPageBehaviour = viewStoryPageBehaviour
         
-        // TargetSelectionPage
-        let targetSelectionPageBehaviour = AmityTargetSelectionPageBehaviour()
-        behavior.targetSelectionPageBehaviour = targetSelectionPageBehaviour
+        // StoryTargetSelectionPage
+        let storyTargetSelectionPageBehaviour = AmityStoryTargetSelectionPageBehaviour()
+        behavior.storyTargetSelectionPageBehaviour = storyTargetSelectionPageBehaviour
+        
+        // SocialHomePage
+        let socialHomePageBehavior = AmitySocialHomePageBehavior()
+        behavior.socialHomePageBehavior = socialHomePageBehavior
+        
+        // MyCommunitiesComponentBehavior
+        let myCommunitiesComponentBehavior = AmityMyCommunitiesComponentBehavior()
+        behavior.myCommunitiesComponentBehavior = myCommunitiesComponentBehavior
+        
+        // NewsFeedComponent
+        let newsFeedComponentBehavior = AmityNewsFeedComponentBehavior()
+        behavior.newsFeedComponentBehavior = newsFeedComponentBehavior
         
         // GlobalFeedComponent
         let globalFeedComponentBehavior = AmityGlobalFeedComponentBehavior()
         behavior.globalFeedComponentBehavior = globalFeedComponentBehavior
+        
+        // CreatePostMenuComponent
+        let createPostMenuComponentBehavior = AmityCreatePostMenuComponentBehavior()
+        behavior.createPostMenuComponentBehavior = createPostMenuComponentBehavior
+        
+        // PostTargetSelectionPage
+        let postTargetSelectionPageBehavior = AmityPostTargetSelectionPageBehavior()
+        behavior.postTargetSelectionPageBehavior = postTargetSelectionPageBehavior
+        
+        // PostDetailPage
+        let postDetailPageBehavior = AmityPostDetailPageBehavior()
+        behavior.postDetailPageBehavior = postDetailPageBehavior
+        
+        // SocialGlobalSearchPage
+        let socialGlobalSearchPageBehavior = AmitySocialGlobalSearchPageBehavior()
+        behavior.socialGlobalSearchPageBehavior = socialGlobalSearchPageBehavior
+        
+        // MyCommunitiesSearchPage
+        let myCommunitiesSearchPageBehavior = AmityMyCommunitiesSearchPageBehavior()
+        behavior.myCommunitiesSearchPageBehavior = myCommunitiesSearchPageBehavior
+        
+        // CommunitySearchResultComponent
+        let communitySearchResultComponentBehavior = AmityCommunitySearchResultComponentBehavior()
+        behavior.communitySearchResultComponentBehavior = communitySearchResultComponentBehavior
+        
+        // UserSearchResultComponentBehavior
+        let userSearchResultComponentBehavior = AmityUserSearchResultComponentBehavior()
+        behavior.userSearchResultComponentBehavior = userSearchResultComponentBehavior
+        
+        // PostComposerPage
+        let postComposerPageBehavior = AmityPostComposerPageBehavior()
+        behavior.postComposerPageBehavior = postComposerPageBehavior
+        
+        // CommunityProfilePage
+        let communityProfilePageBehavior = AmityCommunityProfilePageBehavior()
+        behavior.communityProfilePageBehavior = communityProfilePageBehavior
     }
     
     func registerDevice(_ userId: String,

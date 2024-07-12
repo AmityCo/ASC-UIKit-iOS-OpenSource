@@ -10,7 +10,7 @@ import AmitySDK
 import Combine
 
 public struct AmityPostDetailPage: AmityPageView {
-    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     @StateObject private var viewModel: AmityPostDetailPageViewModel
     
     @StateObject private var commentCoreViewModel: CommentCoreViewModel
@@ -18,6 +18,8 @@ public struct AmityPostDetailPage: AmityPageView {
     @StateObject private var commentBottomSheetViewModel = CommentBottomSheetViewModel()
     @StateObject private var viewConfig: AmityViewConfigController
     @State private var showBottomSheet: Bool = false
+    
+    private var postContentStyle: AmityPostContentComponentStyle = .postDetail
     
     public var id: PageId {
         .postDetailPage
@@ -31,7 +33,8 @@ public struct AmityPostDetailPage: AmityPageView {
     }
     
     /// Convenience initializer
-    public init(post: AmityPost) {
+    public init(post: AmityPost, style: AmityPostContentComponentStyle = .postDetail) {
+        self.postContentStyle = style
         self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(post: post))
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: nil, allowCreateComment: true))
@@ -96,31 +99,40 @@ public struct AmityPostDetailPage: AmityPageView {
                         }
                         
                     }
+                } else {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(width: 24, height: 24)
                 }
             }
             .padding(EdgeInsets(top: 19, leading: 16, bottom: 16, trailing: 16))
             
-            if let post = viewModel.post {
-                CommentCoreView(headerView: {
-                    VStack(spacing: 4) {
-                        AmityPostContentComponent(post: post, style: .postDetail, hideMenuButton: true)
+            CommentCoreView(headerView: {
+                VStack(spacing: 4) {
+                    if let post = viewModel.post {
+                        let hideTarget = postContentStyle == .announcement_detail || postContentStyle == .pin_detail
+
+                        AmityPostContentComponent(post: post, style: postContentStyle, hideTarget: hideTarget, hideMenuButton: true)
                         Rectangle()
                             .fill(Color(viewConfig.theme.baseColorShade4))
                             .frame(height: 1)
-                    }
-                },
-                viewModel: commentCoreViewModel,
-                commentButtonAction: self.commentButtonAction(_:))
-                .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
-                             height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? 204 : 148,
-                             backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                    CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
-                        commentCoreViewModel.editingComment = comment
+                    } else {
+                        PostContentSkeletonView()
                     }
                 }
-            } else { Spacer() }
-            
+            },
+                            viewModel: commentCoreViewModel,
+                            commentButtonAction: self.commentButtonAction(_:))
+            .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
+                         height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? 204 : 148,
+                         backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
+                    commentCoreViewModel.editingComment = comment
+                }
+            }
+
             CommentComposerView(viewModel: commentComposerViewModel)
+                .isHidden(!(viewModel.post?.targetCommunity?.isJoined ?? true))
         }
         .sheet(isPresented: $commentCoreViewModel.adSeetState.isShown, content: {
             if let ad = commentCoreViewModel.adSeetState.ad {
@@ -129,6 +141,9 @@ public struct AmityPostDetailPage: AmityPageView {
         })
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
+        .onAppear {
+            host.controller?.navigationController?.isNavigationBarHidden = true
+        }
     }
     
     func calculateBottomSheetHeight(post: AmityPostModel) -> CGFloat {

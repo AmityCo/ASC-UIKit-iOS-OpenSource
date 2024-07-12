@@ -10,6 +10,8 @@ import AmitySDK
 import Combine
 
 public struct AmityMyCommunitiesComponent: AmityComponentView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     public var pageId: PageId?
     
     public var id: ComponentId {
@@ -36,7 +38,12 @@ public struct AmityMyCommunitiesComponent: AmityComponentView {
                             .fill(Color(viewConfig.theme.baseColorShade4))
                             .frame(height: 1)
                             .padding([.leading, .trailing], 16)
-                    }.onAppear {
+                    }
+                    .onTapGesture {
+                        let context = AmityMyCommunitiesComponentBehavior.Context(component: self, communityId: community.communityId)
+                        AmityUIKitManagerInternal.shared.behavior.myCommunitiesComponentBehavior?.goToCommunityProfilePage(context: context)
+                    }
+                    .onAppear {
                         if index == viewModel.communities.count - 1 {
                             viewModel.loadMore()
                         }

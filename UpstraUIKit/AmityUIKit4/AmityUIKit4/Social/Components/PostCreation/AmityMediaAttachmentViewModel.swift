@@ -1,5 +1,5 @@
 //
-//  AmityMediaAttatchmentViewModel.swift
+//  AmityMediaAttachmentViewModel.swift
 //  AmityUIKit4
 //
 //  Created by Zay Yar Htun on 6/13/24.
@@ -11,7 +11,7 @@ import Combine
 public class AmityMediaAttachmentViewModel: ObservableObject {
     @Published var medias: [AmityMedia] = []
     
-    init(medias: [AmityMedia]) {
+    public init(medias: [AmityMedia] = []) {
         self.medias = medias
     }
 }

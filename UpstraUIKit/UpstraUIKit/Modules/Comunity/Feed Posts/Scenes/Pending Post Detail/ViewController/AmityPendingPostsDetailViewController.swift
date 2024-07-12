@@ -8,7 +8,7 @@
 
 import UIKit
 
-final class AmityPendingPostsDetailViewController: AmityViewController {
+public final class AmityPendingPostsDetailViewController: AmityViewController {
 
     // MARK: - IBOutlet Properties
     @IBOutlet private var tableView: AmityPostTableView!
@@ -17,13 +17,13 @@ final class AmityPendingPostsDetailViewController: AmityViewController {
     private var screenViewModel: AmityPendingPostsDetailScreenViewModelType!
     
     // MARK: - View lifecycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
         setupViewModel()
     }
     
-    static func make(communityId: String, postId: String) -> AmityPendingPostsDetailViewController {
+    public static func make(communityId: String, postId: String) -> AmityPendingPostsDetailViewController {
         let viewModel = AmityPendingPostsDetailScreenViewModel(communityId: communityId, postId: postId)
         let vc = AmityPendingPostsDetailViewController(nibName: AmityPendingPostsDetailViewController.identifier, bundle: AmityUIKitManager.bundle)
         vc.screenViewModel = viewModel
@@ -115,7 +115,7 @@ extension AmityPendingPostsDetailViewController: AmityPendingPostsDetailScreenVi
 
 extension AmityPendingPostsDetailViewController: AmityPostHeaderDelegate {
     
-    func didPerformAction(_ cell: AmityPostHeaderProtocol, action: AmityPostHeaderAction) {
+    public func didPerformAction(_ cell: AmityPostHeaderProtocol, action: AmityPostHeaderAction) {
         switch action {
         case .tapOption:
             let bottomSheet = BottomSheetViewController()
@@ -151,7 +151,7 @@ extension AmityPendingPostsDetailViewController: AmityPostDelegate {
         present(photoViewerVC, animated: true, completion: nil)
     }
     
-    func didPerformAction(_ cell: AmityPostProtocol, action: AmityPostAction) {
+    public func didPerformAction(_ cell: AmityPostProtocol, action: AmityPostAction) {
         switch action {
         case .tapMedia(let media):
             guard let cell = cell as? AmityPostGalleryTableViewCell else {

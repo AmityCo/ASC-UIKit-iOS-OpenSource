@@ -19,4 +19,9 @@ class CommunityManager {
     func getCommunity(withId: String) -> AmityObject<AmityCommunity> {
         communityRepository.getCommunity(withId: withId)
     }
+    
+    @discardableResult
+    func joinCommunity(withId: String) async throws -> Bool {
+        return try await communityRepository.joinCommunity(withId: withId)
+    }
 }

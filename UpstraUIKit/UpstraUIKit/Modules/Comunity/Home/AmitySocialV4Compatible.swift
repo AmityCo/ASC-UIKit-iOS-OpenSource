@@ -136,6 +136,7 @@ public class AmityV4NewsFeedViewController: AmityViewController, IndicatorInfoPr
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.isNavigationBarHidden = false
     }
 
     private func setupPostButton() {

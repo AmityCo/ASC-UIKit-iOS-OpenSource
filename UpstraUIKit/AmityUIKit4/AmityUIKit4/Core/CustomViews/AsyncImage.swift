@@ -28,9 +28,8 @@ struct AsyncImage: View {
                         .aspectRatio(contentMode: .fill)
                 }
                 .resizable()
-                .fromMemoryCacheOrRefresh()
+                .loadDiskFileSynchronously()
                 .startLoadingBeforeViewAppear()
-                .fade(duration: 0.1)
                 .modifier(ImageScaleMode(mode: contentMode))
                 .frame(width: proxy.size.width, height: proxy.size.height)
                 .clipped()

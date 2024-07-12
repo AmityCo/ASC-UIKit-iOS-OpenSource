@@ -57,10 +57,11 @@ class AppManager {
         AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
         
         // override AmityViewStoryPageBehaviour
-        let customViewStoryPageBehaviour = CustomViewStoryPageBehaviour()
-        AmityUIKit4Manager.behaviour.viewStoryPageBehaviour = customViewStoryPageBehaviour
         let customPostContentComponenetBehaviour = CustomPostContentComponenetBehaviour()
         AmityUIKit4Manager.behaviour.postContentComponentBehavior = customPostContentComponenetBehaviour
+        // override AmityViewStoryPageBehaviour
+        let customCommunityProfilePageBahavior = CustomAmityProfilePageBehaviour()
+        AmityUIKit4Manager.behaviour.communityProfilePageBehavior = customCommunityProfilePageBahavior
         #endif
     }
     
@@ -162,30 +163,9 @@ class AppManager {
 
 
 #if canImport(AmityUIKit4)
-class CustomViewStoryPageBehaviour: AmityViewStoryPageBehaviour {
-    
-    override func goToCommunityPage(context: AmityViewStoryPageBehaviour.Context) {
-        let viewController = AmityCommunityProfilePageViewController.make(withCommunityId: context.targetId)
-        if let navigationController = context.page.host.controller?.navigationController {
-            navigationController.navigationBar.isHidden = false
-            navigationController.pushViewController(viewController, animated: true)
-        }
-        
-    }
-    
-}
 
 class CustomPostContentComponenetBehaviour: AmityPostContentComponentBehavior {
     
-    override func goToCommunityProfilePage(context: AmityPostContentComponentBehavior.Context) {
-        let viewController = AmityCommunityProfilePageViewController.make(withCommunityId: context.component.post.targetId)
-        if let navigationController = context.component.host.controller?.navigationController {
-            
-            navigationController.isNavigationBarHidden = false
-            navigationController.pushViewController(viewController, animated: true)
-        }
-        
-    }
     override func goToUserProfilePage(context: AmityPostContentComponentBehavior.Context) {
         let viewController = AmityUserProfilePageViewController.make(withUserId: context.component.post.postedUserId)
         if let navigationController = context.component.host.controller?.navigationController {
@@ -195,5 +175,30 @@ class CustomPostContentComponenetBehaviour: AmityPostContentComponentBehavior {
         
     }
     
+}
+
+class CustomAmityProfilePageBehaviour: AmityCommunityProfilePageBehavior {
+    override func goToCommunitySettingPage(context: AmityCommunityProfilePageBehavior.Context) {
+        
+        let communityId = context.page.communityId
+        
+        let viewController = AmityCommunitySettingsViewController.make(communityId: communityId)
+        
+        if let navigationController = context.page.host.controller?.navigationController {
+            navigationController.isNavigationBarHidden = false
+            navigationController.pushViewController(viewController, animated: true)
+        }
+    }
+    
+    override func goToPendingPostPage(context: AmityCommunityProfilePageBehavior.Context) {
+        let communityId = context.page.communityId
+        
+        let viewController = AmityPendingPostsViewController.make(communityId: communityId)
+        
+        if let navigationController = context.page.host.controller?.navigationController {
+            navigationController.isNavigationBarHidden = false
+            navigationController.pushViewController(viewController, animated: true)
+        }
+    }
 }
 #endif

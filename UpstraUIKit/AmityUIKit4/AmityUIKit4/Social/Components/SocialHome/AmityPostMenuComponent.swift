@@ -18,10 +18,11 @@ enum PostMenuType: String, CaseIterable, Identifiable {
 //    case liveStream = "Livestream"
 }
 
-public struct AmityPostMenuComponent: AmityComponentView {
-    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+public struct AmityCreatePostMenuComponent: AmityComponentView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     public var pageId: PageId?
-    let postTypes: [PostMenuType] = PostMenuType.allCases
+    private let postTypes: [PostMenuType] = PostMenuType.allCases
     
     @StateObject private var viewConfig: AmityViewConfigController
     @Binding private var isPresented: Bool
@@ -137,12 +138,8 @@ public struct AmityPostMenuComponent: AmityComponentView {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            let view = AmityPostTargetSelectionPage()
-            let controller = AmitySwiftUIHostingController(rootView: view)
-            let navigationController = UINavigationController(rootViewController: controller)
-            navigationController.modalPresentationStyle = .fullScreen
-            navigationController.navigationBar.isHidden = true
-            host.controller?.present(navigationController, animated: true)
+            let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
+            AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectPostTargetPage(context: context)
         }
     }
     
@@ -152,19 +149,8 @@ public struct AmityPostMenuComponent: AmityComponentView {
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            let view = AmityTargetSelectionPage(type: .story)
-            let controller = AmitySwiftUIHostingController(rootView: view)
-            let navigationController = UINavigationController(rootViewController: controller)
-            navigationController.modalPresentationStyle = .fullScreen
-            navigationController.navigationBar.isHidden = true
-            host.controller?.present(navigationController, animated: true)
+            let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
+            AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectStoryTargetPage(context: context)
         }
     }
 }
-
-
-#if DEBUG
-#Preview {
-    AmityPostMenuComponent()
-}
-#endif

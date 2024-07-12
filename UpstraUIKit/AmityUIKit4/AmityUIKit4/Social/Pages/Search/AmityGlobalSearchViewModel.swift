@@ -21,8 +21,6 @@ public class AmityGlobalSearchViewModel: ObservableObject {
     private var userCollection: AmityCollection<AmityUser>?
     
     private var cancellable: Set<AnyCancellable> = Set()
-
-    public let cancelAction: (() -> Void)?
     public var searchType: SearchType
     
     @Published public var searchKeyword: String = ""
@@ -31,9 +29,8 @@ public class AmityGlobalSearchViewModel: ObservableObject {
     @Published public var loadingState: AmityLoadingStatus = .notLoading
     @Published public var isFirstTimeSearching: Bool = true
     
-    public init(searchType: SearchType = .community, cancelAction: (() -> Void)? = nil) {
+    public init(searchType: SearchType = .community) {
         self.searchType = searchType
-        self.cancelAction = cancelAction
     
         $searchKeyword
             .drop { $0.isEmpty }

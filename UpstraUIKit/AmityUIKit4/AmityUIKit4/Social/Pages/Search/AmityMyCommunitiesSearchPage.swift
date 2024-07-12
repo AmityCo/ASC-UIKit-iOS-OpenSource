@@ -10,6 +10,8 @@ import AmitySDK
 import Combine
 
 public struct AmityMyCommunitiesSearchPage: AmityPageView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     public var id: PageId {
         .myCommunitiesSearchPage
     }
@@ -17,15 +19,16 @@ public struct AmityMyCommunitiesSearchPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var searchViewModel: AmityGlobalSearchViewModel
     
-    public init(cancelAction: (() -> Void)? = nil) {
+    public init() {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .myCommunitiesSearchPage))
-        self._searchViewModel = StateObject(wrappedValue: AmityGlobalSearchViewModel(searchType: .myCommunities, cancelAction: cancelAction))
+        self._searchViewModel = StateObject(wrappedValue: AmityGlobalSearchViewModel(searchType: .myCommunities))
     }
     
     public var body: some View {
         VStack(spacing: 0) {
             AmityTopSearchBarComponent(viewModel: searchViewModel, pageId: .socialGlobalSearchPage)
                 .padding(.top, 60)
+                .environmentObject(host)
             
             if !searchViewModel.isFirstTimeSearching {
                 ZStack {
@@ -67,5 +70,6 @@ public struct AmityMyCommunitiesSearchPage: AmityPageView {
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)
+        .ignoresSafeArea()
     }
 }

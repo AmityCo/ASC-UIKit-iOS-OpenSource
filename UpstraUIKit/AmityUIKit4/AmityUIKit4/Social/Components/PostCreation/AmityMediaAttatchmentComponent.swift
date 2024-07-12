@@ -1,5 +1,5 @@
 //
-//  AmityMediaAttatchmentComponent.swift
+//  AmityMediaAttachmentComponent.swift
 //  AmityUIKit4
 //
 //  Created by Zay Yar Htun on 6/6/24.
@@ -10,7 +10,7 @@ import AVKit
 import PhotosUI
 
 #warning ("FIX ME: Refactor and share the same code base between AmityMediaAttatchmentComponent and AmityDetailMediaAttatchmentComponent")
-public struct AmityMediaAttatchmentComponent: AmityComponentView {
+public struct AmityMediaAttachmentComponent: AmityComponentView {
     public var pageId: PageId?
     
     public var id: ComponentId {

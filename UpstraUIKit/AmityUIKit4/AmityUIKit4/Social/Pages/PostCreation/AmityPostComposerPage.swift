@@ -111,9 +111,9 @@ public struct AmityPostComposerPage: AmityPageView {
                             .foregroundColor(Color(viewConfig.theme.baseColorShade3))
                         
                         if showSmallComponent {
-                            AmityMediaAttatchmentComponent(viewModel: mediaAttatchmentViewModel)
+                            AmityMediaAttachmentComponent(viewModel: mediaAttatchmentViewModel)
                         } else {
-                            AmityDetailedMediaAttatchmentComponent(viewModel: mediaAttatchmentViewModel)
+                            AmityDetailedMediaAttachmentComponent(viewModel: mediaAttatchmentViewModel)
                         }
                     }
                     .onReceive(keyboardPublisher) { keyboardEvent in

@@ -26,6 +26,7 @@ public struct AmityCommunityModel {
     let categories: [String]
     var categoryId: String?
     let avatarURL: String
+    let largeAvatarURL: String
     let isPostReviewEnabled: Bool
     let isStoryCommentsAllowed: Bool
     let participation: AmityCommunityMembership
@@ -51,6 +52,7 @@ public struct AmityCommunityModel {
         self.categories = object.categories.map { $0.name }
         self.categoryId = object.categoryIds.first
         self.avatarURL = object.avatar?.fileURL ?? ""
+        self.largeAvatarURL = object.avatar?.largeFileURL ?? ""
         self.participation = object.membership
         self.isPostReviewEnabled = object.isPostReviewEnabled
         self.isStoryCommentsAllowed = object.storySettings.allowComment

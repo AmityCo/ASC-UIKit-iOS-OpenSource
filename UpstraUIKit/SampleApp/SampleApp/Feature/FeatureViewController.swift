@@ -162,6 +162,7 @@ extension Color {
 
 struct SocialUIKitPage: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    @Environment(\.colorScheme) private var colorScheme
     
     var body: some View {
         VStack(spacing: 0) {
@@ -170,6 +171,8 @@ struct SocialUIKitPage: View {
                     host.controller?.dismiss(animated: true)
                 }) {
                     Image(uiImage: UIImage(named: "closeIcon") ?? UIImage())
+                        .renderingMode(.template)
+                        .foregroundColor(colorScheme == .dark ? .white : .black)
                         .frame(width: 32, height: 32)
                 }
                 Spacer()
@@ -178,5 +181,8 @@ struct SocialUIKitPage: View {
             
             AmitySocialHomePage()
         }
+        .padding(.top, 55)
+        .background(colorScheme == .dark ? Color(UIColor(hex: "#191919")) : Color(UIColor(hex: "#FFFFFF")))
+        .ignoresSafeArea()
     }
 }

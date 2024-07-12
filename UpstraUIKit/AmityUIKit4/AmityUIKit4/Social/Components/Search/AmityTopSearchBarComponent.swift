@@ -9,6 +9,8 @@ import SwiftUI
 import Combine
 
 public struct AmityTopSearchBarComponent: AmityComponentView {
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    
     public var pageId: PageId?
     
     public var id: ComponentId {
@@ -41,16 +43,18 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
                 TextField(placeholder, text: $viewModel.searchKeyword)
                     .font(.system(size: 15))
                 
-                Button(action: {
-                    viewModel.searchKeyword = ""
-                }, label: {
-                    let clearIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .clearButton, key: "icon", of: String.self) ?? "")
-                    Image(clearIcon)
-                        .resizable()
-                        .frame(width: 17, height: 17)
-                        .padding(.trailing, 12)
-                })
-                .isHidden(viewConfig.isHidden(elementId: .clearButton))
+                if !viewModel.searchKeyword.isEmpty {
+                    Button(action: {
+                        viewModel.searchKeyword = ""
+                    }, label: {
+                        let clearIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .clearButton, key: "icon", of: String.self) ?? "")
+                        Image(clearIcon)
+                            .resizable()
+                            .frame(width: 17, height: 17)
+                            .padding(.trailing, 12)
+                    })
+                    .isHidden(viewConfig.isHidden(elementId: .clearButton))
+                }
             }
             .frame(maxWidth: .infinity)
             .background(Color(viewConfig.theme.baseColorShade4))
@@ -59,7 +63,7 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
             
             
             Button(action: {
-                viewModel.cancelAction?()
+                host.controller?.dismiss(animated: false)
             }, label: {
                 let cancelButtonTitle = viewConfig.getConfig(elementId: .cancelButtonElement, key: "text", of: String.self) ?? ""
                 Text(cancelButtonTitle)

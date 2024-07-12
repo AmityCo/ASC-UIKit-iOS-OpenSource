@@ -25,14 +25,26 @@ extension Int {
 
         switch num {
         case 1_000_000_000...:
+            guard num.remainder(dividingBy: 1_000_000_000) >= 100_000_000 else {
+                return "1B"
+            }
+            
             let kCount = Double(self) / 1_000_000_000
             return String(format: "%.1fB", kCount)
 
         case 1_000_000...:
+            guard num.remainder(dividingBy: 1_000_000) >= 100_000 else {
+                return "1M"
+            }
+            
             let kCount = Double(self) / 1_000_000
             return String(format: "%.1fM", kCount)
 
         case 1_000...:
+            guard num.remainder(dividingBy: 1_000) >= 100 else {
+                return "1K"
+            }
+            
             let kCount = Double(self) / 1000.0
             return String(format: "%.1fK", kCount)
 

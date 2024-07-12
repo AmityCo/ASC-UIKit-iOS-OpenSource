@@ -10,7 +10,7 @@ import Combine
 import AmitySDK
 
 public struct AmityNewsFeedComponent: AmityComponentView {
-    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var pageId: PageId?
     
@@ -19,7 +19,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
     }
     
     @StateObject private var viewConfig: AmityViewConfigController
-    @StateObject private var postFeedViewModel = PostFeedViewModel()
+    @StateObject private var postFeedViewModel = PostFeedViewModel(feedType: .globalFeed)
     @StateObject private var viewModel = AmityNewsFeedComponentViewModel()
     @State private var hideStoryTab: Bool = true
     @State private var pullToRefreshShowing: Bool = false
@@ -55,7 +55,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                 // refresh global feed
                 // swiftUI cannot update properly if we use nested Observable Object
                 // that is the reason why postFeedViewModel is not moved into viewModel
-                postFeedViewModel.loadGlobalFeed()
+                postFeedViewModel.loadFeed(feedType: .globalFeed)
             }
         } else {
             getPostListView()
@@ -82,10 +82,6 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                 ForEach(0..<5, id: \.self) { index in
                     VStack(spacing: 0) {
                         PostContentSkeletonView()
-                        
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(height: 8)
                     }
                     .listRowInsets(EdgeInsets())
                     .modifier(HiddenListSeparator())
@@ -107,9 +103,9 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                         case .content(let post):
                             
                             VStack(spacing: 0){
-                                AmityPostContentComponent(post: post.object, tapAction: {
-                                    let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: post.object))
-                                    host.controller?.navigationController?.pushViewController(vc, animated: true)
+                                AmityPostContentComponent(post: post.object, onTapAction: {
+                                    let context = AmityNewsFeedComponentBehavior.Context(component: self, post: post)
+                                    AmityUIKitManagerInternal.shared.behavior.newsFeedComponentBehavior?.goToPostDetailPage(context: context)
                                 }, pageId: pageId)
                                 .contentShape(Rectangle())
                                 

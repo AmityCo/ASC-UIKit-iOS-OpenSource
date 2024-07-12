@@ -127,6 +127,8 @@ public struct AmityLocalizedStringSet {
         static let postUnReportedMessage = "post_unreported_message"
         static let postDeletedToastMessage = "post_deleted_toast_message"
         static let postDetailPageTitle = "post_detail_page_title"
-        
+        static let sponsored = "ads_sponsored_label"
+        static let createPostBottomSheetTitle = "create_post_bottom_sheet_title"
     }
+    
 }

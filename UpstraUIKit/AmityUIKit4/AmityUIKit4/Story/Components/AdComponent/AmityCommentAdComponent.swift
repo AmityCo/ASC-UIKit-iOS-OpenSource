@@ -34,14 +34,12 @@ struct AmityCommentAdComponent: View {
                             HStack {
                                 Text(ad.advertiser?.name ?? "")
                                     .font(.system(size: 13, weight: .semibold))
-                                    .padding([.top, .leading, .trailing], 12)
                                     .foregroundColor(Color(viewConfig.theme.baseColor))
                                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.nameTextView)
                                 Spacer()
                             }
                             
                             AdSponsorLabel()
-                                .padding(.leading, 12)
                             
                             Text(ad.body)
                                 .lineLimit(6)
@@ -72,7 +70,6 @@ struct AmityCommentAdComponent: View {
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 100, alignment: .center)
                                         .background(Color.red.opacity(0.1))
-                                        .padding(.trailing, 12)
                                     
                                     
                                     VStack {
@@ -92,11 +89,12 @@ struct AmityCommentAdComponent: View {
                                             
                                             Text(ad.callToAction)
                                                 .font(.system(size: 14, weight: .bold))
-                                                .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                                                .lineLimit(1)
+                                                .foregroundColor(Color.white)
                                                 .padding(.horizontal, 12)
-                                                .padding(.vertical, 8)
-                                                .background(Color(viewConfig.theme.primaryColor))
-                                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                                .padding(.vertical, 10)
+                                                .background(Color(viewConfig.theme.highlightColor))
+                                                .clipShape(RoundedRectangle(cornerRadius: 6))
                                                 .opacity(ad.callToAction.isEmpty ? 0 : 1)
                                         }
                                         .padding(.all, 12)
@@ -109,9 +107,10 @@ struct AmityCommentAdComponent: View {
                                 .background(Color(viewConfig.theme.backgroundColor))
                                 .frame(height: 118)
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
-                                .padding(EdgeInsets(top: 4, leading: 12, bottom: 12, trailing: 12))
+                                .padding(.top, 4)
                             }
                         }
+                        .padding(.all, 12)
                         
                         Button {
                             selctedAdInfoAction?(ad)
@@ -152,9 +151,9 @@ struct AdSponsorLabel: View {
                 .foregroundColor(Color(viewConfig.theme.backgroundColor))
                 .padding(.leading, 4)
             
-            Text("Premium Sponsored")
+            Text(AmityLocalizedStringSet.Social.sponsored.localizedString)
                 .font(.system(size: 11, weight: .regular))
-                .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                .foregroundColor(Color.white)
                 .padding(.leading, 2)
                 .padding(.trailing, 6)
         }

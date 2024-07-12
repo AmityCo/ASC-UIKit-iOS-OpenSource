@@ -10,10 +10,12 @@ import AmitySDK
 import Combine
 
 public struct AmityGlobalFeedComponent: AmityComponentView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     public var pageId: PageId?
     
     @StateObject private var viewConfig: AmityViewConfigController
-    @StateObject private var postFeedViewModel = PostFeedViewModel()
+    @StateObject private var postFeedViewModel = PostFeedViewModel(feedType: .globalFeed)
     
     public var id: ComponentId {
         .globalFeedComponent
@@ -43,7 +45,10 @@ public struct AmityGlobalFeedComponent: AmityComponentView {
                     case .content(let post):
                         
                         VStack(spacing: 0){
-                            AmityPostContentComponent(post: post.object, pageId: pageId)
+                            AmityPostContentComponent(post: post.object, onTapAction: {
+                                let context = AmityGlobalFeedComponentBehavior.Context(component: self, post: post)
+                                AmityUIKitManagerInternal.shared.behavior.globalFeedComponentBehavior?.goToPostDetailPage(context: context)
+                            }, pageId: pageId)
                             .contentShape(Rectangle())
                             
                             Rectangle()

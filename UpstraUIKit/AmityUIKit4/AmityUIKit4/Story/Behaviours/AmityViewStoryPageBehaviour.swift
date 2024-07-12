@@ -7,6 +7,7 @@
 
 import Foundation
 import AmitySDK
+import UIKit
 
 open class AmityViewStoryPageBehaviour {
     
@@ -24,7 +25,15 @@ open class AmityViewStoryPageBehaviour {
     
     public init() {}
     
-    open func goToCommunityPage(context: Context) {}
+    open func goToCommunityPage(context: Context) {
+        let communityId = context.targetId
+        
+        let communityProfilePage = AmityCommunityProfilePage(communityId: communityId)
+        let controller = AmitySwiftUIHostingController(rootView: communityProfilePage)
+        controller.navigationController?.isNavigationBarHidden = true
+        
+        context.page.host.controller?.navigationController?.pushViewController(controller, animated: true)
+    }
     
     open func goToCreateStoryPage(context: Context) {
         let createStoryPage = AmityCreateStoryPage(targetId: context.targetId, targetType: context.targetType)

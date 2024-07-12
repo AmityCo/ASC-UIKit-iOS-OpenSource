@@ -13,10 +13,13 @@ class PostFeedViewModel: ObservableObject {
     @Published var feedLoadingStatus: AmityLoadingStatus = .notLoading
     @Published var postItems: [PaginatedItem<AmityPostModel>] = []
     
+    @Published var announcementPost: AmityPostModel?
+    
     private var postCollection: AmityCollection<AmityPost>?
     private let feedManager = FeedManager()
+    private let postManager = PostManager()
     
-    private var paginator: UIKitPaginator<AmityPost>
+    private var paginator: UIKitPaginator<AmityPost>?
     
     // loadGlobalFeed can be called multiple times. We only want one subscriber at a time
     private var feedCancellable: AnyCancellable?
@@ -24,19 +27,19 @@ class PostFeedViewModel: ObservableObject {
     
     // cached recently created post by current user to show on top of post feed
     private var recentlyCreatedPosts: [AmityPost] = []
+    private let feedType: FeedType
     
-    init() {
-        let collection = feedManager.getGlobalFeedPosts()
-        
-        paginator = UIKitPaginator(liveCollection: collection, adPlacement: .feed, modelIdentifier: { model in
-            return model.postId
-        })
-        paginator.load()
-        
-        postCollection = collection
-        
-        // Load global feed.
-        loadGlobalFeed()
+    public enum FeedType: Equatable {
+        case community(communityId: String)
+        case globalFeed
+    }
+    
+    private var token: AmityNotificationToken?
+    private var pinnedPostCollection: AmityCollection<AmityPinnedPost>?
+    
+    init(feedType: FeedType) {
+        self.feedType = feedType
+        loadFeed(feedType: feedType)
     }
     
     deinit {
@@ -45,11 +48,41 @@ class PostFeedViewModel: ObservableObject {
         NotificationCenter.default.removeObserver(self, name: .didPostReacted, object: nil)
     }
     
-    func loadGlobalFeed() {
+    func loadFeed(feedType: FeedType) {
         /// Clear out recentlyCreatedPosts on fresh data loading
         recentlyCreatedPosts.removeAll()
         
-        feedCancellable = paginator.$snapshots.sink { [weak self] items in
+        let collection: AmityCollection<AmityPost>
+        
+        switch feedType {
+        case .community(let communityId):
+            pinnedPostCollection = postManager.getCommunityAnnouncementPost(communityId: communityId)
+            collection = feedManager.getCommunityFeedPosts(communityId: communityId)
+        case .globalFeed:
+            collection = feedManager.getGlobalFeedPosts()
+        }
+        
+        
+        paginator = UIKitPaginator(liveCollection: collection, adPlacement: .feed, modelIdentifier: { model in
+            return model.postId
+        })
+        paginator?.load()
+        
+        postCollection = collection
+        
+        if pinnedPostCollection != nil {
+            token = pinnedPostCollection?.observe({ [weak self] collection, _, error in
+                if let announcementPost = collection.snapshots.first?.post {
+                    self?.announcementPost = AmityPostModel(post: announcementPost)
+                    self?.postItems.removeAll(where: {$0.id == announcementPost.postId})
+                } else {
+                    self?.announcementPost = nil
+                }
+                
+            })
+        }
+        feedCancellable = nil
+        feedCancellable = paginator?.$snapshots.sink { [weak self] items in
             guard let self else { return }
             
             let normalizedPosts: [PaginatedItem<AmityPost>] = items.filter { item in
@@ -57,7 +90,11 @@ class PostFeedViewModel: ObservableObject {
                 case .ad:
                     return true
                 case .content(let post):
-                    return !post.childrenPosts.contains { $0.dataType == "poll" || $0.dataType == "liveStream" || $0.dataType == "file" }
+                    var filterCondition = !post.childrenPosts.contains { $0.dataType == "poll" || $0.dataType == "liveStream" || $0.dataType == "file" }
+                    if let announcementPost = self.announcementPost {
+                        filterCondition = filterCondition && post.postId != announcementPost.postId
+                    }
+                    return filterCondition
                 }
             }
             
@@ -71,12 +108,13 @@ class PostFeedViewModel: ObservableObject {
             }
             
             /// Append recently created posts at first to show at the top of global feed.
-            if !recentlyCreatedPosts.isEmpty {
+            if !recentlyCreatedPosts.isEmpty, feedType == .globalFeed {
                 let newPosts = recentlyCreatedPosts.map { PaginatedItem(id: $0.postId, type: .content(AmityPostModel(post: $0)))}
                 self.postItems = newPosts + postItems
             }
         }
         
+        loadingStateCancellable = nil
         loadingStateCancellable = postCollection?.$loadingStatus
             .sink(receiveValue: { [weak self] status in
                 guard let self else { return }
@@ -97,13 +135,13 @@ class PostFeedViewModel: ObservableObject {
     }
     
     func loadMorePosts() {
-        if paginator.hasNextPage() {
+        if let paginator, paginator.hasNextPage() {
             paginator.nextPage()
         }
     }
     
     @objc private func didPostCreated(_ notification: Notification) {
-        if let object = notification.object as? AmityPost {
+        if let object = notification.object as? AmityPost, feedType == .globalFeed {
             /// Ensure recentlyCreatedPosts is not having the post to prevent duplication in data source
             if !recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
                 recentlyCreatedPosts.append(object)
@@ -115,7 +153,7 @@ class PostFeedViewModel: ObservableObject {
     }
     
     @objc private func didPostDeleted(_ notification: Notification) {
-        if let info = notification.userInfo, let postId = info["postId"] as? String {
+        if let info = notification.userInfo, let postId = info["postId"] as? String, feedType == .globalFeed {
             /// Check recentlyCreatedPosts is deleted
             if recentlyCreatedPosts.contains(where: { $0.postId == postId }) {
                 
@@ -132,7 +170,7 @@ class PostFeedViewModel: ObservableObject {
     }
     
     @objc private func didPostReacted(_ notification: Notification) {
-        if let object = notification.object as? AmityPost {
+        if let object = notification.object as? AmityPost, feedType == .globalFeed {
             /// Check recentlyCreatedPosts is reacted
             if recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
                 self.objectWillChange.send()

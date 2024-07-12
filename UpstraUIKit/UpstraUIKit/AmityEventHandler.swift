@@ -158,8 +158,8 @@ open class AmityEventHandler {
         #if canImport(AmityUIKit4)
         
         let storyCompletion: ((AmityPostContentType) -> Void) = { postContentType in
-            let targetSelectionPage = AmityTargetSelectionPage(type: .story)
-            let navPostTargetVC = UINavigationController(rootViewController: AmitySwiftUIHostingController(rootView: targetSelectionPage))
+            let storyTargetSelectionPage = AmityStoryTargetSelectionPage()
+            let navPostTargetVC = UINavigationController(rootViewController: AmitySwiftUIHostingController(rootView: storyTargetSelectionPage))
             navPostTargetVC.isNavigationBarHidden = true
             navPostTargetVC.modalPresentationStyle = .fullScreen
             source.present(navPostTargetVC, animated: true, completion: nil)

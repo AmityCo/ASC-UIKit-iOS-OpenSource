@@ -9,6 +9,8 @@ import SwiftUI
 import AmitySDK
 
 public struct AmityCommunitySearchResultComponent: AmityComponentView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     public var pageId: PageId?
     
     public var id: ComponentId {
@@ -18,7 +20,7 @@ public struct AmityCommunitySearchResultComponent: AmityComponentView {
     @ObservedObject private var viewModel: AmityGlobalSearchViewModel
     @StateObject private var viewConfig: AmityViewConfigController
     
-    public init(viewModel: AmityGlobalSearchViewModel, pageId: PageId?) {
+    public init(viewModel: AmityGlobalSearchViewModel, pageId: PageId? = nil) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communitySearchResultComponent))
         self.viewModel = viewModel
     }
@@ -40,6 +42,10 @@ public struct AmityCommunitySearchResultComponent: AmityComponentView {
             
             List(Array(viewModel.communities.enumerated()), id: \.element.communityId) { index, community in
                 getCommunityCellView(community)
+                    .onTapGesture {
+                        let context = AmityCommunitySearchResultComponentBehavior.Context(component: self, communityId: community.communityId)
+                        AmityUIKitManagerInternal.shared.behavior.communitySearchResultComponentBehavior?.goToCommunityProfilePage(context: context)
+                    }
                 .onAppear {
                     if index == viewModel.communities.count - 1 {
                         viewModel.loadMoreCommunities()

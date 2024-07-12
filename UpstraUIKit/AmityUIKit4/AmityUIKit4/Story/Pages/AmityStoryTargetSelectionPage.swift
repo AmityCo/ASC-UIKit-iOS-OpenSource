@@ -1,5 +1,5 @@
 //
-//  AmityTargetSelectionPage.swift
+//  AmityStoryTargetSelectionPage.swift
 //  AmityUIKit4
 //
 //  Created by Zay Yar Htun on 4/2/24.
@@ -9,14 +9,7 @@ import SwiftUI
 import AmitySDK
 import Combine
 
-public enum AmityTargetSelectionPageType {
-    case post
-    case poll
-    case livestream
-    case story
-}
-
-public struct AmityTargetSelectionPage: AmityPageIdentifiable, View {
+public struct AmityStoryTargetSelectionPage: AmityPageIdentifiable, View {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     @Environment(\.colorScheme) private var colorScheme
     
@@ -25,10 +18,8 @@ public struct AmityTargetSelectionPage: AmityPageIdentifiable, View {
     }
     
     @StateObject private var viewConfig: AmityViewConfigController
-    private let contentType: AmityTargetSelectionPageType
     
-    public init(type: AmityTargetSelectionPageType) {
-        self.contentType = type
+    public init() {
         _viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .targetSelectionPage))
     }
     
@@ -60,8 +51,8 @@ public struct AmityTargetSelectionPage: AmityPageIdentifiable, View {
             
             TargetSelectionView(communityOnTapAction: { communityModel in
                 
-                let context = AmityTargetSelectionPageBehaviour.Context(page: self, community: communityModel.object, targetType: .community)
-                AmityUIKitManagerInternal.shared.behavior.targetSelectionPageBehaviour?.goToCreateStoryPage(context: context)
+                let context = AmityStoryTargetSelectionPageBehaviour.Context(page: self, community: communityModel.object, targetType: .community)
+                AmityUIKitManagerInternal.shared.behavior.storyTargetSelectionPageBehaviour?.goToCreateStoryPage(context: context)
                 
             })
         }

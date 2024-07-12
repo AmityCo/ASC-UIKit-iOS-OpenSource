@@ -8,7 +8,7 @@
 import SwiftUI
 
 public struct AmityPostTargetSelectionPage: AmityPageView {
-    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var id: PageId {
         .postTargetSelectionPage
@@ -65,10 +65,8 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        let createOptions = AmityPostComposerOptions.createOptions(targetId: nil, targetType: .user, community: nil)
-                        let view = AmityPostComposerPage(options: createOptions)
-                        let controller = AmitySwiftUIHostingController(rootView: view)
-                        host.controller?.navigationController?.pushViewController(controller, animated: true)
+                        let context = AmityPostTargetSelectionPageBehavior.Context(page: self, community: nil)
+                        AmityUIKitManagerInternal.shared.behavior.postTargetSelectionPageBehavior?.goToPostComposerPage(context: context)
                     }
                     
                     Rectangle()
@@ -77,10 +75,8 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
                 }
                 .padding([.leading, .trailing], 16)
             }, communityOnTapAction: { communityModel in
-                let createOptions = AmityPostComposerOptions.createOptions(targetId: communityModel.communityId, targetType: .community, community: communityModel)
-                let view = AmityPostComposerPage(options: createOptions)
-                let controller = AmitySwiftUIHostingController(rootView: view)
-                host.controller?.navigationController?.pushViewController(controller, animated: true)
+                let context = AmityPostTargetSelectionPageBehavior.Context(page: self, community: communityModel)
+                AmityUIKitManagerInternal.shared.behavior.postTargetSelectionPageBehavior?.goToPostComposerPage(context: context)
             })
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())

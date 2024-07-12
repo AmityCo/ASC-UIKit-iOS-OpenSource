@@ -86,14 +86,14 @@ struct PostBottomSheetView: View {
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 20, height: 24)
-                .foregroundColor(.red)
+                .foregroundColor(Color(viewConfig.theme.alertColor))
             
             Button {
                 isDeleteAlertShown.toggle()
             } label: {
                 Text(AmityLocalizedStringSet.Social.deletePostBottomSheetTitle.localizedString)
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.red)
+                    .foregroundColor(Color(viewConfig.theme.alertColor))
             }
             .buttonStyle(.plain)
             

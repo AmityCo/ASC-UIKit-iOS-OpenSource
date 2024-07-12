@@ -8,18 +8,19 @@
 import SwiftUI
 
 public struct AmitySocialGlobalSearchPage: AmityPageView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     public var id: PageId {
         .socialGlobalSearchPage
     }
     
-    @StateObject private var viewModel: AmityGlobalSearchViewModel
+    @StateObject private var viewModel: AmityGlobalSearchViewModel = AmityGlobalSearchViewModel()
     @StateObject private var viewConfig: AmityViewConfigController
     
     @State private var tabIndex: Int = 0
     @State private var tabs: [String] = ["Communities", "Users"]
     
-    init(cancelAction: (() -> Void)? = nil) {
-        self._viewModel = StateObject(wrappedValue: AmityGlobalSearchViewModel(cancelAction: cancelAction))
+    public init() {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .socialGlobalSearchPage))
     }
     
@@ -27,6 +28,7 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
         VStack(spacing: 0) {
             AmityTopSearchBarComponent(viewModel: viewModel, pageId: id)
                 .padding(.top, 60)
+                .environmentObject(host)
             
             if !viewModel.isFirstTimeSearching {
                 ZStack(alignment: .bottom) {
@@ -63,6 +65,7 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)
+        .ignoresSafeArea()
     }
 }
 

@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 public struct AmitySocialHomePage: AmityPageView {
-    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var id: PageId {
         .socialHomePage
@@ -24,7 +24,16 @@ public struct AmitySocialHomePage: AmityPageView {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            AmitySocialHomeTopNavigationComponent(pageId: id, selectedTab: selectedTab)
+            AmitySocialHomeTopNavigationComponent(pageId: id, selectedTab: selectedTab, searchButtonAction: {
+                if selectedTab == .newsFeed {
+                    let context = AmitySocialHomePageBehavior.Context(page: self)
+                    AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToGlobalSearchPage(context: context)
+                    
+                } else if selectedTab == .myCommunities {
+                    let context = AmitySocialHomePageBehavior.Context(page: self)
+                    AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToMyCommunitiesSearchPage(context: context)
+                }
+            })
             
             SocialHomePageTabView($selectedTab)
                 .frame(height: 62)
@@ -34,5 +43,8 @@ public struct AmitySocialHomePage: AmityPageView {
         .background(Color(viewConfig.theme.backgroundColor))
         .ignoresSafeArea(edges: .bottom)
         .updateTheme(with: viewConfig)
+        .onAppear {
+            host.controller?.navigationController?.isNavigationBarHidden = true
+        }
     }
 }

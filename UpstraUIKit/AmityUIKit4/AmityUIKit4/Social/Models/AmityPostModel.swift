@@ -326,7 +326,7 @@ public class AmityPostModel: Identifiable {
         mentionees = post.mentionees
         isEdited = post.isEdited
         
-        if let communityMember = targetCommunity?.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
+        if let communityMember = targetCommunity?.membership.getMember(withId: postedUserId) {
             isModerator = communityMember.hasModeratorRole
         }
         

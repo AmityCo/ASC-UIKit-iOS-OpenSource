@@ -11,7 +11,7 @@ import Combine
 import PhotosUI
 
 #warning ("FIX ME: Refactor and share the same code base between AmityMediaAttatchmentComponent and AmityDetailMediaAttatchmentComponent")
-public struct AmityDetailedMediaAttatchmentComponent: AmityComponentView {
+public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
     public var pageId: PageId?
     
     public var id: ComponentId {

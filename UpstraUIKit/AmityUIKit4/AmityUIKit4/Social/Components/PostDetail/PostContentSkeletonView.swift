@@ -15,7 +15,7 @@ struct PostContentSkeletonView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     var body: some View {
-        VStack {
+        VStack(spacing: 5) {
             HStack {
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade3))
@@ -66,6 +66,10 @@ struct PostContentSkeletonView: View {
                 Spacer()
             }
             .padding(EdgeInsets(top: 8, leading: 20, bottom: 80, trailing: 12))
+            
+            Rectangle()
+                .fill(Color(viewConfig.theme.baseColorShade4))
+                .frame(height: 8)
             
             Spacer()
         }

@@ -9,6 +9,8 @@ import SwiftUI
 import AmitySDK
 
 public struct AmityUserSearchResultComponent: AmityComponentView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     public var pageId: PageId?
     
     public var id: ComponentId {
@@ -19,7 +21,7 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
     @ObservedObject private var viewModel: AmityGlobalSearchViewModel
     @StateObject private var viewConfig: AmityViewConfigController
     
-    init(viewModel: AmityGlobalSearchViewModel, pageId: PageId?) {
+    public init(viewModel: AmityGlobalSearchViewModel, pageId: PageId? = nil) {
         self.viewModel = viewModel
         self.pageId = pageId
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: nil, componentId: .communitySearchResultComponent))
@@ -42,6 +44,10 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
             
             List(Array(viewModel.users.enumerated()), id: \.element.userId) { index, user in
                 getUserCellView(user)
+                .onTapGesture {
+                    let context = AmityUserSearchResultComponentBehavior.Context(component: self)
+                    AmityUIKitManagerInternal.shared.behavior.userSearchResultComponentBehavior?.goToUserProfilePage(context: context)
+                }
                 .onAppear {
                     if index == viewModel.users.count - 1 {
                         viewModel.loadMoreUsers()
@@ -88,7 +94,7 @@ struct UserCellView: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: URL(string: user.getAvatarInfo()?.fileURL ?? ""))
+            AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: user.getAvatarInfo()?.fileURL ?? ""))
                 .frame(size: CGSize(width: 40, height: 40))
                 .clipShape(Circle())
             

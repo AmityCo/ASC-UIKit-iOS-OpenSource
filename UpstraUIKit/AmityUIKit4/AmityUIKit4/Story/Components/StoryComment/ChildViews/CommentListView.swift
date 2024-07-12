@@ -36,12 +36,27 @@ struct CommentListView<Content>: View where Content: View {
                     
                     headerView()
                     
-                    getCommentWithAds(value: value)
+                    if commentItems.isEmpty && commentCoreViewModel.loadingStatus != .loaded {
+                        getSkeletonView()
+                    } else {
+                        getCommentWithAds(value: value)
+                    }
                     
                     Color.clear.frame(height: 6)
                     
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    func getSkeletonView() -> some View {
+        ForEach(0..<10, id: \.self) { index in
+            VStack(spacing: 0) {
+                CommentSkeletonView()
+            }
+            .listRowInsets(EdgeInsets())
+            .modifier(HiddenListSeparator())
         }
     }
         
@@ -97,10 +112,6 @@ struct CommentListView<Content>: View where Content: View {
             .onAppear {
                 // Parent comment list will load previous page on scrolling.
                 // Reply comment list will load on View More Reply button action.
-                Log.add(event: .info, "CommentIndex: \(index), count: \(commentCoreViewModel.commentItems.count)")
-                if index == commentCoreViewModel.commentItems.count - 1 {
-                    Log.add(event: .info, "LastItem & \(commentCoreViewModel.paginator.hasPreviousPage())")
-                }
                 if index == commentCoreViewModel.commentItems.count - 1 && commentCoreViewModel.paginator.hasPreviousPage() {
                     commentCoreViewModel.paginator.previousPage()
                     

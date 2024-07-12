@@ -16,13 +16,14 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
     }
     
     @StateObject private var viewConfig: AmityViewConfigController
-    @State private var showSearchPage: Bool = false
     @State private var showPostCreationMenu: Bool = false
     private let selectedTab: AmitySocialHomePageTab
+    private var searchButtonAction: (() -> Void)?
     
-    public init(pageId: PageId? = nil, selectedTab: AmitySocialHomePageTab = .newsFeed) {
+    public init(pageId: PageId? = nil, selectedTab: AmitySocialHomePageTab = .newsFeed, searchButtonAction: (() -> Void)? = nil) {
         self.pageId = pageId
         self.selectedTab = selectedTab
+        self.searchButtonAction = searchButtonAction
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .socialHomePageTopNavigationComponent))
     }
     
@@ -39,7 +40,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
             Spacer()
             
             Button(action: {
-                withoutAnimation { showSearchPage.toggle() }
+                searchButtonAction?()
             }, label: {
                 VStack {
                     let searchIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .globalSearchButton, key: "icon", of: String.self) ?? "")
@@ -49,15 +50,6 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                 .frame(size: CGSize(width: 32.0, height: 32.0))
                 .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
                 .clipShape(Circle())
-            })
-            .fullScreenCover(isPresented: $showSearchPage, content: {
-                if selectedTab == .newsFeed {
-                    AmitySocialGlobalSearchPage(cancelAction: { withoutAnimation { showSearchPage.toggle() } })
-                        .ignoresSafeArea()
-                } else if selectedTab == .myCommunities {
-                    AmityMyCommunitiesSearchPage(cancelAction: { withoutAnimation { showSearchPage.toggle() } })
-                        .ignoresSafeArea()
-                }
             })
             .isHidden(viewConfig.isHidden(elementId: .globalSearchButton), remove: true)
             
@@ -77,7 +69,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                     .clipShape(Circle())
                 })
                 .fullScreenCover(isPresented: $showPostCreationMenu) {
-                    AmityPostMenuComponent(isPresented: $showPostCreationMenu)
+                    AmityCreatePostMenuComponent(isPresented: $showPostCreationMenu)
                         .background(ClearBackgroundView())
                 }
                 .isHidden(viewConfig.isHidden(elementId: .postCreationButton), remove: true)

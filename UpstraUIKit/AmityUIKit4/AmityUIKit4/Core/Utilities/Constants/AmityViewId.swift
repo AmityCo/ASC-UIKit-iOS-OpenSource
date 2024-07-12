@@ -24,6 +24,8 @@ public enum PageId: String {
     case createPostPage = "create_post_page"
     case postTargetSelectionPage = "select_post_target_page"
     case myCommunitiesSearchPage = "my_communities_search_page"
+    
+    case communityProfilePage = "community_profile_page"
 }
 
 public enum ComponentId: String {
@@ -49,6 +51,10 @@ public enum ComponentId: String {
     case communitySearchResultComponent = "community_search_result"
     case userSearchResultComponent = "user_search_result"
     case createPostMenu = "create_post_menu"
+    case communityHeader = "community_header"
+    case communityFeed = "community_feed"
+    case communityPin = "community_pin"
+
 }
 
 public enum ElementId: String {

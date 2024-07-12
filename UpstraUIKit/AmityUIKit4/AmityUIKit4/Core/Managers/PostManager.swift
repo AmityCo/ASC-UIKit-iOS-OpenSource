@@ -36,6 +36,9 @@ class PostManager {
         try await postRepository.isFlaggedByMe(withId: withId)
     }
     
+    func getCommunityAnnouncementPost(communityId: String) -> AmityCollection<AmityPinnedPost> {
+        return postRepository.getPinnedPosts(communityId: communityId, placement: AmityPinPlacement.announcement.rawValue, sortBy: .lastPinned)
+    }
     
     @discardableResult
     func createTextPost(text: String, communityId: String?, metadata: [String: Any]?, mentionees: AmityMentioneesBuilder?) async throws -> AmityPost {
