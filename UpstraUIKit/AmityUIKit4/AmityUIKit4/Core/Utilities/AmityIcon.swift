@@ -125,6 +125,8 @@ enum AmityIcon: String, ImageResourceProvider {
     case communityFeedIcon = "communityFeedIcon"
     case communityPinIcon = "communityPinIcon"
     case communityAnnouncementBadge = "communityAnnouncementBadge"
+    case communityPinBadge = "communityPinBadge"
+    case communityProfileEmptyPostIcon = "communityProfileEmptyPostIcon"
     case communityPendingPostIcon = "communityPendingPostIcon"
 
     func getURL() -> URL {

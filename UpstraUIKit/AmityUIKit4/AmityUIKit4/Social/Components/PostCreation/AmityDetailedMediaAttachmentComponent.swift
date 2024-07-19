@@ -15,7 +15,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
     public var pageId: PageId?
     
     public var id: ComponentId {
-        .commentTrayComponent
+        .detailedMediaAttachment
     }
     
     @StateObject private var viewConfig: AmityViewConfigController
@@ -30,13 +30,15 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
     public init(viewModel: AmityMediaAttachmentViewModel, pageId: PageId? = nil) {
         self.pageId = pageId
         self.viewModel = viewModel
-        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId))
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .detailedMediaAttachment))
     }
     
     public var body: some View {
         VStack(spacing: 28) {
-            getItemView(image: AmityIcon.cameraAttatchmentIcon.getImageResource(), 
-                        title: "Camera",
+            let cameraButtonIcon = viewConfig.getConfig(elementId: .cameraButton, key: "image", of: String.self) ?? ""
+            let cameraButtonTitle = viewConfig.getConfig(elementId: .cameraButton, key: "text", of: String.self) ?? ""
+            getItemView(image: AmityIcon.getImageResource(named: cameraButtonIcon),
+                        title: cameraButtonTitle,
                         isHidden: false) {
                 if let currentType =  viewModel.medias.first?.type {
                     showCamera.type = currentType == .image ? [UTType.image] : [UTType.movie]
@@ -48,16 +50,20 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                 showCamera.isShown.toggle()
             }
             
-            getItemView(image: AmityIcon.photoAttatchmentIcon.getImageResource(),
-                        title: "Photo",
+            let imageButtonIcon = viewConfig.getConfig(elementId: .imageButton, key: "image", of: String.self) ?? ""
+            let imageButtonTitle = viewConfig.getConfig(elementId: .imageButton, key: "text", of: String.self) ?? ""
+            getItemView(image: AmityIcon.getImageResource(named: imageButtonIcon),
+                        title: imageButtonTitle,
                         isHidden: viewModel.medias.first?.type ?? .image != .image) {
                 showMediaPicker.type = .images
                 showMediaPicker.source = .photoLibrary
                 showMediaPicker.isShown.toggle()
             }
             
-            getItemView(image: AmityIcon.videoAttatchmentIcon.getImageResource(),
-                        title: "Video",
+            let videoButtonIcon = viewConfig.getConfig(elementId: .videoButton, key: "image", of: String.self) ?? ""
+            let videoButtonTitle = viewConfig.getConfig(elementId: .videoButton, key: "text", of: String.self) ?? ""
+            getItemView(image: AmityIcon.getImageResource(named: videoButtonIcon),
+                        title: videoButtonTitle,
                         isHidden: viewModel.medias.first?.type ?? .video != .video) {
                 showMediaPicker.type = .videos
                 showMediaPicker.source = .photoLibrary

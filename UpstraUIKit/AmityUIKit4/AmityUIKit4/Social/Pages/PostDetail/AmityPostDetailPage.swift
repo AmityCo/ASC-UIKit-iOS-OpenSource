@@ -19,7 +19,8 @@ public struct AmityPostDetailPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     @State private var showBottomSheet: Bool = false
     
-    private var postContentStyle: AmityPostContentComponentStyle = .postDetail
+    private var postCategory: AmityPostCategory = .general
+    private var hideTarget: Bool = false
     
     public var id: PageId {
         .postDetailPage
@@ -33,8 +34,9 @@ public struct AmityPostDetailPage: AmityPageView {
     }
     
     /// Convenience initializer
-    public init(post: AmityPost, style: AmityPostContentComponentStyle = .postDetail) {
-        self.postContentStyle = style
+    public init(post: AmityPost, category: AmityPostCategory = .general, hideTarget: Bool = false) {
+        self.postCategory = category
+        self.hideTarget = hideTarget
         self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(post: post))
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: nil, allowCreateComment: true))
@@ -63,9 +65,8 @@ public struct AmityPostDetailPage: AmityPageView {
                 
                 Spacer()
                 
-                if let post = viewModel.post {
-                    let model = AmityPostModel(post: post)
-                    let bottomSheetHeight = calculateBottomSheetHeight(post: model)
+                if let postModel = viewModel.post {
+                    let bottomSheetHeight = calculateBottomSheetHeight(post: postModel)
                     Button(action: {
                         showBottomSheet.toggle()
                     }, label: {
@@ -78,7 +79,7 @@ public struct AmityPostDetailPage: AmityPageView {
                     })
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
                     .bottomSheet(isShowing: $showBottomSheet, height: bottomSheetHeight, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                        PostBottomSheetView(isShown: $showBottomSheet, post: model) {
+                        PostBottomSheetView(isShown: $showBottomSheet, post: postModel) {
                             host.controller?.navigationController?.popViewController(animated: true)
                         } editPostActionCompletion: {
                             
@@ -87,7 +88,7 @@ public struct AmityPostDetailPage: AmityPageView {
                             // Dismiss bottomsheet
                             host.controller?.dismiss(animated: false)
                             
-                            let editOption = AmityPostComposerOptions.editOptions(post: model)
+                            let editOption = AmityPostComposerOptions.editOptions(post: postModel)
                             let view = AmityPostComposerPage(options: editOption)
                             let controller = AmitySwiftUIHostingController(rootView: view)
                             
@@ -109,10 +110,8 @@ public struct AmityPostDetailPage: AmityPageView {
             
             CommentCoreView(headerView: {
                 VStack(spacing: 4) {
-                    if let post = viewModel.post {
-                        let hideTarget = postContentStyle == .announcement_detail || postContentStyle == .pin_detail
-
-                        AmityPostContentComponent(post: post, style: postContentStyle, hideTarget: hideTarget, hideMenuButton: true)
+                    if let postModel = viewModel.post {
+                        AmityPostContentComponent(post: postModel.object, style: .detail, category: postCategory, hideTarget: hideTarget, hideMenuButton: true)
                         Rectangle()
                             .fill(Color(viewConfig.theme.baseColorShade4))
                             .frame(height: 1)
@@ -143,6 +142,11 @@ public struct AmityPostDetailPage: AmityPageView {
         .updateTheme(with: viewConfig)
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
+            
+            if let isCommunityMember = viewModel.post?.isGroupMember {
+                commentCoreViewModel.hideCommentButtons = !isCommunityMember
+            }
+
         }
     }
     
@@ -152,7 +156,7 @@ public struct AmityPostDetailPage: AmityPageView {
         let itemHeight: CGFloat = 48
         let additionalItems = [
             true,  // Always add one item
-            post.isModerator || post.isOwner,
+            post.hasModeratorPermission || post.isOwner,
         ].filter { $0 }
         
         let additionalHeight = CGFloat(additionalItems.count) * itemHeight
@@ -182,23 +186,27 @@ class AmityPostDetailPageViewModel: ObservableObject {
     private var cancellable: AnyCancellable?
     private let postManager = PostManager()
     
-    @Published var post: AmityPost?
+    @Published var post: AmityPostModel?
     
     init(id: String) {
         self.postId = id
+        
         postObject = postManager.getPost(withId: id)
         cancellable = postObject?.$snapshot
             .sink { [weak self] post in
-                self?.post = post
+                guard let post else { return }
+                self?.post = AmityPostModel(post: post)
             }
     }
     
     init(post: AmityPost) {
-        self.post = post
+        self.post = AmityPostModel(post: post)
+        
         postObject = postManager.getPost(withId: post.postId)
         cancellable = postObject?.$snapshot
             .sink { [weak self] post in
-                self?.post = post
+                guard let post else { return }
+                self?.post = AmityPostModel(post: post)
             }
     }
 }

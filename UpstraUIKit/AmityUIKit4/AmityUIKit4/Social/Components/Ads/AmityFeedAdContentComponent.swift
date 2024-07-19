@@ -39,7 +39,7 @@ struct AmityFeedAdContentComponent: View {
             
             HStack(spacing: 0) {
                 AsyncImage(placeholder: AmityIcon.adAvatarPlaceholder.imageResource, url: URL(string: ad.advertiser?.avatar?.fileURL ?? ""))
-                    .frame(size: CGSize(width: 32.0, height: 32.0))
+                    .frame(width: 32.0, height: 32.0)
                     .clipShape(Circle())
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 8))
                 

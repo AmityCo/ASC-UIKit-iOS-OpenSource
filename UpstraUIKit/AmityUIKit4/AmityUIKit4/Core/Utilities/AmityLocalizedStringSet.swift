@@ -129,6 +129,11 @@ public struct AmityLocalizedStringSet {
         static let postDetailPageTitle = "post_detail_page_title"
         static let sponsored = "ads_sponsored_label"
         static let createPostBottomSheetTitle = "create_post_bottom_sheet_title"
+        static let createStoryBottomSheetTitle = "create_story_bottom_sheet_title"
+        static let communityPageJoinTitle = "community_page_join_title"
+        static let communityPagePendingPostTitle = "community_page_pending_post_title"
+        static let nonMemberReactPostMessage = "non_member_react_post_message"
+
     }
     
 }

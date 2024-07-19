@@ -14,19 +14,20 @@ public struct AmityStoryTargetSelectionPage: AmityPageIdentifiable, View {
     @Environment(\.colorScheme) private var colorScheme
     
     public var id: PageId {
-        .targetSelectionPage
+        .storyTargetSelectionPage
     }
     
     @StateObject private var viewConfig: AmityViewConfigController
     
     public init() {
-        _viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .targetSelectionPage))
+        _viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .storyTargetSelectionPage))
     }
     
     public var body: some View {
         VStack {
             HStack {
-                Image(AmityIcon.closeIcon.getImageResource())
+                let closeButtonIcon = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
+                Image(AmityIcon.getImageResource(named: closeButtonIcon))
                     .renderingMode(.template)
                     .frame(width: 24, height: 24)
                     .foregroundColor(Color(viewConfig.theme.baseColor))
@@ -42,7 +43,7 @@ public struct AmityStoryTargetSelectionPage: AmityPageIdentifiable, View {
                 Spacer()
             }
             .overlay(
-                Text("Share To")
+                Text(viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     

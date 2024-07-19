@@ -1,20 +1,19 @@
 //
-//  AmityCommunityFeedComponent.swift
+//  AmityCommunityPinnedPostComponent.swift
 //  AmityUIKit4
 //
-//  Created by Manuchet Rungraksa on 12/7/2567 BE.
+//  Created by Manuchet Rungraksa on 17/7/2567 BE.
 //
 
 import SwiftUI
 
-public struct AmityCommunityFeedComponent: AmityComponentView {
+public struct AmityCommunityPinnedPostComponent: AmityComponentView {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     
     public var pageId: PageId?
     private let communityId: String
     
     @StateObject private var viewConfig: AmityViewConfigController
-    @StateObject private var postFeedViewModel: PostFeedViewModel
     @StateObject private var communityProfileViewModel: CommunityProfileViewModel
     
     public var id: ComponentId {
@@ -29,10 +28,8 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
         self.onTapPostDetailAction = onTapPostDetailAction
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityFeed))
         if let communityProfileViewModel {
-            self._postFeedViewModel = StateObject(wrappedValue: communityProfileViewModel.postFeedViewModel)
             self._communityProfileViewModel = StateObject(wrappedValue: communityProfileViewModel)
         } else {
-            self._postFeedViewModel = StateObject(wrappedValue: PostFeedViewModel(feedType: .community(communityId: communityId)))
             self._communityProfileViewModel = StateObject(wrappedValue: CommunityProfileViewModel(communityId: communityId))
         }
     }
@@ -46,7 +43,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
     @ViewBuilder
     func getPostListView() -> some View {
         LazyVStack(spacing: 0) {
-            if postFeedViewModel.postItems.isEmpty {
+            if communityProfileViewModel.pinnedPosts.isEmpty {
                 ForEach(0..<5, id: \.self) { index in
                     VStack(spacing: 0) {
                         PostContentSkeletonView()
@@ -74,41 +71,20 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                     .listRowInsets(EdgeInsets())
                     .modifier(HiddenListSeparator())
                 }
-                ForEach(Array(postFeedViewModel.postItems.filter({$0.id != communityProfileViewModel.announcementPost?.postId ?? ""}).enumerated()), id: \.element.id) { index, item in
+                ForEach(Array(communityProfileViewModel.pinnedPosts.filter({$0.postId != communityProfileViewModel.announcementPost?.postId ?? ""}) .enumerated()), id: \.element.id) { index, post in
                     VStack(spacing: 0) {
+                        AmityPostContentComponent(post: post.object, category: .pin, hideTarget: true, onTapAction: {
+                            onTapPostDetailAction?(AmityPostModel(post: post.object), .pin)
+
+                        }, pageId: pageId)
+                        .contentShape(Rectangle())
                         
-                        switch item.type {
-                        case .ad(let ad):
-                            VStack(spacing: 0) {
-                                AmityFeedAdContentComponent(ad: ad)
-                                
-                                Rectangle()
-                                    .fill(Color(viewConfig.theme.baseColorShade4))
-                                    .frame(height: 8)
-                            }
-                            
-                        case .content(let post):
-                            
-                            VStack(spacing: 0) {
-                                let category: AmityPostCategory = communityProfileViewModel.pinnedPosts.contains(where: {$0.postId == post.postId}) ? .pin : .general
-                                AmityPostContentComponent(post: post.object, category: category, hideTarget: true, onTapAction: {
-                                    onTapPostDetailAction?(post, category)
-                                }, pageId: pageId)
-                                .contentShape(Rectangle())
-                                
-                                Rectangle()
-                                    .fill(Color(viewConfig.theme.baseColorShade4))
-                                    .frame(height: 8)
-                            }
-                        }
+                        Rectangle()
+                            .fill(Color(viewConfig.theme.baseColorShade4))
+                            .frame(height: 8)
                     }
                     .listRowInsets(EdgeInsets())
                     .modifier(HiddenListSeparator())
-                    .onAppear {
-                        if index == postFeedViewModel.postItems.count - 1 {
-                            postFeedViewModel.loadMorePosts()
-                        }
-                    }
                 }
             }
         }
@@ -117,10 +93,10 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
     public var body: some View {
         ZStack(alignment: .top) {
             getContentView()
-                .isHidden(postFeedViewModel.postItems.isEmpty && postFeedViewModel.feedLoadingStatus == .loaded)
+                .isHidden(communityProfileViewModel.pinnedPosts.isEmpty && communityProfileViewModel.pinnedFeedLoadingStatus == .loaded)
             
             EmptyCommunityFeedView()
-                .isHidden(!(postFeedViewModel.postItems.isEmpty && postFeedViewModel.feedLoadingStatus == .loaded))
+                .isHidden(!(communityProfileViewModel.pinnedPosts.isEmpty && communityProfileViewModel.pinnedFeedLoadingStatus == .loaded))
         }
         .updateTheme(with: viewConfig)
     }

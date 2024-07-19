@@ -12,14 +12,13 @@ import Combine
 class PostFeedViewModel: ObservableObject {
     @Published var feedLoadingStatus: AmityLoadingStatus = .notLoading
     @Published var postItems: [PaginatedItem<AmityPostModel>] = []
-    
-    @Published var announcementPost: AmityPostModel?
-    
+        
     private var postCollection: AmityCollection<AmityPost>?
     private let feedManager = FeedManager()
     private let postManager = PostManager()
     
     private var paginator: UIKitPaginator<AmityPost>?
+    var seenPostIds: Set<String> = Set()
     
     // loadGlobalFeed can be called multiple times. We only want one subscriber at a time
     private var feedCancellable: AnyCancellable?
@@ -33,10 +32,7 @@ class PostFeedViewModel: ObservableObject {
         case community(communityId: String)
         case globalFeed
     }
-    
-    private var token: AmityNotificationToken?
-    private var pinnedPostCollection: AmityCollection<AmityPinnedPost>?
-    
+        
     init(feedType: FeedType) {
         self.feedType = feedType
         loadFeed(feedType: feedType)
@@ -56,7 +52,6 @@ class PostFeedViewModel: ObservableObject {
         
         switch feedType {
         case .community(let communityId):
-            pinnedPostCollection = postManager.getCommunityAnnouncementPost(communityId: communityId)
             collection = feedManager.getCommunityFeedPosts(communityId: communityId)
         case .globalFeed:
             collection = feedManager.getGlobalFeedPosts()
@@ -70,17 +65,6 @@ class PostFeedViewModel: ObservableObject {
         
         postCollection = collection
         
-        if pinnedPostCollection != nil {
-            token = pinnedPostCollection?.observe({ [weak self] collection, _, error in
-                if let announcementPost = collection.snapshots.first?.post {
-                    self?.announcementPost = AmityPostModel(post: announcementPost)
-                    self?.postItems.removeAll(where: {$0.id == announcementPost.postId})
-                } else {
-                    self?.announcementPost = nil
-                }
-                
-            })
-        }
         feedCancellable = nil
         feedCancellable = paginator?.$snapshots.sink { [weak self] items in
             guard let self else { return }
@@ -91,9 +75,6 @@ class PostFeedViewModel: ObservableObject {
                     return true
                 case .content(let post):
                     var filterCondition = !post.childrenPosts.contains { $0.dataType == "poll" || $0.dataType == "liveStream" || $0.dataType == "file" }
-                    if let announcementPost = self.announcementPost {
-                        filterCondition = filterCondition && post.postId != announcementPost.postId
-                    }
                     return filterCondition
                 }
             }

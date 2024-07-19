@@ -107,6 +107,10 @@ public final class AmityUIKit4Manager {
         AmityUIKitManagerInternal.shared.env = env
     }
     
+    public static func didUpdateClient() {
+        AmityUIKitManagerInternal.shared.didUpdateClient()
+    }
+    
     // MARK: - Variable
     
     /// Public instance of `AmityClient` from `AmitySDK`. If you are using both`AmitySDK` & `AmityUIKit` in a same project, we recommend to have only one instance of `AmityClient`. You can use this instance instead.
@@ -331,7 +335,7 @@ final class AmityUIKitManagerInternal: NSObject {
             
     }
     
-    private func didUpdateClient() {
+    func didUpdateClient() {
         // Update file repository to use in file service.
         fileService.fileRepository = AmityFileRepository(client: client)
         messageMediaService.fileRepository = AmityFileRepository(client: client)

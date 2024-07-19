@@ -14,6 +14,7 @@ struct EndpointsView: View {
     @State var selectedEnv: EnvironmentType
     @State var config: EndpointConfigModel
     @State var httpEndpoint: String
+    @State var uploadURL: String
     @State var apiKey: String
     
     init() {
@@ -23,6 +24,7 @@ struct EndpointsView: View {
         _config = .init(initialValue: config)
         _httpEndpoint = .init(initialValue: config.httpEndpoint)
         _apiKey = .init(initialValue: config.apiKey)
+        _uploadURL = .init(initialValue: config.uploadURL)
     }
     
     @State private var favoriteColor = 0
@@ -56,9 +58,19 @@ struct EndpointsView: View {
         }
         .padding()
         
+        HStack {
+            Text("UploadURL")
+                .font(.caption)
+            TextField("", text: $uploadURL)
+                .font(.subheadline)
+                .background(Color(.systemGray6))
+                .cornerRadius(3.0)
+        }
+        .padding()
+        
         Button("Save") {
             // Save selected environment and update values if any
-            EndpointManager.shared.update(environment: selectedEnv, apiKey: apiKey, httpEndpoint: httpEndpoint, socketEndpoint: httpEndpoint)
+            EndpointManager.shared.update(environment: selectedEnv, apiKey: apiKey, httpEndpoint: httpEndpoint, socketEndpoint: httpEndpoint, uploadURL: uploadURL)
             saveButtonDidTap?()
         }
         
@@ -71,6 +83,7 @@ struct EndpointsView: View {
         config = EndpointManager.shared.getEndpointConfig(for: tag)
         httpEndpoint = config.httpEndpoint
         apiKey = config.apiKey
+        uploadURL = config.uploadURL
     }
     
 }

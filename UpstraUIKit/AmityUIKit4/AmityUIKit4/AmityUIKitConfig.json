@@ -39,12 +39,6 @@
     { "name": "sad", "image": "messageReactionSad"}
   ],
   "customizations": {
-    "select_target_page/*/*": {
-      "title": "Share to"
-    },
-    "select_target_page/*/back_button": {
-      "back_icon": "back.png"
-    },
     "camera_page/*/*": {
       "resolution": "720p"
     },
@@ -271,6 +265,13 @@
         "icon": "shareActionIcon",
         "text": "Share"
     },
+    "*/post_content/announcement_badge": {
+        "image": "communityAnnouncementBadge"
+    },
+    "*/post_content/pin_badge": {
+        "image": "communityPinBadge"
+    },
+    "*/post_content/non_member_section": {},
     "social_global_search_page/*/*": {},
     "social_global_search_page/top_search_bar/*": {},
     "social_global_search_page/top_search_bar/search_icon": {
@@ -318,10 +319,10 @@
     "community_profile_page/community_header/community_pending_post": {
         "image": "communityPendingPostIcon"
     },
-    "community_profile_page/community_header/back_button": {
-        "image": "backButton"
+    "community_profile_page/*/back_button": {
+        "image": "backIcon"
     },
-    "community_profile_page/community_header/menu_button": {
+    "community_profile_page/*/menu_button": {
         "image": "threeDotIcon"
     },
     "community_profile_page/community_profile_tab/*": {},
@@ -336,7 +337,88 @@
     "community_profile_page/community_pin/community_create_post_button": {
         "image": "plusIcon"
     },
-    "*/post_content/non_member_section": {},
-    "community_profile_page/post_content/*": {}
+    
+    "social_home_page/create_post_menu/*": {},
+    "social_home_page/create_post_menu/create_post_button": {
+        "text": "Post",
+        "image": "createPostMenuIcon"
+    },
+    
+    "social_home_page/create_post_menu/create_story_button": {
+        "text": "Story",
+        "image": "createStoryMenuIcon"
+    },
+    "social_home_page/create_post_menu/create_poll_button": {
+        "text": "Poll",
+        "image": "createPollMenuIcon"
+    },
+    "social_home_page/create_post_menu/create_livestream_button": {
+        "text": "Livestream",
+        "image": "createLivestreamMenuIcon"
+    },
+    
+    "select_post_target_page/*/close_button": {
+        "image": "closeIcon"
+    },
+    "select_post_target_page/*/my_timeline_avatar": {},
+    "select_post_target_page/*/title": {
+        "text": "Post to"
+    },
+    "select_post_target_page/*/my_timeline_text": {
+        "text": "My Timeline"
+    },
+    
+    "select_story_target_page/*/close_button": {
+        "image": "closeIcon"
+    },
+    "select_story_target_page/*/title": {
+        "text": "Share To"
+    },
+    
+    "post_composer_page/*/*": {},
+    "post_composer_page/*/close_button": {
+        "image": "closeIcon"
+    },
+    "post_composer_page/*/community_display_name": {},
+    
+    "post_composer_page/*/create_new_post_button": {
+        "text": "Post"
+    },
+    "post_composer_page/*/edit_post_button": {
+        "text": "Save"
+    },
+    "post_composer_page/*/edit_post_title": {
+        "text": "Edit post"
+    },
+    "post_composer_page/media_attachment/*": {},
+    "post_composer_page/media_attachment/camera_button": {
+        "image": "cameraAttatchmentIcon"
+    },
+    "post_composer_page/media_attachment/image_button": {
+        "image": "photoAttatchmentIcon"
+    },
+    "post_composer_page/media_attachment/video_button": {
+        "image": "videoAttatchmentIcon"
+    },
+    "post_composer_page/media_attachment/file_button": {
+        "image": "attatchmentIcon"
+    },
+    "post_composer_page/detailed_media_attachment/*": {},
+    "post_composer_page/detailed_media_attachment/camera_button": {
+        "text": "Camera",
+        "image": "cameraAttatchmentIcon"
+    },
+    "post_composer_page/detailed_media_attachment/image_button": {
+        "text": "Photo",
+        "image": "photoAttatchmentIcon"
+    },
+    "post_composer_page/detailed_media_attachment/video_button": {
+        "text": "Video",
+        "image": "videoAttatchmentIcon"
+    },
+    "post_composer_page/detailed_media_attachment/file_button": {
+        "text": "Attachment",
+        "image": "attatchmentIcon"
+    },
     }
 }

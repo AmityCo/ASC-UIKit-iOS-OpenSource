@@ -24,7 +24,8 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
     public var body: some View {
         VStack {
             HStack {
-                Image(AmityIcon.closeIcon.getImageResource())
+                let closeButton = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
+                Image(AmityIcon.getImageResource(named: closeButton))
                     .renderingMode(.template)
                     .frame(width: 24, height: 24)
                     .foregroundColor(Color(viewConfig.theme.baseColor))
@@ -39,7 +40,7 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
                 Spacer()
             }
             .overlay(
-                Text("Post To")
+                Text(viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     
@@ -55,9 +56,10 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
                             .frame(width: 40, height: 40)
                             .clipShape(Circle())
                             .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 12))
+                            .isHidden(viewConfig.isHidden(elementId: .myTimelineAvatar), remove: true)
                             
-                        
-                        Text("My Timeline")
+                        let myTimelineTitle = viewConfig.getConfig(elementId: .myTimelineText, key: "text", of: String.self) ?? ""
+                        Text(myTimelineTitle)
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(Color(viewConfig.theme.baseColor))
                         

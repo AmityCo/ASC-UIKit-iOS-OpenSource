@@ -11,12 +11,14 @@ import LinkPresentation
 
 public enum AmityPostContentComponentStyle {
     case feed
-    case postDetail
-    case announcement_feed
-    case announcement_detail
-    case pin_feed
-    case pin_detail
+    case detail
 
+}
+
+public enum AmityPostCategory {
+    case general
+    case announcement
+    case pin
 }
 
 public struct AmityPostContentComponent: AmityComponentView {
@@ -37,17 +39,19 @@ public struct AmityPostContentComponent: AmityComponentView {
     @State private var showBottomSheet: Bool = false
     
     private let style: AmityPostContentComponentStyle
+    private let category: AmityPostCategory
     private let hideMenuButton: Bool
     private let hideTarget: Bool
     private var onTapAction: (() -> Void)?
 
-    public init(post: AmityPost, style: AmityPostContentComponentStyle = .feed, hideTarget: Bool = false, hideMenuButton: Bool = false, onTapAction: (() -> Void)? = nil, pageId: PageId? = nil) {
+    public init(post: AmityPost, style: AmityPostContentComponentStyle = .feed, category: AmityPostCategory = .general, hideTarget: Bool = false, hideMenuButton: Bool = false, onTapAction: (() -> Void)? = nil, pageId: PageId? = nil) {
         self.post = AmityPostModel(post: post)
         self.style = style
         self.hideMenuButton = hideMenuButton
         self.hideTarget = hideTarget
         self.onTapAction = onTapAction
         self.pageId = pageId
+        self.category = category
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
     
@@ -144,13 +148,21 @@ public struct AmityPostContentComponent: AmityComponentView {
             
             Spacer()
             
-            if style == .announcement_feed || style == .announcement_detail {
-                Image(AmityIcon.communityAnnouncementBadge.getImageResource())
-                    .resizable()
-                    .renderingMode(.template)
-                    .foregroundColor(Color(viewConfig.theme.primaryColor))
-                    .frame(width: 20, height: 20)
-            }
+            let announcementIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .announcementBadge, key: "image", of: String.self) ?? "")
+            Image(announcementIcon)
+                .resizable()
+                .renderingMode(.template)
+                .foregroundColor(Color(viewConfig.theme.primaryColor))
+                .frame(width: 20, height: 20)
+                .isHidden(category != .announcement || viewConfig.isHidden(elementId: .announcementBadge))
+            
+            let pinBadge = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .pinBadge, key: "image", of: String.self) ?? "")
+            Image(pinBadge)
+                .renderingMode(.template)
+                .scaledToFit()
+                .foregroundColor(Color(viewConfig.theme.primaryColor))
+                .frame(width: 20, height: 20)
+                .isHidden(category != .pin || viewConfig.isHidden(elementId: .pinBadge))
             
             if !hideMenuButton {
                 let bottomSheetHeight = calculateBottomSheetHeight(post: post)
@@ -327,7 +339,7 @@ public struct AmityPostContentComponent: AmityComponentView {
     
     @ViewBuilder
     private func postEngagementView(_ post: AmityPostModel) -> some View {
-        if style == .postDetail || style == .announcement_detail || style == .pin_detail {
+        if style == .detail {
             VStack(spacing: 8) {
                 HStack(spacing: 4) {
                     if post.reactionsCount != 0 {
@@ -370,10 +382,10 @@ public struct AmityPostContentComponent: AmityComponentView {
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 1)
             
-            Text("Join community to interact with all posts")
+            Text(AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
                 .font(.system(size: 15))
                 .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade2))
-                .isHidden((self.post.targetCommunity?.isJoined ?? true))
+                .isHidden(self.post.targetCommunity?.isJoined ?? true || viewConfig.isHidden(elementId: .nonMemberSection))
             
             HStack(spacing: 4) {
                 Button(feedbackStyle: .light, action: {
@@ -395,11 +407,11 @@ public struct AmityPostContentComponent: AmityComponentView {
                         Image(post.isLiked ? AmityIcon.likeReactionIcon.getImageResource() : reactionIcon)
                             .resizable()
                             .frame(width: 20.0, height: 20.0)
-                        if style == .feed || style == .announcement_feed || style == .pin_feed {
+                        if style == .feed {
                             Text(post.reactionsCount == 0 ? "0" : "\(post.reactionsCount.formattedCountString)")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Color(post.isLiked ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade2))
-                        } else if style == .postDetail || style == .announcement_detail || style == .pin_detail {
+                        } else if style == .detail {
                             Text(reactionTitle)
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Color(post.isLiked ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade2))
@@ -419,11 +431,11 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .resizable()
                             .frame(width: 20.0, height: 20.0)
                         
-                            if style == .feed || style == .announcement_feed || style == .pin_feed {
+                            if style == .feed {
                             Text(post.allCommentCount == 0 ? "0" : "\(post.allCommentCount)")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                        } else if style == .postDetail || style == .announcement_detail || style == .pin_detail {
+                        } else if style == .detail {
                             Text(commentTitle)
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Color(viewConfig.theme.baseColorShade2))
@@ -463,7 +475,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         let itemHeight: CGFloat = 48
         let additionalItems = [
             true,  // Always add one item
-            post.isModerator || post.isOwner,
+            post.hasModeratorPermission || post.isOwner,
         ].filter { $0 }
         
         let additionalHeight = CGFloat(additionalItems.count) * itemHeight

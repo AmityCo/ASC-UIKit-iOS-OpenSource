@@ -22,8 +22,9 @@ public enum AmityPostComposerOptions {
 
 public struct AmityPostComposerPage: AmityPageView {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+   
     public var id: PageId {
-        .createPostPage
+        .postComposerPage
     }
     
     @State private var mediaAttatchmentComponentYOffset: CGFloat = 0.0
@@ -45,13 +46,13 @@ public struct AmityPostComposerPage: AmityPageView {
 
             self._textEditorViewModel = StateObject(wrappedValue: AmityTextEditorViewModel(mentionManager: MentionManager(withType: .post(communityId: post.targetId))))
             self._mediaAttatchmentViewModel = StateObject(wrappedValue: AmityMediaAttachmentViewModel(medias: post.medias))
-            self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: nil))
+            self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postComposerPage))
                         
         case .createOptions(_, let targetId, let targetType, let community):
             self._viewModel = StateObject(wrappedValue: AmityPostComposerViewModel(targetId: targetId, targetType: targetType, community: community))
             self._textEditorViewModel = StateObject(wrappedValue: AmityTextEditorViewModel(mentionManager: MentionManager(withType: .post(communityId: targetId))))
             self._mediaAttatchmentViewModel = StateObject(wrappedValue: AmityMediaAttachmentViewModel(medias: []))
-            self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: nil))
+            self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postComposerPage))
         }
 
     }
@@ -111,9 +112,9 @@ public struct AmityPostComposerPage: AmityPageView {
                             .foregroundColor(Color(viewConfig.theme.baseColorShade3))
                         
                         if showSmallComponent {
-                            AmityMediaAttachmentComponent(viewModel: mediaAttatchmentViewModel)
+                            AmityMediaAttachmentComponent(viewModel: mediaAttatchmentViewModel, pageId: id)
                         } else {
-                            AmityDetailedMediaAttachmentComponent(viewModel: mediaAttatchmentViewModel)
+                            AmityDetailedMediaAttachmentComponent(viewModel: mediaAttatchmentViewModel, pageId: id)
                         }
                     }
                     .onReceive(keyboardPublisher) { keyboardEvent in
@@ -166,7 +167,8 @@ public struct AmityPostComposerPage: AmityPageView {
     @ViewBuilder
     private var navigationBarView: some View {
         HStack(spacing: 0) {
-            Image(AmityIcon.closeIcon.getImageResource())
+            let closeIcon = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
+            Image(AmityIcon.getImageResource(named: closeIcon))
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
@@ -183,13 +185,17 @@ public struct AmityPostComposerPage: AmityPageView {
             
             Spacer()
             
+           
             let displayName = viewModel.displayName
-            Text(displayName)
+            let editPostTitle = viewConfig.getConfig(elementId: .editPostTitle, key: "text", of: String.self) ?? "Edit Post"
+            Text(viewModel.mode == .create ? displayName : editPostTitle)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(Color(viewConfig.theme.baseColor))
+                .isHidden(viewConfig.isHidden(elementId: .communityDisplayName))
             Spacer()
             
-            Button("Post", action: {
+            let postButtonTitle = viewConfig.getConfig(elementId: .createNewPostButton, key: "text", of: String.self) ?? "Post"
+            Button(postButtonTitle, action: {
                 Task {
                     postCreationToastAlphaValue = 1.0
                     do {
@@ -214,7 +220,8 @@ public struct AmityPostComposerPage: AmityPageView {
             .disabled(viewModel.postText.isEmpty && mediaAttatchmentViewModel.medias.isEmpty)
             .isHidden(viewModel.mode == .edit)
             
-            Button("Save", action: {
+            let editPostButtonTitle = viewConfig.getConfig(elementId: .editPostButton, key: "text", of: String.self) ?? "Save"
+            Button(editPostButtonTitle, action: {
                 Task {
                     postCreationToastAlphaValue = 1.0
 

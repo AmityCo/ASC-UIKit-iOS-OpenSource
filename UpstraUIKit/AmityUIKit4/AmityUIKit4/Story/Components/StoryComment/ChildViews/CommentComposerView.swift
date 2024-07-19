@@ -114,7 +114,7 @@ class CommentComposerViewModel: ObservableObject {
     let referenceId: String
     let referenceType: AmityCommentReferenceType
     let community: AmityCommunity?
-    let allowCreateComment: Bool
+    @Published var allowCreateComment: Bool
     
     @Published var replyState: (showToReply: Bool, comment: AmityCommentModel?) = (false, nil)
     @Published var text: String = ""

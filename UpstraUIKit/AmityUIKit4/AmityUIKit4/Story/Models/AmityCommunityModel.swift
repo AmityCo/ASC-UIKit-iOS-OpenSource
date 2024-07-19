@@ -31,7 +31,7 @@ public struct AmityCommunityModel {
     let isStoryCommentsAllowed: Bool
     let participation: AmityCommunityMembership
     
-    var object: AmityCommunity
+    public var object: AmityCommunity
     
     init(object: AmityCommunity) {
         self.object = object

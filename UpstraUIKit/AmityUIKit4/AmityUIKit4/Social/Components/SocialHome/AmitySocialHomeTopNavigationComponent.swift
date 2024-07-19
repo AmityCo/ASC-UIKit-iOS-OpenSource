@@ -69,7 +69,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                     .clipShape(Circle())
                 })
                 .fullScreenCover(isPresented: $showPostCreationMenu) {
-                    AmityCreatePostMenuComponent(isPresented: $showPostCreationMenu)
+                    AmityCreatePostMenuComponent(isPresented: $showPostCreationMenu, pageId: pageId)
                         .background(ClearBackgroundView())
                 }
                 .isHidden(viewConfig.isHidden(elementId: .postCreationButton), remove: true)

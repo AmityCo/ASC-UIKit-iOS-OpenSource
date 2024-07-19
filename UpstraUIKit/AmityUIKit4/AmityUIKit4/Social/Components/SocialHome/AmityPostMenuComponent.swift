@@ -33,7 +33,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
         .createPostMenu
     }
     
-    public init(pageId: PageId? = nil, isPresented: Binding<Bool>? = nil) {
+    public init(isPresented: Binding<Bool>? = nil, pageId: PageId? = nil) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .createPostMenu))
         self._isPresented = isPresented ?? Binding.constant(false)
     }
@@ -66,14 +66,16 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
             ForEach(postTypes, id: \.rawValue) { type in
                 switch type {
                 case .post:
-                    let icon = AmityIcon.createPostMenuIcon
-                    getItemView(image: icon.getImageResource(), title: type.rawValue)
+                    let createPostButton = viewConfig.getConfig(elementId: .createPostButton, key: "image", of: String.self) ?? ""
+                    let createPostTitle = viewConfig.getConfig(elementId: .createPostButton, key: "text", of: String.self) ?? ""
+                    getItemView(image: AmityIcon.getImageResource(named: createPostButton), title: createPostTitle)
                         .onTapGesture {
                             goToPostCreation()
                         }
                 case .story:
-                    let icon = AmityIcon.createStoryMenuIcon
-                    getItemView(image: icon.getImageResource(), title: type.rawValue)
+                    let createStoryButton = viewConfig.getConfig(elementId: .createStoryButton, key: "image", of: String.self) ?? ""
+                    let createStoryTitle = viewConfig.getConfig(elementId: .createStoryButton, key: "text", of: String.self) ?? ""
+                    getItemView(image: AmityIcon.getImageResource(named: createStoryButton), title: createStoryTitle)
                         .onTapGesture {
                             goToStoryCreation()
                         }

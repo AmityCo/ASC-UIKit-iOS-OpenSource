@@ -53,7 +53,7 @@ class CommentCoreViewModel: ObservableObject {
     let referenceId: String
     let referenceType: AmityCommentReferenceType
     let hideEmptyText: Bool
-    let hideCommentButtons: Bool
+    @Published var hideCommentButtons: Bool
     
     private var paginatorCancellable: AnyCancellable?
     

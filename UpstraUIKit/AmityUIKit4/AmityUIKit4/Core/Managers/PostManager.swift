@@ -40,6 +40,10 @@ class PostManager {
         return postRepository.getPinnedPosts(communityId: communityId, placement: AmityPinPlacement.announcement.rawValue, sortBy: .lastPinned)
     }
     
+    func getAllPinnedPost(communityId: String) -> AmityCollection<AmityPinnedPost> {
+        return postRepository.getPinnedPosts(communityId: communityId, placement: nil, sortBy: .lastPinned)
+    }
+    
     @discardableResult
     func createTextPost(text: String, communityId: String?, metadata: [String: Any]?, mentionees: AmityMentioneesBuilder?) async throws -> AmityPost {
         

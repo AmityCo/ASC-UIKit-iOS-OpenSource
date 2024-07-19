@@ -12,7 +12,7 @@ public enum PageId: String {
     case storyCreationPage = "create_story_page"
     case storyPage = "story_page"
     case cameraPage = "camera_page"
-    case targetSelectionPage = "select_target_page"
+    case storyTargetSelectionPage = "select_story_target_page"
     
     // MARK: - Chat
     case liveChatPage = "live_chat"
@@ -21,7 +21,7 @@ public enum PageId: String {
     case socialHomePage = "social_home_page"
     case postDetailPage = "post_detail_page"
     case socialGlobalSearchPage = "social_global_search_page"
-    case createPostPage = "create_post_page"
+    case postComposerPage = "post_composer_page"
     case postTargetSelectionPage = "select_post_target_page"
     case myCommunitiesSearchPage = "my_communities_search_page"
     
@@ -52,8 +52,11 @@ public enum ComponentId: String {
     case userSearchResultComponent = "user_search_result"
     case createPostMenu = "create_post_menu"
     case communityHeader = "community_header"
+    case communityProfileTab = "community_profile_tab"
     case communityFeed = "community_feed"
     case communityPin = "community_pin"
+    case mediaAttachment = "media_attachment"
+    case detailedMediaAttachment = "detailed_media_attachment"
 
 }
 
@@ -133,8 +136,47 @@ public enum ElementId: String {
     case reactionButton = "reaction_button"
     case commentButton = "comment_button"
     case shareButton = "share_button"
+    case nonMemberSection = "non_member_section"
+    case announcementBadge = "announcement_badge"
+    case pinBadge = "pin_badge"
     
     // TopSearchBar
     case searchIcon = "search_icon"
     case clearButton = "clear_button"
+    
+    // CommunityProfileHeader
+    case communityName = "community_name"
+    case communityCover = "community_cover"
+    case communityVerifyBadge = "community_verify_badge"
+    case communityCategory = "community_category"
+    case communityDescription = "community_description"
+    case communityInfo = "community_info"
+    case communityJoinButton = "community_join_button"
+    case communityPendingPost = "community_pending_post"
+    
+    // CommunityProfileTab
+    case communityFeedTabButton = "community_feed_tab_button"
+    case communityPinTabButton = "community_pin_tab_button"
+    
+    // CreatePostMenu
+    case createPostButton = "create_post_button"
+    case createStoryButton = "create_story_button"
+    case createPollButton = "create_poll_button"
+    case createLivestreamButton = "create_livestream_button"
+    
+    // PostTargetSelectionPage
+    case myTimelineAvatar = "my_timeline_avatar"
+    case myTimelineText = "my_timeline_text"
+    
+    // PostComposerPage
+    case createNewPostButton = "create_new_post_button"
+    case editPostButton = "edit_post_button"
+    case editPostTitle = "edit_post_title"
+    
+    // MediaAttachment
+    case cameraButton = "camera_button"
+    case imageButton = "image_button"
+    case videoButton = "video_button"
+    case fileButton = "file_button"
+    
 }

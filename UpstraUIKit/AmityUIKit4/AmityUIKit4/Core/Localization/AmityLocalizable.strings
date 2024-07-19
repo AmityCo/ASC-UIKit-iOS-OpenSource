@@ -111,6 +111,10 @@
 "post_deleted_toast_message" = "Post deleted";
 "post_detail_page_title" = "Post";
 "create_post_bottom_sheet_title" = "Post";
+"create_story_bottom_sheet_title" = "Story";
+"community_page_join_title" = "Join";
+"community_page_pending_post_title" = "Pending post";
+"non_member_react_post_message" = "Join community to interact with all posts";
 
 "reaction_list_unable_to_load_title" = "Unable to load reactions";
 "reaction_list_unrable_to_load_subtitle" = "Reactions aren't available for this message";

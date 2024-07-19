@@ -34,7 +34,7 @@ class AppManager {
     func setupAmityUIKit() {
         // setup api key
         let endpointConfig = EndpointManager.shared.currentEndpointConfig
-        AmityUIKitManager.setup(apiKey: endpointConfig.apiKey, endpoint: AmityEndpoint(httpUrl: endpointConfig.httpEndpoint, rpcUrl: endpointConfig.socketEndpoint, mqttHost: endpointConfig.mqttEndpoint))
+        AmityUIKitManager.setup(apiKey: endpointConfig.apiKey, endpoint: AmityEndpoint(httpUrl: endpointConfig.httpEndpoint, rpcUrl: endpointConfig.socketEndpoint, mqttHost: endpointConfig.mqttEndpoint, uploadUrl: endpointConfig.uploadURL))
         
         // setup event handlers and page settings
         AmityUIKitManager.set(eventHandler: CustomEventHandler())
@@ -194,6 +194,16 @@ class CustomAmityProfilePageBehaviour: AmityCommunityProfilePageBehavior {
         let communityId = context.page.communityId
         
         let viewController = AmityPendingPostsViewController.make(communityId: communityId)
+        
+        if let navigationController = context.page.host.controller?.navigationController {
+            navigationController.isNavigationBarHidden = false
+            navigationController.pushViewController(viewController, animated: true)
+        }
+    }
+    
+    override func goToMemberListPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
+        guard let community else { return }
+        let viewController = AmityCommunityMemberSettingsViewController.make(community: community.object)
         
         if let navigationController = context.page.host.controller?.navigationController {
             navigationController.isNavigationBarHidden = false

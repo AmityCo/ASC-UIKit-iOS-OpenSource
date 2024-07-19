@@ -26,7 +26,7 @@ struct PostBottomSheetView: View {
     
     var body: some View {
         ZStack {
-            if post.isModerator {
+            if post.hasModeratorPermission {
                 moderatorView
             } else {
                 memberView

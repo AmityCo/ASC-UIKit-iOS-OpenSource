@@ -1,5 +1,5 @@
 //
-//  CommunityPageTabBarView.swift
+//  AmityCommunityProfileTabComponent.swift
 //  AmityUIKit4
 //
 //  Created by Manuchet Rungraksa on 12/7/2567 BE.
@@ -7,26 +7,44 @@
 
 import SwiftUI
 
-struct CommunityPageTabBarView: View {
+public struct AmityCommunityProfileTabComponent: AmityComponentView {
+    
+    public var pageId: PageId?
+    public var id: ComponentId {
+        return .communityProfileTab
+    }
+        
     @Binding var currentTab: Int
     @Namespace var namespace
-    @Binding var tabBarOptions: [CommunityPageTabItem]
-    
-    init(currentTab: Binding<Int>, tabBarOptions: Binding<[CommunityPageTabItem]>) {
+    @StateObject var viewConfig: AmityViewConfigController
+
+    public init(currentTab: Binding<Int>, pageId: PageId = .communityProfilePage) {
+        self.pageId = pageId
         self._currentTab = currentTab
-        self._tabBarOptions = tabBarOptions
+        
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityProfileTab))
     }
     
-    var body: some View {
+    public var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 20) {
-                ForEach(tabBarOptions) { item in
-                    CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: item)
-                }
+                
+                let feedIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityFeedTabButton, key: "image", of: String.self) ?? "")
+                
+                let feedTabItem = CommunityPageTabItem(index: 0, image: feedIcon)
+
+                CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: feedTabItem)
+                    .isHidden(viewConfig.isHidden(elementId: .communityFeedTabButton))
+                
+                let pinIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityPinTabButton, key: "image", of: String.self) ?? "")
+                let pinTabItem = CommunityPageTabItem(index: 1, image: pinIcon)
+                CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: pinTabItem)
+                    .isHidden(viewConfig.isHidden(elementId: .communityPinTabButton))
             }
             .padding(.horizontal)
         }
         .padding(.top, 8)
+        .background(Color(viewConfig.theme.backgroundColor))
     }
 }
 
@@ -69,6 +87,7 @@ struct CommunityPageTabBarItemView: View {
         .buttonStyle(.plain)
     }
 }
+
 
 struct CommunityPageTabItem: Identifiable, Equatable {
     let id: UUID

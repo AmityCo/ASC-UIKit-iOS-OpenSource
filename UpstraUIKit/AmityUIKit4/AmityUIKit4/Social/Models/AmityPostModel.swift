@@ -271,12 +271,17 @@ public class AmityPostModel: Identifiable {
     
     public var poll: Poll?
     
+    public var isPinned: Bool
+    
+    public let analytic: AmityPostAnalytics
+    
     var commentExpandedIds: Set<String> = []
     
     // MARK: - Internal variables
     
     var dataTypeInternal: DataType = .unknown
     var isModerator: Bool = false
+    var hasModeratorPermission: Bool = false
     let parentPostId: String?
     let latestComments: [AmityCommentModel]
     let postAsModerator: Bool = false
@@ -296,7 +301,7 @@ public class AmityPostModel: Identifiable {
     
     // MARK: - Initializer
     
-    public init(post: AmityPost) {
+    public init(post: AmityPost, isPinned: Bool = false) {
         self.object = post
         postId = post.postId
         latestComments = post.latestComments.map(AmityCommentModel.init)
@@ -325,9 +330,15 @@ public class AmityPostModel: Identifiable {
         metadata = post.metadata
         mentionees = post.mentionees
         isEdited = post.isEdited
+        analytic = post.analytics
+        self.isPinned = isPinned
         
         if let communityMember = targetCommunity?.membership.getMember(withId: postedUserId) {
             isModerator = communityMember.hasModeratorRole
+        }
+        
+        if let communityMember = targetCommunity?.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
+            hasModeratorPermission = communityMember.hasModeratorRole
         }
         
         extractPostData()

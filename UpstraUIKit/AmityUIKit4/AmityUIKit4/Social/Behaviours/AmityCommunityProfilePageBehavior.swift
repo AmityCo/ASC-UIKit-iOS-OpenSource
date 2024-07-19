@@ -47,4 +47,53 @@ open class AmityCommunityProfilePageBehavior {
         
     }
     
+    open func goToCreateStoryPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
+        
+        if let community = community {
+            
+            let createStoryPage = AmityCreateStoryPage(targetId: community.communityId, targetType: .community)
+
+            let controller = AmitySwiftUIHostingController(rootView: createStoryPage)
+            
+            let navigationController = UINavigationController(rootViewController: controller)
+            navigationController.modalPresentationStyle = .fullScreen
+            navigationController.navigationBar.isHidden = true
+            
+            context.page.host.controller?.present(navigationController, animated: true)
+            
+        }
+        
+    }
+    
+    open func goToMemberListPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
+        
+        if let community = community {
+            
+            let createStoryPage = AmityCreateStoryPage(targetId: community.communityId, targetType: .community)
+
+            let controller = AmitySwiftUIHostingController(rootView: createStoryPage)
+            
+            let navigationController = UINavigationController(rootViewController: controller)
+            navigationController.modalPresentationStyle = .fullScreen
+            navigationController.navigationBar.isHidden = true
+            
+            context.page.host.controller?.present(navigationController, animated: true)
+            
+        }
+        
+    }
+    
+    
+    open func goToPostDetailPage(context: AmityCommunityProfilePageBehavior.Context, post: AmityPostModel?, category: AmityPostCategory = .general) {
+        
+        if let post = post {
+            
+            let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: post.object, category: category, hideTarget: true))
+            let host = context.page.host
+            host.controller?.navigationController?.pushViewController(vc, animated: true)            
+            
+        }
+        
+    }
+    
 }
