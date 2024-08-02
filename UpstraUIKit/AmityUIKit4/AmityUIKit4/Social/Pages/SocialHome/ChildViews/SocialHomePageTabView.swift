@@ -39,15 +39,16 @@ struct SocialHomePageTabView: View {
                     TabButtonView(title: getTitle(tab: item.tab), selected: item.selected)
                         .onTapGesture {
                             selectedTab = item.tab
-                            
-                            for (index, item) in tabItems.enumerated() {
-                                tabItems[index].selected = item.tab == selectedTab
-                            }
                         }
                 }
             }
             .padding(.leading, 20)
             .padding(.trailing, 2)
+        }
+        .onChange(of: selectedTab) { value in
+            for (index, item) in tabItems.enumerated() {
+                tabItems[index].selected = item.tab == value
+            }
         }
         .onAppear {
             /// Filter out tabs if element is excluded in config

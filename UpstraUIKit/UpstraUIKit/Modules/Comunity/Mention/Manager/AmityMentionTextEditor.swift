@@ -1,10 +1,10 @@
 //
-//  MentionTextEditor.swift
-//  AmityUIKit4
+//  AmityMentionTextEditor.swift
+//  AmityUIKit
 //
-//  Created by Nishan on 27/3/2567 BE.
+//  Created by Nishan on 8/7/2567 BE.
+//  Copyright © 2567 BE Amity. All rights reserved.
 //
-
 import Foundation
 import UIKit
 import AmitySDK
@@ -13,6 +13,13 @@ protocol MentionTextEditorDelegate: AnyObject {
     
     func didChangeMentionState(state: MentionTextEditor.MentionState)
     func didUpdateAttributedText(text: NSAttributedString)
+}
+
+extension AmityMention: CustomStringConvertible {
+    
+    public var description: String {
+        return "Mention: \(self.userId ?? "") | Index: \(self.index) | Length: \(self.length)"
+    }
 }
 
 /// Highlights mentions in Text Editor
@@ -221,7 +228,7 @@ class MentionTextEditor {
             return
         }
         
-        Log.add(event: .info, "Adding mention \(member.displayName) to index: \(mentionRange.location), length: \(mentionRange.length)")
+        //Log.add(event: .info, "Adding mention \(member.displayName) to index: \(mentionRange.location), length: \(mentionRange.length)")
         
         // Append mention display name to current text
         let searchInput = mentionSearchKey.isEmpty ? "@" : "@\(mentionSearchKey)" // Actual search input in UITextView with "@"
@@ -242,7 +249,7 @@ class MentionTextEditor {
         // Determine index to be shifted for existing mentions
         let mentionSearchKeyLength = mentionSearchKey.utf8.count // Length of search key already used
         let mentionOffset = member.displayName.count - mentionSearchKeyLength // Amount of search text to be replaced.
-        Log.add(event: .info, "Mention Offset: \(mentionOffset)")
+        //Log.add(event: .info, "Mention Offset: \(mentionOffset)")
                 
         // Update the length of previous mention
         for (index, mention) in self.mentions.enumerated() where mentionRange.location < mention.index {
@@ -254,7 +261,7 @@ class MentionTextEditor {
         self.updateMentionState(state: .idle)
                 
         // Notify mention addition
-        Log.add(event: .info, "Final Text: \(finalText)")
+        //Log.add(event: .info, "Final Text: \(finalText)")
         let highlightedText = self.highlightMentions(in: finalText, mentions: mentions, highlightAttributes: highlightAttributes)
         self.delegate?.didUpdateAttributedText(text: highlightedText)
     }

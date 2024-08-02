@@ -258,6 +258,7 @@ class AmityPostComposerViewModel: ObservableObject {
     private let post: AmityPostModel?
     let mode: AmityPostComposerMode
     let targetType: AmityPostTargetType
+    private let networkMonitor = NetworkMonitor()
     
     @Published var displayName: String
 
@@ -288,6 +289,7 @@ class AmityPostComposerViewModel: ObservableObject {
     
     @discardableResult
     func createPost(medias: [AmityMedia], files: [AmityFile]) async throws -> AmityPost {
+        guard networkMonitor.isConnected else { throw NSError(domain: "Internet is not connected.", code: 500) }
         
         let targetType: AmityPostTargetType = targetId == nil ? .user : .community
         var postBuilder: AmityPostBuilder

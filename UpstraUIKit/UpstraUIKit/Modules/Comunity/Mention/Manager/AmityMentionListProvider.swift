@@ -1,20 +1,21 @@
 //
-//  MentionListProvider.swift
-//  AmityUIKit4
+//  AmityMentionListProvider.swift
+//  AmityUIKit
 //
-//  Created by Nishan on 27/3/2567 BE.
+//  Created by Nishan on 8/7/2567 BE.
+//  Copyright © 2567 BE Amity. All rights reserved.
 //
 
 import Foundation
 import AmitySDK
 
 // Work In Progress: Decoupled class which provides list of users to mention from live collection.
-class MentionListProvider {
+public class MentionListProvider {
     
     // Mention Configuration
     // We can use this to determine if mention @all is enabled or not.
     private var mentionConfiguration: AmityMentionConfigurations? = AmityUIKitManagerInternal.shared.client.mentionConfigurations
-    private var mentionType: MentionManagerType
+    private var mentionType: AmityMentionManagerType
     private var canMentionAll = false // Mention all members in a channel
     
     // Repositories
@@ -41,7 +42,7 @@ class MentionListProvider {
     // Callback
     public var didGetMentionList: (([AmityMentionUserModel]) -> Void)?
 
-    public init(type: MentionManagerType) {
+    public init(type: AmityMentionManagerType) {
         self.mentionType = type
         let client = AmityUIKitManagerInternal.shared.client
         
@@ -56,16 +57,16 @@ class MentionListProvider {
             }
         }
         
-        self.checkMentionPermission()
+//        self.checkMentionPermission()
     }
     
-    func checkMentionPermission() {
-        if case let .message(subChannelId)  = mentionType {
-            ChatPermissionChecker.hasModeratorPermission(for: subChannelId ?? "") { hasPermission in
-                self.canMentionAll = hasPermission
-            }
-        }
-    }
+//    func checkMentionPermission() {
+//        if case let .message(subChannelId)  = mentionType {
+//            ChatPermissionChecker.hasModeratorPermission(for: subChannelId ?? "") { hasPermission in
+//                self.canMentionAll = hasPermission
+//            }
+//        }
+//    }
     
     public func searchUser(text: String) {
         switch mentionType {
@@ -83,7 +84,7 @@ class MentionListProvider {
         }
     }
     
-    func loadMore() {
+    public func loadMore() {
         switch mentionType {
         case .post(let communityId), .comment(let communityId):
             if let communityId, !(community?.isPublic ?? true) {
@@ -105,7 +106,8 @@ class MentionListProvider {
         }
     }
     
-    func reset() {
+    // Equivalent to reset state()
+    public func reset() {
         mentionList = []
         
         mentionListToken?.invalidate()
@@ -117,7 +119,7 @@ class MentionListProvider {
     }
     
     private func setupCommunity(withId communityId: String) {
-        communityMembersRepo = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+        communityMembersRepo = AmityCommunityMembership(client: AmityUIKitManager.client, andCommunityId: communityId)
         communityToken = communityRepository.getCommunity(withId: communityId).observe { [weak self] liveObject, error in
             if liveObject.dataStatus == .fresh {
                 self?.communityToken?.invalidate()

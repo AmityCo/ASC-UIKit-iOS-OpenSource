@@ -277,15 +277,15 @@ extension AdEngine {
     // AdEngine query ads filtering by activeness, readiness, and placement, then use AdSupplier to determine which ads to recommend.
     // This is the entry points for paginator.
     public func getRecommendedAds(count: Int, placement: AmityAdPlacement, communityId: String?) -> [AmityAd] {
-        let applicableAds = getApplicableAds(placement: placement)
+        let applicableAds = getApplicableAds(placement: placement, communityId: communityId)
         
         // Ask supplier to provide us with relevant ads
         return AdSupplier.shared.recommendAds(count: count, placement: placement, communityId: communityId, from: applicableAds)
     }
     
     // Determines ads which suits for given placement & whose assets are downloaded & ready to be used.
-    private func getApplicableAds(placement: AmityAdPlacement) -> [AmityAd] {
-        return ads.filter {
+    private func getApplicableAds(placement: AmityAdPlacement, communityId: String?) -> [AmityAd] {
+        let readyAds = ads.filter {
             
             // Criteria 1: Placement should be valid.
             let isPlacementValid = $0.placements.contains(placement)
@@ -310,6 +310,32 @@ extension AdEngine {
             }
             
             return isPlacementValid && isEndDateValid && isAssetReady
+        }
+        
+        // Find if any ready ads targets matches community id
+        if let communityId {
+            let targetedAds = readyAds.filter { ad in
+                let commIds = ad.target?.communityIds ?? []
+                return commIds.contains(communityId)
+            }
+            
+            // If there are no ads which target particular communities, we return non targeted ads
+            if targetedAds.isEmpty {
+                let nonTargetedAds = readyAds.filter { ad in
+                    let commIds = ad.target?.communityIds ?? []
+                    return commIds.isEmpty
+                }
+                return nonTargetedAds
+            }
+            
+            return targetedAds
+        } else {
+            let nonTargetedAds = readyAds.filter { ad in
+                let commIds = ad.target?.communityIds ?? []
+                return commIds.isEmpty
+            }
+            
+            return nonTargetedAds
         }
     }
 }

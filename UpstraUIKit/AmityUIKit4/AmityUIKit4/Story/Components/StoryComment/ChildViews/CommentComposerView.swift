@@ -43,7 +43,7 @@ struct CommentComposerView: View {
                 }
             }
             .frame(height: 40)
-            .background(Color(viewConfig.theme.backgroundColor))
+            .background(Color(viewConfig.theme.baseColorShade4))
             .isHidden(!viewModel.replyState.showToReply)
             
             HStack(spacing: 8) {
@@ -80,7 +80,11 @@ struct CommentComposerView: View {
                     hideKeyboard()
                 } label: {
                     Text("Post")
-                        .foregroundColor(.accentColor)
+                        .overlay(
+                            Text("Post")
+                                .foregroundColor(Color(viewConfig.theme.primaryColor))
+                                .opacity(viewModel.text.isEmpty ? 0.4 : 1.0)
+                        )
                 }
                 .padding(.trailing, 12)
                 .disabled(viewModel.text.isEmpty)

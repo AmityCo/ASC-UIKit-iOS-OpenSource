@@ -15,7 +15,7 @@ public struct AmitySocialHomePage: AmityPageView {
         .socialHomePage
     }
     
-    @State private var selectedTab: AmitySocialHomePageTab = .newsFeed
+    @StateObject private var viewModel: AmitySocialHomePageViewModel = AmitySocialHomePageViewModel()
     @StateObject private var viewConfig: AmityViewConfigController
     
     public init() {
@@ -24,21 +24,21 @@ public struct AmitySocialHomePage: AmityPageView {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            AmitySocialHomeTopNavigationComponent(pageId: id, selectedTab: selectedTab, searchButtonAction: {
-                if selectedTab == .newsFeed {
+            AmitySocialHomeTopNavigationComponent(pageId: id, selectedTab: viewModel.selectedTab, searchButtonAction: {
+                if viewModel.selectedTab == .newsFeed {
                     let context = AmitySocialHomePageBehavior.Context(page: self)
                     AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToGlobalSearchPage(context: context)
                     
-                } else if selectedTab == .myCommunities {
+                } else if viewModel.selectedTab == .myCommunities {
                     let context = AmitySocialHomePageBehavior.Context(page: self)
                     AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToMyCommunitiesSearchPage(context: context)
                 }
             })
             
-            SocialHomePageTabView($selectedTab)
+            SocialHomePageTabView($viewModel.selectedTab)
                 .frame(height: 62)
 
-            SocialHomeContainerView($selectedTab, pageId: id)
+            SocialHomeContainerView($viewModel.selectedTab, pageId: id)
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .ignoresSafeArea(edges: .bottom)
@@ -46,5 +46,24 @@ public struct AmitySocialHomePage: AmityPageView {
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
         }
+    }
+}
+
+
+class AmitySocialHomePageViewModel: ObservableObject {
+    @Published var selectedTab: AmitySocialHomePageTab = .newsFeed
+    
+    init() {
+        /// Observe didPostCreated event sent from AmityPostCreationPage
+        /// We need to explicitly change the tab to Newsfeed.
+        NotificationCenter.default.addObserver(self, selector: #selector(didPostCreated(_:)), name: .didPostCreated, object: nil)
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    @objc private func didPostCreated(_ notification: Notification) {
+        selectedTab = .newsFeed
     }
 }

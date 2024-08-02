@@ -27,9 +27,10 @@ public struct AmityPostDetailPage: AmityPageView {
     }
     
     public init(id: String) {
-        self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(id: id))
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false))
-        self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: id, referenceType: .post, community: nil, allowCreateComment: true))
+        let postDetailViewModel = AmityPostDetailPageViewModel(id: id)
+        self._viewModel = StateObject(wrappedValue: postDetailViewModel)
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId))
+        self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: id, referenceType: .post, community: postDetailViewModel.post?.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
     }
     
@@ -38,8 +39,8 @@ public struct AmityPostDetailPage: AmityPageView {
         self.postCategory = category
         self.hideTarget = hideTarget
         self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(post: post))
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false))
-        self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: nil, allowCreateComment: true))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
+        self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: post.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
     }
     
@@ -143,8 +144,8 @@ public struct AmityPostDetailPage: AmityPageView {
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
             
-            if let isCommunityMember = viewModel.post?.isGroupMember {
-                commentCoreViewModel.hideCommentButtons = !isCommunityMember
+            if let targetCommunity = viewModel.post?.targetCommunity {
+                commentCoreViewModel.hideCommentButtons = !targetCommunity.isJoined
             }
 
         }

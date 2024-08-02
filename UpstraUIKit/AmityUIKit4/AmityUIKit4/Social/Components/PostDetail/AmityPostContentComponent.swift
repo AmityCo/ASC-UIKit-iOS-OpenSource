@@ -342,30 +342,27 @@ public struct AmityPostContentComponent: AmityComponentView {
         if style == .detail {
             VStack(spacing: 8) {
                 HStack(spacing: 4) {
-                    if post.reactionsCount != 0 {
-                        Group {
-                            Image(AmityIcon.likeReactionIcon.getImageResource())
-                                .resizable()
-                                .frame(width: 20.0, height: 20.0)
-                            Text("\(post.reactionsCount.formattedCountString) \(post.reactionsCount == 1 ? "like" : "likes")")
-                                .font(.system(size: 13))
-                                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                        }
-                        .onTapGesture {
-                            showReactionList.toggle()
-                        }
+                    Group {
+                        Image(AmityIcon.likeReactionIcon.getImageResource())
+                            .resizable()
+                            .frame(width: 20.0, height: 20.0)
+                            .isHidden(post.reactionsCount == 0, remove: true)
+                        
+                        Text("\(post.reactionsCount.formattedCountString) \(post.reactionsCount == 1 ? "like" : "likes")")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    }
+                    .onTapGesture {
+                        showReactionList.toggle()
                     }
                     
                     Spacer()
                     
-                    if post.allCommentCount != 0 {
-                        Text("\(post.allCommentCount.formattedCountString) \(post.allCommentCount == 1 ? "comment" : "comments")")
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                    }
+                    Text("\(post.allCommentCount.formattedCountString) \(post.allCommentCount == 1 ? "comment" : "comments")")
+                        .font(.system(size: 13))
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 }
                 .frame(height: 20)
-                .isHidden(post.reactionsCount == 0 && post.allCommentCount == 0, remove: true)
             }
             .padding([.leading, .trailing], 16)
             .sheet(isPresented: $showReactionList) {

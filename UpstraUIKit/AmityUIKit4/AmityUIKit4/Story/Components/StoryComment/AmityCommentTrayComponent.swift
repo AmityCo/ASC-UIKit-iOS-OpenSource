@@ -31,7 +31,7 @@ public struct AmityCommentTrayComponent: AmityComponentView {
                 shouldAllowCreation: Bool = false,
                 pageId: PageId? = nil) {
         
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: referenceId, referenceType: referenceType, hideEmptyText: false, hideCommentButtons: !shouldAllowInteraction))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: referenceId, referenceType: referenceType, hideEmptyText: false, hideCommentButtons: !shouldAllowInteraction, communityId: community?.communityId))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: referenceId, referenceType: referenceType, community: community, allowCreateComment: shouldAllowCreation))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .commentTrayComponent))
         self.pageId = pageId

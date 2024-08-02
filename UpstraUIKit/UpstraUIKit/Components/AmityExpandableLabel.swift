@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AmitySDK
 
 typealias LineIndexTuple = (line: CTLine, index: Int)
 
@@ -595,6 +596,14 @@ extension UILabel {
 }
 
 extension AmityExpandableLabel {
+    
+    func setText(_ text: String, metadata: [String: Any], mentionees: [AmityMentionees]) {
+        let result = TextHighlighter.highlightLinksAndMentions(text: text, metadata: metadata, mentionees: mentionees)
+        
+        self.hyperLinks = result.hyperlinks
+        self.attributedText = result.text
+    }
+    
     func setText(_ text: String, withAttributes attributes: [MentionAttribute]) {
         let attributedString = NSMutableAttributedString(string: text)
         let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
@@ -621,10 +630,4 @@ extension AmityExpandableLabel {
         hyperLinks = _hyperLinkTextRange
         self.attributedText = attributedString
     }
-}
-
-struct MentionAttribute {
-    let attributes: [NSAttributedString.Key: Any]
-    let range: NSRange
-    let userId: String
 }

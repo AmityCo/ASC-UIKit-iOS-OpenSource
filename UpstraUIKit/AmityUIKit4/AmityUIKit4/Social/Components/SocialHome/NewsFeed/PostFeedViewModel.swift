@@ -50,15 +50,17 @@ class PostFeedViewModel: ObservableObject {
         
         let collection: AmityCollection<AmityPost>
         
+        var paginatorCommunityId: String? = nil
+        
         switch feedType {
         case .community(let communityId):
             collection = feedManager.getCommunityFeedPosts(communityId: communityId)
+            paginatorCommunityId = communityId
         case .globalFeed:
             collection = feedManager.getGlobalFeedPosts()
         }
         
-        
-        paginator = UIKitPaginator(liveCollection: collection, adPlacement: .feed, modelIdentifier: { model in
+        paginator = UIKitPaginator(liveCollection: collection, adPlacement: .feed, communityId: paginatorCommunityId, modelIdentifier: { model in
             return model.postId
         })
         paginator?.load()

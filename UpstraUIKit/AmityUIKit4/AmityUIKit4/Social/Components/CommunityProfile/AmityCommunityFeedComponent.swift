@@ -95,6 +95,12 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                                     onTapPostDetailAction?(post, category)
                                 }, pageId: pageId)
                                 .contentShape(Rectangle())
+                                .background(GeometryReader { geometry in
+                                    Color.clear
+                                        .onChange(of: geometry.frame(in: .global)) { frame in
+                                            checkVisibilityAndMarkSeen(postContentFrame: frame, post: post)
+                                        }
+                                })
                                 
                                 Rectangle()
                                     .fill(Color(viewConfig.theme.baseColorShade4))
@@ -123,5 +129,19 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                 .isHidden(!(postFeedViewModel.postItems.isEmpty && postFeedViewModel.feedLoadingStatus == .loaded))
         }
         .updateTheme(with: viewConfig)
+    }
+    
+    
+    private func checkVisibilityAndMarkSeen(postContentFrame: CGRect, post: AmityPostModel) {
+        let screenHeight = UIScreen.main.bounds.height
+        let visibleHeight = min(screenHeight, postContentFrame.maxY) - max(0, postContentFrame.minY)
+        let visiblePercentage = (visibleHeight / postContentFrame.height) * 100
+        
+        if visiblePercentage > 60 && !postFeedViewModel.seenPostIds.contains(post.postId) {
+            postFeedViewModel.seenPostIds.insert(post.postId)
+            DispatchQueue.main.async {
+                post.analytic.markAsViewed()
+            }
+        }
     }
 }

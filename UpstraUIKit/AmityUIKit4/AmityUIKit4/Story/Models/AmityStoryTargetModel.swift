@@ -42,6 +42,7 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
     
 
     public init(_ storyTarget: AmityStoryTarget) {
+        self.storyTarget = storyTarget
         self.targetId = storyTarget.targetId
         self.targetName = storyTarget.community?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
         self.isVerifiedTarget = storyTarget.community?.isOfficial ?? false
@@ -53,6 +54,7 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
     }
     
     func updateModel(_ storyTarget: AmityStoryTarget) {
+        self.storyTarget = storyTarget
         self.hasUnseenStory = storyTarget.hasUnseen
         self.hasFailedStory = storyTarget.failedStoriesCount != 0
         self.hasSyncingStory = storyTarget.syncingStoriesCount != 0
@@ -74,7 +76,8 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
         
         paginatorCancellable = nil
         
-        paginator = UIKitStoryPaginator(liveCollection: storyCollection, surplus: surplus, modelIdentifier: { $0.storyId })
+        let communityId = storyTarget?.community?.communityId
+        paginator = UIKitStoryPaginator(liveCollection: storyCollection, surplus: surplus, communityId: communityId, modelIdentifier: { $0.storyId })
         paginator?.load()
         
         paginatorCancellable = paginator?.$snapshots

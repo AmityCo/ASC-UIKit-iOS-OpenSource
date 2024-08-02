@@ -16,16 +16,16 @@ protocol AmityCommunityFetchMemberControllerProtocol {
 
 final class AmityCommunityFetchMemberController: AmityCommunityFetchMemberControllerProtocol {
     
-    private var membershipParticipation: AmityCommunityParticipation?
+    private var membership: AmityCommunityMembership?
     private var memberCollection: AmityCollection<AmityCommunityMember>?
     private var memberToken: AmityNotificationToken?
     
     init(communityId: String) {
-        membershipParticipation = AmityCommunityParticipation(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+        membership = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
     }
     
     func fetch(roles: [String], _ completion: @escaping (Result<[AmityCommunityMembershipModel], Error>) -> Void) {
-        memberCollection = membershipParticipation?.getMembers(membershipOptions: [.member], roles: roles, sortBy: .lastCreated)
+        memberCollection = membership?.getMembers(filter: .member, roles: roles, sortBy: .lastCreated, includeDeleted: false)
         memberToken = memberCollection?.observe { (collection, change, error) in
             if let error = error {
                 completion(.failure(error))

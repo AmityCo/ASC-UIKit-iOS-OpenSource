@@ -57,7 +57,7 @@ class CommentCoreViewModel: ObservableObject {
     
     private var paginatorCancellable: AnyCancellable?
     
-    init(referenceId: String, referenceType: AmityCommentReferenceType, hideEmptyText: Bool, hideCommentButtons: Bool) {
+    init(referenceId: String, referenceType: AmityCommentReferenceType, hideEmptyText: Bool, hideCommentButtons: Bool, communityId: String? = nil) {
         self.referenceId = referenceId
         self.referenceType = referenceType
         self.hideEmptyText = hideEmptyText
@@ -69,7 +69,7 @@ class CommentCoreViewModel: ObservableObject {
                                                     includeDeleted: true)
         let collection = commentManager.getComments(queryOptions: queryOptions)
         commentCollection = collection
-        paginator = UIKitPaginator(liveCollection: collection, adPlacement: .comment, modelIdentifier: { model in
+        paginator = UIKitPaginator(liveCollection: collection, adPlacement: .comment, communityId: communityId, modelIdentifier: { model in
             return model.commentId
         })
         paginator.load()

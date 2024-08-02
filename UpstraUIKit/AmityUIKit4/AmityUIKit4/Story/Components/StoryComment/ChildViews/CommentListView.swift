@@ -32,7 +32,6 @@ struct CommentListView<Content>: View where Content: View {
         ScrollViewReader { value in
             ScrollView {
                 LazyVStack {
-                    Color.clear.frame(height: 6)
                     
                     headerView()
                     
@@ -98,8 +97,6 @@ struct CommentListView<Content>: View where Content: View {
                             
                         } else {
                             getDeletedMessageView()
-                                .padding([.top, .bottom], 3)
-                                .padding(.leading, 52)
                         }
                         
                         if comment.childrenNumber != 0 {
@@ -127,24 +124,32 @@ struct CommentListView<Content>: View where Content: View {
     
     @ViewBuilder
     func getDeletedMessageView() -> some View {
-        HStack {
-            HStack(spacing: 8) {
+        VStack(spacing: 10) {
+            Rectangle()
+                .fill(Color(viewConfig.theme.baseColorShade4))
+                .frame(height: 1)
+            
+            HStack(spacing: 16) {
                 Image(AmityIcon.deletedMessageIcon.getImageResource())
                     .resizable()
                     .renderingMode(.template)
                     .frame(width: 16, height: 16)
-                    .padding(.leading, 8)
+                    .padding(.leading, 18)
                     .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                
                 Text(AmityLocalizedStringSet.Comment.deletedCommentMessage.localizedString)
-                    .font(.system(size: 13))
+                    .font(.system(size: 15))
                     .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                     .padding(.trailing, 16)
+                
+                Spacer()
             }
-            .frame(height: 28)
-            .background(Color(viewConfig.theme.baseColorShade4))
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            Spacer()
+            
+            Rectangle()
+                .fill(Color(viewConfig.theme.baseColorShade4))
+                .frame(height: 1)
         }
+        
         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.deletedComment)
     }
 }

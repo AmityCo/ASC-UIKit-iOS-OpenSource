@@ -56,8 +56,7 @@ final public class AmityPostPollTableViewCell: UITableViewCell, Nibbable, AmityP
         
         guard let poll = post.poll else { return }
         if let metadata = post.metadata, let mentionees = post.mentionees {
-            let attributes = AmityMentionManager.getAttributes(fromText: poll.question, withMetadata: metadata, mentionees: mentionees)
-            titlePollLabel.setText(poll.question, withAttributes: attributes)
+            titlePollLabel.setText(poll.question, metadata: metadata, mentionees: mentionees)
         } else {
             titlePollLabel.text = poll.question
         }

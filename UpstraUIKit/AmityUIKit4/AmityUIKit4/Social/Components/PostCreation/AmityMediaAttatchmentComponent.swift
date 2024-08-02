@@ -34,11 +34,10 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
     
     
     public var body: some View {
-        HStack(spacing: 0) {
-                        
-            if (currentType != nil) {
-                Spacer()
-            }
+        HStack(alignment: .center, spacing: 0) {
+        
+            Spacer()
+                .isHidden(currentType == nil, remove: true)
              
             let cameraButtonIcon = viewConfig.getConfig(elementId: .cameraButton, key: "image", of: String.self) ?? ""
             getItemView(image: AmityIcon.getImageResource(named: cameraButtonIcon), isHidden: false) {
@@ -52,10 +51,9 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                 showCamera.isShown.toggle()
                 hideKeyboard()
             }
-            
-            if currentType == .image || currentType == nil {
-                Spacer()
-            }
+
+            Spacer()
+                .isHidden(currentType == .video, remove: true)
             
             let imageButtonIcon = viewConfig.getConfig(elementId: .imageButton, key: "image", of: String.self) ?? ""
             getItemView(image: AmityIcon.getImageResource(named: imageButtonIcon), isHidden: viewModel.medias.first?.type ?? .image != .image) {
@@ -65,9 +63,8 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                 hideKeyboard()
             }
             
-            if currentType == .video || currentType == nil {
-                Spacer()
-            }
+            Spacer()
+                .isHidden(currentType == .image, remove: true)
             
             let videoButtonIcon = viewConfig.getConfig(elementId: .videoButton, key: "image", of: String.self) ?? ""
             getItemView(image: AmityIcon.getImageResource(named: videoButtonIcon), isHidden: viewModel.medias.first?.type ?? .video != .video) {
@@ -77,14 +74,9 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                 hideKeyboard()
             }
             
-            if (currentType != nil) {
-                Spacer()
-            }
+            Spacer()
+                .isHidden(currentType == nil, remove: true)
             
-//            Spacer()
-            
-//            getItemView(image: AmityIcon.attatchmentIcon.getImageResource(), isDisable: false) {}
-
         }
         .frame(maxWidth: .infinity)
         .padding(.bottom, 10)
@@ -133,6 +125,9 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
             pickerViewModel.selectedImages = []
             pickerViewModel.selectedImage = nil
             pickerViewModel.selectedMediaURL = nil
+        }
+        .onAppear {
+            currentType = viewModel.medias.first?.type
         }
         .alert(isPresented: $showMaximumMediaAlert) {
             let typeString = currentType == .image ? "images" : "videoes"

@@ -23,8 +23,8 @@ struct CommentBottomSheetView: View {
             getOwnerBottomSheetView()
         } else {
             getNonOwnerBottomSheetView()
-                .onChange(of: viewModel.sheetState.isShown) { value in
-                    if value, let comment = viewModel.sheetState.comment {
+                .onAppear {
+                    if let comment = viewModel.sheetState.comment {
                         viewModel.updateCommentFlaggedByMeState(id: comment.id)
                     }
                 }

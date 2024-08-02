@@ -144,8 +144,7 @@ class AmityCommentView: AmityView {
         }
         
         if let metadata = comment.metadata, let mentionees = comment.mentionees {
-            let attributes = AmityMentionManager.getAttributes(fromText: comment.text, withMetadata: metadata, mentionees: mentionees)
-            contentLabel.setText(comment.text, withAttributes: attributes)
+            contentLabel.setText(comment.text, metadata: metadata, mentionees: mentionees)
         } else {
             contentLabel.text = comment.text
         }

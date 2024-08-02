@@ -30,7 +30,7 @@ public final class AmityPollCreatorViewController: AmityViewController {
     // MARK: - Properties
     private var postButton: UIBarButtonItem?
     private var screenViewModel: AmityPollCreatorScreenViewModelType?
-    private var mentionManager: AmityMentionManager?
+    private var mentionManager: ASCMentionManager?
     
     // MARK: - View's lifecycle
     public override func viewDidLoad() {
@@ -57,7 +57,7 @@ public final class AmityPollCreatorViewController: AmityViewController {
             }
         default: break
         }
-        vc.mentionManager = AmityMentionManager(withType: .post(communityId: communityId))
+        vc.mentionManager = ASCMentionManager(withType: .post(communityId: communityId))
         return vc
     }
     
@@ -196,7 +196,8 @@ extension AmityPollCreatorViewController: AmityPollCreatorScreenViewModelDelegat
     }
 }
 
-extension AmityPollCreatorViewController: UITableViewDelegate {
+extension AmityPollCreatorViewController: UITableViewDelegate, UITableViewDataSource {
+    
     public func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
@@ -210,13 +211,10 @@ extension AmityPollCreatorViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if tableView == mentionTableView {
             if tableView.isBottomReached {
-                mentionManager?.loadMore()
+                mentionManager?.mentionProvider.loadMore()
             }
         }
     }
-}
-
-extension AmityPollCreatorViewController: UITableViewDataSource {
     
     public func numberOfSections(in tableView: UITableView) -> Int {
         if tableView == mentionTableView {
@@ -227,7 +225,7 @@ extension AmityPollCreatorViewController: UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == mentionTableView {
-            return mentionManager?.users.count ?? 0
+            return mentionManager?.mentionProvider.mentionList.count ?? 0
         }
         guard let section = Section(rawValue: section) else { return 0 }
         switch section {
@@ -240,10 +238,15 @@ extension AmityPollCreatorViewController: UITableViewDataSource {
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if tableView == mentionTableView {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell, let model = mentionManager?.item(at: indexPath) else { return UITableViewCell() }
-            cell.display(with: model)
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell else { return UITableViewCell() }
+            
+            if let provider = mentionManager?.mentionProvider, indexPath.row < provider.mentionList.count {
+                let model = provider.mentionList[indexPath.row]
+                cell.display(with: model)
+            }
             return cell
         }
+        
         guard let section = Section(rawValue: indexPath.section) else { return UITableViewCell() }
         switch section {
         case .question:
@@ -347,17 +350,10 @@ extension AmityPollCreatorViewController: AmityPollCreatorCellProtocolDelegate {
     }
 }
 
-// MARK: - AmityMentionManagerDelegate
-extension AmityPollCreatorViewController: AmityMentionManagerDelegate {
-    public func didCreateAttributedString(attributedString: NSAttributedString) {
-        if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AmityPollCreatorQusetionTableViewCell, let textView = cell.getTextView() {
-            textView.attributedText = attributedString
-            textView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: AmityColorSet.base]
-            screenViewModel?.action.setPollQuestion(textView.text)
-        }
-    }
+// MARK: - ASCMentionManagerDelegate
+extension AmityPollCreatorViewController: ASCMentionManagerDelegate {
     
-    public func didGetUsers(users: [AmityMentionUserModel]) {
+    public func didUpdateMentionUsers(users: [AmityMentionUserModel]) {
         if users.isEmpty {
             mentionTableViewHeightConstraint.constant = 0
             mentionTableView.isHidden = true
@@ -372,13 +368,19 @@ extension AmityPollCreatorViewController: AmityMentionManagerDelegate {
         }
     }
     
-    public func didMentionsReachToMaximumLimit() {
-        let alertController = UIAlertController(title: AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString, message: AmityLocalizedStringSet.Mention.unableToMentionReplyDescription.localizedString, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.done.localizedString, style: .cancel, handler: nil)
-        alertController.addAction(cancelAction)
-        present(alertController, animated: true, completion: nil)
+    public func didReachMaxMentionLimit() {
+        AlertController.showAlert(in: self, title: AmityLocalizedStringSet.Mention.unableToMentionTitle.localizedString, message: AmityLocalizedStringSet.Mention.unableToMentionReplyDescription.localizedString)
     }
     
-    public func didCharactersReachToMaximumLimit() {
+    public func didReachMaxCharacterCountLimit() {
+        // Intentionally left empty
+    }
+    
+    public func didCreateAttributedString(attributedString: NSAttributedString) {
+        if let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? AmityPollCreatorQusetionTableViewCell, let textView = cell.getTextView() {
+            textView.attributedText = attributedString
+            textView.typingAttributes = [.font: AmityFontSet.body, .foregroundColor: AmityColorSet.base]
+            screenViewModel?.action.setPollQuestion(textView.text)
+        }
     }
 }
