@@ -193,18 +193,16 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             HStack(spacing: 8) {
                 ForEach(Array(categories.enumerated()), id: \.element) { index, category in
                     
-                    Text(category)
-                        .font(.system(size: 13))
-                        .lineLimit(1)
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade1))
-                        .background(
-                            Rectangle()
-                                .fill(Color(viewConfig.theme.baseColorShade4))
-                                .clipShape(RoundedCorner())
-                                .padding(EdgeInsets(top: -3, leading: -8, bottom: -3, trailing: -8))
-                            
-                        )
-                        .padding([.leading, .trailing], 5)
+                    HStack {
+                        Text(category)
+                            .font(.system(size: 13))
+                            .lineLimit(1)
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                    }
+                    .background(Color(viewConfig.theme.baseColorShade4))
+                    .clipShape(RoundedCorner())
                     
                 }
             }

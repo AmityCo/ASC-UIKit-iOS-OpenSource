@@ -77,127 +77,134 @@ public struct AmityPostContentComponent: AmityComponentView {
     
     @ViewBuilder
     private func postHeaderView(_ post: AmityPostModel) -> some View {
-        HStack(spacing: 8) {
-            AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: post.postedUser?.avatarURL ?? ""))
-                .frame(size: CGSize(width: 32.0, height: 32.0))
-                .clipShape(Circle())
-                .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-            
-            VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 8) {
-                    Text(post.displayName)
-                        .font(.system(size: 15, weight: .semibold))
-                        .lineLimit(1)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .onTapGesture {
-                            let context = AmityPostContentComponentBehavior.Context(component: self)
-                            AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToUserProfilePage(context: context)
-                        }
-                    
-                    if let _ = post.targetCommunity, !hideTarget {
-                        HStack(spacing: 8) {
-                            Image(AmityIcon.arrowIcon.getImageResource())
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(size: CGSize(width: 10, height: 10))
-                            
-                            Text(post.targetCommunity?.displayName ?? "Unknown")
-                                .font(.system(size: 15, weight: .semibold))
-                                .lineLimit(1)
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
-                                .onTapGesture {
-                                    let context = AmityPostContentComponentBehavior.Context(component: self)
-                                    AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
-                                }
+        
+        VStack(alignment: .leading, spacing: 0) {
+            HStack {
+                Text("Featured")
+                    .font(.system(size: 15, weight: .medium))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                
+            }
+            .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
+            .cornerRadius(4, corners: [.topRight, .bottomRight])
+            .padding(.vertical, 8)
+            .isHidden(category != .announcement || viewConfig.isHidden(elementId: .announcementBadge))
+
+            HStack(spacing: 8) {
+                AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: post.postedUser?.avatarURL ?? ""))
+                    .frame(size: CGSize(width: 32.0, height: 32.0))
+                    .clipShape(Circle())
+                    .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 8) {
+                        Text(post.displayName)
+                            .font(.system(size: 15, weight: .semibold))
+                            .lineLimit(1)
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .onTapGesture {
+                                let context = AmityPostContentComponentBehavior.Context(component: self)
+                                AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToUserProfilePage(context: context)
+                            }
+                        
+                        if let _ = post.targetCommunity, !hideTarget {
+                            HStack(spacing: 8) {
+                                Image(AmityIcon.arrowIcon.getImageResource())
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(size: CGSize(width: 10, height: 10))
+                                
+                                Text(post.targetCommunity?.displayName ?? "Unknown")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .lineLimit(1)
+                                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                                    .onTapGesture {
+                                        let context = AmityPostContentComponentBehavior.Context(component: self)
+                                        AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
+                                    }
+                            }
                         }
                     }
-                }
-                
-                
-                HStack(spacing: 4) {
-                    if post.isModerator && !viewConfig.isHidden(elementId: .moderatorBadge) {
-                        let moderatorIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .moderatorBadge, key: "icon", of: String.self) ?? "")
-                        let moderatorTitle = viewConfig.getConfig(elementId: .moderatorBadge, key: "text", of: String.self) ?? ""
-                        HStack(spacing: 3) {
-                            Image(moderatorIcon)
-                                .resizable()
-                                .frame(width: 12, height: 12)
-                                .padding(.leading, 6)
-                            Text(moderatorTitle)
-                                .font(.system(size: 10))
-                                .foregroundColor(Color(viewConfig.theme.primaryColor))
-                                .padding(.trailing, 6)
+                    
+                    
+                    HStack(spacing: 4) {
+                        if post.isModerator && !viewConfig.isHidden(elementId: .moderatorBadge) {
+                            let moderatorIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .moderatorBadge, key: "icon", of: String.self) ?? "")
+                            let moderatorTitle = viewConfig.getConfig(elementId: .moderatorBadge, key: "text", of: String.self) ?? ""
+                            HStack(spacing: 3) {
+                                Image(moderatorIcon)
+                                    .resizable()
+                                    .frame(width: 12, height: 12)
+                                    .padding(.leading, 6)
+                                Text(moderatorTitle)
+                                    .font(.system(size: 10))
+                                    .foregroundColor(Color(viewConfig.theme.primaryColor))
+                                    .padding(.trailing, 6)
+                            }
+                            .frame(height: 20)
+                            .background(Color(viewConfig.theme.primaryColor.blend(.shade2)))
+                            .clipShape(RoundedCorner(radius: 10))
+                            
+                            Text("•")
+                                .font(.system(size: 13))
+                                .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                         }
-                        .frame(height: 20)
-                        .background(Color(viewConfig.theme.primaryColor.blend(.shade2)))
-                        .clipShape(RoundedCorner(radius: 10))
                         
-                        Text("•")
+                        Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
                             .font(.system(size: 13))
                             .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                            .isHidden(viewConfig.isHidden(elementId: .timestamp))
+                        
                     }
-                    
-                    Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade1))
-                        .isHidden(viewConfig.isHidden(elementId: .timestamp))                    
                     
                 }
                 
-            }
-            
-            Spacer()
-            
-            let announcementIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .announcementBadge, key: "image", of: String.self) ?? "")
-            Image(announcementIcon)
-                .resizable()
-                .renderingMode(.template)
-                .foregroundColor(Color(viewConfig.theme.primaryColor))
-                .frame(width: 20, height: 20)
-                .isHidden(category != .announcement || viewConfig.isHidden(elementId: .announcementBadge))
-            
-            let pinBadge = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .pinBadge, key: "image", of: String.self) ?? "")
-            Image(pinBadge)
-                .renderingMode(.template)
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.primaryColor))
-                .frame(width: 20, height: 20)
-                .isHidden(category != .pin || viewConfig.isHidden(elementId: .pinBadge))
-            
-            if !hideMenuButton {
-                let bottomSheetHeight = calculateBottomSheetHeight(post: post)
-                Button(action: {
-                    showBottomSheet.toggle()
-                }, label: {
-                    let menuIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .menuButton, key: "icon", of: String.self) ?? "")
-                    Image(menuIcon)
-                        .resizable()
-                        .renderingMode(.template)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .frame(width: 24, height: 24)
-                })
-                .buttonStyle(BorderlessButtonStyle())
-                .isHidden(viewConfig.isHidden(elementId: .menuButton))
-                .bottomSheet(isShowing: $showBottomSheet, height: bottomSheetHeight, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                    PostBottomSheetView(isShown: $showBottomSheet, post: post, editPostActionCompletion: {
+                Spacer()
+                
+                let pinBadge = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .pinBadge, key: "image", of: String.self) ?? "")
+                Image(pinBadge)
+                    .renderingMode(.template)
+                    .scaledToFit()
+                    .foregroundColor(Color(viewConfig.theme.primaryColor))
+                    .frame(width: 20, height: 20)
+                    .isHidden(category != .pin || viewConfig.isHidden(elementId: .pinBadge))
+                
+                if !hideMenuButton {
+                    let bottomSheetHeight = calculateBottomSheetHeight(post: post)
+                    Button(action: {
                         showBottomSheet.toggle()
-                        
-                        // Dismiss bottomsheet
-                        host.controller?.dismiss(animated: false)
-                        
-                        let editOption = AmityPostComposerOptions.editOptions(post: post)
-                        let view = AmityPostComposerPage(options: editOption)
-                        let controller = AmitySwiftUIHostingController(rootView: view)
-                        
-                        let navigationController = UINavigationController(rootViewController: controller)
-                        navigationController.modalPresentationStyle = .fullScreen
-                        navigationController.navigationBar.isHidden = true
-                        host.controller?.present(navigationController, animated: true)
+                    }, label: {
+                        let menuIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .menuButton, key: "icon", of: String.self) ?? "")
+                        Image(menuIcon)
+                            .resizable()
+                            .renderingMode(.template)
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .frame(width: 24, height: 24)
                     })
+                    .buttonStyle(BorderlessButtonStyle())
+                    .isHidden(viewConfig.isHidden(elementId: .menuButton))
+                    .bottomSheet(isShowing: $showBottomSheet, height: bottomSheetHeight, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                        PostBottomSheetView(isShown: $showBottomSheet, post: post, editPostActionCompletion: {
+                            showBottomSheet.toggle()
+                            
+                            // Dismiss bottomsheet
+                            host.controller?.dismiss(animated: false)
+                            
+                            let editOption = AmityPostComposerOptions.editOptions(post: post)
+                            let view = AmityPostComposerPage(options: editOption)
+                            let controller = AmitySwiftUIHostingController(rootView: view)
+                            
+                            let navigationController = UINavigationController(rootViewController: controller)
+                            navigationController.modalPresentationStyle = .fullScreen
+                            navigationController.navigationBar.isHidden = true
+                            host.controller?.present(navigationController, animated: true)
+                        })
+                    }
                 }
             }
+            .padding(EdgeInsets(top: 8, leading: 12, bottom: 0, trailing: 12))
         }
-        .padding(EdgeInsets(top: 8, leading: 12, bottom: 0, trailing: 12))
     }
     
     
