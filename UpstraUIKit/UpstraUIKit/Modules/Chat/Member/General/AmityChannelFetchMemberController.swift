@@ -16,16 +16,16 @@ protocol AmityChannelFetchMemberControllerProtocol {
 
 final class AmityChannelFetchMemberController: AmityChannelFetchMemberControllerProtocol {
     
-    private var membershipParticipation: AmityChannelParticipation?
+    private var membership: AmityChannelMembership
     private var memberCollection: AmityCollection<AmityChannelMember>?
     private var memberToken: AmityNotificationToken?
     
     init(channelId: String) {
-        membershipParticipation = AmityChannelParticipation(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membership = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
     }
     
     func fetch(roles: [String], _ completion: @escaping (Result<[AmityChannelMembershipModel], Error>) -> Void) {
-        memberCollection = membershipParticipation?.getMembers(filter: .all, sortBy: .lastCreated, roles: roles)
+        memberCollection = membership.getMembers(filter: .all, sortBy: .lastCreated, roles: roles, includeDeleted: false)
         memberToken?.invalidate()
         memberToken = memberCollection?.observe { (collection, change, error) in
             if let error = error {

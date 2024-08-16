@@ -14,18 +14,19 @@ protocol AmityChannelUserRolesControllerProtocol {
 }
 
 final class AmityChannelUserRolesController: AmityChannelUserRolesControllerProtocol {
-    private var membershipParticipation: AmityChannelParticipation?
+    
+    private var membersRepo: AmityChannelMembership?
     private var membership: AmityChannelMember?
     private var token: AmityNotificationToken?
     
     init(channelId: String) {
-        membershipParticipation = AmityChannelParticipation(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membersRepo = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
     }
     
     func getUserRoles(withUserId userId: String, role: AmityChannelRole, completionHandler: @escaping (Bool) -> ()) {
         token?.invalidate()
         completionHandler(false)
-        token = membershipParticipation?.getMembers(filter: .all, sortBy: .lastCreated, roles: []).observe({ [weak self] collection, change, error in
+        token = membersRepo?.getMembers(filter: .all, sortBy: .lastCreated, roles: [], includeDeleted: false).observe({ [weak self] collection, change, error in
             guard let weakSelf = self else { return }
             if error != nil {
                 completionHandler(false)
