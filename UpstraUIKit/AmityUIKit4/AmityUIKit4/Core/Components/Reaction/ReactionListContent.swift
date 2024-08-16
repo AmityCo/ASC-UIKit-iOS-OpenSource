@@ -118,8 +118,8 @@ struct ReactionListRowItem: View {
                 Text(user.displayName)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .accessibilityIdentifier(AccessibilityID.Chat.ReactionList.userDisplayName)
                     .textShimmerEffect(cornerRadius: 10, isActive: isPlaceholder, color: viewConfig.theme.baseInverseColor)
+                    .accessibilityIdentifier(AccessibilityID.Chat.ReactionList.userDisplayName)
                 
                 Text(AmityLocalizedStringSet.Reaction.tapToRemove.localizedString)
                     .font(.system(size: 13, weight: .regular))
@@ -127,6 +127,7 @@ struct ReactionListRowItem: View {
                     .textShimmerEffect(cornerRadius: 10, isActive: isPlaceholder, color: viewConfig.theme.baseInverseColor)
                     .padding(.top, 4)
                     .isHidden(!user.isLoggedInUser)
+                    .accessibilityIdentifier(AmityLocalizedStringSet.Reaction.tapToRemove.localizedString)
             }
             
             Spacer()

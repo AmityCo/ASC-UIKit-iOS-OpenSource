@@ -61,6 +61,7 @@ public struct AmityLiveChatMessageReactionPicker: AmityElementView {
                             .frame(width: 32, height: 32)
                     }
                 })
+                .accessibilityIdentifier(reaction.accessibilityId)
             }
         }
         .font(.title)

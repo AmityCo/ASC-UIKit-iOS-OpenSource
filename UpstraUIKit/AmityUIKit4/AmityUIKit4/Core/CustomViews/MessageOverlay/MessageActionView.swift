@@ -57,6 +57,7 @@ struct MessageActionView: View {
             }
             .foregroundColor(Color(viewConfig.theme.baseInverseColor))
             .isHidden(message.syncState == .error)
+            .accessibilityIdentifier(AmityLocalizedStringSet.Chat.replyButton.localizedString)
             
             Divider()
                 .frame(maxWidth: .infinity)
@@ -67,6 +68,7 @@ struct MessageActionView: View {
                 dismissAction()
             }
             .foregroundColor(Color(viewConfig.theme.baseInverseColor))
+            .accessibilityIdentifier(AmityLocalizedStringSet.Chat.copyButton.localizedString)
             
             if !message.isOwner {
                 let isFlaggedByOwner = message.isFlaggedByMe ?? viewModel.isReportedByMe
@@ -85,6 +87,7 @@ struct MessageActionView: View {
 
                 }
                 .foregroundColor(Color.red)
+                .accessibilityIdentifier(isFlaggedByOwner ? AmityLocalizedStringSet.Chat.unReportButton.localizedString : AmityLocalizedStringSet.Chat.reportButton.localizedString)
             }
             
             if message.isOwner || message.hasModeratorPermissionInChannel {
@@ -98,7 +101,7 @@ struct MessageActionView: View {
                     dismissAction()
                 }
                 .foregroundColor(Color.red)
-                
+                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.deleteButton.localizedString)
             }
         }
         .frame(maxWidth: .infinity)

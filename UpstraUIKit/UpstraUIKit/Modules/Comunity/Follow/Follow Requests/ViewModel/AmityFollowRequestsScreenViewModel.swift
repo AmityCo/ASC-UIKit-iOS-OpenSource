@@ -108,7 +108,6 @@ private extension AmityFollowRequestsScreenViewModel {
             
             followRequests = newRequests
             delegate?.screenViewModelDidGetRequests()
-            followToken?.invalidate()
         default: break
         }
     }

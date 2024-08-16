@@ -22,7 +22,7 @@ class MessageReactionConfiguration {
             let name = item["name"] ?? ""
             let image = ImageResource(name: item["image"] ?? "", bundle: AmityUIKit4Manager.bundle)
             
-            let item = AmityReactionType(name: name, image: image)
+            let item = AmityReactionType(name: name, image: image, accessibilityId: item["image"] ?? "")
             reactionList.append(item)
             availableReactions[name] = item
         }
@@ -31,7 +31,7 @@ class MessageReactionConfiguration {
     }
     
     func getReaction(withName name: String) -> AmityReactionType {
-        return availableReactions[name] ?? AmityReactionType(name: name, image: AmityIcon.Chat.unknownReaction.imageResource)
+        return availableReactions[name] ?? AmityReactionType(name: name, image: AmityIcon.Chat.unknownReaction.imageResource, accessibilityId: "unknown")
     }
 }
 
@@ -39,4 +39,5 @@ struct AmityReactionType: Identifiable {
     let id: UUID = UUID()
     let name: String
     let image: ImageResource
+    let accessibilityId: String
 }
