@@ -7,6 +7,8 @@
 
 import SwiftUI
 import AVKit
+import ImageIO
+import MobileCoreServices
 
 struct PostCreationMediaAttachmentPreviewView: View {
     
@@ -79,8 +81,8 @@ struct MediaAttachmentView: View {
                                     .overlay(
                                         KFImage.url(url)
                                             .placeholder {
-                                                    ProgressView()
-                                                        .progressViewStyle(CircularProgressViewStyle())
+                                                ProgressView()
+                                                    .progressViewStyle(CircularProgressViewStyle())
                                             }
                                             .resizable()
                                             .fromMemoryCacheOrRefresh()
@@ -186,36 +188,56 @@ struct MediaAttachmentView: View {
     
     
     private func uploadImage() {
+        // Note: This is not a fool-proof way to check image file type. Ideally we want to check starting bytes of the file instead. Since these images are selected from photo gallery or captured using device camera, we are sure that its an image file.
+        // So for simplicity, we just check the file extension of the URL for that image.
+        let allowedFormats: Set<String> = ["jpg","jpeg","png"]
+        let imageExtension = media.localUrl?.pathExtension.lowercased() ?? ""
+        let needsConversion = !allowedFormats.contains(imageExtension)
+        
+        if needsConversion {
+            // Change state outside of dispatch queue
+            media.state = .uploading(progress: 0)
+        }
+
         DispatchQueue.global(qos: .background).async {
-            fileRepositoryManager.fileRepository.uploadImage(with: media.localUrl ?? URL(fileURLWithPath: ""), isFullImage: true) { progress in
-                DispatchQueue.main.async {
-                    Log.add(event: .info, "Image Upload progress: \(progress)")
-                    media.state = .uploading(progress: progress)
-                    
-                    /// Update media state to use within view
-                    mediaState = .uploading(progress: progress)
+            if needsConversion {
+                if let convertedImageURL = ImageConverter.convertImage(url: media.localUrl ?? URL(fileURLWithPath: "")) {
+                    startImageUpload(imageURL: convertedImageURL)
                 }
-            } completion: { imageData, error in
-                DispatchQueue.main.async {
-                    if let error {
-                        mediaState = .error
-                        return
-                    }
-                    
-                    guard let imageData else { return }
-                    Log.add(event: .info, "Image Uploaded!!!")
-                    media.state = .uploadedImage(data: imageData)
-                    
-                    /// Update media state to use within view
-                    mediaState = .uploadedImage(data: imageData)
-                }
+            } else {
+                startImageUpload(imageURL: media.localUrl ?? URL(fileURLWithPath: ""))
             }
         }
     }
     
+    private func startImageUpload(imageURL: URL) {
+        fileRepositoryManager.fileRepository.uploadImage(with: imageURL, isFullImage: true) { progress in
+            DispatchQueue.main.async {
+                Log.add(event: .info, "Image Upload progress: \(progress)")
+                media.state = .uploading(progress: progress)
+                
+                /// Update media state to use within view
+                mediaState = .uploading(progress: progress)
+            }
+        } completion: { imageData, error in
+            DispatchQueue.main.async {
+                if let error {
+                    mediaState = .error
+                    return
+                }
+                
+                guard let imageData else { return }
+                Log.add(event: .info, "Image Uploaded!!!")
+                media.state = .uploadedImage(data: imageData)
+                
+                /// Update media state to use within view
+                mediaState = .uploadedImage(data: imageData)
+            }
+        }
+    }
     
+    // Note: No need for conversion as png image is extracted from UIImage internally in SDK
     private func uploadImage(image: UIImage) {
-        
         Task { @MainActor in
             do {
                 let imageData = try await fileRepositoryManager.fileRepository.uploadImage(image) { progress in
@@ -238,14 +260,32 @@ struct MediaAttachmentView: View {
                 mediaState = .error
                 return
             }
-            
         }
-        
     }
     
-    
     private func generatedThumbnailAndUploadVideo() {
-        let asset = AVAsset(url: media.localUrl ?? URL(fileURLWithPath: ""))
+        let originalURL = media.localUrl ?? URL(fileURLWithPath: "")
+        
+        generateThumbnail(videoURL: originalURL)
+        
+        media.state = .uploading(progress: 0.1)
+        
+        let asset = AVAsset(url: originalURL)
+        if VideoConverter.shouldConvertVideo(asset: asset) {
+            Log.add(event: .info, "Converting video to supported type..")
+            VideoConverter.convertVideo(asset: asset) { convertedVideoURL in
+                Log.add(event: .info, "Video Converted! Starting upload process...")
+                startVideoUpload(videoURL: convertedVideoURL ?? URL(fileURLWithPath: ""))
+            }
+            
+        } else {
+            Log.add(event: .info, "Uploading original video..")
+            startVideoUpload(videoURL: originalURL)
+        }
+    }
+    
+    private func generateThumbnail(videoURL: URL) {
+        let asset = AVAsset(url: videoURL)
         let assetImageGenerator = AVAssetImageGenerator(asset: asset)
         assetImageGenerator.appliesPreferredTrackTransform = true
         let time = CMTime(seconds: 1.0, preferredTimescale: 1)
@@ -256,8 +296,10 @@ struct MediaAttachmentView: View {
         } catch {
             print("Unable to generate thumbnail image for kUTTypeMovie.")
         }
-        
-        fileRepositoryManager.fileRepository.uploadVideo(with: media.localUrl ?? URL(fileURLWithPath: "")) { progress in
+    }
+    
+    private func startVideoUpload(videoURL: URL) {
+        fileRepositoryManager.fileRepository.uploadVideo(with: videoURL) { progress in
             DispatchQueue.main.async {
                 Log.add(event: .info, "Video Upload progress: \(progress)")
                 media.state = .uploading(progress: progress)
@@ -283,3 +325,95 @@ struct MediaAttachmentView: View {
         }
     }
 }
+
+class ImageConverter {
+    
+    static func convertImage(url: URL) -> URL? {
+        let options = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceShouldCacheImmediately: true,
+            kCGImageSourceSubsampleFactor: 2
+        ] as CFDictionary
+        
+        guard let imageSource = CGImageSourceCreateWithURL(url as CFURL, nil), let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, options), let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [AnyHashable: Any] else { return nil }
+        
+        let uuid = UUID().uuidString
+        let suffix = "\(uuid).png"
+        
+        guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else { return nil }
+        
+        directory.appendingPathComponent(suffix)
+        guard let absoluteString = directory.absoluteString, let destinationURL = URL(string: "\(absoluteString)\(suffix)"), let destination = CGImageDestinationCreateWithURL(destinationURL as CFURL, kUTTypePNG, 1, nil) else { return nil }
+        
+        CGImageDestinationAddImage(destination, cgImage, options)
+        if CGImageDestinationFinalize(destination) {
+            return destinationURL
+        }
+        
+        return nil
+    }
+}
+
+class VideoConverter {
+    
+    static func convertVideo(asset: AVAsset, completion: @escaping (_ responseURL : URL?) -> Void) {
+        guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) else { return }
+        
+        let uuid = UUID().uuidString
+        let suffix = "\(uuid).mp4"
+        
+        guard let destinationURL = URL(string: "\(directory.absoluteString)\(suffix)") else { return }
+        
+        let preset = AVAssetExportPresetHighestQuality
+        let outFileType = AVFileType.mp4
+        
+        AVAssetExportSession.determineCompatibility(ofExportPreset: preset, with: asset, outputFileType: outFileType) { isCompatible in
+            
+            guard isCompatible else {
+                completion(nil)
+                return
+            }
+            
+            guard let exportSession = AVAssetExportSession(asset: asset, presetName: preset) else {
+                completion(nil)
+                return
+            }
+            
+            exportSession.outputFileType = outFileType
+            exportSession.outputURL = destinationURL
+            exportSession.exportAsynchronously {
+                completion(exportSession.status == .completed ? destinationURL : nil)
+            }
+        }
+    }
+    
+    static func shouldConvertVideo(asset: AVAsset) -> Bool {
+        let hdrTracks = asset.tracks(withMediaCharacteristic: .containsHDRVideo)
+        var isHDRVideo: Bool = false
+        hdrTracks.forEach {
+            if $0.hasMediaCharacteristic(.containsHDRVideo) {
+                isHDRVideo = true
+            }
+        }
+        
+        // BE Supports standard file format such as 3gp, avi, f4v, flv, m4v, mov, mp4, ogv, 3g2, wmv, vob, webm, and mkv & standard codec i.e h.264
+        // See Image+and+Video+Compatibility docs
+        
+        var isHEVCEncoded = false // H.265 Encoding
+        var isH264Encoded = false
+        if let videoTrack = asset.tracks(withMediaType: .video).first, let formatDescriptions = videoTrack.formatDescriptions as? [CMFormatDescription] {
+            isHEVCEncoded = formatDescriptions.contains(where: { description in
+                return CMFormatDescriptionGetMediaSubType(description) == kCMVideoCodecType_HEVC
+            })
+            
+            isH264Encoded = formatDescriptions.contains(where: { description in
+                return CMFormatDescriptionGetMediaSubType(description) == kCMVideoCodecType_H264
+            })
+        }
+        
+        Log.add(event: .info, "Checking video information, isHEVCEncoded: \(isHEVCEncoded) | isHDRVideo \(isHDRVideo) | isH264Encoded: \(isH264Encoded)")
+        return isHDRVideo || isHEVCEncoded
+    }
+}
+
