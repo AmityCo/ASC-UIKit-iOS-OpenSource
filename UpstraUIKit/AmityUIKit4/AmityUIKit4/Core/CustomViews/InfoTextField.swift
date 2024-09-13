@@ -11,8 +11,10 @@ struct InfoTextFieldModel {
     var title: String
     var placeholder: String
     var isMandatory: Bool
+    var showOptionalTitle: Bool = false
     var infoMessage: String?
     var errorMessage: String?
+    var isExpandable: Bool = false
     var maxCharCount: Int?
 }
 
@@ -84,6 +86,12 @@ struct InfoTextField: View {
                     Text(" *")
                         .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(Color(alertColor))
+                } else {
+                    if data.showOptionalTitle {
+                        Text(" (Optional)")
+                            .font(.system(size: 13))
+                            .foregroundColor(Color(infoTextColor))
+                    }
                 }
                 
                 Spacer()
@@ -96,7 +104,8 @@ struct InfoTextField: View {
             }
             .padding(.bottom, 20)
             
-            TextField(data.placeholder, text: $text)
+            textField
+                .lineLimit(data.isExpandable ? 7 : 1)
                 .font(.system(size: 15))
                 .textFieldStyle(PlainTextFieldStyle())
                 .onChange(of: text) { newText in
@@ -104,6 +113,13 @@ struct InfoTextField: View {
                     charCount = newText.count
                     if charCount >= limitedCharCount {
                         text = String(newText.prefix(limitedCharCount))
+                    }
+                }
+                .onAppear {
+                    guard let limitedCharCount = data.maxCharCount else { return }
+                    charCount = text.count
+                    if charCount >= limitedCharCount {
+                        text = String(text.prefix(limitedCharCount))
                     }
                 }
                 .foregroundColor(Color(textFieldTextColor))
@@ -122,6 +138,32 @@ struct InfoTextField: View {
                     .accessibilityIdentifier(descriptionTextAccessibilityId ?? "descriptionTextAccessibilityId")
             }
         }
-        .padding(EdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 16))
+    }
+    
+    
+    private var textField: TextField<Text> {
+        if #available(iOS 16.0, *) {
+            return TextField(data.placeholder, text: $text, axis: .vertical)
+        } else {
+            return TextField(data.placeholder, text: $text)
+        }
     }
 }
+
+
+struct TestInfoTextField: View {
+    @State var dataModel = InfoTextFieldModel(title: "Hello", placeholder: "Hello", isMandatory: false, showOptionalTitle: true, isExpandable: true, maxCharCount: 180)
+    @State var text: String = ""
+    @State var isVaild: Bool = true
+    
+    var body: some View {
+        InfoTextField(data: $dataModel, text: $text, isValid: $isVaild)
+    }
+}
+
+
+#if DEBUG
+#Preview(body: {
+    TestInfoTextField()
+})
+#endif

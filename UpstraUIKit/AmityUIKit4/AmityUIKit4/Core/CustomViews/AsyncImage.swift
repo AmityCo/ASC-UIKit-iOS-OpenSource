@@ -9,11 +9,11 @@ import SwiftUI
 import UIKit
 
 struct AsyncImage: View {
-    let placeholder: ImageResource
+    let placeholder: ImageResource?
     let url: URL?
     let contentMode: ContentMode
     
-    init(placeholder: ImageResource, url: URL?, contentMode: ContentMode = .fill) {
+    init(placeholder: ImageResource? = nil, url: URL?, contentMode: ContentMode = .fill) {
         self.placeholder = placeholder
         self.url = url
         self.contentMode = contentMode
@@ -23,9 +23,11 @@ struct AsyncImage: View {
         GeometryReader { proxy in
             KFImage.url(url)
                 .placeholder {
-                    Image(placeholder)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                    if let placeholder {
+                        Image(placeholder)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    }
                 }
                 .resizable()
                 .loadDiskFileSynchronously()

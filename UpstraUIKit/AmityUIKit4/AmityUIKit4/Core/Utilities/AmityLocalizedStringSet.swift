@@ -16,9 +16,14 @@ public struct AmityLocalizedStringSet {
         static let save = "save"
         static let retry = "retry"
         static let discard = "discard"
+        static let leave = "leave"
+        static let confirm = "confirm"
+        static let okay = "okay"
         static let anonymous = "general_anonymous"
         static let permissionRequired = "permission_required"
         static let cameraAccessDenied = "camera_access_denied"
+        static let on = "on"
+        static let off = "off"
     }
     
     public struct Story {
@@ -133,7 +138,64 @@ public struct AmityLocalizedStringSet {
         static let communityPageJoinTitle = "community_page_join_title"
         static let communityPagePendingPostTitle = "community_page_pending_post_title"
         static let nonMemberReactPostMessage = "non_member_react_post_message"
-
+        static let communitySetupAlertTitle = "community_setup_alert_title"
+        static let communitySetupAlertMessage = "community_setup_alert_message"
+        static let communitySetupEditAlertTitle = "community_setup_edit_alert_title"
+        static let communitySetupEditAlertMessage = "community_setup_edit_alert_message"
+        
+        static let communitySettingBasicInfoTitle = "community_setting_basic_info_title"
+        static let communitySettingCommunityPermissionsTitle = "community_setting_community_permissions_title" 
+        static let communitySettingEditProfile = "community_setting_edit_profile";
+        static let communitySettingMembers = "community_setting_members";
+        static let communitySettingNotifications = "community_setting_notifications";
+        static let communitySettingPostPermissions = "community_setting_post_permissions";
+        static let communitySettingStoryComments = "community_setting_story_comments";
+        static let communitySettingLeaveCommunity = "community_setting_leave_community";
+        static let communitySettingCloseCommunity = "community_setting_close_community";
+        static let communitySettingCloseCommunityDescription = "community_setting_close_community_description";
+        
+        static let communitySettingLeaveCommunityAlertTitle = "community_setting_leave_community_alert_title"
+        static let communitySettingLeaveCommunityAlertMessage = "community_setting_leave_community_alert_message"
+        static let communitySettingLeaveCommunityFailedAlertTitle = "community_setting_leave_community_failed_alert_title"
+        static let communitySettingLeaveCommunityFailedAlertMessage = "community_setting_leave_community_failed_alert_message"
+        static let communitySettingCloseCommunityAlertTitle = "community_setting_close_community_alert_title"
+        static let communitySettingCloseCommunityAlertMessage = "community_setting_close_community_alert_message"
+        
+        static let communityPostPermissionTitle = "community_post_permission_title"
+        static let communityPostPermissionDescription = "community_post_permission_description"
+        static let communityPostPermissionEveryoneCanPostSetting = "community_post_permission_everyone_can_post_setting"
+        static let communityPostPermissionAdminReviewSetting = "community_post_permission_admin_review_setting"
+        static let communityPostPermissionOnlyAdminCanPostSetting = "community_post_permission_only_admin_can_post_setting"
+        static let communityStorySettingTitle = "community_story_setting_title"
+        static let communityStorySettingDescription = "community_story_setting_description"
+        
+        static let communityNotificationSettingPageTitle = "community_notification_setting_page_title"
+        static let communityNotificationSettingTitle = "community_notification_setting_title"
+        static let communityNotificationSettingDescription = "community_notification_setting_description"
+        static let communityNotificationSettingPosts = "community_notification_setting_posts"
+        static let communityNotificationSettingComments = "community_notification_setting_comments"
+        static let communityNotificationSettingStories = "community_notification_setting_stories"
+        
+        static let communityNotificationSettingOptionEveryone = "community_notification_setting_option_everyone"
+        static let communityNotificationSettingOptionOnlyModerator = "community_notification_setting_option_only_moderator"
+        static let communityNotificationSettingOptionOff = "community_notification_setting_option_off"
+        
+        static let communityNotificationSettingPostReactionTitle = "community_notification_setting_post_reaction_title"
+        static let communityNotificationSettingPostReactionDescription = "community_notification_setting_post_reaction_description"
+        static let communityNotificationSettingPostCreationTitle = "community_notification_setting_post_creation_title"
+        static let communityNotificationSettingPostCreationDescription = "community_notification_setting_post_creation_description"
+        static let communityNotificationSettingCommentReactionTitle = "community_notification_setting_comment_reaction_title"
+        static let communityNotificationSettingCommentReactionDescription = "community_notification_setting_comment_reaction_description"
+        static let communityNotificationSettingCommentCreationTitle = "community_notification_setting_comment_creation_title"
+        static let communityNotificationSettingCommentCreationDescription = "community_notification_setting_comment_creation_description"
+        static let communityNotificationSettingCommentReplyTitle = "community_notification_setting_comment_reply_title"
+        static let communityNotificationSettingCommentReplyDescription = "community_notification_setting_comment_reply_description"
+        static let communityNotificationSettingStoryCreationTitle = "community_notification_setting_story_creation_title"
+        static let communityNotificationSettingStoryCreationDescription = "community_notification_setting_story_creation_description"
+        static let communityNotificationSettingStoryReactionTitle = "community_notification_setting_story_reaction_title"
+        static let communityNotificationSettingStoryReactionDescription = "community_notification_setting_story_reaction_Description"
+        static let communityNotificationSettingStoryCommentTitle = "community_notification_setting_story_comment_title"
+        static let communityNotificationSettingStoryCommentDescription = "community_notification_setting_story_comment_description"
     }
     
 }

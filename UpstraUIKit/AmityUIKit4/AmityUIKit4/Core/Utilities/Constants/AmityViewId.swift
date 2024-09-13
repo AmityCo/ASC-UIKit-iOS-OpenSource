@@ -26,6 +26,17 @@ public enum PageId: String {
     case myCommunitiesSearchPage = "my_communities_search_page"
     
     case communityProfilePage = "community_profile_page"
+    case communitySetupPage = "community_setup_page"
+    case communityAddCategoryPage = "community_add_category_page"
+    case communityAddUserPage = "community_add_user_page"
+    case communitySettingPage = "community_setting_page"
+    case communityMembershipPage = "community_membership_page"
+    case communityNotificationSettingPage = "community_notification_page"
+    case communityPostPermissionPage = "community_post_permission_page"
+    case communityStorySettingPage = "community_story_setting_page"
+    case communityPostsNotificationSettingPage = "community_posts_notification_page"
+    case communityCommentsNotificationSettingPage = "community_comments_notification_page"
+    case communityPendingPostPage = "pending_posts_page"
 }
 
 public enum ComponentId: String {

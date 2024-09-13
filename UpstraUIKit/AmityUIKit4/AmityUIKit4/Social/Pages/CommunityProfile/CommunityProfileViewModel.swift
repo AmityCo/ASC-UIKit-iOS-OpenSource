@@ -17,13 +17,17 @@ public class CommunityProfileViewModel: ObservableObject {
     
     @Published var headerHeight: CGFloat = 0
     @Published var stories: [AmityStory] = []
+    @Published var pendingPostCount: Int = 0
+    @Published var shouldShowPendingBanner: Bool = false
     
     private let communityManger = CommunityManager()
     private let storyManager = StoryManager()
     private let communityId: String
     private let postManager = PostManager()
+    private let feedManager = FeedManager()
 
     private var communityToken: AmityNotificationToken?
+    private var pendingPostToken: AmityNotificationToken?
     private var storyToken: AmityNotificationToken?
     private var pinnedPostToken: AmityNotificationToken?
     
@@ -37,23 +41,38 @@ public class CommunityProfileViewModel: ObservableObject {
         self.communityId = communityId
         self.postFeedViewModel = PostFeedViewModel(feedType: .community(communityId: communityId))
         
+        loadCommunity()
+        loadStories()
+        loadPinnedFeed()
+        
+        Task { @MainActor in
+            hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: communityId)
+        }
+    }
+    
+    func loadCommunity() {
+        communityToken = nil
         communityToken = communityManger.getCommunity(withId: communityId).observe { [weak self] community, error in
             guard let communityObject = community.snapshot else { return }
             let community = AmityCommunityModel(object: communityObject)
             self?.community = community
+            
+            self?.pendingPostCount = community.pendingPostCount
         }
         
+        
+        pendingPostToken = nil
+        pendingPostToken = feedManager.getPendingCommunityFeedPosts(communityId: communityId).observe{ [weak self] collection, change, error in
+            self?.shouldShowPendingBanner = collection.count() != 0
+        }
+    }
+    
+    func loadStories() {
+        storyToken = nil
         storyToken = storyManager.getActiveStories(in: communityId).observe({ [weak self] collection, _, error in
             let stories = collection.snapshots
             self?.stories = stories
         })
-        
-        Task {
-            hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: communityId)
-        }
-
-        loadPinnedFeed()
-        
     }
     
     func loadPinnedFeed() {
@@ -84,19 +103,15 @@ public class CommunityProfileViewModel: ObservableObject {
     }
     
     func refreshFeed(currentTab: Int) {
+        loadCommunity()
+        loadStories()
+        
         if currentTab == 0 {
             loadPinnedFeed()
             postFeedViewModel.loadFeed(feedType: .community(communityId: communityId))
         } else {
             loadPinnedFeed()
         }
-    }
-    
-    func getPendingPostCount() -> Int {
-        guard let community = community, community.isPostReviewEnabled else {
-            return 0
-        }
-        return community.object.getPostCount(feedType: .reviewing)
     }
     
     func updateHeaderHeight(height: CGFloat) {
@@ -106,12 +121,5 @@ public class CommunityProfileViewModel: ObservableObject {
     @MainActor
     func joinCommunity() async throws {
         try await communityManger.joinCommunity(withId: communityId)
-    }
-    
-    func hasModeratorRole() -> Bool {
-        if let communityMember = community?.object.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
-            return communityMember.hasModeratorRole
-        }
-        return false
     }
 }

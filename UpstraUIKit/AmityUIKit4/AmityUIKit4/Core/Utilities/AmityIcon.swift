@@ -20,6 +20,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case statusLoadingIcon = "statusLoadingIcon"
     case defaultCommunityAvatar = "defaultCommunityAvatar"
     case flagIcon = "flagIcon"
+    case unflagIcon = "unflagIcon"
     case lockIcon = "lockIcon"
     case lockBlackIcon = "lockBlackIcon"
     
@@ -128,6 +129,19 @@ enum AmityIcon: String, ImageResourceProvider {
     case communityPinBadge = "communityPinBadge"
     case communityProfileEmptyPostIcon = "communityProfileEmptyPostIcon"
     case communityPendingPostIcon = "communityPendingPostIcon"
+    case brandBadge = "brandBadgeIcon"
+    case globeIcon = "globeIcon"
+    case checkboxIcon = "checkBoxIcon"
+    case penIcon = "penIcon"
+    case memberIcon = "memberIcon"
+    case notificationIcon = "notificationIcon"
+    case postPermissionIcon = "postPermissionIcon"
+    case cameraIcon = "cameraIcon"
+    case communityMemberIcon = "communityMemberIcon"
+    case communityModeratorIcon = "communityModeratorIcon"
+    case postMenuIcon = "postMenuIcon"
+    case commentMenuIcon = "commentMenuIcon"
+    case emptyPendingPostIcon = "emptyPendingPostIcon"
 
     func getURL() -> URL {
         let path = AmityUIKit4Manager.bundle.path(forResource: self.rawValue, ofType: ".svg")

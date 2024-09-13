@@ -124,7 +124,7 @@ class PostFeedViewModel: ObservableObject {
     }
     
     @objc private func didPostCreated(_ notification: Notification) {
-        if let object = notification.object as? AmityPost, feedType == .globalFeed {
+        if let object = notification.object as? AmityPost, feedType == .globalFeed, let community = object.targetCommunity, !community.isPostReviewEnabled {
             /// Ensure recentlyCreatedPosts is not having the post to prevent duplication in data source
             if !recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
                 recentlyCreatedPosts.append(object)

@@ -35,4 +35,10 @@ open class AmitySocialHomePageBehavior {
         context.page.host.controller?.present(vc, animated: false)
     }
     
+//    open func goToCommunitySetupPage(context: AmitySocialHomePageBehavior.Context) {
+//        let page = AmityCommunitySetupPage(mode: .create)
+//        let vc = AmitySwiftUIHostingController(rootView: page)
+//        vc.modalPresentationStyle = .overFullScreen
+//        context.page.host.controller?.present(vc, animated: false)
+//    }
 }

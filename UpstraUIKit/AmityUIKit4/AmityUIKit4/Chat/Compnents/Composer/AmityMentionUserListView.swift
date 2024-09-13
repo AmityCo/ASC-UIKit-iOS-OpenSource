@@ -75,6 +75,14 @@ struct AmityMentionUserItemView: View {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .accessibilityIdentifier(AccessibilityID.Chat.MentionList.userDisplayName)
                 
+                if user.isBrand {
+                    Image(AmityIcon.brandBadge.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 18, height: 18)
+                        .padding(.leading, 4)
+                }
+                
                 Spacer()
                 
                 if user.isChannelMention {

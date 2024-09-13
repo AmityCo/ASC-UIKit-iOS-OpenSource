@@ -63,7 +63,7 @@ public struct AmityCommentTrayComponent: AmityComponentView {
                 .isHidden(commentCoreViewModel.hideCommentButtons, remove: true)
         }
         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
-                     height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? 204 : 148,
+                     height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? .fixed(204) : .fixed(148),
                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
                 commentCoreViewModel.editingComment = comment

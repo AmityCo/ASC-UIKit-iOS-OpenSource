@@ -168,7 +168,7 @@ public struct AmityViewStoryPage: AmityPageView {
                     storyCoreViewModel.playVideo = !value
                 }
                 .onChange(of: showToast) { value in
-                    Toast.showToast(style: viewModel.toastStyle, message: viewModel.toastMessage)
+                    Toast.showToast(style: viewModel.toastStyle, message: viewModel.toastMessage, bottomPadding: 70)
                 }
                 .onReceive(viewModel.$storyTargets) { value in
                     if case .globalFeed(let communityId) = storyPageType {

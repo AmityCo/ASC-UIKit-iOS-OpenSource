@@ -79,7 +79,7 @@ public struct AmityPostDetailPage: AmityPageView {
                             .frame(width: 24, height: 24)
                     })
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
-                    .bottomSheet(isShowing: $showBottomSheet, height: bottomSheetHeight, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                    .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                         PostBottomSheetView(isShown: $showBottomSheet, post: postModel) {
                             host.controller?.navigationController?.popViewController(animated: true)
                         } editPostActionCompletion: {
@@ -124,7 +124,7 @@ public struct AmityPostDetailPage: AmityPageView {
                             viewModel: commentCoreViewModel,
                             commentButtonAction: self.commentButtonAction(_:))
             .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
-                         height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? 204 : 148,
+                         height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? .fixed(204) : .fixed(148),
                          backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                 CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
                     commentCoreViewModel.editingComment = comment

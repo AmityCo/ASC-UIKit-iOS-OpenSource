@@ -32,6 +32,7 @@ struct PostContentMediaView: View {
                             })
                             .environment(\.urlImageOptions, URLImageOptions.amityOptions)
                         )
+                        .compositingGroup()
                         .clipped()
                         .contentShape(Rectangle())
                         .onTapGesture {

@@ -44,14 +44,28 @@ class PostManager {
         return postRepository.getPinnedPosts(communityId: communityId, placement: nil, sortBy: .lastPinned)
     }
     
-    @discardableResult
-    func createTextPost(text: String, communityId: String?, metadata: [String: Any]?, mentionees: AmityMentioneesBuilder?) async throws -> AmityPost {
-        
-        let targetType: AmityPostTargetType = communityId == nil ? .user : .community
+    func approvePost(postId: String) async throws -> Bool {
+        try await postRepository.approvePost(withId: postId)
+    }
     
-        let textPostBuilder = AmityTextPostBuilder()
-        textPostBuilder.setText(text)
-        
-        return try await postRepository.createTextPost(textPostBuilder, targetId: communityId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+    func declinePost(postId: String) async throws -> Bool {
+        try await postRepository.declinePost(withId: postId)
+    }
+    
+    func createPost(_ builder: any AmitySDK.AmityPostBuilder, targetId: String?, targetType: AmitySDK.AmityPostTargetType, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
+        if let mentionees, let metadata {
+            try await postRepository.createPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+        } else {
+            try await postRepository.createPost(builder, targetId: targetId, targetType: targetType)
+        }
+    }
+    
+    @discardableResult
+    func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
+        if let mentionees, let metadata {
+            try await postRepository.editPost(withId: withId, builder: builder, metadata: metadata, mentionees: mentionees)
+        } else {
+            try await postRepository.editPost(withId: withId, builder: builder)
+        }
     }
 }

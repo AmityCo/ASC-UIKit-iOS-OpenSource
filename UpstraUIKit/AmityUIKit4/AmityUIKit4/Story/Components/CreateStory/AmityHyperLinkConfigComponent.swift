@@ -50,7 +50,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
     
     public var body: some View {
         NavigationView {
-            VStack {
+            VStack(spacing: 16) {
                 Rectangle()
                     .frame(height: 1)
                     .foregroundColor(Color(viewConfig.theme.baseColorShade4))
@@ -97,6 +97,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                 Spacer()
             }
             .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+            .padding([.leading, .trailing], 16)
             .navigationTitle("Add link")
             .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.titleTextView)
             .navigationBarTitleDisplayMode(.inline)

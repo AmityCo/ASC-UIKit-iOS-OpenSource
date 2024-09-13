@@ -8,7 +8,7 @@
 import SwiftUI
 
 public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
-    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     public var pageId: PageId?
     
     public var id: ComponentId {
@@ -55,9 +55,15 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
             
             if selectedTab != .explore {
                 Button(action: {
-                    withoutAnimation {
-                        showPostCreationMenu.toggle()
+                    
+                    if selectedTab == .myCommunities {
+                        goToCommunitySetupPage()
+                    } else {
+                        withoutAnimation {
+                            showPostCreationMenu.toggle()
+                        }
                     }
+                    
                 }, label: {
                     VStack {
                         let createButtonIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .postCreationButton, key: "icon", of: String.self) ?? "")
@@ -79,7 +85,15 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
     }
+    
+    
+    private func goToCommunitySetupPage() {
+        let context = AmitySocialHomeTopNavigationComponentBehavior.Context(component: self)
+        AmityUIKitManagerInternal.shared.behavior.socialHomeTopNavigationComponentBehavior?.goToCreateCommunityPage(context: context)
+    }
 }
+
+
 
 #if DEBUG
 #Preview {

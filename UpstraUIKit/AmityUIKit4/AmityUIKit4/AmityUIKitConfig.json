@@ -294,6 +294,16 @@
     "social_global_search_page/community_search_result/community_category_name": {},
     "social_global_search_page/community_search_result/community_members_count": {},
     "social_global_search_page/user_search_result/*": {},
+    "my_communities_search_page/*/community_avatar": {},
+    "my_communities_search_page/*/community_display_name": {},
+    "my_communities_search_page/*/community_private_badge": {
+        "icon": "lockBlackIcon"
+    },
+    "my_communities_search_page/*/community_official_badge": {
+        "icon": "verifiedBadge"
+    },
+    "my_communities_search_page/*/community_category_name": {},
+    "my_communities_search_page/*/community_members_count": {},
 
     "message_reaction_list_page/*/*": { },
     "message_reaction_list_page/message_reaction_list_header/*": { },

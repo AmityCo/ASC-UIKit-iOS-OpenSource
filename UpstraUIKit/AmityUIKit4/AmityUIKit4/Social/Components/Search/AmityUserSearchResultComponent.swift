@@ -17,7 +17,6 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
         .userSearchResultComponent
     }
     
-    
     @ObservedObject private var viewModel: AmityGlobalSearchViewModel
     @StateObject private var viewConfig: AmityViewConfigController
     
@@ -93,7 +92,7 @@ struct UserCellView: View {
     }
     
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 0) {
             AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: user.getAvatarInfo()?.fileURL ?? ""))
                 .frame(size: CGSize(width: 40, height: 40))
                 .clipShape(Circle())
@@ -102,6 +101,14 @@ struct UserCellView: View {
                 .font(.system(size: 15, weight: .semibold))
                 .lineLimit(1)
                 .foregroundColor(Color(viewConfig.theme.baseColor))
+                .padding(.leading, 16)
+                        
+            Image(AmityIcon.brandBadge.imageResource)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 18, height: 18)
+                .padding(.leading, 4)
+                .opacity(user.isBrand ? 1 : 0)
             
             Spacer()
         }

@@ -202,7 +202,16 @@ public struct AmityPostComposerPage: AmityPageView {
                         let post = try await viewModel.createPost(medias: mediaAttatchmentViewModel.medias, files: [])
                         postCreationToastAlphaValue = 0.0
                         
-                        host.controller?.navigationController?.dismiss(animated: true)
+                        host.controller?.navigationController?.dismiss(animated: true, completion: {
+                            if post.getFeedType() == .reviewing {
+                                let alertController = UIAlertController(title: "Your post has been submitted to the pending list. It will be reviewed by community moderator.", message: "", preferredStyle: .alert)
+                                
+                                let okAction = UIAlertAction(title: AmityLocalizedStringSet.General.okay.localizedString, style: .cancel)
+                                alertController.addAction(okAction)
+                                
+                                UIApplication.topViewController()?.present(alertController, animated: true)
+                            }
+                        })
                         
                         /// Send didPostCreated event to mod global feed listing
                         /// This event is observed in PostFeedViewModel
@@ -252,7 +261,7 @@ public struct AmityPostComposerPage: AmityPageView {
 
 class AmityPostComposerViewModel: ObservableObject {
     private let communityManager = CommunityManager()
-    private let postRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let postManager = PostManager()
     private let targetId: String?
     private let community: AmityCommunityModel?
     private let post: AmityPostModel?
@@ -332,11 +341,7 @@ class AmityPostComposerViewModel: ObservableObject {
             postBuilder = textPostBuilder
         }
         
-        if let mentionees = mentionData.mentionee {
-            return try await postRepository.createPost(postBuilder, targetId: targetId, targetType: targetType, metadata: mentionData.metadata, mentionees: mentionees)
-        } else {
-            return try await postRepository.createPost(postBuilder, targetId: targetId, targetType: targetType)
-        }
+        return try await postManager.createPost(postBuilder, targetId: targetId, targetType: targetType, metadata: mentionData.metadata, mentionees: mentionData.mentionee)
     }
     
 
@@ -384,12 +389,7 @@ class AmityPostComposerViewModel: ObservableObject {
         
         
         if let postId = post?.postId {
-            if let mentionees = mentionData.mentionee {
-                try await postRepository.editPost(withId: postId, builder: postBuilder, metadata: mentionData.metadata, mentionees: mentionees)
-            } else {
-                try await postRepository.editPost(withId: postId, builder: postBuilder)
-
-            }
+            try await postManager.editPost(withId: postId, builder: postBuilder, metadata: mentionData.metadata, mentionees: mentionData.mentionee)
         }
     }
     

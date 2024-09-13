@@ -103,10 +103,20 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .font(.system(size: 15, weight: .semibold))
                             .lineLimit(1)
                             .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .layoutPriority(1)
                             .onTapGesture {
                                 let context = AmityPostContentComponentBehavior.Context(component: self)
                                 AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToUserProfilePage(context: context)
                             }
+                        
+                        if post.isFromBrand {
+                            Image(AmityIcon.brandBadge.imageResource)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 18, height: 18)
+                                .padding(.leading, -4)
+                                .opacity(post.isFromBrand ? 1 : 0)
+                        }
                         
                         if let _ = post.targetCommunity, !hideTarget {
                             HStack(spacing: 8) {
@@ -115,18 +125,22 @@ public struct AmityPostContentComponent: AmityComponentView {
                                     .aspectRatio(contentMode: .fit)
                                     .frame(size: CGSize(width: 10, height: 10))
                                 
-                                Text(post.targetCommunity?.displayName ?? "Unknown")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .lineLimit(1)
-                                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                                    .onTapGesture {
-                                        let context = AmityPostContentComponentBehavior.Context(component: self)
-                                        AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
-                                    }
+                                communityNameLabel
+                            }
+                        }
+                        
+                        // If user posts to his own feed, we hide this part
+                        if post.postTargetType == .user && post.postedUserId != post.targetId {
+                            HStack(spacing: 8) {
+                                Image(AmityIcon.arrowIcon.getImageResource())
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(size: CGSize(width: 10, height: 10))
+                                
+                                userNameLabel
                             }
                         }
                     }
-                    
                     
                     HStack(spacing: 4) {
                         if post.isModerator && !viewConfig.isHidden(elementId: .moderatorBadge) {
@@ -184,7 +198,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     })
                     .buttonStyle(BorderlessButtonStyle())
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
-                    .bottomSheet(isShowing: $showBottomSheet, height: bottomSheetHeight, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                    .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                         PostBottomSheetView(isShown: $showBottomSheet, post: post, editPostActionCompletion: {
                             showBottomSheet.toggle()
                             
@@ -486,7 +500,57 @@ public struct AmityPostContentComponent: AmityComponentView {
         
         return baseBottomSheetHeight + additionalHeight
     }
+}
+
+extension AmityPostContentComponent {
     
+    @ViewBuilder
+    var communityNameLabel: some View {
+        HStack(spacing: 8) {
+            if !post.isTargetPublicCommunity {
+                Image(AmityIcon.getImageResource(named: "lockBlackIcon"))
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+            }
+            
+            Text(post.targetCommunity?.displayName ?? "Unknown")
+                .font(.system(size: 15, weight: .semibold))
+                .lineLimit(1)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .layoutPriority(1)
+                .onTapGesture {
+                    let context = AmityPostContentComponentBehavior.Context(component: self)
+                    AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
+                }
+            
+            if post.isTargetOfficialCommunity {
+                let verifiedBadgeIcon = AmityIcon.getImageResource(named: "verifiedBadge")
+                Image(verifiedBadgeIcon)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 16, height: 16)
+                    .isHidden(viewConfig.isHidden(elementId: .communityOfficialBadge))
+            }
+        }
+    }
+    
+    @ViewBuilder
+    var userNameLabel: some View {
+        HStack(spacing: 8) {
+            
+            Text(post.targetUser?.displayName ?? "Unknown")
+                .font(.system(size: 15, weight: .semibold))
+                .lineLimit(1)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .layoutPriority(1)
+                .onTapGesture {
+                    let context = AmityPostContentComponentBehavior.Context(component: self)
+                    AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
+                }
+        }
+    }
+
 }
 
 

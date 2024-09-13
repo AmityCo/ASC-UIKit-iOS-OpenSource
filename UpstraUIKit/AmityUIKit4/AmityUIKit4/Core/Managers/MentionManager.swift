@@ -26,6 +26,7 @@ public struct AmityMentionUserModel {
     let avatarURL: String
     let isGlobalBan: Bool
     let isChannelMention: Bool
+    let isBrand: Bool
     
     var type: AmityMessageMentionType {
         return isChannelMention ? .channel : .user
@@ -37,6 +38,7 @@ public struct AmityMentionUserModel {
         self.avatarURL = user.getAvatarInfo()?.fileURL ?? ""
         self.isGlobalBan = user.isGlobalBanned
         self.isChannelMention = false
+        self.isBrand = user.isBrand
     }
     
     internal init(userId: String, displayName: String, avatarURL: String, isGlobalBan: Bool, isChannelMention: Bool) {
@@ -45,6 +47,7 @@ public struct AmityMentionUserModel {
         self.avatarURL = avatarURL
         self.isGlobalBan = isGlobalBan
         self.isChannelMention = isChannelMention
+        self.isBrand = false
     }
     
     static let channelMention = AmityMentionUserModel(userId: "", displayName: "All", avatarURL: AmityIcon.Chat.mentionAll.rawValue, isGlobalBan: false, isChannelMention: true)

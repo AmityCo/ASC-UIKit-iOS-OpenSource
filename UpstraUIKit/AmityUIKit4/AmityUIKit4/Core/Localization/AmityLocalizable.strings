@@ -14,9 +14,14 @@
 "retry" = "Retry";
 "delete" = "Delete";
 "discard" = "Discard";
+"leave" = "Leave";
+"confirm" = "Confirm";
+"okay" = "OK";
 "general_anonymous" = "Anonymous";
 "permission_required" = "Permission Required!!";
 "camera_access_denied" = "Please grant camera permission in iOS settings.";
+"on" = "On";
+"off" = "Off";
 
 // Create Story
 "created_story_successfully" = "Successfully shared story";
@@ -126,3 +131,60 @@
 "reach_mention_limit_title" = "Unable to mention user";
 "chat_reach_mention_limit_Message" = "You have reached maximum 30 mentioned users in a chat.";
 "ads_sponsored_label" = "Sponsored";
+"community_setup_alert_title" = "Leave without finishing?";
+"community_setup_alert_message" = "Your progress won’t be saved and your community won’t be created.";
+"community_setup_edit_alert_title" = "Unsaved changes";
+"community_setup_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+
+// Community Setting
+"community_setting_basic_info_title" = "Basic Info";
+"community_setting_community_permissions_title" = "Community permissions";
+"community_setting_edit_profile" = "Edit Profile";
+"community_setting_members" = "Members";
+"community_setting_notifications" = "Notifications";
+"community_setting_post_permissions" = "Post permissions";
+"community_setting_story_comments" = "Story comments";
+"community_setting_leave_community" = "Leave community";
+"community_setting_close_community" = "Close community";
+"community_setting_close_community_description" = "Closing this community will remove the community  page and all its content and comments.";
+
+"community_setting_leave_community_alert_title" = "Leave community";
+"community_setting_leave_community_alert_message" = "Leave the community. You will no longer be able to post and interact in this community.";
+"community_setting_leave_community_failed_alert_title" = "Unable to leave community";
+"community_setting_leave_community_failed_alert_message" = "You’re the only moderator in this group. To leave community, nominate other members to moderator role.";
+"community_setting_close_community_alert_title" = "Close community?";
+"community_setting_close_community_alert_message" = "All members will be removed from the community. All posts, messages, reactions, and media shared in community will be deleted. This cannot be undone.";
+"community_post_permission_title" = "Who can post on this community";
+"community_post_permission_description" = "You can control who can create posts in your community.";
+"community_post_permission_everyone_can_post_setting" = "Everyone can post";
+"community_post_permission_admin_review_setting" = "Admin review post";
+"community_post_permission_only_admin_can_post_setting" = "Only admins can post";
+"community_story_setting_title" = "Allow comments on community stories";
+"community_story_setting_description" = "Turn on to receive comments on stories in this community.";
+
+
+"community_notification_setting_page_title" = "Notifications";
+"community_notification_setting_title" = "Allow notifications";
+"community_notification_setting_description" = "Turn on to receive push notifications from this community.";
+"community_notification_setting_posts" = "Posts";
+"community_notification_setting_comments" = "Comments";
+"community_notification_setting_stories" = "Stories";
+"community_notification_setting_option_everyone" = "Everyone";
+"community_notification_setting_option_only_moderator" = "Only moderator";
+"community_notification_setting_option_off" = "Off";
+"community_notification_setting_post_reaction_title" = "React posts";
+"community_notification_setting_post_reaction_description" = "Receive notifications when someone make a reaction to your posts in this community.";
+"community_notification_setting_post_creation_title" = "New posts";
+"community_notification_setting_post_creation_description" = "Receive notifications when someone create new posts in this community.";
+"community_notification_setting_comment_reaction_title" = "React comments";
+"community_notification_setting_comment_reaction_description" = "Receive notifications when someone like your comment in this community.";
+"community_notification_setting_comment_creation_title" = "New comments";
+"community_notification_setting_comment_creation_description" = "Receive notifications when someone comment to your posts in this community.";
+"community_notification_setting_comment_reply_title" = "Replies";
+"community_notification_setting_comment_reply_description" = "Receive notifications when someone comment to your comments in this community.";
+"community_notification_setting_story_creation_title" = "New stories";
+"community_notification_setting_story_creation_description" = "Receive notifications when someone creates a new story in this community.";
+"community_notification_setting_story_reaction_title" = "Story reactions";
+"community_notification_setting_story_reaction_Description" = "Receive notifications when someone reacts to your story in this community.";
+"community_notification_setting_story_comment_title" = "Story comments";
+"community_notification_setting_story_comment_description" = "Receive notifications when someone comments on your story in this community.";

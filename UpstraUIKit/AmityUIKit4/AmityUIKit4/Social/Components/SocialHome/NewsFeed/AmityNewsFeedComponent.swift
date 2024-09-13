@@ -141,9 +141,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
         
         if visiblePercentage > 60 && !postFeedViewModel.seenPostIds.contains(post.postId) {
             postFeedViewModel.seenPostIds.insert(post.postId)
-            DispatchQueue.main.async {
-                post.analytic.markAsViewed()
-            }
+            post.analytic.markAsViewed()
         }
     }
 }

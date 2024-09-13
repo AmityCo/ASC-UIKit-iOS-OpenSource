@@ -181,7 +181,7 @@ struct SocialUIKitPage: View {
             
             AmitySocialHomePage()
         }
-        .padding(.top, 55)
+        .padding(.top, UIDevice.hasNotch ? 50 : 15)
         .background(colorScheme == .dark ? Color(UIColor(hex: "#191919")) : Color(UIColor(hex: "#FFFFFF")))
         .ignoresSafeArea()
     }

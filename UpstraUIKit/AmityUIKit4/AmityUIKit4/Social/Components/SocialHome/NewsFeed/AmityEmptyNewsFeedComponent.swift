@@ -8,6 +8,7 @@
 import SwiftUI
 
 public struct AmityEmptyNewsFeedComponent: AmityComponentView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     public var pageId: PageId?
     
     public var id: ComponentId {
@@ -70,7 +71,9 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
                 .foregroundColor(Color(viewConfig.theme.primaryColor))
                 .padding(.top, 14)
                 .onTapGesture {
-                    Log.add(event: .info, "Create Community")
+                    let page = AmityCommunitySetupPage(mode: .create)
+                    let vc = AmitySwiftUIHostingController(rootView: page)
+                    host.controller?.navigationController?.pushViewController(vc, animation: .presentation)
                 }
                 .isHidden(viewConfig.isHidden(elementId: .createCommunityButton))
         }

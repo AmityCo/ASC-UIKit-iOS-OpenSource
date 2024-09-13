@@ -38,6 +38,7 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
                             viewModel.searchType = value == 0 ? .community : .user
                             viewModel.searchKeyword = viewModel.searchKeyword
                         }
+                        .padding(.horizontal)
                         
                     Rectangle()
                         .fill(Color(viewConfig.theme.baseColorShade4))
@@ -113,7 +114,6 @@ struct TabBarView: View {
                     
                 })
             }
-            .padding(.horizontal)
         }
     }
 }

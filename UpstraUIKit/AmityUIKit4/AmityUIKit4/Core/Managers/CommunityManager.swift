@@ -24,4 +24,32 @@ class CommunityManager {
     func joinCommunity(withId: String) async throws -> Bool {
         return try await communityRepository.joinCommunity(withId: withId)
     }
+    
+    func getCategories() -> AmityCollection<AmityCommunityCategory> {
+        communityRepository.getCategories(sortBy: .displayName, includeDeleted: false)
+    }
+    
+    func createCommunity(_ createOptions: AmityCommunityCreateOptions) async throws -> AmityCommunity {
+        try await communityRepository.createCommunity(with: createOptions)
+    }
+    
+    @discardableResult
+    func editCommunity(withId: String, updateOptions: AmityCommunityUpdateOptions) async throws -> AmityCommunity {
+        try await communityRepository.editCommunity(withId: withId, options: updateOptions)
+    }
+    
+    @discardableResult
+    func leaveCommunity(withId: String) async throws -> Bool {
+        try await communityRepository.leaveCommunity(withId: withId)
+    }
+    
+    func deleteCommunity(withId: String, completion: ((AmityError?) -> Void)?) {
+        communityRepository.deleteCommunity(withId: withId) { success, error in
+            if success {
+                completion?(nil)
+            } else {
+                completion?(AmityError(error: error) ?? .unknown)
+            }
+        }
+    }
 }

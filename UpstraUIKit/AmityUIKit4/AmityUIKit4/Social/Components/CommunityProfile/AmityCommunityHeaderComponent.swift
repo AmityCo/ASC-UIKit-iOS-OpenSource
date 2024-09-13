@@ -43,7 +43,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 .frame(height: 188)
                 .isHidden(viewConfig.isHidden(elementId: .communityCover))
             
-            HStack(alignment: .top, spacing: 0) {
+            HStack(alignment: .top, spacing: 3) {
                 if !community.isPublic {
                     let lockIcon = AmityIcon.lockBlackIcon.imageResource
                     Image(lockIcon)
@@ -146,7 +146,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 .isHidden(!(!viewModel.stories.isEmpty || viewModel.hasStoryManagePermission))
             
             VStack(alignment: .center) {
-                let pendingPostCountString = viewModel.getPendingPostCount() == 1 ? "" : "s"
+                let pendingPostCountString = viewModel.pendingPostCount == 1 ? "" : "s"
                 HStack(alignment: .center,spacing: 7) {
                     Image(AmityIcon.communityPendingPostIcon.imageResource)
                         .renderingMode(.template)
@@ -159,7 +159,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 }
                 .padding(.top, 12)
                 
-                Text("\(viewModel.getPendingPostCount()) post\(pendingPostCountString) need approval")
+                Text(community.hasModeratorRole ? "\(viewModel.pendingPostCount) post\(pendingPostCountString) need approval" : "Your posts are pending for review")
                     .font(.system(size: 13))
                     .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                     .padding(.bottom, 12)
@@ -168,7 +168,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             .background(Color(viewConfig.theme.baseColorShade4))
             .cornerRadius(4)
             .padding([.horizontal, .bottom], 16)
-            .isHidden(!(viewModel.hasModeratorRole() && viewModel.getPendingPostCount() != 0) || viewConfig.isHidden(elementId: .communityPendingPost))
+            .isHidden(!viewModel.shouldShowPendingBanner || !community.isPostReviewEnabled || viewConfig.isHidden(elementId: .communityPendingPost))
             .onTapGesture {
                 onPendingPostsTapAction?()
             }
@@ -190,7 +190,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
     private func getCategoryView(_ categories: [String]) -> some View {
         
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
+            HStack(spacing: 10) {
                 ForEach(Array(categories.enumerated()), id: \.element) { index, category in
                     
                     HStack {

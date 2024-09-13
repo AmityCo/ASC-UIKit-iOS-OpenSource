@@ -150,6 +150,15 @@ public struct AmityTextEditorView: View {
                                                     
                                                     Text(user.displayName)
                                                         .foregroundColor(Color(textColor))
+                                                    
+                                                    if user.isBrand {
+                                                        Image(AmityIcon.brandBadge.imageResource)
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 18, height: 18)
+                                                            .opacity(user.isBrand ? 1 : 0)
+                                                    }
+                                                    
                                                     Spacer()
                                                 }
                                                 .padding([.leading, .trailing], 15)

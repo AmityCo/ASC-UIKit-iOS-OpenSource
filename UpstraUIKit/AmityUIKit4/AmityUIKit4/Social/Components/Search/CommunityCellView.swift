@@ -24,7 +24,6 @@ struct CommunityCellView: View {
         getCommunityView(community)
     }
     
-    
     @ViewBuilder
     private func getCommunityView(_ model: AmityCommunityModel) -> some View {
         
@@ -35,12 +34,16 @@ struct CommunityCellView: View {
                 .isHidden(viewConfig.isHidden(elementId: .communityAvatar))
             
             VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 0) {
+                HStack(spacing: 2) {
                     if !model.isPublic {
                         let lockIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityPrivateBadge, key: "icon", of: String.self) ?? "")
                         Image(lockIcon)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFill()
                             .frame(width: 20, height: 12)
                             .offset(y: -1)
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
                             .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
                     }
                     

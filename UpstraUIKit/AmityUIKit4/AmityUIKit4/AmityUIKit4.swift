@@ -212,6 +212,10 @@ final class AmityUIKitManagerInternal: NSObject {
         let socialHomePageBehavior = AmitySocialHomePageBehavior()
         behavior.socialHomePageBehavior = socialHomePageBehavior
         
+        // SocialHomeTopNavigationComponent
+        let socialHomeTopNavigationComponentBehavior = AmitySocialHomeTopNavigationComponentBehavior()
+        behavior.socialHomeTopNavigationComponentBehavior = socialHomeTopNavigationComponentBehavior
+        
         // MyCommunitiesComponentBehavior
         let myCommunitiesComponentBehavior = AmityMyCommunitiesComponentBehavior()
         behavior.myCommunitiesComponentBehavior = myCommunitiesComponentBehavior
@@ -259,6 +263,22 @@ final class AmityUIKitManagerInternal: NSObject {
         // CommunityProfilePage
         let communityProfilePageBehavior = AmityCommunityProfilePageBehavior()
         behavior.communityProfilePageBehavior = communityProfilePageBehavior
+        
+        // CommunitySetupPage
+        let communitySetupPageBehavior = AmityCommunitySetupPageBehavior()
+        behavior.communitySetupPageBehavior = communitySetupPageBehavior
+        
+        // CommunityMembershipPage
+        let communityMembershipPageBehavior = AmityCommunityMembershipPageBehavior()
+        behavior.communityMembershipPageBehavior = communityMembershipPageBehavior
+        
+        // CommunitySettingPage
+        let communitySettingPageBehavior = AmityCommunitySettingPageBehavior()
+        behavior.communitySettingPageBehavior = communitySettingPageBehavior
+        
+        // CommunityNotificaitonSettingPage
+        let communityNotificationSettingPageBehavior = AmityCommunityNotificationSettingPageBehavior()
+        behavior.communityNotificationSettingPageBehavior = communityNotificationSettingPageBehavior
     }
     
     func registerDevice(_ userId: String,

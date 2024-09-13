@@ -69,11 +69,13 @@ extension AmityPostModel {
         public let avatarURL: String?
         public let displayName: String?
         public let isGlobalBan: Bool
+        public let isBrand: Bool
         
-        public init( avatarURL: String?, displayName: String?, isGlobalBan: Bool) {
+        public init( avatarURL: String?, displayName: String?, isGlobalBan: Bool, isBrand: Bool) {
             self.avatarURL = avatarURL
             self.displayName = displayName
             self.isGlobalBan = isGlobalBan
+            self.isBrand = isBrand
         }
     }
     
@@ -293,6 +295,13 @@ public class AmityPostModel: Identifiable {
     // Maps fileId to PostId for child post
     private var fileMap = [String: String]()
     
+    let isFromBrand: Bool
+    let isTargetPublicCommunity: Bool
+    let isTargetOfficialCommunity: Bool
+    
+    // Owner of the feed if targetType is user
+    var targetUser: AmityUser?
+    
     var isLiked: Bool {
         return myReactions.contains(.like)
     }
@@ -312,10 +321,9 @@ public class AmityPostModel: Identifiable {
         parentPostId = post.parentPostId
         postedUser = Author(
             avatarURL: post.postedUser?.getAvatarInfo()?.fileURL,
-            displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, isGlobalBan: post.postedUser?.isGlobalBanned ?? false)
+            displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, isGlobalBan: post.postedUser?.isGlobalBanned ?? false, isBrand: post.postedUser?.isBrand ?? false)
+        isFromBrand = post.postedUser?.isBrand ?? false
         timestamp = post.createdAt.relativeTime
-        
-        
         postedUserId = post.postedUserId
         sharedCount = Int(post.sharedCount)
         reactionsCount = Int(post.reactionsCount)
@@ -332,13 +340,18 @@ public class AmityPostModel: Identifiable {
         isEdited = post.isEdited
         analytic = post.analytics
         self.isPinned = isPinned
-        
+        isTargetPublicCommunity = post.targetCommunity?.isPublic ?? false
+        isTargetOfficialCommunity = post.targetCommunity?.isOfficial ?? false
         if let communityMember = targetCommunity?.membership.getMember(withId: postedUserId) {
             isModerator = communityMember.hasModeratorRole
         }
         
         if let communityMember = targetCommunity?.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
             hasModeratorPermission = communityMember.hasModeratorRole
+        }
+        
+        if post.targetType == "user" {
+            self.targetUser = post.targetUser
         }
         
         extractPostData()

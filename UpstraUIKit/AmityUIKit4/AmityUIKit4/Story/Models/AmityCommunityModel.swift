@@ -30,6 +30,7 @@ public struct AmityCommunityModel {
     let isPostReviewEnabled: Bool
     let isStoryCommentsAllowed: Bool
     let participation: AmityCommunityMembership
+    let isBrand: Bool
     
     public var object: AmityCommunity
     
@@ -56,6 +57,7 @@ public struct AmityCommunityModel {
         self.participation = object.membership
         self.isPostReviewEnabled = object.isPostReviewEnabled
         self.isStoryCommentsAllowed = object.storySettings.allowComment
+        self.isBrand = object.user?.isBrand ?? false
     }
     
     /// Returns pending post count.
@@ -71,5 +73,12 @@ public struct AmityCommunityModel {
     /// Returns declined post count.
     var declinedPostCount: Int {
         return object.getPostCount(feedType: .declined)
+    }
+    
+    var hasModeratorRole: Bool {
+        if let communityMember = object.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
+            return communityMember.hasModeratorRole
+        }
+        return false
     }
 }

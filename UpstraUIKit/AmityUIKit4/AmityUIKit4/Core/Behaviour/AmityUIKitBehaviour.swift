@@ -25,9 +25,14 @@ open class AmityUIKitBehaviour {
     public var postTargetSelectionPageBehavior: AmityPostTargetSelectionPageBehavior?
     public var postDetailPageBehavior: AmityPostDetailPageBehavior?
     public var socialGlobalSearchPageBehavior: AmitySocialGlobalSearchPageBehavior?
+    public var socialHomeTopNavigationComponentBehavior: AmitySocialHomeTopNavigationComponentBehavior?
     public var myCommunitiesSearchPageBehavior: AmityMyCommunitiesSearchPageBehavior?
     public var communitySearchResultComponentBehavior: AmityCommunitySearchResultComponentBehavior?
     public var userSearchResultComponentBehavior: AmityUserSearchResultComponentBehavior?
     public var postComposerPageBehavior: AmityPostComposerPageBehavior?
     public var communityProfilePageBehavior: AmityCommunityProfilePageBehavior?
+    public var communitySetupPageBehavior: AmityCommunitySetupPageBehavior?
+    public var communityMembershipPageBehavior: AmityCommunityMembershipPageBehavior?
+    public var communitySettingPageBehavior: AmityCommunitySettingPageBehavior?
+    public var communityNotificationSettingPageBehavior: AmityCommunityNotificationSettingPageBehavior?
 }

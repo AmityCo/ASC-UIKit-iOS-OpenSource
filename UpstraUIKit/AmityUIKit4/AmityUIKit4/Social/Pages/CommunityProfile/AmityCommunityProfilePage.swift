@@ -48,7 +48,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                             
                             AmityCommunityHeaderComponent(community: community, pageId: id, viewModel: viewModel, onPendingPostsTapAction: {
                                 
-                                let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                                let context = AmityCommunityProfilePageBehavior.Context(page: self, community: community.object)
                                 AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPendingPostPage(context: context)
                             }, onMemberListTapAction: {
                                 
@@ -242,7 +242,7 @@ extension AmityCommunityProfilePage {
         .buttonStyle(BorderlessButtonStyle())
         .padding(.trailing, 16)
         .padding(.bottom, 8)
-        .bottomSheet(isShowing: $showBottomSheet, height: bottomSheetHeight, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+        .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             VStack {
                 HStack(spacing: 12) {
                     // Post
@@ -370,7 +370,7 @@ extension AmityCommunityProfilePage {
                     
                 )
                 .onTapGesture {
-                    let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                    let context = AmityCommunityProfilePageBehavior.Context(page: self, community: viewModel.community?.object)
                     AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToCommunitySettingPage(context: context)
                 }
         }

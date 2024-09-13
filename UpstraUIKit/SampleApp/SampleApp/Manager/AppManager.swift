@@ -69,8 +69,10 @@ class AppManager {
         AmityUIKitManager.registerDevice(withUserId: userId, displayName: nil, sessionHandler: SampleSessionHandler()) { [weak self] success, error in
             print("[Sample App] register device with userId '\(userId)' \(success ? "successfully" : "failed")")
             if let error = error {
-                print("[Sample App] register device failed \(error.localizedDescription)")
+                AmityHUD.show(.error(message: "Could not register user: \(error.localizedDescription)"))
+                return
             }
+            
             self?.registerDevicePushNotification()
         }
         UserDefaults.standard.setValue(userId, forKey: UserDefaultsKey.userId)
@@ -178,37 +180,37 @@ class CustomPostContentComponenetBehaviour: AmityPostContentComponentBehavior {
 }
 
 class CustomAmityProfilePageBehaviour: AmityCommunityProfilePageBehavior {
-    override func goToCommunitySettingPage(context: AmityCommunityProfilePageBehavior.Context) {
-        
-        let communityId = context.page.communityId
-        
-        let viewController = AmityCommunitySettingsViewController.make(communityId: communityId)
-        
-        if let navigationController = context.page.host.controller?.navigationController {
-            navigationController.isNavigationBarHidden = false
-            navigationController.pushViewController(viewController, animated: true)
-        }
-    }
+//    override func goToCommunitySettingPage(context: AmityCommunityProfilePageBehavior.Context) {
+//        
+//        let communityId = context.page.communityId
+//        
+//        let viewController = AmityCommunitySettingsViewController.make(communityId: communityId)
+//        
+//        if let navigationController = context.page.host.controller?.navigationController {
+//            navigationController.isNavigationBarHidden = false
+//            navigationController.pushViewController(viewController, animated: true)
+//        }
+//    }
     
-    override func goToPendingPostPage(context: AmityCommunityProfilePageBehavior.Context) {
-        let communityId = context.page.communityId
-        
-        let viewController = AmityPendingPostsViewController.make(communityId: communityId)
-        
-        if let navigationController = context.page.host.controller?.navigationController {
-            navigationController.isNavigationBarHidden = false
-            navigationController.pushViewController(viewController, animated: true)
-        }
-    }
+//    override func goToPendingPostPage(context: AmityCommunityProfilePageBehavior.Context) {
+//        let communityId = context.page.communityId
+//        
+//        let viewController = AmityPendingPostsViewController.make(communityId: communityId)
+//        
+//        if let navigationController = context.page.host.controller?.navigationController {
+//            navigationController.isNavigationBarHidden = false
+//            navigationController.pushViewController(viewController, animated: true)
+//        }
+//    }
     
-    override func goToMemberListPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
-        guard let community else { return }
-        let viewController = AmityCommunityMemberSettingsViewController.make(community: community.object)
-        
-        if let navigationController = context.page.host.controller?.navigationController {
-            navigationController.isNavigationBarHidden = false
-            navigationController.pushViewController(viewController, animated: true)
-        }
-    }
+//    override func goToMemberListPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
+//        guard let community else { return }
+//        let viewController = AmityCommunityMemberSettingsViewController.make(community: community.object)
+//        
+//        if let navigationController = context.page.host.controller?.navigationController {
+//            navigationController.isNavigationBarHidden = false
+//            navigationController.pushViewController(viewController, animated: true)
+//        }
+//    }
 }
 #endif
