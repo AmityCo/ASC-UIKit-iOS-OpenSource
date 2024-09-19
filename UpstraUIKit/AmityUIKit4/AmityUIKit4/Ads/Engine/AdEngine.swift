@@ -195,7 +195,7 @@ class AdEngine {
         let asset = realm.object(ofType: AdAsset.self, forPrimaryKey: assetId)
         
         if let asset {
-            Log.adAssets.debug("Is Asset Downloaded: \(assetId) \(asset.isDownloaded)")
+            // Log.adAssets.debug("Is Asset Downloaded: \(assetId) \(asset.isDownloaded)")
             return asset.isDownloaded
         } else {
             Log.adAssets.debug("Is Asset Downloaded: Error - Asset not found")
@@ -211,7 +211,7 @@ class AdEngine {
                 
                 if let asset = realm.object(ofType: AdAsset.self, forPrimaryKey: id) {
                     asset.isDownloaded = true
-                    Log.adAssets.debug("Asset is ready: \(id)")
+                    // Log.adAssets.debug("Asset is ready: \(id)")
                 } else {
                     Log.adAssets.debug("Asset is ready: \(id) Error - Asset not found")
                 }

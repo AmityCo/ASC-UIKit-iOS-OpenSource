@@ -27,7 +27,6 @@ struct EndpointsView: View {
         _uploadURL = .init(initialValue: config.uploadURL)
     }
     
-    @State private var favoriteColor = 0
     var body: some View {
         
         Picker(selection: $selectedEnv.onChange(valueChange), label: /*@START_MENU_TOKEN@*/Text("Picker")/*@END_MENU_TOKEN@*/) {

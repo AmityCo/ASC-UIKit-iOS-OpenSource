@@ -28,9 +28,10 @@ struct CommunityCellView: View {
     private func getCommunityView(_ model: AmityCommunityModel) -> some View {
         
         HStack(spacing: 16) {
-            AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: URL(string: model.avatarURL))
+            AsyncImage(placeholder: AmityIcon.communityThumbnail.imageResource, url: URL(string: model.avatarURL))
                 .frame(size: CGSize(width: 64, height: 64))
-                .clipShape(Circle())
+                .clipped()
+                .cornerRadius(8, corners: .allCorners)
                 .isHidden(viewConfig.isHidden(elementId: .communityAvatar))
             
             VStack(alignment: .leading, spacing: 8) {

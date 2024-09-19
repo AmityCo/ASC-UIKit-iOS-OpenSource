@@ -80,5 +80,6 @@ struct PostContentSkeletonView: View {
 #if DEBUG
 #Preview {
     PostContentSkeletonView()
+        .environmentObject(AmityViewConfigController(pageId: .communityProfilePage))
 }
 #endif

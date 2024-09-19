@@ -168,14 +168,14 @@ public struct AmityCommunitySetupPage: AmityPageView {
                             .padding([.leading, .trailing], 16)
                         }
                     }
-                    .gesture(
-                        DragGesture()
-                            .onChanged { _ in
-                                hideKeyboard()
-                            }
-                    )
                 }
             }
+            .simultaneousGesture(
+                DragGesture()
+                    .onChanged { _ in
+                        hideKeyboard()
+                    }
+            )
             
             
             if case .edit(let community) = pageMode {

@@ -129,6 +129,13 @@ enum AmityIcon: String, ImageResourceProvider {
     case communityPinBadge = "communityPinBadge"
     case communityProfileEmptyPostIcon = "communityProfileEmptyPostIcon"
     case communityPendingPostIcon = "communityPendingPostIcon"
+    case tickIcon = "tickIcon"
+    case communityCategoryPlaceholder = "categoriesPlaceholder"
+    case communityPlaceholder = "communityPlaceholder"
+    case communityThumbnail = "communityThumbnail"
+    case emptyStateExplore = "emptyStateExplore"
+    case communityNotFoundIcon = "communityNotFoundIcon"
+
     case brandBadge = "brandBadgeIcon"
     case globeIcon = "globeIcon"
     case checkboxIcon = "checkBoxIcon"

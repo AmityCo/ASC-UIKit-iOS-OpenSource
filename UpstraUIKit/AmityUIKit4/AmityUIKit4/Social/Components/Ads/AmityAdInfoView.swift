@@ -76,7 +76,9 @@ struct AmityAdInfoView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     AmityAdInfoView(advertiserName: "Nishan")
         .environmentObject(AmityViewConfigController(pageId: nil, componentId: .postContentComponent))
 }
+#endif

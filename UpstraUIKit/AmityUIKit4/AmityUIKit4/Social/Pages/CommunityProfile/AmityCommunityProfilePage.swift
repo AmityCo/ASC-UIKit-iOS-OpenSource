@@ -23,7 +23,6 @@ public struct AmityCommunityProfilePage: AmityPageView {
     
     public var id: PageId {
         return .communityProfilePage
-        
     }
     
     public init(communityId: String) {

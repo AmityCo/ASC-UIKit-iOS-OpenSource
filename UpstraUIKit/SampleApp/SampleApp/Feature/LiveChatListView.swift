@@ -63,9 +63,11 @@ struct LiveChatListView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     LiveChatListView()
 }
+#endif
 
 class TestLiveChatListViewModel: ObservableObject {
     let channelRepo = AmityChannelRepository(client: AmityUIKit4Manager.client)

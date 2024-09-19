@@ -88,13 +88,11 @@ class AppManager {
         
         AmityUIKitManager.registerDeviceForPushNotification(deviceToken) { success, error in
             if success {
-                AmityHUD.show(.success(message: "Success with id \(deviceToken)"))
+                AmityHUD.show(.success(message: "Successfully registered push notification for device \(deviceToken)"))
             } else {
-                AmityHUD.show(.error(message: "Failed with error \(error?.localizedDescription)"))
+                AmityHUD.show(.error(message: "Failed to register push notification. Error: \(error?.localizedDescription ?? "")"))
             }
-            
         }
-        
     }
     
     func unregister() {

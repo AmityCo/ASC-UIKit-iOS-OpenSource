@@ -25,7 +25,7 @@ public struct AmitySocialHomePage: AmityPageView {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             AmitySocialHomeTopNavigationComponent(pageId: id, selectedTab: viewModel.selectedTab, searchButtonAction: {
-                if viewModel.selectedTab == .newsFeed {
+                if viewModel.selectedTab == .newsFeed || viewModel.selectedTab == .explore {
                     let context = AmitySocialHomePageBehavior.Context(page: self)
                     AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToGlobalSearchPage(context: context)
                     

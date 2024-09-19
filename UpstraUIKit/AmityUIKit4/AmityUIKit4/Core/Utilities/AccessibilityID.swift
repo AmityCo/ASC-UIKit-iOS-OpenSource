@@ -186,6 +186,30 @@ struct AccessibilityID {
             static let reactionImageView = "reaction_list/reaction_image_view"
         }
     }
+    
+    struct Social {
+        
+        struct CategoryList {
+            static let categoryImage = "community_row_image"
+            static let communityName = "community_row_name"
+        }
+        
+        struct Explore {
+            static let emptyStateImage = "explore_empty_image"
+            static let emptyStateText = "explore_empty_text"
+            static let emptyStateCreateCommunity = "explore_create_community"
+            
+            
+            static let recommendedSection = "recommended_communities"
+            static let categoriesSection = "community_categories"
+            static let trendingSection = "trending_communities"
+        
+            static let communityJoinButton = "community_card_join_button"
+            static let communityMemberCount = "community_card_member_count"
+            static let communityCategories = "community_card_categories"
+            static let communityImage = "community_card_image"
+        }
+    }
 }
 
 

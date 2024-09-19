@@ -118,6 +118,7 @@
 "create_post_bottom_sheet_title" = "Post";
 "create_story_bottom_sheet_title" = "Story";
 "community_page_join_title" = "Join";
+"community_page_joined_title" = "Joined";
 "community_page_pending_post_title" = "Pending post";
 "non_member_react_post_message" = "Join community to interact with all posts";
 
@@ -188,3 +189,13 @@
 "community_notification_setting_story_reaction_Description" = "Receive notifications when someone reacts to your story in this community.";
 "community_notification_setting_story_comment_title" = "Story comments";
 "community_notification_setting_story_comment_description" = "Receive notifications when someone comments on your story in this community.";
+
+"community_member_count_singular" = "%@ member";
+"community_member_count_plural" = "%@ members";
+
+"explore_categories_see_more" = "See More";
+"explore_trending_now_component_title" = "Trending Now";
+"explore_recommended_communities_component_title" = "Recommended for you";
+
+"community_all_categories_title" = "All Categories";
+"community_list_empty_state_title" = "No community yet";

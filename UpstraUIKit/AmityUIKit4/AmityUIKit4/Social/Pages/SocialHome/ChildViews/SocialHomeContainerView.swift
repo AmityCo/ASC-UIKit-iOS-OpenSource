@@ -26,7 +26,7 @@ struct SocialHomeContainerView: View {
             case .newsFeed:
                 AmityNewsFeedComponent(pageId: pageId)
             case .explore:
-                ComponentA()
+                AmityExplorePageContainer()
             case .myCommunities:
                 AmityMyCommunitiesComponent(pageId: pageId)
             }
@@ -45,13 +45,3 @@ struct SocialHomeContainerView: View {
         .padding(.top, 8)
     }
 }
-
-
-struct ComponentA: View {
-    var body: some View {
-        VStack {
-            Text("Explore Component")
-        }
-    }
-}
-

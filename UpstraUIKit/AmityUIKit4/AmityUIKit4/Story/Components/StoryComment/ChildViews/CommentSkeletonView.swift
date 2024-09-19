@@ -55,6 +55,8 @@ struct TestSkeletonView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     TestSkeletonView()
 }
+#endif

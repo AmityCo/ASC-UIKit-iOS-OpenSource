@@ -8,7 +8,12 @@
 import UIKit
 import AmitySDK
 
-public struct AmityCommunityModel {
+public struct AmityCommunityModel: Identifiable {
+    
+    public var id: String {
+        return communityId
+    }
+    
     let communityId: String
     let description: String
     let displayName: String

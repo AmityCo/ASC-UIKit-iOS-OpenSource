@@ -136,6 +136,7 @@ public struct AmityLocalizedStringSet {
         static let createPostBottomSheetTitle = "create_post_bottom_sheet_title"
         static let createStoryBottomSheetTitle = "create_story_bottom_sheet_title"
         static let communityPageJoinTitle = "community_page_join_title"
+        static let communityPageJoinedTitle = "community_page_joined_title"
         static let communityPagePendingPostTitle = "community_page_pending_post_title"
         static let nonMemberReactPostMessage = "non_member_react_post_message"
         static let communitySetupAlertTitle = "community_setup_alert_title"
@@ -196,6 +197,16 @@ public struct AmityLocalizedStringSet {
         static let communityNotificationSettingStoryReactionDescription = "community_notification_setting_story_reaction_Description"
         static let communityNotificationSettingStoryCommentTitle = "community_notification_setting_story_comment_title"
         static let communityNotificationSettingStoryCommentDescription = "community_notification_setting_story_comment_description"
+        
+        static let communityMemberCountSingular = "community_member_count_singular"
+        static let communityMemberCountPlural = "community_member_count_plural"
+
+        static let exploreCategoriesSeeMore = "explore_categories_see_more"
+        static let exploreTrendingComponentTitle = "explore_trending_now_component_title"
+        static let exploreRecommendedComponentTitle = "explore_recommended_communities_component_title"
+        
+        static let communityAllCategoriesPageTitle = "community_all_categories_title"
+        static let communityEmptyStateTitle = "community_list_empty_state_title"
     }
     
 }

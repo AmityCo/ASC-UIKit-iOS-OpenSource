@@ -21,7 +21,7 @@ public struct AmityEmptyStateView: View {
         VStack(spacing: 0) {
             if let icon = configuration.image {
                 Image(ImageResource(name: icon, bundle: AmityUIKit4Manager.bundle))
-                    .renderingMode(.template)
+                    .renderingMode(configuration.renderingMode)
                     .resizable()
                     .scaledToFit()
                     .frame(size: configuration.iconSize)
@@ -58,13 +58,15 @@ public struct AmityEmptyStateView: View {
         public let subtitle: String?
         public let tapAction: DefaultTapAction?
         public let iconSize: CGSize
+        public let renderingMode: Image.TemplateRenderingMode
         
-        public init(image: String?, title: String?, subtitle: String?, iconSize: CGSize = CGSize(width: 28, height: 24), tapAction: DefaultTapAction?) {
+        public init(image: String?, title: String?, subtitle: String?, iconSize: CGSize = CGSize(width: 28, height: 24), renderingMode: Image.TemplateRenderingMode = .template, tapAction: DefaultTapAction?) {
             self.image = image
             self.title = title
             self.subtitle = subtitle
             self.tapAction = tapAction
             self.iconSize = iconSize
+            self.renderingMode = renderingMode
         }
         
         internal static let previewWithoutTitle = Configuration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: nil, subtitle: "Couldn't load chat", tapAction: nil)

@@ -91,8 +91,8 @@ class AdSupplier {
             let weightSum = weights.reduce(0, { $0 + $1 })
             
             // Normalize Weights
-            var likelihoods = weights.map { $0 / weightSum }
-            var selectedAdIndex = weightedRandomChoice(weights: likelihoods)
+            let likelihoods = weights.map { $0 / weightSum }
+            let selectedAdIndex = weightedRandomChoice(weights: likelihoods)
             
             selectedAds.append(relevantAds[selectedAdIndex])
             relevantAds.remove(at: selectedAdIndex)

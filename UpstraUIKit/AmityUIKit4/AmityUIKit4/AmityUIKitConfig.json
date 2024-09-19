@@ -430,5 +430,18 @@
         "text": "Attachment",
         "image": "attatchmentIcon"
     },
+    "social_home_page/community_categories/*": {},
+    "social_home_page/recommended_communities/*": {},
+    "social_home_page/*/explore_empty_image": {
+           "image": "emptyExploreIcon"
+       },
+    "social_home_page/*/explore_empty_title": {
+    },
+    "social_home_page/*/explore_empty_description": {
+    },
+    "social_home_page/*/explore_create_community": {},
+    "social_home_page/trending_communities/*": {},
+    "all_categories_page/*/*": {},
+    "communities_by_category_page/*/*": {}
     }
 }
