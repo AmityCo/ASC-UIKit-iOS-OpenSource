@@ -41,19 +41,29 @@ struct MediaViewer: View {
                 
                 Pager(page: page, data: medias, id: \.id) { media in
                     ZStack {
+                        let emptyView = Color(hex: "#EBECEF").padding(.vertical, 100)
                         /// If the media is local file, it will load from local file path.
                         /// When MediaViewer is used to preview attached medias in AmityComposePage, media will have localUrl.
                         if let url = media.localUrl {
                             Image(uiImage: media.type == .image ?  UIImage(contentsOfFile: url.path) ?? UIImage() : media.generatedThumbnailImage ?? UIImage())
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
+                                .adaptiveVerticalPadding(top: 35, bottom: 35)
                         } else if let url = media.getImageURL() {
-                            URLImage(url, content: { image in
+                            URLImage(url, empty: {
+                                emptyView
+                            }, inProgress: {_ in
+                                emptyView
+                            },
+                            failure: {_, _ in
+                                emptyView
+                            }, content: { image in
                                 image
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
                             })
                             .environment(\.urlImageOptions, URLImageOptions.amityOptions)
+                            .adaptiveVerticalPadding(top: 35, bottom: 35)
                         }
                         
                         if media.type == .video {
@@ -65,7 +75,14 @@ struct MediaViewer: View {
                     }
                     .onTapGesture {
                         if media.type == .video {
-                            viewModel.videoURL = media.localUrl ?? URL(string: media.video?.getVideo(resolution: .original) ?? "")
+                            let url: URL?
+                            if let urlStr = media.video?.getVideo(resolution: .original) {
+                                url = URL(string: urlStr)
+                            } else {
+                                url = URL(string: media.video?.fileURL ?? "")
+                            }
+                            
+                            viewModel.videoURL = media.localUrl ?? url
                             showVideoPlayer.toggle()
                         }
                     }
@@ -130,14 +147,15 @@ struct MediaViewer: View {
                         
                         Spacer()
                     }
-                    .offset(x: 20, y: 30)
+                    .padding(.leading, 16)
                     
                     Text("\(pageIndex) / \(page.totalPages)")
                         .font(.system(size: 17))
                         .foregroundColor(.white)
-                        .offset(y: 30)
+                        .isHidden(page.totalPages == 1)
                 }
-                .frame(height: 110)
+                .adaptiveVerticalPadding(top: 20)
+                .padding(.bottom, 15)
                 .background(Color.black.opacity(0.5))
                 .opacity(backgroundOpacity == 1.0 ? 1.0 : 0)
                 .transition(.opacity.combined(with: .scale))

@@ -72,6 +72,7 @@ public enum ComponentId: String {
     case communityPin = "community_pin"
     case mediaAttachment = "media_attachment"
     case detailedMediaAttachment = "detailed_media_attachment"
+    case communityImageFeed = "community_image_feed"
 
     case recommendedCommunities = "recommended_communities"
     case trendingCommunities = "trending_communities"

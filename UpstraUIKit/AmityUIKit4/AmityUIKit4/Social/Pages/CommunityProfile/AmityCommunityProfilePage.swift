@@ -105,7 +105,13 @@ public struct AmityCommunityProfilePage: AmityPageView {
                             let context = AmityCommunityProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: category)
                         })
-                            .isHidden(currentTab != 1 )
+                            .isHidden(currentTab != 1)
+                        
+                        AmityCommunityImageFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
+                            .isHidden(currentTab != 2)
+                        
+                        AmityCommunityVideoFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
+                            .isHidden(currentTab != 3)
                         
                     }
                     .offset(y: 0)

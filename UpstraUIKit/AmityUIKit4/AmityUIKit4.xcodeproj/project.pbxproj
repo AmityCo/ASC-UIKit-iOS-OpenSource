@@ -92,6 +92,8 @@
 		684098312B318B3C00697E1B /* ImageVideoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684098302B318B3C00697E1B /* ImageVideoPicker.swift */; };
 		68435FDD2C8ED5F9000B7737 /* AmityCommunityNotificationSettingPageBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68435FDC2C8ED5F9000B7737 /* AmityCommunityNotificationSettingPageBehavior.swift */; };
 		68435FDF2C8ED7C3000B7737 /* AmitySocialHomeTopNavigationComponentBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68435FDE2C8ED7C3000B7737 /* AmitySocialHomeTopNavigationComponentBehavior.swift */; };
+		68435FE12C8EE19B000B7737 /* AmityCommunityImageFeedComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68435FE02C8EE19B000B7737 /* AmityCommunityImageFeedComponent.swift */; };
+		68435FE32C8EFC9A000B7737 /* AmityCommunityMediaFeedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68435FE22C8EFC9A000B7737 /* AmityCommunityMediaFeedViewModel.swift */; };
 		684AE0F62B0C5B0200FD7270 /* AmityUIKit4.docc in Sources */ = {isa = PBXBuildFile; fileRef = 684AE0F52B0C5B0200FD7270 /* AmityUIKit4.docc */; };
 		684AE0FC2B0C5B0200FD7270 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */; };
 		684AE1012B0C5B0200FD7270 /* AmityUIKit4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1002B0C5B0200FD7270 /* AmityUIKit4Tests.swift */; };
@@ -167,6 +169,8 @@
 		686198532C12E41400BA81BE /* AmityPostTargetSelectionPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686198522C12E41400BA81BE /* AmityPostTargetSelectionPage.swift */; };
 		686198552C12E5B200BA81BE /* TargetSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686198542C12E5B200BA81BE /* TargetSelectionView.swift */; };
 		6862513D2B7DD3DC0097BB7E /* AmityViewStoryPageBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6862513C2B7DD3DC0097BB7E /* AmityViewStoryPageBehaviour.swift */; };
+		686830222C9154F3009B1694 /* AmityCommunityVideoFeedComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686830212C9154E7009B1694 /* AmityCommunityVideoFeedComponent.swift */; };
+		686830242C915DFC009B1694 /* TimeInterval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686830232C915DFC009B1694 /* TimeInterval+Extension.swift */; };
 		6868302C2C92EBE4009B1694 /* AmityCommunityMembershipPageBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6868302B2C92EBE4009B1694 /* AmityCommunityMembershipPageBehavior.swift */; };
 		686D173C2B1452A7007AEF59 /* AmityStoryTabComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D173B2B1452A7007AEF59 /* AmityStoryTabComponent.swift */; };
 		686D173E2B1496D2007AEF59 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 686D173D2B1496D2007AEF59 /* Assets.xcassets */; };
@@ -300,7 +304,7 @@
 		68FF77DB2B81DEC900B8F561 /* AmityStoryTargetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FF77DA2B81DEC900B8F561 /* AmityStoryTargetModel.swift */; };
 		921C3FC92C379F3E00BF403E /* AmityPostContentComponentBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921C3FC82C379F3E00BF403E /* AmityPostContentComponentBehavior.swift */; };
 		9250CA2D2C2D55E9007551ED /* MultiSelectionMediaPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9250CA2C2C2D55E9007551ED /* MultiSelectionMediaPicker.swift */; };
-		925522502C9C2DF200AD85B5 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9255224F2C9C2DF200AD85B5 /* SharedFrameworks */; };
+		925522582CA5651700AD85B5 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 925522572CA5651700AD85B5 /* SharedFrameworks */; };
 		926894402C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9268943F2C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift */; };
 		926894422C474A6A004CECF8 /* EmptyCommunityFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926894412C474A6A004CECF8 /* EmptyCommunityFeedView.swift */; };
 		926F079C2BB4DDB9000806CB /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926F079B2BB4DDB9000806CB /* Shimmer.swift */; };
@@ -542,6 +546,8 @@
 		684098302B318B3C00697E1B /* ImageVideoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageVideoPicker.swift; sourceTree = "<group>"; };
 		68435FDC2C8ED5F9000B7737 /* AmityCommunityNotificationSettingPageBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCommunityNotificationSettingPageBehavior.swift; sourceTree = "<group>"; };
 		68435FDE2C8ED7C3000B7737 /* AmitySocialHomeTopNavigationComponentBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmitySocialHomeTopNavigationComponentBehavior.swift; sourceTree = "<group>"; };
+		68435FE02C8EE19B000B7737 /* AmityCommunityImageFeedComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCommunityImageFeedComponent.swift; sourceTree = "<group>"; };
+		68435FE22C8EFC9A000B7737 /* AmityCommunityMediaFeedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCommunityMediaFeedViewModel.swift; sourceTree = "<group>"; };
 		684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		684AE0F42B0C5B0200FD7270 /* AmityUIKit4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AmityUIKit4.h; sourceTree = "<group>"; };
 		684AE0F52B0C5B0200FD7270 /* AmityUIKit4.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = AmityUIKit4.docc; sourceTree = "<group>"; };
@@ -626,6 +632,8 @@
 		686198522C12E41400BA81BE /* AmityPostTargetSelectionPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityPostTargetSelectionPage.swift; sourceTree = "<group>"; };
 		686198542C12E5B200BA81BE /* TargetSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetSelectionView.swift; sourceTree = "<group>"; };
 		6862513C2B7DD3DC0097BB7E /* AmityViewStoryPageBehaviour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityViewStoryPageBehaviour.swift; sourceTree = "<group>"; };
+		686830212C9154E7009B1694 /* AmityCommunityVideoFeedComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCommunityVideoFeedComponent.swift; sourceTree = "<group>"; };
+		686830232C915DFC009B1694 /* TimeInterval+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extension.swift"; sourceTree = "<group>"; };
 		6868302B2C92EBE4009B1694 /* AmityCommunityMembershipPageBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCommunityMembershipPageBehavior.swift; sourceTree = "<group>"; };
 		686D173B2B1452A7007AEF59 /* AmityStoryTabComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityStoryTabComponent.swift; sourceTree = "<group>"; };
 		686D173D2B1496D2007AEF59 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -913,7 +921,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				925522502C9C2DF200AD85B5 /* SharedFrameworks in Frameworks */,
+				925522582CA5651700AD85B5 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1387,6 +1395,7 @@
 				685CE28A2B68E2D400AF8F54 /* Int+Extension.swift */,
 				685CE28C2B68EFB900AF8F54 /* Date+Extension.swift */,
 				68FF77802B7E00C300B8F561 /* Array+Extension.swift */,
+				686830232C915DFC009B1694 /* TimeInterval+Extension.swift */,
 				683DF10D2C6B5220005BF06C /* UINavigationController+Extension.swift */,
 				6877D3782C75CFAA008B3598 /* AmityCommunityNotificaitonSettings+Extension.swift */,
 			);
@@ -1989,11 +1998,14 @@
 		9280FDD22C40E9EE0052F01A /* CommunityProfile */ = {
 			isa = PBXGroup;
 			children = (
+				686830212C9154E7009B1694 /* AmityCommunityVideoFeedComponent.swift */,
 				9280FDD32C40E9F90052F01A /* AmityCommunityHeaderComponent.swift */,
 				9280FDD72C40EB970052F01A /* AmityCommunityFeedComponent.swift */,
 				9268943F2C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift */,
 				926894412C474A6A004CECF8 /* EmptyCommunityFeedView.swift */,
 				68804E232C8083560081CBC9 /* AmityPendingPostContentComponent.swift */,
+				68435FE02C8EE19B000B7737 /* AmityCommunityImageFeedComponent.swift */,
+				68435FE22C8EFC9A000B7737 /* AmityCommunityMediaFeedViewModel.swift */,
 			);
 			path = CommunityProfile;
 			sourceTree = "<group>";
@@ -2556,7 +2568,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				9255224F2C9C2DF200AD85B5 /* SharedFrameworks */,
+				925522572CA5651700AD85B5 /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -2845,6 +2857,7 @@
 				6874B95E2C3F469C0021D8D0 /* AmityPostComposerPageBehavior.swift in Sources */,
 				68FB40982C3D890E006C97CC /* AmityPostTargetSelectionPageBehavior.swift in Sources */,
 				68D3A3102BE346740096CF79 /* AmitySocialHomeTopNavigationComponent.swift in Sources */,
+				686830222C9154F3009B1694 /* AmityCommunityVideoFeedComponent.swift in Sources */,
 				6877D3792C75CFAA008B3598 /* AmityCommunityNotificaitonSettings+Extension.swift in Sources */,
 				689A31D02C634D4D00F17999 /* PrivacyRadioButtonView.swift in Sources */,
 				684098162B313A6F00697E1B /* GSAVPlayerViewController.swift in Sources */,
@@ -2865,6 +2878,7 @@
 				A97A442B2C2D2D4D0017327D /* ImageContext.swift in Sources */,
 				680204662B88527D00CC0CD0 /* AccessibilityID.swift in Sources */,
 				68FF77C72B81C4A300B8F561 /* Pager.swift in Sources */,
+				68435FE12C8EE19B000B7737 /* AmityCommunityImageFeedComponent.swift in Sources */,
 				A97A443A2C2D2D4D0017327D /* AnimatedImageView.swift in Sources */,
 				684097DC2B30942F00697E1B /* DownloadTypes.swift in Sources */,
 				A97A441A2C2D2D4D0017327D /* ImageFormat.swift in Sources */,
@@ -3034,8 +3048,10 @@
 				6877D3A12C7C849E008B3598 /* AmityCommunityNotificationSettingPage.swift in Sources */,
 				684098252B313A6F00697E1B /* VideoDownloader.swift in Sources */,
 				A97188462B7F382F00B1BCA2 /* AmityLiveChatHeader.swift in Sources */,
+				686830242C915DFC009B1694 /* TimeInterval+Extension.swift in Sources */,
 				685CE26E2B67665E00AF8F54 /* AmityCommentTrayComponent.swift in Sources */,
 				A97A44182C2D2D4D0017327D /* Image.swift in Sources */,
+				68435FE32C8EFC9A000B7737 /* AmityCommunityMediaFeedViewModel.swift in Sources */,
 				921C3FC92C379F3E00BF403E /* AmityPostContentComponentBehavior.swift in Sources */,
 				687A69C62B5F77ED00C17B6D /* AmityHyperLinkConfigComponent.swift in Sources */,
 				A9AD73B32B8759F3009D6C19 /* ExpandableTextEditorView.swift in Sources */,
@@ -3359,7 +3375,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9255224F2C9C2DF200AD85B5 /* SharedFrameworks */ = {
+		925522572CA5651700AD85B5 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

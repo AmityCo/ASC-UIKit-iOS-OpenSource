@@ -371,7 +371,7 @@
 		78DA0324263C715C007C11CE /* AmityMyCommunityPreviewViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 78DA0320263C715C007C11CE /* AmityMyCommunityPreviewViewController.xib */; };
 		78DA0325263C715C007C11CE /* AmityMyCommunityPreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78DA0321263C715C007C11CE /* AmityMyCommunityPreviewViewController.swift */; };
 		921C3FCB2C379FDB00BF403E /* AmitySocialV4Compatible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921C3FCA2C379FDB00BF403E /* AmitySocialV4Compatible.swift */; };
-		925522522C9C2DF900AD85B5 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 925522512C9C2DF900AD85B5 /* SharedFrameworks */; };
+		9255225A2CA5653600AD85B5 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 925522592CA5653600AD85B5 /* SharedFrameworks */; };
 		970E784726429FA500E5FCEE /* ChatSettingsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970E784526429FA500E5FCEE /* ChatSettingsTableViewCell.swift */; };
 		970E784826429FA500E5FCEE /* ChatSettingsTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 970E784626429FA500E5FCEE /* ChatSettingsTableViewCell.xib */; };
 		970E784E26429FB300E5FCEE /* AmityChatSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970E784C26429FB300E5FCEE /* AmityChatSettingsViewController.swift */; };
@@ -1340,7 +1340,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				925522522C9C2DF900AD85B5 /* SharedFrameworks in Frameworks */,
+				9255225A2CA5653600AD85B5 /* SharedFrameworks in Frameworks */,
 				68F5D9FA2B481E4000A9FA0D /* AmityUIKit4.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4507,7 +4507,7 @@
 			);
 			name = AmityUIKit;
 			packageProductDependencies = (
-				925522512C9C2DF900AD85B5 /* SharedFrameworks */,
+				925522592CA5653600AD85B5 /* SharedFrameworks */,
 			);
 			productName = UpstraUIKit;
 			productReference = 72A3503024EA811500DA9D46 /* AmityUIKit.framework */;
@@ -5523,7 +5523,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		925522512C9C2DF900AD85B5 /* SharedFrameworks */ = {
+		925522592CA5653600AD85B5 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

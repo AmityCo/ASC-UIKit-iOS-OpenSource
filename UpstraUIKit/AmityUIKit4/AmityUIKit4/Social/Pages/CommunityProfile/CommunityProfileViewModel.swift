@@ -36,10 +36,12 @@ public class CommunityProfileViewModel: ObservableObject {
     var hasStoryManagePermission: Bool = false
     
     var postFeedViewModel: PostFeedViewModel
+    var mediaFeedViewModel: MediaFeedViewModel
     
     public init(communityId: String) {
         self.communityId = communityId
         self.postFeedViewModel = PostFeedViewModel(feedType: .community(communityId: communityId))
+        self.mediaFeedViewModel = MediaFeedViewModel(feedType: .community(communityId: communityId))
         
         loadCommunity()
         loadStories()
@@ -48,6 +50,10 @@ public class CommunityProfileViewModel: ObservableObject {
         Task { @MainActor in
             hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: communityId)
         }
+    }
+    
+    deinit {
+        URLImageService.defaultImageService.inMemoryStore?.removeAllImages()
     }
     
     func loadCommunity() {
@@ -109,8 +115,12 @@ public class CommunityProfileViewModel: ObservableObject {
         if currentTab == 0 {
             loadPinnedFeed()
             postFeedViewModel.loadFeed(feedType: .community(communityId: communityId))
-        } else {
+        } else if currentTab == 1 {
             loadPinnedFeed()
+        } else if currentTab == 2 {
+            mediaFeedViewModel.loadMediaFeed(.image)
+        } else if currentTab == 3 {
+            mediaFeedViewModel.loadMediaFeed(.video)
         }
     }
     

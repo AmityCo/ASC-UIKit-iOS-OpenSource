@@ -68,7 +68,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             host.controller?.navigationController?.isNavigationBarHidden = true
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
-        
+        .updateTheme(with: viewConfig)
     }
     
     

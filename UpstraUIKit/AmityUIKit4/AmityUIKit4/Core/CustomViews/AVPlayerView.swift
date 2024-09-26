@@ -11,9 +11,11 @@ import SwiftUI
 
 struct AVPlayerView: UIViewControllerRepresentable {
     private let url: URL
+    private let autoPlay: Bool
     
-    init(url: URL) {
+    init(url: URL, autoPlay: Bool = true) {
         self.url = url
+        self.autoPlay = autoPlay
     }
     
     func makeUIViewController(context: Context) -> AVPlayerViewController {
@@ -27,7 +29,9 @@ struct AVPlayerView: UIViewControllerRepresentable {
         
         let vc = AVPlayerViewController()
         vc.player = player
-        player.play()
+        if autoPlay {
+            player.play()
+        }
         return vc
     }
     

@@ -32,6 +32,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
             Text(AmityLocalizedStringSet.Social.communitySettingBasicInfoTitle.localizedString)
                 .font(.system(size: 17, weight: .semibold))
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
             
             /// Edit Profile setting
             if viewModel.shouldShowEditProfile {
@@ -71,6 +72,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
                 Text(AmityLocalizedStringSet.Social.communitySettingCommunityPermissionsTitle.localizedString)
                     .font(.system(size: 17, weight: .semibold))
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
             }
             
             /// Post Permissions setting
@@ -165,6 +167,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
         }
         .padding([.leading, .trailing], 16)
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .updateTheme(with: viewConfig)
     }
     
     private var navigationBarView: some View {

@@ -76,6 +76,7 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
                 .padding(.bottom, 10)
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .updateTheme(with: viewConfig)
     }
     
     private var navigationBarView: some View {

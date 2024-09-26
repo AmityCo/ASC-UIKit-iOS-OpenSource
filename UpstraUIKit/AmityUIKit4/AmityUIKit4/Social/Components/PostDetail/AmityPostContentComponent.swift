@@ -82,6 +82,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             HStack {
                 Text("Featured")
                     .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 6)
                 

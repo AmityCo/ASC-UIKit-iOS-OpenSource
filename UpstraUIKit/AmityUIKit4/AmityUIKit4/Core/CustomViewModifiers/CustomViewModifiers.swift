@@ -68,6 +68,10 @@ extension View {
             .debounce(for: .seconds(0.1), scheduler: RunLoop.main)
             .eraseToAnyPublisher()
     }
+    
+    func adaptiveVerticalPadding(top: CGFloat = 0, bottom: CGFloat = 0) -> some View {
+        self.modifier(AdaptiveVerticalPadding(top: top, bottom: bottom))
+    }
 }
 
 // MARK: Button
@@ -178,6 +182,47 @@ struct HiddenListSeparator: ViewModifier {
                 .listRowSeparator(.hidden)
         } else {
             content
+        }
+    }
+}
+
+struct AdaptiveVerticalPadding: ViewModifier {
+    let additionalTopPadding: CGFloat
+    let additionalBottomPadding: CGFloat
+    @State private var topPadding: CGFloat = 0
+    @State private var bottomPadding: CGFloat = 0
+
+    init(top: CGFloat = 0, bottom: CGFloat = 0) {
+        self.additionalTopPadding = top
+        self.additionalBottomPadding = bottom
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .padding(.top, topPadding)
+            .padding(.bottom, bottomPadding)
+            .edgesIgnoringSafeArea([.top, .bottom])
+            .onAppear {
+                calculatePadding()
+            }
+    }
+    
+    private func calculatePadding() {
+        guard let window = UIApplication.shared.windows.first else { return }
+        let safeAreaInsets = window.safeAreaInsets
+        
+       
+        // For devices with a notch or home indicator
+        if additionalTopPadding > 0 {
+            topPadding = safeAreaInsets.top > 20 ? safeAreaInsets.top + additionalTopPadding : additionalTopPadding
+        } else {
+            topPadding = 0
+        }
+        
+        if additionalBottomPadding > 0 {
+            bottomPadding = safeAreaInsets.bottom > 0 ? safeAreaInsets.bottom + additionalBottomPadding : additionalBottomPadding
+        } else {
+            bottomPadding = 0
         }
     }
 }

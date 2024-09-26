@@ -25,7 +25,7 @@ extension Int {
 
         switch num {
         case 1_000_000_000...:
-            guard num.remainder(dividingBy: 1_000_000_000) >= 100_000_000 else {
+            guard num > 1_100_000_000 else {
                 return "1B"
             }
             
@@ -33,7 +33,7 @@ extension Int {
             return String(format: "%.1fB", kCount)
 
         case 1_000_000...:
-            guard num.remainder(dividingBy: 1_000_000) >= 100_000 else {
+            guard num > 1_100_000 else {
                 return "1M"
             }
             
@@ -41,7 +41,7 @@ extension Int {
             return String(format: "%.1fM", kCount)
 
         case 1_000...:
-            guard num.remainder(dividingBy: 1_000) >= 100 else {
+            guard num > 1100 else {
                 return "1K"
             }
             

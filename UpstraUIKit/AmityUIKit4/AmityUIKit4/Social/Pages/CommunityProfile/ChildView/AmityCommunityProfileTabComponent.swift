@@ -26,25 +26,29 @@ public struct AmityCommunityProfileTabComponent: AmityComponentView {
     }
     
     public var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 20) {
-                
-                let feedIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityFeedTabButton, key: "image", of: String.self) ?? "")
-                
-                let feedTabItem = CommunityPageTabItem(index: 0, image: feedIcon)
-
-                CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: feedTabItem)
-                    .isHidden(viewConfig.isHidden(elementId: .communityFeedTabButton))
-                
-                let pinIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityPinTabButton, key: "image", of: String.self) ?? "")
-                let pinTabItem = CommunityPageTabItem(index: 1, image: pinIcon)
-                CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: pinTabItem)
-                    .isHidden(viewConfig.isHidden(elementId: .communityPinTabButton))
-            }
-            .padding(.horizontal)
+        HStack(spacing: 20) {
+            let feedIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityFeedTabButton, key: "image", of: String.self) ?? "")
+            let feedTabItem = CommunityPageTabItem(index: 0, image: feedIcon)
+            CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: feedTabItem)
+                .isHidden(viewConfig.isHidden(elementId: .communityFeedTabButton))
+            
+            let pinIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityPinTabButton, key: "image", of: String.self) ?? "")
+            let pinTabItem = CommunityPageTabItem(index: 1, image: pinIcon)
+            CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: pinTabItem)
+                .isHidden(viewConfig.isHidden(elementId: .communityPinTabButton))
+            
+            let imageFeedTabIcon = AmityIcon.communityImageFeedIcon.getImageResource()
+            let imageFeedTabItem = CommunityPageTabItem(index: 2, image: imageFeedTabIcon)
+            CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: imageFeedTabItem)
+            
+            let videoFeedTabIcon = AmityIcon.communityVideoFeedIcon.getImageResource()
+            let videoFeedTabItem = CommunityPageTabItem(index: 3, image: videoFeedTabIcon)
+            CommunityPageTabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: videoFeedTabItem)
         }
+        .padding(.horizontal)
         .padding(.top, 8)
         .background(Color(viewConfig.theme.backgroundColor))
+        .updateTheme(with: viewConfig)
     }
 }
 
@@ -68,7 +72,6 @@ struct CommunityPageTabBarItemView: View {
                         .frame(width: 24, height: 24)
                         .foregroundColor(currentTab == tabItem.index ? Color(viewConfig.theme.baseColor) : Color(viewConfig.theme.baseColorShade3))
                 }
-                .frame(width: 70)
                 .padding(.bottom, 12)
                 
                 // Underline

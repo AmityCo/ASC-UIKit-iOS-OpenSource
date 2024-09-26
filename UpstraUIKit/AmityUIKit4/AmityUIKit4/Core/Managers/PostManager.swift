@@ -8,12 +8,20 @@
 import Foundation
 import AmitySDK
 
+enum PostTypeFilter: String {
+    case image, video
+}
+
 class PostManager {
     private let postRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
     
     @discardableResult
     func getPost(withId: String) -> AmityObject<AmityPost> {
         postRepository.getPost(withId: withId)
+    }
+    
+    func getPosts(options: AmityPostQueryOptions) -> AmityCollection<AmityPost> {
+        postRepository.getPosts(options)
     }
     
     @discardableResult

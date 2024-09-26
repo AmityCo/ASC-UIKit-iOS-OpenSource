@@ -58,6 +58,7 @@ public struct AmityCommunityCommentsNotificationSettingPage: AmityPageView {
             host.controller?.navigationController?.isNavigationBarHidden = true
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .updateTheme(with: viewConfig)
     }
     
     private var navigationBarView: some View {

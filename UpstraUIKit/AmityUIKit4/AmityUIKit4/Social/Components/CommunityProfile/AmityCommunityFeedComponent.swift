@@ -111,7 +111,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                     .listRowInsets(EdgeInsets())
                     .modifier(HiddenListSeparator())
                     .onAppear {
-                        if index == postFeedViewModel.postItems.count - 1 {
+                        if index == postFeedViewModel.postItems.filter({$0.id != communityProfileViewModel.announcementPost?.postId ?? ""}).count - 1 {
                             postFeedViewModel.loadMorePosts()
                         }
                     }

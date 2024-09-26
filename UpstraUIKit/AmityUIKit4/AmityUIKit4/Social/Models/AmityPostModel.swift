@@ -390,53 +390,60 @@ public class AmityPostModel: Identifiable {
         text = data[DataType.text.rawValue] as? String ?? ""
         dataTypeInternal = DataType(rawValue: dataType) ?? .unknown
         
-        // Get images/files for post if any
+        // Get media data if parent post itself is not text type.
+        // If the posts are queried with a specific data type, parent post is the post of data type and it does not have any child posts.
+        if childrenPosts.isEmpty && object.dataType != "text" {
+            prepareData(object)
+        }
         
-        for aChild in childrenPosts {
-            switch aChild.dataType {
-            case "image":
-                if let imageData = aChild.getImageInfo() {
-                    let state = AmityMediaState.downloadableImage(
-                        imageData: imageData,
-                        placeholder: UIImage()
-                    )
-                    let media = AmityMedia(state: state, type: .image)
-                    media.image = imageData
-                    medias.append(media)
-                    fileMap[imageData.fileId] = aChild.postId
-                    dataTypeInternal = .image
-                }
-            case "file": break
+        for childPost in childrenPosts {
+            prepareData(childPost)
+        }
+    }
+    
+    private func prepareData(_ post: AmityPost) {
+        switch post.dataType {
+        case "image":
+            if let imageData = post.getImageInfo() {
+                let state = AmityMediaState.downloadableImage(
+                    imageData: imageData,
+                    placeholder: UIImage()
+                )
+                let media = AmityMedia(state: state, type: .image)
+                media.image = imageData
+                medias.append(media)
+                fileMap[imageData.fileId] = post.postId
+                dataTypeInternal = .image
+            }
+        case "file": break
 //                if let fileData = aChild.getFileInfo() {
 //                    let tempFile = AmityFile(state: .downloadable(fileData: fileData))
 //                    files.append(tempFile)
 //                    fileMap[fileData.fileId] = aChild.postId
 //                    dataTypeInternal = .file
 //                }
-            case "video":
-                if let videoData = aChild.getVideoInfo() {
-                    let thumbnail = aChild.getVideoThumbnailInfo()
-                    let state = AmityMediaState.downloadableVideo(
-                        videoData: videoData,
-                        thumbnailUrl: thumbnail?.fileURL
-                    )
-                    let media = AmityMedia(state: state, type: .video)
-                    media.video = videoData
-                    medias.append(media)
-                    fileMap[videoData.fileId] = aChild.postId
-                    dataTypeInternal = .video
-                }
-            case "poll": break
-//                dataTypeInternal = .poll
-            case "liveStream":
-                if let liveStreamData = aChild.getLiveStreamInfo() {
-                    liveStream = liveStreamData
-                    dataTypeInternal = .liveStream
-                }
-            default:
-                dataTypeInternal = .unknown
+        case "video":
+            if let videoData = post.getVideoInfo() {
+                let thumbnail = post.getVideoThumbnailInfo()
+                let state = AmityMediaState.downloadableVideo(
+                    videoData: videoData,
+                    thumbnailUrl: thumbnail?.fileURL
+                )
+                let media = AmityMedia(state: state, type: .video)
+                media.video = videoData
+                medias.append(media)
+                fileMap[videoData.fileId] = post.postId
+                dataTypeInternal = .video
             }
+        case "poll": break
+//                dataTypeInternal = .poll
+        case "liveStream":
+            if let liveStreamData = post.getLiveStreamInfo() {
+                liveStream = liveStreamData
+                dataTypeInternal = .liveStream
+            }
+        default:
+            dataTypeInternal = .unknown
         }
     }
-    
 }
