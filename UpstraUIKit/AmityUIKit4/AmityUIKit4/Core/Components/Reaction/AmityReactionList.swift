@@ -10,6 +10,7 @@ import AmitySDK
 import Combine
 
 public struct AmityReactionList: AmityComponentView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var pageId: PageId?
     public var id: ComponentId {

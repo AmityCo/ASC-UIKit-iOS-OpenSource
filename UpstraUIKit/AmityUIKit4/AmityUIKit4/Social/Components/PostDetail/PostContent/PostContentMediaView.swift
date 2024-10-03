@@ -61,7 +61,9 @@ struct PostContentMediaView: View {
     private func getGridView<Content: View, Data: RandomAccessCollection>(data: Data, @ViewBuilder content: @escaping (Data.Index, Data.Element) -> Content) -> some View where Data.Element: Identifiable {
         GeometryReader { geometry in
             VStack(spacing: 4) {
-                if 1...2 ~= data.count {
+                if data.count == 0 {
+                    EmptyView()
+                } else if 1...2 ~= data.count {
                     HStack(spacing: 4) {
                         ForEach(0..<data.count, id: \.self) { index in
                             content(index as! Data.Index, data[index as! Data.Index])

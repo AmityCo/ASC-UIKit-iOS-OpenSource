@@ -199,3 +199,7 @@
 
 "community_all_categories_title" = "All Categories";
 "community_list_empty_state_title" = "No community yet";
+
+"user_profile_edit_alert_title" = "Unsaved changes";
+"user_profile_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+"user_profile_follow_request_title" = "New follow requests";

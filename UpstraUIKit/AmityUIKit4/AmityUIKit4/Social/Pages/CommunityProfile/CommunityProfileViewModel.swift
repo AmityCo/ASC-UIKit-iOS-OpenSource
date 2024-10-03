@@ -36,12 +36,14 @@ public class CommunityProfileViewModel: ObservableObject {
     var hasStoryManagePermission: Bool = false
     
     var postFeedViewModel: PostFeedViewModel
-    var mediaFeedViewModel: MediaFeedViewModel
+    var imageFeedViewModel: MediaFeedViewModel
+    var videoFeedViewModel: MediaFeedViewModel
     
     public init(communityId: String) {
         self.communityId = communityId
         self.postFeedViewModel = PostFeedViewModel(feedType: .community(communityId: communityId))
-        self.mediaFeedViewModel = MediaFeedViewModel(feedType: .community(communityId: communityId))
+        self.imageFeedViewModel = MediaFeedViewModel(feedType: .community(communityId: communityId), postType: .image)
+        self.videoFeedViewModel = MediaFeedViewModel(feedType: .community(communityId: communityId), postType: .video)
         
         loadCommunity()
         loadStories()
@@ -97,11 +99,7 @@ public class CommunityProfileViewModel: ObservableObject {
                     if pinnedpost.placement == AmityPinPlacement.announcement.rawValue {
                         self?.announcementPost = AmityPostModel(post: post)
                     } else {
-                        if let announcementPost = self?.announcementPost, post.postId == announcementPost.postId {
-                            continue
-                        } else {
-                            self?.pinnedPosts.append(AmityPostModel(post: post, isPinned: true))
-                        }
+                        self?.pinnedPosts.append(AmityPostModel(post: post, isPinned: true))
                     }
                 }
             }
@@ -118,9 +116,9 @@ public class CommunityProfileViewModel: ObservableObject {
         } else if currentTab == 1 {
             loadPinnedFeed()
         } else if currentTab == 2 {
-            mediaFeedViewModel.loadMediaFeed(.image)
+            imageFeedViewModel.loadMediaFeed()
         } else if currentTab == 3 {
-            mediaFeedViewModel.loadMediaFeed(.video)
+            videoFeedViewModel.loadMediaFeed()
         }
     }
     
@@ -131,5 +129,9 @@ public class CommunityProfileViewModel: ObservableObject {
     @MainActor
     func joinCommunity() async throws {
         try await communityManger.joinCommunity(withId: communityId)
+    }
+    
+    func isAnnouncementPostPinned() -> Bool {
+        return pinnedPosts.contains(where: {$0.postId == announcementPost?.postId})
     }
 }

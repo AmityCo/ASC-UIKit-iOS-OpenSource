@@ -37,7 +37,14 @@ public enum PageId: String {
     case communityStorySettingPage = "community_story_setting_page"
     case communityPostsNotificationSettingPage = "community_posts_notification_page"
     case communityCommentsNotificationSettingPage = "community_comments_notification_page"
+    case communityStoriesNotificationSettingPage = "community_stories_notification_page"
     case communityPendingPostPage = "pending_posts_page"
+    
+    case userProfilePage = "user_profile_page"
+    case editUserProfilePage = "edit_user_profile_page"
+    case userRelationshipPage = "user_relationship_page"
+    case blockedUsersPage = "blocked_users_page"
+    case pendingFollowRequestPage = "user_pending_follow_request_page"
     
     case communitiesByCategoryPage = "communities_by_category_page"
     case allCategories = "all_categories_page"
@@ -73,10 +80,16 @@ public enum ComponentId: String {
     case mediaAttachment = "media_attachment"
     case detailedMediaAttachment = "detailed_media_attachment"
     case communityImageFeed = "community_image_feed"
+    case pendingPostContentComponent = "pending_post_content"
 
     case recommendedCommunities = "recommended_communities"
     case trendingCommunities = "trending_communities"
     case communityCategories = "community_categories"
+    
+    case userProfileHeader = "user_profile_header"
+    case userFeed = "user_feed"
+    case userImageFeed = "user_image_feed"
+    case userVideoFeed = "user_video_feed"
 }
 
 public enum ElementId: String {
@@ -198,4 +211,71 @@ public enum ElementId: String {
     case videoButton = "video_button"
     case fileButton = "file_button"
     
+    // Community Setup Page
+    case communityEditTitle = "community_edit_title"
+    case communityNameTitle = "community_name_title"
+    case communityAboutTitle = "community_about_title"
+    case communityCategoryTitle = "community_category_title"
+    case communityPrivacyTitle = "community_privacy_title"
+    case communityPrivacyPrivateIcon = "community_privacy_private_icon"
+    case communityPrivacyPrivateTitle = "community_privacy_private_title"
+    case communityPrivacyPrivateDescription = "community_privacy_private_description"
+    case communityPrivacyPublicIcon = "community_privacy_public_icon"
+    case communityPrivacyPublicTitle = "community_privacy_public_title"
+    case communityPrivacyPublicDescription = "community_privacy_public_description"
+    case communityAddMemberTitle = "community_add_member_title"
+    case communityAddMemberButton = "community_add_member_button"
+    case communityCreateButton = "community_create_button"
+    case communityEditButton = "community_edit_button"
+    
+    // Pending Posts Page
+    case postAcceptButton = "post_accept_button"
+    case postDeclineButton = "post_decline_button"
+    
+    // Community Setting Page
+    case editProfile = "edit_profile"
+    case members = "members"
+    case notifications = "notifications"
+    case postPermission = "post_permission"
+    case storySetting = "story_setting"
+    case leaveCommunity = "leave_community"
+    case closeCommunity = "close_community"
+    case closeCommunityDescription = "close_community_description"
+    
+    // UserProfilePage
+    case userFeedTabButton = "user_feed_tab_button"
+    case userImageFeedTabButton = "user_image_feed_tab_button"
+    case userVideoFeedTabButton = "user_video_feed_tab_button"
+    
+    // UserProfileHeader
+    case followUserButton = "follow_user_button"
+    case followingUserButton = "following_user_button"
+    case pendingUserButton = "pending_user_button"
+    case unblockUserButton = "unblock_user_button"
+    case userAvatar = "user_avatar"
+    case userName = "user_name"
+    case userDescription = "user_description"
+    case userFollowing = "user_following"
+    case userFollower = "user_follower"
+    
+    // User Feed, Image Feed, Video Feed
+    case emptyUserFeed = "empty_user_feed"
+    case privateUserFeed = "private_user_feed"
+    case privateUserFeedInfo = "private_user_feed_info"
+    case blockedUserFeed = "blocked_user_feed"
+    case blockedUserFeedInfo = "blocked_user_feed_info"
+    case emptyUserImageFeed = "empty_user_image_feed"
+    case privateUserImageFeed = "private_user_image_feed"
+    case privateUserImageFeedInfo = "private_user_image_feed_info"
+    case blockedUserImageFeed = "blocked_user_image_feed"
+    case blockedUserImageFeedInfo = "blocked_user_image_feed_info"
+    case emptyUserVideoFeed = "empty_user_video_feed"
+    case privateUserVideoFeed = "private_user_video_feed"
+    case privateUserVideoFeedInfo = "private_user_video_feed_info"
+    case blockedUserVideoFeed = "blocked_user_video_feed"
+    case blockedUserVideoFeedInfo = "blocked_user_video_feed_info"
+    // Edit User Profile
+    case userDisplayNameTitle = "user_display_name_title"
+    case userAboutTitle = "user_about_title"
+    case updateUserProfileButton = "update_user_profile_button"
 }

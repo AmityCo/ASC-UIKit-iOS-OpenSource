@@ -9,7 +9,7 @@ import SwiftUI
 import AmitySDK
 
 struct ReactionListContent: View {
-    
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @StateObject var viewModel: ReactionLoader
     
     @Environment(\.presentationMode) private var dismissScreen
@@ -28,7 +28,14 @@ struct ReactionListContent: View {
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
                                 .onTapGesture {
-                                    guard user.isLoggedInUser else { return }
+                                    guard user.isLoggedInUser else {
+                                        /// Dismiss the present viewcontroller twice for the case AmityReactionList is used from AmityCommentTrayComponent which is presented view controller itself. It does not have any effect if there is no another presented view controller in the normal case like using it from AmityPostContentComponent.
+                                        /// iOS needs to dismiss presented view controller first before making navigation in underlying UINavigationController.
+                                        host.controller?.navigationController?.presentedViewController?.dismiss(animated: false)
+                                        host.controller?.navigationController?.presentedViewController?.dismiss(animated: false)
+                                        goToUserProfilePage(user.userId)
+                                        return
+                                    }
                                     
                                     viewModel.removeReaction(reactionName: user.reactionName)
                                     
@@ -89,6 +96,12 @@ struct ReactionListContent: View {
             }
         }
         .padding(.horizontal, 12)
+    }
+    
+    private func goToUserProfilePage(_ userId: String) {
+        let page = AmityUserProfilePage(userId: userId)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        host.controller?.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

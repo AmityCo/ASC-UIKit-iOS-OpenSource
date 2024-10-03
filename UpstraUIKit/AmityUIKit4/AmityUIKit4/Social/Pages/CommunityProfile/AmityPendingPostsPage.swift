@@ -44,7 +44,8 @@ public struct AmityPendingPostsPage: AmityPageView {
     
     private var navigationBarView: some View {
         HStack(spacing: 0) {
-            Image(AmityIcon.backIcon.getImageResource())
+            let backIcon = viewConfig.getImage(elementId: .backButtonElement)
+            Image(backIcon)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
@@ -56,7 +57,8 @@ public struct AmityPendingPostsPage: AmityPageView {
             
             Spacer()
             
-            Text("Pending posts (\(viewModel.posts.count))")
+            let title = viewConfig.getText(elementId: .title) ?? "Pending posts"
+            Text("\(title) (\(viewModel.posts.count))")
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(Color(viewConfig.theme.baseColor))
             

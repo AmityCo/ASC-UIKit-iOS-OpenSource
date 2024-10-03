@@ -36,15 +36,16 @@ public struct AmityCommunitySettingPage: AmityPageView {
             
             /// Edit Profile setting
             if viewModel.shouldShowEditProfile {
-                getItemView(AmityIcon.penIcon.getImageResource(), AmityLocalizedStringSet.Social.communitySettingEditProfile.localizedString)
+                let editProfileText = viewConfig.getText(elementId: .editProfile) ?? AmityLocalizedStringSet.Social.communitySettingEditProfile.localizedString
+                getItemView(AmityIcon.penIcon.getImageResource(), editProfileText)
                     .onTapGesture {
                         let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToEditCommunityPage(context)
                     }
             }
             
-            
-            getItemView(AmityIcon.memberIcon.getImageResource(), AmityLocalizedStringSet.Social.communitySettingMembers.localizedString)
+            let communityMembersText = viewConfig.getText(elementId: .members) ?? AmityLocalizedStringSet.Social.communitySettingMembers.localizedString
+            getItemView(AmityIcon.memberIcon.getImageResource(), communityMembersText)
                 .onTapGesture {
                     let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                     AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToMembershipPage(context)
@@ -52,7 +53,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
             
             /// Notifications setting
             if viewModel.shouldShowNotifications {
-                getItemView(AmityIcon.notificationIcon.getImageResource(), AmityLocalizedStringSet.Social.communitySettingNotifications.localizedString, disclosureText: viewModel.isNotificationEnabled ? AmityLocalizedStringSet.General.on.localizedString : AmityLocalizedStringSet.General.off.localizedString)
+                let notificationText = viewConfig.getText(elementId: .notifications) ?? AmityLocalizedStringSet.Social.communitySettingNotifications.localizedString
+                getItemView(AmityIcon.notificationIcon.getImageResource(), notificationText, disclosureText: viewModel.isNotificationEnabled ? AmityLocalizedStringSet.General.on.localizedString : AmityLocalizedStringSet.General.off.localizedString)
                     .onTapGesture {
                         let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToNotificationPage(context)
@@ -77,7 +79,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
             
             /// Post Permissions setting
             if viewModel.shouldShowPostPermissions {
-                getItemView(AmityIcon.postPermissionIcon.getImageResource(), AmityLocalizedStringSet.Social.communitySettingPostPermissions.localizedString)
+                let postPermissionText = viewConfig.getText(elementId: .postPermission) ?? AmityLocalizedStringSet.Social.communitySettingPostPermissions.localizedString
+                getItemView(AmityIcon.postPermissionIcon.getImageResource(), postPermissionText)
                     .onTapGesture {
                         let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToPostPermissionPage(context)
@@ -86,14 +89,16 @@ public struct AmityCommunitySettingPage: AmityPageView {
             
             /// Story Comments setting
             if viewModel.shouldShowStoryComments {
-                getItemView(AmityIcon.createStoryMenuIcon.getImageResource(), AmityLocalizedStringSet.Social.communitySettingStoryComments.localizedString)
+                let storyCommentsText = viewConfig.getText(elementId: .storySetting) ?? AmityLocalizedStringSet.Social.communitySettingStoryComments.localizedString
+                getItemView(AmityIcon.createStoryMenuIcon.getImageResource(), storyCommentsText)
                     .onTapGesture {
                         let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToStorySettingPage(context)
                     }
             }
             
-            Text(AmityLocalizedStringSet.Social.communitySettingLeaveCommunity.localizedString)
+            let leaveCommunityText = viewConfig.getText(elementId: .leaveCommunity) ?? AmityLocalizedStringSet.Social.communitySettingLeaveCommunity.localizedString
+            Text(leaveCommunityText)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundColor(Color(viewConfig.theme.alertColor))
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -131,12 +136,14 @@ public struct AmityCommunitySettingPage: AmityPageView {
             /// Close Community setting
             if viewModel.shouldShowCloseCommunity {
                 VStack(spacing: 8) {
-                    Text(AmityLocalizedStringSet.Social.communitySettingCloseCommunity.localizedString)
+                    let closeCommunityText = viewConfig.getText(elementId: .closeCommunity) ?? AmityLocalizedStringSet.Social.communitySettingCloseCommunity.localizedString
+                    Text(closeCommunityText)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(Color(viewConfig.theme.alertColor))
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    Text(AmityLocalizedStringSet.Social.communitySettingCloseCommunityDescription.localizedString)
+                    let closeCommunityDesc = viewConfig.getText(elementId: .closeCommunityDescription) ?? AmityLocalizedStringSet.Social.communitySettingCloseCommunityDescription.localizedString
+                    Text(closeCommunityDesc)
                         .font(.system(size: 13))
                         .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                         .frame(maxWidth: .infinity, alignment: .leading)

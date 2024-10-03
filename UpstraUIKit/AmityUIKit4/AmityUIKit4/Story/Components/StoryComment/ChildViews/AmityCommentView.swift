@@ -11,6 +11,7 @@ public enum AmityCommentButtonActionType {
     case react(AmityCommentModel)
     case reply(AmityCommentModel)
     case meatball(AmityCommentModel)
+    case userProfile(String)
 }
 
 public typealias AmityCommentButtonAction = (AmityCommentButtonActionType) -> Void
@@ -38,10 +39,13 @@ public struct AmityCommentView: View {
     
     public var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: comment.fileURL))
+            AmityUserProfileImageView(displayName: comment.displayName, avatarURL: URL(string: comment.avatarURL))
                 .frame(width: 32, height: 32)
                 .clipShape(.circle)
                 .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))
+                .onTapGesture {
+                    commentButtonAction(.userProfile(comment.userId))
+                }
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.avatarImageView)
             
             VStack(alignment: .leading, spacing: 12) {
@@ -51,6 +55,9 @@ public struct AmityCommentView: View {
                             .font(.system(size: 13, weight: .semibold))
                             .padding([.top, .leading, .trailing], 12)
                             .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .onTapGesture {
+                                commentButtonAction(.userProfile(comment.userId))
+                            }
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.nameTextView)
                         
                         getModeratorBadgeView()
@@ -58,18 +65,20 @@ public struct AmityCommentView: View {
                             .isHidden(!comment.isModerator)
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.badgeImageView)
                         
-                        ExpandableText(comment.text, metadata: comment.metadata, mentionees: comment.mentionees)
-                            .lineLimit(8)
-                            .moreButtonText("...See more")
-                            .font(.system(size: 13.5))
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
-                            .attributedColor(viewConfig.theme.primaryColor)
-                            .moreButtonColor(Color(viewConfig.theme.primaryColor))
-                            .expandAnimation(.easeOut(duration: 0.25))
-                            .lineSpacing(5)
-                            .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
-                            .padding([.leading, .bottom, .trailing], 12)
-                            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentTextView)
+                        ExpandableText(comment.text, metadata: comment.metadata, mentionees: comment.mentionees, onTapMentionee: { userId in
+                            commentButtonAction(.userProfile(userId))
+                        })
+                        .lineLimit(8)
+                        .moreButtonText("...See more")
+                        .font(.system(size: 13.5))
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .attributedColor(viewConfig.theme.primaryColor)
+                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .expandAnimation(.easeOut(duration: 0.25))
+                        .lineSpacing(5)
+                        .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
+                        .padding([.leading, .bottom, .trailing], 12)
+                        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentTextView)
                     
                     }
                     .background(Color(viewConfig.theme.baseColorShade4))

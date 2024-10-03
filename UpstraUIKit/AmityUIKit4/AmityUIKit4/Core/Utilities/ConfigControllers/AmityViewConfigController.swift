@@ -47,8 +47,15 @@ class AmityViewConfigController: NSObject, ObservableObject {
                              of type: T.Type) -> T? {
         let configId = constructConfigId(pageId: pageId, componentId: componentId, elementId: elementId)
         let config = AmityUIKitConfigController.shared.getConfig(configId: configId)
-        
         return config[key] as? T
+    }
+    
+    public func getText(elementId: ElementId) -> String? {
+        getConfig(elementId: elementId, key: "text", of: String.self)
+    }
+    
+    public func getImage(elementId: ElementId) -> ImageResource {
+        AmityIcon.getImageResource(named: getConfig(elementId: elementId, key: "image", of: String.self) ?? "")
     }
     
     public func isHidden(elementId: ElementId? = nil) -> Bool {

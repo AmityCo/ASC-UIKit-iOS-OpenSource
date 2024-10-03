@@ -69,6 +69,10 @@ extension View {
             .eraseToAnyPublisher()
     }
     
+    func dismissKeyboardOnDrag() -> some View {
+        self.modifier(DismissKeyboardOnDrag())
+    }
+    
     func adaptiveVerticalPadding(top: CGFloat = 0, bottom: CGFloat = 0) -> some View {
         self.modifier(AdaptiveVerticalPadding(top: top, bottom: bottom))
     }
@@ -185,6 +189,19 @@ struct HiddenListSeparator: ViewModifier {
         }
     }
 }
+
+struct DismissKeyboardOnDrag: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .simultaneousGesture(
+                DragGesture(minimumDistance: 15)
+                    .onEnded({ _ in
+                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                    })
+            )
+    }
+}
+
 
 struct AdaptiveVerticalPadding: ViewModifier {
     let additionalTopPadding: CGFloat

@@ -31,8 +31,10 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
             if viewModel.users.isEmpty && viewModel.loadingState == .loaded {
                 VStack(spacing: 15) {
                     Image(AmityIcon.noSearchableIcon.getImageResource())
+                        .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                         .frame(width: 60, height: 60)
                     
                     Text("No results found")
@@ -43,8 +45,9 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
             
             List(Array(viewModel.users.enumerated()), id: \.element.userId) { index, user in
                 getUserCellView(user)
+                .background(Color(viewConfig.theme.backgroundColor))
                 .onTapGesture {
-                    let context = AmityUserSearchResultComponentBehavior.Context(component: self)
+                    let context = AmityUserSearchResultComponentBehavior.Context(component: self, user: user)
                     AmityUIKitManagerInternal.shared.behavior.userSearchResultComponentBehavior?.goToUserProfilePage(context: context)
                 }
                 .onAppear {
@@ -65,6 +68,7 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
         if #available(iOS 15.0, *) {
             VStack(spacing: 0) {
                 UserCellView(user: user)
+                    .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 0))
                 
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
@@ -76,6 +80,7 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
         } else {
             VStack(spacing: 0) {
                 UserCellView(user: user)
+                    .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 0))
             }
             .listRowInsets(EdgeInsets())
         }
@@ -86,22 +91,24 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
 struct UserCellView: View {
     private let user: AmityUser
     @EnvironmentObject private var viewConfig: AmityViewConfigController
+    private var menuButtonAction: ((AmityUser) -> Void)? = nil
     
-    init(user: AmityUser) {
+    init(user: AmityUser, menuButtonAction: ((AmityUser) -> Void)? = nil) {
         self.user = user
+        self.menuButtonAction = menuButtonAction
     }
     
     var body: some View {
         HStack(spacing: 0) {
-            AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: user.getAvatarInfo()?.fileURL ?? ""))
+            AmityUserProfileImageView(displayName: user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: user.getAvatarInfo()?.fileURL ?? ""))
                 .frame(size: CGSize(width: 40, height: 40))
                 .clipShape(Circle())
             
-            Text(user.displayName ?? "Unknown")
+            Text(user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString)
                 .font(.system(size: 15, weight: .semibold))
                 .lineLimit(1)
                 .foregroundColor(Color(viewConfig.theme.baseColor))
-                .padding(.leading, 16)
+                .padding(.leading, 8)
                         
             Image(AmityIcon.brandBadge.imageResource)
                 .resizable()
@@ -110,9 +117,20 @@ struct UserCellView: View {
                 .padding(.leading, 4)
                 .opacity(user.isBrand ? 1 : 0)
             
-            Spacer()
+            if let menuButtonAction {
+                Spacer()
+                Button {
+                    menuButtonAction(user)
+                } label: {
+                    Image(AmityIcon.threeDotIcon.getImageResource())
+                        .renderingMode(.template)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .frame(width: 24, height: 18)
+                }
+            } else {
+                Spacer()
+            }
         }
-        .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 0))
         .background(Color(viewConfig.theme.backgroundColor))
     }
 }

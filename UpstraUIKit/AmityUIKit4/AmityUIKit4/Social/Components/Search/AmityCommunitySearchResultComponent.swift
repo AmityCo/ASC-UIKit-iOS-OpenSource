@@ -30,8 +30,10 @@ public struct AmityCommunitySearchResultComponent: AmityComponentView {
             if viewModel.communities.isEmpty && viewModel.loadingState == .loaded {
                 VStack(spacing: 15) {
                     Image(AmityIcon.noSearchableIcon.getImageResource())
+                        .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                         .frame(width: 60, height: 60)
                     
                     Text("No results found")

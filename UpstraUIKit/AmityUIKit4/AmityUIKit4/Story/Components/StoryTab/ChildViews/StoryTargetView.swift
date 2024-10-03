@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct StoryTargetView<Content: View>: View {
-    
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
     let componentId: ComponentId
     @ViewBuilder private let cornerImage: () -> Content
     @ObservedObject private var storyTarget: AmityStoryTargetModel
@@ -61,12 +61,16 @@ struct StoryTargetView<Content: View>: View {
             
             HStack(spacing: 0) {
                 Image(AmityIcon.lockBlackIcon.getImageResource())
+                    .renderingMode(.template)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .scaledToFit()
                     .frame(width: 20, height: 12)
                     .offset(y: -1)
                     .isHidden(hideLockIcon)
                     
                 Text(name)
                     .font(.system(size: 13))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .frame(height: 20, alignment: .leading)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.targetNameTextView)
             }

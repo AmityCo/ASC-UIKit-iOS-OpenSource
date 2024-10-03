@@ -166,14 +166,14 @@ class AppManager {
 
 class CustomPostContentComponenetBehaviour: AmityPostContentComponentBehavior {
     
-    override func goToUserProfilePage(context: AmityPostContentComponentBehavior.Context) {
-        let viewController = AmityUserProfilePageViewController.make(withUserId: context.component.post.postedUserId)
-        if let navigationController = context.component.host.controller?.navigationController {
-            navigationController.isNavigationBarHidden = false
-            navigationController.pushViewController(viewController, animated: true)
-        }
-        
-    }
+//    override func goToUserProfilePage(context: AmityPostContentComponentBehavior.Context) {
+//        let viewController = AmityUserProfilePageViewController.make(withUserId: context.component.post.postedUserId)
+//        if let navigationController = context.component.host.controller?.navigationController {
+//            navigationController.isNavigationBarHidden = false
+//            navigationController.pushViewController(viewController, animated: true)
+//        }
+//        
+//    }
     
 }
 

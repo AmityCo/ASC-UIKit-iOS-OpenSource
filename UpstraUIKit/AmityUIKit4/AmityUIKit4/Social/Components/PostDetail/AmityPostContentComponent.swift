@@ -19,10 +19,11 @@ public enum AmityPostCategory {
     case general
     case announcement
     case pin
+    case pinAndAnnouncement
 }
 
 public struct AmityPostContentComponent: AmityComponentView {
-    
+
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var pageId: PageId?
@@ -90,13 +91,16 @@ public struct AmityPostContentComponent: AmityComponentView {
             .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
             .cornerRadius(4, corners: [.topRight, .bottomRight])
             .padding(.vertical, 8)
-            .isHidden(category != .announcement || viewConfig.isHidden(elementId: .announcementBadge))
+            .isHidden(!(category == .announcement || category == .pinAndAnnouncement) || viewConfig.isHidden(elementId: .announcementBadge))
 
             HStack(spacing: 8) {
-                AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: post.postedUser?.avatarURL ?? ""))
+                AmityUserProfileImageView(displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: post.postedUser?.avatarURL ?? ""))
                     .frame(size: CGSize(width: 32.0, height: 32.0))
                     .clipShape(Circle())
                     .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                    .onTapGesture {
+                        goToUserProfilePage(post.postedUserId)
+                    }
                 
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 8) {
@@ -106,8 +110,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .foregroundColor(Color(viewConfig.theme.baseColor))
                             .layoutPriority(1)
                             .onTapGesture {
-                                let context = AmityPostContentComponentBehavior.Context(component: self)
-                                AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToUserProfilePage(context: context)
+                                goToUserProfilePage(post.postedUserId)
                             }
                         
                         if post.isFromBrand {
@@ -183,7 +186,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     .scaledToFit()
                     .foregroundColor(Color(viewConfig.theme.primaryColor))
                     .frame(width: 20, height: 20)
-                    .isHidden(category != .pin || viewConfig.isHidden(elementId: .pinBadge))
+                    .isHidden(!(category == .pin || category == .pinAndAnnouncement) || viewConfig.isHidden(elementId: .pinBadge))
                 
                 if !hideMenuButton {
                     let bottomSheetHeight = calculateBottomSheetHeight(post: post)
@@ -268,16 +271,18 @@ public struct AmityPostContentComponent: AmityComponentView {
     @ViewBuilder
     private func postContentTextView() -> some View {
         if !post.text.isEmpty {
-            ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees)
-                .lineLimit(8)
-                .moreButtonText("...See more")
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-                .attributedColor(viewConfig.theme.primaryColor)
-                .moreButtonColor(Color(viewConfig.theme.primaryColor))
-                .expandAnimation(.easeOut(duration: 0.25))
-                .lineSpacing(5)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
+                goToUserProfilePage(userId)
+            })
+            .lineLimit(8)
+            .moreButtonText("...See more")
+            .font(.system(size: 15))
+            .foregroundColor(Color(viewConfig.theme.baseColor))
+            .attributedColor(viewConfig.theme.primaryColor)
+            .moreButtonColor(Color(viewConfig.theme.primaryColor))
+            .expandAnimation(.easeOut(duration: 0.25))
+            .lineSpacing(5)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
     
@@ -389,6 +394,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             .padding([.leading, .trailing], 16)
             .sheet(isPresented: $showReactionList) {
                 AmityReactionList(post: post.object, pageId: pageId)
+                    .environmentObject(host)
             }
         }
     }
@@ -551,7 +557,11 @@ extension AmityPostContentComponent {
                 }
         }
     }
-
+    
+    private func goToUserProfilePage(_ userId: String) {
+        let context = AmityPostContentComponentBehavior.Context(component: self, userId: userId)
+        AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToUserProfilePage(context: context)
+    }
 }
 
 

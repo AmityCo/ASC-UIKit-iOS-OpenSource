@@ -12,6 +12,7 @@ struct CommentComposerView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     private let avatarURL: URL? = URL(string: AmityUIKitManagerInternal.shared.client.user?.snapshot?.getAvatarInfo()?.fileURL ?? "")
+    private let displayName: String = AmityUIKitManagerInternal.shared.client.user?.snapshot?.displayName ?? ""
     @ObservedObject private var viewModel: CommentComposerViewModel
     
     init(viewModel: CommentComposerViewModel) {
@@ -47,7 +48,7 @@ struct CommentComposerView: View {
             .isHidden(!viewModel.replyState.showToReply)
             
             HStack(spacing: 8) {
-                AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: avatarURL)
+                AmityUserProfileImageView(displayName: displayName, avatarURL: avatarURL)
                     .frame(width: 32, height: 32)
                     .clipShape(.circle)
                     .padding(.leading, 12)

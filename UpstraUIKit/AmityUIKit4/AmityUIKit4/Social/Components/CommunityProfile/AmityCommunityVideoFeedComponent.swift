@@ -28,9 +28,9 @@ public struct AmityCommunityVideoFeedComponent: AmityComponentView {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityImageFeed))
         
         if let communityProfileViewModel {
-            self._viewModel = StateObject(wrappedValue: communityProfileViewModel.mediaFeedViewModel)
+            self._viewModel = StateObject(wrappedValue: communityProfileViewModel.videoFeedViewModel)
         } else {
-            self._viewModel = StateObject(wrappedValue: MediaFeedViewModel(feedType: .community(communityId: communityId)))
+            self._viewModel = StateObject(wrappedValue: MediaFeedViewModel(feedType: .community(communityId: communityId), postType: .video))
         }
     }
     
@@ -41,9 +41,6 @@ public struct AmityCommunityVideoFeedComponent: AmityComponentView {
             
             EmptyCommunityFeedView(.video)
                 .isHidden(!(viewModel.medias.isEmpty && viewModel.loadingStatus == .loaded))
-        }
-        .onAppear {
-            viewModel.loadMediaFeed(.video)
         }
         .updateTheme(with: viewConfig)
     }

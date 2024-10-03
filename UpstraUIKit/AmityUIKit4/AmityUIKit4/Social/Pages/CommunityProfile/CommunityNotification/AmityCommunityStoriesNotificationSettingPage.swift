@@ -15,7 +15,7 @@ public struct AmityCommunityStoriesNotificationSettingPage: AmityPageView {
     @StateObject private var viewModel: AmityCommunityStoriesNotificationSettingPageViewModel
     
     public var id: PageId {
-        .communityCommentsNotificationSettingPage
+        .communityStoriesNotificationSettingPage
     }
     
     public init(community: AmityCommunity) {

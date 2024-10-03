@@ -48,16 +48,18 @@ public struct ExpandableText: View {
     internal var trimMultipleNewlinesWhenTruncated: Bool = true
     internal var metadata: [String: Any]?
     internal var mentionees: [AmityMentionees]?
+    internal var onTapMentionee: ((String) -> Void)?
     
     /**
      Initializes a new `ExpandableText` instance with the specified text string, trimmed of any leading or trailing whitespace and newline characters.
      - Parameter text: The initial text string to display in the `ExpandableText` view.
      - Returns: A new `ExpandableText` instance with the specified text string and trimming applied.
      */
-    public init(_ text: String, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil) {
+    public init(_ text: String, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, onTapMentionee: ((String) -> Void)? = nil) {
         self.text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         self.metadata = metadata
         self.mentionees = mentionees
+        self.onTapMentionee = onTapMentionee
     }
     
     public var body: some View {
@@ -116,6 +118,16 @@ public struct ExpandableText: View {
             .font(font)
             .foregroundColor(color)
             .frame(alignment: .leading)
+            .environment(\.openURL, OpenURLAction { url in
+                // Tapping on mention user attribute
+                if url.deletingLastPathComponent().absoluteString == TextHighlighter.mentionURL {
+                    let userId = url.lastPathComponent
+                    onTapMentionee?(userId)
+                    return .discarded
+                }
+                
+                return .systemAction
+            })
         } else {
             Text(.init(
                 trimMultipleNewlinesWhenTruncated
@@ -157,7 +169,7 @@ extension ExpandableText {
         // If links is present, highlight links
         let links = TextHighlighter.detectLinks(in: contentText)
         if !links.isEmpty {
-            highlightedText = TextHighlighter.highlightLinks(links: links, in: highlightedText, attributes: [.foregroundColor : attributedColor])
+            highlightedText = TextHighlighter.highlightLinks(links: links, in: highlightedText, attributes: highlightAttributes)
         }
         
         return highlightedText

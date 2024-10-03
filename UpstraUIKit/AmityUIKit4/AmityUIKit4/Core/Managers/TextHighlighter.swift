@@ -13,6 +13,7 @@ import SwiftUI
 /// Highlights mentions & links and returns AttributedString
 @available(iOS 15, *)
 class TextHighlighter {
+    public static let mentionURL: String = "https://www.amity.co/mentionuser/"
     
     // Helper Method
     public static func getAttributedText(from message: MessageModel, highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemBlue, .font: UIFont.systemFont(ofSize: 15)]) -> AttributedString {
@@ -90,6 +91,7 @@ class TextHighlighter {
             finalStr[linkRange].link = URL(string: finalLink)
             finalStr[linkRange].underlineStyle = attributes[.underlineStyle] as? Text.LineStyle
             finalStr[linkRange].foregroundColor = attributes[.foregroundColor] as? UIColor
+            finalStr[linkRange].font = attributes[.font] as? UIFont
         }
         
         return finalStr
@@ -129,7 +131,12 @@ class TextHighlighter {
                 let mentionAttr = MentionAttribute(attributes: highlightAttributes, range: range, userId: mention.userId ?? "")
                 attributes.append(mentionAttr)
                 
-                attributedString.addAttributes(mentionAttr.attributes, range: mentionAttr.range)
+                // Update link attribute of mention users to handle tap event
+                // SwiftUI need valid url so provide it
+                var updatedAttributes = mentionAttr.attributes
+                updatedAttributes[.link] = URL(string: "\(TextHighlighter.mentionURL)\(mentionAttr.userId)")
+                
+                attributedString.addAttributes(updatedAttributes, range: mentionAttr.range)
             }
         }
         

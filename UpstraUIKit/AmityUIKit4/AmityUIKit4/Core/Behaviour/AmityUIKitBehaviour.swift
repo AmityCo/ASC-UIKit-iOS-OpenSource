@@ -14,6 +14,7 @@ open class AmityUIKitBehaviour {
     public var storyTabComponentBehaviour: AmityStoryTabComponentBehaviour?
     public var viewStoryPageBehaviour: AmityViewStoryPageBehaviour?
     public var storyTargetSelectionPageBehaviour: AmityStoryTargetSelectionPageBehaviour?
+    public var commentTrayComponentBehavior: AmityCommentTrayComponentBehavior?
     
     // MARK: - Social
     public var socialHomePageBehavior: AmitySocialHomePageBehavior?
@@ -35,4 +36,10 @@ open class AmityUIKitBehaviour {
     public var communityMembershipPageBehavior: AmityCommunityMembershipPageBehavior?
     public var communitySettingPageBehavior: AmityCommunitySettingPageBehavior?
     public var communityNotificationSettingPageBehavior: AmityCommunityNotificationSettingPageBehavior?
+    public var userProfilePageBehavior: AmityUserProfilePageBehavior?
+    public var userProfileHeaderComponentBehavior: AmityUserProfileHeaderComponentBehavior?
+    public var userRelationshipPageBehavior: AmityUserRelationshipPageBehavior?
+    public var userPendingFollowRequestsPageBehavior: AmityUserPendingFollowRequestsPageBehavior?
+    public var blockedUsersPageBehavior: AmityBlockedUsersPageBehavior?
+    public var pendingPostContentComponentBehavior: AmityPendingPostContentComponentBehavior?
 }

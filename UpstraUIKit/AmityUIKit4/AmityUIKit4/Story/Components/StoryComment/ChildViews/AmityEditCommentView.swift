@@ -26,7 +26,7 @@ public struct AmityEditCommentView: View {
     
     public var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: URL(string: comment.fileURL))
+            AmityUserProfileImageView(displayName: comment.displayName, avatarURL: URL(string: comment.avatarURL))
                 .frame(width: 32, height: 32)
                 .clipShape(.circle)
                 .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))

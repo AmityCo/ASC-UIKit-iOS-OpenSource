@@ -11,12 +11,19 @@ open class AmityPostDetailPageBehavior {
     
     open class Context {
         public let page: AmityPostDetailPage
+        public let userId: String
         
-        init(page: AmityPostDetailPage) {
+        init(page: AmityPostDetailPage, userId: String) {
             self.page = page
+            self.userId = userId
         }
     }
     
     public init() {}
     
+    open func goToUserProfilePage(context: AmityPostDetailPageBehavior.Context) {
+        let page = AmityUserProfilePage(userId: context.userId)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
 }

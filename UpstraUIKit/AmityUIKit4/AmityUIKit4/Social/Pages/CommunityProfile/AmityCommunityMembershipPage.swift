@@ -48,12 +48,16 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             
             TabView(selection: $tabIndex) {
                 CommunityMemberTabView(viewConfig: viewConfig, community: community, onTapAction: { member in
+                    goToUserProfilePage(member.userId)
+                }, onMenuAction: { member in
                     viewModel.communityMember = member
                     viewModel.showBottomSheet.toggle()
                 })
                 .tag(0)
                 
                 CommunityModeratorTabView(viewConfig: viewConfig, community: community, onTapAction: { member in
+                    goToUserProfilePage(member.userId)
+                }, onMenuAction: { member in
                     viewModel.communityMember = member
                     viewModel.showBottomSheet.toggle()
                 })
@@ -122,6 +126,12 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             CommunityMembershipBottomSheetView(showBottomSheet: $viewModel.showBottomSheet, community: community, communityMember: member)
                 .environmentObject(viewConfig)
         }
+    }
+    
+    private func goToUserProfilePage(_ userId: String) {
+        let page = AmityUserProfilePage(userId: userId)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        host.controller?.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

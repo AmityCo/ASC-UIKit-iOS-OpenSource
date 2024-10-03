@@ -10,6 +10,7 @@ import LinkPresentation
 import AmitySDK
 
 public struct AmityPendingPostContentComponent: AmityComponentView {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: AmityPendingPostContentComponenttViewModel
     @State private var showBottomSheet: Bool = false
@@ -18,13 +19,13 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
     private let post: AmityPostModel
     
     public var id: ComponentId {
-        .commentTrayComponent
+        .pendingPostContentComponent
     }
     
     public init(pageId: PageId? = nil, post: AmityPost) {
         self.pageId = pageId
         self.post = AmityPostModel(post: post)
-        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .commentTrayComponent))
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .pendingPostContentComponent))
         self._viewModel = StateObject(wrappedValue: AmityPendingPostContentComponenttViewModel(post))
     }
     
@@ -55,10 +56,13 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
     @ViewBuilder
     private func postHeaderView(_ post: AmityPostModel) -> some View {
         HStack(spacing: 8) {
-            AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: post.postedUser?.avatarURL ?? ""))
+            AmityUserProfileImageView(displayName: post.postedUser?.displayName ?? "", avatarURL: URL(string: post.postedUser?.avatarURL ?? ""))
                 .frame(size: CGSize(width: 32.0, height: 32.0))
                 .clipShape(Circle())
                 .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .onTapGesture {
+                    goToUserProfilePage(post.postedUserId)
+                }
             
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 8) {
@@ -66,10 +70,9 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                         .font(.system(size: 15, weight: .semibold))
                         .lineLimit(1)
                         .foregroundColor(Color(viewConfig.theme.baseColor))
-//                        .onTapGesture {
-//                            let context = AmityPostContentComponentBehavior.Context(component: self)
-//                            AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToUserProfilePage(context: context)
-//                        }
+                        .onTapGesture {
+                            goToUserProfilePage(post.postedUserId)
+                        }
                 }
                 
                 
@@ -154,16 +157,18 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
     @ViewBuilder
     private func postContentTextView() -> some View {
         if !post.text.isEmpty {
-            ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees)
-                .lineLimit(8)
-                .moreButtonText("...See more")
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-                .attributedColor(viewConfig.theme.primaryColor)
-                .moreButtonColor(Color(viewConfig.theme.primaryColor))
-                .expandAnimation(.easeOut(duration: 0.25))
-                .lineSpacing(5)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
+                goToUserProfilePage(userId)
+            })
+            .lineLimit(8)
+            .moreButtonText("...See more")
+            .font(.system(size: 15))
+            .foregroundColor(Color(viewConfig.theme.baseColor))
+            .attributedColor(viewConfig.theme.primaryColor)
+            .moreButtonColor(Color(viewConfig.theme.primaryColor))
+            .expandAnimation(.easeOut(duration: 0.25))
+            .lineSpacing(5)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
     
@@ -174,7 +179,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             Rectangle()
                 .fill(Color(viewConfig.theme.primaryColor))
                 .overlay (
-                    Text("Accept")
+                    Text(viewConfig.getText(elementId: .postAcceptButton) ?? "Accept")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.white)
                 )
@@ -190,7 +195,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             Rectangle()
                 .fill(.clear)
                 .overlay (
-                    Text("Decline")
+                    Text(viewConfig.getText(elementId: .postDeclineButton) ?? "Decline")
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                 )
@@ -308,6 +313,11 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
         }
         .contentShape(Rectangle())
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
+    }
+    
+    private func goToUserProfilePage(_ userId: String) {
+        let context = AmityPendingPostContentComponentBehavior.Context(component: self, userId: userId)
+        AmityUIKitManagerInternal.shared.behavior.pendingPostContentComponentBehavior?.goToUserProfilePage(context: context)
     }
 }
 

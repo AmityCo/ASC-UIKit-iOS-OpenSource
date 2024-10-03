@@ -141,7 +141,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 ForEach(Array(selectedUsers.enumerated()), id: \.element.userId) { index, user in
                     VStack(spacing: 8) {
                         ZStack(alignment: .topTrailing) {
-                            AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: user.avatarURL))
+                            AmityUserProfileImageView(displayName: user.displayName, avatarURL: URL(string: user.avatarURL))
                                 .frame(width: 40, height: 40)
                                 .clipShape(Circle())
                             
@@ -175,7 +175,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
     private func getUserView(_ user: AmityUserModel, isSelected: Bool) -> some View {
         ZStack {
             HStack(spacing: 12) {
-                AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: user.avatarURL))
+                AmityUserProfileImageView(displayName: user.displayName, avatarURL: URL(string: user.avatarURL))
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
                 

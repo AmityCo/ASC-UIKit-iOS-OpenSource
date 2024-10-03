@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import AmitySDK
 import AVKit
 
 struct MediaViewer: View {
@@ -23,6 +24,7 @@ struct MediaViewer: View {
     
     private let medias: [AmityMedia]
     private let closeAction: (() -> Void)?
+    private var url: URL? = nil
     
     init(medias: [AmityMedia], startIndex: Int, closeAction: (() -> Void)?) {
         self._page = State(initialValue: Page.withIndex(startIndex))
@@ -30,6 +32,17 @@ struct MediaViewer: View {
         self.medias = medias
         self.closeAction = closeAction
     }
+    
+    
+    init(url: URL?, closeAction: (() -> Void)?) {
+        self._page = State(initialValue: Page.withIndex(0))
+        self._pageIndex = State(initialValue: 1)
+        let imageData = AmityImageData()
+        imageData.fileURL = url?.absoluteString ?? ""
+        self.medias = [AmityMedia(state: .downloadableImage(imageData: imageData, placeholder: UIImage()), type: .image)]
+        self.closeAction = closeAction
+    }
+    
     
     var body: some View {
         GeometryReader { geometry in

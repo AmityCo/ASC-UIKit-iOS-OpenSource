@@ -13,11 +13,13 @@ struct CommunityModeratorTabView: View {
     @ObservedObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: CommunityModeratorTabViewModel
     private let onTapAction: (AmityCommunityMember) -> Void
+    private let onMenuAction: (AmityCommunityMember) -> Void
     
-    init(viewConfig: AmityViewConfigController, community: AmityCommunity, onTapAction: @escaping (AmityCommunityMember) -> Void) {
+    init(viewConfig: AmityViewConfigController, community: AmityCommunity, onTapAction: @escaping (AmityCommunityMember) -> Void, onMenuAction: @escaping (AmityCommunityMember) -> Void) {
         self.viewConfig = viewConfig
         self._viewModel = StateObject(wrappedValue: CommunityModeratorTabViewModel(community: community))
         self.onTapAction = onTapAction
+        self.onMenuAction = onMenuAction
     }
     
     var body: some View {
@@ -32,7 +34,7 @@ struct CommunityModeratorTabView: View {
                         }
                     } else {
                         ForEach(Array(viewModel.communityMembers.enumerated()), id: \.element.userId) { index, communityMember in
-                            CommunityMemberView(communityMember, isModerator: true, onTapAction: onTapAction)
+                            CommunityMemberView(communityMember, isModerator: true, onTapAction: onTapAction, onMenuAction: onMenuAction)
                                 .padding([.leading, .trailing], 16)
                                 .onAppear {
                                     if index == viewModel.communityMembers.count - 1 {

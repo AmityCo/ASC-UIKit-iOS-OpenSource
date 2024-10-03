@@ -22,4 +22,8 @@ class FeedManager {
     func getPendingCommunityFeedPosts(communityId: String) -> AmityCollection<AmityPost> {
         feedRepository.getCommunityFeed(withCommunityId: communityId, sortBy: .lastCreated, includeDeleted: false, feedType: .reviewing)
     }
+    
+    func getUserFeed(userId: String) -> AmityCollection<AmityPost> {
+        feedRepository.getUserFeed(userId, sortBy: .lastCreated, includeDeleted: false)
+    }
 }

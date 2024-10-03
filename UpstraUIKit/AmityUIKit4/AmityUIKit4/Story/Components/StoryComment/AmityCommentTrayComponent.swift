@@ -9,7 +9,7 @@ import SwiftUI
 import AmitySDK
 
 public struct AmityCommentTrayComponent: AmityComponentView {
-    
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     public var pageId: PageId?
     
     public var id: ComponentId {
@@ -88,6 +88,10 @@ public struct AmityCommentTrayComponent: AmityComponentView {
             
             commentBottomSheetViewModel.sheetState.isShown.toggle()
             commentBottomSheetViewModel.sheetState.comment = comment
+        case .userProfile(let userId):
+            host.controller?.presentedViewController?.dismiss(animated: false)
+            let context = AmityCommentTrayComponentBehavior.Context(component: self, userId: userId)
+            AmityUIKitManagerInternal.shared.behavior.commentTrayComponentBehavior?.goToUserProfilePage(context: context)
         }
     }
 }

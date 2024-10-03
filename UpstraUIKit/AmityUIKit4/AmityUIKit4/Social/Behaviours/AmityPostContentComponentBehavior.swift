@@ -12,9 +12,11 @@ open class AmityPostContentComponentBehavior {
     
     open class Context {
         public let component: AmityPostContentComponent
+        public let userId: String?
         
-        init(component: AmityPostContentComponent) {
+        init(component: AmityPostContentComponent, userId: String? = nil) {
             self.component = component
+            self.userId = userId
         }
     }
     
@@ -30,7 +32,9 @@ open class AmityPostContentComponentBehavior {
     }
     
     open func goToUserProfilePage(context: AmityPostContentComponentBehavior.Context) {
-
+        let userProfilePage = AmityUserProfilePage(userId: context.userId ?? context.component.post.postedUserId)
+        let controller = AmitySwiftUIHostingController(rootView: userProfilePage)
+        context.component.host.controller?.navigationController?.pushViewController(controller, animated: true)
     }
     
     open func goToPostComposerPage(context: AmityPostContentComponentBehavior.Context) {

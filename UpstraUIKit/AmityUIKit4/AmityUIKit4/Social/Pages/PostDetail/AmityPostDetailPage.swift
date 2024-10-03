@@ -177,6 +177,9 @@ public struct AmityPostDetailPage: AmityPageView {
             
             commentBottomSheetViewModel.sheetState.isShown.toggle()
             commentBottomSheetViewModel.sheetState.comment = comment
+        case .userProfile(let userId):
+            let context = AmityPostDetailPageBehavior.Context(page: self, userId: userId)
+            AmityUIKitManagerInternal.shared.behavior.postDetailPageBehavior?.goToUserProfilePage(context: context)
         }
     }
 }

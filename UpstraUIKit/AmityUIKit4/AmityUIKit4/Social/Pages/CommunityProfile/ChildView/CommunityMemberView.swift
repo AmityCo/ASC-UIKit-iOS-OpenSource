@@ -13,17 +13,19 @@ struct CommunityMemberView: View {
     private let communityMember: AmityCommunityMember
     private let isModerator: Bool
     private let onTapAction: (AmityCommunityMember) -> Void
+    private let onMenuAction: (AmityCommunityMember) -> Void
     
-    init(_ communityMember: AmityCommunityMember, isModerator: Bool, onTapAction: @escaping (AmityCommunityMember) -> Void) {
+    init(_ communityMember: AmityCommunityMember, isModerator: Bool, onTapAction: @escaping (AmityCommunityMember) -> Void, onMenuAction: @escaping (AmityCommunityMember) -> Void) {
         self.communityMember = communityMember
         self.isModerator = isModerator
         self.onTapAction = onTapAction
+        self.onMenuAction = onMenuAction
     }
     
     var body: some View {
         HStack(spacing: 12) {
             ZStack(alignment: .bottomTrailing) {
-                AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: communityMember.user?.getAvatarInfo()?.largeFileURL ?? ""))
+                AmityUserProfileImageView(displayName: communityMember.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: communityMember.user?.getAvatarInfo()?.largeFileURL ?? ""))
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
                 
@@ -55,7 +57,7 @@ struct CommunityMemberView: View {
             
             if(communityMember.userId != AmityUIKitManagerInternal.shared.currentUserId) {
                 Button {
-                    onTapAction(communityMember)
+                    onMenuAction(communityMember)
                 } label: {
                     Image(AmityIcon.threeDotIcon.getImageResource())
                         .renderingMode(.template)
@@ -63,6 +65,10 @@ struct CommunityMemberView: View {
                         .frame(width: 24, height: 18)
                 }
             }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTapAction(communityMember)
         }
     }
 }

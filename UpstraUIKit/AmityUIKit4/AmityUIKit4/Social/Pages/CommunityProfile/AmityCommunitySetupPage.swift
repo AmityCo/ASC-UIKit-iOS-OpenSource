@@ -134,19 +134,26 @@ public struct AmityCommunitySetupPage: AmityPageView {
 
                                 VStack(spacing: 16) {
                                     HStack {
-                                        Text("Privacy")
+                                        let privacyTitle = viewConfig.getText(elementId: .communityPrivacyTitle) ?? ""
+                                        Text(privacyTitle)
                                             .font(.system(size: 17, weight: .semibold))
                                             .foregroundColor(Color(viewConfig.theme.baseColor))
                                         
                                         Spacer()
                                     }
                                     
-                                    PrivacyRadioButtonView(isSelected: isPublicCommunity, icon: AmityIcon.globeIcon.getImageResource(), title: "Public", description: "Anyone can join, view, and search the posts in this community.")
+                                    let publicTitle = viewConfig.getText(elementId: .communityPrivacyPublicTitle) ?? ""
+                                    let publicDesc = viewConfig.getText(elementId: .communityPrivacyPublicDescription) ?? ""
+                                    let publicIcon = viewConfig.getImage(elementId: .communityPrivacyPublicIcon)
+                                    PrivacyRadioButtonView(isSelected: isPublicCommunity, icon: publicIcon, title: publicTitle, description: publicDesc)
                                         .onTapGesture {
                                             isPublicCommunity = true
                                         }
                                     
-                                    PrivacyRadioButtonView(isSelected: !isPublicCommunity, icon: AmityIcon.lockBlackIcon.getImageResource(), title: "Private", description: "Only members invited by the moderators can join, view, and search the posts in this community.")
+                                    let privateTitle = viewConfig.getText(elementId: .communityPrivacyPrivateTitle) ?? ""
+                                    let privateDesc = viewConfig.getText(elementId: .communityPrivacyPrivateDescription) ?? ""
+                                    let privateIcon = viewConfig.getImage(elementId: .communityPrivacyPrivateIcon)
+                                    PrivacyRadioButtonView(isSelected: !isPublicCommunity, icon: privateIcon, title: privateTitle, description: privateDesc)
                                         .onTapGesture {
                                             isPublicCommunity = false
                                         }
@@ -220,6 +227,10 @@ public struct AmityCommunitySetupPage: AmityPageView {
         }
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
+            
+            nameTextFieldModel.title = viewConfig.getText(elementId: .communityNameTitle) ?? ""
+            aboutTextFieldModel.title = viewConfig.getText(elementId: .communityAboutTitle) ?? ""
+            categoryTextFieldModel.title = viewConfig.getText(elementId: .communityCategoryTitle) ?? ""
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
@@ -249,7 +260,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
             
             Spacer()
             
-            Text(pageMode == .create ? "Create Communiy" : "Edit Community")
+            let title = pageMode == .create ? viewConfig.getText(elementId: .title) ?? "" : viewConfig.getText(elementId: .communityEditTitle) ?? ""
+            Text(title)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(Color(viewConfig.theme.baseColor))
             
@@ -333,7 +345,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
     private func getAddMemberView(_ geometry: GeometryProxy) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             HStack {
-                Text("Member")
+                let addMemberTitle = viewConfig.getText(elementId: .communityAddMemberTitle) ?? ""
+                Text(addMemberTitle)
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                 
@@ -349,7 +362,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                     case .user:
                         VStack(spacing: 8) {
                             ZStack(alignment: .topTrailing) {
-                                AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: member.user?.avatarURL ?? ""))
+                                AmityUserProfileImageView(displayName: member.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: member.user?.avatarURL ?? ""))
                                     .frame(width: 40, height: 40)
                                     .clipShape(Circle())
                                 
@@ -382,7 +395,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                 .fill(Color(viewConfig.theme.baseColorShade4))
                                 .frame(width: 40, height: 40)
                                 .overlay(
-                                    Image(AmityIcon.plusIcon.getImageResource())
+                                    Image(viewConfig.getImage(elementId: .communityAddMemberButton))
                                         .renderingMode(.template)
                                         .resizable()
                                         .foregroundColor(Color(viewConfig.theme.baseColor))
@@ -390,7 +403,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         .frame(width: 20, height: 20)
                                 )
                             
-                            Text("Add")
+                            let addMemberText = viewConfig.getText(elementId: .communityAddMemberButton) ?? ""
+                            Text(addMemberText)
                                 .font(.system(size: 13))
                                 .lineLimit(1)
                                 .foregroundColor(Color(viewConfig.theme.baseColor))
@@ -432,14 +446,16 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .cornerRadius(4)
                 .overlay (
                     HStack(spacing: 8) {
-                        Image(AmityIcon.plusIcon.getImageResource())
+                        let communityCreateButtonImage = viewConfig.getImage(elementId: .communityCreateButton)
+                        Image(communityCreateButtonImage)
                             .resizable()
                             .renderingMode(.template)
                             .foregroundColor(.white)
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 20.0, height: 20.0)
                         
-                        Text("Create Community")
+                        let communityCreateButtonText = viewConfig.getText(elementId: .communityCreateButton) ?? ""
+                        Text(communityCreateButtonText)
                             .font(.system(size: 15.0, weight: .semibold))
                             .foregroundColor(.white)
                     }
@@ -465,7 +481,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .frame(height: 40)
                 .cornerRadius(4)
                 .overlay (
-                    Text("Save")
+                    Text(viewConfig.getText(elementId: .communityEditButton) ?? "Save")
                         .font(.system(size: 15.0, weight: .semibold))
                         .foregroundColor(.white)
                 )
@@ -483,7 +499,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
     private func getBottomSheetView() -> some View {
         VStack(spacing: 28) {
             
-            getItemView(image: AmityIcon.cameraAttatchmentIcon.getImageResource(), title: "Camera", onTapAction: {
+            let cameraTitle = viewConfig.getText(elementId: .cameraButton) ?? "Camera"
+            let cameraImage = viewConfig.getImage(elementId: .cameraButton)
+            getItemView(image: cameraImage, title: cameraTitle, onTapAction: {
                 /// Delay opening picker view a bit to avoid conflicts of opening & closing fullScreenCover views
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                     showImagePicker.sourceType = .camera
@@ -493,7 +511,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 showBottomSheet.toggle()
             })
             
-            getItemView(image: AmityIcon.photoAttatchmentIcon.getImageResource(), title: "Photo", onTapAction: {
+            let photoTitle = viewConfig.getText(elementId: .imageButton) ?? "Photo"
+            let photoImage = viewConfig.getImage(elementId: .imageButton)
+            getItemView(image: photoImage, title: photoTitle, onTapAction: {
                 /// Delay opening picker view a bit to avoid conflicts of opening & closing fullScreenCover views
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                     showImagePicker.sourceType = .photoLibrary

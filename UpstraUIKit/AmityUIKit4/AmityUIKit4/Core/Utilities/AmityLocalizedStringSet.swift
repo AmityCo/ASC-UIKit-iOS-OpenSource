@@ -207,6 +207,10 @@ public struct AmityLocalizedStringSet {
         
         static let communityAllCategoriesPageTitle = "community_all_categories_title"
         static let communityEmptyStateTitle = "community_list_empty_state_title"
+        
+        static let userProfileEditAlertTitle = "user_profile_edit_alert_title"
+        static let userProfileEditAlertMessage = "user_profile_edit_alert_message"
+        static let userProfileFollowRequestTitle = "user_profile_follow_request_title"
     }
     
 }

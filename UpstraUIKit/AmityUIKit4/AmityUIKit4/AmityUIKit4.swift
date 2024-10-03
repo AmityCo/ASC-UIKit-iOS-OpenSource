@@ -204,6 +204,10 @@ final class AmityUIKitManagerInternal: NSObject {
         let viewStoryPageBehaviour = AmityViewStoryPageBehaviour()
         behavior.viewStoryPageBehaviour = viewStoryPageBehaviour
         
+        // CommentTrayComponent
+        let commentTrayComponentBehavior = AmityCommentTrayComponentBehavior()
+        behavior.commentTrayComponentBehavior = commentTrayComponentBehavior
+        
         // StoryTargetSelectionPage
         let storyTargetSelectionPageBehaviour = AmityStoryTargetSelectionPageBehaviour()
         behavior.storyTargetSelectionPageBehaviour = storyTargetSelectionPageBehaviour
@@ -279,6 +283,30 @@ final class AmityUIKitManagerInternal: NSObject {
         // CommunityNotificaitonSettingPage
         let communityNotificationSettingPageBehavior = AmityCommunityNotificationSettingPageBehavior()
         behavior.communityNotificationSettingPageBehavior = communityNotificationSettingPageBehavior
+        
+        // UserProfilePage
+        let userProfilePageBehavior = AmityUserProfilePageBehavior()
+        behavior.userProfilePageBehavior = userProfilePageBehavior
+        
+        // UserProfileHeaderComponent
+        let userProfileHeaderComponentBehavior = AmityUserProfileHeaderComponentBehavior()
+        behavior.userProfileHeaderComponentBehavior = userProfileHeaderComponentBehavior
+        
+        // UserRelationshipPage
+        let userRelationshipPageBehavior = AmityUserRelationshipPageBehavior()
+        behavior.userRelationshipPageBehavior = userRelationshipPageBehavior
+        
+        // UserPendingFollowRequestsPage
+        let userPendingFollowRequestsPageBehavior = AmityUserPendingFollowRequestsPageBehavior()
+        behavior.userPendingFollowRequestsPageBehavior = userPendingFollowRequestsPageBehavior
+        
+        // BlockedUsersPage
+        let blockedUsersPageBehavior = AmityBlockedUsersPageBehavior()
+        behavior.blockedUsersPageBehavior = blockedUsersPageBehavior
+        
+        // PendingPostContentComponent
+        let pendingPostContentComponentBehavior = AmityPendingPostContentComponentBehavior()
+        behavior.pendingPostContentComponentBehavior = pendingPostContentComponentBehavior
     }
     
     func registerDevice(_ userId: String,

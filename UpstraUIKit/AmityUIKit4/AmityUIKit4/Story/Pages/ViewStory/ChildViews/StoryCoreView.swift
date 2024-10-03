@@ -92,6 +92,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
         }
         .gesture(DragGesture().onChanged{ _ in})
         .environmentObject(viewConfig)
+        .environmentObject(host)
         .animation(nil)
     }
     

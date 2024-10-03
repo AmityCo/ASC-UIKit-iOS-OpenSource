@@ -8,29 +8,54 @@
 import SwiftUI
 
 struct InfoTextFieldModel {
+    // Title of TextField
     var title: String
+    
+    // Placeholder of TextField
     var placeholder: String
+    
+    // If TextField is mandatory and want to show * after title
     var isMandatory: Bool
+    
+    // If TextField is optional and want to show optional text after title
     var showOptionalTitle: Bool = false
+    
+    // If TextField needs to show info message under it
     var infoMessage: String?
+    
+    // If TextField need to show error message if data is not valid.
+    // isValid property will decide to show or not the error message.
     var errorMessage: String?
+    
+    // If TextField need to be expandable
     var isExpandable: Bool = false
+    
+    // If TextField need to limit maximum character count
     var maxCharCount: Int?
 }
 
 extension InfoTextField: AmityViewBuildable {
+    // Color that will show if inValid proptery is true
     public func alertColor(_ value: UIColor) -> Self {
         mutating(keyPath: \.alertColor, value: value)
     }
     
+    // Color of TextField underline divider
     public func dividerColor(_ value: UIColor) -> Self {
         mutating(keyPath: \.dividerColor, value: value)
     }
     
+    // Color of TextField title
+    public func titleTextColor(_ value: UIColor) -> Self {
+        mutating(keyPath: \.titleTextColor, value: value)
+    }
+    
+    // Color of information text after title e.g. ( Optional )
     public func infoTextColor(_ value: UIColor) -> Self {
         mutating(keyPath: \.infoTextColor, value: value)
     }
     
+    // Color of TextField text
     public func textFieldTextColor(_ value: UIColor) -> Self {
         mutating(keyPath: \.textFieldTextColor, value: value)
     }
@@ -50,6 +75,7 @@ struct InfoTextField: View {
     
     private var alertColor: UIColor = UIColor(hex: "#FA4D30")
     private var dividerColor: UIColor = UIColor(hex: "#EBECEF")
+    private var titleTextColor: UIColor?
     private var infoTextColor: UIColor = UIColor(hex: "#898E9E")
     private var textFieldTextColor: UIColor = UIColor(hex: "#000000")
     
@@ -79,7 +105,7 @@ struct InfoTextField: View {
             HStack(spacing: 0) {
                 Text(data.title)
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(textFieldTextColor))
+                    .foregroundColor(Color(titleTextColor == nil ? textFieldTextColor : titleTextColor!))
                     .accessibilityIdentifier(titleTextAccessibilityId ?? "titleTextAccessibilityId")
                 
                 if data.isMandatory {
