@@ -95,7 +95,7 @@ public class CommunityProfileViewModel: ObservableObject {
 
             self?.pinnedFeedLoadingStatus = collection.loadingStatus
             for pinnedpost in collection.snapshots {
-                if let post = pinnedpost.post, !post.childrenPosts.contains(where: { $0.dataType == "poll" || $0.dataType == "liveStream" || $0.dataType == "file" }), !post.isDeleted {
+                if let post = pinnedpost.post, !post.childrenPosts.contains(where: { $0.dataType == "poll" || $0.dataType == "file" }), !post.isDeleted {
                     if pinnedpost.placement == AmityPinPlacement.announcement.rawValue {
                         self?.announcementPost = AmityPostModel(post: post)
                     } else {

@@ -14,6 +14,7 @@ class PostFeedViewModel: ObservableObject {
     @Published var postItems: [PaginatedItem<AmityPostModel>] = []
         
     private var postCollection: AmityCollection<AmityPost>?
+    private var pinnedPostCollection: AmityCollection<AmityPinnedPost>?
     private let feedManager = FeedManager()
     private let postManager = PostManager()
     
@@ -23,10 +24,14 @@ class PostFeedViewModel: ObservableObject {
     // loadGlobalFeed can be called multiple times. We only want one subscriber at a time
     private var feedCancellable: AnyCancellable?
     private var loadingStateCancellable: AnyCancellable?
+    private var pinnedPostCancellable: AnyCancellable?
     
     // cached recently created post by current user to show on top of post feed
     private var recentlyCreatedPosts: [AmityPost] = []
     private let feedType: FeedType
+    private var globalPinnedPosts: [AmityPost] = [] // pinned posts
+    private var globalPinnedPostsIds: Set<String> = []
+    private var feedPosts: [PaginatedItem<AmityPost>] = []
     
     public enum FeedType: Equatable {
         case community(communityId: String)
@@ -42,6 +47,7 @@ class PostFeedViewModel: ObservableObject {
         NotificationCenter.default.removeObserver(self, name: .didPostCreated, object: nil)
         NotificationCenter.default.removeObserver(self, name: .didPostDeleted, object: nil)
         NotificationCenter.default.removeObserver(self, name: .didPostReacted, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .didLivestreamStatusUpdated, object: nil)
     }
     
     func loadFeed(feedType: FeedType) {
@@ -57,6 +63,10 @@ class PostFeedViewModel: ObservableObject {
             collection = feedManager.getCommunityFeedPosts(communityId: communityId)
             paginatorCommunityId = communityId
         case .globalFeed:
+            // Fetch pinned posts in global feed
+            fetchGlobalPinnedPost()
+            
+            // Fetch normal posts in global feed
             collection = feedManager.getGlobalFeedPosts()
         }
         
@@ -71,30 +81,8 @@ class PostFeedViewModel: ObservableObject {
         feedCancellable = paginator?.$snapshots.sink { [weak self] items in
             guard let self else { return }
             
-            let normalizedPosts: [PaginatedItem<AmityPost>] = items.filter { item in
-                switch item.type {
-                case .ad:
-                    return true
-                case .content(let post):
-                    var filterCondition = !post.childrenPosts.contains { $0.dataType == "poll" || $0.dataType == "liveStream" || $0.dataType == "file" }
-                    return filterCondition
-                }
-            }
-            
-            self.postItems = normalizedPosts.map {
-                switch $0.type {
-                case .content(let post):
-                    return PaginatedItem(id: $0.id, type: .content(AmityPostModel(post: post)))
-                case .ad(let ad):
-                    return PaginatedItem(id: $0.id, type: .ad(ad))
-                }
-            }
-            
-            /// Append recently created posts at first to show at the top of global feed.
-            if !recentlyCreatedPosts.isEmpty, feedType == .globalFeed {
-                let newPosts = recentlyCreatedPosts.map { PaginatedItem(id: $0.postId, type: .content(AmityPostModel(post: $0)))}
-                self.postItems = newPosts + postItems
-            }
+            self.feedPosts = items
+            self.renderFeed()
         }
         
         loadingStateCancellable = nil
@@ -115,6 +103,9 @@ class PostFeedViewModel: ObservableObject {
         /// Observe didPostReacted event sent from AmityPostContentComponent
         /// If the post is the modded one that is not from liveCollection, we need to update directly to the dataSource to be reactive.
         NotificationCenter.default.addObserver(self, selector: #selector(didPostReacted(_:)), name: .didPostReacted, object: nil)
+        
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(didLivestreamStatusUpdated(_:)), name: .didLivestreamStatusUpdated, object: nil)
     }
     
     func loadMorePosts() {
@@ -160,4 +151,101 @@ class PostFeedViewModel: ObservableObject {
             }
         }
     }
+    
+    @objc private func didLivestreamStatusUpdated(_ notification: Notification) {
+        self.objectWillChange.send()
+    }
 }
+
+// Global Pinned Post
+extension PostFeedViewModel {
+    
+    func fetchGlobalPinnedPost() {
+        // reset state
+        postCollection = nil
+        pinnedPostCancellable = nil
+        globalPinnedPosts = []
+        globalPinnedPostsIds = []
+        
+        pinnedPostCollection = postManager.getGlobalPinnedPost()
+        pinnedPostCancellable = pinnedPostCollection?.$snapshots.sink { [weak self] result in
+            guard let self else { return }
+                        
+            var pinnedPostIds = Set<String>()
+            let pinnedPosts = result.compactMap {
+                // To filter out pinned post from regular feed
+                if let postId = $0.post?.postId {
+                    pinnedPostIds.insert(postId)
+                }
+                
+                return $0.post
+            }
+            
+            self.globalPinnedPosts = pinnedPosts
+            self.globalPinnedPostsIds = pinnedPostIds
+                        
+            // Ask to render feed
+            renderFeed()
+        }
+    }
+    
+    private func renderFeed() {
+        var listItems = [PaginatedItem<AmityPostModel>]()
+        
+        // Pinned post at the top of the feed
+        let pinnedPosts = prepareGlobalPinnedPosts()
+        listItems.append(contentsOf: pinnedPosts)
+        
+        // Newly created post
+        /// Append recently created posts at first to show at the top of global feed.
+        if !recentlyCreatedPosts.isEmpty, feedType == .globalFeed {
+            let newPosts = recentlyCreatedPosts.map { PaginatedItem(id: $0.postId, type: .content(AmityPostModel(post: $0)))}
+            listItems.append(contentsOf: newPosts)
+        }
+        
+        // Rest of the global feed.
+        let feedPosts = prepareFeedPosts()
+        listItems.append(contentsOf: feedPosts)
+        
+        self.postItems = listItems
+    }
+    
+    private func prepareGlobalPinnedPosts() -> [PaginatedItem<AmityPostModel>]{
+        guard feedType == .globalFeed else { return [] }
+        
+        var pinnedPosts = [PaginatedItem<AmityPostModel>]()
+        
+        for globalPinnedPost in self.globalPinnedPosts {
+            guard canRenderPost(post: globalPinnedPost) else { continue }
+            
+            pinnedPosts.append(.init(id: globalPinnedPost.postId, type: .content(AmityPostModel(post: globalPinnedPost, isPinned: true))))
+        }
+        
+        return pinnedPosts
+    }
+    
+    private func prepareFeedPosts() -> [PaginatedItem<AmityPostModel>] {
+        var finalItems = [PaginatedItem<AmityPostModel>]()
+        
+        // Filter out posts which we do not support yet.
+        feedPosts.forEach {
+            switch $0.type {
+            case .ad(let ad):
+                finalItems.append(PaginatedItem(id: $0.id, type: .ad(ad)))
+            case .content(let post):
+                if canRenderPost(post: post) && !globalPinnedPostsIds.contains(post.postId) {
+                    finalItems.append(PaginatedItem(id: $0.id, type: .content(AmityPostModel(post: post))))
+                }
+            }
+        }
+        
+        return finalItems
+    }
+    
+    private func canRenderPost(post: AmityPost) -> Bool {
+        let filterCondition = !post.childrenPosts.contains { $0.dataType == "poll" || $0.dataType == "file" }
+        return filterCondition
+    }
+}
+
+

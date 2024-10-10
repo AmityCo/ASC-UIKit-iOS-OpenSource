@@ -14,8 +14,8 @@ struct CommunityCellSkeletonView: View {
         HStack(spacing: 16) {
             Rectangle()
                 .fill(Color(viewConfig.theme.baseColorShade3))
-                .frame(size: CGSize(width: 64, height: 64))
-                .clipShape(Circle())
+                .frame(size: CGSize(width: 80, height: 80))
+                .cornerRadius(8, corners: .allCorners)
                 .shimmering(gradient: shimmerGradient)
             
             VStack(alignment: .leading, spacing: 8) {
@@ -35,7 +35,8 @@ struct CommunityCellSkeletonView: View {
             
             Spacer()
         }
-        .padding(.all, 16)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
         .background(Color(viewConfig.theme.backgroundColor))
     }
 }

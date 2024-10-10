@@ -57,11 +57,14 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
                             .clipShape(Circle())
                             .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 12))
                             .isHidden(viewConfig.isHidden(elementId: .myTimelineAvatar), remove: true)
+                            .accessibilityIdentifier(AccessibilityID.Social.PostTargetSelection.myTimelineAvatar)
                             
                         let myTimelineTitle = viewConfig.getConfig(elementId: .myTimelineText, key: "text", of: String.self) ?? ""
                         Text(myTimelineTitle)
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .isHidden(viewConfig.isHidden(elementId: .myTimelineText), remove: true)
+                            .accessibilityIdentifier(AccessibilityID.Social.PostTargetSelection.myTimelineText)
                         
                         Spacer()
                     }
@@ -79,7 +82,7 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
             }, communityOnTapAction: { communityModel in
                 let context = AmityPostTargetSelectionPageBehavior.Context(page: self, community: communityModel)
                 AmityUIKitManagerInternal.shared.behavior.postTargetSelectionPageBehavior?.goToPostComposerPage(context: context)
-            })
+            }, contentType: .post)
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)

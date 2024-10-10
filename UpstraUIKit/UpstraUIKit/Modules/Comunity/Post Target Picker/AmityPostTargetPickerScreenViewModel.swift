@@ -15,27 +15,50 @@ class AmityPostTargetPickerScreenViewModel: AmityPostTargetPickerScreenViewModel
     
     private let communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
     private var communityCollection: AmityCollection<AmityCommunity>?
+    private var communities: [AmityCommunity] = []
     private var categoryCollectionToken:AmityNotificationToken?
     
     func observe() {
         let queryOptions = AmityCommunityQueryOptions(displayName: "", filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
         communityCollection = communityRepository.getCommunities(with: queryOptions)
         categoryCollectionToken = communityCollection?.observe({ [weak self] (collection, _, _) in
+            self?.communities = []
+
             guard let strongSelf = self else { return }
+            let dispatchGroup = DispatchGroup()
+
             switch collection.dataStatus {
             case .fresh:
-                strongSelf.delegate?.screenViewModelDidUpdateItems(strongSelf)
+                for item in collection.snapshots {
+                    dispatchGroup.enter()
+                    
+                    if item.onlyAdminCanPost {
+                        AmityUIKitManager.client.hasPermission(.createPrivilegedPost, forCommunity: item.communityId) { success in
+                            if success {
+                                self?.communities.append(item)
+                            }
+                            dispatchGroup.leave()
+                        }
+                    } else {
+                        self?.communities.append(item)
+                        dispatchGroup.leave()
+                    }
+                }
+                dispatchGroup.notify(queue: .main) { [weak self] in
+                    guard let strongSelf = self else { return }
+                    strongSelf.delegate?.screenViewModelDidUpdateItems(strongSelf)
+                }
             default: break
             }
         })
     }
     
     func numberOfItems() -> Int {
-        return Int(communityCollection?.count() ?? 0)
+        return communities.count
     }
     
     func community(at indexPath: IndexPath) -> AmityCommunity? {
-        return communityCollection?.object(at: indexPath.row)
+        return communities[indexPath.row]
     }
     
     func loadNext() {

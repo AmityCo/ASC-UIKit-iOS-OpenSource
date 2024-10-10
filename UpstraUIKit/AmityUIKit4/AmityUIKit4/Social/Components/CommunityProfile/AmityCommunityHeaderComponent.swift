@@ -42,6 +42,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             AsyncImage(placeholder: AmityIcon.communityProfilePlaceholder.imageResource, url: URL(string: community.largeAvatarURL) , contentMode: .fill)
                 .frame(height: 188)
                 .isHidden(viewConfig.isHidden(elementId: .communityCover))
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityCover)
             
             HStack(alignment: .top, spacing: 3) {
                 if !community.isPublic {
@@ -51,6 +52,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .frame(width: 20, height: 20)
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
+                        .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityPrivateBadge)
                 }
                 
                 Text(community.displayName)
@@ -69,6 +71,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .frame(width: 20, height: 20)
                         .padding(.leading, 4)
                         .isHidden(viewConfig.isHidden(elementId: .communityVerifyBadge))
+                        .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityVerifyBadge)
                 }
                 
             }
@@ -76,12 +79,14 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             
             getCategoryView(community.categories)
                 .isHidden(community.categories.isEmpty || viewConfig.isHidden(elementId: .communityCategory))
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityCategory)
             
             Text(community.description)
                 .font(.system(size: 15))
                 .lineLimit(4)
                 .isHidden(community.description.isEmpty || viewConfig.isHidden(elementId: .communityDescription))
                 .padding(.all, 16)
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityDescription)
             
             HStack(spacing: 0) {
                 Text(community.postsCount.formattedCountString)
@@ -115,6 +120,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             }
             .padding([.horizontal, .bottom], 16)
             .isHidden(viewConfig.isHidden(elementId: .communityInfo))
+            .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityInfo)
             
             Button(action: {
                 Task { @MainActor in
@@ -139,6 +145,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             .cornerRadius(8)
             .padding(.all, 16)
             .isHidden(community.isJoined || viewConfig.isHidden(elementId: .communityJoinButton))
+            .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityJoinButton)
             
             AmityStoryTabComponent(type: .communityFeed(community.communityId))
                 .padding(.vertical, 12)
@@ -172,6 +179,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             .onTapGesture {
                 onPendingPostsTapAction?()
             }
+            .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityPendingPost)
             
         }
         .background(Color(viewConfig.theme.backgroundColor))

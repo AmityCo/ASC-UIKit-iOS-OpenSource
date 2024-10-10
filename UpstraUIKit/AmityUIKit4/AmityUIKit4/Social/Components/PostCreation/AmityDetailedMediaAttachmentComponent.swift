@@ -49,6 +49,9 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                 showCamera.source = .camera
                 showCamera.isShown.toggle()
             }
+            .isHidden(viewConfig.isHidden(elementId: .cameraButton))
+            .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.cameraButton)
+                        
             
             let imageButtonIcon = viewConfig.getConfig(elementId: .imageButton, key: "image", of: String.self) ?? ""
             let imageButtonTitle = viewConfig.getConfig(elementId: .imageButton, key: "text", of: String.self) ?? ""
@@ -59,6 +62,8 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                 showMediaPicker.source = .photoLibrary
                 showMediaPicker.isShown.toggle()
             }
+            .isHidden(viewConfig.isHidden(elementId: .imageButton))
+            .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.imageButton)
             
             let videoButtonIcon = viewConfig.getConfig(elementId: .videoButton, key: "image", of: String.self) ?? ""
             let videoButtonTitle = viewConfig.getConfig(elementId: .videoButton, key: "text", of: String.self) ?? ""
@@ -69,6 +74,8 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                 showMediaPicker.source = .photoLibrary
                 showMediaPicker.isShown.toggle()
             }
+            .isHidden(viewConfig.isHidden(elementId: .videoButton))
+            .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.videoButton)
             
 //            getItemView(image: AmityIcon.attatchmentIcon.getImageResource(),
 //                        title: "Attatchment",

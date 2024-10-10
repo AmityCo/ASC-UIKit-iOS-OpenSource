@@ -45,23 +45,32 @@ public struct AmityMyCommunitiesSearchPage: AmityPageView {
                         }
                     }
                     
-                    ScrollView {
-                        LazyVStack(spacing: 0) {
-                            ForEach(Array(searchViewModel.communities.enumerated()), id: \.element.communityId) { index, community in
-                                VStack {
+                    if searchViewModel.loadingState == .loading && searchViewModel.communities.isEmpty {
+                        ScrollView {
+                            LazyVStack(spacing: 0) {
+                                ForEach(0..<10, id: \.self) { index in
+                                    CommunityCellSkeletonView()
+                                        .padding(.top, index == 0 ? 8 : 0)
+                                }
+                            }
+                        }
+                    } else {
+                        ScrollView {
+                            LazyVStack(spacing: 0) {
+                                ForEach(Array(searchViewModel.communities.enumerated()), id: \.element.communityId) { index, community in
                                     let model = AmityCommunityModel(object: community)
                                     CommunityCellView(community: model, pageId: id)
-                                   
-                                    Rectangle()
-                                        .fill(Color(viewConfig.theme.baseColorShade4))
-                                        .frame(height: 1)
-                                        .padding([.leading, .trailing], 16)
-                                }.onAppear {
-                                    if index == searchViewModel.communities.count - 1 {
-                                        searchViewModel.loadMoreMyCommunities()
-                                    }
+                                        .padding(.top, index == 0 ? 8 : 0)
+                                        .onTapGesture {
+                                            let context = AmityMyCommunitiesSearchPageBehavior.Context(page: self, communityId: community.communityId)
+                                            AmityUIKitManagerInternal.shared.behavior.myCommunitiesSearchPageBehavior?.goToCommunityProfilePage(context: context)
+                                        }
+                                        .onAppear {
+                                            if index == searchViewModel.communities.count - 1 {
+                                                searchViewModel.loadMoreMyCommunities()
+                                            }
+                                        }
                                 }
-                                
                             }
                         }
                     }

@@ -15,7 +15,8 @@ struct AmityUserProfileImageView: View {
     var onLoaded: ((Bool) -> Void)?
     
     init(displayName: String, avatarURL: URL?) {
-        self.displayName = "\(displayName.trimmingCharacters(in: .whitespacesAndNewlines).first ?? " ")"
+        let name = "\(displayName.trimmingCharacters(in: .whitespacesAndNewlines).first ?? " ")"
+        self.displayName = name.uppercased()
         self.avatarURL = avatarURL
     }
     

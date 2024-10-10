@@ -33,7 +33,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
     
     private let pageMode: AmityCommunitySetupPageMode
     @StateObject private var viewConfig: AmityViewConfigController
-    @StateObject private var viewModel: AmityCommunitySetupPageViewModel = AmityCommunitySetupPageViewModel()
+    @StateObject private var viewModel: AmityCommunitySetupPageViewModel
     
     /// Community Avarta data
     @State private var showBottomSheet: Bool = false
@@ -63,19 +63,20 @@ public struct AmityCommunitySetupPage: AmityPageView {
     
     /// Track data changes in editMode
     @State private var isExistingDataChanged: Bool = false
-    
+        
     public init(mode: AmityCommunitySetupPageMode) {
         self.pageMode = mode
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .communitySetupPage))
+        self._viewModel =  StateObject(wrappedValue: AmityCommunitySetupPageViewModel(mode: mode, communityId: nil))
         
         if case .edit(let community) = mode {
             self._nameText = State(initialValue: community.displayName)
             self._aboutText = State(initialValue: community.communityDescription)
             self._selectedCategories = State(initialValue: community.categories.map { AmityCommunityCategoryModel(object: $0) })
             self._isPublicCommunity = State(initialValue: community.isPublic)
+            self._viewModel =  StateObject(wrappedValue: AmityCommunitySetupPageViewModel(mode: mode, communityId: community.communityId))
         }
     }
-    
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -118,13 +119,13 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                 }
                             
                             VStack(alignment: .leading, spacing: 24) {
-                                InfoTextField(data: $nameTextFieldModel, text: $nameText, isValid: $isTextValid)
+                                InfoTextField(data: $nameTextFieldModel, text: $nameText, isValid: $isTextValid, titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup.communityNameTitle)
                                     .alertColor(viewConfig.theme.alertColor)
                                     .dividerColor(viewConfig.theme.baseColorShade4)
                                     .infoTextColor(viewConfig.theme.baseColorShade2)
                                     .textFieldTextColor(viewConfig.theme.baseColor)
                                 
-                                InfoTextField(data: $aboutTextFieldModel, text: $aboutText, isValid: $isTextValid)
+                                InfoTextField(data: $aboutTextFieldModel, text: $aboutText, isValid: $isTextValid, titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup.communityAboutTitle)
                                     .alertColor(viewConfig.theme.alertColor)
                                     .dividerColor(viewConfig.theme.baseColorShade4)
                                     .infoTextColor(viewConfig.theme.baseColorShade2)
@@ -138,6 +139,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         Text(privacyTitle)
                                             .font(.system(size: 17, weight: .semibold))
                                             .foregroundColor(Color(viewConfig.theme.baseColor))
+                                            .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityPrivacyTitle)
                                         
                                         Spacer()
                                     }
@@ -149,6 +151,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         .onTapGesture {
                                             isPublicCommunity = true
                                         }
+                                        .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityPrivacyPublicTitle)
                                     
                                     let privateTitle = viewConfig.getText(elementId: .communityPrivacyPrivateTitle) ?? ""
                                     let privateDesc = viewConfig.getText(elementId: .communityPrivacyPrivateDescription) ?? ""
@@ -157,6 +160,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         .onTapGesture {
                                             isPublicCommunity = false
                                         }
+                                        .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityPrivacyPrivateTitle)
                                 }
                                 
                                 Rectangle()
@@ -189,7 +193,28 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 editCommunityButtonView
                     .onTapGesture {
                         guard isExistingDataChanged else { return }
-                        editCommunity(community)
+                        
+                        let isCommunityPublicBeforeEdit = community.isPublic
+                        let isCommunityPrivateAfterEdit = !isPublicCommunity
+                        let handlePrivacyChange = isCommunityPublicBeforeEdit && isCommunityPrivateAfterEdit
+                        
+                        if viewModel.hasGlobalPinnedPost && handlePrivacyChange  {
+                            let title = AmityLocalizedStringSet.Social.globalFeaturedCommunityEditConfirmationTitle.localizedString
+                            let message = AmityLocalizedStringSet.Social.globalFeaturedCommunityEditConfirmationMessage.localizedString
+                            
+                            let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
+                            let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.confirm.localizedString, style: .destructive) { action in
+                                editCommunity(community)
+                            }
+                            
+                            let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+
+                            alertController.addAction(cancelAction)
+                            alertController.addAction(confirmAction)
+                            host.controller?.present(alertController, animated: true)
+                        } else {
+                            editCommunity(community)
+                        }
                     }
             } else {
                 createCommunityButtonView
@@ -264,6 +289,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
             Text(title)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(Color(viewConfig.theme.baseColor))
+                .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.title)
             
             Spacer()
             
@@ -286,7 +312,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                         .frame(width: 18, height: 18)
                         .offset(y: 10)
                     
-                    InfoTextField(data: $categoryTextFieldModel, text: $categoryText, isValid: $isTextValid)
+                    InfoTextField(data: $categoryTextFieldModel, text: $categoryText, isValid: $isTextValid, titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup.communityCategoryTitle)
                         .alertColor(viewConfig.theme.alertColor)
                         .dividerColor(viewConfig.theme.baseColorShade4)
                         .infoTextColor(viewConfig.theme.baseColorShade2)
@@ -349,6 +375,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 Text(addMemberTitle)
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityAddMemberTitle)
                 
                 Spacer()
             }
@@ -401,6 +428,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         .foregroundColor(Color(viewConfig.theme.baseColor))
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 20, height: 20)
+                                        .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityAddMemberButton)
                                 )
                             
                             let addMemberText = viewConfig.getText(elementId: .communityAddMemberButton) ?? ""
@@ -467,6 +495,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 )
                 .padding([.leading, .trailing], 16)
         }
+        .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityCreateButton)
     }
     
     
@@ -492,6 +521,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 )
                 .padding([.leading, .trailing], 16)
         }
+        .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityEditButton)
     }
     
     

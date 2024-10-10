@@ -34,6 +34,7 @@ struct CommentComposerView: View {
                 Text(" \(viewModel.replyState.comment?.displayName ?? AmityLocalizedStringSet.General.anonymous)")
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .lineLimit(1)
                 Spacer()
                 Button {
                     viewModel.replyState.showToReply.toggle()

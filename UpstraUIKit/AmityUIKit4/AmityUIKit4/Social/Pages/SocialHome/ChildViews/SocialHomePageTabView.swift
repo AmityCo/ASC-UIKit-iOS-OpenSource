@@ -40,6 +40,7 @@ struct SocialHomePageTabView: View {
                         .onTapGesture {
                             selectedTab = item.tab
                         }
+                        .accessibilityIdentifier(getAccessibilityID(tab: item.tab))
                 }
             }
             .padding(.leading, 20)
@@ -78,6 +79,14 @@ struct SocialHomePageTabView: View {
             return viewConfig.getConfig(elementId: .exploreButton, key: "text", of: String.self) ?? ""
         case .myCommunities:
             return viewConfig.getConfig(elementId: .myCommunitiesButton, key: "text", of: String.self) ?? ""
+        }
+    }
+    
+    private func getAccessibilityID(tab: AmitySocialHomePageTab) -> String {
+        switch tab {
+        case .newsFeed: AccessibilityID.Social.SocialHomePage.newsFeedButton
+        case .explore: AccessibilityID.Social.SocialHomePage.exploreButton
+        case .myCommunities: AccessibilityID.Social.SocialHomePage.myCommunitiesButton
         }
     }
     

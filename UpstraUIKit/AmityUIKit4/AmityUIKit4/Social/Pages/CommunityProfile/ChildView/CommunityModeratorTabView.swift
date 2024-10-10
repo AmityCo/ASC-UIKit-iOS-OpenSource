@@ -26,7 +26,7 @@ struct CommunityModeratorTabView: View {
         VStack(spacing: 12) {
             ScrollView {
                 LazyVStack(spacing: 16) {
-                    if viewModel.loadingStatus == .loading {
+                    if viewModel.loadingStatus == .loading && viewModel.communityMembers.isEmpty {
                         ForEach(0..<10, id: \.self) { _ in
                             UserCellSkeletonView()
                                 .padding([.leading, .trailing], 16)

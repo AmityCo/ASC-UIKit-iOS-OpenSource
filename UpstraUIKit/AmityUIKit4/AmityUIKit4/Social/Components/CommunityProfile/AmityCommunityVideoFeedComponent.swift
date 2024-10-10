@@ -23,7 +23,7 @@ public struct AmityCommunityVideoFeedComponent: AmityComponentView {
         ]
     }
     
-    init(communityId: String, communityProfileViewModel: CommunityProfileViewModel? = nil, pageId: PageId? = nil) {
+    public init(communityId: String, communityProfileViewModel: CommunityProfileViewModel? = nil, pageId: PageId? = nil) {
         self.pageId = pageId
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityImageFeed))
         
@@ -49,45 +49,54 @@ public struct AmityCommunityVideoFeedComponent: AmityComponentView {
     private var videoFeedView: some View {
         VStack(spacing: 0) {
             Color.clear
-                .frame(height: 8)
+                .frame(height: 16)
             
             LazyVGrid(columns: gridLayout, spacing: 8) {
-                ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
-                    if let url = media.getImageURL(),
-                       let attributes = media.video?.attributes,
-                       let meta = attributes["metadata"] as? [String: Any],
-                       let videoMeta = meta["video"] as? [String: Any],
-                       let duration = videoMeta["duration"] as? TimeInterval {
-                        getVideoView(url, duration)
-                            .frame(maxWidth: .infinity)
-                            .aspectRatio(1, contentMode: .fit)
-                            .background(Color.gray)
-                            .cornerRadius(10)
-                            .onTapGesture {
-                                if let urlStr = media.video?.getVideo(resolution: .original) {
-                                    viewModel.videoURL = URL(string: urlStr)
-                                } else {
-                                    viewModel.videoURL = URL(string: media.video?.fileURL ?? "")
-                                }
-                                 
-                                viewModel.showMediaViewer.toggle()
-                            }
-                            .onAppear {
-                                if index == viewModel.medias.count - 1 {
-                                    viewModel.loadMore()
-                                }
-                            }
+                if viewModel.loadingStatus == .loading && viewModel.medias.isEmpty {
+                    ForEach(0..<10, id: \.self) { _ in
+                        skeletonImageView
                     }
-                    
+                } else {
+                    ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
+                        if let url = media.getImageURL(),
+                           let attributes = media.video?.attributes,
+                           let meta = attributes["metadata"] as? [String: Any],
+                           let videoMeta = meta["video"] as? [String: Any],
+                           let duration = videoMeta["duration"] as? TimeInterval {
+                            getVideoView(url, duration)
+                                .frame(maxWidth: .infinity)
+                                .aspectRatio(1, contentMode: .fit)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .onTapGesture {
+                                    if let urlStr = media.video?.getVideo(resolution: .original) {
+                                        viewModel.videoURL = URL(string: urlStr)
+                                    } else {
+                                        viewModel.videoURL = URL(string: media.video?.fileURL ?? "")
+                                    }
+                                     
+                                    viewModel.showMediaViewer.toggle()
+                                }
+                                .onAppear {
+                                    if index == viewModel.medias.count - 1 {
+                                        viewModel.loadMore()
+                                    }
+                                }
+                        }
+                        
+                    }
                 }
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 16)
             .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
                 if let videoURL = viewModel.videoURL {
                     AVPlayerView(url: videoURL, autoPlay: false)
                         .ignoresSafeArea(.all)
                 }
             }
+            
+            Color.clear
+                .frame(height: 16)
         }
     }
     
@@ -126,5 +135,14 @@ public struct AmityCommunityVideoFeedComponent: AmityComponentView {
                 .padding([.leading, .bottom], 8)
         }
         
+    }
+    
+    @ViewBuilder
+    private var skeletonImageView: some View {
+        Color(viewConfig.theme.baseColorShade3)
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            .cornerRadius(10)
+            .shimmering(gradient: shimmerGradient)
     }
 }

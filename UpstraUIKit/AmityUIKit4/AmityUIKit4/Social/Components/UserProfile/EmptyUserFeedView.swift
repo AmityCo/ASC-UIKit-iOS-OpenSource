@@ -19,9 +19,13 @@ struct EmptyUserFeedView: View {
     private var icon: ImageResource?
     private var title: String?
     private var description: String?
+    private let feedType: EmptyUserFeedViewType
+    private let feedState: EmptyUserFeedViewState
     
     init(feedType: EmptyUserFeedViewType, feedState: EmptyUserFeedViewState, viewConfig: AmityViewConfigController) {
         self.viewConfig = viewConfig
+        self.feedType = feedType
+        self.feedState = feedState
         let emptyFeedId: ElementId
         let privateFeedId: ElementId
         let privateFeedInfoId: ElementId
@@ -94,6 +98,40 @@ struct EmptyUserFeedView: View {
         .padding(.vertical, 140)
         .frame(maxWidth: 387)
         .updateTheme(with: viewConfig)
+        .accessibilityIdentifier(getAccessibilityID(feedState, feedType))
     }
     
+    private func getAccessibilityID(_ feedState: EmptyUserFeedViewState, _ type: EmptyUserFeedViewType) -> String {
+        switch feedState {
+        case .empty:
+            switch type {
+            case .post:
+                AccessibilityID.Social.UserFeed.emptyUserFeed
+            case .image:
+                AccessibilityID.Social.UserFeed.emptyUserImageFeed
+            case .video:
+                AccessibilityID.Social.UserFeed.emptyUserVideoFeed
+            }
+            
+        case .private:
+            switch type {
+            case .post:
+                AccessibilityID.Social.UserFeed.privateUserFeed
+            case .image:
+                AccessibilityID.Social.UserFeed.privateUserImageFeed
+            case .video:
+                AccessibilityID.Social.UserFeed.privateUserVideoFeed
+            }
+            
+        case .blocked:
+            switch type {
+            case .post:
+                AccessibilityID.Social.UserFeed.blockedUserFeed
+            case .image:
+                AccessibilityID.Social.UserFeed.blockedUserImageFeed
+            case .video:
+                AccessibilityID.Social.UserFeed.blockedUserVideoFeed
+            }
+        }
+    }
 }

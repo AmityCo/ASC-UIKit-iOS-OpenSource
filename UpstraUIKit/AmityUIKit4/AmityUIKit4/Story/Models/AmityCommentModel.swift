@@ -31,6 +31,7 @@ public struct AmityCommentModel: Identifiable, Equatable  {
     let parentId: String?
     let userId: String
     let isAuthorGlobalBanned: Bool
+    let isAuthorBrand: Bool
     private let myReactions: [String]
     var metadata: [String: Any]?
     var mentioneeBuilder: AmityMentioneesBuilder?
@@ -47,6 +48,7 @@ public struct AmityCommentModel: Identifiable, Equatable  {
     init(comment: AmityComment) {
         commentId = comment.commentId
         displayName = comment.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
+        isAuthorBrand = comment.user?.isBrand ?? false
         avatarURL = comment.user?.getAvatarInfo()?.fileURL ?? ""
         text = comment.data?["text"] as? String ?? ""
         isDeleted = comment.isDeleted

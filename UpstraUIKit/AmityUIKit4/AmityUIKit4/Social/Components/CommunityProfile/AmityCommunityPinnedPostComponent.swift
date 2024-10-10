@@ -59,7 +59,7 @@ public struct AmityCommunityPinnedPostComponent: AmityComponentView {
                 if let announcementPost = communityProfileViewModel.announcementPost, communityProfileViewModel.isAnnouncementPostPinned() {
                     VStack(spacing: 0) {
                         AmityPostContentComponent(post: announcementPost.object, style: .feed, category: .pinAndAnnouncement, hideTarget: true, onTapAction: {
-                            onTapPostDetailAction?(AmityPostModel(post: announcementPost.object), .announcement)
+                            onTapPostDetailAction?(AmityPostModel(post: announcementPost.object), .pinAndAnnouncement)
                         }, pageId: pageId)
                         .contentShape(Rectangle())
                         

@@ -12,7 +12,7 @@ import AmitySDK
 public struct AmityPendingPostContentComponent: AmityComponentView {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     @StateObject private var viewConfig: AmityViewConfigController
-    @StateObject private var viewModel: AmityPendingPostContentComponenttViewModel
+    @StateObject private var viewModel: AmityPendingPostContentComponentViewModel
     @State private var showBottomSheet: Bool = false
     
     public var pageId: PageId?
@@ -26,7 +26,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
         self.pageId = pageId
         self.post = AmityPostModel(post: post)
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .pendingPostContentComponent))
-        self._viewModel = StateObject(wrappedValue: AmityPendingPostContentComponenttViewModel(post))
+        self._viewModel = StateObject(wrappedValue: AmityPendingPostContentComponentViewModel(post))
     }
     
     public var body: some View {
@@ -123,13 +123,8 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             switch post.dataTypeInternal {
             case .text:
                 postContentTextView()
-                    .onAppear {
-                        Task { @MainActor in
-                            await viewModel.getPreviewlinkData()
-                        }
-                    }
-                
-                postPreviewLinkView()
+                    
+                PreviewLinkView(post: post)
                 
             case .image, .video:
                 postContentTextView()
@@ -190,6 +185,8 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                         Toast.showToast(style: .success, message: "Post accepted.")
                     }
                 }
+                .isHidden(viewConfig.isHidden(elementId: .postAcceptButton))
+                .accessibilityIdentifier(AccessibilityID.Social.PendingPost.postAcceptButton)
                 
             
             Rectangle()
@@ -214,85 +211,10 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                         }
                     }
                 }
+                .isHidden(viewConfig.isHidden(elementId: .postDeclineButton))
+                .accessibilityIdentifier(AccessibilityID.Social.PendingPost.postDeclineButton)
         }
         .frame(height: 40)
-    }
-    
-    
-    @ViewBuilder
-    private func postPreviewLinkView() -> some View {
-        if let url = viewModel.previewLinkData.url {
-            VStack(alignment: .leading, spacing: 0) {
-                let fallbackImage = viewModel.previewLinkData.metadata == nil ? AmityIcon.previewLinkErrorIcon : AmityIcon.previewLinkDefaultIcon
-                Rectangle()
-                    .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(height: 240)
-                    .overlay(
-                        previewLinkImageView(viewModel.previewLinkData.image, fallback: fallbackImage.getImage() ?? UIImage())
-                            .isHidden(!viewModel.previewLinkData.loaded)
-                    )
-                    .clipped()
-                    .shimmering(active: !viewModel.previewLinkData.loaded)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    if !viewModel.previewLinkData.loaded {
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(width: 180, height: 10)
-                            .clipShape(RoundedCorner())
-                            .shimmering()
-                        
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(width: 160, height: 10)
-                            .clipShape(RoundedCorner())
-                            .shimmering()
-                    } else {
-                        let urlText = viewModel.previewLinkData.metadata?.url?.host ?? "Preview not available"
-                        let titleText = viewModel.previewLinkData.metadata?.title ?? "Please make sure the URL is correct and try again."
-                        let urlFont = viewModel.previewLinkData.metadata?.url?.host == nil ? Font.system(size: 15.0, weight: .semibold) : Font.system(size: 14.0)
-                        let titleFont = viewModel.previewLinkData.metadata?.url?.host == nil ? Font.system(size: 15.0) : Font.system(size: 16.0, weight: .semibold)
-                        let urlTextColor = viewModel.previewLinkData.metadata?.url?.host == nil ? Color(viewConfig.theme.baseColor) : Color(viewConfig.theme.baseColorShade1)
-                        let titleTextColor = viewModel.previewLinkData.metadata?.url?.host == nil ? Color(viewConfig.theme.baseColorShade1) : Color(viewConfig.theme.baseColor)
-                        
-                        Text(urlText)
-                            .font(urlFont)
-                            .lineLimit(1)
-                            .foregroundColor(urlTextColor)
-                        
-                        Text(titleText)
-                            .font(titleFont)
-                            .lineLimit(2)
-                            .foregroundColor(titleTextColor)
-                    }
-                }
-                .padding([.leading, .trailing], 12)
-                .padding([.bottom, .top], 14)
-            }
-            .cornerRadius(8.0)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                UIApplication.shared.open(url)
-            }
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 0.4)
-            )
-        }
-    }
-    
-    
-    @ViewBuilder
-    private func previewLinkImageView(_ image: UIImage?, fallback: UIImage) -> some View {
-        if let image {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-        } else {
-            Image(uiImage: fallback)
-                .frame(width: 50, height: 50)
-                .scaledToFit()
-        }
     }
     
     
@@ -321,7 +243,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
     }
 }
 
-class AmityPendingPostContentComponenttViewModel: ObservableObject {
+class AmityPendingPostContentComponentViewModel: ObservableObject {
     @Published var previewLinkData: (url: URL?, metadata: LPLinkMetadata?, image: UIImage?, loaded: Bool) = (nil, nil, nil, false)
     private let postManager = PostManager()
     private let post: AmityPostModel

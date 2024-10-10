@@ -24,6 +24,7 @@ public struct AmityLocalizedStringSet {
         static let cameraAccessDenied = "camera_access_denied"
         static let on = "on"
         static let off = "off"
+        static let edit = "edit"
     }
     
     public struct Story {
@@ -130,6 +131,8 @@ public struct AmityLocalizedStringSet {
         static let deletePostMessage = "delete_post_message"
         static let postReportedMessage = "post_reported_message"
         static let postUnReportedMessage = "post_unreported_message"
+        static let postFailedReportedMessage = "post_failed_reported_message"
+        static let postFailedUnReportedMessage = "post_failed_unreported_message"
         static let postDeletedToastMessage = "post_deleted_toast_message"
         static let postDetailPageTitle = "post_detail_page_title"
         static let sponsored = "ads_sponsored_label"
@@ -143,6 +146,16 @@ public struct AmityLocalizedStringSet {
         static let communitySetupAlertMessage = "community_setup_alert_message"
         static let communitySetupEditAlertTitle = "community_setup_edit_alert_title"
         static let communitySetupEditAlertMessage = "community_setup_edit_alert_message"
+        static let livestreamPlayerEndedTitle = "livestream_player_ended_title"
+        static let livestreamPlayerEndedMessage = "livestream_player_ended_message"
+        static let livestreamPlayerTerminatedTitle = "livestream_player_terminated_title"
+        static let livestreamPlayerTerminatedMessage = "livestream_player_terminated_message"
+        static let livestreamPlayerUnavailableTitle = "livestream_player_unavailable_title"
+        static let livestreamPlayerUnavailableMessage = "livestream_player_unavailable_message"
+        static let livestreamPlayerReconnectingTitle = "livestream_player_reconnecting_title"
+        static let livestreamPlayerReconnectingMessage = "livestream_player_reconnecting_message"
+        static let livestreamPlayerLive = "livestream_player_live"
+        static let livestreamPlayerRecorded = "livestream_player_recorded"
         
         static let communitySettingBasicInfoTitle = "community_setting_basic_info_title"
         static let communitySettingCommunityPermissionsTitle = "community_setting_community_permissions_title" 
@@ -207,6 +220,14 @@ public struct AmityLocalizedStringSet {
         
         static let communityAllCategoriesPageTitle = "community_all_categories_title"
         static let communityEmptyStateTitle = "community_list_empty_state_title"
+        
+        static let featuredPostBadge = "featured_post_badge"
+        static let featuredPostEditConfirmation = "featured_post_edit_confirmation"
+        static let featuredPostEditConfirmationTitle = "featured_post_edit_confirmation_title"
+      
+        static let globalFeaturedCommunityEditConfirmationTitle = "global_featured_community_edit_confirmation_title"
+        
+        static let globalFeaturedCommunityEditConfirmationMessage = "global_featured_community_edit_confirmation_msg"
         
         static let userProfileEditAlertTitle = "user_profile_edit_alert_title"
         static let userProfileEditAlertMessage = "user_profile_edit_alert_message"

@@ -38,6 +38,7 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
                     .frame(width: 20, height: 20)
                     .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 8))
                     .isHidden(viewConfig.isHidden(elementId: .searchIcon), remove: true)
+                    .accessibilityIdentifier(AccessibilityID.Social.TopSearchBar.searchIcon)
                     
                 let placeholder = viewModel.searchType == .myCommunities ? "Search my community" : "Search community and user"
                 TextField(placeholder, text: $viewModel.searchKeyword)
@@ -54,6 +55,7 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
                             .padding(.trailing, 12)
                     })
                     .isHidden(viewConfig.isHidden(elementId: .clearButton))
+                    .accessibilityIdentifier(AccessibilityID.Social.TopSearchBar.clearButton)
                 }
             }
             .frame(maxWidth: .infinity)

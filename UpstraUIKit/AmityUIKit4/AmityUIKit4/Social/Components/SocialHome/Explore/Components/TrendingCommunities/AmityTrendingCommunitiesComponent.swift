@@ -51,7 +51,7 @@ public struct AmityTrendingCommunitiesComponent: AmityComponentView {
             Text(AmityLocalizedStringSet.Social.exploreTrendingComponentTitle.localizedString)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(Color(viewConfig.theme.baseColor))
-                .padding(.bottom, 16)
+                .padding(.bottom, 12)
             
             ForEach(Array(viewModel.communities.enumerated()), id: \.element.id) { index, community in
                 VStack(spacing: 0) {
@@ -67,10 +67,6 @@ public struct AmityTrendingCommunitiesComponent: AmityComponentView {
                                 .offset(x: 8, y: -8)
                                 .shadow(radius: 2, x: 0, y: 0)
                             , alignment: .bottomLeading)
-                    
-                    Divider()
-                        .opacity(viewModel.isLastCommunity(community: community) ? 0 : 1)
-                        .padding(.vertical, 12)
                 }
             }
         }

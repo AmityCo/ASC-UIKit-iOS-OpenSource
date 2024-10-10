@@ -39,7 +39,7 @@ public struct AmityUserProfilePage: AmityPageView {
         VStack(spacing: 0) {
             navigationBarView
                 .padding(.leading, 16)
-                .padding(.trailing, 8)
+                .padding(.trailing, 6)
             
             tabBarView
                 .padding(.top, 10)
@@ -163,14 +163,19 @@ public struct AmityUserProfilePage: AmityPageView {
         ZStack(alignment: .bottom) {
             HStack {
                 let feedTabItem = TabItem(index: 0, image: AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .userFeedTabButton, key: "image", of: String.self) ?? ""))
-                TabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: feedTabItem)
+                TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: feedTabItem)
+                    .isHidden(viewConfig.isHidden(elementId: .userFeedTabButton))
+                    .accessibilityIdentifier(AccessibilityID.Social.UserProfile.userFeedTabButton)
                 
                 let imageFeedTabItem = TabItem(index: 1, image: AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .userImageFeedTabButton, key: "image", of: String.self) ?? ""))
-                TabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: imageFeedTabItem)
-                    .isHidden(viewConfig.isHidden(elementId: .communityPinTabButton))
+                TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: imageFeedTabItem)
+                    .isHidden(viewConfig.isHidden(elementId: .userImageFeedTabButton))
+                    .accessibilityIdentifier(AccessibilityID.Social.UserProfile.userImageFeedTabButton)
                 
                 let videoFeedTabItem = TabItem(index: 2, image: AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .userVideoFeedTabButton, key: "image", of: String.self) ?? ""))
-                TabBarItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: videoFeedTabItem)
+                TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: videoFeedTabItem)
+                    .isHidden(viewConfig.isHidden(elementId: .userVideoFeedTabButton))
+                    .accessibilityIdentifier(AccessibilityID.Social.UserProfile.userVideoFeedTabButton)
             }
             .padding(.horizontal, 16)
             
@@ -311,6 +316,7 @@ public struct AmityUserProfilePage: AmityPageView {
                     .fill(Color(viewConfig.theme.primaryColor))
                     .clipShape(RoundedCorner())
                     .frame(width: 64, height: 64)
+                    .shadow(radius: 4, y: 2)
                 Image(AmityIcon.plusIcon.imageResource)
                     .resizable()
                     .renderingMode(.template)

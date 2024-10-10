@@ -103,7 +103,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                         case .content(let post):
                             
                             VStack(spacing: 0){
-                                AmityPostContentComponent(post: post.object, onTapAction: {
+                                AmityPostContentComponent(post: post.object, category: post.isPinned ? .global : .general, onTapAction: {
                                     let context = AmityNewsFeedComponentBehavior.Context(component: self, post: post)
                                     AmityUIKitManagerInternal.shared.behavior.newsFeedComponentBehavior?.goToPostDetailPage(context: context)
                                 }, pageId: pageId)

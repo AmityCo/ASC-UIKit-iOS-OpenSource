@@ -45,7 +45,7 @@ public struct AmityGlobalFeedComponent: AmityComponentView {
                     case .content(let post):
                         
                         VStack(spacing: 0){
-                            AmityPostContentComponent(post: post.object, onTapAction: {
+                            AmityPostContentComponent(post: post.object, category: post.isPinned ? .global : .general, onTapAction: {
                                 let context = AmityGlobalFeedComponentBehavior.Context(component: self, post: post)
                                 AmityUIKitManagerInternal.shared.behavior.globalFeedComponentBehavior?.goToPostDetailPage(context: context)
                             }, pageId: pageId)

@@ -19,7 +19,7 @@ public struct AmityUserFeedComponent: AmityComponentView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: AmityUserFeedComponentViewModel
     
-    init(userId: String, userProfilePageViewModel: AmityUserProfilePageViewModel? = nil, pageId: PageId? = nil) {
+    public init(userId: String, userProfilePageViewModel: AmityUserProfilePageViewModel? = nil, pageId: PageId? = nil) {
         self.pageId = pageId
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .userFeed))
         if let userProfilePageViewModel {

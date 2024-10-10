@@ -24,7 +24,8 @@ class MediaFeedViewModel: ObservableObject {
     private let debouner = Debouncer(delay: 0.1)
     private let feedType: MediaFeedType
     private var token: AmityNotificationToken?
-    private var followInfoObject: AmityObject<AmityUserFollowInfo>?
+    private var myFollowInfoObject: AmityObject<AmityMyFollowInfo>?
+    private var userFollowInfoObject: AmityObject<AmityUserFollowInfo>?
     private var cancellable: AnyCancellable?
     private let postManager = PostManager()
     private let userManager = UserManager()
@@ -57,16 +58,29 @@ class MediaFeedViewModel: ObservableObject {
     }
     
     private func loadFollowInfo(userId: String, queryOptions: AmityPostQueryOptions) {
-        followInfoObject = userManager.getFollowInfo(withId: userId)
-        cancellable = followInfoObject?.$snapshot
-            .sink(receiveValue: { [weak self] followInfo in
-                guard let followInfo else { return }
-                let model = AmityFollowInfoModel(followInfo)
-                self?.blockedFeedState = model.status == .blocked ? .blocked : nil
-                if model.status != .blocked {
-                    self?.loadPosts(queryOptions)
-                }
-            })
+        if AmityUIKitManagerInternal.shared.currentUserId == userId {
+            myFollowInfoObject = userManager.getMyFollowInfo()
+            cancellable = myFollowInfoObject?.$snapshot
+                .sink(receiveValue: { [weak self] followInfo in
+                    guard let followInfo else { return }
+                    let model = AmityFollowInfoModel(followInfo)
+                    self?.blockedFeedState = model.status == .blocked ? .blocked : nil
+                    if model.status != .blocked {
+                        self?.loadPosts(queryOptions)
+                    }
+                })
+        } else {
+            userFollowInfoObject = userManager.getFollowInfo(withId: userId)
+            cancellable = userFollowInfoObject?.$snapshot
+                .sink(receiveValue: { [weak self] followInfo in
+                    guard let followInfo else { return }
+                    let model = AmityFollowInfoModel(followInfo)
+                    self?.blockedFeedState = model.status == .blocked ? .blocked : nil
+                    if model.status != .blocked {
+                        self?.loadPosts(queryOptions)
+                    }
+                })
+        }
     }
     
     private func loadPosts(_ queryOptions: AmityPostQueryOptions) {

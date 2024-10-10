@@ -23,7 +23,7 @@ public struct AmityCommunityImageFeedComponent: AmityComponentView {
         ]
     }
     
-    init(communityId: String, communityProfileViewModel: CommunityProfileViewModel? = nil, pageId: PageId? = nil) {
+    public init(communityId: String, communityProfileViewModel: CommunityProfileViewModel? = nil, pageId: PageId? = nil) {
         self.pageId = pageId
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityImageFeed))
         
@@ -49,34 +49,43 @@ public struct AmityCommunityImageFeedComponent: AmityComponentView {
     private var imageFeedView: some View {
         VStack(spacing: 0) {
             Color.clear
-                .frame(height: 8)
+                .frame(height: 16)
             
             LazyVGrid(columns: gridLayout, spacing: 8) {
-                ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
-                    if let url = media.getImageURL() {
-                        getImageView(url)
-                            .frame(maxWidth: .infinity)
-                            .aspectRatio(1, contentMode: .fit)
-                            .background(Color.gray)
-                            .cornerRadius(10)
-                            .onTapGesture {
-                                viewModel.selectedMediaIndex = index
-                                withoutAnimation {
-                                    viewModel.showMediaViewer.toggle()
+                if viewModel.loadingStatus == .loading && viewModel.medias.isEmpty {
+                    ForEach(0..<10, id: \.self) { _ in
+                        skeletonImageView
+                    }
+                } else {
+                    ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
+                        if let url = media.getImageURL() {
+                            getImageView(url)
+                                .frame(maxWidth: .infinity)
+                                .aspectRatio(1, contentMode: .fit)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .onTapGesture {
+                                    viewModel.selectedMediaIndex = index
+                                    withoutAnimation {
+                                        viewModel.showMediaViewer.toggle()
+                                    }
                                 }
-                            }
-                            .onAppear {
-                                if index == viewModel.medias.count - 1 {
-                                    viewModel.loadMore()
+                                .onAppear {
+                                    if index == viewModel.medias.count - 1 {
+                                        viewModel.loadMore()
+                                    }
                                 }
-                            }
+                        }
                     }
                 }
             }
-            .padding(.horizontal, 8)
+            .padding(.horizontal, 16)
             .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
                 MediaViewer(medias: [viewModel.medias[viewModel.selectedMediaIndex]], startIndex: 0, closeAction: { viewModel.showMediaViewer.toggle() })
             }
+            
+            Color.clear
+                .frame(height: 16)
         }
     }
     
@@ -104,5 +113,14 @@ public struct AmityCommunityImageFeedComponent: AmityComponentView {
             .compositingGroup()
             .clipped()
             .contentShape(Rectangle())
+    }
+    
+    @ViewBuilder
+    private var skeletonImageView: some View {
+        Color(viewConfig.theme.baseColorShade3)
+            .frame(maxWidth: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            .cornerRadius(10)
+            .shimmering(gradient: shimmerGradient)
     }
 }

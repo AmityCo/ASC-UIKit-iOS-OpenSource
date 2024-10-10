@@ -31,25 +31,13 @@ public struct AmityMyCommunitiesComponent: AmityComponentView {
             LazyVStack(spacing: 0) {
                 if viewModel.loadingStatus == .loading && viewModel.communities.isEmpty {
                     ForEach(0..<8, id: \.self) { _ in
-                        VStack {
-                            CommunityCellSkeletonView()
-                            
-                            Rectangle()
-                                .fill(Color(viewConfig.theme.baseColorShade4))
-                                .frame(height: 1)
-                                .padding([.leading, .trailing], 16)
-                        }
+                        CommunityCellSkeletonView()
                     }
                 } else {
                     ForEach(Array(viewModel.communities.enumerated()), id: \.element.communityId) { index, community in
                         VStack {
                             let model = AmityCommunityModel(object: community)
                             CommunityCellView(community: model, pageId: pageId, componentId: id)
-                           
-                            Rectangle()
-                                .fill(Color(viewConfig.theme.baseColorShade4))
-                                .frame(height: 1)
-                                .padding([.leading, .trailing], 16)
                         }
                         .onTapGesture {
                             let context = AmityMyCommunitiesComponentBehavior.Context(component: self, communityId: community.communityId)

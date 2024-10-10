@@ -1,12 +1,12 @@
 //
-//  TabBarItemView.swift
+//  TabItemView.swift
 //  AmityUIKit4
 //
 //  Created by Zay Yar Htun on 9/19/24.
 //
 import SwiftUI
 
-struct TabBarItemView: View {
+struct TabItemView: View {
     @EnvironmentObject var viewConfig: AmityViewConfigController
     
     @Binding var currentTab: Int

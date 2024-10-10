@@ -72,6 +72,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             goToPostCreation()
                         }
+                        .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createPostButton)
                 case .story:
                     let createStoryButton = viewConfig.getConfig(elementId: .createStoryButton, key: "image", of: String.self) ?? ""
                     let createStoryTitle = viewConfig.getConfig(elementId: .createStoryButton, key: "text", of: String.self) ?? ""
@@ -79,6 +80,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             goToStoryCreation()
                         }
+                        .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createStoryButton)
 //                case .poll:
 //                    let icon = AmityIcon.createPollMenuIcon
 //                    getItemView(image: icon.getImageResource(), title: type.rawValue)
@@ -99,7 +101,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
         .background(Color(viewConfig.theme.backgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 12.0))
         .shadow(radius: 2, y: 1)
-        .padding(.top, 50)
+        .padding(.top, 68)
         .padding(.trailing, 20)
     }
     

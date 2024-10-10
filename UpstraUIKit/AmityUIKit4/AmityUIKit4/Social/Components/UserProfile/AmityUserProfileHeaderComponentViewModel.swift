@@ -14,9 +14,14 @@ class AmityUserProfileHeaderComponentViewModel: ObservableObject {
     @Published var followRequestCount: Int = 0
     
     private let userId: String
-    private var followInfoObject: AmityObject<AmityUserFollowInfo>?
+    private var myFollowInfoObject: AmityObject<AmityMyFollowInfo>?
+    private var userFollowInfoObject: AmityObject<AmityUserFollowInfo>?
     private var pendingFollowerCollection: AmityCollection<AmityFollowRelationship>?
     private let userManager = UserManager()
+    
+    private var isOwnUser: Bool {
+        AmityUIKitManagerInternal.shared.currentUserId == userId
+    }
     
     init(_ userId: String) {
         self.userId = userId
@@ -24,12 +29,19 @@ class AmityUserProfileHeaderComponentViewModel: ObservableObject {
     }
     
     func load() {
-        followInfoObject = userManager.getFollowInfo(withId: userId)
-        pendingFollowerCollection = userManager.getMyFollowers(.pending)
+        if isOwnUser {
+            myFollowInfoObject = userManager.getMyFollowInfo()
+            myFollowInfoObject?.$snapshot
+                .map { $0.flatMap { AmityFollowInfoModel($0) }}
+                .assign(to: &$followInfo)
+        } else {
+            userFollowInfoObject = userManager.getFollowInfo(withId: userId)
+            userFollowInfoObject?.$snapshot
+                .map { $0.flatMap { AmityFollowInfoModel($0) }}
+                .assign(to: &$followInfo)
+        }
         
-        followInfoObject?.$snapshot
-            .map { $0.flatMap { AmityFollowInfoModel($0) }}
-            .assign(to: &$followInfo)
+        pendingFollowerCollection = userManager.getMyFollowers(.pending)
         
         pendingFollowerCollection?.$snapshots
             .map { $0.count }

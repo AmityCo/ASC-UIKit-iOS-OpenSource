@@ -12,18 +12,19 @@ import LinkPresentation
 public enum AmityPostContentComponentStyle {
     case feed
     case detail
-
 }
 
 public enum AmityPostCategory {
     case general
+    // Note: Announcement & global featured post is similar. `announcement` is used in case of community feed whereas `global` is used for global feed.
     case announcement
+    case global
     case pin
     case pinAndAnnouncement
 }
 
 public struct AmityPostContentComponent: AmityComponentView {
-
+    
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var pageId: PageId?
@@ -34,17 +35,18 @@ public struct AmityPostContentComponent: AmityComponentView {
     
     public let post: AmityPostModel
     @StateObject private var viewConfig: AmityViewConfigController
-   
+    
     @StateObject private var viewModel = AmityPostContentComponentViewModel()
     @State private var showReactionList: Bool = false
     @State private var showBottomSheet: Bool = false
+    @State private var showEditAlert: Bool = false
     
     private let style: AmityPostContentComponentStyle
     private let category: AmityPostCategory
     private let hideMenuButton: Bool
     private let hideTarget: Bool
     private var onTapAction: (() -> Void)?
-
+    
     public init(post: AmityPost, style: AmityPostContentComponentStyle = .feed, category: AmityPostCategory = .general, hideTarget: Bool = false, hideMenuButton: Bool = false, onTapAction: (() -> Void)? = nil, pageId: PageId? = nil) {
         self.post = AmityPostModel(post: post)
         self.style = style
@@ -80,19 +82,23 @@ public struct AmityPostContentComponent: AmityComponentView {
     private func postHeaderView(_ post: AmityPostModel) -> some View {
         
         VStack(alignment: .leading, spacing: 0) {
+            
+            let isBadgeVisible = category == .announcement || category == .global || category == .pinAndAnnouncement
             HStack {
-                Text("Featured")
+                Text(AmityLocalizedStringSet.Social.featuredPostBadge.localizedString)
                     .font(.system(size: 15, weight: .medium))
                     .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                 
             }
             .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
-            .cornerRadius(4, corners: [.topRight, .bottomRight])
-            .padding(.vertical, 8)
-            .isHidden(!(category == .announcement || category == .pinAndAnnouncement) || viewConfig.isHidden(elementId: .announcementBadge))
-
+            .cornerRadius(5, corners: [.topRight, .bottomRight])
+            .padding(.top, 8)
+            .padding(.bottom, 2)
+            .isHidden(!isBadgeVisible || viewConfig.isHidden(elementId: .announcementBadge))
+            .accessibilityIdentifier(AccessibilityID.Social.PostContent.announcementBadge)
+            
             HStack(spacing: 8) {
                 AmityUserProfileImageView(displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: post.postedUser?.avatarURL ?? ""))
                     .frame(size: CGSize(width: 32.0, height: 32.0))
@@ -103,49 +109,34 @@ public struct AmityPostContentComponent: AmityComponentView {
                     }
                 
                 VStack(alignment: .leading, spacing: 3) {
+                    // Title
                     HStack(spacing: 8) {
-                        Text(post.displayName)
-                            .font(.system(size: 15, weight: .semibold))
-                            .lineLimit(1)
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
+                        authorDisplayNameLabel
                             .layoutPriority(1)
-                            .onTapGesture {
-                                goToUserProfilePage(post.postedUserId)
-                            }
-                        
-                        if post.isFromBrand {
-                            Image(AmityIcon.brandBadge.imageResource)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 18, height: 18)
-                                .padding(.leading, -4)
-                                .opacity(post.isFromBrand ? 1 : 0)
-                        }
                         
                         if let _ = post.targetCommunity, !hideTarget {
-                            HStack(spacing: 8) {
-                                Image(AmityIcon.arrowIcon.getImageResource())
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(size: CGSize(width: 10, height: 10))
-                                
-                                communityNameLabel
-                            }
+                            Image(AmityIcon.arrowIcon.getImageResource())
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(size: CGSize(width: 10, height: 10))
+                            
+                            communityNameLabel
+                                .layoutPriority(1)
                         }
                         
                         // If user posts to his own feed, we hide this part
                         if post.postTargetType == .user && post.postedUserId != post.targetId {
-                            HStack(spacing: 8) {
-                                Image(AmityIcon.arrowIcon.getImageResource())
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(size: CGSize(width: 10, height: 10))
-                                
-                                userNameLabel
-                            }
+                            Image(AmityIcon.arrowIcon.getImageResource())
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(size: CGSize(width: 10, height: 10))
+                            
+                            targetUserNameLabel
+                                .layoutPriority(1)
                         }
                     }
                     
+                    // Moderator Badge
                     HStack(spacing: 4) {
                         if post.isModerator && !viewConfig.isHidden(elementId: .moderatorBadge) {
                             let moderatorIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .moderatorBadge, key: "icon", of: String.self) ?? "")
@@ -161,8 +152,9 @@ public struct AmityPostContentComponent: AmityComponentView {
                                     .padding(.trailing, 6)
                             }
                             .frame(height: 20)
-                            .background(Color(viewConfig.theme.primaryColor.blend(.shade2)))
+                            .background(Color(viewConfig.theme.primaryColor.blend(.shade3)))
                             .clipShape(RoundedCorner(radius: 10))
+                            .accessibilityIdentifier(AccessibilityID.Social.PostContent.moderatorBadge)
                             
                             Text("•")
                                 .font(.system(size: 13))
@@ -173,6 +165,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .font(.system(size: 13))
                             .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                             .isHidden(viewConfig.isHidden(elementId: .timestamp))
+                            .accessibilityIdentifier(AccessibilityID.Social.PostContent.timestamp)
                         
                     }
                     
@@ -187,6 +180,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     .foregroundColor(Color(viewConfig.theme.primaryColor))
                     .frame(width: 20, height: 20)
                     .isHidden(!(category == .pin || category == .pinAndAnnouncement) || viewConfig.isHidden(elementId: .pinBadge))
+                    .accessibilityIdentifier(AccessibilityID.Social.PostContent.pinBadge)
                 
                 if !hideMenuButton {
                     let bottomSheetHeight = calculateBottomSheetHeight(post: post)
@@ -204,27 +198,40 @@ public struct AmityPostContentComponent: AmityComponentView {
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
                     .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                         PostBottomSheetView(isShown: $showBottomSheet, post: post, editPostActionCompletion: {
+                            
                             showBottomSheet.toggle()
                             
                             // Dismiss bottomsheet
                             host.controller?.dismiss(animated: false)
                             
-                            let editOption = AmityPostComposerOptions.editOptions(post: post)
-                            let view = AmityPostComposerPage(options: editOption)
-                            let controller = AmitySwiftUIHostingController(rootView: view)
-                            
-                            let navigationController = UINavigationController(rootViewController: controller)
-                            navigationController.modalPresentationStyle = .fullScreen
-                            navigationController.navigationBar.isHidden = true
-                            host.controller?.present(navigationController, animated: true)
+                            if category == .global {
+                                showEditAlert.toggle()
+                            } else {
+                                showPostEditScreen()
+                            }
                         })
                     }
                 }
             }
             .padding(EdgeInsets(top: 8, leading: 12, bottom: 0, trailing: 12))
         }
+        .alert(isPresented: $showEditAlert, content: {
+            Alert(title: Text(AmityLocalizedStringSet.Social.featuredPostEditConfirmationTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.featuredPostEditConfirmation.localizedString), primaryButton: .default(Text(AmityLocalizedStringSet.General.edit.localizedString), action: {
+                self.showPostEditScreen()
+            }), secondaryButton: .cancel(Text(AmityLocalizedStringSet.General.cancel.localizedString)))
+        })
     }
     
+    private func showPostEditScreen() {
+        let editOption = AmityPostComposerOptions.editOptions(post: post)
+        let view = AmityPostComposerPage(options: editOption)
+        let controller = AmitySwiftUIHostingController(rootView: view)
+        
+        let navigationController = UINavigationController(rootViewController: controller)
+        navigationController.modalPresentationStyle = .fullScreen
+        navigationController.navigationBar.isHidden = true
+        host.controller?.present(navigationController, animated: true)
+    }
     
     @ViewBuilder
     private func postContentView(_ post: AmityPostModel) -> some View {
@@ -232,39 +239,33 @@ public struct AmityPostContentComponent: AmityComponentView {
             switch post.dataTypeInternal {
             case .text:
                 postContentTextView()
-                    .onAppear {
-                        Task { @MainActor in
-                            await viewModel.getPreviewlinkData(post: post)
-                        }
-                    }
                 
-                postPreviewLinkView()
+                PreviewLinkView(post: post)
                 
             case .image, .video:
                 postContentTextView()
                 
                 PostContentMediaView(post: post)
-                .frame(height: 328)
-                .clipShape(RoundedCorner(radius: 8))
+                    .frame(height: 328)
+                    .clipShape(RoundedCorner(radius: 8))
                 
             case .file:
                 EmptyView()
-           
+                
             case .poll:
                 EmptyView()
                 
             case .liveStream:
-                postContentTextView()
+                livestreamPostContentTextView()
                 
                 PostContentLiveStreamView(post: post)
-                    .frame(height: 328)
-                    .clipShape(RoundedCorner(radius: 8))
-                
+                    .padding([.leading, .trailing, .top], -16)
             case .unknown:
                 EmptyView()
             }
         }
         .padding([.leading, .trailing], 16)
+        
     }
     
     
@@ -288,78 +289,35 @@ public struct AmityPostContentComponent: AmityComponentView {
     
     
     @ViewBuilder
-    private func postPreviewLinkView() -> some View {
-        if let url = viewModel.previewLinkData.url {
-            VStack(alignment: .leading, spacing: 0) {
-                let fallbackImage = viewModel.previewLinkData.metadata == nil ? AmityIcon.previewLinkErrorIcon : AmityIcon.previewLinkDefaultIcon
-                Rectangle()
-                    .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(height: 240)
-                    .overlay(
-                        previewLinkImageView(viewModel.previewLinkData.image, fallback: fallbackImage.getImage() ?? UIImage())
-                            .isHidden(!viewModel.previewLinkData.loaded)
-                    )
-                    .clipped()
-                    .shimmering(active: !viewModel.previewLinkData.loaded)
+    private func livestreamPostContentTextView() -> some View {
+        if let livestream = post.liveStream {
+            
+            VStack(spacing: 0) {
+                let title = livestream.title ?? ""
+                let description = livestream.streamDescription ?? ""
                 
-                VStack(alignment: .leading, spacing: 4) {
-                    if !viewModel.previewLinkData.loaded {
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(width: 180, height: 10)
-                            .clipShape(RoundedCorner())
-                            .shimmering()
-                        
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(width: 160, height: 10)
-                            .clipShape(RoundedCorner())
-                            .shimmering()
-                    } else {
-                        let urlText = viewModel.previewLinkData.metadata?.url?.host ?? "Preview not available"
-                        let titleText = viewModel.previewLinkData.metadata?.title ?? "Please make sure the URL is correct and try again."
-                        let urlFont = viewModel.previewLinkData.metadata?.url?.host == nil ? Font.system(size: 15.0, weight: .semibold) : Font.system(size: 14.0)
-                        let titleFont = viewModel.previewLinkData.metadata?.url?.host == nil ? Font.system(size: 15.0) : Font.system(size: 16.0, weight: .semibold)
-                        let urlTextColor = viewModel.previewLinkData.metadata?.url?.host == nil ? Color(viewConfig.theme.baseColor) : Color(viewConfig.theme.baseColorShade1)
-                        let titleTextColor = viewModel.previewLinkData.metadata?.url?.host == nil ? Color(viewConfig.theme.baseColorShade1) : Color(viewConfig.theme.baseColor)
-                        
-                        Text(urlText)
-                            .font(urlFont)
-                            .lineLimit(1)
-                            .foregroundColor(urlTextColor)
-                        
-                        Text(titleText)
-                            .font(titleFont)
-                            .lineLimit(2)
-                            .foregroundColor(titleTextColor)
-                    }
+                if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text("\(title)")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, description.isEmpty ? 16 : 20)
                 }
-                .padding([.leading, .trailing], 12)
-                .padding([.bottom, .top], 14)
+                
+                if !description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    ExpandableText(description)
+                        .lineLimit(8)
+                        .moreButtonText("...See more")
+                        .font(.system(size: 15))
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .attributedColor(viewConfig.theme.primaryColor)
+                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .expandAnimation(.easeOut(duration: 0.25))
+                        .lineSpacing(5)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 16)
+                }
             }
-            .cornerRadius(8.0)
-            .contentShape(Rectangle())
-            .onTapGesture {
-                UIApplication.shared.open(url)
-            }
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 0.4)
-            )
-        }
-    }
-    
-    
-    @ViewBuilder
-    private func previewLinkImageView(_ image: UIImage?, fallback: UIImage) -> some View {
-        if let image {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-        } else {
-            Image(uiImage: fallback)
-                .frame(width: 50, height: 50)
-                .scaledToFit()
         }
     }
     
@@ -411,6 +369,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 .font(.system(size: 15))
                 .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade2))
                 .isHidden(self.post.targetCommunity?.isJoined ?? true || viewConfig.isHidden(elementId: .nonMemberSection))
+                .accessibilityIdentifier(AccessibilityID.Social.PostContent.nonMemberSection)
             
             HStack(spacing: 4) {
                 Button(feedbackStyle: .light, action: {
@@ -445,6 +404,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .isHidden(viewConfig.isHidden(elementId: .reactionButton), remove: true)
+                .accessibilityIdentifier(AccessibilityID.Social.PostContent.reactionButton)
                 
                 Button(feedbackStyle: .light, action: {
                     onTapAction?()
@@ -456,7 +416,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .resizable()
                             .frame(width: 20.0, height: 20.0)
                         
-                            if style == .feed {
+                        if style == .feed {
                             Text(post.allCommentCount == 0 ? "0" : "\(post.allCommentCount)")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(Color(viewConfig.theme.baseColorShade2))
@@ -470,6 +430,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 .buttonStyle(PlainButtonStyle())
                 .padding(.leading, 8)
                 .isHidden(viewConfig.isHidden(elementId: .commentButton), remove: true)
+                .accessibilityIdentifier(AccessibilityID.Social.PostContent.commentButton)
                 
                 Spacer()
                 
@@ -487,6 +448,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 }
                 .buttonStyle(PlainButtonStyle())
                 .isHidden(viewConfig.isHidden(elementId: .shareButton), remove: true)
+                .accessibilityIdentifier(AccessibilityID.Social.PostContent.shareButton)
             }
             .isHidden(!(self.post.targetCommunity?.isJoined ?? true))
         }
@@ -495,7 +457,7 @@ public struct AmityPostContentComponent: AmityComponentView {
     
     
     func calculateBottomSheetHeight(post: AmityPostModel) -> CGFloat {
-                
+        
         let baseBottomSheetHeight: CGFloat = 68
         let itemHeight: CGFloat = 48
         let additionalItems = [
@@ -512,6 +474,28 @@ public struct AmityPostContentComponent: AmityComponentView {
 extension AmityPostContentComponent {
     
     @ViewBuilder
+    var authorDisplayNameLabel: some View {
+        HStack(spacing: 8) {
+            Text(post.displayName)
+                .font(.system(size: 15, weight: .semibold))
+                .lineLimit(1)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .onTapGesture {
+                    self.goToUserProfilePage(post.postedUserId)
+                }
+            
+            if post.isFromBrand {
+                Image(AmityIcon.brandBadge.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 18, height: 18)
+                    .padding(.leading, -4)
+                    .opacity(post.isFromBrand ? 1 : 0)
+            }
+        }
+    }
+    
+    @ViewBuilder
     var communityNameLabel: some View {
         HStack(spacing: 8) {
             if !post.isTargetPublicCommunity {
@@ -525,7 +509,6 @@ extension AmityPostContentComponent {
                 .font(.system(size: 15, weight: .semibold))
                 .lineLimit(1)
                 .foregroundColor(Color(viewConfig.theme.baseColor))
-                .layoutPriority(1)
                 .onTapGesture {
                     let context = AmityPostContentComponentBehavior.Context(component: self)
                     AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
@@ -543,14 +526,13 @@ extension AmityPostContentComponent {
     }
     
     @ViewBuilder
-    var userNameLabel: some View {
+    var targetUserNameLabel: some View {
         HStack(spacing: 8) {
             
             Text(post.targetUser?.displayName ?? "Unknown")
                 .font(.system(size: 15, weight: .semibold))
                 .lineLimit(1)
                 .foregroundColor(Color(viewConfig.theme.baseColor))
-                .layoutPriority(1)
                 .onTapGesture {
                     let context = AmityPostContentComponentBehavior.Context(component: self)
                     AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
@@ -567,7 +549,6 @@ extension AmityPostContentComponent {
 
 class AmityPostContentComponentViewModel: ObservableObject {
     private let reactionManager = ReactionManager()
-    @Published var previewLinkData: (url: URL?, metadata: LPLinkMetadata?, image: UIImage?, loaded: Bool) = (nil, nil, nil, false)
     
     init() {}
     
@@ -577,30 +558,5 @@ class AmityPostContentComponentViewModel: ObservableObject {
     
     func removeReaction(id: String) async throws {
         try await reactionManager.removeReaction(.like, referenceId: id, referenceType: .post)
-    }
-    
-    @MainActor
-    func getPreviewlinkData(post: AmityPostModel) async {
-        let urls = AmityPreviewLinkWizard.shared.detectLinks(input: post.text)
-        
-        guard urls.count > 0 else {
-            previewLinkData.url = nil
-            return
-        }
-        
-        previewLinkData.loaded = false
-        previewLinkData.url = urls[0]
-        previewLinkData.metadata = await AmityPreviewLinkWizard.shared.getMetadata(url: urls[0])
-        previewLinkData.loaded = true
-        
-        previewLinkData.metadata?.imageProvider?.loadObject(ofClass: UIImage.self, completionHandler: { [weak self] image, error in
-            guard let self else { return }
-            
-            DispatchQueue.main.async {
-                if let image = image as? UIImage {
-                    self.previewLinkData.image = image
-                }
-            }
-        })
     }
 }

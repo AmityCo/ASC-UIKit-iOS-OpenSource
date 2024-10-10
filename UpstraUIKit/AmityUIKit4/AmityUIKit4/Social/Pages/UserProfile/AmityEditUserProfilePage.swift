@@ -54,7 +54,7 @@ public struct AmityEditUserProfilePage: AmityPageView {
                 VStack(spacing: 24) {
                     userProifleAvatarView
                     
-                    InfoTextField(data: $displayNameTextFieldModel, text: $displayNameText, isValid: $isTextVaild)
+                    InfoTextField(data: $displayNameTextFieldModel, text: $displayNameText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userDisplayNameTitle)
                         .alertColor(viewConfig.theme.alertColor)
                         .dividerColor(viewConfig.theme.baseColorShade4)
                         .titleTextColor(viewConfig.theme.baseColor)
@@ -62,7 +62,7 @@ public struct AmityEditUserProfilePage: AmityPageView {
                         .textFieldTextColor(viewConfig.theme.baseColorShade2)
                         .allowsHitTesting(false)
                     
-                    InfoTextField(data: $aboutTextFieldModel, text: $aboutText, isValid: $isTextVaild)
+                    InfoTextField(data: $aboutTextFieldModel, text: $aboutText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userAboutTitle)
                         .alertColor(viewConfig.theme.alertColor)
                         .dividerColor(viewConfig.theme.baseColorShade4)
                         .infoTextColor(viewConfig.theme.baseColorShade2)
@@ -203,6 +203,7 @@ public struct AmityEditUserProfilePage: AmityPageView {
                         }
                     }
                 }
+                .accessibilityIdentifier(AccessibilityID.Social.EditUserProfile.updateUserProfileButton)
         }
     }
     

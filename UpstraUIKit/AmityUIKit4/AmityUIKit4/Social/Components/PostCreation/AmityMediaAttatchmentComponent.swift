@@ -51,6 +51,8 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                 showCamera.isShown.toggle()
                 hideKeyboard()
             }
+            .isHidden(viewConfig.isHidden(elementId: .cameraButton))
+            .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.cameraButton)
 
             Spacer()
                 .isHidden(currentType == .video, remove: true)
@@ -62,6 +64,8 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                 showMediaPicker.isShown.toggle()
                 hideKeyboard()
             }
+            .isHidden(viewConfig.isHidden(elementId: .imageButton))
+            .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.imageButton)
             
             Spacer()
                 .isHidden(currentType == .image, remove: true)
@@ -73,6 +77,8 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                 showMediaPicker.isShown.toggle()
                 hideKeyboard()
             }
+            .isHidden(viewConfig.isHidden(elementId: .videoButton))
+            .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.videoButton)
             
             Spacer()
                 .isHidden(currentType == nil, remove: true)

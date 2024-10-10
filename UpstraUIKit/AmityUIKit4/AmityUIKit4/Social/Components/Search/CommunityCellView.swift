@@ -29,10 +29,11 @@ struct CommunityCellView: View {
         
         HStack(spacing: 16) {
             AsyncImage(placeholder: AmityIcon.communityThumbnail.imageResource, url: URL(string: model.avatarURL))
-                .frame(size: CGSize(width: 64, height: 64))
+                .frame(size: CGSize(width: 80, height: 80))
                 .clipped()
                 .cornerRadius(8, corners: .allCorners)
                 .isHidden(viewConfig.isHidden(elementId: .communityAvatar))
+                .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityAvatar)
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 2) {
@@ -40,12 +41,11 @@ struct CommunityCellView: View {
                         let lockIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityPrivateBadge, key: "icon", of: String.self) ?? "")
                         Image(lockIcon)
                             .renderingMode(.template)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 20, height: 12)
+                            .frame(width: 20, height: 20)
                             .offset(y: -1)
                             .foregroundColor(Color(viewConfig.theme.baseColor))
                             .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
+                            .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityPrivateBadge)
                     }
                     
                     Text(model.displayName)
@@ -53,6 +53,7 @@ struct CommunityCellView: View {
                         .lineLimit(1)
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .isHidden(viewConfig.isHidden(elementId: .communityDisplayName))
+                        .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityDisplayName)
                     
                     if model.isOfficial {
                         let verifiedBadgeIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityOfficialBadge, key: "icon", of: String.self) ?? "")
@@ -62,12 +63,14 @@ struct CommunityCellView: View {
                             .frame(width: 20, height: 12)
                             .offset(x: 5,y: -1)
                             .isHidden(viewConfig.isHidden(elementId: .communityOfficialBadge))
+                            .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityOfficialBadge)
                     }
                 }
                 
                 if !model.categories.isEmpty {
-                    getCategoryView(model.categories)
+                    CategoryListView(community: model)
                         .isHidden(viewConfig.isHidden(elementId: .communityCategoryName))
+                        .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityCategoryName)
                 }
                 
                 Text("\(model.membersCount.formattedCountString) members")
@@ -75,35 +78,13 @@ struct CommunityCellView: View {
                     .lineLimit(1)
                     .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                     .isHidden(viewConfig.isHidden(elementId: .communityMembersCount))
+                    .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityMembersCount)
             }
             
             Spacer()
         }
-        .padding(.all, 16)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
         .background(Color(viewConfig.theme.backgroundColor))
-    }
-    
-    
-    @ViewBuilder
-    private func getCategoryView(_ categories: [String]) -> some View {
-        HStack {
-            ForEach(Array(categories.enumerated()), id: \.element) { index, category in
-                if index <= 3 {
-                    let name = index < 3 ? category : "+\(categories.count - 3)"
-                    Text(name)
-                        .font(.system(size: 13))
-                        .lineLimit(1)
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade1))
-                        .background(
-                            Rectangle()
-                                .fill(Color(viewConfig.theme.baseColorShade4))
-                                .clipShape(RoundedCorner())
-                                .padding(EdgeInsets(top: -3, leading: -7, bottom: -3, trailing: -7))
-                            
-                        )
-                        .padding([.leading, .trailing], 5)
-                }
-            }
-        }
     }
 }

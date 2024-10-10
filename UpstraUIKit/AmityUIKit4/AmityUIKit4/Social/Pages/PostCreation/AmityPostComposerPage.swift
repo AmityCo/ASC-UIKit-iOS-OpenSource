@@ -191,7 +191,8 @@ public struct AmityPostComposerPage: AmityPageView {
             Text(viewModel.mode == .create ? displayName : editPostTitle)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(Color(viewConfig.theme.baseColor))
-                .isHidden(viewConfig.isHidden(elementId: .communityDisplayName))
+                .isHidden(viewConfig.isHidden(elementId: .editPostTitle))
+                .accessibilityIdentifier(AccessibilityID.Social.PostComposer.editPostTitle)
             Spacer()
             
             let postButtonTitle = viewConfig.getConfig(elementId: .createNewPostButton, key: "text", of: String.self) ?? "Post"
@@ -226,8 +227,9 @@ public struct AmityPostComposerPage: AmityPageView {
                     }
                 }
             })
-            .disabled(viewModel.postText.isEmpty && mediaAttatchmentViewModel.medias.isEmpty)
+            .disabled(viewModel.postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && mediaAttatchmentViewModel.medias.isEmpty)
             .isHidden(viewModel.mode == .edit)
+            .accessibilityIdentifier(AccessibilityID.Social.PostComposer.createNewPostButton)
             
             let editPostButtonTitle = viewConfig.getConfig(elementId: .editPostButton, key: "text", of: String.self) ?? "Save"
             Button(editPostButtonTitle, action: {
@@ -250,8 +252,9 @@ public struct AmityPostComposerPage: AmityPageView {
                     }
                 }
             })
-            .disabled(viewModel.postText.isEmpty && mediaAttatchmentViewModel.medias.isEmpty)
+            .disabled(viewModel.postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && mediaAttatchmentViewModel.medias.isEmpty)
             .isHidden(viewModel.mode == .create)
+            .accessibilityIdentifier(AccessibilityID.Social.PostComposer.editPostButton)
         }
         .padding([.leading, .trailing], 16)
     }

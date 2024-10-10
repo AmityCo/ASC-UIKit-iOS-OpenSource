@@ -33,6 +33,17 @@ struct CommunityModel {
 class AmityCommunitySetupPageViewModel: ObservableObject {
     let communityManager: CommunityManager = CommunityManager()
     let fileRepostiory: AmityFileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    let postManager: PostManager = PostManager()
+    let mode: AmityCommunitySetupPageMode
+    var token: AmityNotificationToken?
+    var hasGlobalPinnedPost = false
+    var communityId: String?
+    
+    init(mode: AmityCommunitySetupPageMode, communityId: String?) {
+        self.mode = mode
+        self.communityId = communityId
+        self.checkGlobalPinnedPostPresence()
+    }
     
     func createCommunity(_ model: CommunityModel) async throws -> AmityCommunity {
         let createOptions = AmityCommunityCreateOptions()
@@ -71,5 +82,25 @@ class AmityCommunitySetupPageViewModel: ObservableObject {
         }
         
         return try await communityManager.editCommunity(withId: id, updateOptions: updateOptions)
+    }
+    
+    func checkGlobalPinnedPostPresence() {
+        guard case .edit = mode else {
+            return
+        }
+
+        token = postManager.getGlobalPinnedPost().observe({ [weak self] liveCollection, _, error in
+            guard let self, liveCollection.dataStatus == .fresh else { return }
+
+            let snapshots = liveCollection.snapshots
+            snapshots.forEach { pinnedPost in
+                if let post = pinnedPost.post, let communityId = self.communityId, post.targetId == communityId {
+                    self.hasGlobalPinnedPost = true
+                }
+            }
+            
+            self.token?.invalidate()
+            self.token = nil
+        })
     }
 }

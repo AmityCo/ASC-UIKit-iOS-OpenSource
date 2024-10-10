@@ -65,6 +65,17 @@ extension AmityPostModel {
         case postDetail
     }
     
+    
+    public enum LivestreamState {
+        case live
+        case ended
+        case terminated
+        case recorded
+        case idle
+        case none
+    }
+    
+    
     public class Author {
         public let avatarURL: String?
         public let displayName: String?
@@ -277,6 +288,8 @@ public class AmityPostModel: Identifiable {
     
     public let analytic: AmityPostAnalytics
     
+    public let impression: Int
+    
     var commentExpandedIds: Set<String> = []
     
     // MARK: - Internal variables
@@ -289,6 +302,7 @@ public class AmityPostModel: Identifiable {
     let postAsModerator: Bool = false
     private(set) var text: String = ""
     private(set) var liveStream: AmityStream?
+    private(set) var livestreamState: LivestreamState = .none
     let object: AmityPost
     private let childrenPosts: [AmityPost]
     
@@ -339,6 +353,8 @@ public class AmityPostModel: Identifiable {
         mentionees = post.mentionees
         isEdited = post.isEdited
         analytic = post.analytics
+        impression = post.impression
+
         self.isPinned = isPinned
         isTargetPublicCommunity = post.targetCommunity?.isPublic ?? false
         isTargetOfficialCommunity = post.targetCommunity?.isOfficial ?? false
@@ -441,6 +457,19 @@ public class AmityPostModel: Identifiable {
             if let liveStreamData = post.getLiveStreamInfo() {
                 liveStream = liveStreamData
                 dataTypeInternal = .liveStream
+                if !(liveStreamData.moderation?.terminateLabels.isEmpty ?? true) {
+                    livestreamState = .terminated
+                } else if liveStreamData.status == AmityStreamStatus.ended {
+                    livestreamState = .ended
+                } else if liveStreamData.status == AmityStreamStatus.live {
+                    livestreamState = .live
+                } else if liveStreamData.status == AmityStreamStatus.recorded {
+                    livestreamState = .recorded
+                    
+                } else {
+                    livestreamState = .idle
+                    
+                }
             }
         default:
             dataTypeInternal = .unknown

@@ -40,6 +40,8 @@ public enum PageId: String {
     case communityStoriesNotificationSettingPage = "community_stories_notification_page"
     case communityPendingPostPage = "pending_posts_page"
     
+    case livestreamPlayerPage = "livestream_player_page"
+
     case userProfilePage = "user_profile_page"
     case editUserProfilePage = "edit_user_profile_page"
     case userRelationshipPage = "user_relationship_page"

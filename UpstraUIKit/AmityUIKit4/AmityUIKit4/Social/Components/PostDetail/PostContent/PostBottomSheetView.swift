@@ -67,7 +67,6 @@ struct PostBottomSheetView: View {
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
     }
     
-
     private var memberView: some View {
         VStack {
             editSheetButton.isHidden(!post.isOwner)
@@ -80,95 +79,94 @@ struct PostBottomSheetView: View {
     
     
     private var deleteSheetButton: some View {
-        HStack(spacing: 12) {
-            Image(AmityIcon.trashBinIcon.getImageResource())
-                .renderingMode(.template)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 20, height: 24)
-                .foregroundColor(Color(viewConfig.theme.alertColor))
-            
-            Button {
-                isDeleteAlertShown.toggle()
-            } label: {
+        Button(action: {
+            isDeleteAlertShown.toggle()
+        }, label: {
+            HStack(spacing: 12) {
+                Image(AmityIcon.trashBinIcon.getImageResource())
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 20, height: 24)
+                    .foregroundColor(Color(viewConfig.theme.alertColor))
+                
                 Text(AmityLocalizedStringSet.Social.deletePostBottomSheetTitle.localizedString)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.alertColor))
+                
+                Spacer()
             }
-            .buttonStyle(.plain)
-            
-            Spacer()
-        }
+            .contentShape(Rectangle())
+        })
+        .buttonStyle(.plain)
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
     }
     
-    
     private var flagSheetButton: some View {
-        HStack(spacing: 12) {
-            Image(AmityIcon.flagIcon.getImageResource())
-                .renderingMode(.template)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 20, height: 24)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-            
-            Button {
-                Task { @MainActor in
-                    do {
-                        if viewModel.isPostFlaggedByMe {
-                            try await viewModel.unflagPost(id: post.postId)
-                        } else {
-                            try await viewModel.flagPost(id: post.postId)
-                        }
-                        
-                        isShown.toggle()
-                        viewModel.updatePostFlaggedByMeState(id: post.postId)
-                        
-                        Toast.showToast(style: .success, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postReportedMessage.localizedString)
-                    } catch {
-                        Toast.showToast(style: .warning, message: error.localizedDescription)
+        Button(action: {
+            Task { @MainActor in
+                do {
+                    if viewModel.isPostFlaggedByMe {
+                        try await viewModel.unflagPost(id: post.postId)
+                    } else {
+                        try await viewModel.flagPost(id: post.postId)
                     }
+                    
+                    isShown.toggle()
+                    viewModel.updatePostFlaggedByMeState(id: post.postId)
+                    
+                    Toast.showToast(style: .success, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postReportedMessage.localizedString)
+                } catch {
+                    isShown.toggle()
+                    Toast.showToast(style: .warning, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postFailedUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postFailedReportedMessage.localizedString)
                 }
-            } label: {
+            }
+        }, label: {
+            HStack(spacing: 12) {
+                Image(viewModel.isPostFlaggedByMe ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource())
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 20, height: 24)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                
                 Text(viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.unreportPostBottomSheetTitle.localizedString : AmityLocalizedStringSet.Social.reportPostBottomSheetTitle.localizedString)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
+                
+                Spacer()
             }
-            .buttonStyle(.plain)
-            
-            Spacer()
-        }
+            .contentShape(Rectangle()) // Make whole row tappable
+        })
+        .buttonStyle(.plain)
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
     }
     
-    
     private var editSheetButton: some View {
-        HStack(spacing: 12) {
-            Image(AmityIcon.editCommentIcon.getImageResource())
-                .renderingMode(.template)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 20, height: 24)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-            
-            Button {
-                // action here
-                editPostActionCompletion?()
-            } label: {
+        Button(action: {
+            editPostActionCompletion?()
+        }, label: {
+            HStack(spacing: 12) {
+                Image(AmityIcon.editCommentIcon.getImageResource())
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 20, height: 24)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                
                 Text(AmityLocalizedStringSet.Social.editPostBottomSheetTitle.localizedString)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
+                
+                Spacer()
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
-            
-            Spacer()
-        }
+            .contentShape(Rectangle())
+        })
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
     }
-    
 }
-
 
 class PostBottomSheetViewModel: ObservableObject {
     private let postManager = PostManager()

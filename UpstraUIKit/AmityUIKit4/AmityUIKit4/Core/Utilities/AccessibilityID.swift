@@ -194,6 +194,49 @@ struct AccessibilityID {
             static let communityName = "community_row_name"
         }
         
+        struct SocialHomePage {
+            static let headerLabel = "header_label"
+            static let globalSearchButton = "global_search_button"
+            static let postCreationButton = "post_creation_button"
+            static let newsFeedButton = "newsfeed_button"
+            static let exploreButton = "explore_button"
+            static let myCommunitiesButton = "my_communities_button"
+        }
+        
+        struct TopSearchBar {
+            static let searchIcon = "search_icon"
+            static let clearButton = "clear_button"
+        }
+        
+        struct EmptyNewsFeed {
+            static let illustration = "illustration"
+            static let title = "title"
+            static let description = "description"
+            static let exploreCommunittiesButton = "explore_communitties_button"
+            static let createCommunityButton = "create_community_button"
+        }
+        
+        struct MyCommunities {
+            static let communityAvatar = "community_avatar"
+            static let communityDisplayName = "community_display_name"
+            static let communityPrivateBadge = "community_private_badge"
+            static let communityOfficialBadge = "community_official_badge"
+            static let communityCategoryName = "community_category_name"
+            static let communityMembersCount = "community_members_count"
+        }
+        
+        struct PostContent {
+            static let moderatorBadge = "moderator_badge"
+            static let timestamp = "timestamp"
+            static let postContent = "post_content_view_count"
+            static let reactionButton = "reaction_button"
+            static let commentButton = "comment_button"
+            static let shareButton = "share_button"
+            static let nonMemberSection = "non_member_section"
+            static let announcementBadge = "announcement_badge"
+            static let pinBadge = "pin_badge"
+        }
+        
         struct Explore {
             static let emptyStateImage = "explore_empty_image"
             static let emptyStateText = "explore_empty_text"
@@ -208,6 +251,124 @@ struct AccessibilityID {
             static let communityMemberCount = "community_card_member_count"
             static let communityCategories = "community_card_categories"
             static let communityImage = "community_card_image"
+        }
+        
+        struct CreatePostMenu {
+            static let createPostButton = "create_post_button"
+            static let createStoryButton = "create_story_button"
+            static let createPollButton = "create_poll_button"
+            static let createLivestreamButton = "create_livestream_button"
+        }
+        
+        struct PostTargetSelection {
+            static let myTimelineAvatar = "my_timeline_avatar"
+            static let myTimelineText = "my_timeline_text"
+        }
+        
+        struct PostComposer {
+            static let createNewPostButton = "create_new_post_button"
+            static let editPostButton = "edit_post_button"
+            static let editPostTitle = "edit_post_title"
+        }
+        
+        struct MediaAttachment {
+            static let cameraButton = "camera_button"
+            static let imageButton = "image_button"
+            static let videoButton = "video_button"
+            static let fileButton = "file_button"
+        }
+        
+        struct CommunityHeader {
+            static let communityName = "community_name"
+            static let communityCover = "community_cover"
+            static let communityVerifyBadge = "community_verify_badge"
+            static let communityCategory = "community_category"
+            static let communityDescription = "community_description"
+            static let communityInfo = "community_info"
+            static let communityJoinButton = "community_join_button"
+            static let communityPendingPost = "community_pending_post"
+        }
+        
+        struct CommunityProfileTab {
+            static let communityFeedTabButton = "community_feed_tab_button"
+            static let communityPinTabButton = "community_pin_tab_button"
+        }
+        
+        struct CommunitySetup {
+            static let title = "title"
+            static let communityEditTitle = "community_edit_title"
+            static let communityNameTitle = "community_name_title"
+            static let communityAboutTitle = "community_about_title"
+            static let communityCategoryTitle = "community_category_title"
+            static let communityPrivacyTitle = "community_privacy_title"
+            static let communityPrivacyPrivateIcon = "community_privacy_private_icon"
+            static let communityPrivacyPrivateTitle = "community_privacy_private_title"
+            static let communityPrivacyPrivateDescription = "community_privacy_private_description"
+            static let communityPrivacyPublicIcon = "community_privacy_public_icon"
+            static let communityPrivacyPublicTitle = "community_privacy_public_title"
+            static let communityPrivacyPublicDescription = "community_privacy_public_description"
+            static let communityAddMemberTitle = "community_add_member_title"
+            static let communityAddMemberButton = "community_add_member_button"
+            static let communityCreateButton = "community_create_button"
+            static let communityEditButton = "community_edit_button"
+        }
+        
+        struct PendingPost {
+            static let postAcceptButton = "post_accept_button"
+            static let postDeclineButton = "post_decline_button"
+        }
+        
+        struct CommunitySettings {
+            static let editProfile = "edit_profile"
+            static let members = "members"
+            static let notifications = "notifications"
+            static let postPermission = "post_permission"
+            static let storySetting = "story_setting"
+            static let leaveCommunity = "leave_community"
+            static let closeCommunity = "close_community"
+            static let closeCommunityDescription = "close_community_description"
+        }
+        
+        struct UserProfile {
+            static let userFeedTabButton = "user_feed_tab_button"
+            static let userImageFeedTabButton = "user_image_feed_tab_button"
+            static let userVideoFeedTabButton = "user_video_feed_tab_button"
+        }
+        
+        struct UserProfileHeader {
+            static let followUserButton = "follow_user_button"
+            static let followingUserButton = "following_user_button"
+            static let pendingUserButton = "pending_user_button"
+            static let unblockUserButton = "unblock_user_button"
+            static let userAvatar = "user_avatar"
+            static let userName = "user_name"
+            static let userDescription = "user_description"
+            static let userFollowing = "user_following"
+            static let userFollower = "user_follower"
+        }
+        
+        struct EditUserProfile {
+            static let userDisplayNameTitle = "user_display_name_title"
+            static let userAboutTitle = "user_about_title"
+            static let updateUserProfileButton = "update_user_profile_button"
+        }
+        
+        struct UserFeed {
+            static let emptyUserFeed = "empty_user_feed"
+            static let privateUserFeed = "private_user_feed"
+            static let privateUserFeedInfo = "private_user_feed_info"
+            static let blockedUserFeed = "blocked_user_feed"
+            static let blockedUserFeedInfo = "blocked_user_feed_info"
+            static let emptyUserImageFeed = "empty_user_image_feed"
+            static let privateUserImageFeed = "private_user_image_feed"
+            static let privateUserImageFeedInfo = "private_user_image_feed_info"
+            static let blockedUserImageFeed = "blocked_user_image_feed"
+            static let blockedUserImageFeedInfo = "blocked_user_image_feed_info"
+            static let emptyUserVideoFeed = "empty_user_video_feed"
+            static let privateUserVideoFeed = "private_user_video_feed"
+            static let privateUserVideoFeedInfo = "private_user_video_feed_info"
+            static let blockedUserVideoFeed = "blocked_user_video_feed"
+            static let blockedUserVideoFeedInfo = "blocked_user_video_feed_info"
         }
     }
 }

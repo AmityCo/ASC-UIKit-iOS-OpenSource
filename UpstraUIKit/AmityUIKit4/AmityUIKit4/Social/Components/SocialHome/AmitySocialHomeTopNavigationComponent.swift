@@ -36,6 +36,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                 .padding([.top, .bottom], 15.5)
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .isHidden(viewConfig.isHidden(elementId: .headerLabel), remove: true)
+                .accessibilityIdentifier(AccessibilityID.Social.SocialHomePage.headerLabel)
             
             Spacer()
             
@@ -52,6 +53,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                 .clipShape(Circle())
             })
             .isHidden(viewConfig.isHidden(elementId: .globalSearchButton), remove: true)
+            .accessibilityIdentifier(AccessibilityID.Social.SocialHomePage.globalSearchButton)
             
             if selectedTab != .explore {
                 Button(action: {
@@ -73,6 +75,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                     .frame(size: CGSize(width: 32.0, height: 32.0))
                     .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
                     .clipShape(Circle())
+                    .accessibilityIdentifier(AccessibilityID.Social.SocialHomePage.postCreationButton)
                 })
                 .fullScreenCover(isPresented: $showPostCreationMenu) {
                     AmityCreatePostMenuComponent(isPresented: $showPostCreationMenu, pageId: pageId)

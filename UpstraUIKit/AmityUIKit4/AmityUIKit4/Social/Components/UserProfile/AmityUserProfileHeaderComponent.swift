@@ -51,6 +51,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 .lineLimit(4)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .isHidden(viewConfig.isHidden(elementId: .userDescription) || user.about.isEmpty)
+                .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userDescription)
             
             userRelationshipView
                 .frame(height: 20)
@@ -105,19 +106,23 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 .frame(width: 56, height: 56)
                 .clipShape(Circle())
                 .isHidden(viewConfig.isHidden(elementId: .userAvatar))
+                .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userAvatar)
             
-            Text(user.displayName)
-                .font(.system(size: 20, weight: .bold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-                .lineLimit(4)
-                .isHidden(viewConfig.isHidden(elementId: .userName))
-            
-            Image(AmityIcon.brandBadge.imageResource)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 24, height: 24)
-                .padding(.leading, -4)
-                .opacity(user.isBrand ? 1 : 0)
+            ZStack(alignment: .bottomTrailing) {
+                Text(user.displayName)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .lineLimit(4)
+                    .isHidden(viewConfig.isHidden(elementId: .userName))
+                    .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userName)
+                
+                Image(AmityIcon.brandBadge.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .offset(x: 30) // image size + padding
+                    .opacity(user.isBrand ? 1 : 0)
+            }
             
             Spacer()
         }
@@ -136,17 +141,18 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                     .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                     .padding(.leading, 4)
             }
-            .isHidden(viewConfig.isHidden(elementId: .userFollowing))
+            .isHidden(viewConfig.isHidden(elementId: .userFollowing) || user.isBrand)
             .onTapGesture {
                 guard user.isCurrentUser || viewModel.followInfo?.status == .accepted else { return }
                 goToUserRelationshipPage(user.userId, .following)
             }
+            .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userFollowing)
             
             Rectangle()
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(width: 2)
                 .padding(.leading, 12)
-                .isHidden(viewConfig.isHidden(elementId: .userFollower) || viewConfig.isHidden(elementId: .userFollowing))
+                .isHidden(viewConfig.isHidden(elementId: .userFollower) || viewConfig.isHidden(elementId: .userFollowing) || user.isBrand)
             
             Group {
                 Text((viewModel.followInfo?.followerCount ?? 0).formattedCountString)
@@ -165,6 +171,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 guard user.isCurrentUser || viewModel.followInfo?.status == .accepted else { return }
                 goToUserRelationshipPage(user.userId, .follower)
             }
+            .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userFollower)
             
             Spacer()
         }
@@ -220,6 +227,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 }
             }
             .isHidden(viewConfig.isHidden(elementId: .followUserButton))
+            .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.followUserButton)
     }
     
     @ViewBuilder
@@ -234,6 +242,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 }
             }
             .isHidden(viewConfig.isHidden(elementId: .pendingUserButton))
+            .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.pendingUserButton)
     }
     
     @ViewBuilder
@@ -246,6 +255,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 showBottomSheet.toggle()
             }
             .isHidden(viewConfig.isHidden(elementId: .followingUserButton))
+            .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.followingUserButton)
     }
     
     @ViewBuilder
@@ -267,6 +277,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 })
             }
             .isHidden(viewConfig.isHidden(elementId: .unblockUserButton))
+            .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.unblockUserButton)
     }
     
     @ViewBuilder

@@ -35,6 +35,8 @@ struct AmityTextMessageReplyPreview: View {
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(Color(viewConfig.theme.baseInverseColor))
                     .accessibilityIdentifier(AccessibilityID.Chat.ReplyPanel.userDisplayName)
+                    .lineLimit(1)
+                
                 Text(message.text)
                     .font(.system(size: 13, weight: .regular))
                     .lineLimit(1)

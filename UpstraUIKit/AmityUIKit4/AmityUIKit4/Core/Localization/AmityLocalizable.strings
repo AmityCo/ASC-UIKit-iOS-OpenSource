@@ -17,6 +17,7 @@
 "leave" = "Leave";
 "confirm" = "Confirm";
 "okay" = "OK";
+"edit" = "Edit";
 "general_anonymous" = "Anonymous";
 "permission_required" = "Permission Required!!";
 "camera_access_denied" = "Please grant camera permission in iOS settings.";
@@ -111,9 +112,11 @@
 "unreport_post_bottom_sheet_title" = "Unreport post";
 "delete_post_title" = "Delete post";
 "delete_post_message" = "This post will be permanently removed.";
-"post_reported_message" = "Post reported";
-"post_unreported_message" = "Post unreported";
-"post_deleted_toast_message" = "Post deleted";
+"post_reported_message" = "Post reported.";
+"post_unreported_message" = "Post unreported.";
+"post_failed_unreported_message" = "Failed to report post. Please try again.";
+"post_failed_unreported_message" = "Failed to unreport post. Please try again.";
+"post_deleted_toast_message" = "Post deleted.";
 "post_detail_page_title" = "Post";
 "create_post_bottom_sheet_title" = "Post";
 "create_story_bottom_sheet_title" = "Story";
@@ -136,6 +139,17 @@
 "community_setup_alert_message" = "Your progress won’t be saved and your community won’t be created.";
 "community_setup_edit_alert_title" = "Unsaved changes";
 "community_setup_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+
+"livestream_player_ended_title" = "This livestream has ended.";
+"livestream_player_ended_message" = "Playback will be available for you to watch shortly.";
+"livestream_player_terminated_title" = "This stream has been terminated.";
+"livestream_player_terminated_message" = "It looks like this livestream goes against our content moderation guidelines.";
+"livestream_player_unavailable_title" = "This stream is currently unavailable.";
+"livestream_player_unavailable_message" = "Please try again later.";
+"livestream_player_reconnecting_title" = "Reconnecting";
+"livestream_player_reconnecting_message" = "Due to poor connection, this livestream has been paused. It will resume automatically once the connection is stable.";
+"livestream_player_live" = "LIVE";
+"livestream_player_recorded" = "RECORDED";
 
 // Community Setting
 "community_setting_basic_info_title" = "Basic Info";
@@ -199,6 +213,13 @@
 
 "community_all_categories_title" = "All Categories";
 "community_list_empty_state_title" = "No community yet";
+
+"featured_post_badge" = "Featured";
+"featured_post_edit_confirmation_title" = "Edit globally featured post?";
+"featured_post_edit_confirmation" = "The post you're editing has been featured globally. If you edit your post, it will need to be re-approved and will no longer be globally featured";
+
+"global_featured_community_edit_confirmation_title" = "Change community privacy settings?";
+"global_featured_community_edit_confirmation_msg" = "This community has globally featured posts. Changing the community from public to private will remove these posts from being featured globally.";
 
 "user_profile_edit_alert_title" = "Unsaved changes";
 "user_profile_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";

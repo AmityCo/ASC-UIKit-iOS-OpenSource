@@ -681,6 +681,9 @@
         },
         "blocked_users_page/*/unblock_user_button": {
             "text": "Unblock"
+        },
+        "livestream_player_page/*/*": {
+            "theme": {}
         }
     }
 }

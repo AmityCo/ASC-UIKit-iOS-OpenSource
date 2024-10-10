@@ -231,11 +231,11 @@ extension AmityCommunityProfilePage {
             showBottomSheet.toggle()
         }, label: {
             ZStack {
-                
                 Rectangle()
                     .fill(Color(viewConfig.theme.primaryColor))
                     .clipShape(RoundedCorner())
                     .frame(width: 64, height: 64)
+                    .shadow(radius: 4, y: 2)
                 Image(AmityIcon.plusIcon.imageResource)
                     .resizable()
                     .renderingMode(.template)
@@ -247,61 +247,28 @@ extension AmityCommunityProfilePage {
         .buttonStyle(BorderlessButtonStyle())
         .padding(.trailing, 16)
         .padding(.bottom, 8)
-        .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-            VStack {
-                HStack(spacing: 12) {
-                    // Post
-                    Image(AmityIcon.createPostMenuIcon.getImageResource())
-                        .renderingMode(.template)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 20, height: 24)
-                    
-                    Button {
+        .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+            VStack(spacing: 0) {
+                BottomSheetItemView(icon: AmityIcon.createPostMenuIcon.getImageResource(), text: AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
+                    .onTapGesture {
                         showBottomSheet.toggle()
                         host.controller?.dismiss(animated: false)
                         let context = AmityCommunityProfilePageBehavior.Context(page: self)
                         AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostComposerPage(context: context, community: viewModel.community)
-                    } label: {
-                        Text(AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
                     }
-                    .buttonStyle(.plain)
-                    
-                    Spacer()
-                }
-                .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
                 
                 // Story
                 if viewModel.hasStoryManagePermission {
-                    HStack(spacing: 12) {
-                        Image(AmityIcon.createStoryMenuIcon.getImageResource())
-                            .renderingMode(.template)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 20, height: 24)
-                        
-                        Button {
+                    BottomSheetItemView(icon: AmityIcon.createStoryMenuIcon.getImageResource(), text: AmityLocalizedStringSet.Social.createStoryBottomSheetTitle.localizedString)
+                        .onTapGesture {
                             showBottomSheet.toggle()
                             host.controller?.dismiss(animated: false)
                             let context = AmityCommunityProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToCreateStoryPage(context: context, community: viewModel.community)
-                        } label: {
-                            Text(AmityLocalizedStringSet.Social.createStoryBottomSheetTitle.localizedString)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
                         }
-                        .buttonStyle(.plain)
-                        
-                        Spacer()
-                    }
-                    .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
                 }
-                
-                Spacer()
             }
-            
+            .padding(.bottom, 32)
         }
         .isHidden(!(viewModel.community?.isJoined ?? false))
     }

@@ -11,14 +11,15 @@ import AmitySDK
 
 struct TargetSelectionView<Content: View>: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
-    @StateObject private var viewModel = TargetSelectionViewModel()
+    @StateObject private var viewModel: TargetSelectionViewModel
     private let headerView: () -> Content
     private let communityOnTapAction: ((AmityCommunityModel) -> Void)?
     
     init(@ViewBuilder headerView: @escaping () -> Content = { EmptyView() },
-         communityOnTapAction: ((AmityCommunityModel) -> Void)? = nil) {
+         communityOnTapAction: ((AmityCommunityModel) -> Void)? = nil, contentType: PostMenuType) {
         self.headerView = headerView
         self.communityOnTapAction = communityOnTapAction
+        self._viewModel = StateObject(wrappedValue: TargetSelectionViewModel(contentType: contentType))
     }
     
     var body: some View {
@@ -41,19 +42,18 @@ struct TargetSelectionView<Content: View>: View {
                                         .frame(width: 40, height: 40)
                                         .clipShape(Circle())
                                         .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 12))
-                                        
-                                    
-                                    Text(community.displayName)
-                                        .font(.system(size: 15, weight: .semibold))
-                                        .foregroundColor(Color(viewConfig.theme.baseColor))
                                     
                                     if !community.isPublic {
                                         let lockIcon = AmityIcon.getImageResource(named: "lockBlackIcon")
                                         Image(lockIcon)
-                                            .frame(width: 20, height: 12)
+                                            .frame(width: 20, height: 20)
                                             .offset(y: -1)
                                             .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
                                     }
+                                    
+                                    Text(community.displayName)
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundColor(Color(viewConfig.theme.baseColor))
                                     
                                     if community.isOfficial {
                                         let verifiedBadgeIcon = AmityIcon.getImageResource(named: "verifiedBadge")
@@ -93,15 +93,46 @@ class TargetSelectionViewModel: ObservableObject {
     
     private let communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
     
-    init() {
-        let queryOptions = AmityCommunityQueryOptions(displayName: "", filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
+    init(contentType: PostMenuType) {
+        let queryOptions = AmityCommunityQueryOptions(filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
         communityCollection = communityRepository.getCommunities(with: queryOptions)
+        
         cancellable = communityCollection?.$snapshots
-            .map { communities -> [AmityCommunityModel] in
-                communities.map { community in
-                    AmityCommunityModel(object: community)
-                }
+            .flatMap { communities in
+                Publishers.MergeMany(
+                    communities.map { community -> AnyPublisher<AmityCommunityModel?, Never> in
+                        let communityModel = AmityCommunityModel(object: community)
+                        
+                        if community.onlyAdminCanPost {
+                            return Future<AmityCommunityModel?, Never> { promise in
+                                let permission: AmityPermission
+                                
+                                switch contentType {
+                                case .post:
+                                    permission = .createPrivilegedPost
+
+                                case .story:
+                                    permission = .manageStoryCommunity
+
+                                }
+                                
+                                AmityUIKit4Manager.client.hasPermission(permission, forCommunity: community.communityId) { success in
+                                    if success {
+                                        promise(.success(communityModel))
+                                    } else {
+                                        promise(.success(nil))
+                                    }
+                                }
+                            }
+                            .eraseToAnyPublisher()
+                        } else {
+                            return Just(communityModel).eraseToAnyPublisher()
+                        }
+                    }
+                )
+                .collect()
             }
+            .compactMap { $0.compactMap { $0 } }
             .assign(to: \.communities, on: self)
     }
     

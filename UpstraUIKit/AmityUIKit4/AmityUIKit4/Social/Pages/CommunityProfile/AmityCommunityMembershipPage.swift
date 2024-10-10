@@ -31,9 +31,9 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             navigationBarView
                 .padding(.all, 16)
             
-            ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
                 TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
-                    .selectedTabColor(viewConfig.theme.primaryColor)
+                    .selectedTabColor(viewConfig.theme.highlightColor)
                     .onChange(of: tabIndex) { value in
 
                     }   
@@ -41,8 +41,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
                 
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(height: 0.5)
-                    .offset(y: -1)
+                    .frame(height: 1)
             }
             .padding([.leading, .trailing], 16)
             

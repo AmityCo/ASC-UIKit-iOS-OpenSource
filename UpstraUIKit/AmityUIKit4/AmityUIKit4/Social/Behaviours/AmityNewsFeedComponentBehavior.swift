@@ -22,7 +22,7 @@ open class AmityNewsFeedComponentBehavior {
     public init() {}
     
     open func goToPostDetailPage(context: AmityNewsFeedComponentBehavior.Context) {
-        let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: context.post.object))
+        let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: context.post.object, category: context.post.isPinned ? .global : .general))
         let host = context.component.host
         host.controller?.navigationController?.pushViewController(vc, animated: true)
     }

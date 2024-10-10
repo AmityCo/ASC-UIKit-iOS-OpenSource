@@ -64,9 +64,9 @@ extension UIColor {
 }
 
 enum ColorBlendingOption: CGFloat, CaseIterable {
-    case shade1 = 25
-    case shade2 = 40
-    case shade3 = 50
+    case shade1 = 15
+    case shade2 = 35
+    case shade3 = 45
     case shade4 = 75
 }
 

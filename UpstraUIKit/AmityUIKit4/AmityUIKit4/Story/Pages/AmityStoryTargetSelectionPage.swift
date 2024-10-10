@@ -55,7 +55,7 @@ public struct AmityStoryTargetSelectionPage: AmityPageIdentifiable, View {
                 let context = AmityStoryTargetSelectionPageBehaviour.Context(page: self, community: communityModel.object, targetType: .community)
                 AmityUIKitManagerInternal.shared.behavior.storyTargetSelectionPageBehaviour?.goToCreateStoryPage(context: context)
                 
-            })
+            }, contentType: .story)
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)

@@ -51,14 +51,24 @@ public struct AmityCommentView: View {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(comment.displayName)
-                            .font(.system(size: 13, weight: .semibold))
-                            .padding([.top, .leading, .trailing], 12)
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
-                            .onTapGesture {
-                                commentButtonAction(.userProfile(comment.userId))
-                            }
-                            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.nameTextView)
+                        
+                        HStack(spacing: 4) {
+                            Text(comment.displayName)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundColor(Color(viewConfig.theme.baseColor))
+                                .onTapGesture {
+                                    commentButtonAction(.userProfile(comment.userId))
+                                }
+                                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.nameTextView)
+                                .lineLimit(1)
+                            
+                            Image(AmityIcon.brandBadge.imageResource)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 18, height: 18)
+                                .opacity(comment.isAuthorBrand ? 1 : 0)
+                        }
+                        .padding([.top, .leading, .trailing], 12)
                         
                         getModeratorBadgeView()
                             .padding([.leading, .trailing], 12)
@@ -190,7 +200,7 @@ public struct AmityCommentView: View {
                 .padding(.trailing, 6)
         }
         .frame(height: 20)
-        .background(Color(viewConfig.theme.primaryColor.blend(.shade2)))
+        .background(Color(viewConfig.theme.primaryColor.blend(.shade3)))
         .clipShape(RoundedCorner(radius: 10))
     }
 }

@@ -20,9 +20,14 @@ class AmityUserFeedComponentViewModel: ObservableObject {
     private let feedManager = FeedManager()
     private let userManager = UserManager()
     private var userFeedCollection: AmityCollection<AmityPost>?
-    private var followInfoObject: AmityObject<AmityUserFollowInfo>?
+    private var myFollowInfoObject: AmityObject<AmityMyFollowInfo>?
+    private var userFollowInfoObject: AmityObject<AmityUserFollowInfo>?
     private var cancellable: AnyCancellable?
     private var token: AmityNotificationToken?
+    
+    private var isOwnUser: Bool {
+        return AmityUIKitManagerInternal.shared.currentUserId == userId
+    }
     
     init(_ userId: String) {
         self.userId = userId
@@ -33,16 +38,29 @@ class AmityUserFeedComponentViewModel: ObservableObject {
     }
     
     private func loadFollowInfo() {
-        followInfoObject = userManager.getFollowInfo(withId: userId)
-        cancellable = followInfoObject?.$snapshot
-            .sink(receiveValue: { [weak self] followInfo in
-                guard let followInfo else { return }
-                let model = AmityFollowInfoModel(followInfo)
-                self?.blockedFeedState = model.status == .blocked ? .blocked : nil
-                if model.status != .blocked {
-                    self?.loadPosts()
-                }
-            })
+        if isOwnUser {
+            myFollowInfoObject = userManager.getMyFollowInfo()
+            cancellable = myFollowInfoObject?.$snapshot
+                .sink(receiveValue: { [weak self] followInfo in
+                    guard let followInfo else { return }
+                    let model = AmityFollowInfoModel(followInfo)
+                    self?.blockedFeedState = model.status == .blocked ? .blocked : nil
+                    if model.status != .blocked {
+                        self?.loadPosts()
+                    }
+                })
+        } else {
+            userFollowInfoObject = userManager.getFollowInfo(withId: userId)
+            cancellable = userFollowInfoObject?.$snapshot
+                .sink(receiveValue: { [weak self] followInfo in
+                    guard let followInfo else { return }
+                    let model = AmityFollowInfoModel(followInfo)
+                    self?.blockedFeedState = model.status == .blocked ? .blocked : nil
+                    if model.status != .blocked {
+                        self?.loadPosts()
+                    }
+                })
+        }
     }
     
     private func loadPosts() {

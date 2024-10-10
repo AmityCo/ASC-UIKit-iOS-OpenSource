@@ -52,6 +52,10 @@ class PostManager {
         return postRepository.getPinnedPosts(communityId: communityId, placement: nil, sortBy: .lastPinned)
     }
     
+    func getGlobalPinnedPost() -> AmityCollection<AmityPinnedPost> {
+        return postRepository.getGlobalPinnedPosts()
+    }
+    
     func approvePost(postId: String) async throws -> Bool {
         try await postRepository.approvePost(withId: postId)
     }

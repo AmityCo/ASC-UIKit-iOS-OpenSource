@@ -42,6 +42,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                         let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToEditCommunityPage(context)
                     }
+                    .isHidden(viewConfig.isHidden(elementId: .editProfile))
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.editProfile)
             }
             
             let communityMembersText = viewConfig.getText(elementId: .members) ?? AmityLocalizedStringSet.Social.communitySettingMembers.localizedString
@@ -50,6 +52,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                     let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                     AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToMembershipPage(context)
                 }
+                .isHidden(viewConfig.isHidden(elementId: .members))
+                .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.members)
             
             /// Notifications setting
             if viewModel.shouldShowNotifications {
@@ -63,6 +67,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                         /// Check notification setting to update the on/off status on view appeared...
                         viewModel.isSocialNetworkEnabled(nil)
                     }
+                    .isHidden(viewConfig.isHidden(elementId: .notifications))
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.notifications)
             }
             
             Rectangle()
@@ -85,6 +91,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                         let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToPostPermissionPage(context)
                     }
+                    .isHidden(viewConfig.isHidden(elementId: .postPermission))
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.postPermission)
             }
             
             /// Story Comments setting
@@ -95,6 +103,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                         let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToStorySettingPage(context)
                     }
+                    .isHidden(viewConfig.isHidden(elementId: .storySetting))
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.storySetting)
             }
             
             let leaveCommunityText = viewConfig.getText(elementId: .leaveCommunity) ?? AmityLocalizedStringSet.Social.communitySettingLeaveCommunity.localizedString
@@ -128,6 +138,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                         host.controller?.present(alertController, animated: true)
                     }
                 }
+                .isHidden(viewConfig.isHidden(elementId: .leaveCommunity))
+                .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.leaveCommunity)
             
             Rectangle()
                 .fill(Color(viewConfig.theme.baseColorShade4))
@@ -161,6 +173,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                     
                     host.controller?.present(alertController, animated: true)
                 }
+                .isHidden(viewConfig.isHidden(elementId: .closeCommunity))
+                .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.closeCommunity)
                 
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))

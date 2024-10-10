@@ -30,7 +30,8 @@ open class AmitySocialHomePageBehavior {
     
     open func goToMyCommunitiesSearchPage(context: AmitySocialHomePageBehavior.Context) {
         let page = AmityMyCommunitiesSearchPage()
-        let vc = AmitySwiftUIHostingController(rootView: page)
+        let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+        vc.isNavigationBarHidden = true
         vc.modalPresentationStyle = .overFullScreen
         context.page.host.controller?.present(vc, animated: false)
     }
