@@ -172,7 +172,6 @@
 		686830242C915DFC009B1694 /* TimeInterval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686830232C915DFC009B1694 /* TimeInterval+Extension.swift */; };
 		6868302C2C92EBE4009B1694 /* AmityCommunityMembershipPageBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6868302B2C92EBE4009B1694 /* AmityCommunityMembershipPageBehavior.swift */; };
 		686830332C993D52009B1694 /* AmityUserProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686830322C993D52009B1694 /* AmityUserProfilePage.swift */; };
-		6869149D2CB8055500D64409 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 6869149C2CB8055500D64409 /* SharedFrameworks */; };
 		686D173C2B1452A7007AEF59 /* AmityStoryTabComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D173B2B1452A7007AEF59 /* AmityStoryTabComponent.swift */; };
 		686D173E2B1496D2007AEF59 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 686D173D2B1496D2007AEF59 /* Assets.xcassets */; };
 		686D17402B149F63007AEF59 /* AmityIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 686D173F2B149F63007AEF59 /* AmityIcon.swift */; };
@@ -354,6 +353,7 @@
 		926894402C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9268943F2C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift */; };
 		926894422C474A6A004CECF8 /* EmptyCommunityFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926894412C474A6A004CECF8 /* EmptyCommunityFeedView.swift */; };
 		926C520D2CB7190B0085CA64 /* AmityLivestreamPlayerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926C520C2CB7190B0085CA64 /* AmityLivestreamPlayerPage.swift */; };
+		926C52352CB92F5B0085CA64 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 926C52342CB92F5B0085CA64 /* SharedFrameworks */; };
 		926F079C2BB4DDB9000806CB /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926F079B2BB4DDB9000806CB /* Shimmer.swift */; };
 		926F079E2BB4E25B000806CB /* LiveChatMessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926F079D2BB4E25B000806CB /* LiveChatMessageBubble.swift */; };
 		9280FDAA2C3C8A390052F01A /* AmityCommunityProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9280FDA92C3C8A380052F01A /* AmityCommunityProfilePage.swift */; };
@@ -1016,7 +1016,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6869149D2CB8055500D64409 /* SharedFrameworks in Frameworks */,
+				926C52352CB92F5B0085CA64 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2751,6 +2751,9 @@
 			dependencies = (
 			);
 			name = AmityUIKit4;
+			packageProductDependencies = (
+				926C52342CB92F5B0085CA64 /* SharedFrameworks */,
+			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
 			productType = "com.apple.product-type.framework";
@@ -3602,7 +3605,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6869149C2CB8055500D64409 /* SharedFrameworks */ = {
+		926C52342CB92F5B0085CA64 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

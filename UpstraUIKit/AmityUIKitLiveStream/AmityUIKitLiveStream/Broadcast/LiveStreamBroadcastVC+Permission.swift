@@ -15,9 +15,9 @@ extension LiveStreamBroadcastViewController {
         if auth != .authorized {
             return false
         }
-//        if AVAudioSession.sharedInstance().recordPermission != .granted {
-//            return false
-//        }
+        if AVAudioSession.sharedInstance().recordPermission != .granted {
+            return false
+        }
         return true
     }
     
@@ -35,17 +35,17 @@ extension LiveStreamBroadcastViewController {
                 }
             }
         }
-//        let requestMicrophonePermission: (@escaping (Bool) -> Void) -> Void = { completion in
-//            AVAudioSession.sharedInstance().requestRecordPermission { granted in
-//                DispatchQueue.main.async {
-//                    completion(granted)
-//                }
-//            }
-//        }
+        let requestMicrophonePermission: (@escaping (Bool) -> Void) -> Void = { completion in
+            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                DispatchQueue.main.async {
+                    completion(granted)
+                }
+            }
+        }
         requestCameraPermission { cameraGranted in
-//            requestMicrophonePermission { microphoneGranted in
-                completion(cameraGranted && true)
-//            }
+            requestMicrophonePermission { microphoneGranted in
+                completion(cameraGranted && microphoneGranted)
+            }
         }
     }
     
