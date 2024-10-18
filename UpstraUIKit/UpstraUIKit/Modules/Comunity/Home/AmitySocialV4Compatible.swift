@@ -8,11 +8,12 @@
 
 import Foundation
 import AmitySDK
+import UIKit
 #if canImport(AmityUIKit4)
 import AmityUIKit4
-import UIKit
 #endif
 
+#if canImport(AmityUIKit4)
 public class AmitySocialV4Compatible: AmityPageViewController {
     
     // MARK: - Properties
@@ -98,7 +99,7 @@ private extension AmitySocialV4Compatible {
     }
 }
 
-#if canImport(AmityUIKit4)
+
 public class AmityV4NewsFeedViewController: AmityViewController, IndicatorInfoProvider {
     
     var pageTitle: String?

@@ -31,6 +31,9 @@ public struct AmityCommunitiesByCategoryPage: AmityPageView {
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
+        .onAppear {
+            host.controller?.navigationController?.isNavigationBarHidden = true
+        }
     }
 }
 

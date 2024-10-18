@@ -83,6 +83,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             
             Text(community.description)
                 .font(.system(size: 15))
+                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .lineLimit(4)
                 .isHidden(community.description.isEmpty || viewConfig.isHidden(elementId: .communityDescription))
                 .padding(.all, 16)

@@ -161,7 +161,7 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFill()
-                    .foregroundColor(isDisable ? Color(viewConfig.theme.baseColorShade3) : nil)
+                    .foregroundColor(isDisable ? Color(viewConfig.theme.baseColor) : nil)
                     .frame(width: 20, height: 20)
             )
         .clipShape(Circle())

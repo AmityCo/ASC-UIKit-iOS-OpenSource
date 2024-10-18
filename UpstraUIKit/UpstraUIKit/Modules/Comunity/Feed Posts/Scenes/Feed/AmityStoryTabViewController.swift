@@ -64,4 +64,32 @@ extension AmityStoryTabViewController: FeedHeaderPresentable {
     }
 }
 
+#else
+
+class AmityStoryTabViewController: AmityViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+    }
+    static func make() -> AmityStoryTabViewController {
+        let vc = AmityStoryTabViewController(nibName: AmityStoryTabViewController.identifier, bundle: AmityUIKitManager.bundle)
+        return vc
+    }
+    
+}
+
+extension AmityStoryTabViewController: FeedHeaderPresentable {
+    public var headerView: UIView {
+        return view
+    }
+    
+    public var height: CGFloat {
+        return 0
+    }
+}
+
 #endif

@@ -232,6 +232,10 @@ final class AmityUIKitManagerInternal: NSObject {
         let globalFeedComponentBehavior = AmityGlobalFeedComponentBehavior()
         behavior.globalFeedComponentBehavior = globalFeedComponentBehavior
         
+        // PostContentComponent
+        let postContentComponentBehavior = AmityPostContentComponentBehavior()
+        behavior.postContentComponentBehavior = postContentComponentBehavior
+        
         // CreatePostMenuComponent
         let createPostMenuComponentBehavior = AmityCreatePostMenuComponentBehavior()
         behavior.createPostMenuComponentBehavior = createPostMenuComponentBehavior

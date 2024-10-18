@@ -334,6 +334,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 HStack {
                     Text("Categories")
                         .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                     
                     Spacer()
                 }

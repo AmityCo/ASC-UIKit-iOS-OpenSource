@@ -88,6 +88,7 @@ struct CategoryLabel: View {
                 
                 Text(category.name)
                     .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .padding(.horizontal, 8)
             }
             .padding(4)

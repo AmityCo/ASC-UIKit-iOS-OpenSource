@@ -90,11 +90,10 @@ extension FeatureViewController: UITableViewDelegate {
             //            navigationController?.present(hostingController, animated: true)
             navigationController?.pushViewController(hostingController, animated: true)
         case .socialUIKit:
-            let pageView = SocialUIKitPage()
-            let hostingController = AmitySwiftUIHostingNavigationController(rootView: pageView)
-            hostingController.isNavigationBarHidden = true
-            hostingController.modalPresentationStyle = .overFullScreen
-            navigationController?.present(hostingController, animated: true)
+            let pageView = AmitySocialHomePage()
+            let hostingController = AmitySwiftUIHostingController(rootView: pageView)
+            hostingController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(hostingController, animated: true)
         case .socialUIKitV4Comaptible:
             let homepage = AmitySocialV4Compatible.make()
             let navigationController = UINavigationController(rootViewController: homepage)
@@ -156,33 +155,5 @@ extension Color {
         Scanner(string: cString).scanHexInt64(&rgbValue)
         
         self.init(.sRGB, red: Double(((rgbValue & 0xFF0000) >> 16)) / 255.0, green: Double((rgbValue & 0x00FF00) >> 8) / 255.0, blue: Double(rgbValue & 0x0000FF) / 255.0, opacity: 1.0)
-    }
-}
-
-
-struct SocialUIKitPage: View {
-    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
-    @Environment(\.colorScheme) private var colorScheme
-    
-    var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Button(action: {
-                    host.controller?.dismiss(animated: true)
-                }) {
-                    Image(uiImage: UIImage(named: "closeIcon") ?? UIImage())
-                        .renderingMode(.template)
-                        .foregroundColor(colorScheme == .dark ? .white : .black)
-                        .frame(width: 32, height: 32)
-                }
-                Spacer()
-            }
-            .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 15))
-            
-            AmitySocialHomePage()
-        }
-        .padding(.top, UIDevice.hasNotch ? 50 : 15)
-        .background(colorScheme == .dark ? Color(UIColor(hex: "#191919")) : Color(UIColor(hex: "#FFFFFF")))
-        .ignoresSafeArea()
     }
 }
