@@ -8,7 +8,6 @@
 import SwiftUI
 import AmitySDK
 import AVKit
-import AmityVideoPlayerKit
 
 struct PostContentLiveStreamView: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper

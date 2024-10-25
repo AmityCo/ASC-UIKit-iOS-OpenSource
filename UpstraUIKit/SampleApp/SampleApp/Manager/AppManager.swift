@@ -13,6 +13,9 @@ import AmityUIKit4
 #endif
 import SwiftUI
 import UIKit
+#if canImport(AmityUIKitLiveStream)
+import AmityUIKitLiveStream
+#endif
 
 class AppManager {
     
@@ -56,12 +59,8 @@ class AppManager {
         #if canImport(AmityUIKit4)
         AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
         
-        // override AmityViewStoryPageBehaviour
-        let customPostContentComponenetBehaviour = CustomPostContentComponenetBehaviour()
-        AmityUIKit4Manager.behaviour.postContentComponentBehavior = customPostContentComponenetBehaviour
-        // override AmityViewStoryPageBehaviour
-        let customCommunityProfilePageBahavior = CustomAmityProfilePageBehaviour()
-        AmityUIKit4Manager.behaviour.communityProfilePageBehavior = customCommunityProfilePageBahavior
+        let livestreamBehavior = CustomV4LivestreamBehavior()
+        AmityUIKit4Manager.behaviour.livestreamBehavior = livestreamBehavior
         #endif
     }
     
@@ -153,10 +152,6 @@ class AppManager {
             return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RegisterNavigationController")
         }
 
-//        var component = AmityCommentTrayComponent(referenceId: "65ba085a9e0c1cf2ee80cfcb", referenceType: .story)
-//        let hostController = SwiftUIHostingController(rootView: component)
-//        
-//        return hostController
     }
     
 }
@@ -164,51 +159,25 @@ class AppManager {
 
 #if canImport(AmityUIKit4)
 
-class CustomPostContentComponenetBehaviour: AmityPostContentComponentBehavior {
+class CustomV4LivestreamBehavior: AmityLivestreamBehavior {
     
-//    override func goToUserProfilePage(context: AmityPostContentComponentBehavior.Context) {
-//        let viewController = AmityUserProfilePageViewController.make(withUserId: context.component.post.postedUserId)
-//        if let navigationController = context.component.host.controller?.navigationController {
-//            navigationController.isNavigationBarHidden = false
-//            navigationController.pushViewController(viewController, animated: true)
-//        }
-//        
-//    }
+    override func createRecordedPlayer(stream: AmityStream, client: AmityClient) -> any View {
+        #if canImport(AmityUIKitLiveStream)
+        return RecordedStreamPlayerView(livestream: stream, client: client)
+        #else
+        print("To watch recorded live stream, please install AmityVideoPlayerKit.")
+        return EmptyView()
+        #endif
+    }
     
-}
-
-class CustomAmityProfilePageBehaviour: AmityCommunityProfilePageBehavior {
-//    override func goToCommunitySettingPage(context: AmityCommunityProfilePageBehavior.Context) {
-//        
-//        let communityId = context.page.communityId
-//        
-//        let viewController = AmityCommunitySettingsViewController.make(communityId: communityId)
-//        
-//        if let navigationController = context.page.host.controller?.navigationController {
-//            navigationController.isNavigationBarHidden = false
-//            navigationController.pushViewController(viewController, animated: true)
-//        }
-//    }
+    override func createLivestreamPlayer(stream: AmityStream, client: AmityClient, isPlaying: Bool) -> any View {
+        #if canImport(AmityUIKitLiveStream)
+        return LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
+        #else
+        print("To watch live stream, please install AmityVideoPlayerKit.")
+        return EmptyView()
+        #endif
+    }
     
-//    override func goToPendingPostPage(context: AmityCommunityProfilePageBehavior.Context) {
-//        let communityId = context.page.communityId
-//        
-//        let viewController = AmityPendingPostsViewController.make(communityId: communityId)
-//        
-//        if let navigationController = context.page.host.controller?.navigationController {
-//            navigationController.isNavigationBarHidden = false
-//            navigationController.pushViewController(viewController, animated: true)
-//        }
-//    }
-    
-//    override func goToMemberListPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
-//        guard let community else { return }
-//        let viewController = AmityCommunityMemberSettingsViewController.make(community: community.object)
-//        
-//        if let navigationController = context.page.host.controller?.navigationController {
-//            navigationController.isNavigationBarHidden = false
-//            navigationController.pushViewController(viewController, animated: true)
-//        }
-//    }
 }
 #endif

@@ -82,8 +82,10 @@ struct LivestreamVideoPlayerView: View {
                             
                         }
                         
-                        AmityVideoPlayerView(stream: viewModel.stream, isConnected: networkMonitor.isConnected, isPlaying: $isPlaying)
-                            .padding(.bottom, 70)
+                        if let view = AmityUIKitManagerInternal.shared.behavior.livestreamBehavior?.createLivestreamPlayer(stream: stream, client: AmityUIKit4Manager.client, isPlaying: $isPlaying.wrappedValue && networkMonitor.isConnected) {
+                            AnyView(view)
+                                .padding(.bottom, 70)
+                        }
                     }
                 }
             } else if viewModel.isLoaded {

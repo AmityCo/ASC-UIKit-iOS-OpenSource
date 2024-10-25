@@ -41,5 +41,6 @@ open class AmityUIKitBehaviour {
     public var userRelationshipPageBehavior: AmityUserRelationshipPageBehavior?
     public var userPendingFollowRequestsPageBehavior: AmityUserPendingFollowRequestsPageBehavior?
     public var blockedUsersPageBehavior: AmityBlockedUsersPageBehavior?
-    public var pendingPostContentComponentBehavior: AmityPendingPostContentComponentBehavior?
+    public var pendingPostContentComponentBehavior: AmityPendingPostContentComponentBehavior?    
+    public var livestreamBehavior: AmityLivestreamBehavior?
 }

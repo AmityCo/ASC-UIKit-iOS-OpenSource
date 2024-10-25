@@ -311,6 +311,9 @@ final class AmityUIKitManagerInternal: NSObject {
         // PendingPostContentComponent
         let pendingPostContentComponentBehavior = AmityPendingPostContentComponentBehavior()
         behavior.pendingPostContentComponentBehavior = pendingPostContentComponentBehavior
+        
+        let livestreamBehavior = AmityLivestreamBehavior()
+        behavior.livestreamBehavior = livestreamBehavior
     }
     
     func registerDevice(_ userId: String,

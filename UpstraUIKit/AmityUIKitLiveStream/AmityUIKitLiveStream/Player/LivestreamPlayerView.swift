@@ -1,38 +1,39 @@
 //
-//  AmityVideoPlayerView.swift
-//  AmityUIKit4
+//  LivestreamPlayerView.swift
+//  AmityUIKitLiveStream
 //
-//  Created by Manuchet Rungraksa on 7/10/2567 BE.
+//  Created by Manuchet Rungraksa on 17/10/2567 BE.
 //
 
 import SwiftUI
 import AmityVideoPlayerKit
 import AmitySDK
 
-struct AmityVideoPlayerView: UIViewRepresentable {
+public struct LivestreamPlayerView: UIViewRepresentable {
     
     let stream: AmityStream?
-    var isConnected: Bool
-    @Binding var isPlaying: Bool
-
-    func makeUIView(context: Context) -> UIView {
-        return UIView()
+    let client: AmityClient
+    
+    var isPlaying: Bool
+    
+    public init(stream: AmityStream?, client: AmityClient, isPlaying: Bool) {
+        self.stream = stream
+        self.client = client
+        self.isPlaying = isPlaying
     }
 
-    func updateUIView(_ uiView: UIView, context: Context) {
-        if !isConnected {
-            if context.coordinator.isPlaying {
-                stopLivestream(on: uiView, coordinator: context.coordinator)
+    public func makeUIView(context: Context) -> UIView {
+        return UIView()
+    }
+    
+    public func updateUIView(_ uiView: UIView, context: Context) {
+        if isPlaying {
+            if !context.coordinator.isPlaying {
+                playLivestream(on: uiView, coordinator: context.coordinator)
             }
         } else {
-            if isPlaying {
-                if !context.coordinator.isPlaying {
-                    playLivestream(on: uiView, coordinator: context.coordinator)
-                }
-            } else {
-                if context.coordinator.isPlaying {
-                    stopLivestream(on: uiView, coordinator: context.coordinator)
-                }
+            if context.coordinator.isPlaying {
+                stopLivestream(on: uiView, coordinator: context.coordinator)
             }
         }
     }
@@ -75,7 +76,7 @@ struct AmityVideoPlayerView: UIViewRepresentable {
         coordinator.isPlaying = true
     }
 
-    class Coordinator {
+    public class Coordinator {
         var lastFrameSnapshotView: UIView?
         var isPlaying = false
         let player: AmityVideoPlayer
@@ -85,8 +86,8 @@ struct AmityVideoPlayerView: UIViewRepresentable {
         }
     }
 
-    func makeCoordinator() -> Coordinator {
-        let player = AmityVideoPlayer(client: AmityUIKit4Manager.client)
+    public func makeCoordinator() -> Coordinator {
+        let player = AmityVideoPlayer(client: client)
         return Coordinator(player: player)
     }
 }

@@ -24,9 +24,10 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
         if let livestream = post.liveStream {
             if post.livestreamState == .recorded {
                 
-                RecordedStreamPlayerView(livestream: livestream)
-                    .ignoresSafeArea(.all)
-                
+                if let view = AmityUIKitManagerInternal.shared.behavior.livestreamBehavior?.createRecordedPlayer(stream: livestream, client: AmityUIKit4Manager.client) {
+                    AnyView(view)
+                        .ignoresSafeArea(.all)
+                }
             } else {
                 LivestreamVideoPlayerView(post: post)
                 
