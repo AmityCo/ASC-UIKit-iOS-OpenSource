@@ -23,9 +23,8 @@ struct CategoryGridView: View {
                     .clipShape(Circle())
                 
                 Text(category.name)
-                    .font(.system(size: 15, weight: .semibold))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .lineLimit(1)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .frame(maxWidth: UIScreen.main.bounds.width - 130)
                 
                 Image(AmityIcon.closeIcon.getImageResource())

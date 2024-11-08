@@ -25,9 +25,8 @@ struct UserCellView: View {
                 .clipShape(Circle())
             
             Text(user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString)
-                .font(.system(size: 15, weight: .semibold))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .padding(.leading, 8)
                         
             Image(AmityIcon.brandBadge.imageResource)

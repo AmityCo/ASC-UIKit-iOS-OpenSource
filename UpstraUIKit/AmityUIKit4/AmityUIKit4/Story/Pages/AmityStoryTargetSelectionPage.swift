@@ -44,9 +44,7 @@ public struct AmityStoryTargetSelectionPage: AmityPageIdentifiable, View {
             }
             .overlay(
                 Text(viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             )
             .frame(height: 58)
             

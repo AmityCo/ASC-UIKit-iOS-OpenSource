@@ -158,7 +158,7 @@ public struct AmityLocalizedStringSet {
         static let livestreamPlayerRecorded = "livestream_player_recorded"
         
         static let communitySettingBasicInfoTitle = "community_setting_basic_info_title"
-        static let communitySettingCommunityPermissionsTitle = "community_setting_community_permissions_title" 
+        static let communitySettingCommunityPermissionsTitle = "community_setting_community_permissions_title"
         static let communitySettingEditProfile = "community_setting_edit_profile";
         static let communitySettingMembers = "community_setting_members";
         static let communitySettingNotifications = "community_setting_notifications";
@@ -213,7 +213,7 @@ public struct AmityLocalizedStringSet {
         
         static let communityMemberCountSingular = "community_member_count_singular"
         static let communityMemberCountPlural = "community_member_count_plural"
-
+        
         static let exploreCategoriesSeeMore = "explore_categories_see_more"
         static let exploreTrendingComponentTitle = "explore_trending_now_component_title"
         static let exploreRecommendedComponentTitle = "explore_recommended_communities_component_title"
@@ -224,7 +224,7 @@ public struct AmityLocalizedStringSet {
         static let featuredPostBadge = "featured_post_badge"
         static let featuredPostEditConfirmation = "featured_post_edit_confirmation"
         static let featuredPostEditConfirmationTitle = "featured_post_edit_confirmation_title"
-      
+        
         static let globalFeaturedCommunityEditConfirmationTitle = "global_featured_community_edit_confirmation_title"
         
         static let globalFeaturedCommunityEditConfirmationMessage = "global_featured_community_edit_confirmation_msg"
@@ -232,6 +232,70 @@ public struct AmityLocalizedStringSet {
         static let userProfileEditAlertTitle = "user_profile_edit_alert_title"
         static let userProfileEditAlertMessage = "user_profile_edit_alert_message"
         static let userProfileFollowRequestTitle = "user_profile_follow_request_title"
+        
+        // Poll
+        static let pollCloseAlertTitle = "poll_close_alert_title"
+        static let pollCloseAlertDesc = "poll_close_alert_desc"
+        static let pollCloseButton = "poll_close_button"
+        static let pollCloseToastError = "poll_close_toast_error"
+
+        static let pollStatusEnded = "poll_status_ended"
+
+        static let pollRemainingDaysLeft = "poll_remaining_days_left"
+        static let pollRemainingHoursLeft = "poll_remaining_hours_left"
+        static let pollRemainingMinutesLeft = "poll_remaining_minutes_left"
+
+        static let pollQuestionTitle = "poll_question_title"
+        static let pollQuestionTextfieldPlaceholder = "poll_question_textfield_placeholder"
+        static let pollMultipleSelectionTitle = "poll_multiple_selection_title"
+        static let pollMultipleSelectionDesc = "poll_multiple_selection_desc"
+
+        static let pollPostCreateError = "poll_post_create_error"
+        static let pollCreatePostingToast = "poll_create_posting_toast"
+
+        static let pollDurationTitle = "poll_duration_title"
+        static let pollDurationDesc = "poll_duration_desc"
+        static let pollEndsOnLabel = "poll_ends_on_label"
+
+        static let pollOptionsTitle = "poll_options_title"
+        static let pollOptionsDesc = "poll_options_desc"
+        static let pollAddOption = "poll_add_option"
+
+        static let pollOptionLabel = "poll_option_label"
+
+        static let pollAnswerResultNoVotes = "poll_answer_result_no_votes"
+        static let pollAnswerResultVotedByYou = "poll_answer_result_voted_by_you"
+        static let pollAnswerResultVotedBySingleParticipant = "poll_answer_result_voted_by_single_participant"
+        static let pollAnswerResultVotedByMultipleParticipants = "poll_answer_result_voted_by_multiple_participants"
+        
+        static let pollAnswerResultVotedByAndYou = "poll_answer_result_voted_by_and_you"
+
+        static let pollDurationPickDateAndTime = "poll_duration_pick_date_and_time"
+        static let pollDurationDoneButton = "poll_duration_done_button"
+
+        static let pollDurationSingularDay = "poll_duration_singular_day"
+        static let pollDurationPluralDays = "poll_duration_plural_days"
+
+        static let pollSelectOneOptionLabel = "poll_select_one_option_label"
+        static let pollSelectOneOrMoreOptionLabel = "poll_select_one_or_more_option_label"
+
+        static let pollSeeFullResultsLabel = "poll_see_full_results_label"
+        static let pollSeeResultsLabel = "poll_see_results_label"
+        static let pollBackToVoteLabel = "poll_back_to_vote_label"
+        static let pollSeeMoreOptionsLabel = "poll_see_more_options_label"
+
+        static let pollVoteCounts = "poll_vote_counts"
+        static let pollVoteButton = "poll_vote_button"
+        
+        static let pollLabel = "poll_label"
+        
+        static let pollOptionCharLimitError = "poll_option_char_limit_error"
+        static let pollQuestionCharLimitError = "poll_question_char_limit_error"
+        
+        static let pollTargetMyTimeline = "poll_target_my_timeline"
+        
+        static let postDeleteError = "post_delete_error"
+        static let postCreateError = "post_create_error"
+        static let postEditError = "post_edit_error"
     }
-    
 }

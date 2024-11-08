@@ -138,8 +138,7 @@ struct CommentListView<Content>: View where Content: View {
                     .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 
                 Text(AmityLocalizedStringSet.Comment.deletedCommentMessage.localizedString)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.trailing, 16)
                 
                 Spacer()
@@ -236,8 +235,7 @@ struct ReplyCommentListView<Content>: View where Content: View {
                     .padding(.leading, 8)
                     .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 Text(AmityLocalizedStringSet.Comment.deletedReplyCommentMessage.localizedString)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.trailing, 16)
             }
             .frame(height: 28)

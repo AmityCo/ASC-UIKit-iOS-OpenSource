@@ -8,20 +8,28 @@
 import SwiftUI
 
 struct PostBottomSheetView: View {
+    
+    enum PostAction {
+        case editPost
+        case deletePost
+        case closePoll
+    }
+    
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     private let post: AmityPostModel
-    private let postDeleteCompletion: (() -> Void)?
-    private let editPostActionCompletion: (() -> Void)?
+    private let action: ((PostAction) -> Void)?
+    
     @Binding private var isShown: Bool
-    @State private var isDeleteAlertShown: Bool = false
+    @State private var isAlertShown: Bool = false
+    @State private var activeAlert: PostAction = .editPost
+        
     @StateObject private var viewModel: PostBottomSheetViewModel = PostBottomSheetViewModel()
     
-    init(isShown: Binding<Bool>, post: AmityPostModel, postDeleteCompletion: (() -> Void)? = nil, editPostActionCompletion: (() -> Void)?) {
+    init(isShown: Binding<Bool>, post: AmityPostModel, action: ((PostAction) -> Void)?) {
         self._isShown = isShown
         self.post = post
-        self.postDeleteCompletion = postDeleteCompletion
-        self.editPostActionCompletion = editPostActionCompletion
+        self.action = action
     }
     
     var body: some View {
@@ -35,33 +43,75 @@ struct PostBottomSheetView: View {
         .onAppear {
             viewModel.updatePostFlaggedByMeState(id: post.postId)
         }
-        .alert(isPresented: $isDeleteAlertShown, content: {
-            Alert(title: Text(AmityLocalizedStringSet.Social.deletePostTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.deletePostMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
-                Task { @MainActor in
-                    isShown.toggle()
-                    postDeleteCompletion?()
-                    try await viewModel.deletePost(id: post.postId)
-                    
-                    /// Send didPostDeleted event to remove created post added in global feed data source
-                    /// that is not from live collection
-                    /// This event is observed in PostFeedViewModel
-                    NotificationCenter.default.post(name: .didPostDeleted, object: nil, userInfo: ["postId" : post.postId])
-                    
-                    /// Delay showing toast as deleting post will effect post data source
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.postDeletedToastMessage.localizedString)
+        .alert(isPresented: $isAlertShown, content: {
+            
+            switch activeAlert {
+            case .editPost, .deletePost:
+                Alert(title: Text(AmityLocalizedStringSet.Social.deletePostTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.deletePostMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
+                    Task { @MainActor in
+                        isShown.toggle()
+                        
+                        action?(.deletePost)
+                        
+                        do {
+                            try await viewModel.deletePost(id: post.postId)
+                            
+                            /// Send didPostDeleted event to remove created post added in global feed data source
+                            /// that is not from live collection
+                            /// This event is observed in PostFeedViewModel
+                            NotificationCenter.default.post(name: .didPostDeleted, object: nil, userInfo: ["postId" : post.postId])
+                            
+                            /// Delay showing toast as deleting post will effect post data source
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.postDeletedToastMessage.localizedString)
+                            }
+                        } catch _ {                            
+                            /// Delay showing toast as deleting post will effect post data source
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postDeleteError.localizedString)
+                            }
+                        }
                     }
-                }
-            }))
+                }))
+            case .closePoll:
+                Alert(title: Text(AmityLocalizedStringSet.Social.pollCloseAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.pollCloseAlertDesc.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.pollCloseButton.localizedString), action: {
+                    Task { @MainActor in
+                        isShown.toggle()
+                        
+                        action?(.closePoll)
+                        
+                        if let pollId = post.poll?.id {
+                            do {
+                                let _ = try await viewModel.closePoll(id: pollId)
+                            } catch let error {
+                                /// Delay showing toast as deleting post will effect post data source
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.pollCloseToastError.localizedString)
+                                }
+                            }
+                        }
+                    }
+                }))
+            }
         })
     }
     
     
     private var moderatorView: some View {
         VStack {
-            editSheetButton.isHidden(!post.isOwner)
-            flagSheetButton.isHidden(post.isOwner)
+            editSheetButton
+                .isHidden(!post.isOwner || post.dataTypeInternal == .poll) // We cannot edit poll post
+            
+            if let poll = post.poll, !poll.isClosed {
+                closePollButton
+                    .isHidden(!post.isOwner || post.dataTypeInternal != .poll)
+            }
+            
+            flagSheetButton
+                .isHidden(post.isOwner)
+            
             deleteSheetButton
+            
             Spacer()
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
@@ -69,9 +119,19 @@ struct PostBottomSheetView: View {
     
     private var memberView: some View {
         VStack {
-            editSheetButton.isHidden(!post.isOwner)
-            flagSheetButton.isHidden(post.isOwner)
-            deleteSheetButton.isHidden(!post.isOwner)
+            editSheetButton
+                .isHidden(!post.isOwner || post.dataTypeInternal == .poll)
+            
+            if let poll = post.poll, !poll.isClosed {
+                closePollButton
+                    .isHidden(!post.isOwner || post.dataTypeInternal != .poll)
+            }
+            
+            flagSheetButton
+                .isHidden(post.isOwner)
+            
+            deleteSheetButton
+                .isHidden(!post.isOwner)
             Spacer()
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
@@ -80,7 +140,8 @@ struct PostBottomSheetView: View {
     
     private var deleteSheetButton: some View {
         Button(action: {
-            isDeleteAlertShown.toggle()
+            activeAlert = .deletePost
+            isAlertShown.toggle()
         }, label: {
             HStack(spacing: 12) {
                 Image(AmityIcon.trashBinIcon.getImageResource())
@@ -91,8 +152,7 @@ struct PostBottomSheetView: View {
                     .foregroundColor(Color(viewConfig.theme.alertColor))
                 
                 Text(AmityLocalizedStringSet.Social.deletePostBottomSheetTitle.localizedString)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.alertColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
                 
                 Spacer()
             }
@@ -131,8 +191,7 @@ struct PostBottomSheetView: View {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Text(viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.unreportPostBottomSheetTitle.localizedString : AmityLocalizedStringSet.Social.reportPostBottomSheetTitle.localizedString)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 
                 Spacer()
             }
@@ -142,9 +201,34 @@ struct PostBottomSheetView: View {
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
     }
     
+    private var closePollButton: some View {
+        Button(action: {
+            activeAlert = .closePoll
+            isAlertShown.toggle()
+        }, label: {
+            HStack(spacing: 12) {
+                Image(AmityIcon.createPollMenuIcon.getImageResource())
+                    .renderingMode(.template)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                
+                Text(AmityLocalizedStringSet.Social.pollCloseButton.localizedString)
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                
+                Spacer()
+            }
+            .contentShape(Rectangle())
+        })
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(AmityLocalizedStringSet.Social.pollCloseButton.localizedString)
+        .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
+    }
+    
     private var editSheetButton: some View {
         Button(action: {
-            editPostActionCompletion?()
+            action?(.editPost)
         }, label: {
             HStack(spacing: 12) {
                 Image(AmityIcon.editCommentIcon.getImageResource())
@@ -155,8 +239,7 @@ struct PostBottomSheetView: View {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Text(AmityLocalizedStringSet.Social.editPostBottomSheetTitle.localizedString)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 
                 Spacer()
             }
@@ -170,6 +253,8 @@ struct PostBottomSheetView: View {
 
 class PostBottomSheetViewModel: ObservableObject {
     private let postManager = PostManager()
+    private let pollManager = PollManager()
+    
     @Published var isPostFlaggedByMe: Bool = false
     
     @MainActor
@@ -185,6 +270,11 @@ class PostBottomSheetViewModel: ObservableObject {
     @MainActor
     func unflagPost(id: String) async throws {
         try await postManager.unflagPost(withId: id)
+    }
+    
+    @MainActor
+    func closePoll(id: String) async throws -> Bool {
+        return try await pollManager.closePoll(pollId: id)
     }
     
     func updatePostFlaggedByMeState(id: String) {

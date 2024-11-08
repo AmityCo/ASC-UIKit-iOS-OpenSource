@@ -19,7 +19,6 @@ public enum AmityPostComposerOptions {
     case createOptions(mode: AmityPostComposerMode = .create, targetId: String?, targetType: AmityPostTargetType, community: AmityCommunityModel?)
 }
 
-
 public struct AmityPostComposerPage: AmityPageView {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
    
@@ -83,7 +82,7 @@ public struct AmityPostComposerPage: AmityPageView {
                     .opacity(postCreationToastAlphaValue)
                     .isHidden(postCreationToastAlphaValue == 0)
                 
-                ToastView(message: "Failed to \(viewModel.mode == .create ? "create" : "edit") post", style: .warning)
+                ToastView(message: viewModel.mode == .create ? AmityLocalizedStringSet.Social.postCreateError.localizedString : AmityLocalizedStringSet.Social.postEditError.localizedString, style: .warning)
                     .padding(.bottom, 16)
                     .opacity(failedToastAlphaValue)
                     .isHidden(failedToastAlphaValue == 0)
@@ -189,8 +188,7 @@ public struct AmityPostComposerPage: AmityPageView {
             let displayName = viewModel.displayName
             let editPostTitle = viewConfig.getConfig(elementId: .editPostTitle, key: "text", of: String.self) ?? "Edit Post"
             Text(viewModel.mode == .create ? displayName : editPostTitle)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .isHidden(viewConfig.isHidden(elementId: .editPostTitle))
                 .accessibilityIdentifier(AccessibilityID.Social.PostComposer.editPostTitle)
             Spacer()

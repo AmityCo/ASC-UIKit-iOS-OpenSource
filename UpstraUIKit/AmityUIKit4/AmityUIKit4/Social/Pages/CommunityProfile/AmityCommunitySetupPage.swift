@@ -137,8 +137,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                     HStack {
                                         let privacyTitle = viewConfig.getText(elementId: .communityPrivacyTitle) ?? ""
                                         Text(privacyTitle)
-                                            .font(.system(size: 17, weight: .semibold))
-                                            .foregroundColor(Color(viewConfig.theme.baseColor))
+                                            .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                                             .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityPrivacyTitle)
                                         
                                         Spacer()
@@ -287,8 +286,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
             
             let title = pageMode == .create ? viewConfig.getText(elementId: .title) ?? "" : viewConfig.getText(elementId: .communityEditTitle) ?? ""
             Text(title)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.title)
             
             Spacer()
@@ -333,8 +331,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
             VStack(alignment: .leading, spacing: 24) {
                 HStack {
                     Text("Categories")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                     
                     Spacer()
                 }
@@ -374,8 +371,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
             HStack {
                 let addMemberTitle = viewConfig.getText(elementId: .communityAddMemberTitle) ?? ""
                 Text(addMemberTitle)
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                     .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityAddMemberTitle)
                 
                 Spacer()
@@ -411,9 +407,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
                             
                             
                             Text(member.user?.displayName ?? "Unknown")
-                                .font(.system(size: 13))
+                                .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                                 .lineLimit(1)
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
                         }
                         .frame(width: 64, height: 68)
                         
@@ -434,9 +429,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
                             
                             let addMemberText = viewConfig.getText(elementId: .communityAddMemberButton) ?? ""
                             Text(addMemberText)
-                                .font(.system(size: 13))
+                                .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                                 .lineLimit(1)
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
                         }
                         .frame(width: 64, height: 68)
                         .onTapGesture {
@@ -485,8 +479,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                         
                         let communityCreateButtonText = viewConfig.getText(elementId: .communityCreateButton) ?? ""
                         Text(communityCreateButtonText)
-                            .font(.system(size: 15.0, weight: .semibold))
-                            .foregroundColor(.white)
+                            .applyTextStyle(.bodyBold(.white))
                     }
                 )
                 .overlay (
@@ -512,8 +505,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .cornerRadius(4)
                 .overlay (
                     Text(viewConfig.getText(elementId: .communityEditButton) ?? "Save")
-                        .font(.system(size: 15.0, weight: .semibold))
-                        .foregroundColor(.white)
+                        .applyTextStyle(.bodyBold(.white))
                 )
                 .overlay (
                     Rectangle()

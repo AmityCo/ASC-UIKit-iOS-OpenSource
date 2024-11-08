@@ -53,11 +53,9 @@ public struct EmptyCommunityFeedView: View {
                 .padding(.top, 24)
             
             Text(feedViewType.description)
-                .font(.system(size: 17, weight: .semibold))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 .padding(.top, 8)
                 .padding(.bottom, 24)
-                .foregroundColor(Color(viewConfig.theme.baseColorShade3))
-            
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .padding(.horizontal, 16)

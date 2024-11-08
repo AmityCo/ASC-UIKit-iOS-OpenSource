@@ -131,8 +131,7 @@ struct CommunityInfoView: View {
                     
                     let memberCountInfo = community.membersCount > 1 ? AmityLocalizedStringSet.Social.communityMemberCountPlural.localized(arguments: "\(community.membersCount.formattedCountString)") : AmityLocalizedStringSet.Social.communityMemberCountSingular.localized(arguments: "\(community.membersCount.formattedCountString)")
                     Text(memberCountInfo)
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                         .accessibilityLabel(AccessibilityID.Social.Explore.communityMemberCount)
                     
                    Spacer()

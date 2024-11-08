@@ -56,10 +56,9 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 }
                 
                 Text(community.displayName)
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                     .padding(.bottom, 10)
                     .lineLimit(2)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .isHidden(viewConfig.isHidden(elementId: .communityName))
                 
                 if community.isOfficial {
@@ -82,8 +81,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityCategory)
             
             Text(community.description)
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                 .lineLimit(4)
                 .isHidden(community.description.isEmpty || viewConfig.isHidden(elementId: .communityDescription))
                 .padding(.all, 16)
@@ -91,12 +89,10 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             
             HStack(spacing: 0) {
                 Text(community.postsCount.formattedCountString)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 Text(community.postsCount == 1 ? "post" : "posts")
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.leading, 4)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 
                 Rectangle().frame(width: 1, height: 20)
                     .foregroundColor(Color(UIColor(hex: "#E5E5E5", alpha: 1)))
@@ -104,14 +100,11 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 
                 HStack(spacing: 0) {
                     Text(community.membersCount.formattedCountString)
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     
                     Text(community.membersCount == 1 ? "member" : "members")
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                         .padding(.leading, 4)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-
                 }                        
                 .onTapGesture {
                     onMemberListTapAction?()
@@ -162,14 +155,12 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .frame(width: 6, height: 6)
                         .foregroundColor(Color(viewConfig.theme.primaryColor))
                     Text(AmityLocalizedStringSet.Social.communityPagePendingPostTitle.localizedString + pendingPostCountString)
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 }
                 .padding(.top, 12)
                 
                 Text(community.hasModeratorRole ? "\(viewModel.pendingPostCount) post\(pendingPostCountString) need approval" : "Your posts are pending for review")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .padding(.bottom, 12)
             }
             .frame(maxWidth: .infinity)
@@ -204,9 +195,8 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                     
                     HStack {
                         Text(category)
-                            .font(.system(size: 13))
+                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                             .lineLimit(1)
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
                             .padding(.horizontal, 8)
                             .padding(.vertical, 4)
                     }

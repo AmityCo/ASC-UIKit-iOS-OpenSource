@@ -92,8 +92,7 @@ public struct AmityCommunityNotificationSettingPage: AmityPageView {
                 .frame(width: 24, height: 20)
             
             Text(text)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
            
@@ -121,8 +120,7 @@ public struct AmityCommunityNotificationSettingPage: AmityPageView {
             Spacer()
             
             Text(AmityLocalizedStringSet.Social.communityNotificationSettingPageTitle.localizedString)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             

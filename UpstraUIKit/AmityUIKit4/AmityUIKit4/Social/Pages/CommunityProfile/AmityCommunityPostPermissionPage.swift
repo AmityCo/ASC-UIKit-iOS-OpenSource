@@ -57,14 +57,12 @@ public struct AmityCommunityPostPermissionPage: AmityPageView {
             Spacer()
             
             Text(AmityLocalizedStringSet.Social.communitySettingPostPermissions.localizedString)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             
             Text(AmityLocalizedStringSet.General.save.localizedString)
-                .font(.system(size: 17))
-                .foregroundColor(Color(viewConfig.theme.primaryColor))
+                .applyTextStyle(.title(Color(viewConfig.theme.primaryColor)))
                 .opacity(community.postSettings == viewModel.selectedSetting ? 0.35 : 1.0)
                 .onTapGesture {
                     guard community.postSettings != viewModel.selectedSetting else { return }
@@ -88,14 +86,12 @@ public struct AmityCommunityPostPermissionPage: AmityPageView {
         VStack(spacing: 28) {
             VStack(spacing: 8) {
                 Text(AmityLocalizedStringSet.Social.communityPostPermissionTitle.localizedString)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     
                 
                 Text(AmityLocalizedStringSet.Social.communityPostPermissionDescription.localizedString)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.trailing, 20)
             }

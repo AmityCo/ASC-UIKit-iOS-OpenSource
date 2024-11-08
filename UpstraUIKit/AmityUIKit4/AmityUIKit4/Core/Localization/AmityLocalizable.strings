@@ -224,3 +224,66 @@
 "user_profile_edit_alert_title" = "Unsaved changes";
 "user_profile_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
 "user_profile_follow_request_title" = "New follow requests";
+
+// Polls
+"poll_close_alert_title" = "Close Poll?";
+"poll_close_alert_desc" = "The Poll duration you've set will be ignored and your poll will be closed immediately.";
+"poll_close_button" = "Close poll";
+"poll_close_toast_error" = "Oops, something went wrong.";
+
+"poll_status_ended" = "Ended";
+
+"poll_remaining_days_left" = "d left";
+"poll_remaining_hours_left" = "h left";
+"poll_remaining_minutes_left" = "m left";
+
+"poll_question_title" = "Poll Question";
+"poll_question_textfield_placeholder" = "What's your poll question?";
+"poll_multiple_selection_title" = "Multiple Selection";
+"poll_multiple_selection_desc" = "Let participants vote more than one option";
+
+"poll_post_create_error" = "Failed to create post. Please try again.";
+"poll_create_posting_toast" = "Posting...";
+
+"poll_duration_title" = "Poll Duration";
+"poll_duration_desc" = "You can always close the poll before the set duration";
+"poll_ends_on_label" = "Ends on";
+
+"poll_options_title" = "Options";
+"poll_options_desc" = "Poll must contain at least 2 options";
+"poll_add_option" = "Add Option";
+
+"poll_option_label" = "Option";
+
+"poll_answer_result_no_votes" = "No votes";
+"poll_answer_result_voted_by_you" = "Voted by you";
+"poll_answer_result_voted_by_single_participant" = "Voted by 1 participant";
+"poll_answer_result_voted_by_multiple_participants" = "Voted by %@ participants";
+"poll_answer_result_voted_by_and_you" = "and you";
+
+"poll_duration_pick_date_and_time" = "Pick date and time";
+"poll_duration_done_button" = "Done";
+
+"poll_duration_singular_day" = "%d day";
+"poll_duration_plural_days" = "%d days";
+
+"poll_select_one_option_label" = "Select one option";
+"poll_select_one_or_more_option_label" = "Select one or more options";
+
+"poll_see_full_results_label" = "See full results";
+"poll_see_results_label" = "See results";
+"poll_back_to_vote_label" = "Back to vote";
+"poll_see_more_options_label" = "See %d more options";
+
+"poll_vote_counts" = "%@ votes";
+"poll_vote_button" = "Vote";
+"poll_label" = "Poll";
+
+"poll_option_char_limit_error" = "Poll option cannot exceed %d characters.";
+"poll_question_char_limit_error" = "Poll question cannot exceed %d characters.";
+
+"poll_target_my_timeline" = "My Timeline";
+
+"post_delete_error" = "Failed to delete post. Please try again.";
+"post_create_error" = "Failed to create post. Please try again.";
+"post_edit_error" = "Failed to edit post. Please try again.";

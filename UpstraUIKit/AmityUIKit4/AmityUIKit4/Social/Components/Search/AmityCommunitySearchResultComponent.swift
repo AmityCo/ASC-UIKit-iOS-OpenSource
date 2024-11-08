@@ -39,8 +39,7 @@ public struct AmityCommunitySearchResultComponent: AmityComponentView {
                         .frame(width: 60, height: 60)
                     
                     Text("No results found")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 }
             }
             

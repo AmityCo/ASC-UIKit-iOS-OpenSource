@@ -30,8 +30,7 @@ struct TargetSelectionView<Content: View>: View {
                     
                     LazyVStack(alignment: .leading, spacing: 0) {
                         Text("My Communities")
-                            .font(.system(size: 15))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                            .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade3)))
                             .padding([.leading, .top], 16)
                             .padding(.bottom, 8)
                         
@@ -52,8 +51,7 @@ struct TargetSelectionView<Content: View>: View {
                                     }
                                     
                                     Text(community.displayName)
-                                        .font(.system(size: 15, weight: .semibold))
-                                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                                     
                                     if community.isOfficial {
                                         let verifiedBadgeIcon = AmityIcon.getImageResource(named: "verifiedBadge")
@@ -108,12 +106,11 @@ class TargetSelectionViewModel: ObservableObject {
                                 let permission: AmityPermission
                                 
                                 switch contentType {
-                                case .post:
+                                case .post, .poll:
                                     permission = .createPrivilegedPost
 
                                 case .story:
                                     permission = .manageStoryCommunity
-
                                 }
                                 
                                 AmityUIKit4Manager.client.hasPermission(permission, forCommunity: community.communityId) { success in

@@ -94,14 +94,12 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
             Spacer()
             
             Text("Select category")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             
             Text("\(selectedCategories.count)/10")
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
         }
     }
     
@@ -118,8 +116,7 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
                 .overlay (
                     ZStack {
                         Text("Add Category")
-                            .font(.system(size: 15.0, weight: .semibold))
-                            .foregroundColor(.white)
+                            .applyTextStyle(.bodyBold(.white))
                         
                         Rectangle()
                             .fill(Color(viewConfig.theme.baseColorShade4).opacity(0.5))
@@ -145,8 +142,7 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
                     .clipShape(Circle())
                 
                 Text(category.name)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 
                 Spacer()
                 

@@ -199,10 +199,8 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             VStack(alignment: .leading) {
                 HStack(alignment: .center) {
                     Text(targetName)
-                        .font(.system(size: 15))
-                        .fontWeight(.semibold)
+                        .applyTextStyle(.bodyBold(.white))
                         .frame(height: 20)
-                        .foregroundColor(.white)
                         .onTapGesture {
                             guard let community = story.community else { return }
                             let context = AmityViewStoryPageBehaviour.Context(page: viewStoryPage, targetId: community.communityId, targetType: .community)
@@ -220,15 +218,12 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 }
                 HStack {
                     Text(story.createdAt.timeAgoString)
-                        .font(.system(size: 13))
-                        .foregroundColor(.white)
+                        .applyTextStyle(.caption(.white))
                         .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.createdAtTextView)
                     Text("•")
-                        .font(.system(size: 13))
-                        .foregroundColor(.white)
+                        .applyTextStyle(.caption(.white))
                     Text("By \(story.creatorName)")
-                        .font(.system(size: 13))
-                        .foregroundColor(.white)
+                        .applyTextStyle(.caption(.white))
                         .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.creatorDisplayNameTextView)
                 }
                 
@@ -262,9 +257,8 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             
             let title = data.getCustomName().isEmpty ? data.getDomainName() ?? "" : data.getCustomName()
             Text(title)
+                .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColor)))
                 .lineLimit(1)
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
                 .padding(.trailing, 16)
                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.hyperlinkTextView)
         }
@@ -335,7 +329,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
         HStack(alignment: .center, spacing: 10) {
             Label {
                 Text("\(story.viewCount)")
-                    .font(.system(size: 15))
+                    .applyTextStyle(.body(.white))
                     .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reachButtonTextView)
             } icon: {
                 let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .impressionIconElement, key: "impression_icon", of: String.self) ?? "")
@@ -359,7 +353,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     .padding(.trailing, 4)
                 Text(story.commentCount.formattedCountString)
                     .lineLimit(1)
-                    .font(.system(size: 15).monospacedDigit())
+                    .font(AmityTextStyle.body(.clear).getFont().monospacedDigit())
                     .foregroundColor(.white)
                     .padding(.trailing, 10)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.commentButtonTextView)
@@ -387,7 +381,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     .padding(.trailing, 4)
                 Text(story.reactionCount.formattedCountString)
                     .lineLimit(1)
-                    .font(.system(size: 15).monospacedDigit())
+                    .font(AmityTextStyle.body(.clear).getFont().monospacedDigit())
                     .foregroundColor(.white)
                     .padding(.trailing, 10)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reactionButtonTextView)
@@ -427,8 +421,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             Image(AmityIcon.statusWarningIcon.getImageResource())
                 .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 8))
             Text(AmityLocalizedStringSet.Story.failedStoryBannerMessage.localizedString)
-                .font(.system(size: 15))
-                .foregroundColor(Color.white)
+                .applyTextStyle(.body(.white))
             Spacer()
             Button(action: {
                 showRetryAlert.toggle()
@@ -511,8 +504,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 .frame(width: 15, height: 15)
                 .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 8))
             Text(AmityLocalizedStringSet.Story.creatingStory.localizedString)
-                .font(.system(size: 15))
-                .foregroundColor(Color.white)
+                .applyTextStyle(.body(.white))
             Spacer()
         }
         .frame(height: 44)

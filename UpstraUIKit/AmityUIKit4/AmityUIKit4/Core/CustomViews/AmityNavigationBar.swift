@@ -61,10 +61,9 @@ struct AmityNavigationBar: View {
             .frame(maxWidth: .infinity)
 
             Text(title)
-                .font(.system(size: 17, weight: .semibold))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .padding(.horizontal, 8)
                 .lineLimit(1)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .layoutPriority(2)
 
             HStack {
@@ -72,7 +71,6 @@ struct AmityNavigationBar: View {
                 
                 if let trailingView {
                     trailingView
-                        .padding(.trailing, 8)
                 }
             }
             .layoutPriority(1)

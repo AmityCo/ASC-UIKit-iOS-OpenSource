@@ -41,12 +41,10 @@ struct PrivacyRadioButtonView: View {
                 
                 VStack(alignment: .leading, spacing: 5) {
                     Text(title)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .font(.system(size: 15, weight: .semibold))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     
                     Text(description)
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade1))
-                        .font(.system(size: 13))
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                 }
                 
                 Spacer()

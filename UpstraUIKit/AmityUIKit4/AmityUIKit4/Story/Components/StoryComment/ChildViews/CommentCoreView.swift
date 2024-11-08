@@ -30,8 +30,7 @@ struct CommentCoreView<Content>: View where Content:View {
             
             if !viewModel.hideEmptyText && viewModel.commentItems.isEmpty && viewModel.loadingStatus == .loaded {
                 Text(AmityLocalizedStringSet.Comment.noCommentAvailable.localizedString)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                    .applyTextStyle(.body(Color(UIColor(hex: "#898E9E"))))
                     .isHidden(viewModel.commentItems.count != 0)
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.emptyTextView)
             }

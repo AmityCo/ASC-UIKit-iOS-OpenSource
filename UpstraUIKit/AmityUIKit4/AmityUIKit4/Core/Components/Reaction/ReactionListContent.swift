@@ -129,14 +129,12 @@ struct ReactionListRowItem: View {
             
             VStack(alignment: .leading, spacing: 0) {
                 Text(user.displayName)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .textShimmerEffect(cornerRadius: 10, isActive: isPlaceholder, color: viewConfig.theme.baseInverseColor)
                     .accessibilityIdentifier(AccessibilityID.Chat.ReactionList.userDisplayName)
                 
                 Text(AmityLocalizedStringSet.Reaction.tapToRemove.localizedString)
-                    .font(.system(size: 13, weight: .regular))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .textShimmerEffect(cornerRadius: 10, isActive: isPlaceholder, color: viewConfig.theme.baseInverseColor)
                     .padding(.top, 4)
                     .isHidden(!user.isLoggedInUser)

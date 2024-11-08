@@ -20,8 +20,7 @@ struct SettingRadioButtonView: View {
     var body: some View {
         HStack(spacing: 0) {
             Text(text)
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             

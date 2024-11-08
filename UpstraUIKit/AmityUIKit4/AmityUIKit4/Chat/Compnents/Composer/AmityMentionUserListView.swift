@@ -70,9 +70,8 @@ struct AmityMentionUserItemView: View {
                     .accessibilityIdentifier(AccessibilityID.Chat.MentionList.userAvatar)
                 
                 Text(user.displayName)
-                    .font(.system(size: 15, weight: .semibold))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .padding(.leading, 8)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .accessibilityIdentifier(AccessibilityID.Chat.MentionList.userDisplayName)
                 
                 if user.isBrand {
@@ -87,8 +86,7 @@ struct AmityMentionUserItemView: View {
                 
                 if user.isChannelMention {
                     Text(AmityLocalizedStringSet.Chat.mentionEveryone.localizedString)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                         .padding(.trailing, 8)
                 }
             }

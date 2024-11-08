@@ -17,18 +17,12 @@ extension AmityMessageTextEditorView: AmityViewBuildable {
         mutating(keyPath: \.textEditorMaxHeight, value: value)
     }
     
-    /// Will show mention list with provided height
-    /// - Parameter value: Height of mention list
-    public func willShowMentionList(_ value:((CGFloat) -> Void)?) -> Self {
-        mutating(keyPath: \.willShowMentionList, value: value)
-    }
-    
-    public func mentionListPosition(_ value: MentionListPosition) -> Self {
-        mutating(keyPath: \.mentionListPosition, value: value)
-    }
-    
     public func autoFocus(_ value: Bool) -> Self {
         mutating(keyPath: \.autoFocusTextEditor, value: value)
+    }
+    
+    public func characterLimit(_ value: Int) -> Self {
+        mutating(keyPath: \.characterLimit, value: value)
     }
 }
 
@@ -46,16 +40,36 @@ public struct AmityMessageTextEditorView: View {
     
     private var placeholder: String = ""
     private var textEditorMaxHeight: CGFloat = 106 // 5 lines (18 px per line) + textContainerInset.top + textContainerInset.bottom
-    private var mentionListPosition: MentionListPosition = .top(20)
     private var willShowMentionList: ((CGFloat) -> Void)?
     private var autoFocusTextEditor: Bool = false
+    private var characterLimit: Int = 0
+    private var placeholderPadding: CGFloat = 5
     
-    public init(_ viewModel: AmityTextEditorViewModel, text: Binding<String>, mentionData: Binding<MentionData>, mentionedUsers: Binding<[AmityMentionUserModel]>, textViewHeight: CGFloat) {
+    public init(_ viewModel: AmityTextEditorViewModel, text: Binding<String>, mentionData: Binding<MentionData>, mentionedUsers: Binding<[AmityMentionUserModel]>, textViewHeight: CGFloat, textEditorMaxHeight: CGFloat = 106) {
         self._text = text
         self._mentionData = mentionData
         self._textEditorHeight = State(initialValue: textViewHeight)
         self._mentionedUsers = mentionedUsers
         self._viewModel = StateObject(wrappedValue: viewModel)
+        self.textEditorMaxHeight = textEditorMaxHeight
+    }
+    
+    public init(
+        _ viewModel: AmityTextEditorViewModel,
+        text: Binding<String>,
+        mentionData: Binding<MentionData>,
+        mentionedUsers: Binding<[AmityMentionUserModel]>,
+        initialEditorHeight: CGFloat = 34,
+        maxNumberOfLines: Int = 5,
+        placeholderPadding: CGFloat = 5
+    ) {
+        self._text = text
+        self._mentionData = mentionData
+        self._textEditorHeight = State(initialValue: initialEditorHeight)
+        self._mentionedUsers = mentionedUsers
+        self._viewModel = StateObject(wrappedValue: viewModel)
+        self.textEditorMaxHeight = CGFloat(maxNumberOfLines) * 18 + viewModel.textView.textContainerInset.top + viewModel.textView.textContainerInset.bottom
+        self.placeholderPadding = placeholderPadding
     }
     
     public var body: some View {
@@ -73,6 +87,12 @@ public struct AmityMessageTextEditorView: View {
                     }
                     .onChange(of: text) { value in
                         hidePlaceholder = !text.isEmpty
+                        
+                        if characterLimit > 0, value.count > characterLimit {
+                            self.text = String(value.prefix(characterLimit))
+                            self.viewModel.textView.text = text
+                        }
+                        
                         let textHeight = viewModel.textView.text.height(withConstrainedWidth: geometry.size.width, font: .systemFont(ofSize: 15))
                         
                         let defaultInset = viewModel.textView.textContainerInset
@@ -93,7 +113,7 @@ public struct AmityMessageTextEditorView: View {
                 Text(placeholder)
                     .font(.system(size: 15))
                     .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                    .padding(.leading, 5)
+                    .padding(.leading, placeholderPadding)
                     .onTapGesture {
                         viewModel.textView.becomeFirstResponder()
                     }

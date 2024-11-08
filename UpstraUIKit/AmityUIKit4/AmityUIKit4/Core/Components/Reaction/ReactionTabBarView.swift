@@ -50,13 +50,11 @@ struct ReactionTabBarItemView: View {
                             .frame(width: 20, height: 20)
                     } else {
                         Text(tabItem.name)
-                            .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(currentTab == tabItem.index ? Color(viewConfig.theme.highlightColor) : Color(viewConfig.theme.baseInverseColor))
+                            .applyTextStyle(.titleBold(currentTab == tabItem.index ? Color(viewConfig.theme.highlightColor) : Color(viewConfig.theme.baseInverseColor)))
                     }
                     
                     Text("\(tabItem.count.formattedCountString)")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(currentTab == tabItem.index ? Color(viewConfig.theme.highlightColor) : Color(viewConfig.theme.baseInverseColor))
+                        .applyTextStyle(.titleBold(currentTab == tabItem.index ? Color(viewConfig.theme.highlightColor) : Color(viewConfig.theme.baseInverseColor)))
                 }
                 
                 // Underline

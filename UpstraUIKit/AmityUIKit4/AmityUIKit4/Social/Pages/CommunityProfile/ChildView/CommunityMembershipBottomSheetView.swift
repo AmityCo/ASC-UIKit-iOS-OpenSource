@@ -102,9 +102,8 @@ struct CommunityMembershipBottomSheetView: View {
                 .foregroundColor(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor))
             
             Text(text)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor))
-            
+                .applyTextStyle(.bodyBold(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor)))
+                
             Spacer()
         }
         .contentShape(Rectangle())

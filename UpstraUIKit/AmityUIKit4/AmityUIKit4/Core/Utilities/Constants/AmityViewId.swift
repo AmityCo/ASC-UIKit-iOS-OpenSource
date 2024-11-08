@@ -24,6 +24,7 @@ public enum PageId: String {
     case postComposerPage = "post_composer_page"
     case postTargetSelectionPage = "select_post_target_page"
     case myCommunitiesSearchPage = "my_communities_search_page"
+    case pollTargetSelectionPage = "select_poll_target_page"
     
     case communityProfilePage = "community_profile_page"
     
@@ -50,6 +51,8 @@ public enum PageId: String {
     
     case communitiesByCategoryPage = "communities_by_category_page"
     case allCategories = "all_categories_page"
+    
+    case pollPostPage = "poll_post_composer_page"
 }
 
 public enum ComponentId: String {

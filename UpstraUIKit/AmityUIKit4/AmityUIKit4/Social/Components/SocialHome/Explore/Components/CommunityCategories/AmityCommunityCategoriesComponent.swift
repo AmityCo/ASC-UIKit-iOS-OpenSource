@@ -87,8 +87,7 @@ struct CategoryLabel: View {
                     .cornerRadius(14, corners: .allCorners)
                 
                 Text(category.name)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     .padding(.horizontal, 8)
             }
             .padding(4)
@@ -114,7 +113,7 @@ struct MoreLabel: View {
         }, label: {
             HStack(spacing: 0) {
                 Text(AmityLocalizedStringSet.Social.exploreCategoriesSeeMore.localizedString)
-                    .font(.system(size: 15, weight: .medium))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     .padding(.horizontal, 8)
                 
                 Image(systemName: "chevron.right")

@@ -30,9 +30,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                 .padding([.top, .bottom], 16)
             
             Text(AmityLocalizedStringSet.Social.communitySettingBasicInfoTitle.localizedString)
-                .font(.system(size: 17, weight: .semibold))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
             
             /// Edit Profile setting
             if viewModel.shouldShowEditProfile {
@@ -78,9 +77,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
             /// Community Permissions header
             if viewModel.shouldShowPostPermissions || viewModel.shouldShowStoryComments {
                 Text(AmityLocalizedStringSet.Social.communitySettingCommunityPermissionsTitle.localizedString)
-                    .font(.system(size: 17, weight: .semibold))
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
             }
             
             /// Post Permissions setting
@@ -109,8 +107,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
             
             let leaveCommunityText = viewConfig.getText(elementId: .leaveCommunity) ?? AmityLocalizedStringSet.Social.communitySettingLeaveCommunity.localizedString
             Text(leaveCommunityText)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.alertColor))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -150,14 +147,12 @@ public struct AmityCommunitySettingPage: AmityPageView {
                 VStack(spacing: 8) {
                     let closeCommunityText = viewConfig.getText(elementId: .closeCommunity) ?? AmityLocalizedStringSet.Social.communitySettingCloseCommunity.localizedString
                     Text(closeCommunityText)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.alertColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
                     let closeCommunityDesc = viewConfig.getText(elementId: .closeCommunityDescription) ?? AmityLocalizedStringSet.Social.communitySettingCloseCommunityDescription.localizedString
                     Text(closeCommunityDesc)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                         .frame(maxWidth: .infinity, alignment: .leading)
                     
                 }
@@ -206,9 +201,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
             Spacer()
             
             Text(community.displayName)
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
             
             Spacer()
             
@@ -235,15 +229,13 @@ public struct AmityCommunitySettingPage: AmityPageView {
                 .cornerRadius(4)
             
             Text(text)
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             
             if let disclosureText {
                 Text(disclosureText)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade1)))
             }
             
             Image(AmityIcon.arrowIcon.getImageResource())

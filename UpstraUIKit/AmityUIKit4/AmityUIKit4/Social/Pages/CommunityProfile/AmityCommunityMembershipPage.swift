@@ -90,8 +90,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             Spacer()
             
             Text("All members")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             

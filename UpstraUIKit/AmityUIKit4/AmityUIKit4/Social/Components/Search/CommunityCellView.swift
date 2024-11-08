@@ -49,9 +49,8 @@ struct CommunityCellView: View {
                     }
                     
                     Text(model.displayName)
-                        .font(.system(size: 15, weight: .semibold))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         .lineLimit(1)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
                         .isHidden(viewConfig.isHidden(elementId: .communityDisplayName))
                         .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityDisplayName)
                     
@@ -74,9 +73,8 @@ struct CommunityCellView: View {
                 }
                 
                 Text("\(model.membersCount.formattedCountString) members")
-                    .font(.system(size: 13))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .lineLimit(1)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                     .isHidden(viewConfig.isHidden(elementId: .communityMembersCount))
                     .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityMembersCount)
             }

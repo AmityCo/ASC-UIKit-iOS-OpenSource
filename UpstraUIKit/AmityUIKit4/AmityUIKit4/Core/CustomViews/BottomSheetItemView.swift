@@ -11,11 +11,13 @@ struct BottomSheetItemView: View {
     @EnvironmentObject var viewConfig: AmityViewConfigController
     private let icon: ImageResource
     private let text: String
+    private let iconSize: CGSize
     private let isDestructive: Bool
     
-    init(icon: ImageResource, text: String, isDestructive: Bool = false) {
+    init(icon: ImageResource, text: String, iconSize: CGSize = CGSize(width: 20, height: 24), isDestructive: Bool = false) {
         self.icon = icon
         self.text = text
+        self.iconSize = iconSize
         self.isDestructive = isDestructive
     }
     
@@ -29,12 +31,11 @@ struct BottomSheetItemView: View {
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 20, height: 24)
+                .frame(width: iconSize.width, height: iconSize.height)
                 .foregroundColor(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor))
             
             Text(text)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.bodyBold(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor)))
             
             Spacer()
         }

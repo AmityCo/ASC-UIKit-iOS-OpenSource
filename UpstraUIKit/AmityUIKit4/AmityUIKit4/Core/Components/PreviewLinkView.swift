@@ -47,20 +47,18 @@ struct PreviewLinkView: View {
                     } else {
                         let urlText = viewModel.previewLinkData.metadata?.url?.host ?? "Preview not available"
                         let titleText = viewModel.previewLinkData.metadata?.title ?? "Please make sure the URL is correct and try again."
-                        let urlFont = viewModel.previewLinkData.metadata?.url?.host == nil ? Font.system(size: 15.0, weight: .semibold) : Font.system(size: 14.0)
-                        let titleFont = viewModel.previewLinkData.metadata?.url?.host == nil ? Font.system(size: 15.0) : Font.system(size: 16.0, weight: .semibold)
                         let urlTextColor = viewModel.previewLinkData.metadata?.url?.host == nil ? Color(viewConfig.theme.baseColor) : Color(viewConfig.theme.baseColorShade1)
+                        let urlTextStyle: AmityTextStyle = viewModel.previewLinkData.metadata?.url?.host == nil ? .bodyBold(urlTextColor) : .caption(urlTextColor)
                         let titleTextColor = viewModel.previewLinkData.metadata?.url?.host == nil ? Color(viewConfig.theme.baseColorShade1) : Color(viewConfig.theme.baseColor)
+                        let titleTextStyle: AmityTextStyle = viewModel.previewLinkData.metadata?.url?.host == nil ? .body(titleTextColor) : .bodyBold(titleTextColor)
                         
                         Text(urlText)
-                            .font(urlFont)
+                            .applyTextStyle(urlTextStyle)
                             .lineLimit(1)
-                            .foregroundColor(urlTextColor)
                         
                         Text(titleText)
-                            .font(titleFont)
+                            .applyTextStyle(titleTextStyle)
                             .lineLimit(2)
-                            .foregroundColor(titleTextColor)
                     }
                 }
                 .padding([.leading, .trailing], 12)

@@ -107,7 +107,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                         isUnsavedAlertShown.toggle()
                     }, label: {
                         Text(viewConfig.getConfig(elementId: .cancelButtonElement, key: "cancel_button_text", of: String.self) ?? "Cancel")
-                            .font(.system(size: 15))
+                            .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     })
                     .buttonStyle(.plain)
                     .foregroundColor(Color(viewConfig.theme.baseColor))
@@ -136,7 +136,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                         }
                     }, label: {
                         Text(viewConfig.getConfig(elementId: .doneButtonElement, key: "done_button_text", of: String.self) ?? "Done")
-                            .font(.system(size: 15))
+                            .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     })
                     .buttonStyle(.plain)
                     .foregroundColor(Color(viewConfig.theme.baseColor))
@@ -177,8 +177,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                         .frame(width: 20, height: 20)
                         .padding(.trailing, 6)
                     Text("Remove link")
-                        .font(.system(size: 15))
-                        .foregroundColor(Color(viewConfig.theme.alertColor))
+                        .applyTextStyle(.body(Color(viewConfig.theme.alertColor)))
                         .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.removeLinkButtonTextView)
                     Spacer()
                 }
@@ -199,7 +198,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                 .frame(height: 1)
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
         }
-        .padding(EdgeInsets(top: 40, leading: 16, bottom: 0, trailing: 16))
+        .padding(EdgeInsets(top: 40, leading: 0, bottom: 0, trailing: 0))
         
         
     }

@@ -49,8 +49,7 @@ public struct AmityTrendingCommunitiesComponent: AmityComponentView {
     var content: some View {
         LazyVStack(alignment: .leading, spacing: 0) {
             Text(AmityLocalizedStringSet.Social.exploreTrendingComponentTitle.localizedString)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .padding(.bottom, 12)
             
             ForEach(Array(viewModel.communities.enumerated()), id: \.element.id) { index, community in

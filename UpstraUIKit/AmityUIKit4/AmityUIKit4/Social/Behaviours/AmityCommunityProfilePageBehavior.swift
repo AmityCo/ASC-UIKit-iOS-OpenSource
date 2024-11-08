@@ -14,10 +14,12 @@ open class AmityCommunityProfilePageBehavior {
     open class Context {
         public let page: AmityCommunityProfilePage
         public var community: AmityCommunity?
+        public let showPollResult: Bool
         
-        init(page: AmityCommunityProfilePage, community: AmityCommunity? = nil) {
+        init(page: AmityCommunityProfilePage, community: AmityCommunity? = nil, showPollResult: Bool = false) {
             self.page = page
             self.community = community
+            self.showPollResult = showPollResult
         }
     }
     
@@ -53,7 +55,20 @@ open class AmityCommunityProfilePageBehavior {
             
             context.page.host.controller?.present(navigationController, animated: true)
         }
+    }
+    
+    open func goToPollPostComposerPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
         
+        if let community = community {
+            let page = AmityPollPostComposerPage(targetId: community.communityId, targetType: .community)
+            let vc = AmitySwiftUIHostingController(rootView: page)
+            
+            let navController = UINavigationController(rootViewController: vc)
+            navController.modalPresentationStyle = .fullScreen
+            navController.navigationBar.isHidden = true
+            
+            context.page.host.controller?.present(navController, animated: true)
+        }
     }
     
     open func goToCreateStoryPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
@@ -86,13 +101,11 @@ open class AmityCommunityProfilePageBehavior {
     open func goToPostDetailPage(context: AmityCommunityProfilePageBehavior.Context, post: AmityPostModel?, category: AmityPostCategory = .general) {
         
         if let post = post {
-            
-            let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: post.object, category: category, hideTarget: true))
+            let postComponentContext = AmityPostContentComponent.Context(shouldShowPollResults: context.showPollResult, category: category, shouldHideTarget: true)
+            let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: post.object, context: postComponentContext))
             let host = context.page.host
             host.controller?.navigationController?.pushViewController(vc, animated: true)            
-            
         }
-        
     }
     
 }

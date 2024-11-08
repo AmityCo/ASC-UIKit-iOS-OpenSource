@@ -67,8 +67,7 @@ public struct AmityCommunityStorySettingPage: AmityPageView {
             Spacer()
             
             Text(AmityLocalizedStringSet.Social.communitySettingStoryComments.localizedString)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             

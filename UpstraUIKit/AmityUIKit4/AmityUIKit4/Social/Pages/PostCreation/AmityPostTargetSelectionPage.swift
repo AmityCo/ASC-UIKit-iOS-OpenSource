@@ -41,9 +41,7 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
             }
             .overlay(
                 Text(viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             )
             .padding([.leading, .trailing], 12)
             .frame(height: 58)
@@ -61,8 +59,7 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
                             
                         let myTimelineTitle = viewConfig.getConfig(elementId: .myTimelineText, key: "text", of: String.self) ?? ""
                         Text(myTimelineTitle)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                             .isHidden(viewConfig.isHidden(elementId: .myTimelineText), remove: true)
                             .accessibilityIdentifier(AccessibilityID.Social.PostTargetSelection.myTimelineText)
                         

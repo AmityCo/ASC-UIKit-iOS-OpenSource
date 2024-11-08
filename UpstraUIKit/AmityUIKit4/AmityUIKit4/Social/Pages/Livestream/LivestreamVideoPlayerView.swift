@@ -41,28 +41,24 @@ struct LivestreamVideoPlayerView: View {
                             .padding(.bottom, 12)
                         
                         Text(AmityLocalizedStringSet.Social.livestreamPlayerTerminatedTitle.localizedString)
-                            .font(.system(size: 17, weight: .bold))
-                            .foregroundColor(Color.white)
+                            .applyTextStyle(.titleBold(Color.white))
                             .padding(.bottom, 4)
                         
                         Text(AmityLocalizedStringSet.Social.livestreamPlayerTerminatedMessage.localizedString)
+                            .applyTextStyle(.caption(Color.white))
                             .multilineTextAlignment(.center)
-                            .font(.system(size: 13))
-                            .foregroundColor(Color.white)
                     }
                     .padding(.horizontal, 16)
                     
                 } else if stream.status == .ended {
                     VStack(alignment: .center) {
                         Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedTitle.localizedString)
-                            .font(.system(size: 17, weight: .bold))
-                            .foregroundColor(Color.white)
+                            .applyTextStyle(.titleBold(Color.white))
                             .padding(.bottom, 4)
                         
                         Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedMessage.localizedString)
+                            .applyTextStyle(.caption(Color.white))
                             .multilineTextAlignment(.center)
-                            .font(.system(size: 13))
-                            .foregroundColor(Color.white)
                     }
                     .padding(.horizontal, 16)
                     
@@ -72,10 +68,9 @@ struct LivestreamVideoPlayerView: View {
                         HStack {
                             
                             Text(AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString)
-                                .font(.system(size: 13, weight: .bold))
+                                .applyTextStyle(.captionBold(Color.white))
                                 .padding(.vertical, 4)
                                 .padding(.horizontal, 8)
-                                .foregroundColor(Color.white)
                                 .background(Color(UIColor(hex: "FF305A")))
                                 .cornerRadius(4, corners: .allCorners)
                                 .padding(.all, 16)
@@ -97,14 +92,12 @@ struct LivestreamVideoPlayerView: View {
                         .padding(.bottom, 12)
                     
                     Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableTitle.localizedString)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(Color.white)
+                        .applyTextStyle(.titleBold(Color.white))
                         .padding(.bottom, 4)
                     
                     Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableMessage.localizedString)
+                        .applyTextStyle(.caption(Color.white))
                         .multilineTextAlignment(.center)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color.white)
                 }
                 .padding(.horizontal, 16)
             }
@@ -121,14 +114,12 @@ struct LivestreamVideoPlayerView: View {
                 
                 
                 Text(AmityLocalizedStringSet.Social.livestreamPlayerReconnectingTitle.localizedString)
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(Color.white)
+                    .applyTextStyle(.titleBold(Color.white))
                     .padding(.bottom, 4)
                 
                 Text(AmityLocalizedStringSet.Social.livestreamPlayerReconnectingMessage.localizedString)
+                    .applyTextStyle(.caption(Color.white))
                     .multilineTextAlignment(.center)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color.white)
             }
             .padding(.horizontal, 16)
             .opacity(networkMonitor.isConnected ? 0 : 1)

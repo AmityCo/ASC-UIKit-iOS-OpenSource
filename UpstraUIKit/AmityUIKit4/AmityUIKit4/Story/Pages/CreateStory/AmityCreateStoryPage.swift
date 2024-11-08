@@ -76,8 +76,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                     
                     if cameraMode == .videoWithMic && videoCaptureButtonSelected {
                         Text("\(formatDuration(videoCaputreDuration))")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.white)
+                            .applyTextStyle(.bodyBold(.white))
                             .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                             .background(Color.red)
                             .cornerRadius(4)

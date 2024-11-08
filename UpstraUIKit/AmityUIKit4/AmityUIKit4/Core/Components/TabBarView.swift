@@ -53,8 +53,7 @@ struct TabBarView: View {
             } label: {
                 VStack(spacing: 10) {
                     Text(tabBarItemName)
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(currentTab == tab ? Color(selectedTabColor) : .gray)
+                        .applyTextStyle(.titleBold(currentTab == tab ? Color(selectedTabColor) : .gray))
                     
                     if currentTab == tab {
                         Color.blue

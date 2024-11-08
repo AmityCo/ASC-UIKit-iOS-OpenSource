@@ -104,35 +104,31 @@ struct InfoTextField: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 0) {
                 Text(data.title)
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(titleTextColor == nil ? textFieldTextColor : titleTextColor!))
+                    .applyTextStyle(.titleBold(Color(titleTextColor == nil ? textFieldTextColor : titleTextColor!)))
                     .accessibilityIdentifier(titleTextAccessibilityId ?? "titleTextAccessibilityId")
                 
                 if data.isMandatory {
                     Text(" *")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(Color(alertColor))
+                        .applyTextStyle(.titleBold(Color(alertColor)))
                 } else {
                     if data.showOptionalTitle {
                         Text(" (Optional)")
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(infoTextColor))
+                            .applyTextStyle(.caption(Color(infoTextColor)))
                     }
                 }
                 
                 Spacer()
                 if let limitedCharCount = data.maxCharCount {
                     Text("\(charCount)/\(limitedCharCount)")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(infoTextColor))
+                        .applyTextStyle(.caption(Color(infoTextColor)))
                         .accessibilityIdentifier(charCountTextAccessibilityId ?? "charCountTextAccessibilityId")
                 }
             }
             .padding(.bottom, 20)
             
             textField
+                .applyTextStyle(.body(Color(textFieldTextColor)))
                 .lineLimit(data.isExpandable ? 7 : 1)
-                .font(.system(size: 15))
                 .textFieldStyle(PlainTextFieldStyle())
                 .onChange(of: text) { newText in
                     guard let limitedCharCount = data.maxCharCount else { return }
@@ -148,7 +144,6 @@ struct InfoTextField: View {
                         text = String(text.prefix(limitedCharCount))
                     }
                 }
-                .foregroundColor(Color(textFieldTextColor))
                 .accessibilityIdentifier(textFieldAccessibilityId ?? "textFieldAccessibilityId")
             
             Rectangle()
@@ -158,14 +153,12 @@ struct InfoTextField: View {
             
             if !(data.infoMessage ?? "").isEmpty || !(data.errorMessage ?? "").isEmpty && !isValid {
                 Text(isValid ? (data.infoMessage ?? "") : (data.errorMessage ?? data.infoMessage ?? ""))
-                    .foregroundColor(isValid ? Color(infoTextColor) : Color(alertColor))
-                    .font(.system(size: 13))
+                    .applyTextStyle(.caption(isValid ? Color(infoTextColor) : Color(alertColor)))
                     .padding(.top, 8)
                     .accessibilityIdentifier(descriptionTextAccessibilityId ?? "descriptionTextAccessibilityId")
             }
         }
     }
-    
     
     private var textField: TextField<Text> {
         if #available(iOS 16.0, *) {

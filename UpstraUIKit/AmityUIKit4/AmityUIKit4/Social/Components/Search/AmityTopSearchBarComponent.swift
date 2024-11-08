@@ -42,7 +42,7 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
                     
                 let placeholder = viewModel.searchType == .myCommunities ? "Search my community" : "Search community and user"
                 TextField(placeholder, text: $viewModel.searchKeyword)
-                    .font(.system(size: 15))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                 
                 if !viewModel.searchKeyword.isEmpty {
                     Button(action: {

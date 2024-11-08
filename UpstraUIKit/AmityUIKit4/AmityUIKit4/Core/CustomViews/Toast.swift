@@ -46,9 +46,8 @@ public struct ToastView: View {
                     .padding(EdgeInsets(top: 16, leading: 12, bottom: 16, trailing: 8))
             }
             Text(message)
+                .applyTextStyle(.body(.white))
                 .lineLimit(2)
-                .font(.system(size: 14))
-                .foregroundColor(.white)
                 .padding(.trailing, 8)
             Spacer()
         }

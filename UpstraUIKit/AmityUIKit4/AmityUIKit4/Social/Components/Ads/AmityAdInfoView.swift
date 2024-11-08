@@ -25,9 +25,8 @@ struct AmityAdInfoView: View {
             }
             
             Text("About this advertisement")
-                .font(.system(size: 17, weight: .semibold))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .frame(maxWidth: .infinity)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .padding(.vertical, 8)
             
             Rectangle()
@@ -36,7 +35,7 @@ struct AmityAdInfoView: View {
                 .offset(y: -1)
             
             Text("Why this advertisement?")
-                .font(.system(size: 15, weight: .semibold))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .padding(.top, 24)
             
             HStack(alignment: .top) {
@@ -44,8 +43,7 @@ struct AmityAdInfoView: View {
                     .padding(.top, 2)
                 
                 Text("You're seeing this advertisement because it was displayed to all users in the system.")
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                    .font(.system(size: 13, weight: .regular))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                 
                 Spacer()
             }
@@ -53,7 +51,7 @@ struct AmityAdInfoView: View {
             .background(Color(viewConfig.theme.baseColorShade4))
             
             Text("About this advertiser")
-                .font(.system(size: 15, weight: .semibold))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .padding(.top, 24)
             
             HStack(alignment: .top) {
@@ -61,8 +59,7 @@ struct AmityAdInfoView: View {
                     .padding(.top, 2)
 
                 Text("Advertiser name: \(advertiserName)")
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                    .font(.system(size: 13, weight: .regular))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
 
                 Spacer()
             }

@@ -111,9 +111,8 @@ public struct AmityDraftStoryPage: AmityPageView {
                                     .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))
                                 let title = viewModel.hyperLinkConfigModel.getCustomName().isEmpty ? viewModel.hyperLinkConfigModel.getDomainName() ?? "" : viewModel.hyperLinkConfigModel.getCustomName()
                                 Text(title)
+                                    .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColor)))
                                     .lineLimit(1)
-                                    .font(.system(size: 15))
-                                    .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
                                     .padding(.trailing, 16)
                                     .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperlinkTextView)
                             }
@@ -226,9 +225,7 @@ public struct AmityDraftStoryPage: AmityPageView {
             }
             
             Text("Share Story")
-                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
-                .font(Font.system(size: 14))
-                .fontWeight(.medium)
+                .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColor)))
             
             Image(shareIcon)
                 .frame(width: 20, height: 20)

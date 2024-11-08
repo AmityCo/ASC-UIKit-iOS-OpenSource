@@ -24,13 +24,11 @@ struct CommunityNotificationSettingView: View {
         VStack(spacing: 28) {
             VStack(spacing: 8) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Text(description)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             

@@ -70,14 +70,12 @@ public struct AmityCommunityPostsNotificationSettingPage: AmityPageView {
             Spacer()
             
             Text(AmityLocalizedStringSet.Social.communityNotificationSettingPosts.localizedString)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             
             Text(AmityLocalizedStringSet.General.save.localizedString)
-                .font(.system(size: 17))
-                .foregroundColor(Color(viewConfig.theme.primaryColor))
+                .applyTextStyle(.title(Color(viewConfig.theme.primaryColor)))
                 .opacity(viewModel.isSettingChanged ? 1.0 : 0.35)
                 .onTapGesture {
                     guard viewModel.isSettingChanged else { return }

@@ -125,8 +125,7 @@ public struct AmityUserVideoFeedComponent: AmityComponentView {
                 .contentShape(Rectangle())
             
             Text("\(duration.formattedDurationString ?? "0:00")")
-                .font(.system(size: 13.0))
-                .foregroundColor(.white)
+                .applyTextStyle(.caption(.white))
                 .padding(.all, 4)
                 .background(Color.black.opacity(0.7))
                 .cornerRadius(4)

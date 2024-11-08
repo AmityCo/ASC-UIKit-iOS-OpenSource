@@ -190,8 +190,7 @@ public struct AmityTextEditorView: View {
                     )
                 
                 Text(placeholder)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(UIColor(hex: "#898E9E")))
+                    .applyTextStyle(.body(Color(UIColor(hex: "#898E9E"))))
                     .padding(.leading, 5)
                     .onTapGesture {
                         viewModel.textView.becomeFirstResponder()
@@ -320,7 +319,6 @@ internal struct TextEditorView: UIViewRepresentable {
         textView.backgroundColor = .clear
         textView.textColor =  viewModel.typingAttributes[.foregroundColor] as? UIColor
         textView.typingAttributes = context.coordinator.parentView.viewModel.typingAttributes
-        //textView.textColor = textColor
         return textView
     }
     

@@ -28,12 +28,10 @@ struct CommentComposerView: View {
         if viewModel.allowCreateComment {
             HStack(spacing: 0) {
                 Text("Replying to")
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     .padding(.leading, 16)
                 Text(" \(viewModel.replyState.comment?.displayName ?? AmityLocalizedStringSet.General.anonymous)")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .lineLimit(1)
                 Spacer()
                 Button {
@@ -103,8 +101,7 @@ struct CommentComposerView: View {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Text(AmityLocalizedStringSet.Comment.disableCreateCommentText.localizedString)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.disableTextView)
                 Spacer()
             }

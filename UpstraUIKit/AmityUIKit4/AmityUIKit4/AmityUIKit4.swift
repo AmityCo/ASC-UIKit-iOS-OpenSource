@@ -312,6 +312,10 @@ final class AmityUIKitManagerInternal: NSObject {
         let pendingPostContentComponentBehavior = AmityPendingPostContentComponentBehavior()
         behavior.pendingPostContentComponentBehavior = pendingPostContentComponentBehavior
         
+        // Poll Post
+        let pollTargetSelectionPageBehavior = AmityPollTargetSelectionPageBehavior()
+        behavior.pollTargetSelectionPageBehavior = pollTargetSelectionPageBehavior
+
         let livestreamBehavior = AmityLivestreamBehavior()
         behavior.livestreamBehavior = livestreamBehavior
     }

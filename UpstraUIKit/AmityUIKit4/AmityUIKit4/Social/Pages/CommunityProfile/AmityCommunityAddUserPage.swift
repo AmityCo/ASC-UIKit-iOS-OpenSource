@@ -102,8 +102,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
             Spacer()
             
             Text("Add Member")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             
@@ -124,7 +123,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .padding(.leading, 12)
             
             TextField("Search user", text: $viewModel.searchKeyword)
-                .font(.system(size: 15.0))
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
         }
         .frame(height: 40)
         .background(Color(viewConfig.theme.baseColorShade4))
@@ -161,9 +160,8 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                         }
                         
                         Text(user.displayName)
-                            .font(.system(size: 13))
+                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                             .lineLimit(1)
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
                     }
                     .frame(width: 68)
                 }
@@ -180,8 +178,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                     .clipShape(Circle())
                 
                 Text(user.displayName)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 
                 if user.isBrand {
                     Image(AmityIcon.brandBadge.imageResource)
@@ -227,8 +224,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .overlay (
                     ZStack {
                         Text("Add member")
-                            .font(.system(size: 15.0, weight: .semibold))
-                            .foregroundColor(.white)
+                            .applyTextStyle(.bodyBold(.white))
                         
                         Rectangle()
                             .fill(Color(viewConfig.theme.baseColorShade4).opacity(0.5))

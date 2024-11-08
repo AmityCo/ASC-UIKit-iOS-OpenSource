@@ -118,10 +118,9 @@ public struct AmityBlockedUsersPage: AmityPageView {
                     .padding(.top, 24)
                 
                 Text("Nothing here to see yet")
-                    .font(.system(size: 17))
+                    .applyTextStyle(.title(Color(viewConfig.theme.baseColorShade3)))
                     .padding(.top, 8)
                     .padding(.bottom, 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade3))
                 
             }
             .background(Color(viewConfig.theme.backgroundColor))
@@ -140,9 +139,8 @@ public struct AmityBlockedUsersPage: AmityPageView {
                 .clipShape(Circle())
             
             Text(user.displayName ?? "Unknown")
-                .font(.system(size: 15, weight: .semibold))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .padding(.leading, 8)
                         
             Image(AmityIcon.brandBadge.imageResource)
@@ -158,8 +156,7 @@ public struct AmityBlockedUsersPage: AmityPageView {
                 unblockAction(user)
             } label: {
                 Text("Unblock")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                     .padding(8)
                     .overlay (
                         RoundedRectangle(cornerRadius: 4)

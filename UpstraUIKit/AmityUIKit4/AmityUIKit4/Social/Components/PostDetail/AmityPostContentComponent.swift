@@ -45,9 +45,10 @@ public struct AmityPostContentComponent: AmityComponentView {
     private let category: AmityPostCategory
     private let hideMenuButton: Bool
     private let hideTarget: Bool
-    private var onTapAction: (() -> Void)?
+    private var onTapAction: ((AmityPostContentComponent.Context?) -> Void)?
+    private let context: AmityPostContentComponent.Context?
     
-    public init(post: AmityPost, style: AmityPostContentComponentStyle = .feed, category: AmityPostCategory = .general, hideTarget: Bool = false, hideMenuButton: Bool = false, onTapAction: (() -> Void)? = nil, pageId: PageId? = nil) {
+    public init(post: AmityPost, style: AmityPostContentComponentStyle = .feed, category: AmityPostCategory = .general, hideTarget: Bool = false, hideMenuButton: Bool = false, onTapAction: ((AmityPostContentComponent.Context?) -> Void)? = nil, pageId: PageId? = nil) {
         self.post = AmityPostModel(post: post)
         self.style = style
         self.hideMenuButton = hideMenuButton
@@ -55,9 +56,23 @@ public struct AmityPostContentComponent: AmityComponentView {
         self.onTapAction = onTapAction
         self.pageId = pageId
         self.category = category
+        self.context = nil
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
     
+    // Convenience Initializer. You can pass context to this component so that it can render the correct state. One usage of context is to show poll results when user taps on
+    // see results button from Feed and we open post detail page with poll post results.
+    public init(post: AmityPost, style: AmityPostContentComponentStyle = .feed, context: AmityPostContentComponent.Context, onTapAction: ((AmityPostContentComponent.Context?) -> Void)? = nil, pageId: PageId? = nil) {
+        self.post = AmityPostModel(post: post)
+        self.style = style
+        self.hideMenuButton = context.hideMenuButton
+        self.hideTarget = context.hidePostTarget
+        self.onTapAction = onTapAction
+        self.pageId = pageId
+        self.category = context.category
+        self.context = context
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
+    }
     
     public var body: some View {
         VStack(spacing: 16) {
@@ -72,7 +87,8 @@ public struct AmityPostContentComponent: AmityComponentView {
         .contentShape(Rectangle())
         .padding(.bottom, 12)
         .onTapGesture {
-            onTapAction?()
+            let context = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
+            onTapAction?(context)
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)
@@ -86,8 +102,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             let isBadgeVisible = category == .announcement || category == .global || category == .pinAndAnnouncement
             HStack {
                 Text(AmityLocalizedStringSet.Social.featuredPostBadge.localizedString)
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
+                    .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColor)))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                 
@@ -147,8 +162,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                                     .frame(width: 12, height: 12)
                                     .padding(.leading, 6)
                                 Text(moderatorTitle)
-                                    .font(.system(size: 10))
-                                    .foregroundColor(Color(viewConfig.theme.primaryColor))
+                                    .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
                                     .padding(.trailing, 6)
                             }
                             .frame(height: 20)
@@ -157,13 +171,11 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .accessibilityIdentifier(AccessibilityID.Social.PostContent.moderatorBadge)
                             
                             Text("•")
-                                .font(.system(size: 13))
-                                .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                         }
                         
                         Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                             .isHidden(viewConfig.isHidden(elementId: .timestamp))
                             .accessibilityIdentifier(AccessibilityID.Social.PostContent.timestamp)
                         
@@ -197,19 +209,24 @@ public struct AmityPostContentComponent: AmityComponentView {
                     .buttonStyle(BorderlessButtonStyle())
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
                     .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                        PostBottomSheetView(isShown: $showBottomSheet, post: post, editPostActionCompletion: {
+                        PostBottomSheetView(isShown: $showBottomSheet, post: post) { postAction in
                             
-                            showBottomSheet.toggle()
-                            
-                            // Dismiss bottomsheet
-                            host.controller?.dismiss(animated: false)
-                            
-                            if category == .global {
-                                showEditAlert.toggle()
-                            } else {
-                                showPostEditScreen()
+                            switch postAction {
+                            case .editPost:
+                                showBottomSheet.toggle()
+                                
+                                // Dismiss bottomsheet
+                                host.controller?.dismiss(animated: false)
+                                
+                                if category == .global {
+                                    showEditAlert.toggle()
+                                } else {
+                                    showPostEditScreen()
+                                }
+                            case .closePoll, .deletePost:
+                                break
                             }
-                        })
+                        }
                     }
                 }
             }
@@ -253,7 +270,12 @@ public struct AmityPostContentComponent: AmityComponentView {
                 EmptyView()
                 
             case .poll:
-                EmptyView()
+                postContentTextView()
+                
+                PostContentPollView(style: style, post: post, showPollResults: context?.showPollResults ?? false, isInPendingFeed: false) { actionType in
+                    let context = Context(shouldShowPollResults: actionType == PollAction.viewDetailWithResults, category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
+                    onTapAction?(context)
+                }
                 
             case .liveStream:
                 livestreamPostContentTextView()
@@ -277,7 +299,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             })
             .lineLimit(8)
             .moreButtonText("...See more")
-            .font(.system(size: 15))
+            .font(AmityTextStyle.body(.clear).getFont())
             .foregroundColor(Color(viewConfig.theme.baseColor))
             .attributedColor(viewConfig.theme.primaryColor)
             .moreButtonColor(Color(viewConfig.theme.primaryColor))
@@ -298,8 +320,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 
                 if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     Text("\(title)")
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.bottom, description.isEmpty ? 16 : 20)
                 }
@@ -308,7 +329,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     ExpandableText(description)
                         .lineLimit(8)
                         .moreButtonText("...See more")
-                        .font(.system(size: 15))
+                        .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .attributedColor(viewConfig.theme.primaryColor)
                         .moreButtonColor(Color(viewConfig.theme.primaryColor))
@@ -334,8 +355,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .isHidden(post.reactionsCount == 0, remove: true)
                         
                         Text("\(post.reactionsCount.formattedCountString) \(post.reactionsCount == 1 ? "like" : "likes")")
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     }
                     .onTapGesture {
                         showReactionList.toggle()
@@ -344,8 +364,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     Spacer()
                     
                     Text("\(post.allCommentCount.formattedCountString) \(post.allCommentCount == 1 ? "comment" : "comments")")
-                        .font(.system(size: 13))
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                 }
                 .frame(height: 20)
             }
@@ -366,8 +385,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 .frame(height: 1)
             
             Text(AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade2))
+                .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColorShade2)))
                 .isHidden(self.post.targetCommunity?.isJoined ?? true || viewConfig.isHidden(elementId: .nonMemberSection))
                 .accessibilityIdentifier(AccessibilityID.Social.PostContent.nonMemberSection)
             
@@ -393,12 +411,10 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .frame(width: 20.0, height: 20.0)
                         if style == .feed {
                             Text(post.reactionsCount == 0 ? "0" : "\(post.reactionsCount.formattedCountString)")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(Color(post.isLiked ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade2))
+                                .applyTextStyle(.bodyBold(Color(post.isLiked ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade2)))
                         } else if style == .detail {
                             Text(reactionTitle)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(Color(post.isLiked ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade2))
+                                .applyTextStyle(.bodyBold(Color(post.isLiked ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade2)))
                         }
                     }
                 }
@@ -407,7 +423,8 @@ public struct AmityPostContentComponent: AmityComponentView {
                 .accessibilityIdentifier(AccessibilityID.Social.PostContent.reactionButton)
                 
                 Button(feedbackStyle: .light, action: {
-                    onTapAction?()
+                    let context = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
+                    onTapAction?(context)
                 }) {
                     let commentIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .commentButton, key: "icon", of: String.self) ?? "")
                     let commentTitle = viewConfig.getConfig(elementId: .commentButton, key: "text", of: String.self) ?? ""
@@ -418,12 +435,10 @@ public struct AmityPostContentComponent: AmityComponentView {
                         
                         if style == .feed {
                             Text(post.allCommentCount == 0 ? "0" : "\(post.allCommentCount)")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColorShade2)))
                         } else if style == .detail {
                             Text(commentTitle)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColorShade2)))
                         }
                     }
                 }
@@ -442,8 +457,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .resizable()
                             .frame(width: 20.0, height: 20.0)
                         Text(shareTitle)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColorShade2)))
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -477,9 +491,8 @@ extension AmityPostContentComponent {
     var authorDisplayNameLabel: some View {
         HStack(spacing: 8) {
             Text(post.displayName)
-                .font(.system(size: 15, weight: .semibold))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .onTapGesture {
                     self.goToUserProfilePage(post.postedUserId)
                 }
@@ -506,9 +519,8 @@ extension AmityPostContentComponent {
             }
             
             Text(post.targetCommunity?.displayName ?? "Unknown")
-                .font(.system(size: 15, weight: .semibold))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .onTapGesture {
                     let context = AmityPostContentComponentBehavior.Context(component: self)
                     AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
@@ -530,9 +542,8 @@ extension AmityPostContentComponent {
         HStack(spacing: 8) {
             
             Text(post.targetUser?.displayName ?? "Unknown")
-                .font(.system(size: 15, weight: .semibold))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .onTapGesture {
                     let context = AmityPostContentComponentBehavior.Context(component: self)
                     AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
@@ -558,5 +569,26 @@ class AmityPostContentComponentViewModel: ObservableObject {
     
     func removeReaction(id: String) async throws {
         try await reactionManager.removeReaction(.like, referenceId: id, referenceType: .post)
+    }
+}
+
+extension AmityPostContentComponent {
+    
+    // Context used to render the post
+    public class Context {
+        var showPollResults: Bool
+        var category: AmityPostCategory
+        var hidePostTarget: Bool
+        var hideMenuButton: Bool
+        
+        public init(shouldShowPollResults: Bool = false,
+                    category: AmityPostCategory = .general,
+                    shouldHideTarget: Bool = false,
+                    shouldHideMenuButton: Bool = false) {
+            self.showPollResults = shouldShowPollResults
+            self.category = category
+            self.hidePostTarget = shouldHideTarget
+            self.hideMenuButton = shouldHideMenuButton
+        }
     }
 }

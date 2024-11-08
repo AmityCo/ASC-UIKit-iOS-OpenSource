@@ -28,7 +28,7 @@ struct StoryCreationView: View {
             }
             
             Text(viewModel.name)
-                .font(.system(size: 13))
+                .font(AmityTextStyle.caption(.clear).getFont())
                 .frame(height: 20, alignment: .leading)
         }
     }

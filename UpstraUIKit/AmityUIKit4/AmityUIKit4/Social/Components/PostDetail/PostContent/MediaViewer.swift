@@ -163,8 +163,7 @@ struct MediaViewer: View {
                     .padding(.leading, 16)
                     
                     Text("\(pageIndex) / \(page.totalPages)")
-                        .font(.system(size: 17))
-                        .foregroundColor(.white)
+                        .applyTextStyle(.title(.white))
                         .isHidden(page.totalPages == 1)
                 }
                 .adaptiveVerticalPadding(top: 20)

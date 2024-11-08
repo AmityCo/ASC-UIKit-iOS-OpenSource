@@ -52,7 +52,6 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
         .updateTheme(with: viewConfig)
     }
     
-    
     @ViewBuilder
     private func postHeaderView(_ post: AmityPostModel) -> some View {
         HStack(spacing: 8) {
@@ -67,18 +66,15 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 8) {
                     Text(post.displayName)
-                        .font(.system(size: 15, weight: .semibold))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         .lineLimit(1)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
                         .onTapGesture {
                             goToUserProfilePage(post.postedUserId)
                         }
                 }
                 
-                
                 Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .isHidden(viewConfig.isHidden(elementId: .timestamp))
                 
             }
@@ -125,7 +121,6 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 postContentTextView()
                     
                 PreviewLinkView(post: post)
-                
             case .image, .video:
                 postContentTextView()
                 
@@ -137,7 +132,11 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 EmptyView()
            
             case .poll:
-                EmptyView()
+                postContentTextView()
+                
+                PostContentPollView(style: .feed, post: post, isInPendingFeed: true) { actionType in
+                    // Empty Implementation
+                }
                 
             case .liveStream:
                 EmptyView()
@@ -157,7 +156,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             })
             .lineLimit(8)
             .moreButtonText("...See more")
-            .font(.system(size: 15))
+            .font(AmityTextStyle.body(.clear).getFont())
             .foregroundColor(Color(viewConfig.theme.baseColor))
             .attributedColor(viewConfig.theme.primaryColor)
             .moreButtonColor(Color(viewConfig.theme.primaryColor))
@@ -175,8 +174,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 .fill(Color(viewConfig.theme.primaryColor))
                 .overlay (
                     Text(viewConfig.getText(elementId: .postAcceptButton) ?? "Accept")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.white)
+                        .applyTextStyle(.bodyBold(.white))
                 )
                 .cornerRadius(8)
                 .onTapGesture {
@@ -193,8 +191,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 .fill(.clear)
                 .overlay (
                     Text(viewConfig.getText(elementId: .postDeclineButton) ?? "Decline")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 )
                 .cornerRadius(8)
                 .overlay(
@@ -228,8 +225,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 .foregroundColor(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor))
             
             Text(text)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.bodyBold(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor)))
             
             Spacer()
         }

@@ -59,8 +59,7 @@ public struct AmityPendingPostsPage: AmityPageView {
             
             let title = viewConfig.getText(elementId: .title) ?? "Pending posts"
             Text("\(title) (\(viewModel.posts.count))")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             
@@ -81,8 +80,7 @@ public struct AmityPendingPostsPage: AmityPageView {
                 .frame(width: 60, height: 60)
             
             Text("No post to review")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
             
             Spacer()
         }
@@ -121,8 +119,7 @@ public struct AmityPendingPostsPage: AmityPageView {
             .frame(height: 60)
             .overlay(
                 Text("Decline pending post will permanently delete the selected post from community.")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .padding([.leading, .trailing], 16)
             )
             .isHidden(!community.hasModeratorRole)

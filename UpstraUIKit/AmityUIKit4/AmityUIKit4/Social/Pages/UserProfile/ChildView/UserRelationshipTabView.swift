@@ -48,10 +48,9 @@ struct UserRelationshipTabView: View {
                     .padding(.top, 24)
                 
                 Text("Nothing here to see yet")
-                    .font(.system(size: 17))
+                    .applyTextStyle(.title(Color(viewConfig.theme.baseColorShade3)))
                     .padding(.top, 8)
                     .padding(.bottom, 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade3))
                 
             }
             .background(Color(viewConfig.theme.backgroundColor))

@@ -47,7 +47,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 .attributedColor(viewConfig.theme.primaryColor)
                 .moreButtonColor(Color(viewConfig.theme.primaryColor))
                 .expandAnimation(.easeOut(duration: 0.25))
-                .font(.system(size: 15))
+                .font(AmityTextStyle.body(.clear).getFont())
                 .lineLimit(4)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .isHidden(viewConfig.isHidden(elementId: .userDescription) || user.about.isEmpty)
@@ -110,8 +110,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
             
             ZStack(alignment: .bottomTrailing) {
                 Text(user.displayName)
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
                     .lineLimit(4)
                     .isHidden(viewConfig.isHidden(elementId: .userName))
                     .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userName)
@@ -132,13 +131,11 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
         HStack(spacing: 0) {
             Group {
                 Text((viewModel.followInfo?.followingCount ?? 0).formattedCountString)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 
                 let followingText = viewConfig.getConfig(elementId: .userFollowing, key: "text", of: String.self) ?? "followings"
                 Text(followingText)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.leading, 4)
             }
             .isHidden(viewConfig.isHidden(elementId: .userFollowing) || user.isBrand)
@@ -156,14 +153,12 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
             
             Group {
                 Text((viewModel.followInfo?.followerCount ?? 0).formattedCountString)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .padding(.leading, 12)
                 
                 let followerText = viewConfig.getConfig(elementId: .userFollower, key: "text", of: String.self) ?? "followers"
                 Text(followerText)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.leading, 4)
             }
             .isHidden(viewConfig.isHidden(elementId: .userFollower))
@@ -189,14 +184,12 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                     .foregroundColor(Color(viewConfig.theme.primaryColor))
                 
                 Text(AmityLocalizedStringSet.Social.userProfileFollowRequestTitle.localizedString)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
             }
             .padding(.top, 12)
             
             Text("\(viewModel.followRequestCount) \(viewModel.followRequestCount == 1 ? "request" : "requests") need your approval")
-                .font(.system(size: 13))
-                .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                 .padding(.bottom, 12)
         }
         .frame(maxWidth: .infinity)
@@ -295,8 +288,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                         .frame(width: 20, height: 20)
                     
                     Text(text)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(color != .clear ? .white : Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(color != .clear ? .white : Color(viewConfig.theme.baseColor)))
                 }
             )
             .overlay(

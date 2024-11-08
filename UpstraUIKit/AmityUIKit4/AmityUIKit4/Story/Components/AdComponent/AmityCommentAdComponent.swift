@@ -33,8 +33,7 @@ struct AmityCommentAdComponent: View {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
                                 Text(ad.advertiser?.name ?? "")
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                                    .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.nameTextView)
                                 Spacer()
                             }
@@ -42,9 +41,8 @@ struct AmityCommentAdComponent: View {
                             AdSponsorLabel()
                             
                             Text(ad.body)
+                                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                                 .lineLimit(6)
-                                .font(.system(size: 14))
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
                                 .multilineTextAlignment(.leading)
                             
                             Button {
@@ -75,22 +73,19 @@ struct AmityCommentAdComponent: View {
                                     VStack {
                                         VStack(alignment: .leading) {
                                             Text(ad.description)
-                                                .font(.system(size: 12, weight: .regular))
+                                                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                                                 .lineLimit(1)
-                                                .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                                             
                                             Text(ad.headline)
-                                                .font(.system(size: 13, weight: .bold))
+                                                .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                                                 .multilineTextAlignment(.leading)
                                                 .lineLimit(2)
-                                                .foregroundColor(Color(viewConfig.theme.baseColor))
                                             
                                             Spacer()
                                             
                                             Text(ad.callToAction)
-                                                .font(.system(size: 14, weight: .bold))
+                                                .applyTextStyle(.bodyBold(.white))
                                                 .lineLimit(1)
-                                                .foregroundColor(Color.white)
                                                 .padding(.horizontal, 12)
                                                 .padding(.vertical, 10)
                                                 .background(Color(viewConfig.theme.highlightColor))
@@ -152,8 +147,7 @@ struct AdSponsorLabel: View {
                 .padding(.leading, 4)
             
             Text(AmityLocalizedStringSet.Social.sponsored.localizedString)
-                .font(.system(size: 11, weight: .regular))
-                .foregroundColor(Color.white)
+                .applyTextStyle(.captionSmall(.white))
                 .padding(.leading, 2)
                 .padding(.trailing, 6)
         }

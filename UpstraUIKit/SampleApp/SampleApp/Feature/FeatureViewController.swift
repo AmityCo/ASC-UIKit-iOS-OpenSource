@@ -20,6 +20,7 @@ class FeatureViewController: UIViewController {
         case chatUIKit
         case socialUIKit
         case socialUIKitV4Comaptible
+        case userProfile
         
         var text: String {
             switch self {
@@ -35,6 +36,9 @@ class FeatureViewController: UIViewController {
                 return "Social UIKit 4"
             case .socialUIKitV4Comaptible:
                 return "Social UIKit 4 Compatible"
+            case .userProfile:
+                return "User Profile"
+            
             }
         }
     }
@@ -52,6 +56,12 @@ class FeatureViewController: UIViewController {
         
         logoutButtonItem = UIBarButtonItem(title: "Logout", style: .plain, target: self, action: #selector(logoutTap))
         navigationItem.rightBarButtonItem = logoutButtonItem
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
     @objc private func logoutTap() {
@@ -99,9 +109,17 @@ extension FeatureViewController: UITableViewDelegate {
             let navigationController = UINavigationController(rootViewController: homepage)
             navigationController.modalPresentationStyle = .fullScreen
             present(navigationController, animated: true, completion: nil)
+        case .userProfile:
+            let profilePage = AmityUserProfilePage(userId: AmityUIKit4Manager.client.currentUserId ?? "")
+//            let navigationController = AmitySwiftUIHostingNavigationController(rootView: profilePage)
+//            navigationController.modalPresentationStyle = .fullScreen
+//            present(navigationController, animated: true, completion: nil)
+            self.navigationController?.pushViewController(AmitySwiftUIHostingController(rootView: profilePage), animated: true)
         }
 
     }
+    
+    
 
 }
 

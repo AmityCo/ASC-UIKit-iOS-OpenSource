@@ -50,8 +50,7 @@ public struct AmityRecommendedCommunitiesComponent: AmityComponentView {
     var content: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(AmityLocalizedStringSet.Social.exploreRecommendedComponentTitle.localizedString)
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .padding(.bottom, 16)
             
             ScrollView(.horizontal, showsIndicators: false) {

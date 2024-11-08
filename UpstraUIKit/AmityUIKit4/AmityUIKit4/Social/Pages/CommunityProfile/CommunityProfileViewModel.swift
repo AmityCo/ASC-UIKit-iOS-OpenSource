@@ -34,6 +34,8 @@ public class CommunityProfileViewModel: ObservableObject {
     private var collection: AmityCollection<AmityPinnedPost>?
     
     var hasStoryManagePermission: Bool = false
+    @Published var hasCreatePostPermission = false
+
     
     var postFeedViewModel: PostFeedViewModel
     var imageFeedViewModel: MediaFeedViewModel
@@ -66,6 +68,14 @@ public class CommunityProfileViewModel: ObservableObject {
             self?.community = community
             
             self?.pendingPostCount = community.pendingPostCount
+            
+            if communityObject.onlyAdminCanPost {
+                AmityUIKit4Manager.client.hasPermission(.createPrivilegedPost, forCommunity: community.communityId) { success in
+                    self?.hasCreatePostPermission = success && community.isJoined
+                }
+            } else {
+                self?.hasCreatePostPermission = community.isJoined
+            }
         }
         
         
@@ -95,7 +105,7 @@ public class CommunityProfileViewModel: ObservableObject {
 
             self?.pinnedFeedLoadingStatus = collection.loadingStatus
             for pinnedpost in collection.snapshots {
-                if let post = pinnedpost.post, !post.childrenPosts.contains(where: { $0.dataType == "poll" || $0.dataType == "file" }), !post.isDeleted {
+                if let post = pinnedpost.post, !post.childrenPosts.contains(where: { $0.dataType == "file" }), !post.isDeleted {
                     if pinnedpost.placement == AmityPinPlacement.announcement.rawValue {
                         self?.announcementPost = AmityPostModel(post: post)
                     } else {

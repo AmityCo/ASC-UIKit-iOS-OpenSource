@@ -243,7 +243,7 @@ extension PostFeedViewModel {
     }
     
     private func canRenderPost(post: AmityPost) -> Bool {
-        let filterCondition = !post.childrenPosts.contains { $0.dataType == "poll" || $0.dataType == "file" }
+        let filterCondition = !post.childrenPosts.contains { $0.dataType == "file" }
         return filterCondition
     }
 }

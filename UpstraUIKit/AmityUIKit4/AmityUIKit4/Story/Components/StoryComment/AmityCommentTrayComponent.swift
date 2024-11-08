@@ -44,9 +44,8 @@ public struct AmityCommentTrayComponent: AmityComponentView {
                 .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade3))
             
             Text(AmityLocalizedStringSet.Comment.commentTrayComponentTitle.localizedString)
-                .font(.system(size: 17, weight: .semibold))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .padding(.bottom, 17)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.titleTextView)
             
             Rectangle()

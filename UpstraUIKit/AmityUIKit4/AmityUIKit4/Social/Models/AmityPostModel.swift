@@ -11,13 +11,13 @@ import UIKit
 
 extension AmityPostModel {
     
-    public class Poll {
+    public class PollModel {
         
         // Public
         public let id: String
         public let question: String
         public let answers: [Answer]
-        public let isMultipleVoted: Bool
+        public let canVoteMultipleOptions: Bool
         public let status: String
         public let isClosed: Bool
         public let isVoted: Bool
@@ -25,10 +25,12 @@ extension AmityPostModel {
         public let voteCount: Int
         public let createdAt: Date
         
+        public let isOpen: Bool
+        
         public init(poll: AmityPoll) {
             self.id = poll.pollId
             self.question = poll.question
-            self.isMultipleVoted = poll.isMultipleVote
+            self.canVoteMultipleOptions = poll.isMultipleVote
             self.status = poll.status
             self.isClosed = poll.isClosed
             self.isVoted = poll.isVoted
@@ -36,15 +38,15 @@ extension AmityPostModel {
             self.voteCount = Int(poll.voteCount)
             self.answers = poll.answers.map { Answer(answer: $0) }
             self.createdAt = poll.createdAt
+            self.isOpen = !poll.isClosed || !poll.isVoted
         }
         
-        public class Answer {
+        public class Answer: Identifiable {
             public let id: String
             public let dataType: String
             public let text: String
             public let isVotedByUser: Bool
             public let voteCount: Int
-            var isSelected: Bool = false
             
             public init(answer: AmityPollAnswer) {
                 self.id = answer.answerId
@@ -282,7 +284,7 @@ public class AmityPostModel: Identifiable {
      */
     public var appearance: AmityPostAppearance
     
-    public var poll: Poll?
+    public var poll: AmityPostModel.PollModel?
     
     public var isPinned: Bool
     
@@ -348,12 +350,16 @@ public class AmityPostModel: Identifiable {
         feedType = post.getFeedType()
         data = post.data ?? [:]
         appearance = AmityPostAppearance()
-        poll = post.getPollInfo().map(Poll.init)
         metadata = post.metadata
         mentionees = post.mentionees
         isEdited = post.isEdited
         analytic = post.analytics
         impression = post.impression
+        
+        if let pollInfo = post.getPollInfo() {
+            poll = PollModel(poll: pollInfo)
+            text = poll?.question ?? ""
+        }
 
         self.isPinned = isPinned
         isTargetPublicCommunity = post.targetCommunity?.isPublic ?? false
@@ -451,8 +457,8 @@ public class AmityPostModel: Identifiable {
                 fileMap[videoData.fileId] = post.postId
                 dataTypeInternal = .video
             }
-        case "poll": break
-//                dataTypeInternal = .poll
+        case "poll":
+                dataTypeInternal = .poll
         case "liveStream":
             if let liveStreamData = post.getLiveStreamInfo() {
                 liveStream = liveStreamData
@@ -473,6 +479,75 @@ public class AmityPostModel: Identifiable {
             }
         default:
             dataTypeInternal = .unknown
+        }
+    }
+}
+
+
+class PollStatus {
+    var statusInfo: String = ""
+
+    init(poll: AmityPostModel.PollModel) {
+        if poll.isClosed {
+            statusInfo = AmityLocalizedStringSet.Social.pollStatusEnded.localizedString
+        } else {
+            let closedInDate = poll.createdAt.addingTimeInterval(Double(poll.closedIn) / 1000)
+            computeRemainingTime(closedInDate: closedInDate)
+        }
+    }
+    
+    private func computeRemainingTime(closedInDate: Date) {
+        let currentDate = Date()
+        
+        if closedInDate > currentDate {
+            let difference = Calendar.current.dateComponents([.day,.hour,.minute], from: currentDate, to: closedInDate)
+            
+            if let remainingDays = difference.day, remainingDays > 0 {
+                // In case of 3 days, 22 hour, we will display 4 days
+                let remainingHours = difference.hour ?? 0
+                let roundUpValue = remainingHours > 0 ? 1 : 0
+                statusInfo = RemainingTime.days(count: remainingDays + roundUpValue).info
+                return
+            }
+            
+            if let remainingHours = difference.hour, remainingHours > 0 {
+                statusInfo = RemainingTime.hours(count: remainingHours).info
+                return
+            }
+            
+            if let remainingMinutes = difference.minute, remainingMinutes > 0 {
+                statusInfo = RemainingTime.minutes(count: remainingMinutes).info
+                return
+            } else {
+                // We don't want to show remaining time in seconds. So we just show `1 minute`
+                statusInfo = RemainingTime.minutes(count: 1).info
+                return
+            }
+            
+        } else {
+            statusInfo = AmityLocalizedStringSet.Social.pollStatusEnded.localizedString
+        }
+    }
+}
+
+extension PollStatus {
+    
+    private enum RemainingTime {
+        case days(count: Int)
+        case hours(count: Int)
+        case minutes(count: Int)
+        
+        var info: String {
+            switch self {
+            case .days(let remainingDays):
+                return "\(remainingDays)" + AmityLocalizedStringSet.Social.pollRemainingDaysLeft.localizedString
+                
+            case .hours(let remainingHours):
+                return "\(remainingHours)" + AmityLocalizedStringSet.Social.pollRemainingHoursLeft.localizedString
+                
+            case .minutes(let remainingMinutes):
+                return "\(remainingMinutes)" + AmityLocalizedStringSet.Social.pollRemainingMinutesLeft.localizedString
+            }
         }
     }
 }

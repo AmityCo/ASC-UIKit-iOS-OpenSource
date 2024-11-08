@@ -33,15 +33,13 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
             
             let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? ""
             Text(title)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 .isHidden(viewConfig.isHidden(elementId: .title))
                 .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.title)
             
             let description = viewConfig.getConfig(elementId: .description, key: "text", of: String.self) ?? ""
             Text(description)
-                .font(.system(size: 14))
-                .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade3)))
                 .padding(.top, 4)
                 .isHidden(viewConfig.isHidden(elementId: .description))
                 .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.description)
@@ -55,8 +53,7 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
                     .padding(.leading, 24)
                     
                 Text(exploreCommunityButtonText)
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.backgroundColor)))
                     .padding([.top, .bottom], 12)
                     .padding(.trailing, 24)
             }
@@ -71,8 +68,7 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
             
             let createCommunityButtonText = viewConfig.getConfig(elementId: .createCommunityButton, key: "text", of: String.self) ?? ""
             Text(createCommunityButtonText)
-                .font(.system(size: 15))
-                .foregroundColor(Color(viewConfig.theme.primaryColor))
+                .applyTextStyle(.body(Color(viewConfig.theme.primaryColor)))
                 .padding(.top, 14)
                 .onTapGesture {
                     let page = AmityCommunitySetupPage(mode: .create)

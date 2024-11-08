@@ -54,8 +54,7 @@ public struct AmityEditCommentView: View {
                         cancelAction()
                     } label: {
                         Text(AmityLocalizedStringSet.General.cancel.localizedString)
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(UIColor(hex: "#636878")))
+                            .applyTextStyle(.caption(Color(UIColor(hex: "#636878"))))
                             .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     }
                     .overlay(
@@ -72,8 +71,7 @@ public struct AmityEditCommentView: View {
                         saveAction(editedComment)
                     } label: {
                         Text(AmityLocalizedStringSet.General.save.localizedString)
-                            .font(.system(size: 13))
-                            .foregroundColor(.white)
+                            .applyTextStyle(.caption(.white))
                             .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     }
                     .background(Color(viewConfig.theme.highlightColor))

@@ -27,8 +27,7 @@ struct AmityUserProfileImageView: View {
                     .fill(Color(viewConfig.theme.primaryColor.blend(.shade2)))
                     .overlay (
                         Text(displayName)
-                            .font(.system(size: geometry.size.height * 0.55))
-                            .foregroundColor(.white)
+                            .applyTextStyle(.custom(geometry.size.height * 0.55, .regular, .white))
                     )
                 
                 AsyncImage(url: avatarURL)

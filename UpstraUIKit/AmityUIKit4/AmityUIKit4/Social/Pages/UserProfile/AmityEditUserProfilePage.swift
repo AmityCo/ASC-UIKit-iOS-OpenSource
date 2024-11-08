@@ -187,8 +187,7 @@ public struct AmityEditUserProfilePage: AmityPageView {
                     ZStack {
                         let updateButtonText = viewConfig.getConfig(elementId: .updateUserProfileButton, key: "text", of: String.self) ?? "Save"
                         Text(updateButtonText)
-                            .font(.system(size: 15.0, weight: .semibold))
-                            .foregroundColor(isExistingDataChanged ? .white : .gray)
+                            .applyTextStyle(.bodyBold(isExistingDataChanged ? .white : .gray))
                     }
                 )
                 .onTapGesture {

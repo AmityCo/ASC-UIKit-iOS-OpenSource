@@ -76,6 +76,20 @@ extension View {
     func adaptiveVerticalPadding(top: CGFloat = 0, bottom: CGFloat = 0) -> some View {
         self.modifier(AdaptiveVerticalPadding(top: top, bottom: bottom))
     }
+    
+    func border(radius: CGFloat, borderColor: Color, borderWidth: CGFloat) -> some View {
+        self
+            .overlay(
+                RoundedRectangle(cornerRadius: radius, style: .continuous)
+                    .strokeBorder(borderColor, lineWidth: borderWidth)
+            )
+    }
+    
+    func continuousCornerRadius(_ radius: Double) -> some View {
+        self
+            .clipped()
+            .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+    }
 }
 
 // MARK: Button

@@ -42,7 +42,6 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
     public var body: some View {
         VStack(spacing: 0) {
             
-            // Display works as expected
             AmityMentionUserListView(mentionedUsers: $mentionedUsers, selection: { selectedMention in
                 // Ask view model to handle this selection
                 textEditorViewModel.selectMentionUser(user: selectedMention)

@@ -329,12 +329,21 @@ public struct AmityUserProfilePage: AmityPageView {
         .padding(.bottom, 8)
         .bottomSheet(isShowing: $postCreationBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             VStack {
-                BottomSheetItemView(icon: AmityIcon.createPostMenuIcon.getImageResource(), text: AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
+                BottomSheetItemView(icon: AmityIcon.createPostMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
                     .onTapGesture {
                         postCreationBottomSheet.toggle()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             let context = AmityUserProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToPostComposerPage(context: context)
+                        }
+                    }
+                
+                BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: "Poll")
+                    .onTapGesture {
+                        postCreationBottomSheet.toggle()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            let context = AmityUserProfilePageBehavior.Context(page: self)
+                            AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToPollPostComposerPage(context: context)
                         }
                     }
             }

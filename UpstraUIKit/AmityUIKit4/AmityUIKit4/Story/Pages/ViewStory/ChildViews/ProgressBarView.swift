@@ -8,7 +8,6 @@
 import SwiftUI
 import AmitySDK
 
-
 struct ProgressBarView: View {
     let spacing: CGFloat = 3.0
     let pageId: PageId

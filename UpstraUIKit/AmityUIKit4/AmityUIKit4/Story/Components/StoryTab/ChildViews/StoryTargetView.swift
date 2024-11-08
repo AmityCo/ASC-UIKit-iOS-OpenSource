@@ -69,8 +69,7 @@ struct StoryTargetView<Content: View>: View {
                     .isHidden(hideLockIcon)
                     
                 Text(name)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                     .frame(height: 20, alignment: .leading)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.targetNameTextView)
             }

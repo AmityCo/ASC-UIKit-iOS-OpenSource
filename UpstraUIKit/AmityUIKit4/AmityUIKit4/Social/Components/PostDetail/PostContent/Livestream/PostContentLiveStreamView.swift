@@ -39,10 +39,9 @@ struct PostContentLiveStreamView: View {
                 
                 VStack(alignment: .leading) {
                     Text(post.livestreamState == .recorded ? AmityLocalizedStringSet.Social.livestreamPlayerRecorded.localizedString : AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString)
-                        .font(.system(size: 13, weight: .bold))
+                        .applyTextStyle(.captionBold(.white))
                         .padding(.vertical, 4)
                         .padding(.horizontal, 8)
-                        .foregroundColor(Color.white)
                         .background(post.livestreamState == .recorded ? (Color.black.opacity(0.5)) : Color(UIColor(hex: "FF305A")))
                         .cornerRadius(4, corners: .allCorners)
                         .padding(.all, 12)
@@ -65,27 +64,23 @@ struct PostContentLiveStreamView: View {
                 VStack(alignment: .center) {
                     
                     Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedTitle.localizedString)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(Color.white)
+                        .applyTextStyle(.titleBold(.white))
                         .padding(.bottom, 4)
                     
-                    Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedMessage.localizedString).multilineTextAlignment(.center)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color.white)
+                    Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedMessage.localizedString)
+                        .applyTextStyle(.caption(.white))
+                        .multilineTextAlignment(.center)
                 }
                 .padding(.horizontal, 16)
                 
             case .terminated:
                 VStack(alignment: .center) {
                     Text(AmityLocalizedStringSet.Social.livestreamPlayerTerminatedTitle.localizedString)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(Color.white)
+                        .applyTextStyle(.titleBold(.white))
                         .padding(.bottom, 4)
                     
-                    
                     Text( AmityLocalizedStringSet.Social.livestreamPlayerTerminatedMessage.localizedString)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color.white)
+                        .applyTextStyle(.caption(.white))
                         .multilineTextAlignment(.center)
                 }
                 .padding(.horizontal, 16)
@@ -100,13 +95,11 @@ struct PostContentLiveStreamView: View {
                         .padding(.bottom, 12)
                     
                     Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableTitle.localizedString)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundColor(Color.white)
+                        .applyTextStyle(.titleBold(.white))
                         .padding(.bottom, 4)
                     
                     Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableMessage.localizedString)
-                        .font(.system(size: 13))
-                        .foregroundColor(Color.white)
+                        .applyTextStyle(.caption(.white))
                 }
                 .padding(.horizontal, 16)
                 

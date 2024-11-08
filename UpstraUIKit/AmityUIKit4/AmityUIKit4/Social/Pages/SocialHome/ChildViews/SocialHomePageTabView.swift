@@ -117,8 +117,7 @@ private struct TabButtonView: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundColor(selected ? Color(viewConfig.defaultLightTheme.backgroundColor) : Color(viewConfig.theme.secondaryColor.blend(.shade1)))
-                .font(.system(size: 17, weight: selected ? .semibold : .regular))
+                .applyTextStyle(selected ? .titleBold(Color(viewConfig.defaultLightTheme.backgroundColor)) : .title(Color(viewConfig.theme.secondaryColor.blend(.shade1))))
                 .padding([.leading, .trailing], 12)
                 .frame(width: buttonWidth)
         }

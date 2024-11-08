@@ -81,16 +81,14 @@ struct EmptyUserFeedView: View {
             
             if let title {
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold))
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                     .padding(.top, 8)
                     .padding(.bottom, 4)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade3))
             }
             
             if let description {
                 Text(description)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade3)))
             }
         }
         .background(Color(viewConfig.theme.backgroundColor))

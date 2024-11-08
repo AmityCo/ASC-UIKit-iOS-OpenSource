@@ -20,12 +20,12 @@ public struct AmityCommunityPinnedPostComponent: AmityComponentView {
         .communityFeed
     }
     
-    private var onTapPostDetailAction: ((AmityPostModel, AmityPostCategory) -> Void)?
+    var onTapAction: ((AmityPostModel, AmityPostContentComponent.Context?) -> Void)?
     
-    public init(communityId: String, pageId: PageId? = nil, communityProfileViewModel: CommunityProfileViewModel? = nil, onTapPostDetailAction: ((AmityPostModel, AmityPostCategory) -> Void)? = nil) {
+    public init(communityId: String, pageId: PageId? = nil, communityProfileViewModel: CommunityProfileViewModel? = nil, onTapAction: ((AmityPostModel, AmityPostContentComponent.Context?) -> Void)? = nil) {
         self.communityId = communityId
         self.pageId = pageId
-        self.onTapPostDetailAction = onTapPostDetailAction
+        self.onTapAction = onTapAction
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityFeed))
         if let communityProfileViewModel {
             self._communityProfileViewModel = StateObject(wrappedValue: communityProfileViewModel)
@@ -58,8 +58,9 @@ public struct AmityCommunityPinnedPostComponent: AmityComponentView {
             } else {
                 if let announcementPost = communityProfileViewModel.announcementPost, communityProfileViewModel.isAnnouncementPostPinned() {
                     VStack(spacing: 0) {
-                        AmityPostContentComponent(post: announcementPost.object, style: .feed, category: .pinAndAnnouncement, hideTarget: true, onTapAction: {
-                            onTapPostDetailAction?(AmityPostModel(post: announcementPost.object), .pinAndAnnouncement)
+                        AmityPostContentComponent(post: announcementPost.object, style: .feed, category: .pinAndAnnouncement, hideTarget: true, onTapAction: { postContext in
+                            
+                            onTapAction?(AmityPostModel(post: announcementPost.object), postContext)
                         }, pageId: pageId)
                         .contentShape(Rectangle())
                         
@@ -72,9 +73,9 @@ public struct AmityCommunityPinnedPostComponent: AmityComponentView {
                 }
                 ForEach(Array(communityProfileViewModel.pinnedPosts.filter({$0.postId != communityProfileViewModel.announcementPost?.postId ?? ""}) .enumerated()), id: \.element.id) { index, post in
                     VStack(spacing: 0) {
-                        AmityPostContentComponent(post: post.object, category: .pin, hideTarget: true, onTapAction: {
-                            onTapPostDetailAction?(AmityPostModel(post: post.object), .pin)
-
+                        AmityPostContentComponent(post: post.object, category: .pin, hideTarget: true, onTapAction: { postContext in
+                            
+                            onTapAction?(AmityPostModel(post: post.object), postContext)
                         }, pageId: pageId)
                         .contentShape(Rectangle())
                         

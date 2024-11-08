@@ -14,7 +14,7 @@ enum PostMenuType: String, CaseIterable, Identifiable {
     
     case post = "Post"
     case story = "Story"
-//    case poll = "Poll"
+    case poll = "Poll"
 //    case liveStream = "Livestream"
 }
 
@@ -81,12 +81,12 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                             goToStoryCreation()
                         }
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createStoryButton)
-//                case .poll:
-//                    let icon = AmityIcon.createPollMenuIcon
-//                    getItemView(image: icon.getImageResource(), title: type.rawValue)
-//                        .onTapGesture {
-//                            Log.add(event: .info, "Create: Poll")
-//                        }
+                case .poll:
+                    let icon = AmityIcon.createPollMenuIcon
+                    getItemView(image: icon.getImageResource(), title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
+                        .onTapGesture {
+                            goToPollCreation()
+                        }
 //                case .liveStream:
 //                    let icon = AmityIcon.createLivestreamMenuIcon
 //                    getItemView(image: icon.getImageResource(), title: type.rawValue)
@@ -107,16 +107,15 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
     
     
     @ViewBuilder
-    private func getItemView(image: ImageResource, title: String) -> some View {
+    private func getItemView(image: ImageResource, title: String, imageSize: CGSize = CGSize(width: 20, height: 20)) -> some View {
         HStack(spacing: 10) {
             Image(image)
                 .resizable()
                 .scaledToFill()
-                .frame(width: 20, height: 20)
+                .frame(width: imageSize.width, height: imageSize.height)
             
             Text(title)
-                .font(.system(size: 15.0, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
         }
@@ -155,6 +154,17 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
             let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
             AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectStoryTargetPage(context: context)
+        }
+    }
+    
+    private func goToPollCreation() {
+        withoutAnimation {
+            isPresented.toggle()
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
+            AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectPollPostTargetPage(context: context)
         }
     }
 }

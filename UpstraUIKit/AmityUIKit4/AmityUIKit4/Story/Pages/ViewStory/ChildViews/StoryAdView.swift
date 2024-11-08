@@ -59,9 +59,8 @@ struct StoryAdView<Content: View>: View {
                         
                         HStack(spacing: 0) {
                             Text(ad.callToAction)
+                                .applyTextStyle(.bodyBold(Color(viewConfig.defaultLightTheme.baseColor)))
                                 .lineLimit(1)
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
                                 .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                         }
                         .frame(height: 40)
@@ -106,10 +105,8 @@ struct StoryAdView<Content: View>: View {
                         VStack(alignment: .leading) {
                             HStack(alignment: .center) {
                                 Text(ad.advertiser?.name ?? "")
-                                    .font(.system(size: 15))
-                                    .fontWeight(.semibold)
+                                    .applyTextStyle(.bodyBold(.white))
                                     .frame(height: 20)
-                                    .foregroundColor(.white)
                                 
                                 Spacer(minLength: 80)
                             }

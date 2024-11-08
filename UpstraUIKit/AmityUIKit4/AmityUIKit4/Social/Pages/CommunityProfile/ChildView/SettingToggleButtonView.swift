@@ -21,18 +21,15 @@ struct SettingToggleButtonView: View {
     
     var body: some View {
         HStack(spacing: 10) {
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Text(description)
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            
             
             Toggle("", isOn: isEnabled)
                 .toggleStyle(SwitchToggleStyle(tint: Color(viewConfig.theme.primaryColor)))

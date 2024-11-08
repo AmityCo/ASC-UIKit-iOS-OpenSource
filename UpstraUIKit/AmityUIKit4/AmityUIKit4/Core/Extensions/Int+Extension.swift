@@ -30,7 +30,7 @@ extension Int {
             }
             
             let kCount = Double(self) / 1_000_000_000
-            return String(format: "%.1fB", kCount)
+            return "\(Formatters.countFormatter.string(from: NSNumber(value: kCount)) ?? "")B" // Format value to make 10.0B -> 10B
 
         case 1_000_000...:
             guard num > 1_100_000 else {
@@ -38,7 +38,7 @@ extension Int {
             }
             
             let kCount = Double(self) / 1_000_000
-            return String(format: "%.1fM", kCount)
+            return "\(Formatters.countFormatter.string(from: NSNumber(value: kCount)) ?? "")M"
 
         case 1_000...:
             guard num > 1100 else {
@@ -46,7 +46,7 @@ extension Int {
             }
             
             let kCount = Double(self) / 1000.0
-            return String(format: "%.1fK", kCount)
+            return "\(Formatters.countFormatter.string(from: NSNumber(value: kCount)) ?? "")K"
 
         case 0...:
             return "\(n)"

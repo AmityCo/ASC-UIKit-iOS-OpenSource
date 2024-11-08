@@ -95,15 +95,16 @@ public struct AmityCommunityProfilePage: AmityPageView {
                                 .padding(.vertical, 10)
                         }
                         
-                        AmityCommunityFeedComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapPostDetailAction: { post, category in
-                            let context = AmityCommunityProfilePageBehavior.Context(page: self)
-                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: category)
+                        AmityCommunityFeedComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, componentContext in
+                            let context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: componentContext?.showPollResults ?? false)
+                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: componentContext?.category ?? .general)
                         })
                             .isHidden(currentTab != 0)
                         
-                        AmityCommunityPinnedPostComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapPostDetailAction: { post, category in                            
-                            let context = AmityCommunityProfilePageBehavior.Context(page: self)
-                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: category)
+                        AmityCommunityPinnedPostComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, postContext in
+                            
+                            var context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: postContext?.showPollResults ?? false)
+                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: postContext?.category ?? .pinAndAnnouncement)
                         })
                             .isHidden(currentTab != 1)
                         
@@ -267,10 +268,19 @@ extension AmityCommunityProfilePage {
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToCreateStoryPage(context: context, community: viewModel.community)
                         }
                 }
+                
+                BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
+                    .onTapGesture {
+                        showBottomSheet.toggle()
+                        host.controller?.dismiss(animated: false)
+                        
+                        let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                        AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPollPostComposerPage(context: context, community: viewModel.community)
+                    }
             }
             .padding(.bottom, 32)
         }
-        .isHidden(!(viewModel.community?.isJoined ?? false))
+        .isHidden(!viewModel.hasCreatePostPermission)
     }
     
     // Top navigation view
@@ -308,9 +318,8 @@ extension AmityCommunityProfilePage {
                     }
                     
                     Text(community.displayName)
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.backgroundColor)))
                         .lineLimit(1)
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.backgroundColor))
                     
                     if community.isOfficial {
                         let verifiedBadgeIcon = AmityIcon.verifiedBadge.imageResource

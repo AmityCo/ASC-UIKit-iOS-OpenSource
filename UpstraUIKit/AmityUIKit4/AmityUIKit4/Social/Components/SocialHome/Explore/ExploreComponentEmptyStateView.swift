@@ -37,13 +37,11 @@ struct ExploreComponentEmptyStateView: View {
                     .frame(width: 160, height: 160)
                     
                 Text("No community yet")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.top, 24)
                 
                 Text("Let's create your own communities")
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
                     .multilineTextAlignment(.center)
                     .padding(.top, 4)
                 

@@ -12,17 +12,21 @@ open class AmityGlobalFeedComponentBehavior {
     open class Context {
         public let component: AmityGlobalFeedComponent
         public let post: AmityPostModel
+        public let showPollResult: Bool
         
-        init(component: AmityGlobalFeedComponent, post: AmityPostModel) {
+        init(component: AmityGlobalFeedComponent, post: AmityPostModel, showPollResult: Bool = false) {
             self.component = component
             self.post = post
+            self.showPollResult = showPollResult
         }
     }
     
     public init() {}
     
     open func goToPostDetailPage(context: AmityGlobalFeedComponentBehavior.Context) {
-        let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: context.post.object))
+        
+        let postComponentContext = AmityPostContentComponent.Context(shouldShowPollResults: context.showPollResult)
+        let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: context.post.object, context: postComponentContext))
         let host = context.component.host
         host.controller?.navigationController?.pushViewController(vc, animated: true)
     }

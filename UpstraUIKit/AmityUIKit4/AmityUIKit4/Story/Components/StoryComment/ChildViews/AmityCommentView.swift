@@ -54,8 +54,7 @@ public struct AmityCommentView: View {
                         
                         HStack(spacing: 4) {
                             Text(comment.displayName)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
+                                .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                                 .onTapGesture {
                                     commentButtonAction(.userProfile(comment.userId))
                                 }
@@ -80,7 +79,7 @@ public struct AmityCommentView: View {
                         })
                         .lineLimit(8)
                         .moreButtonText("...See more")
-                        .font(.system(size: 13.5))
+                        .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .attributedColor(viewConfig.theme.primaryColor)
                         .moreButtonColor(Color(viewConfig.theme.primaryColor))
@@ -118,8 +117,7 @@ public struct AmityCommentView: View {
                 HStack {
                     HStack(spacing: 12) {
                         Text(comment.isEdited ? "\(comment.createdAt.relativeTime) \(AmityLocalizedStringSet.Comment.editedText.localizedString)" : comment.createdAt.relativeTime)
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.timestampTextView)
                         
                         Button(feedbackStyle: .light) {
@@ -134,8 +132,7 @@ public struct AmityCommentView: View {
                             }
                         } label: {
                             Text(comment.isLiked ? AmityLocalizedStringSet.Comment.reactedButtonText.localizedString : AmityLocalizedStringSet.Comment.reactButtonText.localizedString)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(comment.isLiked ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.baseColorShade2))
+                                .applyTextStyle(.captionBold(comment.isLiked ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.baseColorShade2)))
                         }
                         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.reactionButton)
 
@@ -143,8 +140,7 @@ public struct AmityCommentView: View {
                             commentButtonAction(.reply(comment))
                         } label: {
                             Text(AmityLocalizedStringSet.Comment.replyButtonText.localizedString)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                                .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))
                         }
                         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.replyButton)
                         .isHidden(hideReplyButton)
@@ -164,8 +160,7 @@ public struct AmityCommentView: View {
                     
                     HStack(spacing: 4) {
                         Text(comment.reactionsCount.formattedCountString)
-                            .font(.system(size: 13))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.reactionCountTextView)
                         
                         Image(AmityIcon.likeReactionIcon.getImageResource())
@@ -195,8 +190,7 @@ public struct AmityCommentView: View {
                 .frame(width: 12, height: 12)
                 .padding(.leading, 6)
             Text("Moderator")
-                .font(.system(size: 10))
-                .foregroundColor(Color(viewConfig.theme.primaryColor))
+                .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
                 .padding(.trailing, 6)
         }
         .frame(height: 20)

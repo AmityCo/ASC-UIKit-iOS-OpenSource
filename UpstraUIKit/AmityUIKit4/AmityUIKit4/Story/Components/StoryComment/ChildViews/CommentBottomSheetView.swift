@@ -47,8 +47,7 @@ struct CommentBottomSheetView: View {
                     viewModel.sheetState.isShown.toggle()
                 } label: {
                     Text(AmityLocalizedStringSet.Comment.editCommentBottomSheetTitle.localizedString)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
@@ -69,8 +68,7 @@ struct CommentBottomSheetView: View {
                     viewModel.isAlertShown.toggle()
                 } label: {
                     Text(AmityLocalizedStringSet.Comment.deleteCommentBottomSheetTitle.localizedString)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 }
                 .buttonStyle(.plain)
                 .alert(isPresented: $viewModel.isAlertShown, content: {
@@ -130,8 +128,7 @@ struct CommentBottomSheetView: View {
                     viewModel.sheetState.isShown.toggle()
                 } label: {
                     Text(viewModel.isCommentFlaggedByMe ? AmityLocalizedStringSet.Comment.unReportCommentBottomSheetTitle.localizedString : AmityLocalizedStringSet.Comment.reportCommentBottomSheetTitle.localizedString)
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.reportCommentButton)

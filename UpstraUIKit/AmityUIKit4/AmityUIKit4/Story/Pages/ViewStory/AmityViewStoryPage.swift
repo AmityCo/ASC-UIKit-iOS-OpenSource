@@ -216,8 +216,7 @@ public struct AmityViewStoryPage: AmityPageView {
                     showBottomSheet.toggle()
                 } label: {
                     Text("Delete story")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 }
                 .buttonStyle(.plain)
                 .alert(isPresented: $isAlertShown, content: {

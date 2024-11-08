@@ -64,8 +64,8 @@ public struct AmityUserFeedComponent: AmityComponentView {
             LazyVStack(spacing: 0) {
                 ForEach(Array(viewModel.posts.enumerated()), id: \.element.postId) { index, post in
                     VStack(spacing: 0){
-                        AmityPostContentComponent(post: post, onTapAction: {
-                            let page = AmityPostDetailPage(post: post)
+                        AmityPostContentComponent(post: post, onTapAction: { context in
+                            let page = AmityPostDetailPage(post: post, context: context)
                             let vc = AmitySwiftUIHostingController(rootView: page)
                             host.controller?.navigationController?.pushViewController(vc, animated: true)
                         }, pageId: pageId)

@@ -63,7 +63,7 @@ struct CommunityMemberTabView: View {
                 .padding(.leading, 12)
             
             TextField("Search member", text: $viewModel.searchKeyword)
-                .font(.system(size: 15.0))
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
         }
         .frame(height: 40)
         .background(Color(viewConfig.theme.baseColorShade4))

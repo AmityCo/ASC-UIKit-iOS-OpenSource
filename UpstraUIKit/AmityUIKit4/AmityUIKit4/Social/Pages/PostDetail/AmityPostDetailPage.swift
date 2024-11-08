@@ -21,6 +21,7 @@ public struct AmityPostDetailPage: AmityPageView {
     
     private var postCategory: AmityPostCategory = .general
     private var hideTarget: Bool = false
+    private var context: AmityPostContentComponent.Context?
     
     public var id: PageId {
         .postDetailPage
@@ -38,6 +39,17 @@ public struct AmityPostDetailPage: AmityPageView {
     public init(post: AmityPost, category: AmityPostCategory = .general, hideTarget: Bool = false) {
         self.postCategory = category
         self.hideTarget = hideTarget
+        self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(post: post))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
+        self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: post.targetCommunity, allowCreateComment: true))
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
+    }
+    
+    // Post with context
+    public init(post: AmityPost, context: AmityPostContentComponent.Context?) {
+        self.postCategory = context?.category ?? .general
+        self.hideTarget = context?.hidePostTarget ?? false
+        self.context = context
         self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(post: post))
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: post.targetCommunity, allowCreateComment: true))
@@ -62,7 +74,7 @@ public struct AmityPostDetailPage: AmityPageView {
                 Spacer()
                 
                 Text(AmityLocalizedStringSet.Social.postDetailPageTitle.localizedString)
-                    .font(.system(size: 17, weight: .semibold))
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 
                 Spacer()
                 
@@ -80,26 +92,30 @@ public struct AmityPostDetailPage: AmityPageView {
                     })
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
                     .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                        PostBottomSheetView(isShown: $showBottomSheet, post: postModel) {
-                            host.controller?.navigationController?.popViewController(animated: true)
-                        } editPostActionCompletion: {
-                            
-                            showBottomSheet.toggle()
-                            
-                            // Dismiss bottomsheet
-                            host.controller?.dismiss(animated: false)
-                            
-                            let editOption = AmityPostComposerOptions.editOptions(post: postModel)
-                            let view = AmityPostComposerPage(options: editOption)
-                            let controller = AmitySwiftUIHostingController(rootView: view)
-                            
-                            let navigationController = UINavigationController(rootViewController: controller)
-                            navigationController.modalPresentationStyle = .fullScreen
-                            navigationController.navigationBar.isHidden = true
-                            host.controller?.present(navigationController, animated: true)
-                            
-                        }
                         
+                        PostBottomSheetView(isShown: $showBottomSheet, post: postModel) { postAction in
+                            
+                            switch postAction {
+                            case .editPost:
+                                showBottomSheet.toggle()
+                                
+                                // Dismiss bottomsheet
+                                host.controller?.dismiss(animated: false)
+                                
+                                let editOption = AmityPostComposerOptions.editOptions(post: postModel)
+                                let view = AmityPostComposerPage(options: editOption)
+                                let controller = AmitySwiftUIHostingController(rootView: view)
+                                
+                                let navigationController = UINavigationController(rootViewController: controller)
+                                navigationController.modalPresentationStyle = .fullScreen
+                                navigationController.navigationBar.isHidden = true
+                                host.controller?.present(navigationController, animated: true)
+                            case .deletePost:
+                                host.controller?.navigationController?.popViewController(animated: true)
+                            case .closePoll:
+                                break
+                            }
+                        }
                     }
                 } else {
                     Rectangle()
@@ -112,7 +128,7 @@ public struct AmityPostDetailPage: AmityPageView {
             CommentCoreView(headerView: {
                 VStack(spacing: 4) {
                     if let postModel = viewModel.post {
-                        AmityPostContentComponent(post: postModel.object, style: .detail, category: postCategory, hideTarget: hideTarget, hideMenuButton: true)
+                        AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext())
                         Rectangle()
                             .fill(Color(viewConfig.theme.baseColorShade4))
                             .frame(height: 1)
@@ -182,6 +198,12 @@ public struct AmityPostDetailPage: AmityPageView {
             AmityUIKitManagerInternal.shared.behavior.postDetailPageBehavior?.goToUserProfilePage(context: context)
         }
     }
+    
+    func getPostComponentContext() -> AmityPostContentComponent.Context {
+        let componentContext = context ?? AmityPostContentComponent.Context(category: postCategory, shouldHideTarget: hideTarget)
+        componentContext.hideMenuButton = true
+        return componentContext
+    }
 }
 
 class AmityPostDetailPageViewModel: ObservableObject {
@@ -191,27 +213,39 @@ class AmityPostDetailPageViewModel: ObservableObject {
     private let postManager = PostManager()
     
     @Published var post: AmityPostModel?
+    var token: AmityNotificationToken?
     
     init(id: String) {
         self.postId = id
         
-        postObject = postManager.getPost(withId: id)
-        cancellable = postObject?.$snapshot
-            .sink { [weak self] post in
-                guard let post else { return }
-                self?.post = AmityPostModel(post: post)
-            }
+        observePost(postId: postId)
+        
+        // Add observer
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePoll(_:)), name: .didVotePoll, object: nil)
     }
     
     init(post: AmityPost) {
+        self.postId = post.postId
         self.post = AmityPostModel(post: post)
         
-        postObject = postManager.getPost(withId: post.postId)
-        cancellable = postObject?.$snapshot
-            .sink { [weak self] post in
-                guard let post else { return }
-                self?.post = AmityPostModel(post: post)
+        observePost(postId: post.postId)
+        
+        // Add observer
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePoll(_:)), name: .didVotePoll, object: nil)
+    }
+    
+    @objc private func didUpdatePoll(_ notification: Notification) {
+        observePost(postId: self.postId)
+    }
+    
+    func observePost(postId: String) {
+        postObject = postManager.getPost(withId: postId)
+        token = postObject?.observe({ livePost, error in
+            
+            if let snapshot = livePost.snapshot, let _ = snapshot.getPollInfo() {
+                self.post = AmityPostModel(post: snapshot)
             }
+        })
     }
 }
 

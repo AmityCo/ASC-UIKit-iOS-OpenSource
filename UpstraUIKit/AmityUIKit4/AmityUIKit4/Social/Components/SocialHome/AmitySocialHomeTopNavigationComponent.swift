@@ -32,9 +32,8 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
         HStack(spacing: 10) {
             let headerLabel = viewConfig.getConfig(elementId: .headerLabel, key: "text", of: String.self) ?? ""
             Text(headerLabel)
-                .font(.system(size: 20, weight: .bold))
+                .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
                 .padding([.top, .bottom], 15.5)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
                 .isHidden(viewConfig.isHidden(elementId: .headerLabel), remove: true)
                 .accessibilityIdentifier(AccessibilityID.Social.SocialHomePage.headerLabel)
             

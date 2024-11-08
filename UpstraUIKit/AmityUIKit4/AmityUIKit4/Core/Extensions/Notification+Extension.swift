@@ -11,5 +11,6 @@ extension Notification.Name {
     public static let didPostCreated = Notification.Name("didPostCreated")
     public static let didPostDeleted = Notification.Name("didPostDeleted")
     public static let didPostReacted = Notification.Name("didPostReacted")
+    public static let didVotePoll = Notification.Name("didVotePoll")
     public static let didLivestreamStatusUpdated = Notification.Name("didLivestreamStatusUpdated")
 }

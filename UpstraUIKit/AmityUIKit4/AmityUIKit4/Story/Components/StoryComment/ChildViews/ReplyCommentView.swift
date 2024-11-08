@@ -62,8 +62,7 @@ struct ReplyCommentView: View {
                         .padding(.leading, 8)
                     
                     Text("View \(parentComment.childrenNumber) Reply")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.secondaryColor.blend(.shade1)))
+                        .applyTextStyle(.captionBold(Color(viewConfig.theme.secondaryColor.blend(.shade1))))
                         .padding(.trailing, 8)
                 }
                 .frame(height: 28, alignment: .leading)
@@ -92,8 +91,7 @@ struct ReplyCommentView: View {
                         .padding(.leading, 8)
                     
                     Text(AmityLocalizedStringSet.Comment.viewMoreReplyText.localizedString)
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(Color(UIColor(hex: "#636878")))
+                        .applyTextStyle(.captionBold(Color(UIColor(hex: "#636878"))))
                         .padding(.trailing, 8)
                 }
                 .frame(height: 28, alignment: .leading)

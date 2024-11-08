@@ -147,7 +147,14 @@ private extension AmityCommunityProfilePageViewController {
 extension AmityCommunityProfilePageViewController: AmityCommunityProfileScreenViewModelDelegate {
     
     func screenViewModelDidGetCommunity(with community: AmityCommunityModel) {
-        postButton.isHidden = !community.isJoined
+        
+        if community.object.onlyAdminCanPost {
+            AmityUIKitManager.client.hasPermission(.createPrivilegedPost, forCommunity: screenViewModel.communityId) { [weak self] success in
+                self?.postButton.isHidden = !(success && community.isJoined)
+            }
+        } else {
+            postButton.isHidden = !community.isJoined
+        }
         header.updateView()
         setupNavigationItemOption(show: community.isJoined)
         AmityHUD.hide()

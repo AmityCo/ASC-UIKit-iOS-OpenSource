@@ -56,8 +56,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
             Spacer()
             
             Text("Follow requests (\(viewModel.users.count))")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
             
@@ -77,8 +76,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
                 .frame(width: 60, height: 60)
             
             Text("No requests to review")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
             
             Spacer()
         }
@@ -116,8 +114,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
             .frame(height: 60)
             .overlay(
                 Text("Declining a follow request is irreversible. The user must send a new request if declined.")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .padding([.leading, .trailing], 16)
             )
         
@@ -151,7 +148,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
                 .clipShape(Circle())
             
             Text("\(user.displayName)")
-                .font(.system(size: 15, weight: .semibold))
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
             
             Image(AmityIcon.brandBadge.imageResource)
                 .resizable()
@@ -180,8 +177,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
                 .fill(Color(viewConfig.theme.primaryColor))
                 .overlay (
                     Text("Accept")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.white)
+                        .applyTextStyle(.bodyBold(.white))
                 )
                 .cornerRadius(8)
                 .onTapGesture {
@@ -200,8 +196,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
                 .fill(.clear)
                 .overlay (
                     Text("Decline")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 )
                 .cornerRadius(8)
                 .overlay(

@@ -43,4 +43,15 @@ open class AmityUserProfilePageBehavior {
         
         context.page.host.controller?.present(navigationController, animated: true)
     }
+    
+    open func goToPollPostComposerPage(context: AmityUserProfilePageBehavior.Context) {
+        let page = AmityPollPostComposerPage(targetId: nil, targetType: .user)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        
+        let navController = UINavigationController(rootViewController: vc)
+        navController.modalPresentationStyle = .fullScreen
+        navController.navigationBar.isHidden = true
+        
+        context.page.host.controller?.present(navController, animated: true)
+    }
 }

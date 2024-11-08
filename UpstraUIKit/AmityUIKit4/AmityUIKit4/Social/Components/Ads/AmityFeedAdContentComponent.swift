@@ -45,9 +45,8 @@ struct AmityFeedAdContentComponent: View {
                 
                 VStack(alignment: .leading, spacing: 0) {
                     Text(ad.advertiser?.name ?? "")
-                        .font(.system(size: 15, weight: .semibold))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         .lineLimit(1)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
                         .padding(.bottom, 2)
                     
                     AdSponsorLabel()
@@ -73,13 +72,11 @@ struct AmityFeedAdContentComponent: View {
         HStack {
             VStack(alignment: .leading, spacing: 0) {
                 Text(ad.description)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
-                    .font(.system(size: 11, weight: .regular))
+                    .applyTextStyle(.captionSmall(Color(viewConfig.theme.baseColorShade1)))
                     .lineLimit(1)
                 
                 Text(ad.headline)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .font(.system(size: 13, weight: .semibold))
+                    .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                     .lineLimit(2)
                     .padding(.top, 4)
             }
@@ -92,8 +89,8 @@ struct AmityFeedAdContentComponent: View {
                     handleTapOnAd()
                 }, label: {
                     Text(ad.callToAction)
+                        .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                         .lineLimit(1)
-                        .font(.system(size: 13, weight: .semibold))
                         .contentShape(Rectangle())
                 })
                 .buttonStyle(.plain)
@@ -119,9 +116,8 @@ struct AmityFeedAdContentComponent: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Text(ad.body)
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     .lineLimit(6)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .multilineTextAlignment(.leading)
                 
                 Spacer(minLength: 1)

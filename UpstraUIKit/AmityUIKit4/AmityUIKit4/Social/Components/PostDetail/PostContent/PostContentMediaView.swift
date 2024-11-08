@@ -86,8 +86,7 @@ struct PostContentMediaView: View {
                                             .fill(Color.black.opacity(0.25))
                                             .overlay (
                                                 Text("+\(data.count - 3)")
-                                                    .font(.system(size: 20, weight: .semibold))
-                                                    .foregroundColor(.white)
+                                                    .applyTextStyle(.headline(.white))
                                             )
                                             .allowsHitTesting(false)
                                     }
