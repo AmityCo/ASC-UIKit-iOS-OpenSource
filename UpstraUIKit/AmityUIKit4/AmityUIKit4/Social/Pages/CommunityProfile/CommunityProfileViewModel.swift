@@ -51,9 +51,6 @@ public class CommunityProfileViewModel: ObservableObject {
         loadStories()
         loadPinnedFeed()
         
-        Task { @MainActor in
-            hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: communityId)
-        }
     }
     
     deinit {
@@ -68,6 +65,14 @@ public class CommunityProfileViewModel: ObservableObject {
             self?.community = community
             
             self?.pendingPostCount = community.pendingPostCount
+            
+            // Check StoryManage Permission
+            Task { @MainActor [weak self] in
+                let hasPermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: community.communityId)
+                let allowAllUserCreation = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
+               
+                self?.hasStoryManagePermission = (allowAllUserCreation || hasPermission) && community.isJoined
+            }
             
             if communityObject.onlyAdminCanPost {
                 AmityUIKit4Manager.client.hasPermission(.createPrivilegedPost, forCommunity: community.communityId) { success in

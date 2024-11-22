@@ -28,6 +28,7 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
     
     @Published var items: [PaginatedItem<AmityStoryModel>] = []
     @Published var itemCount: Int = 0
+    @Published var storyLoadingStatus: AmityLoadingStatus = .notLoading
     @Published var hasUnseenStory: Bool = false
     @Published var hasFailedStory: Bool = false
     @Published var hasSyncingStory: Bool = false
@@ -72,6 +73,7 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
         var surplus = 0
         if let adFrequency = AdEngine.shared.getAdFrequency(at: .story), adFrequency.value > 0 {
             surplus = totalSeenStoryCount % adFrequency.value
+            Log.add(event: .info, "Surplus: \(surplus)")
         }
         
         paginatorCancellable = nil
@@ -81,7 +83,7 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
         paginator?.load()
         
         paginatorCancellable = paginator?.$snapshots
-            .debounce(for: .milliseconds(100), scheduler: DispatchQueue.main)
+            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
             .sink(receiveValue: { [weak self] items in
                 guard let self, let stories = self.storyCollection?.snapshots else { return }
                 
@@ -109,10 +111,8 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
                 }
                 
                 self.items = newSnapshot.items
-                
-                if self.itemCount != newSnapshot.items.count {
-                    self.itemCount = newSnapshot.items.count
-                }
+                self.itemCount = newSnapshot.items.count
+
                 VideoPlayer.preload(urls: newSnapshot.videoURLs)
                 
                 
@@ -121,8 +121,10 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
                     self.hasFailedStory = false
                     self.hasSyncingStory = false
                 }
+                
+                self.storyLoadingStatus = storyCollection.loadingStatus
             })
-
+        
     }
     
     private func mapToModel(_ items: [PaginatedItem<AmityStory>]) -> (items: [PaginatedItem<AmityStoryModel>], videoURLs: [URL]) {

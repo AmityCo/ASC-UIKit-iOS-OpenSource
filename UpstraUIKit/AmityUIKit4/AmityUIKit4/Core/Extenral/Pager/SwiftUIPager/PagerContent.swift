@@ -26,10 +26,10 @@ extension Pager {
         /*** Constants ***/
 
         /// Angle of rotation when should rotate
-        let rotationDegrees: Double = 20
+        let rotationDegrees: Double = -90
 
         /// Axis of rotation when should rotate
-        let rotationAxis: (x: CGFloat, y: CGFloat, z: CGFloat) = (0, 1, 0)
+        let rotationAxis: (x: CGFloat, y: CGFloat, z: CGFloat) = (0, 1, 0.001)
 
         /*** Dependencies ***/
 
@@ -197,6 +197,9 @@ extension Pager {
                     }
                 }
                 .offset(x: self.xOffset, y : self.yOffset)
+                .onChange(of: pagerModel.index) { index in
+                    onPageChanged?(index)
+                }
             }
             .frame(size: size)
 

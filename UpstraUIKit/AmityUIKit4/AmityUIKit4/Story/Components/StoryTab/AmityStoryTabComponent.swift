@@ -163,15 +163,24 @@ class AmityStoryTabComponentViewModel: ObservableObject {
     }
     
     private func loadCommunityStoryTarget(_ communityId: String) {
-        Task { @MainActor in
-            self.hasManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: communityId)
-        }
-        
         storyTargetObject = storyManager.getStoryTarget(targetType: .community, targetId: communityId)
         cancellable = nil
         cancellable = storyTargetObject?.$snapshot
             .sink(receiveValue: { [weak self] target in
                 guard let target else { return }
+                
+                // Check StoryManage Permission
+                Task { @MainActor [weak self] in
+                    let hasPermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: communityId)
+                    let allowAllUserCreation = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
+                   
+                    guard let community = target.community else {
+                        self?.hasManagePermission = false
+                        return
+                    }
+                        
+                    self?.hasManagePermission = (allowAllUserCreation || hasPermission) && community.isJoined
+                }
                 
                 if let existingModel = self?.communityFeedStoryTarget {
                     existingModel.updateModel(target)

@@ -242,7 +242,7 @@ class AmityPostDetailPageViewModel: ObservableObject {
         postObject = postManager.getPost(withId: postId)
         token = postObject?.observe({ livePost, error in
             
-            if let snapshot = livePost.snapshot, let _ = snapshot.getPollInfo() {
+            if let snapshot = livePost.snapshot {
                 self.post = AmityPostModel(post: snapshot)
             }
         })

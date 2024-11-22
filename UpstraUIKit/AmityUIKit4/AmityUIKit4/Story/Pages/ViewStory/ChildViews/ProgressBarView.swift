@@ -19,18 +19,26 @@ struct ProgressBarView: View {
             HStack(spacing: spacing) {
                 ForEach(0..<progressBarViewModel.progressArray.count, id: \.self) { index in
                     AmityProgressBarElement(pageId: pageId, progressBarViewModel: progressBarViewModel.progressArray[index])
-                }
-                .onAppear {
-                    Log.add(event: .info, "ProgressBar Stack Appeared")
+                        .onAppear {
+                            updateSegmentFullProgress(geometry)
+                        }
+                        .onChange(of: progressBarViewModel.progressArray.count) { _ in
+                            updateSegmentFullProgress(geometry)
+                        }
                 }
             }
         }
+    }
+    
+    private func updateSegmentFullProgress(_ geometry: GeometryProxy) {
+        progressBarViewModel.segmentFullProgress = (geometry.size.width - (3.0 * CGFloat(progressBarViewModel.progressArray.count))) / CGFloat(progressBarViewModel.progressArray.count)
     }
 }
 
 
 class ProgressBarViewModel: ObservableObject {
     @Published var progressArray: [AmityProgressBarElementViewModel]
+    fileprivate(set) var segmentFullProgress: CGFloat = 0.0
     
     init(progressArray: [AmityProgressBarElementViewModel]) {
         self.progressArray = progressArray

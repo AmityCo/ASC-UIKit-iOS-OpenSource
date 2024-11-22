@@ -6,9 +6,9 @@
 //
 
 import SwiftUI
-import AVKit
 import AmitySDK
 import Combine
+import AVKit
 
 struct StoryCoreView: View, AmityViewIdentifiable {
     var viewStoryPage: AmityViewStoryPage
@@ -18,82 +18,182 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
     @ObservedObject var storyTarget: AmityStoryTargetModel
-    @EnvironmentObject var storyPageViewModel: AmityStoryPageViewModel
-    @EnvironmentObject var storyCoreViewModel: StoryCoreViewModel
-    
-    @Binding var storySegmentIndex: Int
-    @Binding var totalDuration: CGFloat
+    @ObservedObject var storyPageViewModel: AmityViewStoryPageViewModel
+    @StateObject private var viewModel: StoryCoreViewModel
+ 
     @State private var muteVideo: Bool = false
     @State private var showRetryAlert: Bool = false
     @State private var showCommentTray: Bool = false
-    
+    @State private var showBottomSheet: Bool = false
+    @State private var isAlertShown: Bool = false
+    @StateObject private var page = Page.first()
     @State private var hasStoryManagePermission: Bool = false
-    
-    var moveStoryTarget: ((MoveDirection) -> Void)?
-    var moveStorySegment: ((MoveDirection) -> Void)?
-    
-    @State private var page: Page = Page.first()
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
-    init(_ viewStoryPage: AmityViewStoryPage, storyTarget: AmityStoryTargetModel,
-         storySegmentIndex: Binding<Int>,
-         totalDuration: Binding<CGFloat>,
-         moveStoryTarget: ((MoveDirection) -> Void)? = nil,
-         moveStorySegment: ((MoveDirection) -> Void)? = nil) {
+    private var isActiveTarget: Bool {
+        storyPageViewModel.activeStoryTarget == storyTarget
+    }
+    
+    init(_ viewStoryPage: AmityViewStoryPage,
+         storyPageViewModel: AmityViewStoryPageViewModel,
+         storyTarget: AmityStoryTargetModel) {
         self.viewStoryPage = viewStoryPage
         self.storyTarget = storyTarget
-        self._storySegmentIndex = storySegmentIndex
-        self._totalDuration = totalDuration
         self.targetName = storyTarget.targetName
         self.avatar = storyTarget.avatar
         self.isVerified = storyTarget.isVerifiedTarget
-        self.moveStoryTarget = moveStoryTarget
-        self.moveStorySegment = moveStorySegment
+       
+        self.storyPageViewModel = storyPageViewModel
+        self._viewModel = StateObject(wrappedValue: StoryCoreViewModel(storyTarget, storyPageViewModel: storyPageViewModel))
     }
     
     var body: some View {
-        Pager(page: page, data: storyTarget.items, id: \.id) { item in
-            switch item.type {
-            case .ad(let ad):
-                StoryAdView(ad: ad, gestureView: getGestureView)
-            case .content(let storyModel):
-                getStoryView(storyModel)
+        ZStack(alignment: .top) {
+            Pager(page: page, data: storyTarget.items, id: \.id) { item in
+                getContentView(item)
+                    .environmentObject(storyPageViewModel)
+                    .environmentObject(viewModel)
+            }
+            .contentLoadingPolicy(.lazy(recyclingRatio: 1))
+            .disableDragging()
+            .onPageChanged { segmentIndex in
+                viewModel.storySegmentIndex = segmentIndex
+                guard isActiveTarget else { return }
+                
+                viewModel.playIfVideoStory()
+                
+                // Mark Seen
+                if let item = storyTarget.items.element(at: viewModel.storySegmentIndex), case .content(let storyModel) = item.type {
+                    storyPageViewModel.markAsSeen(storyModel)
+                }
+            }
+            .onChange(of: viewModel.storySegmentIndex) { segmentIndex in
+                guard page.index != segmentIndex else { return }
+                page.update(.new(index: segmentIndex))
+            }
+            
+            ProgressBarView(pageId: .storyPage, progressBarViewModel: viewModel.progressBarViewModel)
+                .frame(height: 3)
+                .padding(EdgeInsets(top: 16, leading: 20, bottom: 10, trailing: 20))
+                .onReceive(storyTarget.$itemCount) { count in
+                    guard count != viewModel.progressBarViewModel.progressArray.count else { return }
+                    viewModel.createProgressBarViewModelProgressArray(count)
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        viewModel.updateProgressBarViewModelProgressArray(viewModel.storySegmentIndex)
+                    }
+                }
+                .isHidden(viewConfig.isHidden(elementId: .progressBarElement), remove: false)
+        }
+        .onChange(of: storyPageViewModel.storyTargetIndex) { targetIndex in
+            viewModel.updateProgressBarViewModelProgressArray(viewModel.storySegmentIndex)
+            viewModel.stopVideo()
+            
+            guard isActiveTarget else { return }
+            viewModel.storyTarget.fetchStory(totalSeenStoryCount: storyPageViewModel.seenStoryCount)
+            viewModel.playIfVideoStory()
+            
+            // Mark Seen
+            if let item = storyTarget.items.element(at: viewModel.storySegmentIndex), case .content(let storyModel) = item.type {
+                storyPageViewModel.markAsSeen(storyModel)
             }
         }
-        .contentLoadingPolicy(.lazy(recyclingRatio: 1))
-        .overlay (
-            ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
-                .offset(y: -40)
-                .isHidden(storyTarget.items.count != 0, remove: false)
-        )
-        .onAppear {
-            page.update(.new(index: storySegmentIndex))
+        .onReceive(storyTarget.$unseenStoryIndex) { index in
+            viewModel.moveToUnseenStory(index)
+        }
+        .onReceive(storyPageViewModel.timer, perform: { _ in
+            guard storyPageViewModel.shouldRunTimer, isActiveTarget else { return }
+            guard storyTarget.storyLoadingStatus == .loaded || !storyTarget.items.isEmpty else { return }
+            guard viewModel.isLoadedIfVideoStory() else { return }
             
+            viewModel.timerAction(host)
+        })
+        .onChange(of: storyPageViewModel.shouldRunTimer) { shouldRunTimer in
+            guard isActiveTarget else { return }
+            viewModel.playPauseVideo(shouldRunTimer)
+        }
+        .onAppear {
+            storyTarget.fetchStory()
+            checkStoryPermission()
+            Log.add(event: .info, "StoryTarget: \(storyTarget.targetName) appeared!!!")
             // Handle the case going back from Community Page
             host.controller?.navigationController?.navigationBar.isHidden = true
         }
-        .onChange(of: storySegmentIndex) { value in
-            page.update(.new(index: value))
+        .onDisappear {
+            Log.add(event: .info, "StoryTarget: index \(storyTarget.targetName) disappeared!!!")
+        }
+        .onChange(of: showBottomSheet) { value in
+            storyPageViewModel.debounceUpdateShouldRunTimer(!value)
+        }
+        .onChange(of: isAlertShown) { value in
+            storyPageViewModel.debounceUpdateShouldRunTimer(!value)
         }
         .onChange(of: showRetryAlert) { value in
-            storyPageViewModel.shouldRunTimer = !value
-            storyCoreViewModel.playVideo = !value
+            storyPageViewModel.debounceUpdateShouldRunTimer(!value)
         }
         .onChange(of: showCommentTray) { value in
-            storyPageViewModel.shouldRunTimer = !value
-            storyCoreViewModel.playVideo = !value
+            storyPageViewModel.debounceUpdateShouldRunTimer(!value)
             
             if value == false {
                 hideKeyboard()
             }
         }
+        .padding(.bottom, 25)
         .sheet(isPresented: $showCommentTray) {
             getCommentSheetView()
         }
-        .gesture(DragGesture().onChanged{ _ in})
+        .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, sheetContent: {
+            getBottomSheetView()
+        })
         .environmentObject(viewConfig)
         .environmentObject(host)
         .animation(nil)
+    }
+    
+    @ViewBuilder
+    func getContentView(_ item: PaginatedItem<AmityStoryModel>) -> some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .topTrailing) {
+                
+                switch item.type {
+                case .ad(let ad):
+                    StoryAdView(ad: ad, gestureView: getGestureView)
+                case .content(let storyModel):
+                    getStoryView(storyModel)
+                }
+                
+                HStack(spacing: 0) {
+                    /// Show overflow menu if item is the story
+                    /// Hide it if item is ads
+                    if case .content(_) = item.type {
+                        Button {
+                            showBottomSheet.toggle()
+                        } label: {
+                            let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .overflowMenuElement, key: "overflow_menu_icon", of: String.self) ?? "")
+                            Image(icon)
+                                .frame(width: 24, height: 20)
+                                .padding(.trailing, 20)
+                        }
+                        .isHidden(!hasStoryManagePermission, remove: false)
+                        .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.meatballsButton)
+                        .isHidden(viewConfig.isHidden(elementId: .overflowMenuElement), remove: false)
+                    }
+                    
+                    Button {
+                        Log.add(event: .info, "Tapped Closed!!!")
+                        host.controller?.dismiss(animated: true)
+                    } label: {
+                        let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .closeButtonElement, key: "close_icon", of: String.self) ?? "")
+                        Image(icon)
+                            .frame(width: 24, height: 18)
+                            .padding(.trailing, 25)
+                    }
+                    .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.closeButton)
+                    .isHidden(viewConfig.isHidden(elementId: .closeButtonElement), remove: false)
+                }
+                .padding(.top, 40)
+            }
+        }
     }
     
     
@@ -103,18 +203,36 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 GeometryReader { geometry in
                     if let imageURL = storyModel.imageURL {
                         StoryImageView(imageURL: imageURL,
-                                  totalDuration: $totalDuration,
-                                  displayMode: storyModel.imageDisplayMode,
-                                  size: geometry.size)
+                                       displayMode: storyModel.imageDisplayMode,
+                                       size: geometry.size,
+                                       onLoading: {
+                            guard isActiveTarget else { return }
+                            storyPageViewModel.shouldRunTimer = false
+                            storyPageViewModel.showActivityIndicator = true
+                        }, onLoaded: {
+                            guard isActiveTarget else { return }
+                            storyPageViewModel.shouldRunTimer = true
+                            storyPageViewModel.showActivityIndicator = false
+                        })
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .overlay(
                             storyModel.syncState == .error || storyModel.syncState == .syncing ? Color.black.opacity(0.5) : nil
                         )
                     } else if let videoURL = storyModel.videoURL {
                         StoryVideoView(videoURL: videoURL,
-                                  totalDuration: $totalDuration,
-                                  muteVideo: $muteVideo,
-                                  playVideo: $storyCoreViewModel.playVideo)
+                                       muteVideo: $muteVideo,
+                                       time: $viewModel.playTime,
+                                       playVideo: $viewModel.playVideo, onLoading: {
+                            guard isActiveTarget else { return }
+                            viewModel.isVideoLoading = true
+                            storyPageViewModel.showActivityIndicator = true
+                        }, onPlaying: { videoDuration in
+                            guard isActiveTarget else { return }
+                            viewModel.isVideoLoading = false
+                            storyPageViewModel.shouldRunTimer = true
+                            storyPageViewModel.showActivityIndicator = false
+                            storyPageViewModel.totalDuration = videoDuration
+                        })
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .overlay(
                             storyModel.syncState == .error || storyModel.syncState == .syncing ? Color.black.opacity(0.5) : nil
@@ -142,9 +260,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         getHyperLinkView(data: model, story: storyModel)
                     }
                 }
-                .offset(y: 30) // height + padding top, bottom of progressBarView
-                
-                
+                .padding(.top, 30)
             }
             
             if storyModel.syncState == .error {
@@ -156,16 +272,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 getAnalyticView(storyModel)
             }
         }
-        .onAppear {
-            storyPageViewModel.markAsSeen(storyModel)
-            
-            switch storyModel.storyType {
-            case .image:
-                storyCoreViewModel.playVideo = false
-            case .video:
-                storyCoreViewModel.playVideo = true
-            }
-        }
+        .environmentObject(viewModel)
     }
     
     
@@ -188,11 +295,6 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 if hasStoryManagePermission {
                     let context = AmityViewStoryPageBehaviour.Context(page: viewStoryPage, targetId: storyTarget.targetId, targetType: .community)
                     AmityUIKit4Manager.behaviour.viewStoryPageBehaviour?.goToCreateStoryPage(context: context)
-                }
-            }
-            .onAppear {
-                Task {
-                    hasStoryManagePermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: story.targetId)
                 }
             }
             
@@ -283,22 +385,20 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     
     func getGestureView() -> some View {
         GestureView(onLeftTap: {
-            moveStorySegment?(.backward)
+            viewModel.moveStorySegment(direction: .backward, host)
         }, onRightTap: {
-            moveStorySegment?(.forward)
+            viewModel.moveStorySegment(direction: .forward, host)
         }, onTouchAndHoldStart: {
             storyPageViewModel.shouldRunTimer = false
-            storyCoreViewModel.playVideo = false
         }, onTouchAndHoldEnd: {
             storyPageViewModel.shouldRunTimer = true
-            storyCoreViewModel.playVideo = true
-        },onDragChanged: { direction, translation in
+        }, onDragChanged: { direction, translation in
             guard let view = host.controller?.view else { return }
+            guard direction == .downward || direction == .upward else { return }
             
             if translation.y < 0 || (translation.y > 0 && translation.y <= 50) { return }
             
-            storyPageViewModel.shouldRunTimer = false
-            storyCoreViewModel.playVideo = false
+            storyPageViewModel.debounceUpdateShouldRunTimer(false)
             
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
                 view.transform = CGAffineTransform(translationX: 0, y: translation.y)
@@ -306,13 +406,13 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             
         }, onDragEnded: { direction, translation in
             guard let view = host.controller?.view else { return }
+            guard direction == .downward || direction == .upward else { return }
             
-            storyPageViewModel.shouldRunTimer = true
-            storyCoreViewModel.playVideo = true
+            storyPageViewModel.debounceUpdateShouldRunTimer(true)
             
             if translation.y <= 200 {
                 UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: .curveEaseInOut, animations: {
-                    if view.transform == .identity && direction == .upward {
+                    if view.transform == .identity && direction == .upward  && translation.y < -100 {
                         showCommentTray = true
                     }
                     
@@ -321,7 +421,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             } else {
                 host.controller?.dismiss(animated: true)
             }
-    })
+        })
     }
     
     
@@ -401,9 +501,9 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 
                 Task {
                     if story.isLiked {
-                        try await storyPageViewModel.removeReaction(storyId: story.storyId)
+                        try await viewModel.removeReaction(storyId: story.storyId)
                     } else {
-                        try await storyPageViewModel.addReaction(storyId: story.storyId)
+                        try await viewModel.addReaction(storyId: story.storyId)
                     }
                 }
             }
@@ -432,7 +532,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 let retryAction = UIAlertAction(title: AmityLocalizedStringSet.General.retry.localizedString, style: .default, handler: {_ in
                     Task {
                         do {
-                            try await storyCoreViewModel.storyManager.deleteStory(storyId: storyModel.storyId)
+                            try await viewModel.storyManager.deleteStory(storyId: storyModel.storyId)
                             
                             switch storyModel.storyType {
                             case .image:
@@ -440,7 +540,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                                     let targetType: AmityStoryTargetType = AmityStoryTargetType(rawValue: storyTarget.targetType) ?? .community
                                     let createOptions = AmityImageStoryCreateOptions(targetType: targetType, tartgetId: storyTarget.targetId, imageFileURL: url, items: storyModel.storyItems)
                                     
-                                    try await storyCoreViewModel.storyManager.createImageStory(in: storyTarget.targetId, createOption: createOptions)
+                                    try await viewModel.storyManager.createImageStory(in: storyTarget.targetId, createOption: createOptions)
                                 }
                                 
                             case .video:
@@ -448,7 +548,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                                     let targetType: AmityStoryTargetType = AmityStoryTargetType(rawValue: storyTarget.targetType) ?? .community
                                     let createOptions = AmityVideoStoryCreateOptions(targetType: targetType, tartgetId: storyTarget.targetId, videoFileURL: url, items: storyModel.storyItems)
                                     
-                                    try await storyCoreViewModel.storyManager.createVideoStory(in: storyTarget.targetId, createOption: createOptions)
+                                    try await viewModel.storyManager.createVideoStory(in: storyTarget.targetId, createOption: createOptions)
                                 }
                                 
                             }
@@ -468,7 +568,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     
                     let deleteAction = UIAlertAction(title: AmityLocalizedStringSet.General.delete.localizedString, style: .destructive) { _ in
                         Task {
-                            try await storyCoreViewModel.storyManager.deleteStory(storyId: storyModel.storyId)
+                            try await viewModel.storyManager.deleteStory(storyId: storyModel.storyId)
                         }
                         showRetryAlert.toggle()
                     }
@@ -527,7 +627,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     
     @ViewBuilder
     func getCommentSheetContentView() -> some View {
-        if let item = storyTarget.items.element(at: storySegmentIndex),
+        if let item = storyTarget.items.element(at: viewModel.storySegmentIndex),
            case let .content(story) = item.type {
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
             let allowCreateComment = story.storyTarget?.community?.storySettings.allowComment ?? false
@@ -539,114 +639,57 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                                       shouldAllowCreation: allowCreateComment)
         }
     }
-}
-
-
-class StoryCoreViewModel: ObservableObject {
     
-    @Published var playVideo: Bool = true
-    let storyManager = StoryManager()
     
-    init() {}
-}
-
-struct StoryImageView: View {
-    
-    @EnvironmentObject var storyPageViewModel: AmityStoryPageViewModel
-    
-    private let imageURL: URL
-    private let displayMode: ContentMode
-    private let size: CGSize
-    @Binding private var totalDuration: CGFloat
-    
-    init(imageURL: URL, totalDuration: Binding<CGFloat>, displayMode: ContentMode, size: CGSize) {
-        self.imageURL = imageURL
-        self._totalDuration = totalDuration
-        self.displayMode = displayMode
-        self.size = size
-    }
-    
-    var body: some View {
-        URLImage(imageURL) { progress in
-            ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .white))
-                .onAppear {
-                    storyPageViewModel.shouldRunTimer = false
-                }
-            
-        } content: { image, imageInfo in
-            image
-                .resizable()
-                .aspectRatio(contentMode: displayMode)
-                .frame(width: size.width, height: size.height)
-                .background(
-                    LinearGradient(
-                        gradient: Gradient(colors: UIImage(cgImage: imageInfo.cgImage).averageGradientColor ?? [.black]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .onAppear {
-                    storyPageViewModel.shouldRunTimer = true
-                }
-                .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.storyImageView)
-        }
-        .environment(\.urlImageOptions, URLImageOptions.amityOptions)
-        .onAppear {
-            totalDuration = STORY_DURATION
-            Log.add(event: .info, "Story TotalDuration: \(totalDuration)")
-        }
-    }
-}
-
-struct StoryVideoView: View {
-    
-    @EnvironmentObject var storyPageViewModel: AmityStoryPageViewModel
-    @EnvironmentObject var storyCoreViewModel: StoryCoreViewModel
-    
-    private let videoURL: URL
-    @Binding var totalDuration: CGFloat
-    @Binding var muteVideo: Bool
-    @Binding var playVideo: Bool
-    
-    @State private var showActivityIndicator: Bool = false
-    @State private var time: CMTime = .zero
-    
-    init(videoURL: URL, totalDuration: Binding<CGFloat>, muteVideo: Binding<Bool>, playVideo: Binding<Bool>) {
-        self.videoURL = videoURL
-        self._totalDuration = totalDuration
-        self._muteVideo = muteVideo
-        self._playVideo = playVideo
-    }
-    
-    var body: some View {
-        VideoPlayer(url: videoURL, play: $playVideo, time: $time)
-            .autoReplay(false)
-            .mute(muteVideo)
-            .contentMode(.scaleAspectFit)
-            .onStateChanged({ state in
-                switch state {
-                case .loading:
-                    storyPageViewModel.shouldRunTimer = false
-                    showActivityIndicator = true
-                case .playing(totalDuration: let totalDuration):
-                    storyPageViewModel.shouldRunTimer = true
-                    self.totalDuration = totalDuration
-                    showActivityIndicator = false
-                    Log.add(event: .info, "Story TotalDuration: \(totalDuration)")
-                case .paused(playProgress: _, bufferProgress: _): break
-                case .error(_): break
+    @ViewBuilder
+    private func getBottomSheetView() -> some View {
+        VStack(spacing: 0) {
+            BottomSheetItemView(icon: AmityIcon.trashBinIcon.getImageResource(), text: "Delete story", isDestructive: true)
+                .onTapGesture {
+                    let alertController = UIAlertController(title: AmityLocalizedStringSet.Story.deleteStoryTitle.localizedString, message: AmityLocalizedStringSet.Story.deleteStoryMessage.localizedString, preferredStyle: .alert)
                     
+                    let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel) { _ in
+                        isAlertShown.toggle()
+                    }
+                    
+                    let deleteAction = UIAlertAction(title: AmityLocalizedStringSet.General.delete.localizedString, style: .destructive) { _ in
+                        isAlertShown.toggle()
+                        if let item = storyTarget.items.element(at: viewModel.storySegmentIndex),
+                            case let .content(story) = item.type {
+                            Task { @MainActor in
+                                try await viewModel.deleteStory(storyId: story.storyId, host)
+                                Toast.showToast(style: .success, message: "Successfully deleted the story.")
+                            }
+                        }
+                    }
+                    
+                    alertController.addAction(cancelAction)
+                    alertController.addAction(deleteAction)
+                    
+                    showBottomSheet.toggle()
+                    isAlertShown.toggle()
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        host.controller?.present(alertController, animated: true)
+                    }
                 }
-            })
-            .overlay(
-                ActivityIndicatorView(isAnimating: $showActivityIndicator, style: .medium)
-            )
-            .onAppear {
-                time = .zero
-                storyPageViewModel.shouldRunTimer = true
+        }
+        .padding(.bottom, 32)
+    }
+    
+    private func checkStoryPermission() {
+        // Check StoryManage Permission
+        Task {
+            let storyTargetId = storyTarget.targetId
+            let hasPermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: storyTargetId)
+            let allowAllUserCreation = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
+            
+            guard let community = storyTarget.storyTarget?.community else {
+                hasStoryManagePermission = false
+                return
             }
-            .onDisappear {
-            }
-            .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.storyVideoView)
+            
+            hasStoryManagePermission = (allowAllUserCreation || hasPermission) && community.isJoined
+        }
     }
 }

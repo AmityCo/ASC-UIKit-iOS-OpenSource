@@ -101,19 +101,29 @@ class TargetSelectionViewModel: ObservableObject {
                     communities.map { community -> AnyPublisher<AmityCommunityModel?, Never> in
                         let communityModel = AmityCommunityModel(object: community)
                         
+                        // Story permission specifically need to check without considering onlyAdminCanPost
+                        if contentType == .story {
+                            return Future<AmityCommunityModel?, Never> { promise in
+                                
+                                AmityUIKit4Manager.client.hasPermission(.manageStoryCommunity, forCommunity: community.communityId) { success in
+                                    let hasPermission = success
+                                    let allowAllUserCreation = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
+                                    let hasStoryManagePermission = (allowAllUserCreation || hasPermission) && communityModel.isJoined
+                                    
+                                    if hasStoryManagePermission {
+                                        promise(.success(communityModel))
+                                    } else {
+                                        promise(.success(nil))
+                                    }
+                                }
+                            }
+                            .eraseToAnyPublisher()
+                        }
+                        
+                        // Check for post permission
                         if community.onlyAdminCanPost {
                             return Future<AmityCommunityModel?, Never> { promise in
-                                let permission: AmityPermission
-                                
-                                switch contentType {
-                                case .post, .poll:
-                                    permission = .createPrivilegedPost
-
-                                case .story:
-                                    permission = .manageStoryCommunity
-                                }
-                                
-                                AmityUIKit4Manager.client.hasPermission(permission, forCommunity: community.communityId) { success in
+                                AmityUIKit4Manager.client.hasPermission(.createPrivilegedPost, forCommunity: community.communityId) { success in
                                     if success {
                                         promise(.success(communityModel))
                                     } else {

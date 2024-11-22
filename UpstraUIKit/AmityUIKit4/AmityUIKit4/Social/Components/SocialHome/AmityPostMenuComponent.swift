@@ -28,6 +28,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
     @Binding private var isPresented: Bool
     
     @State private var showPostCreationMenuScaleEffect: Bool = false
+    private let allowAllUserToCreateStory = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
     
     public var id: ComponentId {
         .createPostMenu
@@ -80,6 +81,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             goToStoryCreation()
                         }
+                        .isHidden(!allowAllUserToCreateStory)
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createStoryButton)
                 case .poll:
                     let icon = AmityIcon.createPollMenuIcon

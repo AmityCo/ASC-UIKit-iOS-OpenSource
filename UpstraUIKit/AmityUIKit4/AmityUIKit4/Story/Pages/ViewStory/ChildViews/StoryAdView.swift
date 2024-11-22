@@ -10,7 +10,7 @@ import SwiftUI
 
 struct StoryAdView<Content: View>: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
-    @EnvironmentObject var storyPageViewModel: AmityStoryPageViewModel
+    @EnvironmentObject var storyPageViewModel: AmityViewStoryPageViewModel
     @EnvironmentObject var storyCoreViewModel: StoryCoreViewModel
     @State private var showAdInfo: Bool = false
     let ad: AmityAd
@@ -131,10 +131,10 @@ struct StoryAdView<Content: View>: View {
         .sheet(isPresented: $showAdInfo, content: {
             AmityAdInfoView(advertiserName: ad.advertiser?.companyName ?? "-")
         })
-        .onChange(of: showAdInfo) { isShown in
-            storyPageViewModel.shouldRunTimer = !isShown
-            storyCoreViewModel.playVideo = !isShown
-        }
+//        .onChange(of: showAdInfo) { isShown in
+//            storyPageViewModel.shouldRunTimer = !isShown
+//            storyCoreViewModel.playVideo = !isShown
+//        }
         .onAppear {
             ad.analytics.markAsSeen(placement: .story)
         }
