@@ -45,7 +45,9 @@ public struct ExpandableText: View {
     internal var attributedColor: UIColor = UIColor.systemBlue
     internal var expandAnimation: Animation = .default
     internal var collapseEnabled: Bool = false
-    internal var trimMultipleNewlinesWhenTruncated: Bool = true
+    // NOTE:
+    // This crashes if the text contains multiple new lines at the point of truncation. We set it to false to prevent that crash.
+    internal var trimMultipleNewlinesWhenTruncated: Bool = false
     internal var metadata: [String: Any]?
     internal var mentionees: [AmityMentionees]?
     internal var onTapMentionee: ((String) -> Void)?

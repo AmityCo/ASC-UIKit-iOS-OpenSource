@@ -14,7 +14,7 @@ class UserManager {
     let fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
     
     func searchUsers(keyword: String) -> AmityCollection<AmityUser> {
-        userRepostiory.searchUsers(keyword, sortBy: .displayName)
+        userRepostiory.searchUsers(keyword, sortBy: .displayName, matchType: .partial)
     }
     
     func editUser(user: UserModel) async throws -> Bool {

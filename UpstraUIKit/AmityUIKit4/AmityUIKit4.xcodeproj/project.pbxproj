@@ -15,7 +15,6 @@
 		682E02122CEE6A8200FE1042 /* StoryCoreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682E020F2CEE6A8200FE1042 /* StoryCoreViewModel.swift */; };
 		682E02132CEE6A8200FE1042 /* StoryImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682E02102CEE6A8200FE1042 /* StoryImageView.swift */; };
 		682E02142CEE6A8200FE1042 /* StoryVideoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682E02112CEE6A8200FE1042 /* StoryVideoView.swift */; };
-		682E02162CF0AE3D00FE1042 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 682E02152CF0AE3D00FE1042 /* SharedFrameworks */; };
 		683B9D642C995AFF005619FE /* AmityUserProfileHeaderComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683B9D632C995AFF005619FE /* AmityUserProfileHeaderComponent.swift */; };
 		683DF10A2C6B1CAD005BF06C /* AmityCommunityAddUserPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683DF1092C6B1CAD005BF06C /* AmityCommunityAddUserPage.swift */; };
 		683DF10C2C6B27A4005BF06C /* AmityUserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683DF10B2C6B27A4005BF06C /* AmityUserModel.swift */; };
@@ -353,6 +352,7 @@
 		923AA56A2CB3B453009C9357 /* LivestreamVideoPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA5692CB3B453009C9357 /* LivestreamVideoPlayerViewModel.swift */; };
 		923AA56E2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA56D2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift */; };
 		923AA5702CB3B4F0009C9357 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA56F2CB3B4F0009C9357 /* Debouncer.swift */; };
+		9244D0B52D4CED860070A9FD /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9244D0B42D4CED860070A9FD /* SharedFrameworks */; };
 		9250CA2D2C2D55E9007551ED /* MultiSelectionMediaPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9250CA2C2C2D55E9007551ED /* MultiSelectionMediaPicker.swift */; };
 		926894402C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9268943F2C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift */; };
 		926894422C474A6A004CECF8 /* EmptyCommunityFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926894412C474A6A004CECF8 /* EmptyCommunityFeedView.swift */; };
@@ -1042,7 +1042,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				682E02162CF0AE3D00FE1042 /* SharedFrameworks in Frameworks */,
+				9244D0B52D4CED860070A9FD /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3662,7 +3662,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		682E02152CF0AE3D00FE1042 /* SharedFrameworks */ = {
+		9244D0B42D4CED860070A9FD /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
