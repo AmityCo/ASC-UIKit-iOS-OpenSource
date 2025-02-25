@@ -41,9 +41,12 @@ final class AmityFetchUserController {
                     }
                 }
                 
-                let predicate: (AmitySelectMemberModel) -> (String) = { user in
-                    guard let displayName = user.displayName else { return "#" }
-                    let c = String(displayName.prefix(1)).uppercased()
+                let predicate: (AmitySelectMemberModel) -> (String) = { [weak self] user in
+                    guard let self, let displayName = user.displayName else { return "#" }
+                    
+                    let transformedName = self.convertNameToLatinWithoutDiacritics(original: displayName)
+                    
+                    let c = String(transformedName.prefix(1)).uppercased()
                     let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     
                     if alphabet.contains(c) {
@@ -57,6 +60,14 @@ final class AmityFetchUserController {
                 completion(.success(groupUsers))
             }
         }
+    }
+    
+    // First we convert names to latin representation and then strip diacritics from names.
+    // Convert Örjan to Orjan.
+    func convertNameToLatinWithoutDiacritics(original: String) -> String {
+        let latinName = original.applyingTransform(StringTransform.toLatin, reverse: false)
+        let latinNameWithoutDiacritic = latinName?.applyingTransform(StringTransform.stripDiacritics, reverse: false)
+        return latinNameWithoutDiacritic ?? original
     }
     
     func loadmore(isSearch: Bool) -> Bool {
