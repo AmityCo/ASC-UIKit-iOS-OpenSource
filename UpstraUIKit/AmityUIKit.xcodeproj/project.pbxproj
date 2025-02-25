@@ -2122,6 +2122,7 @@
 		72A3503224EA811500DA9D46 /* UpstraUIKit */ = {
 			isa = PBXGroup;
 			children = (
+				68FEE2F62BC7A1050055FEC0 /* PrivacyInfo.xcprivacy */,
 				72A3503324EA811500DA9D46 /* AmityUIKit.h */,
 				72A351AB24EA821F00DA9D46 /* AmityUIKit.swift */,
 				7259789C256CC5850074D414 /* AmityEventHandler.swift */,
@@ -4661,6 +4662,7 @@
 				D404015A25FF88FE00311C83 /* AmityCommunityNotificationSettingsViewController.xib in Resources */,
 				7858D3A626DAD83600A0090E /* AmityPostPollTableViewCell.xib in Resources */,
 				97D7C49D264BF90000EA24F5 /* AmityChannelMemberSettingsTableViewCell.xib in Resources */,
+				68FEE2F72BC7A1060055FEC0 /* PrivacyInfo.xcprivacy in Resources */,
 				B76A101E252B7E1D00AFC7A8 /* AmityTrendingCommunityViewController.xib in Resources */,
 				B70D2BB52577144500E2D56B /* AmityMessageAudioOutgoingTableViewCell.xib in Resources */,
 				A0A903A926BA6E61002949B2 /* PostGalleryItemCell.xib in Resources */,
