@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "pending_follow_request_icon.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

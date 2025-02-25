@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7DC3490F2D6E041B0021525C /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 7DC3490E2D6E041B0021525C /* SharedFrameworks */; };
+		92952FDF2CC0E78E0012B2B9 /* LivestreamPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92952FDE2CC0E78E0012B2B9 /* LivestreamPlayerView.swift */; };
+		92952FE52CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92952FE42CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift */; };
 		A0B68B3026E07278007D7B5B /* LiveStreamViewController+GoLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B2F26E07278007D7B5B /* LiveStreamViewController+GoLive.swift */; };
 		A0B68B3626E07824007D7B5B /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B3526E07824007D7B5B /* AsyncOperation.swift */; };
 		A0B68B3F26E07912007D7B5B /* CreatePost.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B3E26E07912007D7B5B /* CreatePost.swift */; };
@@ -30,10 +31,13 @@
 		A0BD0B5E26DF37160054088B /* LiveStreamBroadcastVC+Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BD0B5D26DF37160054088B /* LiveStreamBroadcastVC+Keyboard.swift */; };
 		A0BD0B6026DF377A0054088B /* LiveStreamBroadcastVC+CoverImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BD0B5F26DF377A0054088B /* LiveStreamBroadcastVC+CoverImagePicker.swift */; };
 		A0BD0B6226DF3A3F0054088B /* LiveStreamBroadcast+UIContainerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BD0B6126DF3A3F0054088B /* LiveStreamBroadcast+UIContainerState.swift */; };
+		ED7E5C962D6E0FB9000E7AAC /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED7E5C952D6E0FB9000E7AAC /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		688F8615299E408F000FE6E7 /* SharedFrameworks */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SharedFrameworks; path = ../SharedFrameworks; sourceTree = "<group>"; };
+		92952FDE2CC0E78E0012B2B9 /* LivestreamPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivestreamPlayerView.swift; sourceTree = "<group>"; };
+		92952FE42CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordedStreamPlayerView.swift; sourceTree = "<group>"; };
 		A0B68B2F26E07278007D7B5B /* LiveStreamViewController+GoLive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LiveStreamViewController+GoLive.swift"; sourceTree = "<group>"; };
 		A0B68B3526E07824007D7B5B /* AsyncOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		A0B68B3E26E07912007D7B5B /* CreatePost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreatePost.swift; sourceTree = "<group>"; };
@@ -69,7 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7DC3490F2D6E041B0021525C /* SharedFrameworks in Frameworks */,
+				ED7E5C962D6E0FB9000E7AAC /* SharedFrameworks in Frameworks */,
 				A0BD0B3426DDD9820054088B /* AmityUIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -186,6 +190,8 @@
 			children = (
 				A0B68B6226E73522007D7B5B /* LiveStreamPlayerViewController.swift */,
 				A0B68B6326E73522007D7B5B /* LiveStreamPlayerViewController.xib */,
+				92952FDE2CC0E78E0012B2B9 /* LivestreamPlayerView.swift */,
+				92952FE42CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -245,7 +251,7 @@
 			);
 			name = AmityUIKitLiveStream;
 			packageProductDependencies = (
-				7DC3490E2D6E041B0021525C /* SharedFrameworks */,
+				ED7E5C952D6E0FB9000E7AAC /* SharedFrameworks */,
 			);
 			productName = AmityUIKitLiveStream;
 			productReference = A0BD0B1526DCE4F50054088B /* AmityUIKitLiveStream.framework */;
@@ -311,9 +317,11 @@
 				A0B68B4726E07960007D7B5B /* GoLive.swift in Sources */,
 				A0B68B3F26E07912007D7B5B /* CreatePost.swift in Sources */,
 				A0BD0B5C26DF35C80054088B /* LiveStreamBroadcastVC+Permission.swift in Sources */,
+				92952FE52CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift in Sources */,
 				A0B68B3026E07278007D7B5B /* LiveStreamViewController+GoLive.swift in Sources */,
 				A0BD0B5A26DE26940054088B /* GeneralError.swift in Sources */,
 				A0BD0B6026DF377A0054088B /* LiveStreamBroadcastVC+CoverImagePicker.swift in Sources */,
+				92952FDF2CC0E78E0012B2B9 /* LivestreamPlayerView.swift in Sources */,
 				A0B68B4126E0791D007D7B5B /* UploadCoverImage.swift in Sources */,
 				A0B68B6426E73522007D7B5B /* LiveStreamPlayerViewController.swift in Sources */,
 				A0B68B3626E07824007D7B5B /* AsyncOperation.swift in Sources */,
@@ -461,7 +469,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = AmityUIKitLiveStream/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -490,7 +498,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = AmityUIKitLiveStream/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -529,7 +537,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7DC3490E2D6E041B0021525C /* SharedFrameworks */ = {
+		ED7E5C952D6E0FB9000E7AAC /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

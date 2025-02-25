@@ -39,6 +39,8 @@ class AmitySocialNotificationSettingsScreenViewModel: AmityPostNotificationSetti
             return [.commentReacted, .commentCreated, .commentReplied]
         case .post:
             return  [.postReacted, .postCreated]
+        case .story:
+            return [.storyCreated, .storyReacted, .storyCommentCreated]
         }
     }
     

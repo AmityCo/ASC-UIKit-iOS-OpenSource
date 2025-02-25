@@ -1,0 +1,32 @@
+<svg width="76" height="77" viewBox="0 0 76 77" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_dd_0_78)">
+<g filter="url(#filter1_b_0_78)">
+<circle cx="38" cy="38" r="36" fill="white" fill-opacity="0.4"/>
+</g>
+<circle cx="38" cy="38" r="14.087" fill="white"/>
+<rect x="14" y="14" width="48" height="48" rx="24" fill="white"/>
+<path d="M46.25 27.7857C47.4688 27.7857 48.5 28.817 48.5 30.0357V46.5357C48.5 47.8013 47.4688 48.7857 46.25 48.7857H29.75C28.4844 48.7857 27.5 47.8013 27.5 46.5357V30.0357C27.5 28.817 28.4844 27.7857 29.75 27.7857H46.25Z" fill="#F72C40"/>
+</g>
+<defs>
+<filter id="filter0_dd_0_78" x="0" y="0.5" width="76" height="76" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="0.5"/>
+<feGaussianBlur stdDeviation="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.376471 0 0 0 0 0.380392 0 0 0 0 0.439216 0 0 0 0.16 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_78"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset/>
+<feGaussianBlur stdDeviation="0.5"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.156863 0 0 0 0 0.160784 0 0 0 0 0.239216 0 0 0 0.08 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_0_78" result="effect2_dropShadow_0_78"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_0_78" result="shape"/>
+</filter>
+<filter id="filter1_b_0_78" x="-1.13043" y="-1.13043" width="78.2609" height="78.2609" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feGaussianBlur in="BackgroundImageFix" stdDeviation="1.56522"/>
+<feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_0_78"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_backgroundBlur_0_78" result="shape"/>
+</filter>
+</defs>
+</svg>

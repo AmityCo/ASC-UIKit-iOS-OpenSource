@@ -36,6 +36,7 @@ struct EndpointConfigModel: Codable {
     let httpEndpoint: String
     let socketEndpoint: String
     let mqttEndpoint: String
+    let uploadURL: String
 }
 
 struct EnvironmentSettingModel: Codable {
@@ -52,7 +53,7 @@ struct EnvironmentSettingModel: Codable {
     }
     
     static func defaultConfig(for environment: EnvironmentType) -> EndpointConfigModel {
-        return EndpointConfigModel(apiKey: "YOUR_API_KEY", httpEndpoint: AmityRegion.SG.httpUrl, socketEndpoint: AmityRegion.SG.rpcUrl, mqttEndpoint: AmityRegion.SG.mqttHost)
+        return EndpointConfigModel(apiKey: "YOUR_API_KEY", httpEndpoint: AmityRegion.SG.httpUrl, socketEndpoint: AmityRegion.SG.rpcUrl, mqttEndpoint: AmityRegion.SG.mqttHost, uploadURL: AmityRegion.SG.uploadUrl)
     }
 }
 
@@ -85,7 +86,7 @@ class EndpointManager {
         return settings.configMap[environment]!
     }
     
-    func update(environment: EnvironmentType, apiKey: String?, httpEndpoint: String?, socketEndpoint: String?) {
+    func update(environment: EnvironmentType, apiKey: String?, httpEndpoint: String?, socketEndpoint: String?, uploadURL: String?) {
         guard let config = settings.configMap[environment] else {
             return
         }
@@ -95,7 +96,8 @@ class EndpointManager {
         let _httpEndpoint = httpEndpoint ?? config.httpEndpoint
         let _socketEndpoint = socketEndpoint ?? config.socketEndpoint
         let _mqttEndpoint = config.mqttEndpoint
-        let newConfig = EndpointConfigModel(apiKey: _apiKey, httpEndpoint: _httpEndpoint, socketEndpoint: _socketEndpoint, mqttEndpoint: _mqttEndpoint)
+        let _uploadURL = uploadURL ?? config.uploadURL
+        let newConfig = EndpointConfigModel(apiKey: _apiKey, httpEndpoint: _httpEndpoint, socketEndpoint: _socketEndpoint, mqttEndpoint: _mqttEndpoint, uploadURL: _uploadURL)
         
         // Update new config to current setting
         settings.configMap[environment] = newConfig

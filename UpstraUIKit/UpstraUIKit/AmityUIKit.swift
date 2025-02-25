@@ -8,6 +8,9 @@
 
 import UIKit
 import AmitySDK
+#if canImport(AmityUIKit4)
+import AmityUIKit4
+#endif
 
 /// AmityUIKit
 public final class AmityUIKitManager {
@@ -196,6 +199,9 @@ final class AmityUIKitManagerInternal: NSObject {
                 try await client.login(userId: userId, displayName: displayName, authToken: authToken, sessionHandler: sessionHandler)
                 await revokeDeviceTokens()
                 didUpdateClient()
+                #if canImport(AmityUIKit4)
+                AmityUIKit4Manager.didUpdateClient()
+                #endif
                 completion?(true, nil)
             } catch let error {
                 completion?(false, error)

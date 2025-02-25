@@ -71,6 +71,9 @@ private extension AmityCommunityNotificationSettingsViewController {
             case .commentNavigation:
                 let vc = AmityPostNotificationSettingsViewController.make(communityId: screenViewModel.community.communityId, type: .comment)
                 navigationController?.pushViewController(vc, animated: true)
+            case .storyNavigation:
+                let vc = AmityPostNotificationSettingsViewController.make(communityId: screenViewModel.community.communityId, type: .story)
+                navigationController?.pushViewController(vc, animated: true)
             }
         default:
             break

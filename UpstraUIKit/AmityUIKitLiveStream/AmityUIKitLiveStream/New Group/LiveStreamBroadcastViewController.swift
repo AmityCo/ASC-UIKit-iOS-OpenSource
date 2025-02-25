@@ -415,7 +415,7 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         mentionTableView.isHidden = true
         mentionTableView.delegate = self
         mentionTableView.dataSource = self
-        mentionTableView.register(AmityMentionTableViewCell.nib, forCellReuseIdentifier: AmityMentionTableViewCell.identifier)
+        mentionTableView.register(AmityMentionTableViewCell.nib, forCellReuseIdentifier: "AmityMentionTableViewCell")
     }
     
     // MARK: - IBActions
@@ -567,7 +567,7 @@ extension LiveStreamBroadcastViewController: UITableViewDataSource {
     }
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: AmityMentionTableViewCell.identifier) as? AmityMentionTableViewCell else { return UITableViewCell() }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "AmityMentionTableViewCell") as? AmityMentionTableViewCell else { return UITableViewCell() }
         
         let provider = mentionManager.mentionProvider
         if indexPath.row < provider.mentionList.count {

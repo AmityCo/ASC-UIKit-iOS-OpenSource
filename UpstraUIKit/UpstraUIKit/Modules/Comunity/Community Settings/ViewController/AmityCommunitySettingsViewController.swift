@@ -8,7 +8,7 @@
 
 import UIKit
 
-final class AmityCommunitySettingsViewController: AmityViewController {
+public final class AmityCommunitySettingsViewController: AmityViewController {
 
     // MARK: - IBOutlet Properties
     @IBOutlet private var settingTableView: AmitySettingsItemTableView!
@@ -17,20 +17,20 @@ final class AmityCommunitySettingsViewController: AmityViewController {
     private var screenViewModel: AmityCommunitySettingsScreenViewModelType!
     
     // MARK: - View lifecycle
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         screenViewModel.delegate = self
         setupView()
         setupSettingTableView()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         screenViewModel.action.retrieveCommunity()
         screenViewModel.action.retrieveNotifcationSettings()
     }
     
-    static func make(communityId: String) -> AmityCommunitySettingsViewController {
+    public static func make(communityId: String) -> AmityCommunitySettingsViewController {
         let userNotificationController = AmityUserNotificationSettingsController()
         let communityNotificationController = AmityCommunityNotificationSettingsController(withCommunityId: communityId)
         let communityLeaveController = AmityCommunityLeaveController(withCommunityId: communityId)
@@ -80,6 +80,9 @@ final class AmityCommunitySettingsViewController: AmityViewController {
                 navigationController?.pushViewController(vc, animated: true)
             case .postReview:
                 let vc = AmityPostReviewSettingsViewController.make(communityId: community.communityId)
+                navigationController?.pushViewController(vc, animated: true)
+            case .storyComment:
+                let vc = AmityStoryCommentSettingsViewController.make(communityId: community.communityId)
                 navigationController?.pushViewController(vc, animated: true)
             default:
                 break
@@ -191,11 +194,11 @@ extension AmityCommunitySettingsViewController: AmityCommunitySettingsScreenView
 
 extension AmityCommunitySettingsViewController: AmityCommunityProfileEditorViewControllerDelegate {
 
-    func viewController(_ viewController: AmityCommunityProfileEditorViewController, didFinishCreateCommunity communityId: String) {
+    public func viewController(_ viewController: AmityCommunityProfileEditorViewController, didFinishCreateCommunity communityId: String) {
         AmityEventHandler.shared.communityDidTap(from: self, communityId: communityId)
     }
 
-    func viewController(_ viewController: AmityCommunityProfileEditorViewController, didFailWithNoPermission: Bool) {
+    public func viewController(_ viewController: AmityCommunityProfileEditorViewController, didFailWithNoPermission: Bool) {
         navigationController?.popToRootViewController(animated: true)
     }
 

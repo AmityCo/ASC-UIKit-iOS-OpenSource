@@ -12,12 +12,18 @@ import AmityUIKit
 class SettingViewController: UIViewController {
     
     private var notificaionSettingButtonItem: UIBarButtonItem!
+    @IBOutlet weak var infoLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         notificaionSettingButtonItem = UIBarButtonItem(title: "User Notifications", style: .plain, target: self, action: #selector(settingTap))
         navigationItem.rightBarButtonItem = notificaionSettingButtonItem
+        
+        let userId = AmityUIKitManager.client.user?.snapshot?.userId ?? "-"
+        let displayName = AmityUIKitManager.client.user?.snapshot?.displayName ?? "-"
+        
+        infoLabel.text = "Current User\nId: \(userId)\nDisplay Name: \(displayName)"
     }
     
     @IBAction func selectCustomizeTheme(_ sender: UIButton) {

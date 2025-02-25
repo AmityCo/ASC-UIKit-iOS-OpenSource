@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Foundation
 
 // Note
 // See more: https://docs.sendbird.com/ios/ui_kit_common_components#3_iconset
@@ -108,8 +109,8 @@ public struct AmityIconSet {
     
     // MARK: - User Feed
     public static var privateUserFeed = UIImage(named: "private_user_feed", in: AmityUIKitManager.bundle, compatibleWith: nil)
-    public static var defaultCommunity = UIImage(named: "default_community", in: AmityUIKitManager.bundle, compatibleWith: nil)
-    public static var defaultCommunityAvatar = UIImage(named: "default_community", in: AmityUIKitManager.bundle, compatibleWith: nil)
+    public static var defaultCommunity = AmityIconSet.getColorImage(color: AmityColorSet.primary.blend(.shade2))
+    public static var defaultCommunityAvatar = UIImage(named: "default_community_avatar", in: AmityUIKitManager.bundle, compatibleWith: nil)
     
     // MARK: - Message
     public static var defaultMessageImage = UIImage(named: "default_message_image", in: AmityUIKitManager.bundle, compatibleWith: nil)
@@ -142,6 +143,7 @@ public struct AmityIconSet {
         public static var iconItemPostReview = UIImage(named: "icon_item_post_review", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconCommentSetting = UIImage(named: "icon_community_setting_comment", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconPostSetting = UIImage(named: "icon_community_setting_post", in: AmityUIKitManager.bundle, compatibleWith: nil)
+        public static var iconStorySetting = UIImage(named: "icon_community_setting_story", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconCommunitySettingBanned = UIImage(named: "icon_community_setting_banned", in: AmityUIKitManager.bundle, compatibleWith: nil)
     }
         
@@ -168,5 +170,20 @@ public struct AmityIconSet {
     enum CreatePost {
         public static var iconPost = UIImage(named: "icon_post", in: AmityUIKitManager.bundle, compatibleWith: nil)
         public static var iconPoll = UIImage(named: "icon_poll", in: AmityUIKitManager.bundle, compatibleWith: nil)
+        public static var iconStory = UIImage(named: "icon_story", in: AmityUIKitManager.bundle, compatibleWith: nil)
+    }
+    
+    static func getColorImage(color: UIColor) -> UIImage? {
+        let rect = CGRect(origin: .zero, size: CGSize(width: 100, height: 100))
+        UIGraphicsBeginImageContextWithOptions(rect.size, false, 0.0)
+        color.setFill()
+        UIRectFill(rect)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        guard let cgImage = image?.cgImage else { 
+            Log.add("Color to Image failed!")
+            return nil }
+        return UIImage(cgImage: cgImage)
     }
 }

@@ -8,6 +8,9 @@
 
 import UIKit
 import AmitySDK
+#if canImport(AmityUIKit4)
+import AmityUIKit4
+#endif
 
 /// Global event handler for function overriding
 ///
@@ -28,6 +31,7 @@ public enum AmityPostContentType {
     case post
     case poll
     case livestream
+    case story
 }
 
 open class AmityEventHandler {
@@ -116,7 +120,7 @@ open class AmityEventHandler {
     ///
     /// If there is a `postTarget` passing into, immediately calls `postTargetDidSelect(:)`.
     /// If there isn't , navigate to `AmityPostTargetSelectionViewController`.
-    open func createPostBeingPrepared(from source: AmityViewController, postTarget: AmityPostTarget? = nil) {
+    open func createPostBeingPrepared(from source: AmityViewController, postTarget: AmityPostTarget? = nil, postOption: Set<AmityPostContentType> = [.post, .story, .livestream, .poll]) {
         let completion: ((AmityPostContentType) -> Void) = { postContentType in
             if let postTarget = postTarget {
                 // show create post
@@ -130,21 +134,46 @@ open class AmityEventHandler {
             }
         }
         
+        var imageOptions: [ImageItemOption] = []
         // present bottom sheet
-        let postOption = ImageItemOption(title: AmityLocalizedStringSet.General.post.localizedString, image: AmityIconSet.CreatePost.iconPost) {
-            completion(.post)
+        if postOption.contains(.post) {
+            imageOptions.append(ImageItemOption(title: AmityLocalizedStringSet.General.post.localizedString, image: AmityIconSet.CreatePost.iconPost) {
+                completion(.post)
+            })
         }
-        let pollPostOption = ImageItemOption(title: AmityLocalizedStringSet.General.poll.localizedString, image: AmityIconSet.CreatePost.iconPoll) {
-            completion(.poll)
+        if postOption.contains(.poll) {
+            imageOptions.append(ImageItemOption(title: AmityLocalizedStringSet.General.poll.localizedString, image: AmityIconSet.CreatePost.iconPoll) {
+                completion(.poll)
+            })
         }
         
-        let livestreamPost = ImageItemOption(
-            title: "Livestream",
-            image: UIImage(named: "icon_create_livestream_post", in: AmityUIKitManager.bundle, compatibleWith: nil)) {
-                completion(.livestream)
-            }
+        if postOption.contains(.poll) {
+            imageOptions.append(ImageItemOption(
+                title: "Livestream",
+                image: UIImage(named: "icon_create_livestream_post", in: AmityUIKitManager.bundle, compatibleWith: nil)) {
+                    completion(.livestream)
+                })
+        }
         
-        AmityBottomSheet.present(options: [livestreamPost, postOption, pollPostOption], from: source)
+        #if canImport(AmityUIKit4)
+        
+        let storyCompletion: ((AmityPostContentType) -> Void) = { postContentType in
+            let storyTargetSelectionPage = AmityStoryTargetSelectionPage()
+            let navPostTargetVC = UINavigationController(rootViewController: AmitySwiftUIHostingController(rootView: storyTargetSelectionPage))
+            navPostTargetVC.isNavigationBarHidden = true
+            navPostTargetVC.modalPresentationStyle = .fullScreen
+            source.present(navPostTargetVC, animated: true, completion: nil)
+        }
+        if postOption.contains(.story) {
+            
+            imageOptions.append(ImageItemOption(title: AmityLocalizedStringSet.General.story.localizedString, image: AmityIconSet.CreatePost.iconStory) {
+                storyCompletion(.story)
+            })
+        }
+        AmityBottomSheet.present(options: imageOptions, from: source)
+        #else
+        AmityBottomSheet.present(options: imageOptions, from: source)
+        #endif
     }
     
     /// Event for post creator
@@ -168,6 +197,32 @@ open class AmityEventHandler {
             case .community(object: let community):
                 createLiveStreamPost(from: source, targetId: community.communityId, targetType: .community, destinationToUnwindBackAfterFinish: source.presentingViewController ?? source)
             }
+            return
+        case .story:
+            #if canImport(AmityUIKit4)
+            switch postTarget {
+            case .myFeed:
+                Log.add("Story in Feed!!!!")
+            case .community(object: let community):
+                Task { @MainActor in
+                    let createStoryPage = AmityCreateStoryPage(targetId: community.communityId, targetType: .community)
+                    let viewController = AmitySwiftUIHostingController(rootView: createStoryPage)
+                    
+                    if let vc = source.navigationController?.viewControllers.last, vc.isKind(of: AmityCommunityProfilePageViewController.self) {
+                        let navigationController = UINavigationController(rootViewController: viewController)
+                        navigationController.navigationBar.isHidden = true
+                        navigationController.modalPresentationStyle = .overFullScreen
+                        navigationController.modalTransitionStyle = .crossDissolve
+                        source.present(navigationController, animated: true, completion: nil)
+                    } else {
+                        source.navigationController?.navigationBar.isHidden = true
+                        source.navigationController?.modalPresentationStyle = .overFullScreen
+                        source.navigationController?.modalTransitionStyle = .crossDissolve
+                        source.navigationController?.pushViewController(viewController, animated: true)
+                    }
+                }
+            }
+            #endif
             return
         }
         

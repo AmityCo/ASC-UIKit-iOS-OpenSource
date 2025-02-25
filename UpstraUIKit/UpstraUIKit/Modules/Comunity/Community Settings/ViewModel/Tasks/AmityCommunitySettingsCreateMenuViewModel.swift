@@ -101,6 +101,15 @@ final class AmityCommunitySettingsCreateMenuViewModel: AmityCommunitySettingsCre
             settingsItems.append(.navigationContent(content: itemPostReviewContent))
         }
         
+        // MARK: Community Story Comment Setting item
+        if shouldShowEditProfileItem || isModerator {
+            let itemPostReviewContent = AmitySettingsItem.NavigationContent(identifier: AmityCommunitySettingsItem.storyComment.identifier,
+                                                                      icon: AmityCommunitySettingsItem.storyComment.icon,
+                                                                      title: AmityCommunitySettingsItem.storyComment.title,
+                                                                      description: AmityCommunitySettingsItem.storyComment.description)
+            settingsItems.append(.navigationContent(content: itemPostReviewContent))
+        }
+        
         // MARK: Create leave community item
         // everyone can leave community
         let leaveContent = AmitySettingsItem.TextContent(identifier: AmityCommunitySettingsItem.leaveCommunity.identifier,

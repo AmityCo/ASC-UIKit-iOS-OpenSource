@@ -67,6 +67,7 @@ public struct AmityLocalizedStringSet {
         static let generalPhoto = "general_photo";
         static let generalAttachment = "general_attachment";
         static let generalAll = "general_all";
+        static let story = "general_story"
     }
     
     static let communitySettings = "community_settings"
@@ -274,6 +275,7 @@ public struct AmityLocalizedStringSet {
         static let itemTitleMembers = "community_settings_item_title_members"
         static let itemTitleNotifications = "community_settings_item_title_notifications"
         static let itemTitlePostReview = "community_settings_item_title_post_review"
+        static let itemTitleStoryComments = "community_settings_item_title_story_comments"
         static let itemTitleLeaveCommunity = "community_settings_item_title_leave_community"
         static let itemTitleCloseCommunity = "community_settings_item_title_close_community"
         static let itemDescCloseCommunity = "community_settings_item_desc_close_community"
@@ -303,8 +305,15 @@ public struct AmityLocalizedStringSet {
         static let descriptionNewComments = "community_notification_settings_description_new_comments"
         static let titleReplies = "community_notification_settings_title_replies"
         static let descriptionReplies = "community_notification_settings_description_replies"
+        static let titleNewStory = "community_notification_settings_title_new_story"
+        static let descriptionNewStory = "community_notification_settings_description_new_story"
+        static let titleReactsStory = "community_notification_settings_title_reacts_story"
+        static let descriptionReactsStory = "community_notification_settings_description_reacts_story"
+        static let titleNewStoryComment = "community_notification_settings_title_new_story_comment"
+        static let descriptionNewStoryComment = "community_notification_settings_description_new_story_comment"
         static let post = "community_notification_settings_post"
         static let comment = "community_notification_settings_comment"
+        static let story = "community_notification_settings_story"
         static let everyone = "community_notification_settings_everyone"
         static let onlyModerator = "community_notification_settings_only_moderator"
     }
@@ -409,6 +418,14 @@ public struct AmityLocalizedStringSet {
         static let hudTitleTurnOffPostReview = "post_review_settings_hud_title_turn_off_post_review"
         static let alertFailTitleTurnOn = "post_review_settings_alert_fail_title_turn_on"
         static let alertFailTitleTurnOff = "post_review_settings_alert_fail_title_turn_off"
+    }
+    
+    enum StoryCommentSettings {
+        static let title = "story_comment_settings_title"
+        static let itemTitleStoryComment = "story_comment_settings_item_title_allow_comments"
+        static let itemDescStoryComment = "story_comment_settings_item_desc_allow_comments"
+        static let alertFailTitleTurnOn = "story_comment_settings_allow_comments_alert_fail_title_turn_on"
+        static let alertFailTitleTurnOff = "story_comment_settings_allow_comments_alert_fail_title_turn_off"
     }
     
     // MARK: - Modal

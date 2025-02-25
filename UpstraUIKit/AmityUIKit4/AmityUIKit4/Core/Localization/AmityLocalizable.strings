@@ -1,0 +1,289 @@
+/* 
+  AmityLocalizable.strings
+  AmityUIKit
+
+  Created by Sarawoot Khunsri on 8/6/2563 BE.
+  Copyright © 2563 Amity Communication. All rights reserved.
+*/
+
+// MARK: - Story
+
+// General
+"cancel" = "Cancel";
+"save" = "Save";
+"retry" = "Retry";
+"delete" = "Delete";
+"discard" = "Discard";
+"leave" = "Leave";
+"confirm" = "Confirm";
+"okay" = "OK";
+"edit" = "Edit";
+"general_anonymous" = "Anonymous";
+"permission_required" = "Permission Required!!";
+"camera_access_denied" = "Please grant camera permission in iOS settings.";
+"on" = "On";
+"off" = "Off";
+
+// Create Story
+"created_story_successfully" = "Successfully shared story";
+"crated_story_failed" = "Failed to share story";
+"creating_story" = "Uploading...";
+
+// View Story
+"delete_story_title" = "Delete this story?";
+"delete_story_message" = "This story will be permanently deleted. You’ll no longer to see and find this story";
+"story_deleted_toast_message" = "Story deleted";
+"failed_story_banner_message" = "Failed to upload";
+"failed_story_alert_title" = "Failed to upload story";
+"failed_story_alert_message" = "Would you like to discard or retry uploading?";
+"non_member_react_story_message" = "Join community to interact with all posts";
+
+
+// Comment Tray
+"comment_tray_component_title" = "Comments";
+"comment_text_field_placeholder" = "Say something nice...";
+"no_comment_available" = "No comments yet";
+"delete_comment_title" = "Delete comment";
+"delete_comment_message" = "This comment will be permanently removed.";
+"deleted_comment_message" = "This comment has been deleted";
+"deleted_reply_comment_message" = "This reply has been deleted";
+"edit_comment_bottom_sheet_title" = "Edit Comment";
+"delete_comment_bottom_sheet_title" = "Delete Comment";
+"report_comment_bottom_sheet_title" = "Report comment";
+"unreport_comment_bottom_sheet_title" = "Unreport comment";
+"comment_reported_message" = "Comment reported";
+"comment_unreported_message" = "Comment unreported";
+"comment_react_button_text" = "Like";
+"comment_reacted_button_text" = "Liked";
+"comment_reply_button_text" = "Reply";
+"comment_edited_text" = "(edited)";
+"view_more_reply_text" = "View more reply";
+"disable_create_comment_text" = "Comments are disabled for this story";
+"comment_with_banned_words_error_message" = "Your comment contains inappropriate word. Please review and delete it.";
+
+// Toast
+"chat_toast_loading" = "Loading chat...";
+"chat_toast_copied" = "Copied";
+"chat_toast_delete_error" = "Unable to delete message. Please try again.";
+"chat_toast_link_not_allow" = "Your message wasn’t sent as it contained a link that’s not allowed.";
+"chat_toast_banned_word" = "Your message wasn’t sent as it contained a blocked word.";
+"chat_toast_report_message" = "Message reported.";
+"chat_toast_un_report_message" = "Message unreported.";
+"chat_toast_report_message_error" = "This message failed to be reported. Please try again.";
+"chat_toast_un_report_message_error" = "This message failed to be unreported. Please try again.";
+
+// Button
+"chat_deleted_message_text" = "This message was deleted";
+
+"chat_button_reply" = "Reply";
+"chat_button_copy" = "Copy";
+"chat_button_delete" = "Delete";
+"chat_button_report" = "Report";
+"chat_button_un_report" = "Unreport";
+"chat_button_ok" = "OK";
+
+// Error
+"chat_error_loading_chat_title" = "Couldn't load chat";
+"chat_error_banned_chat_title" = "You are banned from chat";
+"chat_error_banned_chat_sub_title" = "You won’t be able to participate in this chat until you’ve been unbanned.";
+
+"chat_char_limit_alert_title" = "Unable to send message";
+"chat_char_limit_alert_message" = "Your message is too long. Please shorten your message and try again.";
+"chat_delete_alert_title" = "Delete this message?";
+"chat_delete_alert_message" = "This message will also be removed from your friend’s devices.";
+"chat_delete_action_sheet_title" = "Your message wasn’t sent.";
+
+"chat_user_is_muted" = "You’ve been muted by the channel moderator.";
+"chat_channel_is_muted" = "This channel has been set to read-only by the channel moderator.";
+
+"chat_sending_status" = "sending...";
+"network_connectivity_status" = "Waiting for network...";
+
+"chat_mention_everyone" = "Notify everyone";
+"chat_reply_preview" = "Replying to %@";
+"chat_member_count" = "%@ members";
+
+// Social
+"empty_newsfeed_title" = "Your feed is empty";
+"empty_newsfeed_description" = "Find community or create your own ";
+"edit_post_bottom_sheet_title" = "Edit post";
+"delete_post_bottom_sheet_title" = "Delete post";
+"report_post_bottom_sheet_title" = "Report post";
+"unreport_post_bottom_sheet_title" = "Unreport post";
+"delete_post_title" = "Delete post";
+"delete_post_message" = "This post will be permanently removed.";
+"post_reported_message" = "Post reported.";
+"post_unreported_message" = "Post unreported.";
+"post_failed_unreported_message" = "Failed to report post. Please try again.";
+"post_failed_unreported_message" = "Failed to unreport post. Please try again.";
+"post_deleted_toast_message" = "Post deleted.";
+"post_detail_page_title" = "Post";
+"create_post_bottom_sheet_title" = "Post";
+"create_story_bottom_sheet_title" = "Story";
+"community_page_join_title" = "Join";
+"community_page_joined_title" = "Joined";
+"community_page_pending_post_title" = "Pending post";
+"non_member_react_post_message" = "Join community to interact with all posts";
+
+"reaction_list_unable_to_load_title" = "Unable to load reactions";
+"reaction_list_unrable_to_load_subtitle" = "Reactions aren't available for this message";
+"reaction_list_no_reactions_title" = "No reactions yet";
+"reaction_list_no_reactions_subtitle" = "Be the first to react to this message!";
+"reaction_list_tap_to_remove" = "Tap to remove reaction";
+"reaction_tab_all" = "All";
+
+"reach_mention_limit_title" = "Unable to mention user";
+"chat_reach_mention_limit_Message" = "You have reached maximum 30 mentioned users in a chat.";
+"ads_sponsored_label" = "Sponsored";
+"community_setup_alert_title" = "Leave without finishing?";
+"community_setup_alert_message" = "Your progress won’t be saved and your community won’t be created.";
+"community_setup_edit_alert_title" = "Unsaved changes";
+"community_setup_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+
+"livestream_player_ended_title" = "This livestream has ended.";
+"livestream_player_ended_message" = "Playback will be available for you to watch shortly.";
+"livestream_player_terminated_title" = "This stream has been terminated.";
+"livestream_player_terminated_message" = "It looks like this livestream goes against our content moderation guidelines.";
+"livestream_player_unavailable_title" = "This stream is currently unavailable.";
+"livestream_player_unavailable_message" = "Please try again later.";
+"livestream_player_reconnecting_title" = "Reconnecting";
+"livestream_player_reconnecting_message" = "Due to poor connection, this livestream has been paused. It will resume automatically once the connection is stable.";
+"livestream_player_live" = "LIVE";
+"livestream_player_recorded" = "RECORDED";
+
+// Community Setting
+"community_setting_basic_info_title" = "Basic Info";
+"community_setting_community_permissions_title" = "Community permissions";
+"community_setting_edit_profile" = "Edit Profile";
+"community_setting_members" = "Members";
+"community_setting_notifications" = "Notifications";
+"community_setting_post_permissions" = "Post permissions";
+"community_setting_story_comments" = "Story comments";
+"community_setting_leave_community" = "Leave community";
+"community_setting_close_community" = "Close community";
+"community_setting_close_community_description" = "Closing this community will remove the community  page and all its content and comments.";
+
+"community_setting_leave_community_alert_title" = "Leave community";
+"community_setting_leave_community_alert_message" = "Leave the community. You will no longer be able to post and interact in this community.";
+"community_setting_leave_community_failed_alert_title" = "Unable to leave community";
+"community_setting_leave_community_failed_alert_message" = "You’re the only moderator in this group. To leave community, nominate other members to moderator role.";
+"community_setting_close_community_alert_title" = "Close community?";
+"community_setting_close_community_alert_message" = "All members will be removed from the community. All posts, messages, reactions, and media shared in community will be deleted. This cannot be undone.";
+"community_post_permission_title" = "Who can post on this community";
+"community_post_permission_description" = "You can control who can create posts in your community.";
+"community_post_permission_everyone_can_post_setting" = "Everyone can post";
+"community_post_permission_admin_review_setting" = "Admin review post";
+"community_post_permission_only_admin_can_post_setting" = "Only admins can post";
+"community_story_setting_title" = "Allow comments on community stories";
+"community_story_setting_description" = "Turn on to receive comments on stories in this community.";
+
+
+"community_notification_setting_page_title" = "Notifications";
+"community_notification_setting_title" = "Allow notifications";
+"community_notification_setting_description" = "Turn on to receive push notifications from this community.";
+"community_notification_setting_posts" = "Posts";
+"community_notification_setting_comments" = "Comments";
+"community_notification_setting_stories" = "Stories";
+"community_notification_setting_option_everyone" = "Everyone";
+"community_notification_setting_option_only_moderator" = "Only moderator";
+"community_notification_setting_option_off" = "Off";
+"community_notification_setting_post_reaction_title" = "React posts";
+"community_notification_setting_post_reaction_description" = "Receive notifications when someone make a reaction to your posts in this community.";
+"community_notification_setting_post_creation_title" = "New posts";
+"community_notification_setting_post_creation_description" = "Receive notifications when someone create new posts in this community.";
+"community_notification_setting_comment_reaction_title" = "React comments";
+"community_notification_setting_comment_reaction_description" = "Receive notifications when someone like your comment in this community.";
+"community_notification_setting_comment_creation_title" = "New comments";
+"community_notification_setting_comment_creation_description" = "Receive notifications when someone comment to your posts in this community.";
+"community_notification_setting_comment_reply_title" = "Replies";
+"community_notification_setting_comment_reply_description" = "Receive notifications when someone comment to your comments in this community.";
+"community_notification_setting_story_creation_title" = "New stories";
+"community_notification_setting_story_creation_description" = "Receive notifications when someone creates a new story in this community.";
+"community_notification_setting_story_reaction_title" = "Story reactions";
+"community_notification_setting_story_reaction_Description" = "Receive notifications when someone reacts to your story in this community.";
+"community_notification_setting_story_comment_title" = "Story comments";
+"community_notification_setting_story_comment_description" = "Receive notifications when someone comments on your story in this community.";
+
+"community_member_count_singular" = "%@ member";
+"community_member_count_plural" = "%@ members";
+
+"explore_categories_see_more" = "See More";
+"explore_trending_now_component_title" = "Trending Now";
+"explore_recommended_communities_component_title" = "Recommended for you";
+
+"community_all_categories_title" = "All Categories";
+"community_list_empty_state_title" = "No community yet";
+
+"featured_post_badge" = "Featured";
+"featured_post_edit_confirmation_title" = "Edit globally featured post?";
+"featured_post_edit_confirmation" = "The post you're editing has been featured globally. If you edit your post, it will need to be re-approved and will no longer be globally featured";
+
+"global_featured_community_edit_confirmation_title" = "Change community privacy settings?";
+"global_featured_community_edit_confirmation_msg" = "This community has globally featured posts. Changing the community from public to private will remove these posts from being featured globally.";
+
+"user_profile_edit_alert_title" = "Unsaved changes";
+"user_profile_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+"user_profile_follow_request_title" = "New follow requests";
+
+// Polls
+"poll_close_alert_title" = "Close Poll?";
+"poll_close_alert_desc" = "The Poll duration you've set will be ignored and your poll will be closed immediately.";
+"poll_close_button" = "Close poll";
+"poll_close_toast_error" = "Oops, something went wrong.";
+
+"poll_status_ended" = "Ended";
+
+"poll_remaining_days_left" = "d left";
+"poll_remaining_hours_left" = "h left";
+"poll_remaining_minutes_left" = "m left";
+
+"poll_question_title" = "Poll Question";
+"poll_question_textfield_placeholder" = "What's your poll question?";
+"poll_multiple_selection_title" = "Multiple Selection";
+"poll_multiple_selection_desc" = "Let participants vote more than one option";
+
+"poll_post_create_error" = "Failed to create post. Please try again.";
+"poll_create_posting_toast" = "Posting...";
+
+"poll_duration_title" = "Poll Duration";
+"poll_duration_desc" = "You can always close the poll before the set duration";
+"poll_ends_on_label" = "Ends on";
+
+"poll_options_title" = "Options";
+"poll_options_desc" = "Poll must contain at least 2 options";
+"poll_add_option" = "Add Option";
+
+"poll_option_label" = "Option";
+
+"poll_answer_result_no_votes" = "No votes";
+"poll_answer_result_voted_by_you" = "Voted by you";
+"poll_answer_result_voted_by_single_participant" = "Voted by 1 participant";
+"poll_answer_result_voted_by_multiple_participants" = "Voted by %@ participants";
+"poll_answer_result_voted_by_and_you" = "and you";
+
+"poll_duration_pick_date_and_time" = "Pick date and time";
+"poll_duration_done_button" = "Done";
+
+"poll_duration_singular_day" = "%d day";
+"poll_duration_plural_days" = "%d days";
+
+"poll_select_one_option_label" = "Select one option";
+"poll_select_one_or_more_option_label" = "Select one or more options";
+
+"poll_see_full_results_label" = "See full results";
+"poll_see_results_label" = "See results";
+"poll_back_to_vote_label" = "Back to vote";
+"poll_see_more_options_label" = "See %d more options";
+
+"poll_vote_counts" = "%@ votes";
+"poll_vote_button" = "Vote";
+"poll_label" = "Poll";
+
+"poll_option_char_limit_error" = "Poll option cannot exceed %d characters.";
+"poll_question_char_limit_error" = "Poll question cannot exceed %d characters.";
+
+"poll_target_my_timeline" = "My Timeline";
+
+"post_delete_error" = "Failed to delete post. Please try again.";
+"post_create_error" = "Failed to create post. Please try again.";
+"post_edit_error" = "Failed to edit post. Please try again.";

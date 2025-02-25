@@ -156,8 +156,8 @@ open class AmityExpandableLabel: UILabel {
         set(text) {
             if let text = text {
                 let attributedString = NSMutableAttributedString(string: text)
-                let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-                let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
+                let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+                let matches = detector?.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count)) ?? []
                 var _hyperLinkTextRange: [Hyperlink] = []
                 for match in matches {
                     guard let textRange = Range(match.range, in: text) else { continue }
@@ -606,8 +606,8 @@ extension AmityExpandableLabel {
     
     func setText(_ text: String, withAttributes attributes: [MentionAttribute]) {
         let attributedString = NSMutableAttributedString(string: text)
-        let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-        let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
+        let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+        let matches = detector?.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count)) ?? []
         var _hyperLinkTextRange: [Hyperlink] = []
         for match in matches {
             guard let textRange = Range(match.range, in: text) else { continue }

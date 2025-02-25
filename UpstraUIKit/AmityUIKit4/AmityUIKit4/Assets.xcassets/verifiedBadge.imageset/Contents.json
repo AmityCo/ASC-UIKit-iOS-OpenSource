@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "checkmark_icon.svg",
+      "idiom" : "iphone"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

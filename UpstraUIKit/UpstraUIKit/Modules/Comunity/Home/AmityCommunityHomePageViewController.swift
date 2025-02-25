@@ -13,6 +13,7 @@ public class AmityCommunityHomePageViewController: AmityPageViewController {
     // MARK: - Properties
     public let newsFeedVC = AmityNewsfeedViewController.make()
     public let exploreVC = AmityCommunityExplorerViewController.make()
+    public let myCommunityVC = AmityMyCommunityViewController.make()
     
     private init() {
         super.init(nibName: AmityCommunityHomePageViewController.identifier, bundle: AmityUIKitManager.bundle)
@@ -25,25 +26,59 @@ public class AmityCommunityHomePageViewController: AmityPageViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        setupNavigationBar()
+        setupNavigationBar(moveToIndex: 0)
     }
     
     public static func make() -> AmityCommunityHomePageViewController {
         return AmityCommunityHomePageViewController()
     }
     
+    override func moveToViewController(at index: Int, animated: Bool = true) {
+        super.moveToViewController(at: index, animated: animated)
+        setupNavigationBar(moveToIndex: index)
+    }
+    
     override func viewControllers(for pagerTabStripController: AmityPagerTabViewController) -> [UIViewController] {
         newsFeedVC.pageTitle = AmityLocalizedStringSet.newsfeedTitle.localizedString
         exploreVC.pageTitle = AmityLocalizedStringSet.exploreTitle.localizedString
-        return [newsFeedVC, exploreVC]
+        myCommunityVC.pageTitle = "My Communities"
+        return [newsFeedVC, exploreVC, myCommunityVC]
     }
     
     // MARK: - Setup view
     
-    private func setupNavigationBar() {
+    private func setupNavigationBar(moveToIndex: Int) {
+        
+        var rightBarItems = [UIBarButtonItem]()
+        
+        if communityCreationButtonVisible(), moveToIndex == 2 {
+            let createCommunityItem = UIBarButtonItem(image: AmityIconSet.iconAdd, style: .plain, target: self, action: #selector(createCommunityTap))
+            createCommunityItem.tintColor = AmityColorSet.base
+            navigationItem.rightBarButtonItem = createCommunityItem
+            rightBarItems.append(createCommunityItem)
+        }
+        
         let searchItem = UIBarButtonItem(image: AmityIconSet.iconSearch, style: .plain, target: self, action: #selector(searchTap))
         searchItem.tintColor = AmityColorSet.base
         navigationItem.rightBarButtonItem = searchItem
+        rightBarItems.append(searchItem)
+        
+        navigationItem.rightBarButtonItems = rightBarItems
+
+    }
+    
+    @objc func createCommunityTap() {
+        myCommunityVC.createCommunityTap()
+    }
+    
+    private func communityCreationButtonVisible() -> Bool {
+        // The default visibility of this button.
+        var visible = true
+        // If someone override this env, we then force visibility to be that value.
+        if let overrideVisible = AmityUIKitManagerInternal.shared.env["amity_uikit_social_community_creation_button_visible"] as? Bool {
+            visible = overrideVisible
+        }
+        return visible
     }
 }
 

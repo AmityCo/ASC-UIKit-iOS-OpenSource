@@ -10,7 +10,8 @@ import UIKit
 
 extension UIView {
     
-    public static var identifier: String {
+    // Note: This property shouldn't have been public in first place.
+    static var identifier: String {
         return String(describing: self)
     }
     

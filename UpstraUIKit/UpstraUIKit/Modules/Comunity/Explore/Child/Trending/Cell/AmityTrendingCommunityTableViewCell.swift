@@ -43,7 +43,7 @@ final class AmityTrendingCommunityTableViewCell: UITableViewCell, Nibbable {
     }
     
     func display(with model: AmityCommunityModel) {
-        avatarView.setImage(withImageURL: model.avatarURL, placeholder: AmityIconSet.defaultCommunity)
+        avatarView.setImage(withImageURL: model.avatarURL, placeholder: AmityIconSet.defaultCommunityAvatar)
         displayNameLabel.text = model.displayName
         categoryLabel.text = model.category
         

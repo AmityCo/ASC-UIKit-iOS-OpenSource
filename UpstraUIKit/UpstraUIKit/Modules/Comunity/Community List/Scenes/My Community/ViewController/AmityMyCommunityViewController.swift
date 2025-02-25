@@ -9,8 +9,14 @@
 import UIKit
 
 /// A view controller for providing all community list.
-public final class AmityMyCommunityViewController: AmityViewController {
-
+public final class AmityMyCommunityViewController: AmityViewController, IndicatorInfoProvider {
+    func indicatorInfo(for pagerTabStripController: AmityPagerTabViewController) -> IndicatorInfo {
+        return IndicatorInfo(title: pageTitle)
+    }
+    
+    // MARK: - Properties
+    var pageTitle: String?
+    
     // MARK: - IBOutlet Properties
     @IBOutlet private var tableView: UITableView!
     
@@ -50,11 +56,6 @@ public final class AmityMyCommunityViewController: AmityViewController {
     // MARK: - Setup views
     private func setupView() {
         title = AmityLocalizedStringSet.myCommunityTitle.localizedString
-        if communityCreationButtonVisible() {
-            let rightItem = UIBarButtonItem(image: AmityIconSet.iconAdd, style: .plain, target: self, action: #selector(createCommunityTap))
-            rightItem.tintColor = AmityColorSet.base
-            navigationItem.rightBarButtonItem = rightItem
-        }
     }
     
     private func communityCreationButtonVisible() -> Bool {
@@ -105,10 +106,7 @@ public final class AmityMyCommunityViewController: AmityViewController {
         emptyView.topMargin = 100
     }
     
-}
-
-private extension AmityMyCommunityViewController {
-    @objc func createCommunityTap() {
+    func createCommunityTap() {
         let vc = AmityCommunityCreatorViewController.make()
         vc.delegate = self
         let nav = UINavigationController(rootViewController: vc)

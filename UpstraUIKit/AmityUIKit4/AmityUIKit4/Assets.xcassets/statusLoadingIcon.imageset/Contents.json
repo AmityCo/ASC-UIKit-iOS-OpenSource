@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "toastLoading.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

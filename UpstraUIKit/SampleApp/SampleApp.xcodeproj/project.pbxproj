@@ -18,6 +18,13 @@
 		0D73ACA825DB9423000D73CA /* NewJoinerPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73ACA725DB9423000D73CA /* NewJoinerPostComponent.swift */; };
 		0D8FFC2925DCBFD900943538 /* AmityCustomFooterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2725DCBFD900943538 /* AmityCustomFooterTableViewCell.swift */; };
 		0D8FFC2A25DCBFD900943538 /* AmityCustomFooterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2825DCBFD900943538 /* AmityCustomFooterTableViewCell.xib */; };
+		680DC0032C8ABE09006D8764 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */; };
+		680DC0042C8AC2B2006D8764 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */; };
+		682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; };
+		682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		684097562B30607F00697E1B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 684097552B30607F00697E1B /* GoogleService-Info.plist */; };
+		68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; };
+		68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7214C9CB2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */; };
 		7214C9D72632C0AD00192BB3 /* NotificationModuleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9D62632C0AD00192BB3 /* NotificationModuleTableViewCell.swift */; };
 		7214C9DB2632C0D500192BB3 /* SwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9DA2632C0D500192BB3 /* SwitchTableViewCell.swift */; };
@@ -28,7 +35,6 @@
 		729CAF3E273CC8ED000AE162 /* Binding+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF3D273CC8ED000AE162 /* Binding+Extension.swift */; };
 		729CAF42273CC95B000AE162 /* EndpointManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF41273CC95B000AE162 /* EndpointManager.swift */; };
 		72AACE0B273931F100E59D55 /* EndpointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72AACE0A273931F100E59D55 /* EndpointsView.swift */; };
-		7DC349112D6E04300021525C /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 7DC349102D6E04300021525C /* SharedFrameworks */; };
 		92DBE8A62ACA98CF007D873C /* DataListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D495077325E637C1005C033F /* DataListViewController.swift */; };
 		92DBE8A72ACA98CF007D873C /* SamplePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C25F3274CE38B0058B066 /* SamplePageViewController.swift */; };
 		92DBE8A82ACA98CF007D873C /* PostCreatorSettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */; };
@@ -90,11 +96,12 @@
 		92DBE8E32ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E42ACA98CF007D873C /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45B3A93264A840300F6FF52 /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E52ACA98CF007D873C /* AmityUIKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92DBE8ED2ACA9C16007D873C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 92DBE8EC2ACA9C16007D873C /* GoogleService-Info.plist */; };
 		97F101F526A69FBF00AD84A1 /* CustomChannelEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F101F426A69FBF00AD84A1 /* CustomChannelEventHandler.swift */; };
 		A03190A7272169C1008A85DC /* PostCreatorSettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */; };
 		A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; };
 		A0BD0B4926DDE0E30054088B /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A9FF80E62BBD10010088A317 /* LiveChatListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF80E52BBD10010088A317 /* LiveChatListView.swift */; };
+		A9FF80ED2BBD55870088A317 /* LiveChatListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF80E52BBD10010088A317 /* LiveChatListView.swift */; };
 		B72861D924C573B100ECC563 /* TabbarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72861D824C573B100ECC563 /* TabbarViewController.swift */; };
 		B72CDA3B256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72CDA39256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift */; };
 		B72CDA3C256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B72CDA3A256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib */; };
@@ -120,6 +127,7 @@
 		D4AFF1CF25ECE8AD002C001C /* PostPreviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */; };
 		D4AFF23225ED1E7C002C001C /* GlobalPostsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */; };
 		D4AFF23625ED1F88002C001C /* GlobalPostsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */; };
+		ED7E5C982D6E0FDE000E7AAC /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED7E5C972D6E0FDE000E7AAC /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -151,6 +159,7 @@
 				92DBE8E02ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */,
 				92DBE8E12ACA98CF007D873C /* RealmSwift.xcframework in Embed Frameworks */,
 				92DBE8E22ACA98CF007D873C /* MobileVLCKit.xcframework in Embed Frameworks */,
+				682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */,
 				92DBE8E32ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Embed Frameworks */,
 				92DBE8E42ACA98CF007D873C /* Realm.xcframework in Embed Frameworks */,
 				92DBE8E52ACA98CF007D873C /* AmityUIKit.framework in Embed Frameworks */,
@@ -165,6 +174,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A0BD0B4926DDE0E30054088B /* AmityUIKitLiveStream.framework in Embed Frameworks */,
+				68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */,
 				D478D16A26240A5E006EA140 /* AmityUIKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -184,8 +194,15 @@
 		0D73ACA725DB9423000D73CA /* NewJoinerPostComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewJoinerPostComponent.swift; sourceTree = "<group>"; };
 		0D8FFC2725DCBFD900943538 /* AmityCustomFooterTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCustomFooterTableViewCell.swift; sourceTree = "<group>"; };
 		0D8FFC2825DCBFD900943538 /* AmityCustomFooterTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AmityCustomFooterTableViewCell.xib; sourceTree = "<group>"; };
+		680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
+		684097552B30607F00697E1B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		684AE1302B0C8CB900FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		684AE1402B0C9B4E00FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		688F8617299E409B000FE6E7 /* SharedFrameworks */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SharedFrameworks; path = ../SharedFrameworks; sourceTree = "<group>"; };
 		68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Eko Corporation Company Limited"; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = ../Shared/RealmSwift.xcframework; sourceTree = "<group>"; };
+		68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLevelPushNotificationsTableViewController.swift; sourceTree = "<group>"; };
 		7214C9D62632C0AD00192BB3 /* NotificationModuleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationModuleTableViewCell.swift; sourceTree = "<group>"; };
 		7214C9DA2632C0D500192BB3 /* SwitchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchTableViewCell.swift; sourceTree = "<group>"; };
@@ -198,7 +215,6 @@
 		729CAF41273CC95B000AE162 /* EndpointManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointManager.swift; sourceTree = "<group>"; };
 		72AACE0A273931F100E59D55 /* EndpointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointsView.swift; sourceTree = "<group>"; };
 		92DBE8E92ACA98CF007D873C /* SampleAppDistribution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleAppDistribution.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		92DBE8EC2ACA9C16007D873C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		97F101F426A69FBF00AD84A1 /* CustomChannelEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomChannelEventHandler.swift; sourceTree = "<group>"; };
 		A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCreatorSettingsPage.swift; sourceTree = "<group>"; };
 		A0BD0B3B26DDDFCC0054088B /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -206,6 +222,7 @@
 		A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityVideoPlayerKit.xcframework; path = ../Shared/AmityVideoPlayerKit.xcframework; sourceTree = "<group>"; };
 		A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = ../Shared/MobileVLCKit.xcframework; sourceTree = "<group>"; };
 		A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A9FF80E52BBD10010088A317 /* LiveChatListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveChatListView.swift; sourceTree = "<group>"; };
 		B72861D824C573B100ECC563 /* TabbarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbarViewController.swift; sourceTree = "<group>"; };
 		B72CDA39256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomMessageTextIncomingTableViewCell.swift; sourceTree = "<group>"; };
 		B72CDA3A256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomMessageTextIncomingTableViewCell.xib; sourceTree = "<group>"; };
@@ -252,6 +269,7 @@
 				92DBE8CE2ACA98CF007D873C /* MobileVLCKit.xcframework in Frameworks */,
 				92DBE8CF2ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Frameworks */,
 				92DBE8D02ACA98CF007D873C /* FirebaseCrashlytics in Frameworks */,
+				682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */,
 				92DBE8D12ACA98CF007D873C /* Realm.xcframework in Frameworks */,
 				92DBE8D22ACA98CF007D873C /* AmityUIKit.framework in Frameworks */,
 			);
@@ -261,9 +279,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED7E5C982D6E0FDE000E7AAC /* SharedFrameworks in Frameworks */,
 				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
+				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
-				7DC349112D6E04300021525C /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,6 +467,7 @@
 		B78DA47724BED7D300EE902B /* SampleApp */ = {
 			isa = PBXGroup;
 			children = (
+				684097552B30607F00697E1B /* GoogleService-Info.plist */,
 				72363461260877D600CEB2B5 /* SampleApp.entitlements */,
 				721AF3C226088830005BA15F /* EventHandler */,
 				B78FC53C24CAAA2F0083CBB4 /* Extension */,
@@ -459,7 +479,6 @@
 				B78DA48124BED7DA00EE902B /* Assets.xcassets */,
 				B78DA48324BED7DA00EE902B /* LaunchScreen.storyboard */,
 				B78DA48624BED7DA00EE902B /* Info.plist */,
-				92DBE8EC2ACA9C16007D873C /* GoogleService-Info.plist */,
 			);
 			path = SampleApp;
 			sourceTree = "<group>";
@@ -485,6 +504,11 @@
 		B78DA4A824BED83100EE902B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */,
+				684AE1402B0C9B4E00FD7270 /* AmityUIKit4.framework */,
+				684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */,
+				684AE1302B0C8CB900FD7270 /* AmityUIKit4.framework */,
+				684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */,
 				68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */,
 				A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */,
 				A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */,
@@ -517,6 +541,7 @@
 				D495077325E637C1005C033F /* DataListViewController.swift */,
 				D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */,
 				D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */,
+				A9FF80E52BBD10010088A317 /* LiveChatListView.swift */,
 			);
 			path = Feature;
 			sourceTree = "<group>";
@@ -526,6 +551,7 @@
 			children = (
 				B78FC53D24CAAA2F0083CBB4 /* UserDefault.swift */,
 				729CAF3D273CC8ED000AE162 /* Binding+Extension.swift */,
+				680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -579,7 +605,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				7DC349102D6E04300021525C /* SharedFrameworks */,
+				ED7E5C972D6E0FDE000E7AAC /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -680,7 +706,7 @@
 				92DBE8D82ACA98CF007D873C /* Main.storyboard in Resources */,
 				92DBE8D92ACA98CF007D873C /* AmityPostBirthdayTableViewCell.xib in Resources */,
 				92DBE8DA2ACA98CF007D873C /* PostPreviewTableViewCell.xib in Resources */,
-				92DBE8ED2ACA9C16007D873C /* GoogleService-Info.plist in Resources */,
+				684097562B30607F00697E1B /* GoogleService-Info.plist in Resources */,
 				92DBE8DB2ACA98CF007D873C /* CustomMessageTextIncomingTableViewCell.xib in Resources */,
 				92DBE8DC2ACA98CF007D873C /* AmityPostNewJoinerTableViewCell.xib in Resources */,
 			);
@@ -748,6 +774,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				680DC0042C8AC2B2006D8764 /* UIDevice+Extension.swift in Sources */,
 				92DBE8A62ACA98CF007D873C /* DataListViewController.swift in Sources */,
 				92DBE8A72ACA98CF007D873C /* SamplePageViewController.swift in Sources */,
 				92DBE8A82ACA98CF007D873C /* PostCreatorSettingsPage.swift in Sources */,
@@ -764,6 +791,7 @@
 				92DBE8B32ACA98CF007D873C /* GlobalPostsDataSource.swift in Sources */,
 				92DBE8B42ACA98CF007D873C /* UserDefaults.swift in Sources */,
 				92DBE8B52ACA98CF007D873C /* RegisterViewController.swift in Sources */,
+				A9FF80ED2BBD55870088A317 /* LiveChatListView.swift in Sources */,
 				92DBE8B62ACA98CF007D873C /* SceneDelegate.swift in Sources */,
 				92DBE8B72ACA98CF007D873C /* AmityCustomFooterTableViewCell.swift in Sources */,
 				92DBE8B82ACA98CF007D873C /* NotificationModuleTableViewCell.swift in Sources */,
@@ -796,6 +824,7 @@
 				7214C9CB2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift in Sources */,
 				B78DA4AF24BED89000EE902B /* FeatureViewController.swift in Sources */,
 				B78DA47924BED7D300EE902B /* AppDelegate.swift in Sources */,
+				680DC0032C8ABE09006D8764 /* UIDevice+Extension.swift in Sources */,
 				0D73AC9525DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.swift in Sources */,
 				0D73AC9325DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.swift in Sources */,
 				0D73AC9825DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.swift in Sources */,
@@ -806,6 +835,7 @@
 				D4AFF23625ED1F88002C001C /* GlobalPostsDataSource.swift in Sources */,
 				B74ADE5E24F3B026009C86DA /* UserDefaults.swift in Sources */,
 				B754DBEE24C6F6BB005A8282 /* RegisterViewController.swift in Sources */,
+				A9FF80E62BBD10010088A317 /* LiveChatListView.swift in Sources */,
 				B78DA47B24BED7D300EE902B /* SceneDelegate.swift in Sources */,
 				0D8FFC2925DCBFD900943538 /* AmityCustomFooterTableViewCell.swift in Sources */,
 				7214C9D72632C0AD00192BB3 /* NotificationModuleTableViewCell.swift in Sources */,
@@ -893,6 +923,7 @@
 					"$(PROJECT_DIR)/../Distribution",
 				);
 				INFOPLIST_FILE = SampleApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -912,6 +943,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = SampleApp/SampleApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 37Z583JR6K;
@@ -920,6 +952,7 @@
 					"$(PROJECT_DIR)/../Distribution",
 				);
 				INFOPLIST_FILE = SampleApp/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -928,6 +961,7 @@
 				OTHER_SWIFT_FLAGS = "-D DISTRIBUTION";
 				PRODUCT_BUNDLE_IDENTIFIER = com.ekoapp.sample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE;
 				SWIFT_INCLUDE_PATHS = "";
 				SWIFT_VERSION = 5.0;
@@ -986,7 +1020,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1041,7 +1075,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1111,7 +1145,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = SampleAppTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1132,7 +1166,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = SampleAppTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1254,14 +1288,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7DC349102D6E04300021525C /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SharedFrameworks;
-		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		ED7E5C972D6E0FDE000E7AAC /* SharedFrameworks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -8,7 +8,14 @@
 
 import AmitySDK
 import AmityUIKit
+#if canImport(AmityUIKit4)
+import AmityUIKit4
+#endif
+import SwiftUI
 import UIKit
+#if canImport(AmityUIKitLiveStream)
+import AmityUIKitLiveStream
+#endif
 
 class AppManager {
     
@@ -30,7 +37,7 @@ class AppManager {
     func setupAmityUIKit() {
         // setup api key
         let endpointConfig = EndpointManager.shared.currentEndpointConfig
-        AmityUIKitManager.setup(apiKey: endpointConfig.apiKey, endpoint: AmityEndpoint(httpUrl: endpointConfig.httpEndpoint, rpcUrl: endpointConfig.socketEndpoint, mqttHost: endpointConfig.mqttEndpoint))
+        AmityUIKitManager.setup(apiKey: endpointConfig.apiKey, endpoint: AmityEndpoint(httpUrl: endpointConfig.httpEndpoint, rpcUrl: endpointConfig.socketEndpoint, mqttHost: endpointConfig.mqttEndpoint, uploadUrl: endpointConfig.uploadURL))
         
         // setup event handlers and page settings
         AmityUIKitManager.set(eventHandler: CustomEventHandler())
@@ -47,14 +54,24 @@ class AppManager {
         if let currentUserId = UserDefaults.standard.value(forKey: UserDefaultsKey.userId) as? String {
             register(withUserId: currentUserId)
         }
+        
+        // Share client to the new UIKit
+        #if canImport(AmityUIKit4)
+        AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
+        
+        let livestreamBehavior = CustomV4LivestreamBehavior()
+        AmityUIKit4Manager.behaviour.livestreamBehavior = livestreamBehavior
+        #endif
     }
     
     func register(withUserId userId: String) {
         AmityUIKitManager.registerDevice(withUserId: userId, displayName: nil, sessionHandler: SampleSessionHandler()) { [weak self] success, error in
             print("[Sample App] register device with userId '\(userId)' \(success ? "successfully" : "failed")")
             if let error = error {
-                print("[Sample App] register device failed \(error.localizedDescription)")
+                AmityHUD.show(.error(message: "Could not register user: \(error.localizedDescription)"))
+                return
             }
+            
             self?.registerDevicePushNotification()
         }
         UserDefaults.standard.setValue(userId, forKey: UserDefaultsKey.userId)
@@ -70,13 +87,11 @@ class AppManager {
         
         AmityUIKitManager.registerDeviceForPushNotification(deviceToken) { success, error in
             if success {
-                AmityHUD.show(.success(message: "Success with id \(deviceToken)"))
+                AmityHUD.show(.success(message: "Successfully registered push notification for device \(deviceToken)"))
             } else {
-                AmityHUD.show(.error(message: "Failed with error \(error?.localizedDescription)"))
+                AmityHUD.show(.error(message: "Failed to register push notification. Error: \(error?.localizedDescription ?? "")"))
             }
-            
         }
-        
     }
     
     func unregister() {
@@ -136,6 +151,33 @@ class AppManager {
         } else {
             return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RegisterNavigationController")
         }
+
     }
     
 }
+
+
+#if canImport(AmityUIKit4)
+
+class CustomV4LivestreamBehavior: AmityLivestreamBehavior {
+    
+    override func createRecordedPlayer(stream: AmityStream, client: AmityClient) -> any View {
+        #if canImport(AmityUIKitLiveStream)
+        return RecordedStreamPlayerView(livestream: stream, client: client)
+        #else
+        print("To watch recorded live stream, please install AmityVideoPlayerKit.")
+        return EmptyView()
+        #endif
+    }
+    
+    override func createLivestreamPlayer(stream: AmityStream, client: AmityClient, isPlaying: Bool) -> any View {
+        #if canImport(AmityUIKitLiveStream)
+        return LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
+        #else
+        print("To watch live stream, please install AmityVideoPlayerKit.")
+        return EmptyView()
+        #endif
+    }
+    
+}
+#endif

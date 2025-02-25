@@ -32,7 +32,7 @@ final class AmityMyCommunityCollectionViewCell: UICollectionViewCell, Nibbable {
     private func setupView() {
         containerView.backgroundColor = AmityColorSet.backgroundColor
         avatarView.placeholderPostion = .fullSize
-        avatarView.placeholder = AmityIconSet.defaultCommunity
+        avatarView.placeholder = AmityIconSet.defaultCommunityAvatar
         avatarView.contentMode = .scaleAspectFill
         avatarView.isUserInteractionEnabled = false
         displayNameLabel.text = ""
@@ -48,7 +48,7 @@ final class AmityMyCommunityCollectionViewCell: UICollectionViewCell, Nibbable {
     
     func display(with community: AmityCommunityModel) {
         displayNameLabel.text = community.displayName
-        avatarView.setImage(withImageURL: community.avatarURL, placeholder: AmityIconSet.defaultCommunity)
+        avatarView.setImage(withImageURL: community.avatarURL, placeholder: AmityIconSet.defaultCommunityAvatar)
         badgeImageView.isHidden = !community.isOfficial
         privateBadgeImageView.isHidden = community.isPublic
     }

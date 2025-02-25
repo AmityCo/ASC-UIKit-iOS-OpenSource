@@ -47,7 +47,7 @@ final class AmityMyCommunityTableViewCell: UITableViewCell, Nibbable {
     
     func setupAvatarView() {
         avatarView.placeholderPostion = .fullSize
-        avatarView.placeholder = AmityIconSet.defaultCommunity
+        avatarView.placeholder = AmityIconSet.defaultCommunityAvatar
         avatarView.contentMode = .scaleAspectFill
         avatarView.actionHandler = { [weak self] in
             self?.avatarTap()
@@ -56,7 +56,7 @@ final class AmityMyCommunityTableViewCell: UITableViewCell, Nibbable {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        avatarView.placeholder = AmityIconSet.defaultCommunity
+        avatarView.placeholder = AmityIconSet.defaultCommunityAvatar
         displayNameLabel.text = ""
         avatarView.image = nil
         badgeImageView.isHidden = true
@@ -64,7 +64,7 @@ final class AmityMyCommunityTableViewCell: UITableViewCell, Nibbable {
     }
     
     func display(with community: AmityCommunityModel) {
-        avatarView.setImage(withImageURL: community.avatarURL, placeholder: AmityIconSet.defaultCommunity)
+        avatarView.setImage(withImageURL: community.avatarURL, placeholder: AmityIconSet.defaultCommunityAvatar)
         displayNameLabel.text = community.displayName
         badgeImageView.isHidden = !community.isOfficial
         privateBadgeImageView.isHidden = community.isPublic

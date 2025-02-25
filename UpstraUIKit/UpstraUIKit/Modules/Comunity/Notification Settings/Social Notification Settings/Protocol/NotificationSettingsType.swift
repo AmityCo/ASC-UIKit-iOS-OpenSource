@@ -14,6 +14,9 @@ enum CommunityNotificationEventType: String {
     case commentReacted
     case commentCreated
     case commentReplied
+    case storyCreated
+    case storyReacted
+    case storyCommentCreated
     
     init?(eventType: AmityCommunityNotificationEventType) {
         switch eventType {
@@ -22,6 +25,9 @@ enum CommunityNotificationEventType: String {
         case .commentReacted: self = .commentReacted
         case .commentReplied: self = .commentReplied
         case .commentCreated: self = .commentCreated
+        case .storyCreated: self = .storyCreated
+        case .storyReacted: self = .storyReacted
+        case .storyCommentCreated: self = .storyCommentCreated
         @unknown default:
             return nil
         }
@@ -34,6 +40,9 @@ enum CommunityNotificationEventType: String {
         case .commentReacted: return .commentReacted
         case .commentReplied: return .commentReplied
         case .commentCreated: return .commentCreated
+        case .storyCreated: return .storyCreated
+        case .storyReacted: return .storyReacted
+        case .storyCommentCreated: return .storyCommentCreated
         }
     }
     
@@ -44,6 +53,12 @@ enum CommunityNotificationEventType: String {
         case .commentReacted: return AmityLocalizedStringSet.CommunityNotificationSettings.titleReactsComments.localizedString
         case .commentReplied: return AmityLocalizedStringSet.CommunityNotificationSettings.titleReplies.localizedString
         case .commentCreated: return AmityLocalizedStringSet.CommunityNotificationSettings.titleNewComments.localizedString
+        case .storyCreated: return
+            AmityLocalizedStringSet.CommunityNotificationSettings.titleNewStory.localizedString
+        case .storyReacted: return
+            AmityLocalizedStringSet.CommunityNotificationSettings.titleReactsStory.localizedString
+        case .storyCommentCreated: return
+            AmityLocalizedStringSet.CommunityNotificationSettings.titleNewStoryComment.localizedString
         }
     }
     
@@ -54,6 +69,12 @@ enum CommunityNotificationEventType: String {
         case .commentReacted: return AmityLocalizedStringSet.CommunityNotificationSettings.descriptionReactsComments.localizedString
         case .commentReplied: return AmityLocalizedStringSet.CommunityNotificationSettings.descriptionReplies.localizedString
         case .commentCreated: return AmityLocalizedStringSet.CommunityNotificationSettings.descriptionNewComments.localizedString
+        case .storyCreated: return
+            AmityLocalizedStringSet.CommunityNotificationSettings.descriptionNewStory.localizedString
+        case .storyReacted: return
+            AmityLocalizedStringSet.CommunityNotificationSettings.descriptionReactsStory.localizedString
+        case .storyCommentCreated: return
+            AmityLocalizedStringSet.CommunityNotificationSettings.descriptionNewStoryComment.localizedString
         }
     }
     

@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import AmitySDK
+import Combine
 
 /// A view controller for providing global feed with create post functionality.
 public class AmityNewsfeedViewController: AmityViewController, IndicatorInfoProvider {
@@ -18,21 +20,25 @@ public class AmityNewsfeedViewController: AmityViewController, IndicatorInfoProv
     var pageTitle: String?
     
     private let emptyView = AmityNewsfeedEmptyView()
-    private var headerView = AmityMyCommunityPreviewViewController.make()
+    private var headerView = AmityStoryTabViewController.make()
     private let createPostButton: AmityFloatingButton = AmityFloatingButton()
     private let feedViewController = AmityFeedViewController.make(feedType: .globalFeed)
+    
+    private let storyRepository = AmityStoryRepository(client: AmityUIKitManagerInternal.shared.client)
+    private var storyGlobalFeedCollection: AmityCollection<AmityStoryTarget>?
+    private var cancellable: AnyCancellable?
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         setupFeedView()
-        setupHeaderView()
         setupEmptyView()
+        setupHeaderView()
         setupPostButton()
     }
     
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        headerView.retrieveCommunityList()
+//        headerView.retrieveCommunityList()
     }
     
     public static func make() -> AmityNewsfeedViewController {
@@ -51,12 +57,19 @@ private extension AmityNewsfeedViewController {
         }
         
         feedViewController.pullRefreshHandler = { [weak self] in
-            self?.headerView.retrieveCommunityList()
+//            self?.headerView.retrieveCommunityList()
+            self?.getGlobalStoryTargets()
         }
     }
     
     private func setupHeaderView() {
-        headerView.delegate = self
+//        headerView.delegate = self
+        storyGlobalFeedCollection = getGlobalStoryTargets()
+        cancellable = nil
+        cancellable = storyGlobalFeedCollection?.$snapshots
+            .sink(receiveValue: { [weak self] targets in
+                self?.feedViewController.headerView = targets.count == 0 ? nil : self?.headerView
+            })
     }
     
     private func setupEmptyView() {
@@ -86,6 +99,10 @@ private extension AmityNewsfeedViewController {
         }
     }
     
+    @discardableResult
+    private func getGlobalStoryTargets() -> AmityCollection<AmityStoryTarget> {
+        storyRepository.getGlobalStoryTargets(option: .smart)
+    }
 }
 
 extension AmityNewsfeedViewController: AmityCommunityProfileEditorViewControllerDelegate {
@@ -96,23 +113,23 @@ extension AmityNewsfeedViewController: AmityCommunityProfileEditorViewController
     
 }
 
-extension AmityNewsfeedViewController: AmityMyCommunityPreviewViewControllerDelegate {
-
-    public func viewController(_ viewController: AmityMyCommunityPreviewViewController, didPerformAction action: AmityMyCommunityPreviewViewController.ActionType) {
-        switch action {
-        case .seeAll:
-            let vc = AmityMyCommunityViewController.make()
-            navigationController?.pushViewController(vc, animated: true)
-        case .communityItem(let communityId):
-            AmityEventHandler.shared.communityDidTap(from: self, communityId: communityId)
-        }
-    }
-
-    public func viewController(_ viewController: AmityMyCommunityPreviewViewController, shouldShowMyCommunityPreview: Bool) {
-        if shouldShowMyCommunityPreview {
-            feedViewController.headerView = headerView
-        } else {
-            feedViewController.headerView = nil
-        }
-    }
-}
+//extension AmityNewsfeedViewController: AmityMyCommunityPreviewViewControllerDelegate {
+//
+//    public func viewController(_ viewController: AmityMyCommunityPreviewViewController, didPerformAction action: AmityMyCommunityPreviewViewController.ActionType) {
+//        switch action {
+//        case .seeAll:
+//            let vc = AmityMyCommunityViewController.make()
+//            navigationController?.pushViewController(vc, animated: true)
+//        case .communityItem(let communityId):
+//            AmityEventHandler.shared.communityDidTap(from: self, communityId: communityId)
+//        }
+//    }
+//
+//    public func viewController(_ viewController: AmityMyCommunityPreviewViewController, shouldShowMyCommunityPreview: Bool) {
+//        if shouldShowMyCommunityPreview {
+//            feedViewController.headerView = globalFeedView
+//        } else {
+//            feedViewController.headerView = globalFeedView
+//        }
+//    }
+//}
