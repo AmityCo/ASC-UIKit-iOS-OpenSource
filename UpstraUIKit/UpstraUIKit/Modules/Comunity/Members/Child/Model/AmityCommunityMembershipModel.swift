@@ -25,7 +25,7 @@ struct AmityCommunityMembershipModel {
     
     init(member: AmityCommunityMember) {
         self.user = member.user
-        self.displayName = member.displayName == "" ? AmityLocalizedStringSet.General.anonymous.localizedString : member.displayName
+        self.displayName = member.displayName.isEmpty ? AmityLocalizedStringSet.General.anonymous.localizedString : member.displayName
         self.userId = member.userId
         self.roles = member.roles
         self.avatarURL = member.user?.getAvatarInfo()?.fileURL ?? ""

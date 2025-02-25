@@ -352,7 +352,6 @@
 		923AA56A2CB3B453009C9357 /* LivestreamVideoPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA5692CB3B453009C9357 /* LivestreamVideoPlayerViewModel.swift */; };
 		923AA56E2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA56D2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift */; };
 		923AA5702CB3B4F0009C9357 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA56F2CB3B4F0009C9357 /* Debouncer.swift */; };
-		9244D0B52D4CED860070A9FD /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9244D0B42D4CED860070A9FD /* SharedFrameworks */; };
 		9250CA2D2C2D55E9007551ED /* MultiSelectionMediaPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9250CA2C2C2D55E9007551ED /* MultiSelectionMediaPicker.swift */; };
 		926894402C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9268943F2C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift */; };
 		926894422C474A6A004CECF8 /* EmptyCommunityFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926894412C474A6A004CECF8 /* EmptyCommunityFeedView.swift */; };
@@ -502,6 +501,7 @@
 		ED6EFA112CB39DB6003A176F /* AmityPollPostComposerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6EFA102CB39DB6003A176F /* AmityPollPostComposerPage.swift */; };
 		ED6EFA142CB3D3D2003A176F /* PollAnswerResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6EFA132CB3D3D2003A176F /* PollAnswerResultView.swift */; };
 		ED6EFA612CB4FE0F003A176F /* PollOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6EFA602CB4FE0F003A176F /* PollOptionView.swift */; };
+		ED7E5C922D6E0F79000E7AAC /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED7E5C912D6E0F79000E7AAC /* SharedFrameworks */; };
 		EDF96A582CBE240700A5B83E /* PollManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF96A572CBE240700A5B83E /* PollManager.swift */; };
 		EDF96A5A2CBF7EF500A5B83E /* AmityPollTargetSelectionPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF96A592CBF7EF500A5B83E /* AmityPollTargetSelectionPage.swift */; };
 		EDF96A5C2CC0C42600A5B83E /* PollDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF96A5B2CC0C42600A5B83E /* PollDuration.swift */; };
@@ -1042,7 +1042,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9244D0B52D4CED860070A9FD /* SharedFrameworks in Frameworks */,
+				ED7E5C922D6E0F79000E7AAC /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3662,7 +3662,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9244D0B42D4CED860070A9FD /* SharedFrameworks */ = {
+		ED7E5C912D6E0F79000E7AAC /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
