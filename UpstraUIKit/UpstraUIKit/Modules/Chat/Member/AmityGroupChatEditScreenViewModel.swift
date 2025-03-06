@@ -55,7 +55,7 @@ class AmityGroupChatEditScreenViewModel: AmityGroupChatEditorScreenViewModelType
         channelNotificationToken = channelRepository.getChannel(channelId)
             .observe({ [weak self] channel, error in
                 guard let weakself = self,
-                    let channel = channel.object else{ return }
+                      let channel = channel.snapshot else{ return }
                 weakself.channel = channel
                 weakself.delegate?.screenViewModelDidUpdate(weakself)
             })
@@ -65,26 +65,25 @@ class AmityGroupChatEditScreenViewModel: AmityGroupChatEditorScreenViewModelType
         // Update
         channelUpdateBuilder.setDisplayName(displayName)
                 
-        AmityAsyncAwaitTransformer.toCompletionHandler(asyncFunction: channelRepository.updateChannel, parameters: channelUpdateBuilder) { [weak self] channel, error in
-            guard let weakSelf = self else { return }
-            
-            if let error = error {
-                weakSelf.delegate?.screenViewModelDidUpdateFailed(weakSelf, withError: error.localizedDescription)
-            } else {
-                weakSelf.delegate?.screenViewModelDidUpdateSuccess(weakSelf)
+        Task { @MainActor in
+            do {
+                let result = try await channelRepository.editChannel(with: channelUpdateBuilder)
+                self.delegate?.screenViewModelDidUpdateSuccess(self)
+            } catch let error {
+                self.delegate?.screenViewModelDidUpdateFailed(self, withError: error.localizedDescription)
             }
         }
     }
     
     func update(avatar: UIImage, completion: @escaping (Bool) -> ()) {
         // Update user avatar
-        fileRepository.uploadImage(avatar, progress: nil) { [weak self] (imageData, error) in
-            guard let weakSelf = self else { return }
-            weakSelf.channelUpdateBuilder.setAvatar(imageData)
-            
-            AmityAsyncAwaitTransformer.toCompletionHandler(asyncFunction: weakSelf.channelRepository.updateChannel, parameters: weakSelf.channelUpdateBuilder) { [weak self] channel, error in
-                guard let weakSelf = self else { return }
-                completion(error == nil)
+        Task { @MainActor in
+            do {
+                let uploadedData = try await fileRepository.uploadImage(avatar, progress: nil)
+                let updateResult = try await channelRepository.editChannel(with: channelUpdateBuilder)
+                completion(true)
+            } catch let error {
+                completion(false)
             }
         }
     }

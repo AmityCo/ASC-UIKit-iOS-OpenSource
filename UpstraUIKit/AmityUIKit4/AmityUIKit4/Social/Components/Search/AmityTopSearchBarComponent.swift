@@ -23,14 +23,17 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
     public init(viewModel: AmityGlobalSearchViewModel, pageId: PageId? = nil) {
         self.viewModel = viewModel
         self.pageId = pageId
-        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .topSearchBarComponent))
+        self._viewConfig = StateObject(
+            wrappedValue: AmityViewConfigController(
+                pageId: pageId, componentId: .topSearchBarComponent))
     }
     
-   
     public var body: some View {
-        HStack(spacing: 5) {
+        HStack(spacing: 12) {
             HStack(spacing: 0) {
-                let searchIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .searchIcon, key: "icon", of: String.self) ?? "")
+                let searchIcon = AmityIcon.getImageResource(
+                    named: viewConfig.getConfig(
+                        elementId: .searchIcon, key: "icon", of: String.self) ?? "")
                 Image(searchIcon)
                     .resizable()
                     .renderingMode(.template)
@@ -39,21 +42,33 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
                     .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 8))
                     .isHidden(viewConfig.isHidden(elementId: .searchIcon), remove: true)
                     .accessibilityIdentifier(AccessibilityID.Social.TopSearchBar.searchIcon)
-                    
-                let placeholder = viewModel.searchType == .myCommunities ? "Search my community" : "Search community and user"
-                TextField(placeholder, text: $viewModel.searchKeyword)
+                
+                let placeholderText =
+                viewModel.searchType == .myCommunities
+                ? "Search my communities" : "Search community and user"
+                TextField("", text: $viewModel.searchKeyword)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                    .placeholder(when: viewModel.searchKeyword.isEmpty, placeholder: {
+                        Text(placeholderText)
+                            .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
+                    })
+                    .focused()
                 
                 if !viewModel.searchKeyword.isEmpty {
-                    Button(action: {
-                        viewModel.searchKeyword = ""
-                    }, label: {
-                        let clearIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .clearButton, key: "icon", of: String.self) ?? "")
-                        Image(clearIcon)
-                            .resizable()
-                            .frame(width: 17, height: 17)
-                            .padding(.trailing, 12)
-                    })
+                    Button(
+                        action: {
+                            viewModel.searchKeyword = ""
+                        },
+                        label: {
+                            let clearIcon = AmityIcon.getImageResource(
+                                named: viewConfig.getConfig(
+                                    elementId: .clearButton, key: "icon", of: String.self) ?? "")
+                            Image(clearIcon)
+                                .resizable()
+                                .frame(width: 17, height: 17)
+                                .padding(.trailing, 12)
+                        }
+                    )
                     .isHidden(viewConfig.isHidden(elementId: .clearButton))
                     .accessibilityIdentifier(AccessibilityID.Social.TopSearchBar.clearButton)
                 }
@@ -61,19 +76,23 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
             .frame(maxWidth: .infinity)
             .background(Color(viewConfig.theme.baseColorShade4))
             .clipShape(RoundedCorner(radius: 8))
-            .padding(.leading, 10)
             
-            
-            Button(action: {
-                host.controller?.dismiss(animated: false)
-            }, label: {
-                let cancelButtonTitle = viewConfig.getConfig(elementId: .cancelButtonElement, key: "text", of: String.self) ?? ""
-                Text(cancelButtonTitle)
-            })
-            .padding(.trailing, 10)
+            Button(
+                action: {
+                    host.controller?.dismiss(animated: false)
+                },
+                label: {
+                    let cancelButtonTitle =
+                    viewConfig.getConfig(
+                        elementId: .cancelButtonElement, key: "text", of: String.self) ?? ""
+                    Text(cancelButtonTitle)
+                        .applyTextStyle(AmityTextStyle.body(Color(viewConfig.theme.primaryColor)))
+                }
+            )
             .isHidden(viewConfig.isHidden(elementId: .cancelButtonElement), remove: true)
         }
         .updateTheme(with: viewConfig)
+        .padding(.horizontal, 16)
         
     }
 }

@@ -46,7 +46,10 @@ struct CommentBottomSheetView: View {
                     editingComment?(viewModel.sheetState.comment)
                     viewModel.sheetState.isShown.toggle()
                 } label: {
-                    Text(AmityLocalizedStringSet.Comment.editCommentBottomSheetTitle.localizedString)
+                    let isReply = viewModel.sheetState.comment?.parentId != nil
+                    
+                    let editTitle = isReply ? "Edit reply" : AmityLocalizedStringSet.Comment.editCommentBottomSheetTitle.localizedString
+                    Text(editTitle)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 }
                 .buttonStyle(.plain)
@@ -57,22 +60,30 @@ struct CommentBottomSheetView: View {
             .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
             
             HStack(spacing: 12) {
-                Image(AmityIcon.trashBinIcon.getImageResource())
+                Image(AmityIcon.trashBinIcon.imageResource)
                     .renderingMode(.template)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 20, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .foregroundColor(Color(viewConfig.theme.alertColor))
                 
                 Button {
                     viewModel.isAlertShown.toggle()
                 } label: {
-                    Text(AmityLocalizedStringSet.Comment.deleteCommentBottomSheetTitle.localizedString)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                    let isReply = viewModel.sheetState.comment?.parentId != nil
+                    
+                    let deleteTitle = isReply ? "Delete reply" : AmityLocalizedStringSet.Comment.deleteCommentBottomSheetTitle.localizedString
+                    Text(deleteTitle)
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
                 }
                 .buttonStyle(.plain)
                 .alert(isPresented: $viewModel.isAlertShown, content: {
-                    Alert(title: Text(AmityLocalizedStringSet.Comment.deleteCommentTitle.localizedString), message: Text(AmityLocalizedStringSet.Comment.deleteCommentMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
+                    let isReply = viewModel.sheetState.comment?.parentId != nil
+                    
+                    let alertTitle = isReply ? "Delete reply" : AmityLocalizedStringSet.Comment.deleteCommentTitle.localizedString
+                    let alertMessage = isReply ? "This reply will be permanently deleted." : AmityLocalizedStringSet.Comment.deleteCommentMessage.localizedString
+
+                    return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
                         Task {
                             viewModel.sheetState.isShown.toggle()
                             if let comment = viewModel.sheetState.comment {
@@ -97,7 +108,7 @@ struct CommentBottomSheetView: View {
     func getNonOwnerBottomSheetView() -> some View {
         VStack {
             HStack(spacing: 12) {
-                Image(AmityIcon.flagIcon.getImageResource())
+                Image(viewModel.isCommentFlaggedByMe ? AmityIcon.unflagIcon.imageResource : AmityIcon.flagIcon.imageResource)
                     .renderingMode(.template)
                     .resizable()
                     .aspectRatio(contentMode: .fill)

@@ -15,10 +15,10 @@ public class CommunityProfileViewModel: ObservableObject {
     
     @Published var announcementPost: AmityPostModel?
     
-    @Published var headerHeight: CGFloat = 0
     @Published var stories: [AmityStory] = []
     @Published var pendingPostCount: Int = 0
     @Published var shouldShowPendingBanner: Bool = false
+    @Published var startedScrollingToTop: Bool = false
     
     private let communityManger = CommunityManager()
     private let storyManager = StoryManager()
@@ -33,7 +33,7 @@ public class CommunityProfileViewModel: ObservableObject {
     
     private var collection: AmityCollection<AmityPinnedPost>?
     
-    var hasStoryManagePermission: Bool = false
+    @Published var hasStoryManagePermission: Bool = false
     @Published var hasCreatePostPermission = false
 
     
@@ -135,10 +135,6 @@ public class CommunityProfileViewModel: ObservableObject {
         } else if currentTab == 3 {
             videoFeedViewModel.loadMediaFeed()
         }
-    }
-    
-    func updateHeaderHeight(height: CGFloat) {
-        headerHeight = height
     }
     
     @MainActor

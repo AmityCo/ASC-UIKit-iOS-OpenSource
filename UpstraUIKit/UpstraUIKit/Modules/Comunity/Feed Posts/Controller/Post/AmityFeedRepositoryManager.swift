@@ -28,7 +28,7 @@ final class AmityFeedRepositoryManager: AmityFeedRepositoryManagerProtocol {
     private let repository = AmityFeedRepository(client: AmityUIKitManagerInternal.shared.client)
     private var collection: AmityCollection<AmityPost>?
     private var token: AmityNotificationToken?
-    private var participation: AmityCommunityParticipation?
+    private var participation: AmityCommunityMembership?
     
     func loadMore() -> Bool {
         guard let collection = collection else { return false }
@@ -50,7 +50,7 @@ final class AmityFeedRepositoryManager: AmityFeedRepositoryManagerProtocol {
         case .globalFeed:
             collection = repository.getGlobalFeed()
         case .customPostRankingGlobalFeed:
-            collection = repository.getCustomPostRankingGlobalfeed()
+            collection = repository.getCustomRankingGlobalFeed()
         case .myFeed:
             collection = repository.getMyFeedSorted(by: .lastCreated, includeDeleted: false)
         case .userFeed(let userId):
@@ -92,7 +92,7 @@ final class AmityFeedRepositoryManager: AmityFeedRepositoryManagerProtocol {
             
             let model = AmityPostModel(post: post)
             if let communityId = model.targetCommunity?.communityId {
-                participation = AmityCommunityParticipation(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+                participation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
                 model.isModerator = participation?.getMember(withId: post.postedUserId)?.hasModeratorRole ?? false
                 switch feedType {
                 case .communityFeed(let feedCommunityId), .pendingPostsFeed(let feedCommunityId):

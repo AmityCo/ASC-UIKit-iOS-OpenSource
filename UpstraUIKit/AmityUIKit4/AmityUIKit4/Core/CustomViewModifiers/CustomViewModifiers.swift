@@ -257,3 +257,71 @@ struct AdaptiveVerticalPadding: ViewModifier {
         }
     }
 }
+
+@available(iOS 15.0, *)
+private struct TextFieldFocused: ViewModifier {
+    
+    @FocusState private var focused: Bool
+    
+    init() {
+        self.focused = false
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .focused($focused)
+            .onAppear {
+                focused = true
+            }
+    }
+}
+
+extension View {
+    @ViewBuilder
+    func focused() -> some View {
+        if #available(iOS 15.0, *) {
+            self.modifier(TextFieldFocused())
+        } else {
+            self
+        }
+    }
+}
+
+struct NavigationBarPadding: ViewModifier {
+    
+    func body(content: Content) -> some View {
+        content
+            .padding(.leading, 8)
+            .padding(.trailing, 16)
+    }
+}
+
+struct AmityPagePadding: ViewModifier {
+    
+    func body(content: Content) -> some View {
+        content
+            .padding(.horizontal, 16)
+    }
+}
+
+extension View {
+    
+    func navigationBarPadding() -> some View {
+        self
+            .modifier(NavigationBarPadding())
+    }
+    
+    func pagePadding() -> some View {
+        self
+            .modifier(AmityPagePadding())
+    }
+
+    func placeholder<Content: View>(when shouldShow: Bool, alignment: Alignment = .leading,
+        @ViewBuilder placeholder: () -> Content
+    ) -> some View {
+        ZStack(alignment: alignment) {
+            placeholder().opacity(shouldShow ? 1 : 0)
+            self
+        }
+    }
+}

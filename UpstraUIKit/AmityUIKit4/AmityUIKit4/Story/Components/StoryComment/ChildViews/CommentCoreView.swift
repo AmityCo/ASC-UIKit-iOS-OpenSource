@@ -45,6 +45,8 @@ class CommentCoreViewModel: ObservableObject {
     @Published var commentItems: [PaginatedItem<AmityCommentModel>] = []
     @Published var adSeetState: (isShown: Bool, ad: AmityAd?) = (false, nil)
     @Published var loadingStatus: AmityLoadingStatus = .notLoading
+    @Published var hasScrolledToTop: Bool = true
+
     private var commentCollection: AmityCollection<AmityComment>
     private let commentManager = CommentManager()
     var paginator: UIKitPaginator<AmityComment>

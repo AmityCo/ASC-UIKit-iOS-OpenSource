@@ -27,36 +27,35 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
     public var body: some View {
         VStack(spacing: 0) {
             AmityTopSearchBarComponent(viewModel: viewModel, pageId: id)
-                .padding(.top, 60)
+                .padding(.top, 64)
                 .environmentObject(host)
             
-            if !viewModel.isFirstTimeSearching {
-                VStack(spacing: 0) {
-                    TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
-                        .selectedTabColor(viewConfig.theme.highlightColor)
-                        .onChange(of: tabIndex) { value in
-                            viewModel.searchType = value == 0 ? .community : .user
-                            viewModel.searchKeyword = viewModel.searchKeyword
-                        }
-                        .padding(.horizontal)
-                        
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.baseColorShade4))
-                        .frame(height: 1)
-                }
-                .padding(.top, 15)
-                
-                ZStack(alignment: .top) {
-                    TabView(selection: $tabIndex) {
-                        AmityCommunitySearchResultComponent(viewModel: viewModel, pageId: id)
-                            .tag(0)
-                        
-                        AmityUserSearchResultComponent(viewModel: viewModel, pageId: id)
-                            .tag(1)
+            VStack(spacing: 0) {
+                TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
+                    .selectedTabColor(viewConfig.theme.highlightColor)
+                    .onChange(of: tabIndex) { value in
+                        viewModel.searchType = value == 0 ? .community : .user
+                        viewModel.searchKeyword = viewModel.searchKeyword
                     }
-                    .tabViewStyle(.page(indexDisplayMode: .never))
+                    .padding(.horizontal)
+                
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+            }
+            .padding(.top, 15)
+            
+            ZStack(alignment: .top) {
+                TabView(selection: $tabIndex) {
+                    AmityCommunitySearchResultComponent(viewModel: viewModel, pageId: id)
+                        .tag(0)
+                    
+                    AmityUserSearchResultComponent(viewModel: viewModel, pageId: id)
+                        .tag(1)
                 }
-            } else { Spacer() }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+            }
+            
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)

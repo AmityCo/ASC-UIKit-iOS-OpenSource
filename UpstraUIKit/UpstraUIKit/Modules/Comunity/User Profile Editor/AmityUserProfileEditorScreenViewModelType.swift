@@ -8,9 +8,8 @@
 
 import UIKit
 
-protocol AmityUserProfileEditorScreenViewModelAction {
-    func update(displayName: String, about: String)
-    func update(avatar: UIImage, completion: ((Bool) -> Void)?)
+protocol AmityUserProfileEditorScreenViewModelAction {    
+    func updateUser(displayName: String, aboutDescription: String, avatar: UIImage?, completion: @escaping (Bool) -> Void)
 }
 
 protocol AmityUserProfileScreenEditorViewModelDataSource {

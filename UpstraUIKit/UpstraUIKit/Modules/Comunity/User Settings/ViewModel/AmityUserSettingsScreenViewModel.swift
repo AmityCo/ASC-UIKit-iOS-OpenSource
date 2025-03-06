@@ -23,17 +23,19 @@ final class AmityUserSettingsScreenViewModel: AmityUserSettingsScreenViewModelTy
     let userId: String
     private let userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
     private var userToken: AmityNotificationToken?
-    private let followManager: AmityUserFollowManager
-    private var flagger: AmityUserFlagger?
+    private let followManager: AmityUserRelationship
     private var isFlaggedByMe: Bool?
     private var followStatus: AmityFollowStatus?
     private var dispatchGroup = DispatchGroup()
     private var followToken: AmityNotificationToken?
     
+    let relationshipManager = UserRelationshipManager()
+    let moderationManager = UserModerationManager()
+    
     init(userId: String, userNotificationController: AmityUserNotificationSettingsControllerProtocol) {
         self.userId = userId
         self.userNotificationController = userNotificationController
-        followManager = userRepository.followManager
+        followManager = userRepository.userRelationship
     }
 }
 
@@ -41,16 +43,15 @@ final class AmityUserSettingsScreenViewModel: AmityUserSettingsScreenViewModelTy
 extension AmityUserSettingsScreenViewModel {
     
     func unfollowUser() {
-        followManager.unfollowUser(withUserId: userId) { [weak self] success, response, error in
-            guard let strongSelf = self else { return }
-            
-            if !success {
-                strongSelf.delegate?.screenViewModel(strongSelf, didCompleteAction: .unfollow, error: AmityError(error: error))
+        relationshipManager.unfollowUser(userId: userId) { [weak self] status, followResponse, error in
+            guard let self else { return }
+            if !status {
+                self.delegate?.screenViewModel(self, didCompleteAction: .unfollow, error: AmityError(error: error))
                 return
             }
             
-            strongSelf.followStatus = AmityFollowStatus.none
-            strongSelf.createMenuViewModel()
+            self.followStatus = AmityFollowStatus.none
+            self.createMenuViewModel()
         }
     }
     
@@ -88,8 +89,7 @@ extension AmityUserSettingsScreenViewModel {
     
     func reportUser() {
         guard let user = user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.flag { [weak self] (success, error) in
+        moderationManager.flagUser(userId: user.userId) { [weak self] status, error in
             guard let strongSelf = self else { return }
             
             if let error {
@@ -104,8 +104,7 @@ extension AmityUserSettingsScreenViewModel {
 
     func unreportUser() {
         guard let user = user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.unflag { [weak self] (success, error) in
+        moderationManager.unflagUser(userId: user.userId) { [weak self] status, error in
             guard let strongSelf = self else { return }
             
             if let error = error {
@@ -160,15 +159,15 @@ extension AmityUserSettingsScreenViewModel {
 private extension AmityUserSettingsScreenViewModel {
     func getReportUserStatus(completion: (() -> Void)?) {
         guard let user = user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.isFlaggedByMe(completion: { [weak self] isFlaggedByMe in
-            self?.isFlaggedByMe = isFlaggedByMe
+        
+        moderationManager.isFlaggedByMe(userId: user.userId) { [weak self] status, error in
+            self?.isFlaggedByMe = status
             completion?()
-        })
+        }
     }
     
     func getFollowInfo(completion: (() -> Void)?) {
-        followToken = followManager.getUserFollowInfo(withUserId: userId).observeOnce {
+        followToken = followManager.getFollowInfo(withUserId: userId).observeOnce {
             [weak self] liveObject, error in
             guard let result = liveObject.snapshot else { return }
             

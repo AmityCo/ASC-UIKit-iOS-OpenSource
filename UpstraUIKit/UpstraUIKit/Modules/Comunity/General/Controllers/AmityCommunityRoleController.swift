@@ -24,27 +24,25 @@ final class AmityCommunityRoleController: AmityCommunityRoleControllerProtocol {
     
     // Add role permisstion to users
     func add(roles: [String], userIds: [String], completion: ((AmityError?) -> Void)?) {
-        moderation.addRoles(roles, userIds: userIds, completion: { (success, error) in
-            if success {
+        Task { @MainActor in
+            do {
+                let result = try await moderation.addRoles(roles, userIds: userIds)
                 completion?(nil)
-            } else {
-                if let error = AmityError(error: error) {
-                    completion?(error)
-                } else {
-                    completion?(AmityError.unknown)
-                }
+            } catch let error {
+                completion?(AmityError(error: error))
             }
-        })
+        }
     }
     
     // Remove role permisstion from users
     func remove(roles: [String], userIds: [String], completion: ((AmityError?) -> Void)?) {
-        moderation.removeRoles(roles, userIds: userIds, completion: { (success, error) in
-            if success {
+        Task { @MainActor in
+            do {
+                let result = try await moderation.removeRoles(roles, userIds: userIds)
                 completion?(nil)
-            } else {
-                completion?(AmityError(error: error) ?? .unknown)
-            }  
-        })
+            } catch let error {
+                completion?(AmityError(error: error))
+            }
+        }
     }
 }

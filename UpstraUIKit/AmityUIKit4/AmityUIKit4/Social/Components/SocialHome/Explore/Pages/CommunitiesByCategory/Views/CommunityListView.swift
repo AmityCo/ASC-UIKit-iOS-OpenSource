@@ -20,7 +20,7 @@ struct CommunityListView: View {
                 LazyVStack {
                     ForEach(viewModel.communities) { community in
                         VStack(spacing: 0) {
-                            CommunityListItemView(community: community)
+                            CommunityListItemView(community: community, showJoinButton: false)
                                 .onTapGesture {
                                     host.controller?.navigationController?.pushViewController(AmitySwiftUIHostingController(rootView: AmityCommunityProfilePage(communityId: community.communityId)), animated: true)
                                 }
@@ -29,10 +29,6 @@ struct CommunityListView: View {
                                         viewModel.loadMore()
                                     }
                                 }
-                            
-                            Divider()
-                                .opacity(viewModel.isLastCommunity(community: community) ? 0 : 1)
-                                .padding(.vertical, 12)
                         }
                     }
                 }

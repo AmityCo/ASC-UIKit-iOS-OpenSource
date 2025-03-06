@@ -157,7 +157,7 @@ extension ExpandableText {
     @available(iOS 15, *)
     func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], font: UIFont) -> AttributedString {
         
-        let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: UIFont.systemFont(ofSize: 15, weight: .semibold)]
+        let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: UIFont.systemFont(ofSize: 15, weight: .regular)]
         
         //let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         //let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))

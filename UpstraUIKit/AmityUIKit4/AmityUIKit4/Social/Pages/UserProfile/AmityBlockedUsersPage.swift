@@ -26,7 +26,6 @@ public struct AmityBlockedUsersPage: AmityPageView {
     public var body: some View {
         VStack(spacing: 12) {
             navigationBarView
-                .padding(.horizontal, 16)
             
             ZStack {
                 emptyView
@@ -46,18 +45,7 @@ public struct AmityBlockedUsersPage: AmityPageView {
     @ViewBuilder
     private var navigationBarView: some View {
         let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "Manage blocked users"
-        AmityNavigationBar(title: title, leading: {
-            let backButton = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .backButtonElement, key: "image", of: String.self) ?? "")
-            Image(backButton)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-                .frame(width: 24, height: 20)
-                .onTapGesture {
-                    host.controller?.navigationController?.popViewController()
-                }
-        }, trailing: { EmptyView() })
+        AmityNavigationBar(title: title, showBackButton: true)
     }
     
     @ViewBuilder

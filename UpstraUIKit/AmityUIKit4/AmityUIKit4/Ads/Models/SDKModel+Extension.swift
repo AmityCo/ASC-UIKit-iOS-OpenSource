@@ -47,4 +47,8 @@ extension AmityImageData {
     var largeFileURL: String {
         return fileURL + "?size=large"
     }
+    
+    var mediumFileURL: String {
+        return fileURL + "?size=medium"
+    }
 }

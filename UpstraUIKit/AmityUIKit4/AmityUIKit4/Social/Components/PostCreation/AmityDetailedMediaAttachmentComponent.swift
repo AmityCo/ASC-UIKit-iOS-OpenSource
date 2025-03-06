@@ -76,10 +76,6 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
             }
             .isHidden(viewConfig.isHidden(elementId: .videoButton))
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.videoButton)
-            
-//            getItemView(image: AmityIcon.attatchmentIcon.getImageResource(),
-//                        title: "Attatchment",
-//                        isDisable: false) {}
         }
         .onChange(of: pickerViewModel) { _ in
                         
@@ -149,22 +145,24 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
     @ViewBuilder
     private func getItemView(image: ImageResource, title: String, isHidden: Bool, onTapAction: @escaping () -> Void) -> some View {
         let isDisable = viewModel.medias.count >= 10
+        let currentThemeStyle = AmityUIKitConfigController.shared.getCurrentThemeStyle()
+        let imageTint = currentThemeStyle == .light ? viewConfig.theme.baseColor : UIColor.white
         HStack(spacing: 12) {
             Rectangle()
-                .fill(Color(viewConfig.defaultLightTheme.baseColorShade4))
+                .fill(Color(viewConfig.theme.backgroundShade1Color))
                 .frame(width: 32, height: 32)
                 .overlay (
                     Image(image)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFill()
-                        .foregroundColor(isDisable ? Color(viewConfig.theme.baseColorShade3) : nil)
+                        .foregroundColor(isDisable ? nil : Color(imageTint))
                         .frame(width: 20, height: 20)
                 )
                 .clipShape(Circle())
             
             Text(title)
-                .foregroundColor(isDisable ? .gray : Color(viewConfig.theme.baseColor))
+                .applyTextStyle(.bodyBold(isDisable ? .gray : Color(viewConfig.theme.baseColor)))
             
             Spacer()
         }

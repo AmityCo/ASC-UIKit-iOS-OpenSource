@@ -12,15 +12,16 @@ class NotificationManager {
     
     func getUserNotificationSetting(completion: @escaping ((AmityUserNotificationSettings?, AmityError?) -> Void)) {
         let notificationManager = AmityUIKitManagerInternal.shared.client.notificationManager
-        notificationManager.getSettingsWithCompletion { settings, error in
-            if let error {
-                completion(nil, AmityError(error: error))
-            } else {
+        
+        Task { @MainActor in
+            do {
+                let settings = try await notificationManager.getSettings()
                 completion(settings, nil)
+            } catch let error {
+                completion(nil, AmityError(error: error))
             }
         }
     }
-    
     
     func getCommunityNotificationSetting(withId: String, completion: @escaping ((AmityCommunityNotificationSettings?, AmityError?) -> Void)) {
         let notificationManager: AmityCommunityNotificationsManager = AmityCommunityNotificationsManager(client: AmityUIKitManagerInternal.shared.client, communityId: withId)

@@ -486,20 +486,28 @@ public class AmityPostModel: Identifiable {
 
 class PollStatus {
     var statusInfo: String = ""
+    var isInPendingFeed: Bool
 
-    init(poll: AmityPostModel.PollModel) {
+    init(poll: AmityPostModel.PollModel, isInPendingFeed: Bool) {
+        self.isInPendingFeed = isInPendingFeed
         if poll.isClosed {
             statusInfo = AmityLocalizedStringSet.Social.pollStatusEnded.localizedString
         } else {
             let closedInDate = poll.createdAt.addingTimeInterval(Double(poll.closedIn) / 1000)
-            computeRemainingTime(closedInDate: closedInDate)
+            computeRemainingTime(closedInDate: closedInDate, isInPendingFeed: isInPendingFeed)
         }
     }
     
-    private func computeRemainingTime(closedInDate: Date) {
+    private func computeRemainingTime(closedInDate: Date, isInPendingFeed: Bool) {
         let currentDate = Date()
         
         if closedInDate > currentDate {
+            
+            if isInPendingFeed {
+                statusInfo = AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationFormatter.string(from: closedInDate)
+                return
+            }
+            
             let difference = Calendar.current.dateComponents([.day,.hour,.minute], from: currentDate, to: closedInDate)
             
             if let remainingDays = difference.day, remainingDays > 0 {

@@ -33,10 +33,10 @@ public class AmityGlobalSearchViewModel: ObservableObject {
         self.searchType = searchType
     
         $searchKeyword
-            .drop { $0.isEmpty }
-            .debounce(for: 0.5, scheduler: DispatchQueue.main)
+            .debounce(for: 0.3, scheduler: DispatchQueue.main)
             .sink(receiveValue: { [weak self] value in
                 guard let self else { return }
+                
                 isFirstTimeSearching = false
                 
                 if self.searchType == .community {
@@ -52,6 +52,13 @@ public class AmityGlobalSearchViewModel: ObservableObject {
     
     /// Search Communities globally
     private func searchCommunities(keyword: String) {
+        guard !keyword.isEmpty else {
+            communities = []
+            loadingState = .notLoading
+            
+            return
+        }
+        
         communityCollection = communityManger.searchCommunitites(keyword: keyword, filter: .all)
         communityCollection?.$snapshots
             .sink(receiveValue: { [weak self] communities in
@@ -75,6 +82,15 @@ public class AmityGlobalSearchViewModel: ObservableObject {
     
     /// Search Users globally
     private func searchUsers(keyword: String) {
+        if keyword.isEmpty || keyword.count < 3 {
+            self.users = []
+            self.loadingState = keyword.isEmpty ? .notLoading : .error
+            
+            return // terminate here
+        } else {
+            self.loadingState = .loading
+        }
+        
         userCollection = userManager.searchUsers(keyword: keyword)
         userCollection?.$snapshots
             .sink(receiveValue: { [weak self] users in
@@ -98,6 +114,11 @@ public class AmityGlobalSearchViewModel: ObservableObject {
     
     /// Search My Communities globally
     private func searchMyCommunities(keyword: String) {
+        guard !keyword.isEmpty else {
+            communities = []
+            return
+        }
+        
         communityCollection = communityManger.searchCommunitites(keyword: keyword, filter: .userIsMember)
         communityCollection?.$snapshots
             .sink(receiveValue: { [weak self] communities in

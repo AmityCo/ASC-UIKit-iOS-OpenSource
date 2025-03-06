@@ -96,8 +96,8 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                 }
                 Spacer()
             }
-            .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
             .padding([.leading, .trailing], 16)
+            .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
             .navigationTitle("Add link")
             .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.titleTextView)
             .navigationBarTitleDisplayMode(.inline)

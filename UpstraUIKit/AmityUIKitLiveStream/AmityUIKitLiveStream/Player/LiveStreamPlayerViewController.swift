@@ -227,7 +227,7 @@ public class LiveStreamPlayerViewController: UIViewController {
     
     private func observeStreamObject() {
         
-        getStreamToken = streamRepository.getStreamById(streamIdToWatch).observe { [weak self] data, error in
+        getStreamToken = streamRepository.getStream(streamIdToWatch).observe { [weak self] data, error in
             
             guard let strongSelf = self else { return }
             
@@ -236,7 +236,7 @@ public class LiveStreamPlayerViewController: UIViewController {
                 return
             }
             
-            guard let streamToWatch = data.object else {
+            guard let streamToWatch = data.snapshot else {
                 self?.presentUnableToPlayLiveStreamError(reason: nil)
                 return
             }

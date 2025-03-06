@@ -50,32 +50,36 @@ public struct AmityEditUserProfilePage: AmityPageView {
     public var body: some View {
         VStack(spacing: 0) {
             navigationBarView
-            ScrollView {
-                VStack(spacing: 24) {
-                    userProifleAvatarView
-                    
-                    InfoTextField(data: $displayNameTextFieldModel, text: $displayNameText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userDisplayNameTitle)
-                        .alertColor(viewConfig.theme.alertColor)
-                        .dividerColor(viewConfig.theme.baseColorShade4)
-                        .titleTextColor(viewConfig.theme.baseColor)
-                        .infoTextColor(viewConfig.theme.baseColorShade2)
-                        .textFieldTextColor(viewConfig.theme.baseColorShade2)
-                        .allowsHitTesting(false)
-                    
-                    InfoTextField(data: $aboutTextFieldModel, text: $aboutText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userAboutTitle)
-                        .alertColor(viewConfig.theme.alertColor)
-                        .dividerColor(viewConfig.theme.baseColorShade4)
-                        .infoTextColor(viewConfig.theme.baseColorShade2)
-                        .textFieldTextColor(viewConfig.theme.baseColor)
-                    
-                    Spacer()
+            VStack(spacing: 0) {
+                ScrollView {
+                    VStack(spacing: 24) {
+                        userProifleAvatarView
+                        
+                        InfoTextField(data: $displayNameTextFieldModel, text: $displayNameText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userDisplayNameTitle)
+                            .alertColor(viewConfig.theme.alertColor)
+                            .dividerColor(viewConfig.theme.baseColorShade4)
+                            .titleTextColor(viewConfig.theme.baseColor)
+                            .infoTextColor(viewConfig.theme.baseColorShade2)
+                            .textFieldTextColor(viewConfig.theme.baseColorShade2)
+                            .allowsHitTesting(false)
+                        
+                        InfoTextField(data: $aboutTextFieldModel, text: $aboutText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userAboutTitle)
+                            .alertColor(viewConfig.theme.alertColor)
+                            .dividerColor(viewConfig.theme.baseColorShade4)
+                            .infoTextColor(viewConfig.theme.baseColorShade2)
+                            .textFieldTextColor(viewConfig.theme.baseColor)
+                        
+                        Spacer()
+                    }
+                    .contentShape(Rectangle())
                 }
-                .contentShape(Rectangle())
+                .dismissKeyboardOnDrag()
+                
+                saveButtonView
+                    .padding(.bottom, 10)
             }
-            .dismissKeyboardOnDrag()
-            
-            saveButtonView
-                .padding(.bottom, 10)
+            .padding(.horizontal, 16)
+            .padding(.top, 10)
         }
         .onReceive(viewModel.$user) { user in
             let userDisplayNameTitle = viewConfig.getConfig(elementId: .userDisplayNameTitle, key: "text", of: String.self) ?? "Display Name"
@@ -99,7 +103,6 @@ public struct AmityEditUserProfilePage: AmityPageView {
             )
             aboutText = user?.about ?? ""
         }
-        .padding(.horizontal, 16)
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .fullScreenCover(isPresented: $showImagePicker.isShown) {

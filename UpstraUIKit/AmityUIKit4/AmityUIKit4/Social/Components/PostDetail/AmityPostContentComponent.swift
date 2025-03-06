@@ -206,7 +206,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .foregroundColor(Color(viewConfig.theme.baseColor))
                             .frame(width: 24, height: 24)
                     })
-                    .buttonStyle(BorderlessButtonStyle())
+                    .buttonStyle(PlainButtonStyle())
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
                     .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                         PostBottomSheetView(isShown: $showBottomSheet, post: post) { postAction in
@@ -297,7 +297,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
                 goToUserProfilePage(userId)
             })
-            .lineLimit(8)
+            .lineLimit(style == .detail ? 1000 : 8)
             .moreButtonText("...See more")
             .font(AmityTextStyle.body(.clear).getFont())
             .foregroundColor(Color(viewConfig.theme.baseColor))

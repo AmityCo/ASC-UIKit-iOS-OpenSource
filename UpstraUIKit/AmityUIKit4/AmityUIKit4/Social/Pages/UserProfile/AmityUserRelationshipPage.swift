@@ -36,7 +36,6 @@ public struct AmityUserRelationshipPage: AmityPageView {
     public var body: some View {
         VStack(spacing: 12) {
             navigationBarView
-                .padding(.horizontal, 16)
             
             VStack(spacing: 0) {
                 TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)

@@ -15,21 +15,22 @@ protocol AmityChannelRemoveMemberControllerProtocol {
 
 final class AmityChannelRemoveMemberController: AmityChannelRemoveMemberControllerProtocol {
     
-    private var membershipParticipation: AmityChannelParticipation?
+    private var membershipParticipation: AmityChannelMembership?
     
     init(channelId: String) {
-        membershipParticipation = AmityChannelParticipation(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membershipParticipation = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
     }
     
     func remove(users: [AmityChannelMembershipModel], at indexPath: IndexPath, _ completion: @escaping (AmityError?) -> Void) {
         let userId = users[indexPath.row].userId
-        membershipParticipation?.removeMembers([userId], completion: { (success, error) in
-            if success {
+        Task { @MainActor in
+            do {
+                let result = try await membershipParticipation?.removeMembers([userId])
                 completion(nil)
-            } else {
+            } catch let error {
                 completion(AmityError(error: error) ?? .unknown)
             }
-        })
+        }
     }
 
 }

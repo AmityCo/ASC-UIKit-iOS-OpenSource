@@ -223,7 +223,7 @@ extension AmityCreateCommunityScreenViewModel {
     func getInfo(communityId: String) {
         self.communityId = communityId
         communityInfoToken = repository.getCommunity(withId: communityId).observe{ [weak self] (community, error) in
-            guard let object = community.object else { return }
+            guard let object = community.snapshot else { return }
             let model = AmityCommunityModel(object: object)
             self?.community.value = model
             self?.showProfile(model: model)
@@ -267,13 +267,12 @@ private extension AmityCreateCommunityScreenViewModel {
             createOptions.setAvatar(image)
         }
         
-        repository.createCommunity(with: createOptions) { [weak self] (community, error) in
-            guard let strongSelf = self else { return }
-            
-            if let community = community {
-                strongSelf.delegate?.screenViewModel(strongSelf, state: .createSuccess(communityId: community.communityId))
-            } else {
-                strongSelf.delegate?.screenViewModel(strongSelf, failure: AmityError(error: error) ?? .unknown)
+        Task { @MainActor in
+            do {
+                let community = try await repository.createCommunity(with: createOptions)
+                self.delegate?.screenViewModel(self, state: .createSuccess(communityId: community.communityId))
+            } catch let error {
+                self.delegate?.screenViewModel(self, failure: AmityError(error: error) ?? .unknown)
             }
         }
     }
@@ -295,12 +294,12 @@ private extension AmityCreateCommunityScreenViewModel {
             updateOptions.setAvatar(image)
         }
         
-        repository.updateCommunity(withId: communityId, options: updateOptions) { [weak self] (community, error) in
-            guard let strongSelf = self else { return }
-            if let error = error {
-                strongSelf.delegate?.screenViewModel(strongSelf, failure: AmityError(error: error) ?? .unknown)
-            } else {
-                strongSelf.delegate?.screenViewModel(strongSelf, state: .updateSuccess)
+        Task { @MainActor in
+            do {
+                let community = try await repository.editCommunity(withId: communityId, options: updateOptions)
+                self.delegate?.screenViewModel(self, state: .updateSuccess)
+            } catch let error {
+                self.delegate?.screenViewModel(self, failure: AmityError(error: error) ?? .unknown)
             }
         }
     }

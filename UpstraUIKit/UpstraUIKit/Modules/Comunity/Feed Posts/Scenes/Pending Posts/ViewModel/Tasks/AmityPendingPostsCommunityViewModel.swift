@@ -35,7 +35,7 @@ final class AmityPendingPostsCommunityViewModel: AmityPendingPostsCommunityViewM
             guard let strongSelf = self else { return }
             if community.dataStatus == .fresh {
                 self?.token?.invalidate()
-                guard let object = community.object, error == nil else {
+                guard let object = community.snapshot, error == nil else {
                     completion?(nil, statusMemberOfCommunity)
                     return
                 }

@@ -16,7 +16,7 @@ final class AmityFollowRequestsScreenViewModel: AmityFollowRequestsScreenViewMod
     // MARK: - Properties
     let userId: String
     private let userRepository: AmityUserRepository
-    private let followManager: AmityUserFollowManager
+    private let followManager: AmityUserRelationship
     private var followToken: AmityNotificationToken?
     private var followRequests: [AmityFollowRelationship] = []
     private var followRequestCollection: AmityCollection<AmityFollowRelationship>?
@@ -24,7 +24,7 @@ final class AmityFollowRequestsScreenViewModel: AmityFollowRequestsScreenViewMod
     // MARK: - Initializer
     init(userId: String) {
         userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
-        followManager = userRepository.followManager
+        followManager = userRepository.userRelationship
         self.userId = userId
     }
 }
@@ -44,7 +44,7 @@ extension AmityFollowRequestsScreenViewModel {
 extension AmityFollowRequestsScreenViewModel {
     func getFollowRequests() {
         followToken?.invalidate()
-        followRequestCollection = followManager.getMyFollowerList(with: .pending)
+        followRequestCollection = followManager.getMyFollowers(with: AmityFollowQueryOption.pending)
         followToken = followRequestCollection?.observe { [weak self] collection, _, error in
             self?.prepareDataSource(collection: collection, error: error)
         }
@@ -52,28 +52,32 @@ extension AmityFollowRequestsScreenViewModel {
     
     func acceptRequest(at indexPath: IndexPath) {
         let request = self.item(at: indexPath)
-        followManager.acceptUserRequest(withUserId: request.sourceUserId) { [weak self] success, response, error in
-            guard let strongSelf = self, indexPath.row < strongSelf.followRequests.count else { return }
-            
-            if success {
-                strongSelf.removeRequest(at: indexPath)
-                strongSelf.delegate?.screenViewModel(strongSelf, didAcceptRequestAt: indexPath)
-            } else {
-                strongSelf.delegate?.screenViewModel(strongSelf, didFailToAcceptRequestAt: indexPath)
+        Task { @MainActor in
+            do {
+                let result = try await followManager.acceptMyFollower(withUserId: request.sourceUserId)
+                let isSuccessful = result.0
+                if isSuccessful {
+                    self.removeRequest(at: indexPath)
+                    self.delegate?.screenViewModel(self, didAcceptRequestAt: indexPath)
+                }
+            } catch let error {
+                self.delegate?.screenViewModel(self, didFailToAcceptRequestAt: indexPath)
             }
         }
     }
     
     func declineRequest(at indexPath: IndexPath) {
         let request = self.item(at: indexPath)
-        followManager.declineUserRequest(withUserId: request.sourceUserId) { [weak self] success, response, error in
-            guard let strongSelf = self, indexPath.row < strongSelf.followRequests.count else { return }
-            
-            if success {
-                strongSelf.removeRequest(at: indexPath)
-                strongSelf.delegate?.screenViewModel(strongSelf, didDeclineRequestAt: indexPath)
-            } else {
-                strongSelf.delegate?.screenViewModel(strongSelf, didFailToDeclineRequestAt: indexPath)
+        Task { @MainActor in
+            do {
+                let result = try await followManager.declineMyFollower(withUserId: request.sourceUserId)
+                let isSuccessful = result.0
+                if isSuccessful {
+                    self.removeRequest(at: indexPath)
+                    self.delegate?.screenViewModel(self, didDeclineRequestAt: indexPath)
+                }
+            } catch let error {
+                self.delegate?.screenViewModel(self, didFailToDeclineRequestAt: indexPath)
             }
         }
     }

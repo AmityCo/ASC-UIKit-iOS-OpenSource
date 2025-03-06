@@ -50,7 +50,7 @@ struct PostContentPollView: View {
                 // Show only 4 options in feed and show all options in post detail page.
                 if poll.isVoted || poll.isClosed || showResultsForOwner {
                     // Results
-                    let sortedAnswers = poll.answers.sorted { $0.voteCount >= $1.voteCount }
+                    let sortedAnswers = poll.answers.sorted { $0.voteCount > $1.voteCount }
                     let options = style == .feed ? Array(sortedAnswers.prefix(4)) : sortedAnswers
                     let highestVote = sortedAnswers.first?.voteCount ?? 0
                     ForEach(options) { answer in
@@ -127,7 +127,7 @@ struct PostContentPollView: View {
                             .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))
                         
                         // Days Remaining or Ended
-                        let pollStatus = PollStatus(poll: poll)
+                        let pollStatus = PollStatus(poll: poll, isInPendingFeed: isInPendingFeed)
                         Text(pollStatus.statusInfo)
                             .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))
                     }

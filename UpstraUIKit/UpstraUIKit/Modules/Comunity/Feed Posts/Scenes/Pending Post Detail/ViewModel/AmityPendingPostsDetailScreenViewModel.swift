@@ -85,15 +85,25 @@ extension AmityPendingPostsDetailScreenViewModel {
     }
     
     func approvePost() {
-        postRepository.approvePost(withId: postId, completion: { [weak self] (success, error)in
-            self?.delegate?.screenViewModelDidApproveOrDeclinePost()
-        })
+        Task { @MainActor in
+            do {
+                let result = try await postRepository.approvePost(withId: postId)
+                self.delegate?.screenViewModelDidApproveOrDeclinePost()
+            } catch let error {
+                self.delegate?.screenViewModelDidApproveOrDeclinePost()
+            }
+        }
     }
     
     func declinePost() {
-        postRepository.declinePost(withId: postId, completion: { [weak self] (success, error) in
-            self?.delegate?.screenViewModelDidApproveOrDeclinePost()
-        })
+        Task { @MainActor in
+            do {
+                let result = try await postRepository.declinePost(withId: postId)
+                self.delegate?.screenViewModelDidApproveOrDeclinePost()
+            } catch let error {
+                self.delegate?.screenViewModelDidApproveOrDeclinePost()
+            }
+        }
     }
     
     func deletePost() {
@@ -106,9 +116,14 @@ extension AmityPendingPostsDetailScreenViewModel {
                     strongSelf.delegate?.screenViewModelDidDeletePostFail(title: AmityLocalizedStringSet.PendingPosts.postNotAvailable.localizedString,
                                                                           message: AmityLocalizedStringSet.PendingPosts.alertDeleteFailApproveOrDecline.localizedString)
                 case .reviewing:
-                    self?.postRepository.deletePost(withId: strongSelf.postId, parentId: nil, hardDelete: false, completion: { _, _ in
-                        self?.delegate?.screenViewModelDidDeletePostFinish()
-                    })
+                    Task { @MainActor in
+                        do {
+                            let result = try await strongSelf.postRepository.softDeletePost(withId: strongSelf.postId, parentId: nil)
+                            self?.delegate?.screenViewModelDidDeletePostFinish()
+                        } catch let error {
+                            self?.delegate?.screenViewModelDidDeletePostFinish()
+                        }
+                    }
                 @unknown default:
                     break
                 }

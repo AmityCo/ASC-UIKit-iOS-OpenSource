@@ -47,19 +47,20 @@
 "delete_comment_message" = "This comment will be permanently removed.";
 "deleted_comment_message" = "This comment has been deleted";
 "deleted_reply_comment_message" = "This reply has been deleted";
-"edit_comment_bottom_sheet_title" = "Edit Comment";
-"delete_comment_bottom_sheet_title" = "Delete Comment";
+"edit_comment_bottom_sheet_title" = "Edit comment";
+"delete_comment_bottom_sheet_title" = "Delete comment";
 "report_comment_bottom_sheet_title" = "Report comment";
 "unreport_comment_bottom_sheet_title" = "Unreport comment";
 "comment_reported_message" = "Comment reported";
 "comment_unreported_message" = "Comment unreported";
 "comment_react_button_text" = "Like";
-"comment_reacted_button_text" = "Liked";
+"comment_reacted_button_text" = "Like";
 "comment_reply_button_text" = "Reply";
 "comment_edited_text" = "(edited)";
 "view_more_reply_text" = "View more reply";
 "disable_create_comment_text" = "Comments are disabled for this story";
 "comment_with_banned_words_error_message" = "Your comment contains inappropriate word. Please review and delete it.";
+"comment_with_not_allowed_link_error" = "Your comment contains a link that's not allowed. Please review and delete it.";
 
 // Toast
 "chat_toast_loading" = "Loading chat...";
@@ -216,7 +217,7 @@
 
 "featured_post_badge" = "Featured";
 "featured_post_edit_confirmation_title" = "Edit globally featured post?";
-"featured_post_edit_confirmation" = "The post you're editing has been featured globally. If you edit your post, it will need to be re-approved and will no longer be globally featured";
+"featured_post_edit_confirmation" = "The post you're editing has been featured globally. If you edit your post, it will need to be re-approved and will no longer be globally featured.";
 
 "global_featured_community_edit_confirmation_title" = "Change community privacy settings?";
 "global_featured_community_edit_confirmation_msg" = "This community has globally featured posts. Changing the community from public to private will remove these posts from being featured globally.";
@@ -237,21 +238,21 @@
 "poll_remaining_hours_left" = "h left";
 "poll_remaining_minutes_left" = "m left";
 
-"poll_question_title" = "Poll Question";
+"poll_question_title" = "Poll question";
 "poll_question_textfield_placeholder" = "What's your poll question?";
-"poll_multiple_selection_title" = "Multiple Selection";
+"poll_multiple_selection_title" = "Multiple selection";
 "poll_multiple_selection_desc" = "Let participants vote more than one option";
 
 "poll_post_create_error" = "Failed to create post. Please try again.";
 "poll_create_posting_toast" = "Posting...";
 
-"poll_duration_title" = "Poll Duration";
+"poll_duration_title" = "Poll duration";
 "poll_duration_desc" = "You can always close the poll before the set duration";
 "poll_ends_on_label" = "Ends on";
 
 "poll_options_title" = "Options";
 "poll_options_desc" = "Poll must contain at least 2 options";
-"poll_add_option" = "Add Option";
+"poll_add_option" = "Add option";
 
 "poll_option_label" = "Option";
 
@@ -287,3 +288,10 @@
 "post_delete_error" = "Failed to delete post. Please try again.";
 "post_create_error" = "Failed to create post. Please try again.";
 "post_edit_error" = "Failed to edit post. Please try again.";
+
+"post_discard_alert_title" = "Discard Changes?";
+"post_discard_alert_message" = "Do you want to discard your changes to this post?";
+"post_discard_alert_button_keep_editing" = "Keep editing";
+
+"search_no_results_found_title" = "No results found";
+"search_char_limit_not_reached" = "Start your search by typing\nat least 3 letters";

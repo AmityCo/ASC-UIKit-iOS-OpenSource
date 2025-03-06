@@ -367,13 +367,12 @@ final class AmityUIKitManagerInternal: NSObject {
     func unregisterDevicePushNotification(for userId: String) async throws -> Bool {
         
         do {
-            let success = try await client.unregisterPushNotification(forUserId: userId)
-            if success, let currentUserId = self._client?.currentUserId {
+            try await client.unregisterPushNotification()
+            if let currentUserId = self._client?.currentUserId {
                 // if unregister device successfully, remove device token belonging to the user id.
                 self.notificationTokenMap[currentUserId] = nil
             }
-            return success
-
+            return true
         } catch {
             return false
         }

@@ -153,15 +153,17 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
     @ViewBuilder
     private func getItemView(image: ImageResource, isHidden: Bool, onTapAction: @escaping () -> Void) -> some View {
         let isDisable = viewModel.medias.count >= 10
+        let currentThemeStyle = AmityUIKitConfigController.shared.getCurrentThemeStyle()
+        let imageTint = currentThemeStyle == .light ? viewConfig.theme.baseColor : UIColor.white
         Rectangle()
-            .fill(Color(viewConfig.defaultLightTheme.baseColorShade4))
+            .fill(Color(viewConfig.theme.backgroundShade1Color))
             .frame(width: 32, height: 32)
             .overlay (
                 Image(image)
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFill()
-                    .foregroundColor(isDisable ? Color(viewConfig.theme.baseColor) : nil)
+                    .foregroundColor(isDisable ? nil : Color(imageTint))
                     .frame(width: 20, height: 20)
             )
         .clipShape(Circle())

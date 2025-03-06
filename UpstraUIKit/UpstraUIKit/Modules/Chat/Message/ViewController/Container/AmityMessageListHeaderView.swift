@@ -68,7 +68,7 @@ extension AmityMessageListHeaderView {
                 token?.invalidate()
                 token = repository?.getUser(channel.getOtherUserId()).observeOnce { [weak self] user, error in
                     guard let weakSelf = self else { return }
-                    if let userObject = user.object {
+                    if let userObject = user.snapshot {
                         weakSelf.displayNameLabel.text = userObject.displayName
                     }
                 }

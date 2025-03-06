@@ -30,7 +30,7 @@ public struct AmityPendingPostsPage: AmityPageView {
     public var body: some View {
         VStack(spacing: 0) {
             navigationBarView
-                .padding(.all, 16)
+                .padding(.bottom, 8)
             
             if viewModel.showEmpty {
                 getEmptyView()
@@ -39,33 +39,14 @@ public struct AmityPendingPostsPage: AmityPageView {
             }
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .updateTheme(with: viewConfig)
     }
     
     
     private var navigationBarView: some View {
-        HStack(spacing: 0) {
-            let backIcon = viewConfig.getImage(elementId: .backButtonElement)
-            Image(backIcon)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-                .frame(width: 24, height: 20)
-                .onTapGesture {
-                    host.controller?.navigationController?.popViewController()
-                }
-            
-            Spacer()
-            
-            let title = viewConfig.getText(elementId: .title) ?? "Pending posts"
-            Text("\(title) (\(viewModel.posts.count))")
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-            
-            Spacer()
-            
-            Color.clear
-                .frame(width: 24, height: 20)
-        }
+        let title = viewConfig.getText(elementId: .title) ?? "Pending posts"
+
+        return AmityNavigationBar(title: "\(title) (\(viewModel.posts.count))", showBackButton: true)
     }
     
     

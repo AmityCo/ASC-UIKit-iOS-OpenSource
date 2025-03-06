@@ -58,72 +58,12 @@ public struct AmityPostDetailPage: AmityPageView {
     
     public var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                let backIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .backButtonElement, key: "icon", of: String.self) ?? "")
-                Image(backIcon)
-                    .resizable()
-                    .renderingMode(.template)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 24, height: 20)
-                    .onTapGesture {
-                        host.controller?.navigationController?.popViewController(animated: true)
-                    }
-                    .isHidden(viewConfig.isHidden(elementId: .backButtonElement))
-                
-                Spacer()
-                
-                Text(AmityLocalizedStringSet.Social.postDetailPageTitle.localizedString)
-                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-                
-                Spacer()
-                
-                if let postModel = viewModel.post {
-                    let bottomSheetHeight = calculateBottomSheetHeight(post: postModel)
-                    Button(action: {
-                        showBottomSheet.toggle()
-                    }, label: {
-                        let menuIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .menuButton, key: "icon", of: String.self) ?? "")
-                        Image(menuIcon)
-                            .resizable()
-                            .renderingMode(.template)
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
-                            .frame(width: 24, height: 24)
-                    })
-                    .isHidden(viewConfig.isHidden(elementId: .menuButton))
-                    .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                        
-                        PostBottomSheetView(isShown: $showBottomSheet, post: postModel) { postAction in
-                            
-                            switch postAction {
-                            case .editPost:
-                                showBottomSheet.toggle()
-                                
-                                // Dismiss bottomsheet
-                                host.controller?.dismiss(animated: false)
-                                
-                                let editOption = AmityPostComposerOptions.editOptions(post: postModel)
-                                let view = AmityPostComposerPage(options: editOption)
-                                let controller = AmitySwiftUIHostingController(rootView: view)
-                                
-                                let navigationController = UINavigationController(rootViewController: controller)
-                                navigationController.modalPresentationStyle = .fullScreen
-                                navigationController.navigationBar.isHidden = true
-                                host.controller?.present(navigationController, animated: true)
-                            case .deletePost:
-                                host.controller?.navigationController?.popViewController(animated: true)
-                            case .closePoll:
-                                break
-                            }
-                        }
-                    }
-                } else {
-                    Rectangle()
-                        .fill(.clear)
-                        .frame(width: 24, height: 24)
-                }
-            }
-            .padding(EdgeInsets(top: 19, leading: 16, bottom: 16, trailing: 16))
+            navigationBarView
+            
+            Rectangle()
+                .fill(Color(viewConfig.theme.baseColorShade4))
+                .frame(height: 1)
+                .isHidden(!commentCoreViewModel.hasScrolledToTop)
             
             CommentCoreView(headerView: {
                 VStack(spacing: 4) {
@@ -164,6 +104,56 @@ public struct AmityPostDetailPage: AmityPageView {
                 commentCoreViewModel.hideCommentButtons = !targetCommunity.isJoined
             }
 
+        }
+    }
+    
+    private var navigationBarView: some View {
+        return AmityNavigationBar(title: AmityLocalizedStringSet.Social.postDetailPageTitle.localizedString, showBackButton: true) {
+            
+            if let postModel = viewModel.post {
+                let bottomSheetHeight = calculateBottomSheetHeight(post: postModel)
+                Button(action: {
+                    showBottomSheet.toggle()
+                }, label: {
+                    let menuIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .menuButton, key: "icon", of: String.self) ?? "")
+                    Image(menuIcon)
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .frame(width: 24, height: 24)
+                })
+                .isHidden(viewConfig.isHidden(elementId: .menuButton))
+                .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                    
+                    PostBottomSheetView(isShown: $showBottomSheet, post: postModel) { postAction in
+                        
+                        switch postAction {
+                        case .editPost:
+                            showBottomSheet.toggle()
+                            
+                            // Dismiss bottomsheet
+                            host.controller?.dismiss(animated: false)
+                            
+                            let editOption = AmityPostComposerOptions.editOptions(post: postModel)
+                            let view = AmityPostComposerPage(options: editOption)
+                            let controller = AmitySwiftUIHostingController(rootView: view)
+                            
+                            let navigationController = UINavigationController(rootViewController: controller)
+                            navigationController.modalPresentationStyle = .fullScreen
+                            navigationController.navigationBar.isHidden = true
+                            host.controller?.present(navigationController, animated: true)
+                        case .deletePost:
+                            host.controller?.navigationController?.popViewController(animated: true)
+                        case .closePoll:
+                            break
+                        }
+                    }
+                }
+            } else {
+                Rectangle()
+                    .fill(.clear)
+                    .frame(width: 24, height: 24)
+            }
         }
     }
     

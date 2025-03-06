@@ -46,6 +46,10 @@ struct CommentComposerView: View {
             .background(Color(viewConfig.theme.baseColorShade4))
             .isHidden(!viewModel.replyState.showToReply)
             
+            Rectangle()
+                .fill(Color(viewConfig.theme.baseColorShade4))
+                .frame(height: 1)
+            
             HStack(spacing: 8) {
                 AmityUserProfileImageView(displayName: displayName, avatarURL: avatarURL)
                     .frame(width: 32, height: 32)
@@ -72,11 +76,21 @@ struct CommentComposerView: View {
                             let parentId = viewModel.replyState.showToReply ? viewModel.replyState.comment?.commentId : nil
                             try await viewModel.createComment(text: viewModel.text, parentId: parentId, mentionData: viewModel.mentionData)
                         } catch {
-                            Toast.showToast(style: .warning, message: error.isAmityErrorCode(.banWordFound) ? AmityLocalizedStringSet.Comment.commentWithBannedWordsErrorMessage.localizedString : error.localizedDescription)
+                            let message: String
+                            if error.isAmityErrorCode(.banWordFound) {
+                                message = AmityLocalizedStringSet.Comment.commentWithBannedWordsErrorMessage.localizedString
+                            } else if error.isAmityErrorCode(.linkNotAllowed) {
+                                message = AmityLocalizedStringSet.Comment.commentWithNotAllowedLink.localizedString
+                            } else {
+                                message = error.localizedDescription
+                            }
+                            
+                            Toast.showToast(style: .warning, message: message)
                         }
                         viewModel.replyState = (false, nil)
                         viewModel.text.removeAll()
                     }
+                    
                     hideKeyboard()
                 } label: {
                     Text("Post")

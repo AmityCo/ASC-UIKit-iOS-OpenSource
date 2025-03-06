@@ -24,10 +24,11 @@ final class AmityCommunityLeaveController: AmityCommunityLeaveControllerProtocol
     }
     
     func leave(_ completion: @escaping (AmityError?) -> Void) {
-        repository.leaveCommunity(withId: communityId) { (success, error) in
-            if success {
+        Task { @MainActor in
+            do {
+                let _ = try await repository.leaveCommunity(withId: communityId)
                 completion(nil)
-            } else {
+            } catch let error {
                 completion(AmityError(error: error))
             }
         }

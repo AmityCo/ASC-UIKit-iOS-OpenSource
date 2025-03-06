@@ -51,13 +51,9 @@ struct AmityExplorePageContainer: View {
                     .animation(.easeIn, value: isRefreshing)
                 
                 VStack(alignment: .center, spacing: 0) {
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.baseColorShade4))
-                        .frame(height: 8)
-                    
                     if stateManager.isCategoriesVisible {
                         AmityCommunityCategoriesComponent()
-                            .padding(.vertical, 14)
+                            .padding(.vertical, 8)
                             .accessibilityIdentifier(AccessibilityID.Social.Explore.categoriesSection)
                     }
                     

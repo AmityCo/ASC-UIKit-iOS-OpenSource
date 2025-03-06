@@ -13,7 +13,7 @@ final class AmityCommunityMemberScreenViewModel: AmityCommunityMemberScreenViewM
     
     weak var delegate: AmityCommunityMemberScreenViewModelDelegate?
     
-    private var flagger: AmityUserFlagger?
+    private let flagger: AmityUserRepository
     
     // MARK: - Controller
     private let fetchMemberController: AmityCommunityFetchMemberControllerProtocol
@@ -35,6 +35,7 @@ final class AmityCommunityMemberScreenViewModel: AmityCommunityMemberScreenViewM
         self.removeMemberController = removeMemberController
         self.addMemberController = addMemberController
         self.roleController = roleController
+        self.flagger = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
     }
     
 }
@@ -51,9 +52,14 @@ extension AmityCommunityMemberScreenViewModel {
     
     func getReportUserStatus(at indexPath: IndexPath, completion: ((Bool) -> Void)?) {
         guard let user = member(at: indexPath).user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.isFlaggedByMe {
-            completion?($0)
+        
+        Task { @MainActor in
+            do {
+                let result = try await flagger.isUserFlaggedByMe(withId: user.userId)
+                completion?(result)
+            } catch let error {
+                completion?(false)
+            }
         }
     }
     
@@ -113,29 +119,29 @@ extension AmityCommunityMemberScreenViewModel {
 /// Add user
 extension AmityCommunityMemberScreenViewModel {
     func addUser(users: [AmitySelectMemberModel]) {
-        addMemberController.add(currentUsers: members, newUsers: users, { [weak self] (amityError, controllerError) in
+        addMemberController.add(currentUsers: members, newUsers: users) { [weak self] addMemberError, removeMemberError in
             guard let strongSelf = self else { return }
-            if let error = amityError {
-                strongSelf.delegate?.screenViewModel(strongSelf, failure: error)
-            } else if let controllerError = controllerError {
-                switch controllerError {
-                case .addMemberFailure(let error):
-                    if let error = error {
-                        strongSelf.delegate?.screenViewModel(strongSelf, failure: error)
-                    } else {
-                        strongSelf.delegate?.screenViewModelDidAddMemberSuccess()
-                    }
-                case .removeMemberFailure(let error):
-                    if let error = error {
-                        strongSelf.delegate?.screenViewModel(strongSelf, failure: error)
-                    } else {
-                        strongSelf.delegate?.screenViewModelDidAddMemberSuccess()
-                    }
-                }
-            } else {
-                self?.delegate?.screenViewModelDidAddMemberSuccess()
+
+            // Both failed
+            if let addMemberError, let removeMemberError {
+                strongSelf.delegate?.screenViewModel(strongSelf, failure: addMemberError)
+                return
             }
-        })
+            
+            if let addMemberError {
+                strongSelf.delegate?.screenViewModel(strongSelf, failure: addMemberError)
+                return
+            }
+            
+            if let removeMemberError {
+                strongSelf.delegate?.screenViewModel(strongSelf, failure: removeMemberError)
+
+                return
+            }
+            
+            // Else there was success
+            self?.delegate?.screenViewModelDidAddMemberSuccess()
+        }
     }
 }
 
@@ -145,24 +151,30 @@ extension AmityCommunityMemberScreenViewModel {
 extension AmityCommunityMemberScreenViewModel {
     func reportUser(at indexPath: IndexPath) {
         guard let user = member(at: indexPath).user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.flag { (success, error) in
-            if let error = error {
+        Task { @MainActor in
+            do {
+                let isSuccess = try await flagger.flagUser(withId: user.userId)
+                
+                if isSuccess {
+                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.reportSent.localizedString))
+                }
+            } catch let error {
                 AmityHUD.show(.error(message: error.localizedDescription))
-            } else {
-                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.reportSent.localizedString))
             }
         }
     }
     
     func unreportUser(at indexPath: IndexPath) {
         guard let user = member(at: indexPath).user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.unflag { (success, error) in
-            if let error = error {
+        Task { @MainActor in
+            do {
+                let isSuccess = try await flagger.unflagUser(withId: user.userId)
+                
+                if isSuccess {
+                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.unreportSent.localizedString))
+                }
+            } catch let error {
                 AmityHUD.show(.error(message: error.localizedDescription))
-            } else {
-                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.unreportSent.localizedString))
             }
         }
     }
@@ -202,7 +214,8 @@ extension AmityCommunityMemberScreenViewModel {
     func removeRole(at indexPath: IndexPath) {
         let user = member(at: indexPath)
         var roles: [String] = []
-        if let currentRoles = user.roles as? [String] {
+        let currentRoles = user.roles
+        if !currentRoles.isEmpty {
             if currentRoles.contains(AmityCommunityRole.moderator.rawValue) {
                 roles.append(AmityCommunityRole.moderator.rawValue)
             }

@@ -34,7 +34,7 @@ final class AmitySearchUserController {
             completion(.failure(.textEmpty))
         } else {
             let request =  DispatchWorkItem { [weak self] in
-                self?.collection = self?.repository?.searchUser(text, sortBy: .displayName)
+                self?.collection = self?.repository?.searchUsers(text, sortBy: .displayName)
                 self?.token = self?.collection?.observe { (userCollection, change, error) in
                     guard let strongSelf = self else { return }
                     if let error = error {

@@ -33,21 +33,20 @@ final class AmityMessageAudioController {
         guard let repository = repository else {
             return
         }
-        let createOptions = AmityAudioMessageCreateOptions(subChannelId: subChannelId, audioFileURL: audioURL, fileName: AmityAudioRecorder.shared.fileName)
-        repository.createAudioMessage(options: createOptions) { message, error in
-            guard error == nil, let message = message else {
-                return
-            }
-            self.token = repository.getMessage(message.messageId).observe { [weak self] (collection, error) in
-                guard error == nil, let message = collection.object else {
-                    self?.token = nil
-                    return
-                }
+        
+        let createOptions = AmityAudioMessageCreateOptions(subChannelId: subChannelId, attachment: .localURL(url: audioURL), fileName: AmityAudioRecorder.shared.fileName)
+        Task { @MainActor in
+            do {
+                // This message returned is already synced with the server.
+                let message = try await repository.createAudioMessage(options: createOptions)
+                
                 AmityAudioRecorder.shared.updateFilename(withFilename: message.messageId)
+                
                 completion()
+            } catch let error {
+                Log.warn("Error while creating audio message")
             }
         }
-        
     }
     
 }

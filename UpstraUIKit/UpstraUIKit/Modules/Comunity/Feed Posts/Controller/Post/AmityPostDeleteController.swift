@@ -17,6 +17,13 @@ final class AmityPostDeleteController: AmityPostDeleteControllerProtocol {
     private let repository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
     
     func delete(withPostId postId: String, parentId: String?, completion: AmityRequestCompletion?) {
-        repository.deletePost(withId: postId, parentId: parentId, hardDelete: false, completion: completion)
+        Task { @MainActor in
+            do {
+                let result = try await repository.softDeletePost(withId: postId, parentId: parentId)
+                completion?(result, nil)
+            } catch let error {
+                completion?(false, error)
+            }
+        }
     }
 }

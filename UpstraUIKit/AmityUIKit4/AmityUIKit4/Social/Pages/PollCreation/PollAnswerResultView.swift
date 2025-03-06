@@ -64,7 +64,9 @@ struct PollAnswerResultView: View {
         }
         
         if answer.voteCount > 0 {
-            var final = answer.voteCount > 1 ?  AmityLocalizedStringSet.Social.pollAnswerResultVotedByMultipleParticipants.localized(arguments: answer.voteCount.formattedCountString) : AmityLocalizedStringSet.Social.pollAnswerResultVotedBySingleParticipant.localizedString
+            let voteCountExcludingUser = answer.isVotedByUser ? answer.voteCount - 1 : answer.voteCount
+            
+            var final = voteCountExcludingUser > 1 ?  AmityLocalizedStringSet.Social.pollAnswerResultVotedByMultipleParticipants.localized(arguments: voteCountExcludingUser.formattedCountString) : AmityLocalizedStringSet.Social.pollAnswerResultVotedBySingleParticipant.localizedString
             final += answer.isVotedByUser ? " " + AmityLocalizedStringSet.Social.pollAnswerResultVotedByAndYou.localizedString : ""
             return final
         }

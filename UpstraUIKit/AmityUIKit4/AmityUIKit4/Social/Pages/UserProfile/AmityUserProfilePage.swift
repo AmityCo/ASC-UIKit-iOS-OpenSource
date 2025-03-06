@@ -38,8 +38,7 @@ public struct AmityUserProfilePage: AmityPageView {
     public var body: some View {
         VStack(spacing: 0) {
             navigationBarView
-                .padding(.leading, 16)
-                .padding(.trailing, 6)
+                .padding(.bottom, 10)
             
             tabBarView
                 .padding(.top, 10)
@@ -110,8 +109,7 @@ public struct AmityUserProfilePage: AmityPageView {
                 /// Refresh data if it is scrolled down from ideal offset
                 if offsetY >= 120 && !isRefreshing {
                     isRefreshing = true
-                    
-                    Task {
+                    Task { @MainActor in
                         viewModel.refreshFeed(currentTab: currentTab)
                         await waitWhileRefreshing()
                         await MainActor.run {

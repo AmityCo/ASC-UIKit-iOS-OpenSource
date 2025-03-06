@@ -100,7 +100,7 @@ extension FeatureViewController: UITableViewDelegate {
             //            navigationController?.present(hostingController, animated: true)
             navigationController?.pushViewController(hostingController, animated: true)
         case .socialUIKit:
-            let pageView = AmitySocialHomePage()
+            let pageView = AmitySocialHomePage(showBackButton: true)
             let hostingController = AmitySwiftUIHostingController(rootView: pageView)
             hostingController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(hostingController, animated: true)

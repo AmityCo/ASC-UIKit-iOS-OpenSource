@@ -28,7 +28,7 @@ struct AmityCommunityModel {
     let avatarURL: String
     let isPostReviewEnabled: Bool
     let isStoryCommentsAllowed: Bool
-    let participation: AmityCommunityParticipation
+    //let participation: AmityCommunityParticipation
     
     var object: AmityCommunity
     
@@ -50,7 +50,7 @@ struct AmityCommunityModel {
         self.category = object.categories.first?.name ?? AmityLocalizedStringSet.General.general.localizedString
         self.categoryId = object.categoryIds.first
         self.avatarURL = object.avatar?.fileURL ?? ""
-        self.participation = object.participation
+        //self.participation = object.participation
         self.isPostReviewEnabled = object.isPostReviewEnabled
         self.isStoryCommentsAllowed = object.storySettings.allowComment
     }

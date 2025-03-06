@@ -31,7 +31,7 @@ final class AmityStoryCommentSettingsCommunityViewModel: AmityStoryCommentSettin
         token = community?.observe { [weak self] (community, error) in
             if community.dataStatus == .fresh {
                 self?.token?.invalidate()
-                guard let object = community.object else {
+                guard let object = community.snapshot else {
                     if let error = AmityError(error: error) {
                         completion?(.failure(error))
                     }

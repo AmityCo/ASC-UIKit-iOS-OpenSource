@@ -13,7 +13,7 @@ enum PostTypeFilter: String {
 }
 
 class PostManager {
-    private let postRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    let postRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
     
     @discardableResult
     func getPost(withId: String) -> AmityObject<AmityPost> {
@@ -64,13 +64,13 @@ class PostManager {
         try await postRepository.declinePost(withId: postId)
     }
     
-    func createPost(_ builder: any AmitySDK.AmityPostBuilder, targetId: String?, targetType: AmitySDK.AmityPostTargetType, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
-        if let mentionees, let metadata {
-            try await postRepository.createPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
-        } else {
-            try await postRepository.createPost(builder, targetId: targetId, targetType: targetType)
-        }
-    }
+//    func createPost(_ builder: any AmitySDK.AmityPostBuilder, targetId: String?, targetType: AmitySDK.AmityPostTargetType, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
+//        if let mentionees, let metadata {
+//            try await postRepository.createPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+//        } else {
+//            try await postRepository.createPost(builder, targetId: targetId, targetType: targetType)
+//        }
+//    }
     
     @discardableResult
     func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {

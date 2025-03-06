@@ -20,7 +20,7 @@ final class AmityUserProfileHeaderScreenViewModel: AmityUserProfileHeaderScreenV
     
     private let userRepository: AmityUserRepository
     private let channelRepository: AmityChannelRepository
-    private let followManager: AmityUserFollowManager
+    private let followManager: AmityUserRelationship
     private var userToken: AmityNotificationToken?
     private var channelToken: AmityNotificationToken?
     private var followToken: AmityNotificationToken?
@@ -31,7 +31,7 @@ final class AmityUserProfileHeaderScreenViewModel: AmityUserProfileHeaderScreenV
     init(userId: String) {
         userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
         channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
-        followManager = userRepository.followManager
+        followManager = userRepository.userRelationship
         self.userId = userId
     }
 }
@@ -46,7 +46,7 @@ extension AmityUserProfileHeaderScreenViewModel {
             // So, this is a workaround to execute code specifically for fresh data status.
             switch object.dataStatus {
             case .fresh:
-                if let user = object.object {
+                if let user = object.snapshot {
                     strongSelf.prepareUserData(user: user)
                 }
                 strongSelf.userToken?.invalidate()
@@ -54,7 +54,7 @@ extension AmityUserProfileHeaderScreenViewModel {
                 strongSelf.delegate?.screenViewModel(strongSelf, didReceiveError: AmityError(error: error) ?? .unknown)
                 strongSelf.userToken?.invalidate()
             case .local:
-                if let user = object.object {
+                if let user = object.snapshot {
                     strongSelf.prepareUserData(user: user)
                 }
             case .notExist:
@@ -72,7 +72,7 @@ extension AmityUserProfileHeaderScreenViewModel {
             followToken = followManager.getMyFollowInfo().observe { [weak self] liveObject, error in
                 guard let strongSelf = self else { return }
                 
-                if let object = liveObject.object {
+                if let object = liveObject.snapshot {
                     strongSelf.handleFollowInfo(followInfo: AmityFollowInfo(followInfo: object))
                 } else {
                     strongSelf.delegate?.screenViewModel(strongSelf, didReceiveError: AmityError(error: error) ?? .unknown)
@@ -81,12 +81,12 @@ extension AmityUserProfileHeaderScreenViewModel {
             
             return
         }
-        
-        followToken = followManager.getUserFollowInfo(withUserId: userId).observe { [weak self] liveObject, error in
+                
+        followToken = followManager.getFollowInfo(withUserId: userId).observe { [weak self] liveObject, error in
             
             guard let strongSelf = self else { return }
             
-            if let result = liveObject.object {
+            if let result = liveObject.snapshot {
                 strongSelf.handleFollowInfo(followInfo: AmityFollowInfo(followInfo: result))
             } else {
                 strongSelf.delegate?.screenViewModel(strongSelf, didReceiveError: AmityError(error: error) ?? .unknown)
@@ -108,27 +108,26 @@ extension AmityUserProfileHeaderScreenViewModel {
     }
     
     func follow() {
-        followManager.followUser(withUserId: userId) { [weak self] success, result, error in
-            guard let strongSelf = self else { return }
-            
-            if success, let result = result {
-                strongSelf.followStatus = result.status
-                strongSelf.delegate?.screenViewModel(strongSelf, didFollowUser: result.status, error: nil)
-            } else {
-                strongSelf.delegate?.screenViewModel(strongSelf, didFollowUser: .none, error: AmityError(error: error))
+        Task { @MainActor in
+            do {
+                let result = try await followManager.follow(withUserId: userId)
+                self.followStatus = result.1.status
+                self.delegate?.screenViewModel(self, didFollowUser: result.1.status, error: nil)
+            } catch let error {
+                self.delegate?.screenViewModel(self, didFollowUser: .none, error: AmityError(error: error))
             }
         }
     }
     
     func unfollow() {
-        followManager.unfollowUser(withUserId: userId) { [weak self] success, result, error in
-            guard let strongSelf = self else { return }
-            
-            if success, let result = result {
-                strongSelf.followStatus = result.status
-                strongSelf.delegate?.screenViewModel(strongSelf, didUnfollowUser: result.status, error: nil)
-            } else {
-                strongSelf.delegate?.screenViewModel(strongSelf, didUnfollowUser: .pending, error: AmityError(error: error))
+        Task { @MainActor in
+            do {
+                let result = try await followManager.unfollow(withUserId: userId)
+                self.followStatus = result.1.status
+                self.delegate?.screenViewModel(self, didUnfollowUser: result.1.status, error: nil)
+
+            } catch let error {
+                self.delegate?.screenViewModel(self, didUnfollowUser: .pending, error: AmityError(error: error))
             }
         }
     }

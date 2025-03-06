@@ -18,12 +18,19 @@ public struct AmitySocialHomePage: AmityPageView {
     @StateObject private var viewModel: AmitySocialHomePageViewModel = AmitySocialHomePageViewModel()
     @StateObject private var viewConfig: AmityViewConfigController
     
-    public init() {
+    let showBackButton: Bool
+    
+    public init(showBackButton: Bool = false) {
+        self.showBackButton = showBackButton
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .socialHomePage))
     }
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            if showBackButton {
+                AmityNavigationBar(title: "", showBackButton: showBackButton)
+            }
+            
             AmitySocialHomeTopNavigationComponent(pageId: id, selectedTab: viewModel.selectedTab, searchButtonAction: {
                 if viewModel.selectedTab == .newsFeed || viewModel.selectedTab == .explore {
                     let context = AmitySocialHomePageBehavior.Context(page: self)
@@ -37,6 +44,10 @@ public struct AmitySocialHomePage: AmityPageView {
             
             SocialHomePageTabView($viewModel.selectedTab)
                 .frame(height: 62)
+            
+            Rectangle()
+                .fill(Color(viewConfig.theme.baseColorShade4))
+                .frame(height: 8)
 
             SocialHomeContainerView($viewModel.selectedTab, pageId: id)
         }
@@ -44,7 +55,7 @@ public struct AmitySocialHomePage: AmityPageView {
         .ignoresSafeArea(edges: .bottom)
         .updateTheme(with: viewConfig)
         .onAppear {
-            host.controller?.navigationController?.isNavigationBarHidden = false
+            host.controller?.navigationController?.isNavigationBarHidden = true
         }
     }
 }
@@ -64,6 +75,6 @@ class AmitySocialHomePageViewModel: ObservableObject {
     }
     
     @objc private func didPostCreated(_ notification: Notification) {
-        selectedTab = .newsFeed
+//        selectedTab = .newsFeed
     }
 }

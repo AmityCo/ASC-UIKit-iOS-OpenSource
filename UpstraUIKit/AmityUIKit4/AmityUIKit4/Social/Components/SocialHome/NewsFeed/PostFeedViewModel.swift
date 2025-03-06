@@ -115,19 +115,32 @@ class PostFeedViewModel: ObservableObject {
     }
     
     @objc private func didPostCreated(_ notification: Notification) {
-        if let object = notification.object as? AmityPost, feedType == .globalFeed, let community = object.targetCommunity, !community.isPostReviewEnabled {
+        if let object = notification.object as? AmityPost, feedType == .globalFeed {
+            
+            // If the post targets community & requires post review, don't show it on feed.
+            if let community = object.targetCommunity, community.isPostReviewEnabled {
+                return
+            }
+            
+            /// Rest assured all post object models are not invalidated at this point
+            guard recentlyCreatedPosts.allSatisfy({ post in !post.isInvalidated }) else { return }
+            
             /// Ensure recentlyCreatedPosts is not having the post to prevent duplication in data source
             if !recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
-                recentlyCreatedPosts.append(object)
                 
-                let newPost = PaginatedItem(id: object.postId, type: .content(AmityPostModel(post: object)))
-                self.postItems = [newPost] + postItems
+                // Add to recently created lists & render feed.
+                self.recentlyCreatedPosts.append(object)
+                self.renderFeed()
             }
         }
     }
     
     @objc private func didPostDeleted(_ notification: Notification) {
         if let info = notification.userInfo, let postId = info["postId"] as? String, feedType == .globalFeed {
+            
+            /// Rest assured all post object models are not invalidated at this point
+            guard recentlyCreatedPosts.allSatisfy({ post in !post.isInvalidated }) else { return }
+            
             /// Check recentlyCreatedPosts is deleted
             if recentlyCreatedPosts.contains(where: { $0.postId == postId }) {
                 

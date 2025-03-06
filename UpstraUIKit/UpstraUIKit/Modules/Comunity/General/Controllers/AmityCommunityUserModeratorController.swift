@@ -14,15 +14,15 @@ protocol AmityCommunityUserRolesControllerProtocol {
 }
 
 final class AmityCommunityUserRolesController: AmityCommunityUserRolesControllerProtocol {
-    private var membershipParticipation: AmityCommunityParticipation?
+    private let membershipParticipation: AmityCommunityMembership
     private var membership: AmityCommunityMember?
     
     init(communityId: String) {
-        membershipParticipation = AmityCommunityParticipation(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+        membershipParticipation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
     }
     
     func getUserRoles(withUserId userId: String, role: AmityCommunityRole) -> Bool {
-        membership = membershipParticipation?.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)
+        membership = membershipParticipation.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)
         guard let roles = membership?.roles as? [String] else { return false }
         return roles.contains(role.rawValue)
     }

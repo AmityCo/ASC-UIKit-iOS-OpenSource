@@ -16,26 +16,29 @@ protocol AmityCommentEditorControllerProtocol {
 
 final class AmityCommentEditorController: AmityCommentEditorControllerProtocol {
     
-    private var editor: AmityCommentEditor?
-    private var commentRepository: AmityCommentRepository?
+    private var commentRepository: AmityCommentRepository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
+    
     func delete(withCommentId commentId: String, completion: AmityRequestCompletion?) {
-        commentRepository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
-        commentRepository?.deleteComment(withId: commentId, hardDelete: false, completion: completion)
+        Task { @MainActor in
+            do {
+                let result = try await commentRepository.softDeleteComment(withId: commentId)
+                completion?(result, nil)
+            } catch let error {
+                completion?(false, error)
+            }
+        }
     }
         
     func edit(withComment comment: AmityCommentModel, text: String, metadata: [String : Any]?, mentionees: AmityMentioneesBuilder?, completion: AmityRequestCompletion?) {
-        commentRepository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
         let options = AmityCommentUpdateOptions(text: text, metadata: metadata, mentioneesBuilder: mentionees)
         
-        // Map completion to AmityCommentRequestCompletion
-        let mappedCompletion: (AmityComment?, Error?) -> Void = { comment, error in
-            if let error {
-                completion?(false, error)
-            } else if comment != nil {
+        Task { @MainActor in
+            do {
+                let result = try await commentRepository.editComment(withId: comment.id, options: options)
                 completion?(true, nil)
+            } catch let error {
+                completion?(false, error)
             }
         }
-        
-        commentRepository?.updateComment(withId: comment.id, options: options, completion: mappedCompletion)
     }
 }

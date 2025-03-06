@@ -21,7 +21,7 @@ extension LiveStreamBroadcastViewController {
             }
             liveObjectQueryToken = communityRepository.getCommunity(withId: targetId).observeOnce { [weak self] result, error in
                 self?.liveObjectQueryToken = nil
-                guard let community = result.object else {
+                guard let community = result.snapshot else {
                     self?.setTargetDetail(name: nil, avatarUrl: nil)
                     return
                 }
@@ -31,14 +31,14 @@ extension LiveStreamBroadcastViewController {
             if let targetId = targetId {
                 liveObjectQueryToken = userRepository.getUser(targetId).observeOnce { [weak self] result, error in
                     self?.liveObjectQueryToken = nil
-                    guard let user = result.object else {
+                    guard let user = result.snapshot else {
                         self?.setTargetDetail(name: nil, avatarUrl: nil)
                         return
                     }
                     self?.setTargetDetail(name: user.displayName, avatarUrl: user.getAvatarInfo()?.fileURL)
                 }
             } else {
-                let currentUser = client.currentUser?.object
+                let currentUser = client.user?.snapshot
                 setTargetDetail(
                     name: currentUser?.displayName,
                     avatarUrl: currentUser?.getAvatarInfo()?.fileURL

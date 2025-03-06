@@ -44,6 +44,7 @@ struct CommunityMemberView: View {
             
             Text(communityMember.displayName)
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                .lineLimit(1)
             
             if let isBrand = communityMember.user?.isBrand, isBrand {
                 Image(AmityIcon.brandBadge.imageResource)

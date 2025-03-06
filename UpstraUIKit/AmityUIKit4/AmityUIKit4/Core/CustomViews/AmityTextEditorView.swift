@@ -66,6 +66,8 @@ public struct AmityTextEditorView: View {
     
     @State private var textEditorHeight: CGFloat = 0.0
     
+    private var textEditorMinHeight: CGFloat = 0.0
+    
     @State private var textEditorInitialHeight: CGFloat = 24
     
     @State private var hidePlaceholder: Bool = false
@@ -92,6 +94,7 @@ public struct AmityTextEditorView: View {
         self._text = text
         self._mentionData = mentionData
         self._textEditorHeight = State(initialValue: textViewHeight)
+        self.textEditorMinHeight = textViewHeight
         
         let mentionManger = MentionManager(withType: mentionManagerType)
 
@@ -123,7 +126,7 @@ public struct AmityTextEditorView: View {
                         // Max 5 lines = 90 (18px per line) | Top + Bottom Inset: 16 | ~ Max height: 106
                         
                         let paddedHeight = textHeight + defaultInset.top + defaultInset.bottom
-                        textEditorHeight = min(paddedHeight, textEditorMaxHeight)
+                        textEditorHeight = max(textEditorMinHeight, min(paddedHeight, textEditorMaxHeight))
                     }
                     .onReceive(viewModel.textView.textPublisher, perform: { text in
                         self.mentionData.metadata = viewModel.mentionManager.getMetadata()
@@ -245,7 +248,7 @@ public class AmityTextEditorViewModel: ObservableObject {
     
     func updateAttributes(hightlightColor: UIColor, textColor: UIColor) {
         self.highlightAttributes = [
-            .font: UIFont.systemFont(ofSize: 15, weight: .bold),
+            .font: UIFont.systemFont(ofSize: 15, weight: .regular),
             .foregroundColor: hightlightColor]
         
         self.typingAttributes = [

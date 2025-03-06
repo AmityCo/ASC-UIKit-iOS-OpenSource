@@ -33,7 +33,7 @@ public struct AmityEditCommentView: View {
             
             VStack(alignment: .trailing, spacing: 10) {
             
-                AmityTextEditorView(.comment(communityId: comment.communityId), text: $text, mentionData: $mentionData, textViewHeight: 120.0)
+                AmityTextEditorView(.comment(communityId: comment.communityId), text: $text, mentionData: $mentionData, textViewHeight: 120 - 16) // 16 is the top & bottom padding inset applied to editor.
                     .maxExpandableHeight(120)
                     .mentionListPosition(.bottom(20.0))
                     .autoFocus(true)
@@ -54,12 +54,12 @@ public struct AmityEditCommentView: View {
                         cancelAction()
                     } label: {
                         Text(AmityLocalizedStringSet.General.cancel.localizedString)
-                            .applyTextStyle(.caption(Color(UIColor(hex: "#636878"))))
+                            .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                             .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     }
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
-                            .stroke(.gray, lineWidth: 0.4)
+                            .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 1)
                     )
 
                     Button {
@@ -71,7 +71,7 @@ public struct AmityEditCommentView: View {
                         saveAction(editedComment)
                     } label: {
                         Text(AmityLocalizedStringSet.General.save.localizedString)
-                            .applyTextStyle(.caption(.white))
+                            .applyTextStyle(.captionBold(.white))
                             .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     }
                     .background(Color(viewConfig.theme.highlightColor))

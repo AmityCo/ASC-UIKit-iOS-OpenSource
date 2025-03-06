@@ -18,16 +18,18 @@ final class AmityFollowersListScreenViewModel: AmityFollowersListScreenViewModel
     let type: AmityFollowerViewType
     let isCurrentUser: Bool
     private let userRepository: AmityUserRepository
-    private let followManager: AmityUserFollowManager
+    private let followManager: AmityUserRelationship
     private var followToken: AmityNotificationToken?
     private var followersList: [AmityFollowRelationship] = []
     private var followersCollection: AmityCollection<AmityFollowRelationship>?
-    private var flagger: AmityUserFlagger?
+    
+    private var moderationManager = UserModerationManager()
+    private var relationshipManager = UserRelationshipManager()
     
     // MARK: - Initializer
     init(userId: String, type: AmityFollowerViewType) {
         userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
-        followManager = userRepository.followManager
+        followManager = userRepository.userRelationship
         self.userId = userId
         self.isCurrentUser = userId == AmityUIKitManagerInternal.shared.client.currentUserId
         self.type = type
@@ -50,9 +52,9 @@ extension AmityFollowersListScreenViewModel {
 extension AmityFollowersListScreenViewModel {
     func getFollowsList() {
         if userId == AmityUIKitManagerInternal.shared.client.currentUserId {
-            followersCollection = type == .followers ? followManager.getMyFollowerList(with: .accepted) : followManager.getMyFollowingList(with: .accepted)
+            followersCollection = type == .followers ? followManager.getMyFollowers(with: .accepted) : followManager.getMyFollowers(with: .accepted)
         } else {
-            followersCollection = type == .followers ? followManager.getUserFollowerList(withUserId: userId) : followManager.getUserFollowingList(withUserId: userId)
+            followersCollection = type == .followers ? followManager.getFollowers(withUserId: userId) : followManager.getFollowings(withUserId: userId)
         }
         
         followToken = followersCollection?.observe { [weak self] collection, _, error in
@@ -74,8 +76,7 @@ extension AmityFollowersListScreenViewModel {
     
     func reportUser(at indexPath: IndexPath) {
         guard let user = getUser(at: indexPath) else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.flag { [weak self] (success, error) in
+        moderationManager.flagUser(userId: user.userId) { [weak self] success, error in
             guard let strongSelf = self else { return }
             if success {
                 strongSelf.delegate?.screenViewModel(strongSelf, didReportUserSuccess: indexPath)
@@ -87,8 +88,7 @@ extension AmityFollowersListScreenViewModel {
     
     func unreportUser(at indexPath: IndexPath) {
         guard let user = getUser(at: indexPath) else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.unflag { [weak self] (success, error) in
+        moderationManager.unflagUser(userId: user.userId) { [weak self] (success, error) in
             guard let strongSelf = self else { return }
             if success {
                 strongSelf.delegate?.screenViewModel(strongSelf, didUnreportUserSuccess: indexPath)
@@ -100,8 +100,7 @@ extension AmityFollowersListScreenViewModel {
     
     func getReportUserStatus(at indexPath: IndexPath) {
         guard let user = getUser(at: indexPath) else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.isFlaggedByMe { [weak self] isReported in
+        moderationManager.isFlaggedByMe(userId: user.userId) { [weak self] isReported, error in
             guard let strongSelf = self else { return }
             
             strongSelf.delegate?.screenViewModel(strongSelf, didGetReportUserStatus: isReported, at: indexPath)
@@ -110,7 +109,7 @@ extension AmityFollowersListScreenViewModel {
     
     func removeUser(at indexPath: IndexPath) {
         guard let user = getUser(at: indexPath) else { return }
-        followManager.declineUserRequest(withUserId: user.userId) { [weak self] success, response, error in
+        relationshipManager.declineUser(userId: user.userId) { [weak self] success, response, error in
             guard let strongSelf = self else { return }
             if success {
                 strongSelf.delegate?.screenViewModel(strongSelf, didRemoveUser: indexPath)

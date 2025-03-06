@@ -113,27 +113,19 @@ final public class AmityUserProfileEditorViewController: AmityViewController {
         view.endEditing(true)
         
         // Update display name and about
-        screenViewModel?.action.update(displayName: displayNameTextField.text ?? "", about: aboutTextView.text ?? "")
-        
-        // Update user avatar
-        if let avatar = uploadingAvatarImage {
-            userAvatarView.state = .loading
-            screenViewModel?.action.update(avatar: avatar) { [weak self] success in
-                if success {
-                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.successfullyUpdated.localizedString))
-                    self?.userAvatarView.image = avatar
-                } else {
-                    AmityHUD.show(.error(message: AmityLocalizedStringSet.HUD.somethingWentWrong.localizedString))
-                }
-                self?.userAvatarView.state = .idle
-                self?.uploadingAvatarImage = nil
-                self?.updateViewState()
+        screenViewModel?.action.updateUser(displayName: displayNameTextField.text ?? "", aboutDescription: aboutTextView.text ?? "", avatar: uploadingAvatarImage, completion: { [weak self] success in
+            
+            if success {
+                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.successfullyUpdated.localizedString))
+                self?.userAvatarView.image = self?.uploadingAvatarImage
+            } else {
+                AmityHUD.show(.error(message: AmityLocalizedStringSet.HUD.somethingWentWrong.localizedString))
             }
-        } else {
-            // when there is no image update
-            // directly show success message after updated
-            AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.successfullyUpdated.localizedString))
-        }
+            
+            self?.userAvatarView.state = .idle
+            self?.uploadingAvatarImage = nil
+            self?.updateViewState()
+        })
     }
     
     @IBAction private func avatarButtonTap(_ sender: Any) {

@@ -42,7 +42,15 @@ struct CommentListView<Content>: View where Content: View {
                     }
                     
                     Color.clear.frame(height: 6)
-                    
+                }
+                .background(GeometryReader { geometry in
+                    Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                })
+            }
+            .coordinateSpace(name: "scroll")
+            .onPreferenceChange(ScrollOffsetKey.self) { offsetY in
+                if commentCoreViewModel.hasScrolledToTop != (offsetY < -1) {
+                    commentCoreViewModel.hasScrolledToTop.toggle()
                 }
             }
         }
@@ -239,8 +247,9 @@ struct ReplyCommentListView<Content>: View where Content: View {
                     .padding(.trailing, 16)
             }
             .frame(height: 28)
-            .background(Color(viewConfig.theme.baseColorShade4))
+            .border(radius: 4, borderColor: Color(viewConfig.theme.baseColorShade4), borderWidth: 1)
             .clipShape(RoundedRectangle(cornerRadius: 4))
+            
             Spacer()
         }
         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.deletedComment)

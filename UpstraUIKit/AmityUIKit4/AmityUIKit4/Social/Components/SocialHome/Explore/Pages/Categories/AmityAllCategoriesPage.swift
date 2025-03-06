@@ -34,8 +34,10 @@ public struct AmityAllCategoriesPage: AmityPageView {
                     if #available(iOS 15.0, *) {
                         getListItem(item: item)
                             .listRowSeparator(.hidden)
+                            .padding(.vertical, 8)
                     } else {
                         getListItem(item: item)
+                            .padding(.vertical, 8)
                     }
                 }
             }
@@ -44,6 +46,8 @@ public struct AmityAllCategoriesPage: AmityPageView {
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .onAppear {
+            host.controller?.navigationController?.isNavigationBarHidden = true
+
             viewModel.fetchCategories()
         }
     }
@@ -58,8 +62,7 @@ public struct AmityAllCategoriesPage: AmityPageView {
                     .accessibilityIdentifier("category_row_image")
                 
                 Text(item.name)
-                    .font(.body)
-                    .fontWeight(.semibold)
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .padding(.leading, 12)
                     .lineLimit(1)
                     .accessibilityIdentifier("category_row_name")
@@ -70,13 +73,7 @@ public struct AmityAllCategoriesPage: AmityPageView {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 12, height: 12)
-            }
-            
-            if let lastItemId = viewModel.categories.last?.id, lastItemId != item.id {
-                Divider()
-                    .overlay(Color(viewConfig.theme.baseColorShade4))
-                    .padding(.vertical, 8)
-                    
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
             }
         }
         .contentShape(Rectangle())

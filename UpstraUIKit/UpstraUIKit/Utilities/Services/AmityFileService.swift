@@ -35,16 +35,14 @@ class AmityFileService {
             return
         }
         
-        fileRepository.uploadImage(image, progress: { progress in
-            progressHandler(progress)
-        }) { (imageData, error) in
-            if let data = imageData {
-                completion(.success(data))
-            } else {
+        Task { @MainActor in
+            do {
+                let result = try await fileRepository.uploadImage(image, progress: progressHandler)
+                completion(.success(result))
+            } catch let error {
                 completion(.failure(AmityError.unknown))
             }
         }
-        
     }
     
     func uploadFile(file: AmityUploadableFile, progressHandler: @escaping (Double) -> Void, completion: @escaping (Result<AmityFileData, Error>) -> Void) {
@@ -54,16 +52,14 @@ class AmityFileService {
             return
         }
         
-        fileRepository.uploadFile(file, progress: { fileUploadProgress in
-            progressHandler(fileUploadProgress)
-        }) { fileData, error in
-            if let data = fileData {
-                completion(.success(data))
-            } else {
+        Task { @MainActor in
+            do {
+                let fileData = try await fileRepository.uploadFile(file, progress: progressHandler)
+                completion(.success(fileData))
+            } catch let error {
                 completion(.failure(AmityError.unknown))
             }
         }
-        
     }
     
     func uploadVideo(url: URL,
@@ -75,18 +71,14 @@ class AmityFileService {
             return
         }
         
-        fileRepository.uploadVideo(with: url, progress: progressHandler) { videoData, error in
-            if let error = error {
-                completion(.failure(error))
-                return
+        Task { @MainActor in
+            do {
+                let result = try await fileRepository.uploadVideo(with: url, progress: progressHandler)
+                completion(.success(result))
+            } catch let error {
+                completion(.failure(AmityError.unknown))
             }
-            if let data = videoData {
-                completion(.success(data))
-                return
-            }
-            completion(.failure(AmityError.unknown))
         }
-        
     }
     
     func loadImage(imageURL: String, size: AmityMediaSize, optimisticLoad: Bool = false, completion: ((Result<UIImage, Error>) -> Void)?) {

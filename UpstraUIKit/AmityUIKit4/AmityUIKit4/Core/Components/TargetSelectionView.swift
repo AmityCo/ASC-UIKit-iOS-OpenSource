@@ -141,6 +141,7 @@ class TargetSelectionViewModel: ObservableObject {
             }
             .compactMap { $0.compactMap { $0 } }
             .assign(to: \.communities, on: self)
+
     }
     
     func loadMore() {

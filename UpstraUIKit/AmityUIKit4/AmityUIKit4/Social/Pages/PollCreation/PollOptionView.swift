@@ -24,6 +24,7 @@ struct PollOptionView: View {
             HStack {
                 Text(title)
                     .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                    .lineLimit(4)
                     .padding(.leading, 12)
                 
                 Spacer()

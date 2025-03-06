@@ -105,38 +105,40 @@ public struct AmityCommunitySettingPage: AmityPageView {
                     .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.storySetting)
             }
             
-            let leaveCommunityText = viewConfig.getText(elementId: .leaveCommunity) ?? AmityLocalizedStringSet.Social.communitySettingLeaveCommunity.localizedString
-            Text(leaveCommunityText)
-                .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    if community.membersCount == 1 {
-                        let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString, message: "As you’re the last moderator and member, leaving will also close this community. All posts shared in community will be deleted. This cannot be undone.", preferredStyle: .alert)
-                        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
-                        
-                        let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
-                            closeCommunity()
+            if community.isJoined {
+                let leaveCommunityText = viewConfig.getText(elementId: .leaveCommunity) ?? AmityLocalizedStringSet.Social.communitySettingLeaveCommunity.localizedString
+                Text(leaveCommunityText)
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if community.membersCount == 1 {
+                            let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString, message: "As you’re the last moderator and member, leaving will also close this community. All posts shared in community will be deleted. This cannot be undone.", preferredStyle: .alert)
+                            let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
+                            
+                            let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
+                                closeCommunity()
+                            }
+                            alertController.addAction(cancelAction)
+                            alertController.addAction(confirmAction)
+                            
+                            host.controller?.present(alertController, animated: true)
+                            
+                        } else {
+                            let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertMessage.localizedString, preferredStyle: .alert)
+                            let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
+                            let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
+                                leaveCommunity()
+                            }
+                            alertController.addAction(cancelAction)
+                            alertController.addAction(confirmAction)
+                            
+                            host.controller?.present(alertController, animated: true)
                         }
-                        alertController.addAction(cancelAction)
-                        alertController.addAction(confirmAction)
-                        
-                        host.controller?.present(alertController, animated: true)
-                        
-                    } else {
-                        let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertMessage.localizedString, preferredStyle: .alert)
-                        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
-                        let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
-                            leaveCommunity()
-                        }
-                        alertController.addAction(cancelAction)
-                        alertController.addAction(confirmAction)
-                        
-                        host.controller?.present(alertController, animated: true)
                     }
-                }
-                .isHidden(viewConfig.isHidden(elementId: .leaveCommunity))
-                .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.leaveCommunity)
+                    .isHidden(viewConfig.isHidden(elementId: .leaveCommunity))
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.leaveCommunity)
+            }
             
             Rectangle()
                 .fill(Color(viewConfig.theme.baseColorShade4))

@@ -25,55 +25,36 @@ class AmityUserProfileEditorScreenViewModel: AmityUserProfileEditorScreenViewMod
         userObject = userRepository.getUser(AmityUIKitManagerInternal.shared.client.currentUserId!)
         userCollectionToken = userObject?.observe { [weak self] user, error in
             guard let strongSelf = self,
-                let user = user.object else{ return }
+                  let user = user.snapshot else{ return }
             
             strongSelf.user = AmityUserModel(user: user)
             strongSelf.delegate?.screenViewModelDidUpdate(strongSelf)
         }
     }
     
-    func update(displayName: String, about: String) {
+    func updateUser(displayName: String, aboutDescription: String, avatar: UIImage?, completion: @escaping (Bool) -> Void) {
         
-        let completion: AmityRequestCompletion? = { [weak self] success, error in
-            if success {
-                self?.dispatchGroup.leave()
-            } else {
-                self?.dispatchGroup.leaveWithError(error)
-            }
-        }
-        
-        // Update
-        dispatchGroup.enter()
+        let amityUserUpdateBuilder = AmityUserUpdateBuilder()
         amityUserUpdateBuilder.setDisplayName(displayName)
-        amityUserUpdateBuilder.setUserDescription(about)
-        AmityUIKitManagerInternal.shared.client.updateUser(amityUserUpdateBuilder, completion: completion)
+        amityUserUpdateBuilder.setUserDescription(aboutDescription)
         
-        dispatchGroup.notify(queue: DispatchQueue.main) { error in
-            if let error = error {
-                Log.add("Error")
-            } else {
-                Log.add("Success")
+        Task { @MainActor in
+            
+            // Try to upload image first
+            var imageData: AmityImageData?
+            if let avatar {
+                imageData = try? await fileRepository.uploadImage(avatar, progress: nil)
             }
-        }
-    }
-    
-    func update(avatar: UIImage, completion: ((Bool) -> Void)?) {
-        // Update user avatar
-        dispatchGroup.enter()
-        fileRepository.uploadImage(avatar, progress: nil) { [weak self] (imageData, error) in
-            guard let self = self else { return }
             
-            let userUpdateBuilder = AmityUserUpdateBuilder()
-            userUpdateBuilder.setAvatar(imageData)
+            if let imageData {
+                amityUserUpdateBuilder.setAvatar(imageData)
+            }
             
-            
-            AmityUIKitManagerInternal.shared.client.updateUser(userUpdateBuilder) { [weak self] success, error in
-                if success {
-                    self?.dispatchGroup.leave()
-                } else {
-                    self?.dispatchGroup.leaveWithError(error)
-                }
-                completion?(success)
+            do {
+                let user = try await AmityUIKitManagerInternal.shared.client.editUser(amityUserUpdateBuilder)
+                completion(true)
+            } catch let error {
+                completion(false)
             }
         }
     }

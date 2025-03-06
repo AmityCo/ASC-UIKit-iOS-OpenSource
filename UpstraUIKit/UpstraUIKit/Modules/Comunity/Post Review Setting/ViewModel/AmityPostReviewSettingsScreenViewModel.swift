@@ -71,12 +71,12 @@ extension AmityPostReviewSettingsScreenViewModel {
             let updateOptions = AmityCommunityUpdateOptions()
             
             updateOptions.setPostSettings(isPostReview ? .adminReviewPostRequired : .anyoneCanPost)
-            communityRepository.updateCommunity(withId: communityId, options: updateOptions) { [weak self] (community, error) in
-                guard let strongSelf = self else { return }
-                if let error = error {
-                    strongSelf.delegate?.screenViewModel(strongSelf, didFailWithAction: content)
-                } else {
-                    
+            
+            Task { @MainActor in
+                do {
+                    let result = try await communityRepository.editCommunity(withId: communityId, options: updateOptions)
+                } catch _ {
+                    self.delegate?.screenViewModel(self, didFailWithAction: content)
                 }
             }
         } else {

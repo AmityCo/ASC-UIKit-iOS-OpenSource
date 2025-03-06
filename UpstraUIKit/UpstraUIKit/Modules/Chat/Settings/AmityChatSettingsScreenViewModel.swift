@@ -99,10 +99,8 @@ final class AmityChatSettingsScreenViewModel: AmityChatSettingsScreenViewModelTy
     // MARK: - Repository
     private var channelRepository: AmityChannelRepository?
     private var communityRepository: AmityCommunityRepository?
-    private var userRepository: AmityUserRepository?
-    
-    private var flagger: AmityUserFlagger?
-    
+    private var userRepository: AmityUserRepository
+        
     private var channelId = String()
     var channelModel: AmityChannelModel?
     var otherUser: AmityUser?
@@ -129,7 +127,7 @@ final class AmityChatSettingsScreenViewModel: AmityChatSettingsScreenViewModelTy
         
         channelNotificationToken = channelRepository?.getChannel(channelId).observe { [weak self] (channel, error) in
             guard let weakSelf = self,
-                  let model = channel.object else { return }
+                  let model = channel.snapshot else { return }
             let channelModel = AmityChannelModel(object: model)
             weakSelf.channelModel = channelModel
             weakSelf.memberCount = "\(model.memberCount)"
@@ -207,9 +205,14 @@ extension AmityChatSettingsScreenViewModel {
             isUserReported = false
             return
         }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.isFlaggedByMe {
-            self.isUserReported = $0
+        
+        Task { @MainActor in
+            do {
+                let result = try await userRepository.isUserFlaggedByMe(withId: user.userId)
+                self.isUserReported = result
+            } catch let error {
+                self.isUserReported = false
+            }
         }
     }
     
@@ -217,10 +220,10 @@ extension AmityChatSettingsScreenViewModel {
         guard let channel = channelModel else { return }
         userToken?.invalidate()
         if !channel.getOtherUserId().isEmpty {
-            userToken = userRepository?.getUser(channel.getOtherUserId()).observeOnce({ [weak self] user, error in
+            userToken = userRepository.getUser(channel.getOtherUserId()).observeOnce({ [weak self] user, error in
                 guard let weakSelf = self else { return }
                 if error == nil {
-                    if let userObject = user.object {
+                    if let userObject = user.snapshot {
                         weakSelf.otherUser = userObject
                         weakSelf.getReportStatus()
                     }
@@ -241,23 +244,31 @@ extension AmityChatSettingsScreenViewModel {
     
     private func reportUser() {
         if let user = otherUser {
-            flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-            flagger?.flag { [weak self] (success, error) in
-                guard let weakSelf = self else { return }
-                weakSelf.isUserReported = success
-                weakSelf.delegate?.screenViewModelDidFinishReport(error: error?.localizedDescription)
+            Task { @MainActor in
+                do {
+                    let result = try await userRepository.flagUser(withId: user.userId)
+                    self.isUserReported = result
+                    self.delegate?.screenViewModelDidFinishReport(error: nil)
+
+                } catch let error {
+                    self.isUserReported = false
+                    self.delegate?.screenViewModelDidFinishReport(error: error.localizedDescription)
+                }
             }
         }
     }
     
     private func unreportUser() {
         if let user = otherUser {
-            flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-            flagger?.unflag { [weak self] (success, error) in
-                guard let weakSelf = self else { return }
-                /// we have to take the opposite value of success
-                weakSelf.isUserReported = !success
-                weakSelf.delegate?.screenViewModelDidFinishReport(error: error?.localizedDescription)
+            Task { @MainActor in
+                do {
+                    let result = try await userRepository.unflagUser(withId: user.userId)
+                    self.isUserReported = !result
+                    self.delegate?.screenViewModelDidFinishReport(error: nil)
+                } catch let error {
+                    self.isUserReported = true
+                    self.delegate?.screenViewModelDidFinishReport(error: error.localizedDescription)
+                }
             }
         }
     }
@@ -270,7 +281,7 @@ extension AmityChatSettingsScreenViewModel {
     }
     
     func presentMember() {
-        if let channelObject = channelRepository?.getChannel(channelId).object {
+        if let channelObject = channelRepository?.getChannel(channelId).snapshot {
             let model = AmityChannelModel(object: channelObject)
             delegate?.screenViewModelDidPresentMember(channel: model)
         }

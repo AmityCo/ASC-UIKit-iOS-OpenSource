@@ -52,12 +52,11 @@ final class AmityMessageListScreenViewModel: AmityMessageListScreenViewModelType
     weak var delegate: AmityMessageListScreenViewModelDelegate?
         
     // MARK: - Repository
-    private var membershipParticipation: AmityChannelParticipation?
-    private let channelRepository: AmityChannelRepository!
-    private var messageRepository: AmityMessageRepository!
-    private var userRepository: AmityUserRepository!
-    private var editor: AmityMessageEditor?
-    private var messageFlagger: AmityMessageFlagger?
+    private var membershipParticipation: AmityChannelMembership
+    private let channelRepository: AmityChannelRepository
+    private let subchannelRepository: AmitySubChannelRepository
+    private var messageRepository: AmityMessageRepository
+    
     
     // MARK: - Collection
     private var messagesCollection: AmityCollection<AmityMessage>?
@@ -86,9 +85,10 @@ final class AmityMessageListScreenViewModel: AmityMessageListScreenViewModelType
     init(channelId: String, subChannelId: String) {
         self.channelId = channelId
         self.subChannelId = subChannelId
-        membershipParticipation = AmityChannelParticipation(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membershipParticipation = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
         channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
         messageRepository = AmityMessageRepository(client: AmityUIKitManagerInternal.shared.client)
+        subchannelRepository = AmitySubChannelRepository(client: AmityUIKitManagerInternal.shared.client)
     }
     
     // MARK: - DataSource
@@ -217,7 +217,7 @@ extension AmityMessageListScreenViewModel {
     func getChannel(){
         channelNotificationToken?.invalidate()
         channelNotificationToken = channelRepository.getChannel(channelId).observe { [weak self] (channel, error) in
-            guard let object = channel.object else { return }
+            guard let object = channel.snapshot else { return }
             let channelModel = AmityChannelModel(object: object)
             self?.delegate?.screenViewModelDidGetChannel(channel: channelModel)
         }
@@ -246,10 +246,16 @@ extension AmityMessageListScreenViewModel {
         guard !textMessage.isEmpty else {
             return
         }
-        let createOptioins = AmityTextMessageCreateOptions(subChannelId: subChannelId, text: textMessage)
-        messageRepository.createTextMessage(options: createOptioins) { [weak self] _,_ in
-            self?.text = ""
-            self?.delegate?.screenViewModelEvents(for: .didSendText)
+        let createOptions = AmityTextMessageCreateOptions(subChannelId: subChannelId, text: textMessage)
+        Task { @MainActor in
+            do {
+                let message = try await messageRepository.createTextMessage(options: createOptions)
+                self.text = ""
+                self.delegate?.screenViewModelEvents(for: .didSendText)
+            } catch let error {
+                self.text = ""
+                self.delegate?.screenViewModelEvents(for: .didSendText)
+            }
         }
     }
     
@@ -257,46 +263,64 @@ extension AmityMessageListScreenViewModel {
         let textMessage = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !textMessage.isEmpty else { return }
         
-        editor = AmityMessageEditor(client: AmityUIKitManagerInternal.shared.client, messageId: messageId)
-        editor?.editText(textMessage, completion: { [weak self] (isSuccess, error) in
-            guard isSuccess else { return }
-            
-            self?.delegate?.screenViewModelEvents(for: .didEditText)
-            self?.editor = nil
-        })
+        Task { @MainActor in
+            do {
+                let _ = try await messageRepository.editTextMessage(withId: messageId, text)
+                self.delegate?.screenViewModelEvents(for: .didEditText)
+            } catch let error {
+                Log.warn("Error while editing text message")
+            }
+        }
     }
     
     func delete(withMessage message: AmityMessageModel, at indexPath: IndexPath) {
-        messageRepository?.deleteMessage(withId: message.messageId, completion: { [weak self] (status, error) in
-            guard error == nil , status else { return }
-            switch message.messageType {
-            case .audio:
-                AmityFileCache.shared.deleteFile(for: .audioDirectory, fileName: message.messageId + ".m4a")
-            default:
-                break
+        Task { @MainActor in
+            do {
+                let result = try await messageRepository.softDeleteMessage(withId: message.messageId)
+                switch message.messageType {
+                case .audio:
+                    AmityFileCache.shared.deleteFile(for: .audioDirectory, fileName: message.messageId + ".m4a")
+                default:
+                    break
+                }
+                self.delegate?.screenViewModelEvents(for: .didDelete(indexPath: indexPath))
+            } catch let error {
+                Log.warn("Error while deleting text message")
             }
-            self?.delegate?.screenViewModelEvents(for: .didDelete(indexPath: indexPath))
-            self?.editor = nil
-        })
+        }
     }
     
     
     func deleteErrorMessage(with messageId: String, at indexPath: IndexPath) {
-        messageRepository.deleteFailedMessage(messageId) { [weak self] (isSuccess, error) in
-            if isSuccess {
-                self?.delegate?.screenViewModelEvents(for: .didDeeleteErrorMessage(indexPath: indexPath))
-                self?.delegate?.screenViewModelEvents(for: .updateMessages)
+        Task { @MainActor in
+            do {
+                let _ = try await messageRepository.softDeleteMessage(withId: messageId)
+                self.delegate?.screenViewModelEvents(for: .didDeeleteErrorMessage(indexPath: indexPath))
+                self.delegate?.screenViewModelEvents(for: .updateMessages)
+            } catch let error {
+                Log.warn("Error while deleting failed message \(messageId)")
             }
         }
     }
     
     func startReading() {
-        membershipParticipation?.startReading(subChannelId: subChannelId)
+        Task { @MainActor in
+            do {
+                try await subchannelRepository.startMessageReceiptSync(subChannelId: subChannelId)
+            } catch let error {
+                
+            }
+        }
     }
     
     func stopReading() {
-        membershipParticipation?.stopReading(subChannelId: subChannelId)
-        membershipParticipation = nil
+        Task { @MainActor in
+            do {
+                try await subchannelRepository.stopMessageReceiptSync(subChannelId: subChannelId)
+            } catch let error {
+                
+            }
+        }
     }
     
     func shouldScrollToBottom(force: Bool) {
@@ -362,14 +386,23 @@ extension AmityMessageListScreenViewModel {
     func reportMessage(at indexPath: IndexPath) {
         getReportMessageStatus(at: indexPath) { [weak self] isFlaggedByMe in
             guard let message = self?.message(at: indexPath) else { return }
-            self?.messageFlagger = AmityMessageFlagger(client: AmityUIKitManagerInternal.shared.client, messageId: message.messageId)
             if isFlaggedByMe {
-                self?.messageFlagger?.unflag { [weak self] success, error in
-                    self?.handleReportResponse(at: indexPath, isSuccess: success, error: error)
+                Task { @MainActor in
+                    do {
+                        let result = try await self?.messageRepository.unflagMessage(withId: message.messageId)
+                        self?.handleReportResponse(at: indexPath, isSuccess: result ?? false, error: nil)
+                    } catch let error {
+                        self?.handleReportResponse(at: indexPath, isSuccess: false, error: error)
+                    }
                 }
             } else {
-                self?.messageFlagger?.flag { [weak self] success, error in
-                    self?.handleReportResponse(at: indexPath, isSuccess: success, error: error)
+                Task { @MainActor in
+                    do {
+                        let result = try await self?.messageRepository.flagMessage(withId: message.messageId)
+                        self?.handleReportResponse(at: indexPath, isSuccess: result ?? false, error: nil)
+                    } catch let error {
+                        self?.handleReportResponse(at: indexPath, isSuccess: false, error: error)
+                    }
                 }
             }
         }
@@ -415,9 +448,13 @@ private extension AmityMessageListScreenViewModel {
     
     func getReportMessageStatus(at indexPath: IndexPath, completion: ((Bool) -> Void)?) {
         guard let message = message(at: indexPath) else { return }
-        messageFlagger = AmityMessageFlagger(client: AmityUIKitManagerInternal.shared.client, messageId: message.messageId)
-        messageFlagger?.isFlaggedByMe {
-            completion?($0)
+        Task { @MainActor in
+            do {
+                let result = try await messageRepository.flagMessage(withId: message.messageId)
+                completion?(true)
+            } catch let error {
+                completion?(false)
+            }
         }
     }
     

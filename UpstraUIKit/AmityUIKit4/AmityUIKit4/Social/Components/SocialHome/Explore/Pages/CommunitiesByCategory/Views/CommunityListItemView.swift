@@ -14,6 +14,7 @@ struct CommunityListItemView: View {
     
     var community: AmityCommunityModel
     var shouldOverlayImage: Bool = false
+    var showJoinButton = true
     
     var body: some View {
         HStack {
@@ -27,7 +28,7 @@ struct CommunityListItemView: View {
                         .cornerRadius(8, corners: .allCorners).opacity(shouldOverlayImage ? 1 : 0)
                     , alignment: .center)
             
-            CommunityInfoView(community: community)
+            CommunityInfoView(community: community, showJoinButton: showJoinButton)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 8)
         }
@@ -47,6 +48,7 @@ struct CommunityJoinButton: View {
     init(community: AmityCommunityModel, tapAction: @escaping DefaultTapAction) {
         self.community = community
         self.tapAction = tapAction
+        self._isJoined = State(initialValue: community.isJoined)
     }
     
     var body: some View {
@@ -94,6 +96,7 @@ struct CommunityInfoView: View {
     @StateObject var viewModel = CommunityInfoViewModel()
     
     let community: AmityCommunityModel
+    var showJoinButton: Bool = true
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -115,13 +118,13 @@ struct CommunityInfoView: View {
                 
                 Image(AmityIcon.verifiedBadge.imageResource)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
                     .frame(width: 20, height: 20)
                     .padding(.leading, 4)
                     .opacity(community.isOfficial ? 1 : 0)
             }
             
-            HStack(alignment: community.categories.isEmpty ? .bottom : .bottom, spacing: 0) {
+            HStack(alignment: .bottom, spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {
                     
                     if !community.categories.isEmpty {
@@ -139,19 +142,21 @@ struct CommunityInfoView: View {
                 
                 Spacer()
                 
-                CommunityJoinButton(community: community, tapAction: {
-                    let communityId = community.communityId
-                    let isJoined = community.isJoined
-                    Task { @MainActor in
-                        if isJoined {
-                            let isSuccess = try await viewModel.leaveCommunity(communityId: communityId)
-                            Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
-                        } else {
-                            let isSuccess = try await viewModel.joinCommunity(communityId: communityId)
-                            Log.add(event: .info, "Joining Community Status: \(isSuccess)")
+                if showJoinButton {
+                    CommunityJoinButton(community: community, tapAction: {
+                        let communityId = community.communityId
+                        let isJoined = community.isJoined
+                        Task { @MainActor in
+                            if isJoined {
+                                let isSuccess = try await viewModel.leaveCommunity(communityId: communityId)
+                                Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
+                            } else {
+                                let isSuccess = try await viewModel.joinCommunity(communityId: communityId)
+                                Log.add(event: .info, "Joining Community Status: \(isSuccess)")
+                            }
                         }
-                    }
-                })
+                    })
+                }
             }
             .frame(height: 48)
         }

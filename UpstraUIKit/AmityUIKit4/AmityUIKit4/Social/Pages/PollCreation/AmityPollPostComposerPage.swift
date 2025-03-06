@@ -36,8 +36,8 @@ public struct AmityPollPostComposerPage: AmityPageView {
     
     @State private var mentionData: MentionData = MentionData()
     @State private var mentionedUsers: [AmityMentionUserModel] = []
-    
     @State private var isQuestionCharLimitError = false
+    @State private var showCloseAlert = false
     
     public init(targetId: String?, targetType: AmityPostTargetType) {
         self._viewModel = StateObject(wrappedValue: PollPostComposerViewModel(targetId: targetId, targetType: targetType))
@@ -52,14 +52,20 @@ public struct AmityPollPostComposerPage: AmityPageView {
                 AmityNavigationBar(title: viewModel.pollTarget) {
                     
                     Image(AmityIcon.closeIcon.imageResource)
-                        .renderingMode(.template)
                         .resizable()
+                        .renderingMode(.template)
                         .scaledToFit()
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .frame(width: 24, height: 24)
-                        .padding(.leading, -6)
+                        .frame(width: 24, height: 20)
+                        .padding(.vertical, 8)
                         .onTapGesture {
-                            host.controller?.navigationController?.dismiss(animated: true)
+                            showCloseAlert.toggle()
+                        }
+                        .alert(isPresented: $showCloseAlert) {
+                            Alert(title: Text(AmityLocalizedStringSet.Social.postDiscardAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.postDiscardAlertMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.Social.postDiscardAlertButtonKeepEditing.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: {
+                                host.controller?.navigationController?.dismiss(animated: true)
+                            }))
                         }
                     
                 } trailing: {
@@ -100,7 +106,6 @@ public struct AmityPollPostComposerPage: AmityPageView {
                     .buttonStyle(.plain)
                     .disabled(!isInputValid)
                 }
-                .padding(.horizontal)
                 
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 24) {
@@ -157,11 +162,16 @@ public struct AmityPollPostComposerPage: AmityPageView {
                         Divider()
                         
                         PollDurationSection(duration: $selectedDuration, onTapAction: {
+                            hideKeyboard()
+                            
                             showPollDurationSheet = true
                         })
                         
                     }
                     .padding()
+                }
+                .onTapGesture {
+                    hideKeyboard()
                 }
                 .bottomSheet(isShowing: $showPollDurationSheet, height: .contentSize) {
                     PollDurationSelectionView(duration: $selectedDuration, isVisible: $showPollDurationSheet)
@@ -188,6 +198,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
             .isHidden(mentionedUsers.count == 0)
             .accessibilityIdentifier(AccessibilityID.Chat.MentionList.container)
         }
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .showToast(isPresented: $isToastVisible, style: .warning, message: AmityLocalizedStringSet.Social.pollPostCreateError.localizedString, bottomPadding: 24)
     }
@@ -324,12 +335,12 @@ struct PollOptionSection: View {
                         Image(systemName: "plus")
                         
                         Text(AmityLocalizedStringSet.Social.pollAddOption.localizedString)
-                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.secondaryColor)))
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         
                         Spacer()
                     }
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.secondaryColor))
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
                     .border(radius: 8, borderColor: Color(viewConfig.theme.baseColorShade3), borderWidth: 1)
@@ -405,9 +416,12 @@ struct PollAnswerView: View {
                     onDelete()
                 }, label: {
                     Image(AmityIcon.trashBinIcon.imageResource)
+                        .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                    
                 })
             }
             

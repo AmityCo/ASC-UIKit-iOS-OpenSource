@@ -51,6 +51,7 @@ struct StoryTargetView<Content: View>: View {
                 
                 if showErrorRing {
                     Image(AmityIcon.errorStoryIcon.getImageResource())
+                        .resizable()
                         .frame(width: 22.0, height: 22.0)
                         .offset(x: 22, y: 22)
                 } else {

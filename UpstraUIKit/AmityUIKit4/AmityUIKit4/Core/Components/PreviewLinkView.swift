@@ -31,6 +31,10 @@ struct PreviewLinkView: View {
                     .clipped()
                     .shimmering(active: !viewModel.previewLinkData.loaded)
                 
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+                
                 VStack(alignment: .leading, spacing: 4) {
                     if !viewModel.previewLinkData.loaded {
                         Rectangle()

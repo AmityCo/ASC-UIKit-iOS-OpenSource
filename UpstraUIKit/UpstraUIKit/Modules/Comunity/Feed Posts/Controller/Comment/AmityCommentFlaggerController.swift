@@ -17,22 +17,38 @@ protocol AmityCommentFlaggerControllerProtocol {
 
 final class AmityCommentFlaggerController: AmityCommentFlaggerControllerProtocol {
     
-    private var flagger: AmityCommentFlagger?
+    private var flagger: AmityCommentRepository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
     
     func report(withCommentId commentId: String, completion: AmityRequestCompletion?) {
-        flagger = AmityCommentFlagger(client: AmityUIKitManagerInternal.shared.client, commentId: commentId)
-        flagger?.flag(completion: completion)
+        Task { @MainActor in
+            do {
+                let result = try await flagger.flagComment(withId: commentId)
+                completion?(result, nil)
+            } catch let error {
+                completion?(false, error)
+            }
+        }
     }
     
     func unreport(withCommentId commentId: String, completion: AmityRequestCompletion?) {
-        flagger = AmityCommentFlagger(client: AmityUIKitManagerInternal.shared.client, commentId: commentId)
-        flagger?.unflag(completion: completion)
+        Task { @MainActor in
+            do {
+                let result = try await flagger.unflagComment(withId: commentId)
+                completion?(result, nil)
+            } catch let error {
+                completion?(false, error)
+            }
+        }
     }
     
     func getReportStatus(withCommentId commentId: String, completion: ((Bool) -> Void)?) {
-        flagger = AmityCommentFlagger(client: AmityUIKitManagerInternal.shared.client, commentId: commentId)
-        flagger?.isFlaggedByMe { flag in
-            completion?(flag)
+        Task { @MainActor in
+            do {
+                let result = try await flagger.isCommentFlaggedByMe(withId: commentId)
+                completion?(result)
+            } catch let error {
+                completion?(false)
+            }
         }
     }
 }

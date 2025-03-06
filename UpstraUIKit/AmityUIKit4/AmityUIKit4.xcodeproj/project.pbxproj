@@ -348,6 +348,7 @@
 		68FF77D82B81C4A300B8F561 /* Buildable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FF77C52B81C4A300B8F561 /* Buildable.swift */; };
 		68FF77D92B81C4A300B8F561 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FF77C62B81C4A300B8F561 /* Page.swift */; };
 		68FF77DB2B81DEC900B8F561 /* AmityStoryTargetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68FF77DA2B81DEC900B8F561 /* AmityStoryTargetModel.swift */; };
+		9219B98A2D79EE9B0027162B /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9219B9892D79EE9B0027162B /* SharedFrameworks */; };
 		921C3FC92C379F3E00BF403E /* AmityPostContentComponentBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921C3FC82C379F3E00BF403E /* AmityPostContentComponentBehavior.swift */; };
 		923AA56A2CB3B453009C9357 /* LivestreamVideoPlayerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA5692CB3B453009C9357 /* LivestreamVideoPlayerViewModel.swift */; };
 		923AA56E2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA56D2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift */; };
@@ -501,7 +502,7 @@
 		ED6EFA112CB39DB6003A176F /* AmityPollPostComposerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6EFA102CB39DB6003A176F /* AmityPollPostComposerPage.swift */; };
 		ED6EFA142CB3D3D2003A176F /* PollAnswerResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6EFA132CB3D3D2003A176F /* PollAnswerResultView.swift */; };
 		ED6EFA612CB4FE0F003A176F /* PollOptionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6EFA602CB4FE0F003A176F /* PollOptionView.swift */; };
-		ED7E5C922D6E0F79000E7AAC /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED7E5C912D6E0F79000E7AAC /* SharedFrameworks */; };
+		ED84C2972D717423006FD1DA /* WordsGrammar.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED84C2962D71741C006FD1DA /* WordsGrammar.swift */; };
 		EDF96A582CBE240700A5B83E /* PollManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF96A572CBE240700A5B83E /* PollManager.swift */; };
 		EDF96A5A2CBF7EF500A5B83E /* AmityPollTargetSelectionPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF96A592CBF7EF500A5B83E /* AmityPollTargetSelectionPage.swift */; };
 		EDF96A5C2CC0C42600A5B83E /* PollDuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF96A5B2CC0C42600A5B83E /* PollDuration.swift */; };
@@ -1031,6 +1032,7 @@
 		ED6EFA102CB39DB6003A176F /* AmityPollPostComposerPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityPollPostComposerPage.swift; sourceTree = "<group>"; };
 		ED6EFA132CB3D3D2003A176F /* PollAnswerResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollAnswerResultView.swift; sourceTree = "<group>"; };
 		ED6EFA602CB4FE0F003A176F /* PollOptionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollOptionView.swift; sourceTree = "<group>"; };
+		ED84C2962D71741C006FD1DA /* WordsGrammar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsGrammar.swift; sourceTree = "<group>"; };
 		EDF96A572CBE240700A5B83E /* PollManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollManager.swift; sourceTree = "<group>"; };
 		EDF96A592CBF7EF500A5B83E /* AmityPollTargetSelectionPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityPollTargetSelectionPage.swift; sourceTree = "<group>"; };
 		EDF96A5B2CC0C42600A5B83E /* PollDuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PollDuration.swift; sourceTree = "<group>"; };
@@ -1042,7 +1044,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED7E5C922D6E0F79000E7AAC /* SharedFrameworks in Frameworks */,
+				9219B98A2D79EE9B0027162B /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1498,6 +1500,7 @@
 		684AE1182B0C5DBA00FD7270 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				ED84C2962D71741C006FD1DA /* WordsGrammar.swift */,
 				68B201A92CABF99700F40C22 /* VideoConverter.swift */,
 				68B201A72CABF93200F40C22 /* ImageConverter.swift */,
 				68DCAABA2C9D52B0003F9F2C /* Debouncer.swift */,
@@ -3009,6 +3012,7 @@
 				68DCAAA52C9A91B5003F9F2C /* AmityUserProfilePageViewModel.swift in Sources */,
 				68FF77CF2B81C4A300B8F561 /* ContentLoadingPolicy.swift in Sources */,
 				6877D39F2C7C5D7D008B3598 /* SettingToggleButtonView.swift in Sources */,
+				ED84C2972D717423006FD1DA /* WordsGrammar.swift in Sources */,
 				A9FF80E82BBD14660088A317 /* AmityLiveChatPageViewModel.swift in Sources */,
 				68FF77CA2B81C4A300B8F561 /* PagingAnimation.swift in Sources */,
 				68BD2D5F2CB5119F00FF0A19 /* PreviewLinkView.swift in Sources */,
@@ -3662,7 +3666,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		ED7E5C912D6E0F79000E7AAC /* SharedFrameworks */ = {
+		9219B9892D79EE9B0027162B /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

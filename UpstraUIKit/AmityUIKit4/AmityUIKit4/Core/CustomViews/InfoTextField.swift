@@ -124,12 +124,12 @@ struct InfoTextField: View {
                         .accessibilityIdentifier(charCountTextAccessibilityId ?? "charCountTextAccessibilityId")
                 }
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, 5)
             
             textField
-                .applyTextStyle(.body(Color(textFieldTextColor)))
                 .lineLimit(data.isExpandable ? 7 : 1)
                 .textFieldStyle(PlainTextFieldStyle())
+                .frame(minHeight: 34)
                 .onChange(of: text) { newText in
                     guard let limitedCharCount = data.maxCharCount else { return }
                     charCount = newText.count
@@ -144,12 +144,13 @@ struct InfoTextField: View {
                         text = String(text.prefix(limitedCharCount))
                     }
                 }
+                .padding(.vertical, 10)
                 .accessibilityIdentifier(textFieldAccessibilityId ?? "textFieldAccessibilityId")
             
             Rectangle()
                 .frame(height: 1)
                 .foregroundColor(Color(textFieldLineColor))
-                .padding(.top, 16)
+                .padding(.top, 6)
             
             if !(data.infoMessage ?? "").isEmpty || !(data.errorMessage ?? "").isEmpty && !isValid {
                 Text(isValid ? (data.infoMessage ?? "") : (data.errorMessage ?? data.infoMessage ?? ""))
@@ -160,11 +161,27 @@ struct InfoTextField: View {
         }
     }
     
-    private var textField: TextField<Text> {
+    @ViewBuilder
+    private var textField: some View {
+        let placeholderColor = AmityUIKitConfigController.shared.getTheme().baseColorShade3
         if #available(iOS 16.0, *) {
-            return TextField(data.placeholder, text: $text, axis: .vertical)
+            ZStack(alignment: .leading) {
+                Text(data.placeholder)
+                    .applyTextStyle(.body(Color(placeholderColor)))
+                    .opacity(text.isEmpty ? 1 : 0)
+
+                TextField("", text: $text, axis: .vertical)
+                    .applyTextStyle(.body(Color(textFieldTextColor)))
+            }
         } else {
-            return TextField(data.placeholder, text: $text)
+            ZStack(alignment: .leading) {
+                Text(data.placeholder)
+                    .applyTextStyle(.body(Color(placeholderColor)))
+                    .opacity(text.isEmpty ? 1 : 0)
+
+                TextField("", text: $text)
+                    .applyTextStyle(.body(Color(textFieldTextColor)))
+            }
         }
     }
 }

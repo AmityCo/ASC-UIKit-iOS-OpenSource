@@ -31,27 +31,20 @@ extension GoLive {
             
         }
         
-        
         override func main() {
             
             let coverImageData = findOptionalCoverImageData()
             
-            streamRepository.createVideoStream(withTitle: title, description: streamDescription, thumbnailImage: coverImageData, meta: meta) { [weak self] stream, error in
-                if let error = error {
-                    self?.result = .failure(error)
-                    self?.finish()
-                    return
+            Task { @MainActor in
+                do {
+                    let stream = try await streamRepository.createStream(withTitle: title, description: streamDescription, thumbnailImage: coverImageData, meta: meta)
+                    self.result = .success(stream)
+                    self.finish()
+                } catch let error {
+                    self.result = .failure(error)
+                    self.finish()
                 }
-                guard let stream = stream else {
-                    self?.result = .failure(GeneralError(message: "Unable to find stream data"))
-                    self?.finish()
-                    return
-                }
-                self?.result = .success(stream)
-                self?.finish()
             }
-            
-            
         }
         
         private func findOptionalCoverImageData() -> AmityImageData? {

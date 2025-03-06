@@ -32,7 +32,7 @@ protocol AmityUserProfileHeaderScreenViewModelAction {
     func createChannel()
     func follow()
     func unfollow()
-    func unblockUser()
+    @MainActor func unblockUser()
 }
 
 protocol AmityUserProfileHeaderScreenViewModelType: AmityUserProfileHeaderScreenViewModelAction, AmityUserProfileHeaderScreenViewModelDataSource {

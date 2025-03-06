@@ -32,7 +32,7 @@ extension AmityUserFollowersScreenViewModel {
             guard let strongSelf = self else { return }
             switch object.dataStatus {
             case .fresh:
-                if let user = object.object {
+                if let user = object.snapshot {
                     let userModel = AmityUserModel(user: user)
                     strongSelf.user = userModel
                     strongSelf.delegate?.screenViewModel(strongSelf, didGetUser: userModel)

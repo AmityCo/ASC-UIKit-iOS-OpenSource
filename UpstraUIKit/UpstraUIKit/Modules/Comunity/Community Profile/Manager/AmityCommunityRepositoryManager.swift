@@ -36,7 +36,7 @@ final class AmityCommunityRepositoryManager: AmityCommunityRepositoryManagerProt
                 self?.token?.invalidate()
                 self?.token = nil
             }
-            guard let object = community.object else {
+            guard let object = community.snapshot else {
                 if let error = AmityError(error: error) {
                     completion?(.failure(error))
                 }
@@ -49,10 +49,11 @@ final class AmityCommunityRepositoryManager: AmityCommunityRepositoryManagerProt
     }
     
     func join(_ completion: ((AmityError?) -> Void)?) {
-        communityRepository.joinCommunity(withId: communityId) { (success, error) in
-            if success {
+        Task { @MainActor in
+            do {
+                let _ = try await communityRepository.joinCommunity(withId: communityId)
                 completion?(nil)
-            } else {
+            } catch let error {
                 completion?(AmityError(error: error) ?? .unknown)
             }
         }

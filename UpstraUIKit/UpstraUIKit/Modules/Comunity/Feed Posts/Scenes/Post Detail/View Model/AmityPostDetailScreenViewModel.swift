@@ -110,7 +110,7 @@ extension AmityPostDetailScreenViewModel {
             if let community = post.targetCommunity {
                 self.community = community
                 let communityId = community.communityId
-                let participation = AmityCommunityParticipation(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+                let participation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
                 post.isModerator = participation.getMember(withId: post.postedUserId)?.hasModeratorRole ?? false
             }
             let component = prepareComponents(post: post)
@@ -232,7 +232,7 @@ extension AmityPostDetailScreenViewModel {
     }
     
     func likePost() {
-        reactionController.addReaction(withReaction: .like, referanceId: postId, referenceType: .post) { [weak self] (success, error) in
+        reactionController.addReaction(withReaction: .like, referenceId: postId, referenceType: .post) { [weak self] (success, error) in
             guard let strongSelf = self else { return }
             if success {
                 strongSelf.delegate?.screenViewModelDidLikePost(strongSelf)
@@ -243,7 +243,7 @@ extension AmityPostDetailScreenViewModel {
     }
     
     func unlikePost() {
-        reactionController.removeReaction(withReaction: .like, referanceId: postId, referenceType: .post) { [weak self] (success, error) in
+        reactionController.removeReaction(withReaction: .like, referenceId: postId, referenceType: .post) { [weak self] (success, error) in
             guard let strongSelf = self else { return }
             if success {
                 strongSelf.delegate?.screenViewModelDidUnLikePost(strongSelf)
@@ -324,7 +324,7 @@ extension AmityPostDetailScreenViewModel {
     }
     
     func likeComment(withCommendId commentId: String) {
-        reactionController.addReaction(withReaction: .like, referanceId: commentId, referenceType: .comment) { [weak self] (success, error) in
+        reactionController.addReaction(withReaction: .like, referenceId: commentId, referenceType: .comment) { [weak self] (success, error) in
             guard let strongSelf = self else { return }
             if success {
                 strongSelf.delegate?.screenViewModelDidLikeComment(strongSelf)
@@ -335,7 +335,7 @@ extension AmityPostDetailScreenViewModel {
     }
     
     func unlikeComment(withCommendId commentId: String) {
-        reactionController.removeReaction(withReaction: .like, referanceId: commentId, referenceType: .comment) { [weak self] (success, error) in
+        reactionController.removeReaction(withReaction: .like, referenceId: commentId, referenceType: .comment) { [weak self] (success, error) in
             guard let strongSelf = self else { return }
             if success {
                 strongSelf.delegate?.screenViewModelDidUnLikeComment(strongSelf)
@@ -398,28 +398,28 @@ extension AmityPostDetailScreenViewModel {
     
     func vote(withPollId pollId: String?, answerIds: [String]) {
         guard let pollId = pollId else { return }
-        pollRepository.votePoll(withId: pollId, answerIds: answerIds) { [weak self] success, error in
-            guard let strongSelf = self else { return }
-            if success {
-                self?.debouncer.run {
-                    self?.fetchPost()
+        Task { @MainActor in
+            do {
+                let result = try await pollRepository.votePoll(withId: pollId, answerIds: answerIds)
+                self.debouncer.run {
+                    self.fetchPost()
                 }
-            } else {
-                strongSelf.delegate?.screenViewModel(strongSelf, didFinishWithError: AmityError(error: error) ?? .unknown)
+            } catch let error {
+                self.delegate?.screenViewModel(self, didFinishWithError: AmityError(error: error) ?? .unknown)
             }
         }
     }
     
     func close(withPollId pollId: String?) {
         guard let pollId = pollId else { return }
-        pollRepository.closePoll(withId: pollId) { [weak self] success, error in
-            guard let strongSelf = self else { return }
-            if success {
-                self?.debouncer.run {
-                    self?.fetchPost()
+        Task { @MainActor in
+            do {
+                let result = try await pollRepository.closePoll(withId: pollId)
+                self.debouncer.run {
+                    self.fetchPost()
                 }
-            } else {
-                strongSelf.delegate?.screenViewModel(strongSelf, didFinishWithError: AmityError(error: error) ?? .unknown)
+            } catch let error {
+                self.delegate?.screenViewModel(self, didFinishWithError: AmityError(error: error) ?? .unknown)
             }
         }
     }

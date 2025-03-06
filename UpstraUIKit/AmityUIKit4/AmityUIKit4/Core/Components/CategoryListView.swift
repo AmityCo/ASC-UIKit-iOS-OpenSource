@@ -49,10 +49,9 @@ struct SmallCommunityCategoryLabel: View {
     
     var body: some View {
         Text(title)
-            .font(.caption)
+            .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
             .padding(.horizontal, 10)
             .padding(.vertical, 2)
-            .foregroundColor(Color(viewConfig.theme.baseColor))
             .lineLimit(1)
             .background(Color(viewConfig.theme.baseColorShade4))
             .clipShape(Capsule())

@@ -24,11 +24,12 @@ final class AmityCommunityJoinController: AmityCommunityJoinControllerProtocol {
     }
     
     func join(_ completion: @escaping (AmityError?) -> Void) {
-        repository.joinCommunity(withId: communityId) { (success, error) in
-            if success {
+        Task { @MainActor in
+            do {
+                let _ = try await repository.joinCommunity(withId: communityId)
                 completion(nil)
-            } else {
-                completion(AmityError(error: error) ?? .unknown)
+            } catch let error {
+                completion(AmityError(error: error))
             }
         }
     }

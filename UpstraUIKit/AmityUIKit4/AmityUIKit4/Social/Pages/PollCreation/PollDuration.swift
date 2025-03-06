@@ -147,7 +147,6 @@ struct PollDurationSelectionView: View {
                     Text(AmityLocalizedStringSet.Social.pollDurationDoneButton.localizedString)
                 }
             }
-            .padding(.horizontal)
             
             Divider()
             

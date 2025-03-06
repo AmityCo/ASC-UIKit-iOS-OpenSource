@@ -52,13 +52,12 @@ extension GoLive {
             
             let builder = AmityLiveStreamPostBuilder(streamId: streamId, text: text)
             
-            if let metadata = metadata, let mentionees = mentionees {
-                postRepository.createPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees) { [weak self] post, error in
-                    self?.handleResponse(post: post, error: error)
-                }
-            } else {
-                postRepository.createPost(builder, targetId: targetId, targetType: targetType) { [weak self] post, error in
-                    self?.handleResponse(post: post, error: error)
+            Task { @MainActor in
+                do {
+                    let post = try await postRepository.createLiveStreamPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+                    self.handleResponse(post: post, error: nil)
+                } catch let error {
+                    self.handleResponse(post: nil, error: error)
                 }
             }
         }

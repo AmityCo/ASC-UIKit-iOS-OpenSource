@@ -85,7 +85,7 @@ final class AmityRecentChatTableViewCell: UITableViewCell, Nibbable {
             token?.invalidate()
             if !channel.getOtherUserId().isEmpty {
                 token = repository?.getUser(channel.getOtherUserId()).observeOnce { [weak self] user, error in
-                    guard let userObject = user.object else { return }
+                    guard let userObject = user.snapshot else { return }
                     self?.titleLabel.text = userObject.displayName
                 }
             }

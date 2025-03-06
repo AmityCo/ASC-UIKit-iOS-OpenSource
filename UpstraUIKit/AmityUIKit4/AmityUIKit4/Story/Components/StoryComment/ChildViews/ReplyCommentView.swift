@@ -61,7 +61,8 @@ struct ReplyCommentView: View {
                         .frame(width: 16, height: 16)
                         .padding(.leading, 8)
                     
-                    Text("View \(parentComment.childrenNumber) Reply")
+                    let word = WordsGrammar(count: parentComment.childrenNumber, set: .reply)
+                    Text("View \(parentComment.childrenNumber) \(word.value)")
                         .applyTextStyle(.captionBold(Color(viewConfig.theme.secondaryColor.blend(.shade1))))
                         .padding(.trailing, 8)
                 }

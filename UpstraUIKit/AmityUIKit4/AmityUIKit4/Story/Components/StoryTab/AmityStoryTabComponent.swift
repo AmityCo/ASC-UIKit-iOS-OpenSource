@@ -98,9 +98,10 @@ struct StoryGlobalFeedView: View {
                 ForEach(Array(viewModel.globalFeedStoryTargets.enumerated()), id: \.element.targetId)  { index, storyTarget in
                     
                     StoryTargetView(componentId: id, storyTarget: storyTarget, hideLockIcon: storyTarget.isPublicTarget, cornerImage: {
-                        storyTarget.isVerifiedTarget ? Image(AmityIcon.verifiedBadge.getImageResource())
-                            .frame(width: 22.0, height: 22.0)
-                            .offset(x: 22, y: 22) : nil
+                        storyTarget.isVerifiedTarget ? Image(AmityIcon.verifiedBadgeWithBorder.imageResource)
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .offset(x: 22, y: 20) : nil
                     })
                     .frame(width: 64, height: 64)
                     .padding(.leading, 2)

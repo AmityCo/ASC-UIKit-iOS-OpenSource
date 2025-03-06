@@ -17,68 +17,88 @@ struct AmityNavigationBar: View {
     let isBackButtonEnabled: Bool
     let trailingView: AnyView?
     let leadingView: AnyView?
+    let showDivider: Bool
         
     init(title: String) {
         self.title = title
         self.trailingView = nil
         self.leadingView = nil
         self.isBackButtonEnabled = false
+        self.showDivider = false
     }
     
-    init(title: String, showBackButton: Bool) {
+    init(title: String, showBackButton: Bool, showDivider: Bool = false) {
         self.title = title
         self.isBackButtonEnabled = showBackButton
         self.leadingView = nil
         self.trailingView = nil
+        self.showDivider = showDivider
     }
     
-    init<TrailingView: View>(title: String, showBackButton: Bool, @ViewBuilder trailing: () -> TrailingView) {
+    init<TrailingView: View>(title: String, showBackButton: Bool, showDivider: Bool = false, @ViewBuilder trailing: () -> TrailingView) {
         self.title = title
         self.isBackButtonEnabled = showBackButton
+        self.showDivider = showDivider
         self.leadingView = nil
         self.trailingView = AnyView(trailing())
     }
     
-    init<LeadingView: View, TrailingView: View>(title: String, @ViewBuilder leading: () -> LeadingView, @ViewBuilder trailing: () -> TrailingView) {
+    init<LeadingView: View, TrailingView: View>(title: String, showDivider: Bool = false, @ViewBuilder leading: () -> LeadingView, @ViewBuilder trailing: () -> TrailingView) {
         self.title = title
+        self.showDivider = showDivider
         self.leadingView = AnyView(leading())
         self.trailingView = AnyView(trailing())
         self.isBackButtonEnabled = false
     }
     
     var body: some View {
-        HStack(spacing: 0) {
-            HStack {
-                if let leadingView {
-                    leadingView
-                } else if isBackButtonEnabled  {
-                    BackButton()
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                HStack {
+                    if let leadingView {
+                        leadingView
+                            .padding(.leading, 8)
+                    } else if isBackButtonEnabled  {
+                        BackButton()
+                            .padding(.leading, 8)
+                    }
+                    
+                    Spacer()
                 }
-                
-                Spacer()
-            }
-            .layoutPriority(1)
-            .frame(maxWidth: .infinity)
+                .layoutPriority(1)
+                .frame(maxWidth: .infinity)
 
-            Text(title)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-                .padding(.horizontal, 8)
-                .lineLimit(1)
-                .layoutPriority(2)
+                Text(title)
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                    .padding(.horizontal, 8)
+                    .lineLimit(1)
+                    .layoutPriority(2)
 
-            HStack {
-                Spacer()
-                
-                if let trailingView {
-                    trailingView
+                HStack {
+                    
+                    if let trailingView {
+                        Spacer()
+                        
+                        trailingView
+                            .padding(.trailing, 16)
+                    } else {
+                        Spacer(minLength: 24)
+                    }
                 }
+                .layoutPriority(1)
+                .frame(maxWidth: .infinity)
             }
-            .layoutPriority(1)
-            .frame(maxWidth: .infinity)
+            .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+            .frame(minHeight: host.controller?.navigationController?.navigationBar.frame.height ?? 44)
+            .background(Color(viewConfig.theme.backgroundColor))
+            
+            if showDivider {
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+                    .padding(.horizontal, -16)
+            }
         }
-        .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-        .frame(minHeight: 55) // Investigate why existing nav bar is of height 55 instead of 44
-        .background(Color(viewConfig.theme.backgroundColor))
     }
     
     struct BackButton: View {
@@ -91,14 +111,14 @@ struct AmityNavigationBar: View {
             Image(backIcon)
                 .resizable()
                 .renderingMode(.template)
+                .scaledToFit()
+                .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(Color(viewConfig.theme.baseColor))
-                .aspectRatio(contentMode: .fit)
                 .frame(width: 24, height: 20)
                 .onTapGesture {
                     host.controller?.navigationController?.popViewController(animated: true)
                 }
                 .isHidden(viewConfig.isHidden(elementId: .backButtonElement))
-                .padding(.horizontal, 8) // We add padding here to increase tappable area
                 .padding(.vertical, 8)
         }
     }

@@ -19,7 +19,15 @@ final class AmityPostUpdateController: AmityPostUpdateControllerProtocol {
     func update(withPostId postId: String, text: String, completion: AmityPostRequestCompletion?) {
         let textBuilder = AmityTextPostBuilder()
         textBuilder.setText(text)
-        repository.updatePost(withId: postId, builder: textBuilder, completion: completion)
+        
+        Task { @MainActor in
+            do {
+                let result = try await repository.editPost(withId: postId, builder: textBuilder)
+                completion?(result, nil)
+            } catch let error {
+                completion?(nil, error)
+            }
+        }
     }
     
 }

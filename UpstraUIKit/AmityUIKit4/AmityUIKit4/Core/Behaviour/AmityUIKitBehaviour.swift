@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 open class AmityUIKitBehaviour {
     // MARK: - Story
@@ -44,4 +45,23 @@ open class AmityUIKitBehaviour {
     public var blockedUsersPageBehavior: AmityBlockedUsersPageBehavior?
     public var pendingPostContentComponentBehavior: AmityPendingPostContentComponentBehavior?    
     public var livestreamBehavior: AmityLivestreamBehavior?
+    
+    // We want swipe to back gesture behavior available by default.
+    public var swipeToBackGestureBehaviour: AmitySwipeToBackGestureBehavior? = AmitySwipeToBackGestureBehavior()    
+}
+
+open class AmitySwipeToBackGestureBehavior {
+    
+    public init() {}
+    
+    open func gestureRecognizerShouldBegin(navigationController: UINavigationController, _ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard gestureRecognizer == navigationController.interactivePopGestureRecognizer else { return true }
+        
+        return navigationController.viewControllers.count > 1
+    }
+    
+    open func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        
+        return true
+    }
 }

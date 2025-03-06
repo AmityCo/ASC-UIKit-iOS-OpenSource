@@ -24,11 +24,11 @@ public enum EmptyCommunityFeedViewType {
     var description: String {
         switch self {
         case .post:
-            "No post yet"
+            "No posts yet"
         case .image:
-            "No photo yet"
+            "No photos yet"
         case .video:
-            "No video yet"
+            "No videos yet"
         }
     }
 }

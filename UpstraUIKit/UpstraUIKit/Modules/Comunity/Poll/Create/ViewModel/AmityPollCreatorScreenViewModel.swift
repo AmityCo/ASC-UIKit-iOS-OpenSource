@@ -113,31 +113,31 @@ extension AmityPollCreatorScreenViewModel {
             createOptions.setTimeToClosePoll(timeMilliseconds)
         }
         createOptions.setAnswerType(isMultipleSelection ? .multiple : .single)
-        pollRepository.createPoll(createOptions) { [weak self] pollId, error in
-            guard let strongSelf = self else { return }
-            if let pollId = pollId {
+        
+        Task { @MainActor in
+            do {
+                // Create poll first
+                let pollId = try await pollRepository.createPoll(createOptions)
+                
+                // Create poll post second
                 let pollPostBuilder = AmityPollPostBuilder()
-                pollPostBuilder.setText(strongSelf.pollQuestion)
+                pollPostBuilder.setText(self.pollQuestion)
                 pollPostBuilder.setPollId(pollId)
                 var targetId: String? = nil
                 var targetType = AmityPostTargetType.user
                 
-                switch strongSelf.postTarget {
+                switch self.postTarget {
                 case .community(let object):
                     targetId = object.communityId
                     targetType = .community
-                default: break
+                default:
+                    break
                 }
                 
-                if let metadata = metadata, let mentionees = mentionees {
-                    self?.postRepository.createPost(pollPostBuilder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees, completion: { post, error in
-                        self?.handleResponse(post: post, error: error)
-                    })
-                } else {
-                    self?.postRepository.createPost(pollPostBuilder, targetId: targetId, targetType: targetType, completion: { post, error in
-                        self?.handleResponse(post: post, error: error)
-                    })
-                }
+                let post = try await postRepository.createPollPost(pollPostBuilder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+                self.handleResponse(post: post, error: nil)
+            } catch let error {
+                self.handleResponse(post: nil, error: error)
             }
         }
     }

@@ -15,8 +15,9 @@ public struct AmityCommunityProfilePage: AmityPageView {
     
     @State private var currentTab = 0
     @State private var showBottomSheet: Bool = false
-    @State private var tabBarOffset: CGFloat = 0
     @State private var isRefreshing = false
+    @State private var headerComponentHeight: CGFloat = 0.0
+    @State private var showStickyHeader: Bool = false
     
     @StateObject var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: CommunityProfileViewModel
@@ -37,140 +38,85 @@ public struct AmityCommunityProfilePage: AmityPageView {
     }
     
     public var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
+            // Header #1
+            headerView
+                .opacity(viewModel.startedScrollingToTop ? 0 : 1)
             
             ScrollView(showsIndicators: false) {
-                ZStack {
-                    VStack(spacing: 0) {
-                        
-                        if let community = viewModel.community {
-                            
-                            AmityCommunityHeaderComponent(community: community, pageId: id, viewModel: viewModel, onPendingPostsTapAction: {
-                                
-                                let context = AmityCommunityProfilePageBehavior.Context(page: self, community: community.object)
-                                AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPendingPostPage(context: context)
-                            }, onMemberListTapAction: {
-                                
-                                let context = AmityCommunityProfilePageBehavior.Context(page: self)
-                                AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToMemberListPage(context: context, community: viewModel.community)
-                            })
-                            .offset(y: min(0, (viewModel.headerHeight - tabBarOffset)))
-                            
-                        }
-                        // TabView
-                        GeometryReader { geometry in
-                            VStack(spacing: 0) {
-                                
-                                AmityCommunityProfileTabComponent(currentTab: $currentTab, pageId: .communityProfilePage)
-                                Rectangle()
-                                    .fill(Color(viewConfig.theme.baseColorShade4))
-                                    .frame(height: 1)
-                                
-                            }
-                            .offset(y: min(0, (viewModel.headerHeight - tabBarOffset)))
-                            .background(Color.clear)
-                            .onAppear {
-                                tabBarOffset = geometry.frame(in: .global).origin.y
-                            }
-                            .onChange(of: geometry.frame(in: .global).origin.y) { newValue in
-                                tabBarOffset = geometry.frame(in: .global).origin.y
-                                if tabBarOffset > viewModel.headerHeight + 100 {
-                                    isRefreshing = true
-                                    Task {
-                                        viewModel.refreshFeed(currentTab: currentTab)
-                                        await refreshData()
-                                        await MainActor.run {
-                                            isRefreshing = false
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        .frame(height: 47)
-                        
-                        
-                        if isRefreshing {
-                            ProgressView()
-                                .frame(width: 20, height: 20)
-                                .padding(.vertical, 10)
-                        }
-                        
-                        AmityCommunityFeedComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, componentContext in
-                            let context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: componentContext?.showPollResults ?? false)
-                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: componentContext?.category ?? .general)
-                        })
-                            .isHidden(currentTab != 0)
-                        
-                        AmityCommunityPinnedPostComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, postContext in
-                            
-                            var context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: postContext?.showPollResults ?? false)
-                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: postContext?.category ?? .pinAndAnnouncement)
-                        })
-                            .isHidden(currentTab != 1)
-                        
-                        AmityCommunityImageFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
-                            .isHidden(currentTab != 2)
-                        
-                        AmityCommunityVideoFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
-                            .isHidden(currentTab != 3)
-                        
-                    }
-                    .offset(y: 0)
+                VStack(spacing: 0) {
+                    // Note:
+                    // Hack 1:
+                    // We do not want the header view to move down when user tries to perform pull to refresh. So we show header #1 in the background and header #2 in foreground (inside scroll view). And we hide & show above header view based on scroll position. We do not perform offset calculation to expand/collapse single header view here because it adversely affects the scrolling performance.
+                    //
+                    // Hack 2:
+                    // If the opacity of the view is 0, the view cannot receive any touch event. Since this scroll view is shown above header #1 in a stack, scroll view receives all touch event.
+                    // To prevent this issue & receive touch event, we set the opacity of headerview #2 to be 0.01.
+                    //
+                    // Header #2
+                    headerView
+                        .opacity(!viewModel.startedScrollingToTop ? 0.01 : 1)
                     
-                    // Blurred View for Header
-                    VStack(spacing: 0) {
-                        ZStack {
-                            if let community = viewModel.community {
-                                
-                                AsyncImage(placeholder: AmityIcon.communityProfilePlaceholder.imageResource, url: URL(string: community.largeAvatarURL) , contentMode: .fill)
-                                    .frame(height: 105, alignment: .top)
-                                    .clipped()
-                                    .offset(y: 0)
-                            }
-                            VisualEffectView(effect: UIBlurEffect(style: .regular), alpha: 1)
-                                .frame(height: 105)
-                                .offset(y: 0)
-                        }
-                        
-                        
-                        VStack(spacing: 0) {
-                            Button(action: {
-                                Task { @MainActor in
-                                    try await viewModel.joinCommunity()
-                                }
-                            }, label: {
-                                HStack(spacing: 8) {
-                                    Image(AmityIcon.plusIcon.imageResource)
-                                        .renderingMode(.template)
-                                        .scaledToFit()
-                                        .frame(width: 20, height: 20)
-                                        .foregroundColor(Color(viewConfig.theme.backgroundColor))
-                                    Text(AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString)
-                                        .foregroundColor(Color(viewConfig.theme.backgroundColor))
-                                }
-                                .padding(.vertical, 10)
-                                .frame(maxWidth: .infinity)
-                            })
-                            .background(Color(viewConfig.theme.primaryColor))
-                            .cornerRadius(8)
-                            .padding(.all, 16)
-                            .isHidden(viewModel.community?.isJoined ?? false)
-                            
-                            AmityCommunityProfileTabComponent(currentTab: $currentTab, pageId: .communityProfilePage)
-                            Rectangle()
-                                .fill(Color(viewConfig.theme.baseColorShade4))
-                                .frame(height: 1)
-                            
-                        }
-                        .background(Color(viewConfig.theme.backgroundColor))
-                        
-                        Spacer()
+                    if isRefreshing {
+                        ProgressView()
+                            .frame(width: 20, height: 20)
+                            .padding(.vertical, 10)
                     }
-                    .opacity(tabBarOffset <= 102 ? 1 : 0)
-                    .offset(y: viewModel.headerHeight - tabBarOffset)
+                    
+                    AmityCommunityFeedComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, componentContext in
+                        let context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: componentContext?.showPollResults ?? false)
+                        AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: componentContext?.category ?? .general)
+                    })
+                        .isHidden(currentTab != 0)
+                    
+                    AmityCommunityPinnedPostComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, postContext in
+                        
+                        var context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: postContext?.showPollResults ?? false)
+                        AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: postContext?.category ?? .pinAndAnnouncement)
+                    })
+                        .isHidden(currentTab != 1)
+                    
+                    AmityCommunityImageFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
+                        .isHidden(currentTab != 2)
+                    
+                    AmityCommunityVideoFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
+                        .isHidden(currentTab != 3)
+                    
+                }
+                .background(GeometryReader { geometry in
+                    Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                })
+            }
+            .coordinateSpace(name: "scroll")
+            .onPreferenceChange(ScrollOffsetKey.self) { offsetY in
+                guard headerComponentHeight != 0.0 else { return }
+                
+                if viewModel.startedScrollingToTop != (offsetY < 0) {
+                    viewModel.startedScrollingToTop.toggle()
+                }
+                                
+                // Profile Tab Height: 46
+                if showStickyHeader != (offsetY < -headerComponentHeight + 140) { //
+                    withAnimation {
+                        showStickyHeader.toggle()
+                    }
                 }
                 
+                if offsetY > 100  && !isRefreshing {
+                    ImpactFeedbackGenerator.impactFeedback(style: .light)
+                    isRefreshing = true
+                    Task { @MainActor in
+                        viewModel.refreshFeed(currentTab: currentTab)
+                        await refreshData()
+                        await MainActor.run {
+                            isRefreshing = false
+                        }
+                    }
+                }
             }
+
+            stickyHeaderView
+                .isHidden(!showStickyHeader, remove: true)
             
             VStack {
                 topNavigationView
@@ -194,6 +140,81 @@ public struct AmityCommunityProfilePage: AmityPageView {
         .updateTheme(with: viewConfig)
         .edgesIgnoringSafeArea(.vertical)
     }
+        
+    private var headerView: some View {
+        VStack(spacing: 0) {
+            if let community = viewModel.community {
+                
+                AmityCommunityHeaderComponent(community: community, pageId: id, viewModel: viewModel, onPendingPostsTapAction: {
+                    
+                    let context = AmityCommunityProfilePageBehavior.Context(page: self, community: community.object)
+                    AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPendingPostPage(context: context)
+                }, onMemberListTapAction: {
+                    
+                    let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                    AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToMemberListPage(context: context, community: viewModel.community)
+                })
+                
+                AmityCommunityProfileTabComponent(currentTab: $currentTab, pageId: .communityProfilePage)
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+            } else {
+                headerSkeletonView
+            }
+        }
+        .readSize { headerComponentHeight = $0.height }
+    }
+    
+    private var stickyHeaderView: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                if let community = viewModel.community {
+                    AsyncImage(placeholder: AmityIcon.communityProfilePlaceholder.imageResource, url: URL(string: community.largeAvatarURL) , contentMode: .fill)
+                    .frame(height: 105, alignment: .top)
+                    .clipped()
+                }
+                
+                VisualEffectView(effect: UIBlurEffect(style: .regular), alpha: 1)
+                    .frame(height: 105)
+            }
+
+            VStack(spacing: 0) {
+                Button(action: {
+                    Task { @MainActor in
+                        try await viewModel.joinCommunity()
+                    }
+                }, label: {
+                    HStack(spacing: 8) {
+                        Image(AmityIcon.plusIcon.imageResource)
+                            .renderingMode(.template)
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                        Text(AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.backgroundColor)))
+                    }
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity)
+                })
+                .background(Color(viewConfig.theme.primaryColor))
+                .clipShape(RoundedCorner())
+                .padding(.all, 16)
+                .isHidden(viewModel.community?.isJoined ?? false)
+
+                AmityCommunityProfileTabComponent(currentTab: $currentTab, pageId: .communityProfilePage)
+                
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+
+            }
+            .background(Color(viewConfig.theme.backgroundColor))
+
+            Spacer()
+        }
+    }
+
     
     private struct VisualEffectView: UIViewRepresentable {
         var effect: UIVisualEffect?
@@ -307,14 +328,17 @@ extension AmityCommunityProfilePage {
                 }
             
             if let community = viewModel.community {
-                HStack {
+                HStack(spacing: 3) {
                     if !community.isPublic {
                         let lockIcon = AmityIcon.lockBlackIcon.imageResource
                         Image(lockIcon)
                             .renderingMode(.template)
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 18, height: 18)
+                            .foregroundColor(Color.white)
                             .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
+                            .padding(.trailing, 6)
                     }
                     
                     Text(community.displayName)
@@ -326,12 +350,11 @@ extension AmityCommunityProfilePage {
                         Image(verifiedBadgeIcon)
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 20, height: 20)
-                            .padding(.leading, 2)
+                            .frame(width: 22, height: 22)
                             .isHidden(viewConfig.isHidden(elementId: .communityOfficialBadge))
                     }
                 }
-                .opacity(tabBarOffset <= 102 ? 1 : 0)
+                .opacity(showStickyHeader ? 1 : 0)
                 .padding(.horizontal, 12)
             }
             
@@ -356,7 +379,7 @@ extension AmityCommunityProfilePage {
                 }
         }
         .padding(.horizontal, 16)
-        .padding(.top, 13)
+        .padding(.top, 16)
     }
     
     /// Header skeleton view
@@ -369,7 +392,7 @@ extension AmityCommunityProfilePage {
                 .shimmering(active: true)
             
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 15) {
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade3))
                     .frame(width: 200, height: 12)
@@ -422,8 +445,11 @@ extension AmityCommunityProfilePage {
                         .shimmering(gradient: shimmerGradient)
                     
                 }
+                
+                AmityCommunityProfileTabComponent(currentTab: $currentTab, pageId: .communityProfilePage)
             }
             .padding(.horizontal, 16)
+            .padding(.top, 16)
         }
     }
     

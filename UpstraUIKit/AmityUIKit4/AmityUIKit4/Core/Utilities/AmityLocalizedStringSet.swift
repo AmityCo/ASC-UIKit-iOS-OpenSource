@@ -61,6 +61,7 @@ public struct AmityLocalizedStringSet {
         static let viewMoreReplyText = "view_more_reply_text"
         static let disableCreateCommentText = "disable_create_comment_text"
         static let commentWithBannedWordsErrorMessage = "comment_with_banned_words_error_message"
+        static let commentWithNotAllowedLink = "comment_with_not_allowed_link_error"
     }
     
     public struct Chat {
@@ -218,6 +219,9 @@ public struct AmityLocalizedStringSet {
         static let exploreTrendingComponentTitle = "explore_trending_now_component_title"
         static let exploreRecommendedComponentTitle = "explore_recommended_communities_component_title"
         
+        static let searchNoResultsFound = "search_no_results_found_title"
+        static let searchCharLimitNotReached = "search_char_limit_not_reached"
+        
         static let communityAllCategoriesPageTitle = "community_all_categories_title"
         static let communityEmptyStateTitle = "community_list_empty_state_title"
         
@@ -297,5 +301,10 @@ public struct AmityLocalizedStringSet {
         static let postDeleteError = "post_delete_error"
         static let postCreateError = "post_create_error"
         static let postEditError = "post_edit_error"
+        
+        static let postDiscardAlertTitle = "post_discard_alert_title"
+        static let postDiscardAlertMessage = "post_discard_alert_message"
+        static let postDiscardAlertButtonKeepEditing = "post_discard_alert_button_keep_editing"
+
     }
 }

@@ -26,9 +26,13 @@ final class AmityCommentCreateController: AmityCommentCreateControllerProtocol {
             createOptions = AmityCommentCreateOptions(referenceId: postId, referenceType: referenceType, text: text, parentId: parentId)
         }
         
-        repository.createComment(with: createOptions) { comment, error in
-            completion?(comment, error)
+        Task { @MainActor in
+            do {
+                let result = try await repository.createComment(with: createOptions)
+                completion?(result, nil)
+            } catch let error {
+                completion?(nil, error)
+            }
         }
-        
     }
 }

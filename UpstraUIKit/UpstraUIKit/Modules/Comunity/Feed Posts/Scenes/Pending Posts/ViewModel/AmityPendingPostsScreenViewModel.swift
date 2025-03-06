@@ -84,11 +84,23 @@ extension AmityPendingPostsScreenViewModel {
     }
    
     func approvePost(withPostId postId: String) {
-        postRepository.approvePost(withId: postId, completion: nil)
+        Task { @MainActor in
+            do {
+                let result = try await postRepository.approvePost(withId: postId)
+            } catch let error {
+                Log.warn("Error while approving post")
+            }
+        }
     }
     
     func declinePost(withPostId postId: String) {
-        postRepository.declinePost(withId: postId, completion: nil)
+        Task { @MainActor in
+            do {
+                let result = try await postRepository.declinePost(withId: postId)
+            } catch let error {
+                Log.warn("Error while declining post")
+            }
+        }
     }
     
     func deletePost(withPostId postId: String) {
@@ -101,7 +113,13 @@ extension AmityPendingPostsScreenViewModel {
                     strongSelf.delegate?.screenViewModelDidDeletePostFail(title: AmityLocalizedStringSet.PendingPosts.postNotAvailable.localizedString,
                                                                           message: AmityLocalizedStringSet.PendingPosts.alertDeleteFailApproveOrDecline.localizedString)
                 case .reviewing:
-                    self?.postRepository.deletePost(withId: postId, parentId: nil, hardDelete: false, completion: nil)
+                    Task { @MainActor in
+                        do {
+                            let result = try await self?.postRepository.softDeletePost(withId: postId, parentId: nil)
+                        } catch let error {
+                            Log.warn("Error while soft deleting post")
+                        }
+                    }
                 @unknown default:
                     break
                 }

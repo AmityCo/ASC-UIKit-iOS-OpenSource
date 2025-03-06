@@ -14,6 +14,8 @@ struct MediaViewer: View {
     @State private var offset = CGSize.zero
     @State private var backgroundOpacity: CGFloat = 1.0
     @State private var page: Page
+    @State private var dragStart: CGPoint?
+    @State private var isHorizontalDragEnabled = false
     
     // use for showing image index at top
     @State private var pageIndex: Int
@@ -21,6 +23,7 @@ struct MediaViewer: View {
     @State private var showVideoPlayer: Bool = false
     @StateObject private var viewModel = MediaViewerViewModel()
     @State private var showScaleEffect: Bool = false
+    @State private var isZooming: Bool = false
     
     private let medias: [AmityMedia]
     private let closeAction: (() -> Void)?
@@ -53,37 +56,39 @@ struct MediaViewer: View {
                     .isHidden(!showScaleEffect)
                 
                 Pager(page: page, data: medias, id: \.id) { media in
-                    ZStack {
-                        let emptyView = Color(hex: "#EBECEF").padding(.vertical, 100)
-                        /// If the media is local file, it will load from local file path.
-                        /// When MediaViewer is used to preview attached medias in AmityComposePage, media will have localUrl.
-                        if let url = media.localUrl {
-                            Image(uiImage: media.type == .image ?  UIImage(contentsOfFile: url.path) ?? UIImage() : media.generatedThumbnailImage ?? UIImage())
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .adaptiveVerticalPadding(top: 35, bottom: 35)
-                        } else if let url = media.getImageURL() {
-                            URLImage(url, empty: {
-                                emptyView
-                            }, inProgress: {_ in
-                                emptyView
-                            },
-                            failure: {_, _ in
-                                emptyView
-                            }, content: { image in
-                                image
+                    ZoomableScrollView(isZooming: $isZooming, isZoomable: media.type == .image) {
+                        ZStack {
+                            let emptyView = Color(hex: "#EBECEF").padding(.vertical, 100)
+                            /// If the media is local file, it will load from local file path.
+                            /// When MediaViewer is used to preview attached medias in AmityComposePage, media will have localUrl.
+                            if let url = media.localUrl {
+                                Image(uiImage: media.type == .image ?  UIImage(contentsOfFile: url.path) ?? UIImage() : media.generatedThumbnailImage ?? UIImage())
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)
-                            })
-                            .environment(\.urlImageOptions, URLImageOptions.amityOptions)
-                            .adaptiveVerticalPadding(top: 35, bottom: 35)
-                        }
-                        
-                        if media.type == .video {
-                            Image(AmityIcon.videoControlIcon.getImageResource())
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 40, height: 40)
+                                    .adaptiveVerticalPadding(top: 35, bottom: 35)
+                            } else if let url = media.getImageURL() {
+                                URLImage(url, empty: {
+                                    emptyView
+                                }, inProgress: {_ in
+                                    emptyView
+                                },
+                                failure: {_, _ in
+                                    emptyView
+                                }, content: { image in
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fit)
+                                })
+                                .environment(\.urlImageOptions, URLImageOptions.amityOptions)
+                                .adaptiveVerticalPadding(top: 35, bottom: 35)
+                            }
+                            
+                            if media.type == .video {
+                                Image(AmityIcon.videoControlIcon.getImageResource())
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 40, height: 40)
+                            }
                         }
                     }
                     .onTapGesture {
@@ -101,11 +106,13 @@ struct MediaViewer: View {
                     }
                     
                 }
-                .allowsDragging(backgroundOpacity == 1.0)
+                .allowsDragging(!isZooming)
                 .sensitivity(.high)
+                .delaysTouches(true)
                 .onPageChanged({ index in
                     pageIndex = index + 1
                 })
+                .draggingAnimation(.custom(animation: .easeIn(duration: 0.05)))
                 .background(Color.clear)
                 .scaleEffect(showScaleEffect ? 1.0 : 0.0)
                 .onAppear {
@@ -117,15 +124,30 @@ struct MediaViewer: View {
                 .simultaneousGesture(
                     DragGesture()
                         .onChanged { gesture in
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                if gesture.translation.height > 50 || gesture.translation.height < -50 {
+                            guard !isZooming else { return }
+                            
+                            if dragStart == nil {
+                                dragStart = gesture.startLocation
+                            }
+                            guard let dragStart else { return }
+                            
+                            let verticalDrag = abs(gesture.location.y - dragStart.y)
+                            if verticalDrag > 60  {
+                                isHorizontalDragEnabled = true
+                            }
+                            
+                            // Only enable horizontal drag if vertical movement exceeds threshold
+                            if isHorizontalDragEnabled {
+                                withAnimation(.easeIn(duration: 0.05)) {
                                     self.offset = gesture.translation
                                     self.updateOpacity(for: gesture.translation.height, maxHeight: geometry.size.height)
                                 }
                             }
                         }
                         .onEnded { _ in
-                            withAnimation(.easeInOut(duration: 0.15)) {
+                            guard !isZooming else { return }
+                            
+                            withAnimation(.easeIn(duration: 0.05)) {
                                 guard backgroundOpacity > 0.65 else {
                                     
                                     withAnimation(.easeIn(duration: 0.2)) {
@@ -140,6 +162,8 @@ struct MediaViewer: View {
                                     return
                                 }
                                 
+                                self.dragStart = nil
+                                self.isHorizontalDragEnabled = false
                                 self.offset = .zero
                                 self.backgroundOpacity = 1.0 // Reset opacity when drag ends
                             }
@@ -193,4 +217,84 @@ struct MediaViewer: View {
 
 class MediaViewerViewModel: ObservableObject {
     var videoURL: URL?
+}
+
+
+struct ZoomableScrollView<Content: View>: UIViewRepresentable {
+    
+    private var content: Content
+    @Binding private var isZooming: Bool  // Add a binding for zooming state
+    private var isZoomable: Bool
+    
+    init(isZooming: Binding<Bool>, isZoomable: Bool, @ViewBuilder content: () -> Content) {
+        self._isZooming = isZooming
+        self.isZoomable = isZoomable
+        self.content = content()
+    }
+    
+    func makeUIView(context: Context) -> UIScrollView {
+        
+        // set up the UIScrollView
+        let scrollView = UIScrollView()
+        scrollView.delegate = context.coordinator  // for viewForZooming(in:) and zooming state
+        scrollView.maximumZoomScale = 10
+        scrollView.minimumZoomScale = 1
+        scrollView.bouncesZoom = true
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = false
+        
+        // create a UIHostingController to hold our SwiftUI content
+        let hostedView = context.coordinator.hostingController.view!
+        hostedView.translatesAutoresizingMaskIntoConstraints = true
+        hostedView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        hostedView.frame = scrollView.bounds
+        hostedView.backgroundColor = .clear
+        scrollView.addSubview(hostedView)
+        
+        context.coordinator.scrollView = scrollView
+        if isZoomable {
+            let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.handleTap(_:)))
+            scrollView.addGestureRecognizer(tapGesture)
+        }
+        
+        return scrollView
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        return Coordinator(isZooming: $isZooming, isZoomable: isZoomable, hostingController: UIHostingController(rootView: self.content))
+    }
+    
+    func updateUIView(_ uiView: UIScrollView, context: Context) {
+        context.coordinator.hostingController.rootView = self.content
+    }
+    
+    // MARK: - Coordinator
+    class Coordinator: NSObject, UIScrollViewDelegate {
+        var hostingController: UIHostingController<Content>
+        @Binding var isZooming: Bool
+        var isZoomable: Bool
+        weak var scrollView: UIScrollView?
+        
+        init(isZooming: Binding<Bool>, isZoomable: Bool, hostingController: UIHostingController<Content>) {
+            self._isZooming = isZooming
+            self.isZoomable = isZoomable
+            self.hostingController = hostingController
+        }
+        
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+            isZoomable ? hostingController.view : nil
+        }
+        
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            // Update the isZooming binding whenever the zoom scale changes
+            isZooming = scrollView.zoomScale > 1.0
+        }
+        
+        @objc func handleTap(_ gesture: UITapGestureRecognizer){
+            guard let scrollView else { return }
+            if scrollView.zoomScale > 1.0 {
+                scrollView.setZoomScale(1.0, animated: true)  // Reset to default zoom scale
+            }
+        }
+    }
 }

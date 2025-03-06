@@ -31,8 +31,37 @@ public class AmitySwiftUIHostingController<Content>: HostingController<ModifiedC
 }
 
 public class AmitySwiftUIHostingNavigationController<Content>: UINavigationController where Content: View {
+    
     public convenience init(rootView: Content) {
         let hostingController = AmitySwiftUIHostingController(rootView: rootView)
         self.init(rootViewController: hostingController)
+    }
+}
+
+// Swipe Gesture Backup
+extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
+
+    open override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        if let _ = AmityUIKit4Manager.behaviour.swipeToBackGestureBehaviour {
+            interactivePopGestureRecognizer?.delegate = self
+        }
+    }
+
+    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        if let swipeBehavior = AmityUIKit4Manager.behaviour.swipeToBackGestureBehaviour {
+            return swipeBehavior.gestureRecognizerShouldBegin(navigationController: self, gestureRecognizer)
+        }
+        
+        return true
+    }
+    
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        if let swipeBehavior = AmityUIKit4Manager.behaviour.swipeToBackGestureBehaviour {
+            return swipeBehavior.gestureRecognizer(gestureRecognizer, shouldRecognizeSimultaneouslyWith: otherGestureRecognizer)
+        }
+        
+        return false
     }
 }

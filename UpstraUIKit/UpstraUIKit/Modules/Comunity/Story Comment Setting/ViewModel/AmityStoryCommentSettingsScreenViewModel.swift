@@ -71,12 +71,11 @@ extension AmityStoryCommentSettingsScreenViewModel {
             let updateOptions = AmityCommunityUpdateOptions()
             
             updateOptions.setStorySettings(allowComment: allowComment)
-            communityRepository.updateCommunity(withId: communityId, options: updateOptions) { [weak self] (community, error) in
-                guard let strongSelf = self else { return }
-                if let error = error {
-                    strongSelf.delegate?.screenViewModel(strongSelf, didFailWithAction: content)
-                } else {
-                    
+            Task { @MainActor in
+                do {
+                    let community = try await communityRepository.editCommunity(withId: communityId, options: updateOptions)
+                } catch {
+                    self.delegate?.screenViewModel(self, didFailWithAction: content)
                 }
             }
         } else {

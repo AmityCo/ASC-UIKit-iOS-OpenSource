@@ -74,7 +74,7 @@ struct MediaAttachmentView: View {
                                 Image(uiImage: mediaImage)
                                     .resizable()
                                     .scaledToFill()
-                            } else if let url = media.image?.largeFileURL.url {
+                            } else if let url = media.getImageURL() {
                                 Color.clear
                                     .overlay(
                                         KFImage.url(url)
@@ -99,9 +99,26 @@ struct MediaAttachmentView: View {
                         
                         
                         if media.type == .video {
-                            Image(uiImage: media.generatedThumbnailImage ?? UIImage())
-                                .resizable()
-                                .scaledToFill()
+                            if let thumbnail = media.generatedThumbnailImage {
+                                Image(uiImage: media.generatedThumbnailImage ?? UIImage())
+                                    .resizable()
+                                    .scaledToFill()
+                            } else if let url = media.getImageURL() {
+                                Color.clear
+                                    .overlay(
+                                        KFImage.url(url)
+                                            .placeholder {
+                                                ProgressView()
+                                                    .progressViewStyle(CircularProgressViewStyle())
+                                            }
+                                            .resizable()
+                                            .fromMemoryCacheOrRefresh()
+                                            .startLoadingBeforeViewAppear()
+                                            .aspectRatio(contentMode: .fill)
+                                    )
+                                    .clipped()
+                                    .contentShape(Rectangle())
+                            }
                             
                             Image(AmityIcon.videoControlIcon.getImageResource())
                                 .resizable()
@@ -297,28 +314,26 @@ struct MediaAttachmentView: View {
     }
     
     private func startVideoUpload(videoURL: URL) {
-        fileRepositoryManager.fileRepository.uploadVideo(with: videoURL) { progress in
-            DispatchQueue.main.async {
-                Log.add(event: .info, "Video Upload progress: \(progress)")
-                media.state = .uploading(progress: progress)
-                
-                /// Update media state to use within view
-                mediaState = .uploading(progress: progress)
-            }
-        } completion: { videoData, error in
-            DispatchQueue.main.async {
-                if let error {
-                    mediaState = .error
-                    return
+        
+        Task { @MainActor in
+            do {
+                let videoData = try await fileRepositoryManager.fileRepository.uploadVideo(with: videoURL) { progress in
+                    DispatchQueue.main.async {
+                        Log.add(event: .info, "Video Upload progress: \(progress)")
+                        media.state = .uploading(progress: progress)
+                        
+                        /// Update media state to use within view
+                        mediaState = .uploading(progress: progress)
+                    }
                 }
-                
-                guard let videoData else { return }
                 
                 Log.add(event: .info, "Video Uploaded!!!")
                 media.state = .uploadedVideo(data: videoData)
                 
                 /// Update media state to use within view
                 mediaState = .uploadedVideo(data: videoData)
+            } catch let error {
+                mediaState = .error
             }
         }
     }

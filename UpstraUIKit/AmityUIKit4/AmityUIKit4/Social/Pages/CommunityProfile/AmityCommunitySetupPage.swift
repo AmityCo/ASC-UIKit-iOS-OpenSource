@@ -61,9 +61,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
     @State private var selectedMembers: [AddMemberModel] = [AddMemberModel(type: .create)]
     @State private var enableTouchEvent: Bool = true
     
-    /// Track data changes in editMode
+    /// Track data changes in editMode & create mode
     @State private var isExistingDataChanged: Bool = false
-        
+    
     public init(mode: AmityCommunitySetupPageMode) {
         self.pageMode = mode
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .communitySetupPage))
@@ -132,7 +132,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                     .textFieldTextColor(viewConfig.theme.baseColor)
                                 
                                 getAddCategoryView()
-
+                                
                                 VStack(spacing: 16) {
                                     HStack {
                                         let privacyTitle = viewConfig.getText(elementId: .communityPrivacyTitle) ?? ""
@@ -207,7 +207,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                             }
                             
                             let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-
+                            
                             alertController.addAction(cancelAction)
                             alertController.addAction(confirmAction)
                             host.controller?.present(alertController, animated: true)
@@ -269,6 +269,13 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .frame(width: 24, height: 24)
                 .onTapGesture {
+                    
+                    // Do not show alert if existing data is not changed
+                    if pageMode == .create && !isExistingDataChanged {
+                        host.controller?.navigationController?.popViewController(animation: .presentation)
+                        return
+                    }
+                    
                     let title = pageMode == .create ? AmityLocalizedStringSet.Social.communitySetupAlertTitle.localizedString :  AmityLocalizedStringSet.Social.communitySetupEditAlertTitle.localizedString
                     let message = pageMode == .create ?  AmityLocalizedStringSet.Social.communitySetupAlertMessage.localizedString :  AmityLocalizedStringSet.Social.communitySetupEditAlertMessage.localizedString
                     let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -590,9 +597,20 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 lhs.categoryId == rhs.categoryId
             })) && (isPublicCommunity == community.isPublic) && (imagePickerViewModel.selectedImage == nil))
         }
+        
+        if case .create = pageMode {
+            let isNameChanged = !nameText.isEmpty
+            let isAboutChanged = !aboutText.isEmpty
+            let isCategoryChanged = !selectedCategories.isEmpty
+            let isPrivacyChanged = !isPublicCommunity
+            let isAvatarChanged = imagePickerViewModel.selectedImage != nil
+            let isMemberListChanged = selectedMembers.count > 1 // First item would be of type add member
+            
+            isExistingDataChanged = isNameChanged || isAboutChanged || isCategoryChanged || isPrivacyChanged || isAvatarChanged || isMemberListChanged
+        }
+        
     }
-   
-    
+        
     private func createCommunity() {
         Task { @MainActor in
             enableTouchEvent = false
@@ -606,11 +624,11 @@ public struct AmityCommunitySetupPage: AmityPageView {
             }
             
             let model = CommunityModel(avatar: imagePickerViewModel.selectedImage,
-                                             displayName: nameText,
-                                             description: aboutText,
-                                             categoryIds: selectedCategories.map { $0.categoryId },
-                                             isPublic: isPublicCommunity,
-                                             userIds: userIds)
+                                       displayName: nameText,
+                                       description: aboutText,
+                                       categoryIds: selectedCategories.map { $0.categoryId },
+                                       isPublic: isPublicCommunity,
+                                       userIds: userIds)
             
             do {
                 Toast.showToast(style: .loading, message: "Creating the community.", autoHide: false)
@@ -628,7 +646,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                     host.controller?.navigationController?.setViewControllers(viewControllers, animated: true)
                     Toast.showToast(style: .success, message: "Successfully created community!")
                 }
-
+                
             } catch {
                 Log.add(event: .error, error.localizedDescription)
             }
@@ -638,22 +656,20 @@ public struct AmityCommunitySetupPage: AmityPageView {
         
     }
     
-    
     private func editCommunity(_ community: AmityCommunity) {
         Task { @MainActor in
             enableTouchEvent = false
             
             let model = CommunityModel(avatar: imagePickerViewModel.selectedImage,
-                                             displayName: nameText,
-                                             description: aboutText,
-                                             categoryIds: selectedCategories.map { $0.categoryId },
-                                             isPublic: isPublicCommunity)
+                                       displayName: nameText,
+                                       description: aboutText,
+                                       categoryIds: selectedCategories.map { $0.categoryId },
+                                       isPublic: isPublicCommunity)
             
             do {
-                Toast.showToast(style: .loading, message: "Updating the community.", autoHide: false)
                 let _ = try await viewModel.editCommunity(id: community.communityId, model)
                 host.controller?.navigationController?.popViewController(animation: .presentation)
-                Toast.showToast(style: .success, message: "Successfully updated community!")
+                Toast.showToast(style: .success, message: "Successfully updated community profile!")
             } catch {
                 Log.add(event: .error, error.localizedDescription)
             }

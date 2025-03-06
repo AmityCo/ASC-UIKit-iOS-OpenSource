@@ -10,6 +10,7 @@ import UIKit
 enum AmityIcon: String, ImageResourceProvider {
     // MARK: Story
     case verifiedBadge = "verifiedBadge"
+    case verifiedBadgeWithBorder = "verifiedBadgeWithBorder"
     case createStoryIcon = "createStoryIcon"
     case errorStoryIcon = "errorStoryIcon"
     case closeIcon = "closeIcon"
@@ -118,6 +119,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case attatchmentIcon = "attatchmentIcon"
     case downArrowIcon = "downArrowIcon"
     case noSearchableIcon = "noSearchableIcon"
+    case defaultSearchIcon = "defaultSearchIcon"
     case mediaUploadErrorIcon = "mediaUploadErrorIcon"
     case starIcon = "starIcon"
     case infoIcon = "infoIcon"

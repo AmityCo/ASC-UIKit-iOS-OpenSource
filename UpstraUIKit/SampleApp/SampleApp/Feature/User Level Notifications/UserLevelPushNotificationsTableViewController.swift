@@ -104,12 +104,15 @@ final class UserLevelPushNotificationsTableViewController: UITableViewController
     
     private func fetchUserNotification() {
         let notificationManager = AmityUIKitManager.client.notificationManager
-        notificationManager.getSettingsWithCompletion { [weak self] (notification, error) in
-            guard let strongSelf = self,
-                  let notification = notification else { return }
-            strongSelf.isEnabled = notification.isEnabled
-            strongSelf.modules = notification.modules.map { UserNotificationModuleViewModel(type: $0.moduleType, isEnabled: $0.isEnabled, acceptOnlyModerator: $0.roleFilter?.roleIds?.contains("moderator") ?? false ) }
-            strongSelf.tableView.reloadData()
+        Task { @MainActor in
+            do {
+                let notification = try await notificationManager.getSettings()
+                self.isEnabled = notification.isEnabled
+                self.modules = notification.modules.map { UserNotificationModuleViewModel(type: $0.moduleType, isEnabled: $0.isEnabled, acceptOnlyModerator: $0.roleFilter?.roleIds?.contains("moderator") ?? false ) }
+                self.tableView.reloadData()
+            } catch let error {
+                // ...
+            }
         }
     }
 
@@ -120,13 +123,23 @@ final class UserLevelPushNotificationsTableViewController: UITableViewController
                 let roleIds: [String] = module.acceptOnlyModerator ? ["moderator"] : []
                 return AmityUserNotificationModule(moduleType: module.type, isEnabled: module.isEnabled, roleFilter: .onlyFilter(withRoleIds: roleIds))
             }
-            notificationManager.enable(for: _modules, completion: nil)
+            Task { @MainActor in
+                do {
+                    let result = try await notificationManager.enable(for: _modules)
+                } catch let error {
+                    // ...
+                }
+            }
         } else {
-            notificationManager.disable(completion: nil)
+            Task { @MainActor in
+                do {
+                    let result = try await notificationManager.disableAllNotifications()
+                } catch let error {
+                    // ...
+                }
+            }
         }
     }
-    
-    
 }
 
 extension UserLevelPushNotificationsTableViewController: NotificationModuleTableViewCellDelegate {

@@ -52,7 +52,7 @@ class PollPostComposerViewModel: ObservableObject {
         pollPostBuilder.setText(sanitizedQuestion)
         pollPostBuilder.setPollId(pollId)
         
-        let post = try await postManager.createPost(pollPostBuilder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+        let post = try await postManager.postRepository.createPollPost(pollPostBuilder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
         
         /// Send didPostCreated event to mod global feed listing
         /// This event is observed in PostFeedViewModel

@@ -29,7 +29,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     public var body: some View {
         VStack(spacing: 12) {
             navigationBarView
-                .padding(.all, 16)
+                .padding(.bottom, 8)
             
             VStack(spacing: 0) {
                 TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
@@ -76,24 +76,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     
     
     private var navigationBarView: some View {
-        HStack(spacing: 0) {
-            Image(AmityIcon.backIcon.getImageResource())
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-                .frame(width: 24, height: 20)
-                .onTapGesture {
-                    host.controller?.navigationController?.popViewController()
-                }
-            
-            Spacer()
-            
-            Text("All members")
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-            
-            Spacer()
-            
+        return AmityNavigationBar(title: "All members", showBackButton: true) {
             Image(AmityIcon.plusIcon.getImageResource())
                 .renderingMode(.template)
                 .resizable()

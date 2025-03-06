@@ -36,10 +36,10 @@ final class AmityPostFetchPostController: AmityPostFetchPostControllerProtocol {
     }
     
     private func prepareData() -> AmityPostModel? {
-        guard let _post = postObject?.object else { return nil }
+        guard let _post = postObject?.snapshot else { return nil }
         let post = AmityPostModel(post: _post)
         if let communityId = post.targetCommunity?.communityId {
-            let participation = AmityCommunityParticipation(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+            let participation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
             post.isModerator = participation.getMember(withId: post.postedUserId)?.hasModeratorRole ?? false
         }
         return post

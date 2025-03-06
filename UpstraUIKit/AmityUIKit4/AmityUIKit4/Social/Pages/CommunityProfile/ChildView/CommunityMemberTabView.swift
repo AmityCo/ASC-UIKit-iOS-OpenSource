@@ -99,7 +99,7 @@ class CommunityMemberTabViewModel: ObservableObject {
         cancellable = nil
         
         if keyword.isEmpty {
-            memberCollection = community.membership.getMembers(filter: .member, roles: [], sortBy: .lastCreated)
+            memberCollection = community.membership.getMembers(filter: .member, roles: [], sortBy: .displayName)
         } else {
             memberCollection = community.membership.searchMembers(keyword: keyword, filter: [.member], roles: [], sortBy: .displayName)
         }

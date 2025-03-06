@@ -37,7 +37,7 @@ class AppManager {
     func setupAmityUIKit() {
         // setup api key
         let endpointConfig = EndpointManager.shared.currentEndpointConfig
-        AmityUIKitManager.setup(apiKey: endpointConfig.apiKey, endpoint: AmityEndpoint(httpUrl: endpointConfig.httpEndpoint, rpcUrl: endpointConfig.socketEndpoint, mqttHost: endpointConfig.mqttEndpoint, uploadUrl: endpointConfig.uploadURL))
+        AmityUIKitManager.setup(apiKey: endpointConfig.apiKey, endpoint: AmityEndpoint(httpUrl: endpointConfig.httpEndpoint, mqttHost: endpointConfig.mqttEndpoint, uploadUrl: endpointConfig.uploadURL))
         
         // setup event handlers and page settings
         AmityUIKitManager.set(eventHandler: CustomEventHandler())
@@ -62,6 +62,9 @@ class AppManager {
         let livestreamBehavior = CustomV4LivestreamBehavior()
         AmityUIKit4Manager.behaviour.livestreamBehavior = livestreamBehavior
         #endif
+
+        // Disable swipe to back gesture behavior
+        // AmityUIKit4Manager.behaviour.swipeToBackGestureBehaviour = nil
     }
     
     func register(withUserId userId: String) {

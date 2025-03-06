@@ -30,6 +30,28 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
     
     public var body: some View {
         ZStack {
+            if viewModel.users.isEmpty && viewModel.loadingState == .error {
+                VStack(spacing: 15) {
+                    Spacer()
+                    
+                    Image(AmityIcon.defaultSearchIcon.imageResource)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade4))
+                        .frame(width: 60, height: 60)
+                    
+                    Text(AmityLocalizedStringSet.Social.searchCharLimitNotReached.localizedString)
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 16)
+                    
+                    Spacer()
+                    
+                    Spacer()
+                }
+            }
+            
             if viewModel.users.isEmpty && viewModel.loadingState == .loaded {
                 VStack(spacing: 15) {
                     Image(AmityIcon.noSearchableIcon.getImageResource())

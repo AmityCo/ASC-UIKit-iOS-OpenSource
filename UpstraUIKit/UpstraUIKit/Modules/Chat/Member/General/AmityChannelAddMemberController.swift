@@ -9,32 +9,19 @@
 import UIKit
 import AmitySDK
 
-enum AmityChannelAddMemberError {
-    case addMemberFailure(AmityError?)
-    case removeMemberFailure(AmityError?)
-}
-
 protocol AmityChannelAddMemberControllerProtocol {
-    func add(currentUsers: [AmityChannelMembershipModel], newUsers users: [AmitySelectMemberModel], _ completion: @escaping (AmityError?, AmityChannelAddMemberError?) -> Void)
+    func add(currentUsers: [AmityChannelMembershipModel], newUsers users: [AmitySelectMemberModel], _ completion: @escaping (_ addMemberError: AmityError?, _ removeMemberError: AmityError?) -> Void)
 }
 
 final class AmityChannelAddMemberController: AmityChannelAddMemberControllerProtocol {
     
-    private var membershipParticipation: AmityChannelParticipation?
-    
-    private var queue = DispatchGroup()
-    private var addMemberError: AmityError?
-    private var removeMemberError: AmityError?
+    private var membershipParticipation: AmityChannelMembership
     
     init(channelId: String) {
-        membershipParticipation = AmityChannelParticipation(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membershipParticipation = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
     }
     
-    deinit {
-        membershipParticipation = nil
-    }
-    
-    func add(currentUsers: [AmityChannelMembershipModel], newUsers users: [AmitySelectMemberModel], _ completion: @escaping (AmityError?, AmityChannelAddMemberError?) -> Void) {
+    func add(currentUsers: [AmityChannelMembershipModel], newUsers users: [AmitySelectMemberModel], _ completion: @escaping (AmityError?, AmityError?) -> Void) {
         // get userId
         let currentUserIds = currentUsers.filter { !$0.isCurrentUser}.map { $0.userId }
         let newUserIds = users.map { $0.userId }
@@ -44,56 +31,27 @@ final class AmityChannelAddMemberController: AmityChannelAddMemberControllerProt
         // filter userid has been added
         let difAddUsers = newUserIds.filter { !currentUserIds.contains($0) }
         
-        addUsers(userIds: difAddUsers)
-        removeUsers(userIds: difRemoveUsers)
-        
-        queue.notify(queue: DispatchQueue.main) { [weak self] in
-            guard let strongSelf = self else { return }
-            let _addMemberError = strongSelf.addMemberError
-            let _removeMemberError = strongSelf.removeMemberError
+        Task { @MainActor in
+            var addMemberError: AmityError?
+            var removeMemberError: AmityError?
             
-            if (_addMemberError != nil) && (_removeMemberError != nil), (_addMemberError == _removeMemberError) {
-                // failure both cases add and remove member and same case
-                completion(_addMemberError, nil)
-            } else if (_addMemberError != nil) && (_removeMemberError == nil) {
-                // failure only case add member
-                (completion(nil, .addMemberFailure(_addMemberError)))
-            } else if (_removeMemberError != nil) && (_addMemberError == nil) {
-                (completion(nil, .removeMemberFailure(_removeMemberError)))
-            } else {
-                // success both cases
-                completion(nil, nil)
+            if !difAddUsers.isEmpty {
+                do {
+                    let memberResult = try await membershipParticipation.addMembers(difAddUsers)
+                } catch let error {
+                    addMemberError = AmityError(error: error) ?? .unknown
+                }
             }
-            self?.addMemberError = nil
-            self?.removeMemberError = nil
-        }
-    }
-    
-    private func addUsers(userIds: [String]) {
-        if !userIds.isEmpty {
-            queue.enter()
-            membershipParticipation?.addMembers(userIds, completion: { [weak self] (success, error) in
-                if success {
-                    self?.addMemberError = nil
-                } else {
-                    self?.removeMemberError = AmityError(error: error) ?? .unknown
+            
+            if !difRemoveUsers.isEmpty {
+                do {
+                    let removeMemberResult = try await membershipParticipation.removeMembers(difRemoveUsers)
+                } catch let error {
+                    removeMemberError = AmityError(error: error) ?? .unknown
                 }
-                self?.queue.leave()
-            })
-        }
-    }
-    
-    private func removeUsers(userIds: [String]) {
-        if !userIds.isEmpty {
-            queue.enter()
-            membershipParticipation?.removeMembers(userIds, completion: { [weak self] (success, error) in
-                if success {
-                    self?.removeMemberError = nil
-                } else {
-                    self?.removeMemberError = AmityError(error: error) ?? .unknown
-                }
-                self?.queue.leave()
-            })
+            }
+            
+            completion(addMemberError, removeMemberError)
         }
     }
 }

@@ -27,7 +27,7 @@ public struct AmityMyCommunitiesSearchPage: AmityPageView {
     public var body: some View {
         VStack(spacing: 0) {
             AmityTopSearchBarComponent(viewModel: searchViewModel, pageId: .socialGlobalSearchPage)
-                .padding(.top, 60)
+                .padding(.top, 64)
                 .environmentObject(host)
             
             if !searchViewModel.isFirstTimeSearching {

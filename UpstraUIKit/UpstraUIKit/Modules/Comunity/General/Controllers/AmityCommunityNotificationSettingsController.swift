@@ -20,21 +20,34 @@ class AmityUserNotificationSettingsController: AmityUserNotificationSettingsCont
     private let notificationManager = AmityUIKitManagerInternal.shared.client.notificationManager
     
     func retrieveNotificationSettings(completion: ((Result<AmityUserNotificationSettings, Error>) -> Void)?) {
-        notificationManager.getSettingsWithCompletion { (notification, error) in
-            if let notification = notification {
-                completion?(.success(notification))
-            } else {
-                completion?(.failure(error ?? AmityError.unknown))
+        Task { @MainActor in
+            do {
+                let settings = try await notificationManager.getSettings()
+                completion?(.success(settings))
+            } catch let error {
+                completion?(.failure(error))
             }
         }
     }
     
     func enableNotificationSettings(modules: [AmityUserNotificationModule]?) {
-        notificationManager.enable(for: modules, completion: nil)
+        Task { @MainActor in
+            do {
+                let _ = try await notificationManager.enable(for: modules)
+            } catch let error {
+                Log.warn("Failed to enable notification settings")
+            }
+        }
     }
     
     func disableNotificationSettings() {
-        notificationManager.disable(completion: nil)
+        Task { @MainActor in
+            do {
+                try await notificationManager.disableAllNotifications()
+            } catch let error {
+                Log.warn("Failed to disable notification settings")
+            }
+        }
     }
     
 }

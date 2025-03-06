@@ -11,11 +11,9 @@ import AmitySDK
 
 final class AmityChannelMemberScreenViewModel: AmityChannelMemberScreenViewModelType {
     weak var delegate: AmityChannelMemberScreenViewModelDelegate?
-    
-    private var flagger: AmityUserFlagger?
-    
+        
     // MARK: - Repository
-    private var userRepository: AmityUserRepository?
+    private let userRepository: AmityUserRepository
     
     // MARK: - Controller
     private let fetchMemberController: AmityChannelFetchMemberControllerProtocol
@@ -60,9 +58,14 @@ extension AmityChannelMemberScreenViewModel {
 
     func getReportUserStatus(at indexPath: IndexPath, completion: ((Bool) -> Void)?) {
         guard let user = member(at: indexPath).user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.isFlaggedByMe {
-            completion?($0)
+        
+        Task { @MainActor in
+            do {
+                let result = try await userRepository.isUserFlaggedByMe(withId: user.userId)
+                completion?(true)
+            } catch let error {
+                completion?(false)
+            }
         }
     }
     
@@ -123,29 +126,26 @@ extension AmityChannelMemberScreenViewModel {
 /// Add user
 extension AmityChannelMemberScreenViewModel {
     func addUser(users: [AmitySelectMemberModel]) {
-        addMemberController.add(currentUsers: members, newUsers: users, { [weak self] (amityError, controllerError) in
-            guard let strongSelf = self else { return }
-            if let error = amityError {
-                strongSelf.delegate?.screenViewModel(strongSelf, failure: error)
-            } else if let controllerError = controllerError {
-                switch controllerError {
-                case .addMemberFailure(let error):
-                    if let error = error {
-                        strongSelf.delegate?.screenViewModel(strongSelf, failure: error)
-                    } else {
-                        strongSelf.delegate?.screenViewModelDidAddMemberSuccess()
-                    }
-                case .removeMemberFailure(let error):
-                    if let error = error {
-                        strongSelf.delegate?.screenViewModel(strongSelf, failure: error)
-                    } else {
-                        strongSelf.delegate?.screenViewModelDidAddMemberSuccess()
-                    }
-                }
-            } else {
-                self?.delegate?.screenViewModelDidAddMemberSuccess()
+        addMemberController.add(currentUsers: members, newUsers: users) { [weak self] addMemberError, removeMemberError in
+            guard let self else { return }
+            
+            if let addMemberError, let removeMemberError {
+                self.delegate?.screenViewModel(self, failure: addMemberError)
+                return
             }
-        })
+            
+            if let addMemberError {
+                self.delegate?.screenViewModel(self, failure: addMemberError)
+                return
+            }
+            
+            if let removeMemberError {
+                self.delegate?.screenViewModel(self, failure: removeMemberError)
+            }
+            
+            // Else there was no error,
+            self.delegate?.screenViewModelDidAddMemberSuccess()
+        }
     }
 }
 
@@ -155,28 +155,31 @@ extension AmityChannelMemberScreenViewModel {
 extension AmityChannelMemberScreenViewModel {
     func reportUser(at indexPath: IndexPath) {
         guard let user = member(at: indexPath).user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.flag { (success, error) in
-            if let error = error {
+        Task { @MainActor in
+            do {
+                let isSuccess = try await userRepository.flagUser(withId: user.userId)
+                if isSuccess {
+                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.reportSent.localizedString))
+                }
+            } catch let error {
                 AmityHUD.show(.error(message: error.localizedDescription))
-            } else {
-                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.reportSent.localizedString))
             }
         }
     }
     
     func unreportUser(at indexPath: IndexPath) {
         guard let user = member(at: indexPath).user else { return }
-        flagger = AmityUserFlagger(client: AmityUIKitManagerInternal.shared.client, userId: user.userId)
-        flagger?.unflag { (success, error) in
-            if let error = error {
+        Task { @MainActor in
+            do {
+                let isSuccess = try await userRepository.unflagUser(withId: user.userId)
+                if isSuccess {
+                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.unreportSent.localizedString))
+                }
+            } catch let error {
                 AmityHUD.show(.error(message: error.localizedDescription))
-            } else {
-                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.unreportSent.localizedString))
             }
         }
     }
-    
     
 }
 /// Remove user

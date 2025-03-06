@@ -19,7 +19,7 @@ class AmityPostTargetPickerScreenViewModel: AmityPostTargetPickerScreenViewModel
     private var categoryCollectionToken:AmityNotificationToken?
     
     func observe() {
-        let queryOptions = AmityCommunityQueryOptions(displayName: "", filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
+        let queryOptions = AmityCommunityQueryOptions(filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
         communityCollection = communityRepository.getCommunities(with: queryOptions)
         categoryCollectionToken = communityCollection?.observe({ [weak self] (collection, _, _) in
             self?.communities = []

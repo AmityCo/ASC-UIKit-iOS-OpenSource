@@ -25,7 +25,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
     public var body: some View {
         VStack(spacing: 0) {
             navigationBarView
-                .padding(.all, 16)
+                .padding(.bottom, 16)
             
             if viewModel.users.isEmpty {
                 getEmptyView()
@@ -42,27 +42,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
     
     
     private var navigationBarView: some View {
-        HStack(spacing: 0) {
-            Image(AmityIcon.backIcon.getImageResource())
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColor))
-                .frame(width: 24, height: 20)
-                .onTapGesture {
-                    host.controller?.navigationController?.popViewController()
-                }
-            
-            Spacer()
-            
-            Text("Follow requests (\(viewModel.users.count))")
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-            
-            Spacer()
-            
-            Color.clear
-                .frame(width: 24, height: 20)
-        }
+        return AmityNavigationBar(title: "Follow requests (\(viewModel.users.count))", showBackButton: true)
     }
     
     @ViewBuilder

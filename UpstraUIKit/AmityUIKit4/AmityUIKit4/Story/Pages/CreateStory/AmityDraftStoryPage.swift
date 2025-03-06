@@ -158,7 +158,7 @@ public struct AmityDraftStoryPage: AmityPageView {
             AmityHyperLinkConfigComponent(isPresented: $showHyperLinkSheet, data: $viewModel.hyperLinkConfigModel, pageId: id)
         })
         .alert(isPresented: $isAlertShown, content: {
-            Alert(title: Text("Discard this story?"), message: Text("The story will be permanently deleted. It cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Discard"), action: {
+            Alert(title: Text("Discard story?"), message: Text("The story will be permanently discarded. It cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Discard"), action: {
                 host.controller?.navigationController?.popViewController(animated: true)
             }))
         })

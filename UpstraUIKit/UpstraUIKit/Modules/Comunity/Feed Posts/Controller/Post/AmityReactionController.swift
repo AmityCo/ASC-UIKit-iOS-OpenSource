@@ -14,19 +14,33 @@ public enum AmityReactionType: String {
 }
 
 protocol AmityReactionControllerProtocol {
-    func addReaction(withReaction reaction: AmityReactionType, referanceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?)
-    func removeReaction(withReaction reaction: AmityReactionType, referanceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?)
+    func addReaction(withReaction reaction: AmityReactionType, referenceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?)
+    func removeReaction(withReaction reaction: AmityReactionType, referenceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?)
 }
 
 final class AmityReactionController: AmityReactionControllerProtocol {
     
     private let repository = AmityReactionRepository(client: AmityUIKitManagerInternal.shared.client)
 
-    func addReaction(withReaction reaction: AmityReactionType, referanceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?) {
-        repository.addReaction(reaction.rawValue, referenceId: referanceId, referenceType: referenceType, completion: completion)
+    func addReaction(withReaction reaction: AmityReactionType, referenceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?) {
+        Task { @MainActor in
+            do {
+                let result = try await repository.addReaction(reaction.rawValue, referenceId: referenceId, referenceType: referenceType)
+                completion?(result, nil)
+            } catch let error {
+                completion?(false, error)
+            }
+        }
     }
     
-    func removeReaction(withReaction reaction: AmityReactionType, referanceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?) {
-        repository.removeReaction(reaction.rawValue, referenceId: referanceId, referenceType: referenceType, completion: completion)
+    func removeReaction(withReaction reaction: AmityReactionType, referenceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?) {
+        Task { @MainActor in
+            do {
+                let result = try await repository.removeReaction(reaction.rawValue, referenceId: referenceId, referenceType: referenceType)
+                completion?(result, nil)
+            } catch let error {
+                completion?(false, error)
+            }
+        }
     }
 }

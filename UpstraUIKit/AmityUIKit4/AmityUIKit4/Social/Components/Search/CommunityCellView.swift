@@ -58,9 +58,9 @@ struct CommunityCellView: View {
                         let verifiedBadgeIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .communityOfficialBadge, key: "icon", of: String.self) ?? "")
                         Image(verifiedBadgeIcon)
                             .resizable()
-                            .scaledToFill()
-                            .frame(width: 20, height: 12)
-                            .offset(x: 5,y: -1)
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .padding(.leading, 4)
                             .isHidden(viewConfig.isHidden(elementId: .communityOfficialBadge))
                             .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityOfficialBadge)
                     }

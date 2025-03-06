@@ -34,7 +34,6 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
         } else {
             self._viewModel = StateObject(wrappedValue: CommunityProfileViewModel(communityId: community.communityId))
         }
-        
     }
     
     public var body: some View {
@@ -44,20 +43,22 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .communityCover))
                 .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityCover)
             
-            HStack(alignment: .top, spacing: 3) {
+            HStack(alignment: .center, spacing: 3) {
                 if !community.isPublic {
                     let lockIcon = AmityIcon.lockBlackIcon.imageResource
                     Image(lockIcon)
                         .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
                         .frame(width: 20, height: 20)
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
                         .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityPrivateBadge)
+                        .padding(.trailing, 4)
                 }
                 
                 Text(community.displayName)
-                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-                    .padding(.bottom, 10)
+                    .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
                     .lineLimit(2)
                     .isHidden(viewConfig.isHidden(elementId: .communityName))
                 
@@ -72,8 +73,8 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .isHidden(viewConfig.isHidden(elementId: .communityVerifyBadge))
                         .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityVerifyBadge)
                 }
-                
             }
+            .padding(.bottom, 10)
             .padding([.horizontal, .top], 16)
             
             getCategoryView(community.categories)
@@ -142,7 +143,8 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityJoinButton)
             
             AmityStoryTabComponent(type: .communityFeed(community.communityId))
-                .padding(.vertical, 12)
+                .padding(.top, 8)
+                .padding(.bottom, 12)
                 .padding(.horizontal, 16)
                 .isHidden(!(!viewModel.stories.isEmpty || viewModel.hasStoryManagePermission))
             
@@ -176,13 +178,6 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)
-        .background(GeometryReader {
-            Color.clear.preference(key: ViewHeightKey.self, value: $0.frame(in: .global).size.height)
-        })
-        .onPreferenceChange(ViewHeightKey.self) { height in
-            viewModel.updateHeaderHeight(height: height)
-        }
-        
     }
     
     

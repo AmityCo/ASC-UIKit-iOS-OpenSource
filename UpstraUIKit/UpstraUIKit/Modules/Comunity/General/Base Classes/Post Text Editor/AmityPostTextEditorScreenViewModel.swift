@@ -10,7 +10,7 @@ import AmitySDK
 
 class AmityPostTextEditorScreenViewModel: AmityPostTextEditorScreenViewModelType {
     
-    private let postrepository: AmityPostRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let postRepository: AmityPostRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
     private var postObjectToken: AmityNotificationToken?
     
     public weak var delegate: AmityPostTextEditorScreenViewModelDelegate?
@@ -19,8 +19,8 @@ class AmityPostTextEditorScreenViewModel: AmityPostTextEditorScreenViewModelType
     // MARK: - Datasource
     
     func loadPost(for postId: String) {
-        postObjectToken = postrepository.getPost(withId: postId).observe { [weak self] post, error in
-            guard let strongSelf = self, let post = post.object else { return }
+        postObjectToken = postRepository.getPost(withId: postId).observe { [weak self] post, error in
+            guard let strongSelf = self, let post = post.snapshot else { return }
             strongSelf.delegate?.screenViewModelDidLoadPost(strongSelf, post: post)
             // observe once
             strongSelf.postObjectToken?.invalidate()
@@ -32,7 +32,6 @@ class AmityPostTextEditorScreenViewModel: AmityPostTextEditorScreenViewModelType
     func createPost(text: String, medias: [AmityMedia], files: [AmityFile], communityId: String?, metadata: [String: Any]?, mentionees: AmityMentioneesBuilder?) {
         
         let targetType: AmityPostTargetType = communityId == nil ? .user : .community
-        var postBuilder: AmityPostBuilder
         
         let imagesData = getImagesData(from: medias)
         let videosData = getVideosData(from: medias)
@@ -46,7 +45,15 @@ class AmityPostTextEditorScreenViewModel: AmityPostTextEditorScreenViewModelType
             let imagePostBuilder = AmityImagePostBuilder()
             imagePostBuilder.setText(text)
             imagePostBuilder.setImages(imagesData)
-            postBuilder = imagePostBuilder
+            
+            Task { @MainActor in
+                do {
+                    let post = try await postRepository.createImagePost(imagePostBuilder, targetId: communityId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+                    self.createPostResponseHandler(forPost: post, error: nil)
+                } catch let error {
+                    self.createPostResponseHandler(forPost: nil, error: error)
+                }
+            }
         } else if !videosData.isEmpty {
             // Video Post
             Log.add("Creating video post with \(videosData.count) images")
@@ -55,7 +62,15 @@ class AmityPostTextEditorScreenViewModel: AmityPostTextEditorScreenViewModelType
             let videoPostBuilder = AmityVideoPostBuilder()
             videoPostBuilder.setText(text)
             videoPostBuilder.setVideos(videosData)
-            postBuilder = videoPostBuilder
+            
+            Task { @MainActor in
+                do {
+                    let post = try await postRepository.createVideoPost(videoPostBuilder, targetId: communityId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+                    self.createPostResponseHandler(forPost: post, error: nil)
+                } catch let error {
+                    self.createPostResponseHandler(forPost: nil, error: error)
+                }
+            }
         } else if !filesData.isEmpty {
             // File Post
             Log.add("Creating file post with \(filesData.count) files")
@@ -64,21 +79,27 @@ class AmityPostTextEditorScreenViewModel: AmityPostTextEditorScreenViewModelType
             let fileBuilder = AmityFilePostBuilder()
             fileBuilder.setText(text)
             fileBuilder.setFiles(getFilesData(from: files))
-            postBuilder = fileBuilder
+            
+            Task { @MainActor in
+                do {
+                    let post = try await postRepository.createFilePost(fileBuilder, targetId: communityId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+                    self.createPostResponseHandler(forPost: post, error: nil)
+                } catch let error {
+                    self.createPostResponseHandler(forPost: nil, error: error)
+                }
+            }
         } else {
             // Text Post
             let textPostBuilder = AmityTextPostBuilder()
             textPostBuilder.setText(text)
-            postBuilder = textPostBuilder
-        }
-        
-        if let mentionees = mentionees {
-            postrepository.createPost(postBuilder, targetId: communityId, targetType: targetType, metadata: metadata, mentionees: mentionees) { [weak self] (post, error) in
-                self?.createPostResponseHandler(forPost: post, error: error)
-            }
-        } else {
-            postrepository.createPost(postBuilder, targetId: communityId, targetType: targetType) { [weak self] (post, error) in
-                self?.createPostResponseHandler(forPost: post, error: error)
+            
+            Task { @MainActor in
+                do {
+                    let post = try await postRepository.createTextPost(textPostBuilder, targetId: communityId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+                    self.createPostResponseHandler(forPost: post, error: nil)
+                } catch let error {
+                    self.createPostResponseHandler(forPost: nil, error: error)
+                }
             }
         }
     }
@@ -123,15 +144,23 @@ class AmityPostTextEditorScreenViewModel: AmityPostTextEditorScreenViewModelType
             postBuilder = textPostBuilder
         }
         
-        if let mentionees = mentionees {
-            postrepository.updatePost(withId: oldPost.postId, builder: postBuilder, metadata: metadata, mentionees: mentionees) { [weak self] (post, error) in
-                guard let strongSelf = self else { return }
-                strongSelf.updatePostResponseHandler(forPost: post, error: error)
+        if let mentionees  {
+            Task { @MainActor in
+                do {
+                    let post = try await postRepository.editPost(withId: oldPost.postId, builder: postBuilder, metadata: metadata, mentionees: mentionees)
+                    self.updatePostResponseHandler(forPost: post, error: nil)
+                } catch let error {
+                    self.updatePostResponseHandler(forPost: nil, error: error)
+                }
             }
         } else {
-            postrepository.updatePost(withId: oldPost.postId, builder: postBuilder) { [weak self] (post, error) in
-                guard let strongSelf = self else { return }
-                strongSelf.updatePostResponseHandler(forPost: post, error: error)
+            Task { @MainActor in
+                do {
+                    let post = try await postRepository.editPost(withId: oldPost.postId, builder: postBuilder)
+                    self.updatePostResponseHandler(forPost: post, error: nil)
+                } catch let error {
+                    self.updatePostResponseHandler(forPost: nil, error: error)
+                }
             }
         }
         
