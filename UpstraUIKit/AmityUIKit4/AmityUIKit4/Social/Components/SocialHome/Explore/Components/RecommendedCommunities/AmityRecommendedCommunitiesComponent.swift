@@ -52,6 +52,7 @@ public struct AmityRecommendedCommunitiesComponent: AmityComponentView {
             Text(AmityLocalizedStringSet.Social.exploreRecommendedComponentTitle.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .padding(.bottom, 16)
+                .padding(.horizontal)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 VStack(spacing: 0) {
@@ -61,14 +62,14 @@ public struct AmityRecommendedCommunitiesComponent: AmityComponentView {
                                 .onTapGesture {
                                     host.controller?.navigationController?.pushViewController(AmitySwiftUIHostingController(rootView: AmityCommunityProfilePage(communityId: community.communityId)), animated: true)
                                 }
-                                .padding(.leading, 8)
+                                .padding(.trailing, 12)
+                                .padding(.leading, viewModel.communities.first?.id == community.id ? 16 : 0)
                         }
                     }
                     .frame(height: 222)
                 }
             }
         }
-        .padding(.horizontal)
     }
 }
 

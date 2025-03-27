@@ -71,6 +71,20 @@ open class AmityCommunityProfilePageBehavior {
         }
     }
     
+    open func goToLivestreamPostComposerPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
+        
+        if let community = community {
+            let page = AmityCreateLivestreamPage(targetId: community.communityId, targetType: .community)
+            let vc = AmitySwiftUIHostingController(rootView: page)
+            
+            let navController = UINavigationController(rootViewController: vc)
+            navController.modalPresentationStyle = .fullScreen
+            navController.navigationBar.isHidden = true
+            
+            context.page.host.controller?.present(navController, animated: true)
+        }
+    }
+    
     open func goToCreateStoryPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
         
         if let community = community {

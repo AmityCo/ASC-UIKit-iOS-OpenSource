@@ -15,7 +15,7 @@ enum PostMenuType: String, CaseIterable, Identifiable {
     case post = "Post"
     case story = "Story"
     case poll = "Poll"
-//    case liveStream = "Livestream"
+    case liveStream = "Livestream"
 }
 
 public struct AmityCreatePostMenuComponent: AmityComponentView {
@@ -50,7 +50,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
         }
         .background(Color.clear)
         .onAppear {
-            withAnimation(.bouncy(duration: 0.2, extraBounce: 0.1)) {
+            withAnimation(.bouncy(duration: 0.3, extraBounce: 0.1)) {
                 showPostCreationMenuScaleEffect.toggle()
             }
         }
@@ -89,12 +89,12 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             goToPollCreation()
                         }
-//                case .liveStream:
-//                    let icon = AmityIcon.createLivestreamMenuIcon
-//                    getItemView(image: icon.getImageResource(), title: type.rawValue)
-//                        .onTapGesture {
-//                            Log.add(event: .info, "Create: LiveStream")
-//                        }
+                case .liveStream:
+                    let icon = AmityIcon.createLivestreamMenuIcon
+                    getItemView(image: icon.getImageResource(), title: type.rawValue)
+                        .onTapGesture {
+                            goToLiveStreamCreation()
+                        }
                 }
             }
         }
@@ -103,7 +103,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
         .background(Color(viewConfig.theme.backgroundColor))
         .clipShape(RoundedRectangle(cornerRadius: 12.0))
         .shadow(radius: 2, y: 1)
-        .padding(.top, 68)
+        .padding(.top, 94)
         .padding(.trailing, 20)
     }
     
@@ -126,7 +126,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
     
     
     private func toggleScaleEffect() {
-        withAnimation(.bouncy(duration: 0.2, extraBounce: 0.1)) {
+        withAnimation(.bouncy(duration: 0.3, extraBounce: 0.1)) {
             showPostCreationMenuScaleEffect.toggle()
         }
         
@@ -167,6 +167,17 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
             let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
             AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectPollPostTargetPage(context: context)
+        }
+    }
+    
+    private func goToLiveStreamCreation() {
+        withoutAnimation {
+            isPresented.toggle()
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
+            AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectLiveStreamPostTargetPage(context: context)
         }
     }
 }

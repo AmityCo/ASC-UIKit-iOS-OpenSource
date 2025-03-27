@@ -18,7 +18,8 @@ struct AmityNavigationBar: View {
     let trailingView: AnyView?
     let leadingView: AnyView?
     let showDivider: Bool
-        
+    
+    /// Navigation Bar with title at center
     init(title: String) {
         self.title = title
         self.trailingView = nil
@@ -27,6 +28,7 @@ struct AmityNavigationBar: View {
         self.showDivider = false
     }
     
+    /// Navigation Bar with back button & divider customization
     init(title: String, showBackButton: Bool, showDivider: Bool = false) {
         self.title = title
         self.isBackButtonEnabled = showBackButton
@@ -35,6 +37,16 @@ struct AmityNavigationBar: View {
         self.showDivider = showDivider
     }
     
+    /// Navigation Bar with title, leading view & empty trailing view customization
+    init<LeadingView: View>(title: String, showDivider: Bool = false, @ViewBuilder leading: () -> LeadingView) {
+        self.title = title
+        self.isBackButtonEnabled = false
+        self.showDivider = showDivider
+        self.leadingView = AnyView(leading())
+        self.trailingView = nil
+    }
+    
+    /// Navigation Bar with title, back button, divider & trailing view customization
     init<TrailingView: View>(title: String, showBackButton: Bool, showDivider: Bool = false, @ViewBuilder trailing: () -> TrailingView) {
         self.title = title
         self.isBackButtonEnabled = showBackButton
@@ -43,6 +55,7 @@ struct AmityNavigationBar: View {
         self.trailingView = AnyView(trailing())
     }
     
+    /// Navigation Bar with title, divider, leading & trailing view customization
     init<LeadingView: View, TrailingView: View>(title: String, showDivider: Bool = false, @ViewBuilder leading: () -> LeadingView, @ViewBuilder trailing: () -> TrailingView) {
         self.title = title
         self.showDivider = showDivider

@@ -141,7 +141,7 @@
 "community_setup_edit_alert_title" = "Unsaved changes";
 "community_setup_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
 
-"livestream_player_ended_title" = "This livestream has ended.";
+"livestream_player_ended_title" = "This live stream has ended.";
 "livestream_player_ended_message" = "Playback will be available for you to watch shortly.";
 "livestream_player_terminated_title" = "This stream has been terminated.";
 "livestream_player_terminated_message" = "It looks like this livestream goes against our content moderation guidelines.";
@@ -151,6 +151,7 @@
 "livestream_player_reconnecting_message" = "Due to poor connection, this livestream has been paused. It will resume automatically once the connection is stable.";
 "livestream_player_live" = "LIVE";
 "livestream_player_recorded" = "RECORDED";
+"livestream_player_upcoming_live" = "UPCOMING LIVE";
 
 // Community Setting
 "community_setting_basic_info_title" = "Basic Info";
@@ -177,7 +178,6 @@
 "community_post_permission_only_admin_can_post_setting" = "Only admins can post";
 "community_story_setting_title" = "Allow comments on community stories";
 "community_story_setting_description" = "Turn on to receive comments on stories in this community.";
-
 
 "community_notification_setting_page_title" = "Notifications";
 "community_notification_setting_title" = "Allow notifications";
@@ -295,3 +295,65 @@
 
 "search_no_results_found_title" = "No results found";
 "search_char_limit_not_reached" = "Start your search by typing\nat least 3 letters";
+
+"live_stream_target_live_on_label" = "Live on";
+"live_stream_duration_label" = "LIVE %@";
+"live_stream_my_timeline_label" = "My timeline";
+"live_stream_end_live_label" = "End live";
+
+"live_stream_alert_end_live_title" = "End live stream?";
+"live_stream_alert_end_live_desc" = "If you end your live stream, it will also end for all your viewers.";
+"live_stream_alert_end_button" = "End";
+
+"live_stream_change_thumbnail_label" = "Change thumbnail";
+"live_stream_delete_thumbnail_label" = "Delete thumbnail";
+"live_stream_add_thumbnail_label" = "Add thumbnail";
+
+"live_stream_input_add_stream_title" = "Add live stream title...";
+"live_stream_input_add_stream_desc" = "Add description (optional)";
+
+"live_stream_alert_end_at_max_duration_title" = "Live stream ended";
+"live_stream_alert_end_at_max_duration_message" = "Your live stream has been automatically terminated since you reached 4-hour limit.";
+
+"live_stream_alert_discard_stream_title" = "Unsaved changes";
+"live_stream_alert_discard_stream_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+
+"live_stream_alert_stream_error_title" = "Cannot start live stream";
+"live_stream_alert_stream_error_message" = "Something went wrong while trying to complete your request. Please try again.";
+
+"live_stream_alert_thumbnail_upload_error_title" = "Upload failed";
+"live_stream_alert_thumbnail_upload_error_message" = "Please try again";
+
+"live_stream_alert_thumbnail_upload_inappropriate_error_title" = "Inappropriate image";
+"live_stream_alert_thumbnail_upload_inappropriate_error_message" = "Please choose a different image to upload.";
+
+"live_stream_toast_end_at_max_duration_message" = "Your live will automatically end once it reaches 4-hour limit.";
+
+"live_stream_permission_open_settings_label" = "Open settings";
+"live_stream_permission_camera_and_microphone_title" = "Allow access to your camera and microphone";
+"live_stream_permission_camera_and_microphone_message" = "This lets you record and live stream\nfrom this device.";
+
+"live_stream_starting_state_title" = "Starting live stream";
+"live_stream_reconnecting_state_title" = "Reconnecting";
+"live_stream_reconnecting_state_message" = "Due to poor connection, this live stream has been paused. It will resume automatically once the connection is stable.";
+"live_stream_ending_state_title" = "Live stream ends in";
+
+"post_detail_deleted_post_title" = "Something went wrong";
+"post_detail_deleted_post_message" = "The content you’re looking for is unavailable.";
+"post_detail_deleted_post_button_title" = "Go Back";
+
+"live_stream_terminated_page_title" = "Live terminated";
+"live_stream_terminated_page_desc_section_title" = "What does it mean?";
+
+"live_stream_terminated_watcher_title" = "The live stream has been\nterminated.";
+"live_stream_terminated_streamer_title" = "Your live stream has been\nterminated.";
+
+"live_stream_terminated_watcher_desc" = "It looks like the live stream you’re watching goes against our content moderation guidelines.";
+"live_stream_terminated_streamer_desc" = "It looks like your live stream goes against our content moderation guidelines.";
+
+"live_stream_terminated_playback_desc" = "There will be no playback of this live stream on any feeds.";
+"live_stream_terminated_streamer_content_desc" = "The live stream has also been terminated for all your viewers.";
+
+"live_stream_label" = "Livestream";
+
+"no_internet_connection" = "No internet connection.";

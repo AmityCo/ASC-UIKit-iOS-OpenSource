@@ -38,7 +38,6 @@ class FeatureViewController: UIViewController {
                 return "Social UIKit 4 Compatible"
             case .userProfile:
                 return "User Profile"
-            
             }
         }
     }
@@ -118,9 +117,6 @@ extension FeatureViewController: UITableViewDelegate {
         }
 
     }
-    
-    
-
 }
 
 extension FeatureViewController: UITableViewDataSource {

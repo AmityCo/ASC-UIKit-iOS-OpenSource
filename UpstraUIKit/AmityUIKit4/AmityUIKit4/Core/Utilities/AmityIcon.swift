@@ -157,6 +157,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case commentMenuIcon = "commentMenuIcon"
     case emptyPendingPostIcon = "emptyPendingPostIcon"
     case livestreamPlaceholder = "livestreamPlaceholder"
+    case livestreamPlaceholderGray = "livestreamPlaceholderGray"
     case livestreamErrorIcon = "livestreamErrorIcon"
     case livestreamPauseIcon = "livestreamPauseIcon"
     case livestreamReconnectingIcon = "livestreamReconnectingIcon"
@@ -170,6 +171,21 @@ enum AmityIcon: String, ImageResourceProvider {
     case blockedFeedIcon = "blockedFeedIcon"
     case listRadioIcon = "listRadioIcon"
     case pollRadioIcon = "pollRadioIcon"
+    
+    // Livestream icons
+    enum LiveStream: String, ImageResourceProvider {
+        case shutterButtonEnabled = "ic_stream_button"
+        case shutterButtonDisabled = "ic_stream_button_disabled"
+        case targetSelectionArrow = "ic_arrow_down"
+        case close = "ic_close"
+        case thumbnail = "ic_thumbnail"
+        case switchCamera = "ic_camera_flip"
+        
+        case terminatedPageStreamer = "livestream_terminated_streaming"
+        case terminatedPageWatcher = "livestream_terminated_watching"
+        case terminatedContentViewer = "livestream_terminated_trash"
+        case terminatedContentPlayback = "livestream_terminated_block"
+    }
 
     func getURL() -> URL {
         let path = AmityUIKit4Manager.bundle.path(forResource: self.rawValue, ofType: ".svg")

@@ -57,4 +57,6 @@ extension Log {
     static var adAssets = Logger(subsystem: uikit, category: "Ads.Asset")
     
     static var adInjector = Logger(subsystem: uikit, category: "Ads.Injector")
+    
+    static var liveStream = Logger(subsystem: uikit, category: "Livestream")
 }

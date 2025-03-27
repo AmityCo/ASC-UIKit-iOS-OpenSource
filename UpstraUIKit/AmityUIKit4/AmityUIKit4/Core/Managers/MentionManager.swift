@@ -8,6 +8,12 @@
 import UIKit
 import AmitySDK
 
+// Wrap metadata & mentionees information under same struct for higlight purpose.
+struct AmityMentions {
+    let metadata: [String: Any]
+    let mentionees: [AmityMentionees]
+}
+
 struct MentionAttribute {
     let attributes: [NSAttributedString.Key: Any]
     let range: NSRange

@@ -40,6 +40,7 @@ struct AmityFeedAdContentComponent: View {
             HStack(spacing: 0) {
                 AsyncImage(placeholder: AmityIcon.adAvatarPlaceholder.imageResource, url: URL(string: ad.advertiser?.avatar?.fileURL ?? ""))
                     .frame(width: 32.0, height: 32.0)
+                    .background(Color(viewConfig.theme.primaryColor.blend(.shade2)))
                     .clipShape(Circle())
                     .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 8))
                 
@@ -89,16 +90,15 @@ struct AmityFeedAdContentComponent: View {
                     handleTapOnAd()
                 }, label: {
                     Text(ad.callToAction)
-                        .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.captionBold(Color.white))
                         .lineLimit(1)
                         .contentShape(Rectangle())
                 })
                 .buttonStyle(.plain)
-                .foregroundColor(Color.white)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
-                .background(Color(viewConfig.theme.highlightColor))
-                .cornerRadius(8)
+                .background(Color(viewConfig.theme.primaryColor))
+                .cornerRadius(6)
             }
         }
         .padding(.vertical, 12)

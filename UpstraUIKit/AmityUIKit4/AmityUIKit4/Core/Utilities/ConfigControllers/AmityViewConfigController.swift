@@ -12,6 +12,7 @@ import Combine
 class AmityViewConfigController: NSObject, ObservableObject {
     @Published var theme: AmityThemeColor
     let defaultLightTheme: AmityThemeColor
+    let defaultDarkTheme: AmityThemeColor
     
     let pageId: PageId?
     let componentId: ComponentId?
@@ -24,6 +25,8 @@ class AmityViewConfigController: NSObject, ObservableObject {
         self.theme = AmityUIKitConfigController.shared.getTheme(configId: configId)
         
         self.defaultLightTheme = AmityThemeColor(primaryColor: lightTheme.primaryColor!, secondaryColor: lightTheme.secondaryColor!, baseColor: lightTheme.baseColor!, baseColorShade1: lightTheme.baseColorShade1!, baseColorShade2: lightTheme.baseColorShade2!, baseColorShade3: lightTheme.baseColorShade3!, baseColorShade4: lightTheme.baseColorShade4!, alertColor: lightTheme.alertColor!, backgroundColor: lightTheme.backgroundColor!, baseInverseColor: lightTheme.baseInverseColor!, backgroundShade1Color: lightTheme.backgroundShade1Color!, highlightColor: lightTheme.highlightColor!)
+        
+        self.defaultDarkTheme = AmityThemeColor(primaryColor: darkTheme.primaryColor!, secondaryColor: darkTheme.secondaryColor!, baseColor: darkTheme.baseColor!, baseColorShade1: darkTheme.baseColorShade1!, baseColorShade2: darkTheme.baseColorShade2!, baseColorShade3: darkTheme.baseColorShade3!, baseColorShade4: darkTheme.baseColorShade4!, alertColor: darkTheme.alertColor!, backgroundColor: darkTheme.backgroundColor!, baseInverseColor: darkTheme.baseInverseColor!, backgroundShade1Color: darkTheme.backgroundShade1Color!, highlightColor: darkTheme.highlightColor!)
     }
     
     // MARK: Private functions

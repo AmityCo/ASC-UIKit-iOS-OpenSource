@@ -75,8 +75,20 @@ extension AmityPostModel {
         case recorded
         case idle
         case none
+        
+        var badgeTitle: String {
+            switch self {
+            case .live:
+                return AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString
+            case .recorded:
+                return AmityLocalizedStringSet.Social.livestreamPlayerRecorded.localizedString
+            case .idle:
+                return AmityLocalizedStringSet.Social.livestreamPlayerUpcomingLive.localizedString
+            case .none, .ended, .terminated:
+                return ""
+            }
+        }
     }
-    
     
     public class Author {
         public let avatarURL: String?
@@ -426,7 +438,11 @@ public class AmityPostModel: Identifiable {
     private func prepareData(_ post: AmityPost) {
         switch post.dataType {
         case "image":
-            if let imageData = post.getImageInfo() {
+            // Create a media object regardless of whether imageData can be retrieved
+            let imageData = post.getImageInfo()
+            
+            // If we have image data, use it
+            if let imageData = imageData {
                 let state = AmityMediaState.downloadableImage(
                     imageData: imageData,
                     placeholder: UIImage()
@@ -435,18 +451,21 @@ public class AmityPostModel: Identifiable {
                 media.image = imageData
                 medias.append(media)
                 fileMap[imageData.fileId] = post.postId
-                dataTypeInternal = .image
+            } else {
+                // Still create a media object with placeholder state when image data is missing
+                // This ensures the UI can show something (gray placeholder) for the missing image
+                let media = AmityMedia(state: .none, type: .image)
+                medias.append(media)
             }
-        case "file": break
-//                if let fileData = aChild.getFileInfo() {
-//                    let tempFile = AmityFile(state: .downloadable(fileData: fileData))
-//                    files.append(tempFile)
-//                    fileMap[fileData.fileId] = aChild.postId
-//                    dataTypeInternal = .file
-//                }
+            
+            dataTypeInternal = .image
+            
         case "video":
-            if let videoData = post.getVideoInfo() {
-                let thumbnail = post.getVideoThumbnailInfo()
+            // Similar approach for video - create media even if data is missing
+            let videoData = post.getVideoInfo()
+            let thumbnail = post.getVideoThumbnailInfo()
+            
+            if let videoData = videoData {
                 let state = AmityMediaState.downloadableVideo(
                     videoData: videoData,
                     thumbnailUrl: thumbnail?.fileURL
@@ -455,14 +474,28 @@ public class AmityPostModel: Identifiable {
                 media.video = videoData
                 medias.append(media)
                 fileMap[videoData.fileId] = post.postId
-                dataTypeInternal = .video
+            } else {
+                // Create placeholder for missing video
+                let media = AmityMedia(state: .none, type: .video)
+                medias.append(media)
             }
+            
+            dataTypeInternal = .video
+            
+        case "file": break
+//                if let fileData = aChild.getFileInfo() {
+//                    let tempFile = AmityFile(state: .downloadable(fileData: fileData))
+//                    files.append(tempFile)
+//                    fileMap[fileData.fileId] = aChild.postId
+//                    dataTypeInternal = .file
+//                }
         case "poll":
                 dataTypeInternal = .poll
         case "liveStream":
             if let liveStreamData = post.getLiveStreamInfo() {
                 liveStream = liveStreamData
                 dataTypeInternal = .liveStream
+                
                 if !(liveStreamData.moderation?.terminateLabels.isEmpty ?? true) {
                     livestreamState = .terminated
                 } else if liveStreamData.status == AmityStreamStatus.ended {
@@ -471,10 +504,13 @@ public class AmityPostModel: Identifiable {
                     livestreamState = .live
                 } else if liveStreamData.status == AmityStreamStatus.recorded {
                     livestreamState = .recorded
-                    
                 } else {
                     livestreamState = .idle
-                    
+                }
+                
+                // If stream is deleted but post is still there (due to be bug), show this stream is currently unavailable text.
+                if liveStreamData.isDeleted {
+                    livestreamState = .idle
                 }
             }
         default:

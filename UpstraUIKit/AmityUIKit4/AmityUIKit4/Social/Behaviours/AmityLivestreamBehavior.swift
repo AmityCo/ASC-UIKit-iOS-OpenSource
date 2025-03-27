@@ -13,13 +13,11 @@ open class AmityLivestreamBehavior {
     public init() {}
     
     open func createRecordedPlayer(stream: AmityStream, client: AmityClient) -> any View {
-        print("To present recorded stream, please override \(AmityLivestreamBehavior.self).\(#function), see https://docs.amity.co for more details.")
-        return EmptyView()
+        return RecordedStreamPlayerView(livestream: stream, client: client)
     }
     
     open func createLivestreamPlayer(stream: AmityStream, client: AmityClient, isPlaying: Bool) -> any View {
-        print("To present live stream, please override \(AmityLivestreamBehavior.self).\(#function), see https://docs.amity.co for more details.")
-        return EmptyView()
+        return LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
     }
     
 }

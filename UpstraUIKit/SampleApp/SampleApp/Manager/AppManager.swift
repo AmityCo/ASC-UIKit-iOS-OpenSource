@@ -166,21 +166,20 @@ class CustomV4LivestreamBehavior: AmityLivestreamBehavior {
     
     override func createRecordedPlayer(stream: AmityStream, client: AmityClient) -> any View {
         #if canImport(AmityUIKitLiveStream)
-        return RecordedStreamPlayerView(livestream: stream, client: client)
+        return AmityUIKit4.RecordedStreamPlayerView(livestream: stream, client: client)
         #else
-        print("To watch recorded live stream, please install AmityVideoPlayerKit.")
-        return EmptyView()
+        print("AmityUIKit4 supports playing recorded stream from the same framework")
+        return AmityUIKit4.RecordedStreamPlayerView(livestream: stream, client: client)
         #endif
     }
     
     override func createLivestreamPlayer(stream: AmityStream, client: AmityClient, isPlaying: Bool) -> any View {
         #if canImport(AmityUIKitLiveStream)
-        return LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
+        return AmityUIKit4.LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
         #else
-        print("To watch live stream, please install AmityVideoPlayerKit.")
-        return EmptyView()
+        print("AmityUIKit4 supports watching live stream from the same framework")
+        return AmityUIKit4.LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
         #endif
     }
-    
 }
 #endif

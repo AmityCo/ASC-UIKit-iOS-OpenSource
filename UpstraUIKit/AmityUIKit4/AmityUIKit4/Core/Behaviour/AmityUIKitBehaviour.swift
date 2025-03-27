@@ -26,6 +26,7 @@ open class AmityUIKitBehaviour {
     public var createPostMenuComponentBehavior: AmityCreatePostMenuComponentBehavior?
     public var postTargetSelectionPageBehavior: AmityPostTargetSelectionPageBehavior?
     public var pollTargetSelectionPageBehavior: AmityPollTargetSelectionPageBehavior?
+    public var liveStreamPostTargetSelectionPageBehavior: AmityLivestreamPostTargetSelectionPageBehavior?
     public var postDetailPageBehavior: AmityPostDetailPageBehavior?
     public var socialGlobalSearchPageBehavior: AmitySocialGlobalSearchPageBehavior?
     public var socialHomeTopNavigationComponentBehavior: AmitySocialHomeTopNavigationComponentBehavior?

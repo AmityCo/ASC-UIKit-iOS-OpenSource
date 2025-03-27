@@ -318,6 +318,9 @@ final class AmityUIKitManagerInternal: NSObject {
 
         let livestreamBehavior = AmityLivestreamBehavior()
         behavior.livestreamBehavior = livestreamBehavior
+        
+        let liveStreamPostTargetSelectionPageBehavior = AmityLivestreamPostTargetSelectionPageBehavior()
+        behavior.liveStreamPostTargetSelectionPageBehavior = liveStreamPostTargetSelectionPageBehavior
     }
     
     func registerDevice(_ userId: String,

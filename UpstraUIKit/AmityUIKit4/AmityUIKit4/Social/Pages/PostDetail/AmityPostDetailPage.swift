@@ -57,38 +57,72 @@ public struct AmityPostDetailPage: AmityPageView {
     }
     
     public var body: some View {
-        VStack(spacing: 0) {
-            navigationBarView
+        ZStack {
             
-            Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
-                .frame(height: 1)
-                .isHidden(!commentCoreViewModel.hasScrolledToTop)
+            PostDetailEmptyStateView()
+            .opacity(viewModel.isPostDeleted ? 1 : 0)
             
-            CommentCoreView(headerView: {
-                VStack(spacing: 4) {
-                    if let postModel = viewModel.post {
-                        AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext())
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(height: 1)
-                    } else {
-                        PostContentSkeletonView()
+            VStack(spacing: 0) {
+                navigationBarView
+                
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+                    .isHidden(!commentCoreViewModel.hasScrolledToTop)
+                
+                if viewModel.isLoading {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(spacing: 8) {
+                            RoundedRectangle(cornerRadius: 32)
+                                .fill(Color(viewConfig.theme.baseColorShade4))
+                                .frame(width: 32, height: 32)
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                SkeletonRectangle(height: 8, width: 180)
+                                SkeletonRectangle(height: 8, width: 64)
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.vertical, 12)
+                        
+                        SkeletonRectangle(height: 8, width: 240)
+                        SkeletonRectangle(height: 8, width: 180)
+                        SkeletonRectangle(height: 8, width: 290)
+                        
+                        Spacer()
                     }
-                }
-            },
-                            viewModel: commentCoreViewModel,
-                            commentButtonAction: self.commentButtonAction(_:))
-            .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
-                         height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? .fixed(204) : .fixed(148),
-                         backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
-                    commentCoreViewModel.editingComment = comment
+                    .padding(.horizontal, 16)
+                } else {
+                    VStack(spacing: 0) {
+                        CommentCoreView(headerView: {
+                            VStack(spacing: 4) {
+                                if let postModel = viewModel.post {
+                                    AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext())
+                                    Rectangle()
+                                        .fill(Color(viewConfig.theme.baseColorShade4))
+                                        .frame(height: 1)
+                                } else {
+                                    PostContentSkeletonView()
+                                }
+                            }
+                        },
+                                        viewModel: commentCoreViewModel,
+                                        commentButtonAction: self.commentButtonAction(_:))
+                        .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
+                                     height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? .fixed(204) : .fixed(148),
+                                     backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                            CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
+                                commentCoreViewModel.editingComment = comment
+                            }
+                        }
+
+                        CommentComposerView(viewModel: commentComposerViewModel)
+                            .isHidden(!(viewModel.post?.targetCommunity?.isJoined ?? true))
+                    }
+                    .opacity(viewModel.isPostDeleted ? 0 : 1)
                 }
             }
-
-            CommentComposerView(viewModel: commentComposerViewModel)
-                .isHidden(!(viewModel.post?.targetCommunity?.isJoined ?? true))
         }
         .sheet(isPresented: $commentCoreViewModel.adSeetState.isShown, content: {
             if let ad = commentCoreViewModel.adSeetState.ad {
@@ -103,7 +137,7 @@ public struct AmityPostDetailPage: AmityPageView {
             if let targetCommunity = viewModel.post?.targetCommunity {
                 commentCoreViewModel.hideCommentButtons = !targetCommunity.isJoined
             }
-
+            
         }
     }
     
@@ -193,49 +227,6 @@ public struct AmityPostDetailPage: AmityPageView {
         let componentContext = context ?? AmityPostContentComponent.Context(category: postCategory, shouldHideTarget: hideTarget)
         componentContext.hideMenuButton = true
         return componentContext
-    }
-}
-
-class AmityPostDetailPageViewModel: ObservableObject {
-    private var postObject: AmityObject<AmityPost>?
-    private var postId: String = ""
-    private var cancellable: AnyCancellable?
-    private let postManager = PostManager()
-    
-    @Published var post: AmityPostModel?
-    var token: AmityNotificationToken?
-    
-    init(id: String) {
-        self.postId = id
-        
-        observePost(postId: postId)
-        
-        // Add observer
-        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePoll(_:)), name: .didVotePoll, object: nil)
-    }
-    
-    init(post: AmityPost) {
-        self.postId = post.postId
-        self.post = AmityPostModel(post: post)
-        
-        observePost(postId: post.postId)
-        
-        // Add observer
-        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePoll(_:)), name: .didVotePoll, object: nil)
-    }
-    
-    @objc private func didUpdatePoll(_ notification: Notification) {
-        observePost(postId: self.postId)
-    }
-    
-    func observePost(postId: String) {
-        postObject = postManager.getPost(withId: postId)
-        token = postObject?.observe({ livePost, error in
-            
-            if let snapshot = livePost.snapshot {
-                self.post = AmityPostModel(post: snapshot)
-            }
-        })
     }
 }
 

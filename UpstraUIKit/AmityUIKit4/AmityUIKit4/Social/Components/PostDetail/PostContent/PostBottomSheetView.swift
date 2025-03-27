@@ -100,7 +100,7 @@ struct PostBottomSheetView: View {
     private var moderatorView: some View {
         VStack {
             editSheetButton
-                .isHidden(!post.isOwner || post.dataTypeInternal == .poll) // We cannot edit poll post
+                .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream) // We cannot edit poll post & live stream post
             
             if let poll = post.poll, !poll.isClosed {
                 closePollButton
@@ -120,7 +120,7 @@ struct PostBottomSheetView: View {
     private var memberView: some View {
         VStack {
             editSheetButton
-                .isHidden(!post.isOwner || post.dataTypeInternal == .poll)
+                .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream)
             
             if let poll = post.poll, !poll.isClosed {
                 closePollButton

@@ -64,14 +64,6 @@ class PostManager {
         try await postRepository.declinePost(withId: postId)
     }
     
-//    func createPost(_ builder: any AmitySDK.AmityPostBuilder, targetId: String?, targetType: AmitySDK.AmityPostTargetType, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
-//        if let mentionees, let metadata {
-//            try await postRepository.createPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
-//        } else {
-//            try await postRepository.createPost(builder, targetId: targetId, targetType: targetType)
-//        }
-//    }
-    
     @discardableResult
     func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
         if let mentionees, let metadata {
@@ -79,5 +71,9 @@ class PostManager {
         } else {
             try await postRepository.editPost(withId: withId, builder: builder)
         }
+    }
+    
+    func createStreamPost(builder: AmityLiveStreamPostBuilder, targetId: String?, targetType: AmityPostTargetType, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
+        return try await postRepository.createLiveStreamPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
     }
 }

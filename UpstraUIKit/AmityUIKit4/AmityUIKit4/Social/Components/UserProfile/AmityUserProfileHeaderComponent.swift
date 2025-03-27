@@ -82,7 +82,9 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .fullScreenCover(isPresented: $showMediaViewer) {
-            MediaViewer(url: URL(string: user.avatarURL), closeAction: { showMediaViewer.toggle() })
+            MediaViewer(url: URL(string: user.avatarURL),
+                        viewConfig: viewConfig,
+                        closeAction: { showMediaViewer.toggle() })
         }
         .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
             bottomSheetView

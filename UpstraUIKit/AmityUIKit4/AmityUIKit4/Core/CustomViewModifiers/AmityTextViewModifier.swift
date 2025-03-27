@@ -8,6 +8,7 @@
 import SwiftUI
 
 enum AmityTextStyle {
+    case display(Color)
     case headline(Color)
     case titleBold(Color)
     case title(Color)
@@ -24,6 +25,8 @@ enum AmityTextStyle {
     
     func getStyle() -> (fontSize: CGFloat, weight: Font.Weight, color: Color) {
         switch self {
+        case .display(let color):
+            return (fontSize: 32, weight: .bold, color: color)
         case .headline(let color):
             return (fontSize: 20, weight: .bold, color: color)
         case .titleBold(let color):

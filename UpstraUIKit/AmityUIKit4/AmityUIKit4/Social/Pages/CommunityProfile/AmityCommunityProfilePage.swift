@@ -71,7 +71,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                     
                     AmityCommunityPinnedPostComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, postContext in
                         
-                        var context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: postContext?.showPollResults ?? false)
+                        let context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: postContext?.showPollResults ?? false)
                         AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: postContext?.category ?? .pinAndAnnouncement)
                     })
                         .isHidden(currentTab != 1)
@@ -248,7 +248,6 @@ extension AmityCommunityProfilePage {
     @ViewBuilder
     var createPostView: some View {
         
-        let bottomSheetHeight = calculateBottomSheetHeight()
         Button(action: {
             showBottomSheet.toggle()
         }, label: {
@@ -271,7 +270,7 @@ extension AmityCommunityProfilePage {
         .padding(.bottom, 8)
         .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             VStack(spacing: 0) {
-                BottomSheetItemView(icon: AmityIcon.createPostMenuIcon.getImageResource(), text: AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
+                BottomSheetItemView(icon: AmityIcon.createPostMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
                     .onTapGesture {
                         showBottomSheet.toggle()
                         host.controller?.dismiss(animated: false)
@@ -281,7 +280,7 @@ extension AmityCommunityProfilePage {
                 
                 // Story
                 if viewModel.hasStoryManagePermission {
-                    BottomSheetItemView(icon: AmityIcon.createStoryMenuIcon.getImageResource(), text: AmityLocalizedStringSet.Social.createStoryBottomSheetTitle.localizedString)
+                    BottomSheetItemView(icon: AmityIcon.createStoryMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.createStoryBottomSheetTitle.localizedString)
                         .onTapGesture {
                             showBottomSheet.toggle()
                             host.controller?.dismiss(animated: false)
@@ -298,6 +297,17 @@ extension AmityCommunityProfilePage {
                         let context = AmityCommunityProfilePageBehavior.Context(page: self)
                         AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPollPostComposerPage(context: context, community: viewModel.community)
                     }
+                
+                BottomSheetItemView(icon: AmityIcon.createLivestreamMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.liveStreamLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
+                    .onTapGesture {
+                        showBottomSheet.toggle()
+                        host.controller?.dismiss(animated: false)
+                        
+                        let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                        AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToLivestreamPostComposerPage(context: context, community: viewModel.community)
+                    }
+                
+                
             }
             .padding(.bottom, 32)
         }

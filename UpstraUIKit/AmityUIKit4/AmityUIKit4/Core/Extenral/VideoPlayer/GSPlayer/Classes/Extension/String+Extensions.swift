@@ -8,6 +8,8 @@
 
 import Foundation
 import CommonCrypto
+import AmitySDK
+import UIKit
 
 extension String {
     
@@ -42,4 +44,26 @@ extension String {
         return (self as NSString).appendingPathExtension(str)
     }
     
+    // Extension to support for highlight & mention in texts.
+    @available(iOS 15, *)
+    func highlight(mentions: AmityMentions?, highlightLink: Bool, highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemBlue, .font: UIFont.systemFont(ofSize: 15)]) -> AttributedString {
+                
+        let contentText = self
+        var highlightedText = AttributedString(contentText)
+        
+        // If mention is present, highlight mentions first.
+        if let mentions {
+            highlightedText = TextHighlighter.highlightMentions(for: contentText, metadata: mentions.metadata, mentionees: mentions.mentionees, highlightAttributes: highlightAttributes)
+        }
+        
+        // If links is present, highlight links
+        if highlightLink {
+            let links = TextHighlighter.detectLinks(in: contentText)
+            if !links.isEmpty {
+                highlightedText = TextHighlighter.highlightLinks(links: links, in: highlightedText, attributes: highlightAttributes)
+            }
+        }
+        
+        return highlightedText
+    }
 }

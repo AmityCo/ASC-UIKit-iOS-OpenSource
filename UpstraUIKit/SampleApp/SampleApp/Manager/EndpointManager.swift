@@ -53,7 +53,7 @@ struct EnvironmentSettingModel: Codable {
     }
     
     static func defaultConfig(for environment: EnvironmentType) -> EndpointConfigModel {
-        return EndpointConfigModel(apiKey: "YOUR_API_KEY", httpEndpoint: AmityRegion.SG.httpUrl, socketEndpoint: AmityRegion.SG.rpcUrl, mqttEndpoint: AmityRegion.SG.mqttHost, uploadURL: AmityRegion.SG.uploadUrl)
+        return EndpointConfigModel(apiKey: "YOUR_API_KEY", httpEndpoint: AmityRegion.SG.httpUrl, socketEndpoint: "", mqttEndpoint: AmityRegion.SG.mqttHost, uploadURL: AmityRegion.SG.uploadUrl)
     }
 }
 

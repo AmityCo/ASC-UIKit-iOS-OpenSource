@@ -81,7 +81,8 @@ public struct AmityCommunityImageFeedComponent: AmityComponentView {
             }
             .padding(.horizontal, 16)
             .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
-                MediaViewer(medias: [viewModel.medias[viewModel.selectedMediaIndex]], startIndex: 0, closeAction: { viewModel.showMediaViewer.toggle() })
+                MediaViewer(medias: [viewModel.medias[viewModel.selectedMediaIndex]],
+                            startIndex: 0, viewConfig: viewConfig, closeAction: { viewModel.showMediaViewer.toggle() })
             }
             
             Color.clear

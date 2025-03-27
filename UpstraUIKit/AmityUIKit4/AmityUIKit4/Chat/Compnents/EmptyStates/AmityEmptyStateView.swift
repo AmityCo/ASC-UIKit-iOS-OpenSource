@@ -76,7 +76,7 @@ public struct AmityEmptyStateView: View {
 
 #if DEBUG
 #Preview {
-    AmityEmptyStateView(configuration: AmityEmptyStateView.Configuration.previewWithoutTitle)
+    AmityEmptyStateView(configuration: AmityEmptyStateView.Configuration.previewWithTitle)
         .preferredColorScheme(.dark)
         .colorScheme(.dark)
 }

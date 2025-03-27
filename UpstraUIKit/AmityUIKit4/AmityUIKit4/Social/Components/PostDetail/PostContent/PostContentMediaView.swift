@@ -13,34 +13,37 @@ struct PostContentMediaView: View {
     @State private var offset = CGSize.zero
     @Namespace private var animationNamespace
     @StateObject private var viewModel: PostContentMediaViewModel = PostContentMediaViewModel()
+    @ObservedObject var viewConfig: AmityViewConfigController
     let post: AmityPostModel
     
-    init(post: AmityPostModel) {
+    init(post: AmityPostModel, viewConfig: AmityViewConfigController) {
         self.post = post
+        self.viewConfig = viewConfig
     }
     
     var body: some View {
-        getGridView(data: post.medias) { index, media in
-            if let url = media.getImageURL() {
+        
+        if !post.medias.isEmpty {
+            getGridView(data: post.medias) { index, media in
+                
                 ZStack {
-                    Color.clear
-                        .overlay(
-                            URLImage(url, content: { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            })
-                            .environment(\.urlImageOptions, URLImageOptions.amityOptions)
-                        )
-                        .compositingGroup()
-                        .clipped()
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            withoutAnimation {
-                                viewModel.selectedMediaIndex = index
-                                viewModel.showMediaViewer.toggle()
-                            }
+                    // Handle different media states
+                    Group {
+                        if let url = media.getImageURL() {
+                            Color.clear
+                                .overlay(Color(viewConfig.theme.baseColorShade4))
+                                .overlay(
+                                    URLImage(url, content: { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                    })
+                                    .environment(\.urlImageOptions, URLImageOptions.amityOptions)
+                                )
+                        } else {
+                            Color(viewConfig.theme.baseColorShade4)
                         }
+                    }
                     
                     if media.type == .video {
                         Image(AmityIcon.videoControlIcon.getImageResource())
@@ -49,10 +52,26 @@ struct PostContentMediaView: View {
                             .frame(width: 40, height: 40)
                     }
                 }
+                .compositingGroup()
+                .clipped()
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    withoutAnimation {
+                        viewModel.selectedMediaIndex = index
+                        viewModel.showMediaViewer.toggle()
+                    }
+                }
             }
-        }
-        .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
-            MediaViewer(medias: post.medias, startIndex: viewModel.selectedMediaIndex, closeAction: { viewModel.showMediaViewer.toggle() })
+            .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
+                MediaViewer(
+                    medias: post.medias, 
+                    startIndex: viewModel.selectedMediaIndex, 
+                    viewConfig: viewConfig,
+                    closeAction: { viewModel.showMediaViewer.toggle() }
+                )
+            }
+        } else {
+            EmptyView()
         }
     }
     

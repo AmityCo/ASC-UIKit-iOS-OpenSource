@@ -25,6 +25,7 @@ public struct AmityLocalizedStringSet {
         static let on = "on"
         static let off = "off"
         static let edit = "edit"
+        static let noInternetConnection = "no_internet_connection"
     }
     
     public struct Story {
@@ -157,6 +158,7 @@ public struct AmityLocalizedStringSet {
         static let livestreamPlayerReconnectingMessage = "livestream_player_reconnecting_message"
         static let livestreamPlayerLive = "livestream_player_live"
         static let livestreamPlayerRecorded = "livestream_player_recorded"
+        static let livestreamPlayerUpcomingLive = "livestream_player_upcoming_live"
         
         static let communitySettingBasicInfoTitle = "community_setting_basic_info_title"
         static let communitySettingCommunityPermissionsTitle = "community_setting_community_permissions_title"
@@ -305,6 +307,66 @@ public struct AmityLocalizedStringSet {
         static let postDiscardAlertTitle = "post_discard_alert_title"
         static let postDiscardAlertMessage = "post_discard_alert_message"
         static let postDiscardAlertButtonKeepEditing = "post_discard_alert_button_keep_editing"
+        
+        // Live Stream Creation
+        static let liveStreamTargetLiveOnLabel = "live_stream_target_live_on_label"
+        static let liveStreamDurationLabel = "live_stream_duration_label"
+        static let liveStreamMyTimelineLabel = "live_stream_my_timeline_label"
+        static let liveStreamEndLiveLabel = "live_stream_end_live_label"
 
+        static let liveStreamAlertEndLiveTitle = "live_stream_alert_end_live_title"
+        static let liveStreamAlertEndLiveDesc = "live_stream_alert_end_live_desc"
+        static let liveStreamAlertEndButton = "live_stream_alert_end_button"
+
+        static let liveStreamChangeThumbnailLabel = "live_stream_change_thumbnail_label"
+        static let liveStreamDeleteThumbnailLabel = "live_stream_delete_thumbnail_label"
+        static let liveStreamAddThumbnailLabel = "live_stream_add_thumbnail_label"
+
+        static let liveStreamInputAddStreamTitle = "live_stream_input_add_stream_title"
+        static let liveStreamInputAddStreamDesc = "live_stream_input_add_stream_desc"
+
+        static let liveStreamAlertEndAtMaxDurationTitle = "live_stream_alert_end_at_max_duration_title"
+        static let liveStreamAlertEndAtMaxDurationMessage = "live_stream_alert_end_at_max_duration_message"
+
+        static let liveStreamAlertDiscardStreamTitle = "live_stream_alert_discard_stream_title"
+        static let liveStreamAlertDiscardStreamMessage = "live_stream_alert_discard_stream_message"
+
+        static let liveStreamAlertStreamErrorTitle = "live_stream_alert_stream_error_title"
+        static let liveStreamAlertStreamErrorMessage = "live_stream_alert_stream_error_message"
+
+        static let liveStreamAlertThumbnailUploadErrorTitle = "live_stream_alert_thumbnail_upload_error_title"
+        static let liveStreamAlertThumbnailUploadErrorMessage = "live_stream_alert_thumbnail_upload_error_message"
+
+        static let liveStreamAlertThumbnailUploadInappropriateErrorTitle = "live_stream_alert_thumbnail_upload_inappropriate_error_title"
+        static let liveStreamAlertThumbnailUploadInappropriateErrorMessage = "live_stream_alert_thumbnail_upload_inappropriate_error_message"
+
+        static let liveStreamToastEndAtMaxDurationMessage = "live_stream_toast_end_at_max_duration_message"
+
+        static let liveStreamPermissionOpenSettingsLabel = "live_stream_permission_open_settings_label"
+        static let liveStreamPermissionCameraAndMicrophoneTitle = "live_stream_permission_camera_and_microphone_title"
+        static let liveStreamPermissionCameraAndMicrophoneMessage = "live_stream_permission_camera_and_microphone_message"
+
+        static let liveStreamStartingStateTitle = "live_stream_starting_state_title"
+        static let liveStreamReconnectingStateTitle = "live_stream_reconnecting_state_title"
+        static let liveStreamReconnectingStateMessage = "live_stream_reconnecting_state_message"
+        static let liveStreamEndingStateTitle = "live_stream_ending_state_title"
+        
+        static let postDetailDeletedPostTitle = "post_detail_deleted_post_title"
+        static let postDetailDeletedPostMessage = "post_detail_deleted_post_message"
+        static let postDetailDeletedPostButtonTitle = "post_detail_deleted_post_button_title"
+        
+        static let liveStreamTerminatedPageTitle = "live_stream_terminated_page_title"
+        static let liveStreamTerminatedPageDescSectionTitle = "live_stream_terminated_page_desc_section_title"
+
+        static let liveStreamTerminatedWatcherTitle = "live_stream_terminated_watcher_title"
+        static let liveStreamTerminatedStreamerTitle = "live_stream_terminated_streamer_title"
+
+        static let liveStreamTerminatedWatcherDesc = "live_stream_terminated_watcher_desc"
+        static let liveStreamTerminatedStreamerDesc = "live_stream_terminated_streamer_desc"
+
+        static let liveStreamTerminatedPlaybackDesc = "live_stream_terminated_playback_desc"
+        static let liveStreamTerminatedStreamerContentDesc = "live_stream_terminated_streamer_content_desc"
+        
+        static let liveStreamLabel = "live_stream_label"
     }
 }

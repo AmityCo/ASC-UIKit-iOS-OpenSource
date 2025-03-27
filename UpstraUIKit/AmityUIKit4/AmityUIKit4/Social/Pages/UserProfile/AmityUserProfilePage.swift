@@ -336,12 +336,21 @@ public struct AmityUserProfilePage: AmityPageView {
                         }
                     }
                 
-                BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: "Poll")
+                BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollLabel.localizedString)
                     .onTapGesture {
                         postCreationBottomSheet.toggle()
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             let context = AmityUserProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToPollPostComposerPage(context: context)
+                        }
+                    }
+                
+                BottomSheetItemView(icon: AmityIcon.createLivestreamMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.liveStreamLabel.localizedString)
+                    .onTapGesture {
+                        postCreationBottomSheet.toggle()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            let context = AmityUserProfilePageBehavior.Context(page: self)
+                            AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToLivestreamPostComposerPage(context: context)
                         }
                     }
             }

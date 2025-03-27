@@ -37,10 +37,16 @@ public struct AmityPostComposerPage: AmityPageView {
     @State private var postCreationToastAlphaValue = 0.0
     @State private var failedToastAlphaValue = 0.0
     @State private var showAlert: Bool = false
+    @State private var isLoading: Bool = false
+    @State private var areAttachmentsReady: Bool = true
     private let options: AmityPostComposerOptions
 
     @State private var postErrorMessage = AmityLocalizedStringSet.Social.postCreateError
         .localizedString
+    
+    private var loadingToastMessage: String {
+        viewModel.mode == .create ? "Posting..." : "Updating..."
+    }
 
     public init(options: AmityPostComposerOptions) {
         self.options = options
@@ -81,9 +87,11 @@ public struct AmityPostComposerPage: AmityPageView {
 
                 ScrollView {
                     AmityMessageTextEditorView(
-                        textEditorViewModel, text: $viewModel.postText,
+                        textEditorViewModel,
+                        text: $viewModel.postText,
                         mentionData: $viewModel.mentionData,
-                        mentionedUsers: $viewModel.mentionedUsers, textViewHeight: 34
+                        mentionedUsers: $viewModel.mentionedUsers,
+                        textViewHeight: getTextEditorHeight(for: viewModel.postText)
                     )
                     .placeholder(viewModel.postText.isEmpty ? "What's going on..." : "")
                     .maxExpandableHeight(99999)
@@ -98,10 +106,10 @@ public struct AmityPostComposerPage: AmityPageView {
 
             VStack(spacing: 0) {
 
-                ToastView(message: "Posting...", style: .loading)
+                ToastView(message: loadingToastMessage, style: .loading)
                     .padding(.bottom, 16)
-                    .opacity(postCreationToastAlphaValue)
-                    .isHidden(postCreationToastAlphaValue == 0)
+                    .opacity(isLoading ? 1.0 : 0.0)
+                    .isHidden(!isLoading)
 
                 ToastView(message: postErrorMessage, style: .warning)
                     .padding(.bottom, 16)
@@ -132,68 +140,65 @@ public struct AmityPostComposerPage: AmityPageView {
                 .isHidden(viewModel.mentionedUsers.count == 0, remove: true)
 
                 // Media Attatchment View
-                if case .createOptions(_, _, _, _) = options {
-                    VStack(spacing: 5) {
-                        BottomSheetDragIndicator()
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                VStack(spacing: 5) {
+                    BottomSheetDragIndicator()
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade3))
 
-                        if showSmallComponent {
-                            AmityMediaAttachmentComponent(
-                                viewModel: mediaAttatchmentViewModel, pageId: id)
-                        } else {
-                            AmityDetailedMediaAttachmentComponent(
-                                viewModel: mediaAttatchmentViewModel, pageId: id)
-                        }
+                    if showSmallComponent {
+                        AmityMediaAttachmentComponent(
+                            viewModel: mediaAttatchmentViewModel, pageId: id)
+                    } else {
+                        AmityDetailedMediaAttachmentComponent(
+                            viewModel: mediaAttatchmentViewModel, pageId: id)
                     }
-                    .onReceive(keyboardPublisher) { keyboardEvent in
-                        withAnimation(.bouncy(duration: 0.15)) {
-                            if keyboardEvent.isAppeared {
-                                showSmallComponent = true
-                            }
-                        }
-                    }
-                    .background(Color(viewConfig.theme.backgroundColor))
-                    .clipShape(RoundedCorner(radius: 20, corners: [.topLeft, .topRight]))
-                    .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.1), radius: 0.5, y: -2)
-                    .offset(y: mediaAttatchmentComponentYOffset)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                withAnimation(.bouncy(duration: 0.15)) {
-                                    /// Detail Component is shown at first.
-                                    /// Drag down - change offset of detail component
-                                    /// Drag up - change small to detail component
-                                    if showSmallComponent {
-                                        mediaAttatchmentComponentYOffset =
-                                            gesture.translation.height < 0 ? -5 : 0
-                                    } else {
-                                        mediaAttatchmentComponentYOffset =
-                                            gesture.translation.height > 0
-                                            ? gesture.translation.height : 0
-                                    }
-                                }
-                            }
-                            .onEnded { gesture in
-                                withAnimation(.bouncy(duration: 0.15)) {
-                                    if mediaAttatchmentComponentYOffset > 100
-                                        || mediaAttatchmentComponentYOffset < 0
-                                    {
-                                        showSmallComponent.toggle()
-                                        mediaAttatchmentComponentYOffset = 0
-                                    } else {
-                                        mediaAttatchmentComponentYOffset = 0
-                                    }
-
-                                    hideKeyboard()
-                                }
-                            }
-                    )
                 }
+                .onReceive(keyboardPublisher) { keyboardEvent in
+                    withAnimation(.bouncy(duration: 0.15)) {
+                        if (keyboardEvent.isAppeared) {
+                            showSmallComponent = true
+                        }
+                    }
+                }
+                .background(Color(viewConfig.theme.backgroundColor))
+                .clipShape(RoundedCorner(radius: 20, corners: [.topLeft, .topRight]))
+                .shadow(color: Color(.sRGBLinear, white: 0, opacity: 0.1), radius: 0.5, y: -2)
+                .offset(y: mediaAttatchmentComponentYOffset)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            withAnimation(.bouncy(duration: 0.15)) {
+                                /// Detail Component is shown at first.
+                                /// Drag down - change offset of detail component
+                                /// Drag up - change small to detail component
+                                if showSmallComponent {
+                                    mediaAttatchmentComponentYOffset =
+                                        gesture.translation.height < 0 ? -5 : 0
+                                } else {
+                                    mediaAttatchmentComponentYOffset =
+                                        gesture.translation.height > 0
+                                        ? gesture.translation.height : 0
+                                }
+                            }
+                        }
+                        .onEnded { gesture in
+                            withAnimation(.bouncy(duration: 0.15)) {
+                                if mediaAttatchmentComponentYOffset > 100
+                                    || mediaAttatchmentComponentYOffset < 0
+                                {
+                                    showSmallComponent.toggle()
+                                    mediaAttatchmentComponentYOffset = 0
+                                } else {
+                                    mediaAttatchmentComponentYOffset = 0
+                                }
+
+                                hideKeyboard()
+                            }
+                        }
+                )
             }
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
-
     }
 
     @ViewBuilder
@@ -243,18 +248,18 @@ public struct AmityPostComposerPage: AmityPageView {
             let postButtonTitle =
                 viewConfig.getConfig(elementId: .createNewPostButton, key: "text", of: String.self)
                 ?? "Post"
-            let isPostButtonDisabled = viewModel.postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            && mediaAttatchmentViewModel.medias.isEmpty
+            let hasContent = !viewModel.postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !mediaAttatchmentViewModel.medias.isEmpty
+            let canPost = hasContent && !isLoading && mediaAttatchmentViewModel.areAttachmentsReady
 
             Button(
                 postButtonTitle,
                 action: {
                     Task {
-                        postCreationToastAlphaValue = 1.0
+                        isLoading = true
                         do {
                             let post = try await viewModel.createPost(
                                 medias: mediaAttatchmentViewModel.medias, files: [])
-                            postCreationToastAlphaValue = 0.0
+                            isLoading = false
 
                             host.controller?.navigationController?.dismiss(
                                 animated: true,
@@ -277,8 +282,8 @@ public struct AmityPostComposerPage: AmityPageView {
                             NotificationCenter.default.post(name: .didPostCreated, object: post)
                         } catch {
                             postErrorMessage = getErrorMessage(error: error)
-
-                            postCreationToastAlphaValue = 0.0
+                            
+                            isLoading = false
                             failedToastAlphaValue = 1.0
 
                             withAnimation(.easeInOut(duration: 0.5).delay(3.0)) {
@@ -288,31 +293,52 @@ public struct AmityPostComposerPage: AmityPageView {
                     }
                 }
             )
-            .foregroundColor(isPostButtonDisabled ? Color(viewConfig.theme.primaryColor.blend(.shade2)) : Color(viewConfig.theme.primaryColor))
-            .disabled(isPostButtonDisabled)
+            .foregroundColor(canPost ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.primaryColor.blend(.shade2)))
+            .disabled(!canPost)
             .isHidden(viewModel.mode == .edit)
             .accessibilityIdentifier(AccessibilityID.Social.PostComposer.createNewPostButton)
 
             let editPostButtonTitle =
                 viewConfig.getConfig(elementId: .editPostButton, key: "text", of: String.self)
                 ?? "Save"
+            let hasValidContent = !viewModel.postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !mediaAttatchmentViewModel.medias.isEmpty
+            let hasChanges = viewModel.hasPostChanges(currentText: viewModel.postText, currentMedias: mediaAttatchmentViewModel.medias)
+            let canSave = hasValidContent && hasChanges && !isLoading && mediaAttatchmentViewModel.areAttachmentsReady
+
             Button(
                 editPostButtonTitle,
                 action: {
                     Task { @MainActor in
-                        postCreationToastAlphaValue = 1.0
+                        isLoading = true
 
                         do {
-                            try await viewModel.editPost(
+                            let updatedPost = try await viewModel.editPost(
                                 medias: mediaAttatchmentViewModel.medias, files: [])
-                            postCreationToastAlphaValue = 0.0
+                            isLoading = false
 
-                            host.controller?.navigationController?.dismiss(animated: true)
+                            host.controller?.navigationController?.dismiss(
+                                animated: true,
+                                completion: {
+                                    if updatedPost?.getFeedType() == .reviewing {
+                                        let alertController = UIAlertController(
+                                            title: "Post updates sent for review", 
+                                            message: "Your post update has been submitted to the pending list. It will be published once approved by the community moderator", 
+                                            preferredStyle: .alert)
+
+                                        let okAction = UIAlertAction(
+                                            title: AmityLocalizedStringSet.General.okay
+                                                .localizedString, style: .cancel)
+                                        alertController.addAction(okAction)
+
+                                        UIApplication.topViewController()?.present(
+                                            alertController, animated: true)
+                                    }
+                                })
 
                         } catch {
                             postErrorMessage = getErrorMessage(error: error)
-
-                            postCreationToastAlphaValue = 0.0
+                            
+                            isLoading = false
                             failedToastAlphaValue = 1.0
 
                             withAnimation(.easeInOut(duration: 0.5).delay(3.0)) {
@@ -322,10 +348,7 @@ public struct AmityPostComposerPage: AmityPageView {
                     }
                 }
             )
-            .disabled(
-                viewModel.postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                    && mediaAttatchmentViewModel.medias.isEmpty
-            )
+            .disabled(!canSave)
             .isHidden(viewModel.mode == .create)
             .accessibilityIdentifier(AccessibilityID.Social.PostComposer.editPostButton)
         }
@@ -363,6 +386,52 @@ public struct AmityPostComposerPage: AmityPageView {
         return message
 
     }
+    
+    // Function to check media upload status and update local state
+    private func checkMediaUploadStatus() {
+        // If there are no media attachments, they're considered "ready"
+        if mediaAttatchmentViewModel.medias.isEmpty {
+            areAttachmentsReady = true
+            return
+        }
+        
+        // Check if any media is still uploading or has failed
+        for media in mediaAttatchmentViewModel.medias {
+            switch media.state {
+            case .uploading:
+                // Media is still being uploaded
+                areAttachmentsReady = false
+                return
+            case .error:
+                // Media upload has failed
+                areAttachmentsReady = false
+                return
+            default:
+                // Continue checking other media
+                continue
+            }
+        }
+        
+        // All media are in ready states
+        areAttachmentsReady = true
+    }
+    
+    private func getTextEditorHeight(for text: String) -> CGFloat {
+        if viewModel.mode == .create {
+            return 34
+        } else {
+            let font = UIFont.systemFont(ofSize: 16)
+            let width: CGFloat = UIScreen.main.bounds.width - 32 // account for padding
+            let boundingRect = text.boundingRect(
+                with: CGSize(width: width, height: .greatestFiniteMagnitude),
+                options: .usesLineFragmentOrigin,
+                attributes: [.font: font],
+                context: nil
+            )
+            // A small buffer to avoid cutting off descenders
+            return max(34, ceil(boundingRect.height) + 16)
+        }
+    }
 }
 
 class AmityPostComposerViewModel: ObservableObject {
@@ -381,6 +450,9 @@ class AmityPostComposerViewModel: ObservableObject {
     @Published var mentionData: MentionData = MentionData()
     @Published var mentionedUsers: [AmityMentionUserModel] = []
 
+    private let originalPostText: String
+    private let originalMedias: [AmityMedia]
+
     init(targetId: String?, targetType: AmityPostTargetType, community: AmityCommunityModel?) {
         self.targetId = targetId
         self.targetType = targetType
@@ -389,6 +461,8 @@ class AmityPostComposerViewModel: ObservableObject {
         self.post = nil
         self.displayName =
             targetType == .community ? community?.displayName ?? "Unknown" : "My Timeline"
+        self.originalPostText = ""
+        self.originalMedias = []
     }
 
     // Edit mode
@@ -400,7 +474,52 @@ class AmityPostComposerViewModel: ObservableObject {
         self.community = nil
         self.displayName = "Edit Post"
         self.postText = post.text
+        self.originalPostText = post.text
+        self.originalMedias = post.medias
         self.mentionData.metadata = post.metadata
+    }
+
+    // Add a function to check if post has changes in edit mode
+    func hasPostChanges(currentText: String, currentMedias: [AmityMedia]) -> Bool {
+        // Check for text changes (ignoring only whitespace changes)
+        let trimmedOriginalText = originalPostText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedCurrentText = currentText.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasTextChanges = trimmedOriginalText != trimmedCurrentText
+
+        // Check for media changes (count, content)
+        let hasMediaChanges = !areMediasEqual(originalMedias, currentMedias)
+
+        return hasTextChanges || hasMediaChanges
+    }
+
+    // Helper function to compare two media arrays
+    private func areMediasEqual(_ medias1: [AmityMedia], _ medias2: [AmityMedia]) -> Bool {
+        guard medias1.count == medias2.count else { return false }
+
+        // Compare by fileId as that's the unique identifier
+        let fileIds1 = medias1.compactMap { media -> String? in
+            switch media.state {
+            case .uploadedImage(let data), .downloadableImage(let data, _):
+                return data.fileId
+            case .uploadedVideo(let data), .downloadableVideo(let data, _):
+                return data.fileId
+            default:
+                return nil
+            }
+        }.sorted()
+
+        let fileIds2 = medias2.compactMap { media -> String? in
+            switch media.state {
+            case .uploadedImage(let data), .downloadableImage(let data, _):
+                return data.fileId
+            case .uploadedVideo(let data), .downloadableVideo(let data, _):
+                return data.fileId
+            default:
+                return nil
+            }
+        }.sorted()
+
+        return fileIds1 == fileIds2
     }
 
     @discardableResult
@@ -468,53 +587,89 @@ class AmityPostComposerViewModel: ObservableObject {
         }
     }
 
-    func editPost(medias: [AmityMedia], files: [AmityFile]) async throws {
-
+    func editPost(medias: [AmityMedia], files: [AmityFile]) async throws -> AmityPost? {
         var postBuilder: AmityPostBuilder
-
-        let imagesData = getImagesData(from: medias)
-        let videosData = getVideosData(from: medias)
-        let filesData = getFilesData(from: files)
-
-        if post?.dataTypeInternal == .image {
-            // Image Post
-            Log.add(event: .info, "Creating image post with \(imagesData.count) images")
-            Log.add(event: .info, "FileIds: \(imagesData.map{ $0.fileId })")
-
-            let imagePostBuilder = AmityImagePostBuilder()
-            imagePostBuilder.setText(postText)
-            imagePostBuilder.setImages(imagesData)
-            postBuilder = imagePostBuilder
-        } else if post?.dataTypeInternal == .video {
-            // Video Post
-            Log.add(event: .info, "Creating video post with \(videosData.count) images")
-            Log.add(event: .info, "FileIds: \(videosData.map{ $0.fileId })")
-
-            let videoPostBuilder = AmityVideoPostBuilder()
-            videoPostBuilder.setText(postText)
-            videoPostBuilder.setVideos(videosData)
-            postBuilder = videoPostBuilder
-        } else if post?.dataTypeInternal == .file {
-            // File Post
-            Log.add(event: .info, "Creating file post with \(filesData.count) files")
-            Log.add(event: .info, "FileIds: \(filesData.map{ $0.fileId })")
-
-            let fileBuilder = AmityFilePostBuilder()
-            fileBuilder.setText(postText)
-            fileBuilder.setFiles(getFilesData(from: files))
-            postBuilder = fileBuilder
+        
+        // If all media have been removed, use the appropriate empty builder based on original media type
+        if medias.isEmpty && !originalMedias.isEmpty {
+            // Directly use the type property of the first original media
+            if let firstOriginalMedia = originalMedias.first {
+                switch firstOriginalMedia.type {
+                case .image:
+                    Log.add(event: .info, "Removing all images from image post")
+                    let imagePostBuilder = AmityImagePostBuilder()
+                    imagePostBuilder.setText(postText)
+                    imagePostBuilder.setImages([]) // Empty image array
+                    postBuilder = imagePostBuilder
+                    
+                case .video:
+                    Log.add(event: .info, "Removing all videos from video post")
+                    let videoPostBuilder = AmityVideoPostBuilder()
+                    videoPostBuilder.setText(postText)
+                    videoPostBuilder.setVideos([]) // Empty video array
+                    postBuilder = videoPostBuilder
+                    
+                case .none:
+                    // For files or unknown types, default to text post
+                    Log.add(event: .info, "Using text post builder")
+                    let textPostBuilder = AmityTextPostBuilder()
+                    textPostBuilder.setText(postText)
+                    postBuilder = textPostBuilder
+                }
+            } else {
+                // If originalMedias is somehow empty, default to text post
+                Log.add(event: .info, "Using text post builder (no original media)")
+                let textPostBuilder = AmityTextPostBuilder()
+                textPostBuilder.setText(postText)
+                postBuilder = textPostBuilder
+            }
         } else {
-            // Text Post
-            let textPostBuilder = AmityTextPostBuilder()
-            textPostBuilder.setText(postText)
-            postBuilder = textPostBuilder
+            let imagesData = getImagesData(from: medias)
+            let videosData = getVideosData(from: medias)
+            let filesData = getFilesData(from: files)
+
+            if !imagesData.isEmpty {
+                // Image Post
+                Log.add(event: .info, "Editing post with \(imagesData.count) images")
+                Log.add(event: .info, "FileIds: \(imagesData.map{ $0.fileId })")
+
+                let imagePostBuilder = AmityImagePostBuilder()
+                imagePostBuilder.setText(postText)
+                imagePostBuilder.setImages(imagesData)
+                postBuilder = imagePostBuilder
+            } else if !videosData.isEmpty {
+                // Video Post
+                Log.add(event: .info, "Editing post with \(videosData.count) videos")
+                Log.add(event: .info, "FileIds: \(videosData.map{ $0.fileId })")
+
+                let videoPostBuilder = AmityVideoPostBuilder()
+                videoPostBuilder.setText(postText)
+                videoPostBuilder.setVideos(videosData)
+                postBuilder = videoPostBuilder
+            } else if !filesData.isEmpty {
+                // File Post
+                Log.add(event: .info, "Editing post with \(filesData.count) files")
+                Log.add(event: .info, "FileIds: \(filesData.map{ $0.fileId })")
+
+                let fileBuilder = AmityFilePostBuilder()
+                fileBuilder.setText(postText)
+                fileBuilder.setFiles(getFilesData(from: files))
+                postBuilder = fileBuilder
+            } else {
+                // Text Post
+                Log.add(event: .info, "Editing text post")
+                let textPostBuilder = AmityTextPostBuilder()
+                textPostBuilder.setText(postText)
+                postBuilder = textPostBuilder
+            }
         }
 
         if let postId = post?.postId {
-            try await postManager.editPost(
+            return try await postManager.editPost(
                 withId: postId, builder: postBuilder, metadata: mentionData.metadata,
                 mentionees: mentionData.mentionee)
         }
+        return nil
     }
 
     private func getImagesData(from medias: [AmityMedia]) -> [AmityImageData] {

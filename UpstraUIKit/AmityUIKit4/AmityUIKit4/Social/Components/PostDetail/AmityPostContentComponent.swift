@@ -102,7 +102,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             let isBadgeVisible = category == .announcement || category == .global || category == .pinAndAnnouncement
             HStack {
                 Text(AmityLocalizedStringSet.Social.featuredPostBadge.localizedString)
-                    .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColor)))
+                    .applyTextStyle(.captionBold(Color(viewConfig.defaultLightTheme.baseColor)))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                 
@@ -218,7 +218,11 @@ public struct AmityPostContentComponent: AmityComponentView {
                                 // Dismiss bottomsheet
                                 host.controller?.dismiss(animated: false)
                                 
-                                if category == .global {
+                                // Determine if we should show edit alert or go directly to edit screen
+                                if category == .global
+                                    && post.targetCommunity != nil
+                                    && post.targetCommunity?.postSettings == .adminReviewPostRequired
+                                    && !post.hasModeratorPermission {
                                     showEditAlert.toggle()
                                 } else {
                                     showPostEditScreen()
@@ -262,7 +266,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             case .image, .video:
                 postContentTextView()
                 
-                PostContentMediaView(post: post)
+                PostContentMediaView(post: post, viewConfig: viewConfig)
                     .frame(height: 328)
                     .clipShape(RoundedCorner(radius: 8))
                 
@@ -315,17 +319,27 @@ public struct AmityPostContentComponent: AmityComponentView {
         if let livestream = post.liveStream {
             
             VStack(spacing: 0) {
-                let title = livestream.title ?? ""
-                let description = livestream.streamDescription ?? ""
+                let title = livestream.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                let description = livestream.streamDescription?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 
-                if !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text("\(title)")
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, description.isEmpty ? 16 : 20)
+                if !title.isEmpty {
+                    
+                    if #available(iOS 15, *) {
+                        let highlightedTitle = title.highlight(mentions: nil, highlightLink: true, highlightAttributes: [.foregroundColor: viewConfig.theme.primaryColor, .font: UIFont.systemFont(ofSize: AmityTextStyle.bodyBold(.white).getStyle().fontSize, weight: .semibold)])
+                        Text(highlightedTitle)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, description.isEmpty ? 16 : 20)
+                        
+                    } else {
+                        Text(title)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, description.isEmpty ? 16 : 20)
+                    }
                 }
                 
-                if !description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                if !description.isEmpty {
                     ExpandableText(description)
                         .lineLimit(8)
                         .moreButtonText("...See more")
@@ -341,7 +355,6 @@ public struct AmityPostContentComponent: AmityComponentView {
             }
         }
     }
-    
     
     @ViewBuilder
     private func postEngagementView(_ post: AmityPostModel) -> some View {
@@ -483,6 +496,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         
         return baseBottomSheetHeight + additionalHeight
     }
+    
 }
 
 extension AmityPostContentComponent {

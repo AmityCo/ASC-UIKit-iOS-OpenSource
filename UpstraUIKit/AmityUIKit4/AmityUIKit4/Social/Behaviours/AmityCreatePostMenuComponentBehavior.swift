@@ -47,4 +47,13 @@ open class AmityCreatePostMenuComponentBehavior {
         navigationController.navigationBar.isHidden = true
         context.component.host.controller?.present(navigationController, animated: true)
     }
+    
+    open func goToSelectLiveStreamPostTargetPage(context: AmityCreatePostMenuComponentBehavior.Context) {
+        let view = AmityLivestreamPostTargetSelectionPage()
+        let controller = AmitySwiftUIHostingController(rootView: view)
+        let navigationController = UINavigationController(rootViewController: controller)
+        navigationController.modalPresentationStyle = .fullScreen
+        navigationController.navigationBar.isHidden = true
+        context.component.host.controller?.present(navigationController, animated: true)
+    }
 }

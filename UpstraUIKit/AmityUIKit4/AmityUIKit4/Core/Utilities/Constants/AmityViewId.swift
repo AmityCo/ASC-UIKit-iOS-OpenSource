@@ -25,6 +25,8 @@ public enum PageId: String {
     case postTargetSelectionPage = "select_post_target_page"
     case myCommunitiesSearchPage = "my_communities_search_page"
     case pollTargetSelectionPage = "select_poll_target_page"
+    case liveStreamTargetSelectionPage = "livestream_post_target_selection_page"
+    case liveStreamTerminatedPage = "livestream_terminated_page"
     
     case communityProfilePage = "community_profile_page"
     
@@ -42,6 +44,7 @@ public enum PageId: String {
     case communityPendingPostPage = "pending_posts_page"
     
     case livestreamPlayerPage = "livestream_player_page"
+    case createLivestreamPage = "create_livestream_page"
 
     case userProfilePage = "user_profile_page"
     case editUserProfilePage = "edit_user_profile_page"

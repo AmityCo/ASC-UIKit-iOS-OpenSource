@@ -54,4 +54,15 @@ open class AmityUserProfilePageBehavior {
         
         context.page.host.controller?.present(navController, animated: true)
     }
+    
+    open func goToLivestreamPostComposerPage(context: AmityUserProfilePageBehavior.Context) {
+        let page = AmityCreateLivestreamPage(targetId: AmityUIKitManagerInternal.shared.currentUserId, targetType: .user)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        
+        let navController = UINavigationController(rootViewController: vc)
+        navController.modalPresentationStyle = .fullScreen
+        navController.navigationBar.isHidden = true
+        
+        context.page.host.controller?.present(navController, animated: true)
+    }
 }

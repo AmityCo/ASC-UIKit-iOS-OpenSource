@@ -30,9 +30,13 @@ struct PostCreationMediaAttachmentPreviewView: View {
         
         LazyVGrid(columns: columns, spacing: 5) {
             ForEach(Array(mediaAttachmentViewModel.medias.enumerated()), id: \.element.id) { index, media in
-                MediaAttachmentView(media: media, removeAction: {
-                    mediaAttachmentViewModel.medias.remove(at: index)
-                })
+                MediaAttachmentView(
+                    media: media, 
+                    mediaViewModel: mediaAttachmentViewModel,
+                    removeAction: {
+                        mediaAttachmentViewModel.medias.remove(at: index)
+                    }
+                )
                 .frame(height: mediaAttachmentViewModel.medias.count < 3 ? 300 : 140)
             }
         }
@@ -53,13 +57,13 @@ struct MediaAttachmentView: View {
     private let media: AmityMedia
     private let removeAction: () -> Void
     private let fileRepositoryManager = FileRepositoryManager()
-    @State private var mediaState: AmityMediaState = .none
     @StateObject private var networkMonitor = NetworkMonitor()
+    @ObservedObject private var mediaViewModel: AmityMediaAttachmentViewModel
     
-    init(media: AmityMedia, removeAction: @escaping () -> Void) {
+    init(media: AmityMedia, mediaViewModel: AmityMediaAttachmentViewModel, removeAction: @escaping () -> Void) {
         self.media = media
+        self.mediaViewModel = mediaViewModel
         self.removeAction = removeAction
-        self.mediaState = mediaState
         print(media.state)
         print(media.type)
     }
@@ -126,14 +130,14 @@ struct MediaAttachmentView: View {
                                 .frame(width: 40, height: 40)
                         }
                         
-                        /// Display loading progress view if mediaState is uploading...
-                        if case .uploading(let progress) = mediaState {
+                        /// Display loading progress view if media.state is uploading...
+                        if case .uploading(let progress) = media.state {
                             Color.black.opacity(0.5)
                             getProgressView(progress)
                         }
                         
-                        /// Display error view if mediaState is error...
-                        if case .error = mediaState {
+                        /// Display error view if media.state is error...
+                        if case .error = media.state {
                             Color.black.opacity(0.5)
                             Image(AmityIcon.mediaUploadErrorIcon.getImageResource())
                                 .resizable()
@@ -231,13 +235,14 @@ struct MediaAttachmentView: View {
                 Log.add(event: .info, "Image Upload progress: \(progress)")
                 media.state = .uploading(progress: progress)
                 
-                /// Update media state to use within view
-                mediaState = .uploading(progress: progress)
+                // Trigger objectWillChange to update the button state
+                self.mediaViewModel.updateMediaState(media)
             }
         } completion: { imageData, error in
             DispatchQueue.main.async {
                 if let error {
-                    mediaState = .error
+                    media.state = .error
+                    self.mediaViewModel.updateMediaState(media)
                     return
                 }
                 
@@ -245,8 +250,8 @@ struct MediaAttachmentView: View {
                 Log.add(event: .info, "Image Uploaded!!!")
                 media.state = .uploadedImage(data: imageData)
                 
-                /// Update media state to use within view
-                mediaState = .uploadedImage(data: imageData)
+                // Trigger objectWillChange to update the button state
+                self.mediaViewModel.updateMediaState(media)
             }
         }
     }
@@ -261,18 +266,19 @@ struct MediaAttachmentView: View {
                         Log.add(event: .info, "Image Upload progress: \(progress)")
                         media.state = .uploading(progress: progress)
                         
-                        /// Update media state to use within view
-                        mediaState = .uploading(progress: progress)
+                        // Update view model state
+                        self.mediaViewModel.updateMediaState(media)
                     }
                 }
                 
                 Log.add(event: .info, "Image Uploaded!!!")
                 media.state = .uploadedImage(data: imageData)
                 
-                /// Update media state to use within view
-                mediaState = .uploadedImage(data: imageData)
+                // Update view model state
+                self.mediaViewModel.updateMediaState(media)
             } catch {
-                mediaState = .error
+                media.state = .error
+                self.mediaViewModel.updateMediaState(media)
                 return
             }
         }
@@ -322,18 +328,17 @@ struct MediaAttachmentView: View {
                         Log.add(event: .info, "Video Upload progress: \(progress)")
                         media.state = .uploading(progress: progress)
                         
-                        /// Update media state to use within view
-                        mediaState = .uploading(progress: progress)
+                        // Update view model state
+                        self.mediaViewModel.updateMediaState(media)
                     }
                 }
                 
                 Log.add(event: .info, "Video Uploaded!!!")
                 media.state = .uploadedVideo(data: videoData)
-                
-                /// Update media state to use within view
-                mediaState = .uploadedVideo(data: videoData)
+                self.mediaViewModel.updateMediaState(media)
             } catch let error {
-                mediaState = .error
+                media.state = .error
+                self.mediaViewModel.updateMediaState(media)
             }
         }
     }

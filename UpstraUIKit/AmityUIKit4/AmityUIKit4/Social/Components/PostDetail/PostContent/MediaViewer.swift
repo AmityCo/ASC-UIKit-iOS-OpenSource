@@ -22,6 +22,7 @@ struct MediaViewer: View {
     
     @State private var showVideoPlayer: Bool = false
     @StateObject private var viewModel = MediaViewerViewModel()
+    @ObservedObject var viewConfig: AmityViewConfigController
     @State private var showScaleEffect: Bool = false
     @State private var isZooming: Bool = false
     
@@ -29,23 +30,23 @@ struct MediaViewer: View {
     private let closeAction: (() -> Void)?
     private var url: URL? = nil
     
-    init(medias: [AmityMedia], startIndex: Int, closeAction: (() -> Void)?) {
+    init(medias: [AmityMedia], startIndex: Int, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?) {
         self._page = State(initialValue: Page.withIndex(startIndex))
         self._pageIndex = State(initialValue: startIndex + 1)
         self.medias = medias
         self.closeAction = closeAction
+        self.viewConfig = viewConfig
     }
     
-    
-    init(url: URL?, closeAction: (() -> Void)?) {
+    init(url: URL?, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?) {
         self._page = State(initialValue: Page.withIndex(0))
         self._pageIndex = State(initialValue: 1)
         let imageData = AmityImageData()
         imageData.fileURL = url?.absoluteString ?? ""
         self.medias = [AmityMedia(state: .downloadableImage(imageData: imageData, placeholder: UIImage()), type: .image)]
         self.closeAction = closeAction
+        self.viewConfig = viewConfig
     }
-    
     
     var body: some View {
         GeometryReader { geometry in
@@ -58,7 +59,14 @@ struct MediaViewer: View {
                 Pager(page: page, data: medias, id: \.id) { media in
                     ZoomableScrollView(isZooming: $isZooming, isZoomable: media.type == .image) {
                         ZStack {
-                            let emptyView = Color(hex: "#EBECEF").padding(.vertical, 100)
+                            // Create a properly centered placeholder with maximum height using solid theme color
+                            let emptyView = GeometryReader { geometry in
+                                Color(viewConfig.theme.baseColorShade4) // Use the theme color directly as a solid color
+                                    .frame(maxWidth: geometry.size.width, maxHeight: 480)
+                                    .frame(width: geometry.size.width, height: geometry.size.height)
+                                    .position(x: geometry.size.width/2, y: geometry.size.height/2)
+                            }
+                            
                             /// If the media is local file, it will load from local file path.
                             /// When MediaViewer is used to preview attached medias in AmityComposePage, media will have localUrl.
                             if let url = media.localUrl {
@@ -81,6 +89,9 @@ struct MediaViewer: View {
                                 })
                                 .environment(\.urlImageOptions, URLImageOptions.amityOptions)
                                 .adaptiveVerticalPadding(top: 35, bottom: 35)
+                            } else {
+                                // Add placeholder for missing image URLs - properly centered
+                                emptyView
                             }
                             
                             if media.type == .video {
@@ -99,7 +110,9 @@ struct MediaViewer: View {
                             } else {
                                 url = URL(string: media.video?.fileURL ?? "")
                             }
-                            
+                            if url == nil {
+                                return
+                            }
                             viewModel.videoURL = media.localUrl ?? url
                             showVideoPlayer.toggle()
                         }

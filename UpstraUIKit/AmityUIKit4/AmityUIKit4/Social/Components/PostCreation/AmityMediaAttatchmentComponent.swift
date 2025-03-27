@@ -163,15 +163,17 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFill()
-                    .foregroundColor(isDisable ? nil : Color(imageTint))
+                    .foregroundColor(isDisable ? Color(viewConfig.theme.baseColorShade3) : Color(imageTint))
                     .frame(width: 20, height: 20)
             )
-        .clipShape(Circle())
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTapAction()
-        }
-        .disabled(isDisable)
-        .isHidden(isHidden, remove: true)
+            .clipShape(Circle())
+            .contentShape(Rectangle())
+            .disabled(isDisable) 
+            .onTapGesture {
+                if !isDisable {  
+                    onTapAction()
+                }
+            }
+            .isHidden(isHidden, remove: true)
     }
 }
