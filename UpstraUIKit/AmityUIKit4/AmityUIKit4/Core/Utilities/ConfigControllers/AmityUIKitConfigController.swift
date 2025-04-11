@@ -12,9 +12,26 @@ class AmityUIKitConfigController {
     static let shared = AmityUIKitConfigController()
     private(set) var config: [String: Any] = [:]
     private var excludedList: Set<String> = []
-
+    
     private init() {
-        configParser(configFile: "AmityUIKitConfig")
+        loadConfig()
+    }
+    
+    private func loadConfig() {
+        let wrappedConfig = RemoteConfig.shared.getMergedConfig()
+        
+        if let configDict = wrappedConfig["config"] as? [String: Any], !configDict.isEmpty {
+            config = configDict
+        } else {
+            config = loadConfigFile(fileName: "AmityUIKitConfig")
+        }
+        
+        excludedList = Set(config["excludes"] as? [String] ?? [])
+    }
+    
+    func refreshConfig() {
+        loadConfig()
+        NotificationCenter.default.post(name: .configDidUpdate, object: nil)
     }
     
     // MARK: Public Functions
@@ -120,12 +137,6 @@ class AmityUIKitConfigController {
                                backgroundShade1Color: theme.backgroundShade1Color ?? fallbackTheme.backgroundShade1Color!,
                                highlightColor: theme.highlightColor ?? fallbackTheme.highlightColor!
         )
-    }
-    
-    
-    private func configParser(configFile: String) {
-        config = loadConfigFile(fileName: configFile)
-        excludedList = Set(config["excludes"] as? [String] ?? [])
     }
     
     private func loadConfigFile(fileName: String) -> [String: Any] {

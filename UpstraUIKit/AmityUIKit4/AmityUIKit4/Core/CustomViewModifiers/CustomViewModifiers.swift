@@ -127,6 +127,9 @@ struct ThemeUpdater: ViewModifier {
             .onChange(of: colorScheme) { value in
                 viewConfig.updateTheme()
             }
+            .onReceive(NotificationCenter.default.publisher(for: .configDidUpdate)) { _ in
+                viewConfig.updateTheme()
+            }
     }
 }
 

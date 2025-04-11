@@ -246,7 +246,6 @@
 		68B201B62CAE754300F40C22 /* AmityPendingPostContentComponentBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B201B52CAE753C00F40C22 /* AmityPendingPostContentComponentBehavior.swift */; };
 		68B201B82CAE77D700F40C22 /* AmityCommentTrayComponentBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B201B72CAE77D300F40C22 /* AmityCommentTrayComponentBehavior.swift */; };
 		68B201C82CB3BF5200F40C22 /* UserCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B201C72CB3BF4D00F40C22 /* UserCellView.swift */; };
-		68B4F4872D95710000C59ED6 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 68B4F4862D95710000C59ED6 /* SharedFrameworks */; };
 		68BD2D022CB4E81100FF0A19 /* CategoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68BD2D012CB4E80D00FF0A19 /* CategoryListView.swift */; };
 		68BD2D042CB4EF3600FF0A19 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68BD2D032CB4EF3200FF0A19 /* TabBarView.swift */; };
 		68BD2D5F2CB5119F00FF0A19 /* PreviewLinkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68BD2D5E2CB5119B00FF0A19 /* PreviewLinkView.swift */; };
@@ -354,6 +353,7 @@
 		923AA56E2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA56D2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift */; };
 		923AA5702CB3B4F0009C9357 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 923AA56F2CB3B4F0009C9357 /* Debouncer.swift */; };
 		9250CA2D2C2D55E9007551ED /* MultiSelectionMediaPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9250CA2C2C2D55E9007551ED /* MultiSelectionMediaPicker.swift */; };
+		9263B1332D9287C1002582C2 /* RemoteConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9263B1322D9287B9002582C2 /* RemoteConfig.swift */; };
 		926894402C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9268943F2C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift */; };
 		926894422C474A6A004CECF8 /* EmptyCommunityFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926894412C474A6A004CECF8 /* EmptyCommunityFeedView.swift */; };
 		926C520D2CB7190B0085CA64 /* AmityLivestreamPlayerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926C520C2CB7190B0085CA64 /* AmityLivestreamPlayerPage.swift */; };
@@ -497,6 +497,7 @@
 		A9FF80EB2BBD49C20088A317 /* AmityMessageListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF80EA2BBD49C20088A317 /* AmityMessageListViewModel.swift */; };
 		ED08DC482BA2E8B4000DA797 /* AmityEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED08DC472BA2E8B4000DA797 /* AmityEmptyStateView.swift */; };
 		ED2D02712CB6354C00BF94FA /* PostContentPollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED2D02702CB6354C00BF94FA /* PostContentPollView.swift */; };
+		ED35591E2DA981B300878CD4 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED35591D2DA981B300878CD4 /* SharedFrameworks */; };
 		ED4FA84A2BA01123005D6871 /* AmityLiveChatHeaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED4FA8492BA01123005D6871 /* AmityLiveChatHeaderViewModel.swift */; };
 		ED4FA84C2BA01169005D6871 /* ChannelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED4FA84B2BA01169005D6871 /* ChannelManager.swift */; };
 		ED6EFA112CB39DB6003A176F /* AmityPollPostComposerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED6EFA102CB39DB6003A176F /* AmityPollPostComposerPage.swift */; };
@@ -898,6 +899,7 @@
 		923AA56D2CB3B4BD009C9357 /* LivestreamVideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LivestreamVideoPlayerView.swift; sourceTree = "<group>"; };
 		923AA56F2CB3B4F0009C9357 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debouncer.swift; sourceTree = "<group>"; };
 		9250CA2C2C2D55E9007551ED /* MultiSelectionMediaPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MultiSelectionMediaPicker.swift; sourceTree = "<group>"; };
+		9263B1322D9287B9002582C2 /* RemoteConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteConfig.swift; sourceTree = "<group>"; };
 		9268943F2C474A49004CECF8 /* AmityCommunityPinnedPostComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCommunityPinnedPostComponent.swift; sourceTree = "<group>"; };
 		926894412C474A6A004CECF8 /* EmptyCommunityFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyCommunityFeedView.swift; sourceTree = "<group>"; };
 		926C520C2CB7190B0085CA64 /* AmityLivestreamPlayerPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityLivestreamPlayerPage.swift; sourceTree = "<group>"; };
@@ -1079,7 +1081,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68B4F4872D95710000C59ED6 /* SharedFrameworks in Frameworks */,
+				ED35591E2DA981B300878CD4 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1663,6 +1665,7 @@
 		684AE1642B0F42B200FD7270 /* ConfigControllers */ = {
 			isa = PBXGroup;
 			children = (
+				9263B1322D9287B9002582C2 /* RemoteConfig.swift */,
 				684AE1622B0F322400FD7270 /* AmityUIKitConfigController.swift */,
 				684AE1652B0F42C700FD7270 /* AmityTheme.swift */,
 				686D17472B15E397007AEF59 /* AmityViewConfigController.swift */,
@@ -3217,6 +3220,7 @@
 				68FB40982C3D890E006C97CC /* AmityPostTargetSelectionPageBehavior.swift in Sources */,
 				68DCAAB32C9C0D25003F9F2C /* AmityUserFeedComponentViewModel.swift in Sources */,
 				68D3A3102BE346740096CF79 /* AmitySocialHomeTopNavigationComponent.swift in Sources */,
+				9263B1332D9287C1002582C2 /* RemoteConfig.swift in Sources */,
 				686830222C9154F3009B1694 /* AmityCommunityVideoFeedComponent.swift in Sources */,
 				6877D3792C75CFAA008B3598 /* AmityCommunityNotificaitonSettings+Extension.swift in Sources */,
 				689A31D02C634D4D00F17999 /* PrivacyRadioButtonView.swift in Sources */,
@@ -3776,7 +3780,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		68B4F4862D95710000C59ED6 /* SharedFrameworks */ = {
+		ED35591D2DA981B300878CD4 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

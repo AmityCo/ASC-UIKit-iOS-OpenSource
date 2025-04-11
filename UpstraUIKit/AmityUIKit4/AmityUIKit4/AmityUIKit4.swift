@@ -130,6 +130,11 @@ public final class AmityUIKit4Manager {
         return Bundle(for: self)
     }
     
+    
+    public static func syncNetworkConfig() async throws {
+        try await AmityUIKitManagerInternal.shared.syncNetworkConfig()
+    }
+    
 }
 
 final class AmityUIKitManagerInternal: NSObject {
@@ -145,7 +150,8 @@ final class AmityUIKitManagerInternal: NSObject {
     private(set) var messageMediaService = AmityMessageMediaService()
     
     var currentUserId: String { return client.currentUserId ?? "" }
-    
+    let remoteConfig = RemoteConfig()
+
     var client: AmityClient {
         guard let client = _client else {
             fatalError("Something went wrong. Please ensure `AmityUIKitManager.setup(:_)` get called before accessing client.")
@@ -171,6 +177,8 @@ final class AmityUIKitManagerInternal: NSObject {
         
         _client = client
         _client?.delegate = self
+        
+        verifyStoredConfigForCurrentApiKey()
     }
     
     func setup(_ apiKey: String, endpoint: AmityEndpoint) {
@@ -178,13 +186,31 @@ final class AmityUIKitManagerInternal: NSObject {
         
         _client = client
         _client?.delegate = self
+        
+        verifyStoredConfigForCurrentApiKey()
     }
     
     func setup(_ client: AmityClient) {
         _client = client
         _client?.delegate = self
         didUpdateClient()
+        
+        verifyStoredConfigForCurrentApiKey()
         Log.add(event: .info, "Is AmityClient established: \(client.isEstablished)")
+    }
+    
+    private func verifyStoredConfigForCurrentApiKey() {
+        if !remoteConfig.isCurrentApiKeyMatchingStoredNetwork() {
+            do {
+                try remoteConfig.clearStoredConfig()
+            } catch {
+                print(error)
+            }
+        }
+    }
+    
+    func syncNetworkConfig() async throws {
+        try await remoteConfig.getRemoteConfig()
     }
     
     func setupUIKitBehaviour() {

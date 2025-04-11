@@ -13,4 +13,5 @@ extension Notification.Name {
     public static let didPostReacted = Notification.Name("didPostReacted")
     public static let didVotePoll = Notification.Name("didVotePoll")
     public static let didLivestreamStatusUpdated = Notification.Name("didLivestreamStatusUpdated")
+    static let configDidUpdate = Notification.Name("amityConfigDidUpdate")
 }

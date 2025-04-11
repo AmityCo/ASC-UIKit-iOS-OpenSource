@@ -150,6 +150,8 @@ extension AmityMessageListTableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         configure(for: cell, at: indexPath)
+        
+        message.object.markRead()
         return cell
     }
 }

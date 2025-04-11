@@ -21,6 +21,7 @@ class FeatureViewController: UIViewController {
         case socialUIKit
         case socialUIKitV4Comaptible
         case userProfile
+        case syncNetworkConfig
         
         var text: String {
             switch self {
@@ -38,6 +39,8 @@ class FeatureViewController: UIViewController {
                 return "Social UIKit 4 Compatible"
             case .userProfile:
                 return "User Profile"
+            case .syncNetworkConfig:
+                return "Sync Network Config"
             }
         }
     }
@@ -89,7 +92,7 @@ extension FeatureViewController: UITableViewDelegate {
         case .chatUIKit:
             let view = LiveChatListView()
             let hostingController = AmitySwiftUIHostingController(rootView: view)
-            
+
             //            if #available(iOS 15.0, *) {
             //                if let sheet = hostingController.sheetPresentationController {
             //                    sheet.detents = [.large()]
@@ -114,6 +117,20 @@ extension FeatureViewController: UITableViewDelegate {
 //            navigationController.modalPresentationStyle = .fullScreen
 //            present(navigationController, animated: true, completion: nil)
             self.navigationController?.pushViewController(AmitySwiftUIHostingController(rootView: profilePage), animated: true)
+        case .syncNetworkConfig:
+            Task { @MainActor in
+                
+                do {
+                    try await AmityUIKit4Manager.syncNetworkConfig()
+                    let successAlert = UIAlertController(title: "Success", message: "Network configuration sync successfully", preferredStyle: .alert)
+                    successAlert.addAction(UIAlertAction(title: "OK", style: .default))
+                    present(successAlert, animated: true)
+                } catch {
+                    let errorAlert = UIAlertController(title: "Error", message: "Failed to sync network config: \(error.localizedDescription)", preferredStyle: .alert)
+                    errorAlert.addAction(UIAlertAction(title: "OK", style: .default))
+                    present(errorAlert, animated: true)
+                }
+            }
         }
 
     }

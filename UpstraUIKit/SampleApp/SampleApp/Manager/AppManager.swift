@@ -57,6 +57,8 @@ class AppManager {
         
         // Share client to the new UIKit
         #if canImport(AmityUIKit4)
+        RemoteConfig.setup(apiKey: endpointConfig.apiKey, httpEndpoint: endpointConfig.httpEndpoint)
+                
         AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
         
         let livestreamBehavior = CustomV4LivestreamBehavior()
