@@ -27,7 +27,8 @@ rm -rf "${BUILD_FOLDER}"
 fi
 mkdir -p ${BUILD_FOLDER}
 
-
+# Remove existing zip file.
+rm -f ${ROOT_FOLDER}/amity-uikit.zip
 
 ####### Make AmityUIKit.xcframework
 
@@ -37,7 +38,7 @@ xcodebuild clean archive \
     -workspace UpstraUIKit.xcworkspace \
     -scheme AmityUIKit \
     -configuration Release \
-    -arch arm64 \
+    -destination="generic/platform=iOS" \
     -sdk "iphoneos" \
     -archivePath "${BUILD_FOLDER}/uikit/ios.xcarchive" \
     SKIP_INSTALL=NO
@@ -45,7 +46,7 @@ xcodebuild clean archive \
     -workspace UpstraUIKit.xcworkspace \
     -scheme AmityUIKit \
     -configuration Release \
-    -arch x86_64 \
+    -destination="generic/platform=iOS Simulator" \
     -sdk "iphonesimulator" \
     -archivePath "${BUILD_FOLDER}/uikit/ios_sim.xcarchive" \
     SKIP_INSTALL=NO
@@ -53,12 +54,15 @@ cd ${ROOT_FOLDER}
 
 # 2 combine all archive and create .xcframework
 
-# 2.1 Make xcframework.
+# 2.2 Make xcframework.
 xcodebuild -create-xcframework \
     -framework "${BUILD_FOLDER}/uikit/ios.xcarchive/Products/Library/Frameworks/AmityUIKit.framework" \
     -debug-symbols "${BUILD_FOLDER}/uikit/ios.xcarchive/dSYMs/AmityUIKit.framework.dSYM" \
     -framework "${BUILD_FOLDER}/uikit/ios_sim.xcarchive/Products/Library/Frameworks/AmityUIKit.framework" \
     -output "${BUILD_FOLDER}/AmityUIKit.xcframework"
+
+
+
 
 ####### Make AmityUIKitLiveStream.xcframework
 
@@ -76,7 +80,7 @@ xcodebuild clean archive \
     -workspace UpstraUIKit.xcworkspace \
     -scheme AmityUIKitLiveStream \
     -configuration Release \
-    -arch x86_64 \
+    -destination="generic/platform=iOS Simulator" \
     -sdk "iphonesimulator" \
     -archivePath "${BUILD_FOLDER}/uikit-livestream/ios_sim.xcarchive" \
     SKIP_INSTALL=NO
@@ -84,12 +88,45 @@ cd ${ROOT_FOLDER}
 
 # 2 combine all archive and create .xcframework
 
-# 2.1 Make xcframework.
+# 2.2 Make xcframework.
 xcodebuild -create-xcframework \
     -framework "${BUILD_FOLDER}/uikit-livestream/ios.xcarchive/Products/Library/Frameworks/AmityUIKitLiveStream.framework" \
     -debug-symbols "${BUILD_FOLDER}/uikit-livestream/ios.xcarchive/dSYMs/AmityUIKitLiveStream.framework.dSYM" \
     -framework "${BUILD_FOLDER}/uikit-livestream/ios_sim.xcarchive/Products/Library/Frameworks/AmityUIKitLiveStream.framework" \
     -output "${BUILD_FOLDER}/AmityUIKitLiveStream.xcframework"
+
+
+
+###### Make AmityUIKit4.xcframework
+
+cd ${UIKIT_PROJECT_FOLDER}
+xcodebuild clean archive \
+    -workspace UpstraUIKit.xcworkspace \
+    -scheme AmityUIKit4 \
+    -configuration Release \
+    -arch arm64 \
+    -sdk "iphoneos" \
+    -archivePath "${BUILD_FOLDER}/uikit-4/ios.xcarchive" \
+    SKIP_INSTALL=NO
+xcodebuild clean archive \
+    -workspace UpstraUIKit.xcworkspace \
+    -scheme AmityUIKit4 \
+    -configuration Release \
+    -destination="generic/platform=iOS Simulator" \
+    -sdk "iphonesimulator" \
+    -archivePath "${BUILD_FOLDER}/uikit-4/ios_sim.xcarchive" \
+    SKIP_INSTALL=NO
+cd ${ROOT_FOLDER}
+
+# 2 combine all archive and create .xcframework
+
+# 2.2 Make xcframework.
+xcodebuild -create-xcframework \
+    -framework "${BUILD_FOLDER}/uikit-4/ios.xcarchive/Products/Library/Frameworks/AmityUIKit4.framework" \
+    -debug-symbols "${BUILD_FOLDER}/uikit-4/ios.xcarchive/dSYMs/AmityUIKit4.framework.dSYM" \
+    -framework "${BUILD_FOLDER}/uikit-4/ios_sim.xcarchive/Products/Library/Frameworks/AmityUIKit4.framework" \
+    -output "${BUILD_FOLDER}/AmityUIKit4.xcframework"
+
 
 ####### Make amity-uikit.zip
 
@@ -100,11 +137,16 @@ mv "${BUILD_FOLDER}/AmityUIKit.xcframework" "${RELEASE_FOLDER}"
 
 mv "${BUILD_FOLDER}/AmityUIKitLiveStream.xcframework" "${RELEASE_FOLDER}"
 
+mv "${BUILD_FOLDER}/AmityUIKit4.xcframework" "${RELEASE_FOLDER}"
+
 # Copy AmitySDK.xcframework into release
 cp -r "${UIKIT_PROJECT_FOLDER}/Shared/AmitySDK.xcframework" "${RELEASE_FOLDER}"
 
 # Copy Realm.xcframework into release
 cp -r "${UIKIT_PROJECT_FOLDER}/Shared/Realm.xcframework" "${RELEASE_FOLDER}"
+
+# Copy RealmSwift.xcframework into release
+cp -r "${UIKIT_PROJECT_FOLDER}/Shared/RealmSwift.xcframework" "${RELEASE_FOLDER}"
 
 # Copy AmityVideoPlayerKit.xcframework into release
 cp -r "${UIKIT_PROJECT_FOLDER}/Shared/AmityVideoPlayerKit.xcframework" "${RELEASE_FOLDER}"
