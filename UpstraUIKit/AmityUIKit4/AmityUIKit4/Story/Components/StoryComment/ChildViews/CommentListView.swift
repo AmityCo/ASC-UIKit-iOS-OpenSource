@@ -10,12 +10,14 @@ import AmitySDK
 
 struct CommentListView<Content>: View where Content: View {
     @EnvironmentObject var commentCoreViewModel: CommentCoreViewModel
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    
     private var commentItems: [PaginatedItem<AmityCommentModel>]
     private let headerView: () -> Content
     private let commentButtonAction: AmityCommentButtonAction
     private let hideCommentButtons: Bool
     
-    @EnvironmentObject var viewConfig: AmityViewConfigController
+    @State private var selectedCommentId: String? = nil
     
     init(@ViewBuilder headerView: @escaping () -> Content = { EmptyView() },
          commentItems: [PaginatedItem<AmityCommentModel>],
@@ -29,23 +31,25 @@ struct CommentListView<Content>: View where Content: View {
     }
     
     var body: some View {
-        ScrollViewReader { value in
+        ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack {
-                    
-                    headerView()
-                    
-                    if commentItems.isEmpty && commentCoreViewModel.loadingStatus != .loaded {
-                        getSkeletonView()
-                    } else {
-                        getCommentWithAds(value: value)
+                if commentCoreViewModel.targetCommentId == nil {
+                    LazyVStack(spacing: 0) {
+                        getContent(proxy: proxy)
                     }
-                    
-                    Color.clear.frame(height: 6)
+                    .background(GeometryReader { geometry in
+                        Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                    })
+                } else {
+                    // To support scroll to particular comment & bounce animation when navigating to comment through notification tray page
+                    // We cannot do that in LazyVStack as the comment isn't rendered.
+                    VStack(spacing: 0) {
+                        getContent(proxy: proxy)
+                    }
+                    .background(GeometryReader { geometry in
+                        Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
+                    })
                 }
-                .background(GeometryReader { geometry in
-                    Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
-                })
             }
             .coordinateSpace(name: "scroll")
             .onPreferenceChange(ScrollOffsetKey.self) { offsetY in
@@ -54,6 +58,35 @@ struct CommentListView<Content>: View where Content: View {
                 }
             }
         }
+    }
+    
+    @ViewBuilder
+    func getContent(proxy: ScrollViewProxy) -> some View {
+        headerView()
+            .padding(.bottom, 8)
+        
+        if commentItems.isEmpty && commentCoreViewModel.loadingStatus != .loaded {
+            getSkeletonView()
+        } else {
+            getCommentWithAds(value: proxy)
+                .onAppear {
+                    if let commentId = commentCoreViewModel.targetComment?.id {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation {
+                                proxy.scrollTo(commentId, anchor: .top)
+                            }
+                        }
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            withAnimation {
+                                self.selectedCommentId = commentCoreViewModel.targetCommentReply?.id ?? commentId
+                            }
+                        }
+                    }
+                }
+        }
+        
+        Color.clear.frame(height: 6)
     }
     
     @ViewBuilder
@@ -66,7 +99,7 @@ struct CommentListView<Content>: View where Content: View {
             .modifier(HiddenListSeparator())
         }
     }
-        
+    
     @ViewBuilder
     func getCommentWithAds(value: ScrollViewProxy) -> some View {
         ForEach(Array(commentItems.enumerated()), id: \.element.id) { index, item in
@@ -74,7 +107,6 @@ struct CommentListView<Content>: View where Content: View {
                 switch item.type {
                 case .ad(let ad):
                     AmityCommentAdComponent(ad: ad, selctedAdInfoAction: { ad in
-                        
                         commentCoreViewModel.adSeetState = (true, ad)
                     })
                 case .content(let comment):
@@ -95,16 +127,15 @@ struct CommentListView<Content>: View where Content: View {
                                     }
                                 })
                                 .padding([.top, .bottom], 3)
-                                .padding(.leading, 0)
                             } else {
                                 AmityCommentView(comment: comment, hideReplyButton: false, hideButtonView: hideCommentButtons, commentButtonAction: commentButtonAction)
                                     .id(comment.id)
-                                    .padding([.top, .bottom], 3)
-                                    .padding(.leading, 0)
+                                    .modifier(ShakeEffect(animatableData: selectedCommentId == comment.id ? 1 : 0))
                             }
-                            
                         } else {
-                            getDeletedMessageView()
+                            DeletedCommentView()
+                                .id(comment.id)
+                                .modifier(ShakeEffect(animatableData: selectedCommentId == comment.id ? 1 : 0))
                         }
                         
                         if comment.childrenNumber != 0 {
@@ -130,128 +161,36 @@ struct CommentListView<Content>: View where Content: View {
         }
     }
     
-    @ViewBuilder
-    func getDeletedMessageView() -> some View {
-        VStack(spacing: 10) {
-            Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
-                .frame(height: 1)
-            
-            HStack(spacing: 16) {
-                Image(AmityIcon.deletedMessageIcon.getImageResource())
-                    .resizable()
-                    .renderingMode(.template)
-                    .frame(width: 16, height: 16)
-                    .padding(.leading, 18)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+    struct DeletedCommentView: View {
+        @EnvironmentObject var viewConfig: AmityViewConfigController
+        
+        var body: some View {
+            VStack(spacing: 10) {
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
                 
-                Text(AmityLocalizedStringSet.Comment.deletedCommentMessage.localizedString)
-                    .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
-                    .padding(.trailing, 16)
-                
-                Spacer()
-            }
-            
-            Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
-                .frame(height: 1)
-        }
-        
-        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.deletedComment)
-    }
-}
-
-struct ReplyCommentListView<Content>: View where Content: View {
-    @EnvironmentObject var commentCoreViewModel: CommentCoreViewModel
-    @ObservedObject var collection: AmityCollection<AmityComment>
-    private let headerView: () -> Content
-    private let commentButtonAction: AmityCommentButtonAction
-    private let hideCommentButtons: Bool
-    
-    @EnvironmentObject var viewConfig: AmityViewConfigController
-    
-    init(@ViewBuilder headerView: @escaping () -> Content = { EmptyView() },
-         collection: AmityCollection<AmityComment>,
-         hideCommentButtons: Bool = false,
-         commentButtonAction: @escaping AmityCommentButtonAction) {
-        
-        self.headerView = headerView
-        self.collection = collection
-        self.commentButtonAction = commentButtonAction
-        self.hideCommentButtons = hideCommentButtons
-    }
-    
-    var body: some View {
-        ScrollViewReader { value in
-            ScrollView {
-                LazyVStack {
-                    headerView()
-                    getComment(value: value)
-                }
-            }
-        }
-    }
-        
-    @ViewBuilder
-    func getComment(value: ScrollViewProxy) -> some View {
-        ForEach(Array(collection.snapshots.enumerated()), id: \.element.commentId) { index, amityComment in
-            let comment = AmityCommentModel(comment: amityComment)
-            
-            Section {
-                if !comment.isDeleted {
-                    if let editingComment = commentCoreViewModel.editingComment, editingComment.id == comment.id {
-                        AmityEditCommentView(comment: comment, cancelAction: {
-                            commentCoreViewModel.editingComment = nil
-                        }, saveAction: { editedComment in
-                            Task {
-                                try await commentCoreViewModel.editComment(comment: editedComment)
-                                commentCoreViewModel.editingComment = nil
-                            }
-                        })
-                        .padding([.top, .bottom], 3)
-                        .padding(.leading, 52)
-                    } else {
-                        AmityCommentView(comment: comment, hideReplyButton: true, hideButtonView: hideCommentButtons, commentButtonAction: commentButtonAction)
-                            .id(comment.id)
-                            .padding([.top, .bottom], 3)
-                            .padding(.leading, 52)
-                    }
+                HStack(spacing: 16) {
+                    Image(AmityIcon.deletedMessageIcon.imageResource)
+                        .resizable()
+                        .renderingMode(.template)
+                        .frame(width: 16, height: 16)
+                        .padding(.leading, 18)
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                     
-                } else {
-                    getDeletedMessageView()
-                        .padding([.top, .bottom], 3)
-                        .padding(.leading, 104)
+                    Text(AmityLocalizedStringSet.Comment.deletedCommentMessage.localizedString)
+                        .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
+                        .padding(.trailing, 16)
+                    
+                    Spacer()
                 }
                 
-                if comment.childrenNumber != 0 {
-                    let viewModel = ReplyCommentViewModel(comment)
-                    ReplyCommentView(viewModel, hideCommentButtons: hideCommentButtons, commentButtonAction: commentButtonAction)
-                }
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
             }
-        }
-    }
-    
-    
-    @ViewBuilder
-    func getDeletedMessageView() -> some View {
-        HStack {
-            HStack(spacing: 8) {
-                Image(AmityIcon.deletedMessageIcon.getImageResource())
-                    .resizable()
-                    .renderingMode(.template)
-                    .frame(width: 16, height: 16)
-                    .padding(.leading, 8)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                Text(AmityLocalizedStringSet.Comment.deletedReplyCommentMessage.localizedString)
-                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
-                    .padding(.trailing, 16)
-            }
-            .frame(height: 28)
-            .border(radius: 4, borderColor: Color(viewConfig.theme.baseColorShade4), borderWidth: 1)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
             
-            Spacer()
+            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.deletedComment)
         }
-        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.deletedComment)
     }
 }

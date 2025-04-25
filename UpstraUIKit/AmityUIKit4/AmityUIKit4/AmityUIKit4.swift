@@ -203,8 +203,8 @@ final class AmityUIKitManagerInternal: NSObject {
         if !remoteConfig.isCurrentApiKeyMatchingStoredNetwork() {
             do {
                 try remoteConfig.clearStoredConfig()
-            } catch {
-                print(error)
+            } catch let error {
+                Log.warn("Remote config error: \(error)")
             }
         }
     }
@@ -347,6 +347,9 @@ final class AmityUIKitManagerInternal: NSObject {
         
         let liveStreamPostTargetSelectionPageBehavior = AmityLivestreamPostTargetSelectionPageBehavior()
         behavior.liveStreamPostTargetSelectionPageBehavior = liveStreamPostTargetSelectionPageBehavior
+        
+        let notificationTrayPageBehavior = AmityNotificationTrayPageBehavior()
+        behavior.notificationTrayPageBehavior = notificationTrayPageBehavior
     }
     
     func registerDevice(_ userId: String,

@@ -56,6 +56,8 @@ public enum PageId: String {
     case allCategories = "all_categories_page"
     
     case pollPostPage = "poll_post_composer_page"
+    
+    case notificationTrayPage = "notification_tray_page"
 }
 
 public enum ComponentId: String {
@@ -146,6 +148,7 @@ public enum ElementId: String {
     // MARK: - Social
     case headerLabel = "header_label"
     case globalSearchButton = "global_search_button"
+    case notificationTrayButton = "notification_tray_button"
     case postCreationButton = "post_creation_button"
     case newsFeedButton = "newsfeed_button"
     case exploreButton = "explore_button"

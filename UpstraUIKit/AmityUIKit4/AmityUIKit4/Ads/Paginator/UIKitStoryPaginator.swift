@@ -19,7 +19,9 @@ class UIKitStoryPaginator<T: AmityModel>: UIKitPaginator<T> {
         super.init(liveCollection: liveCollection, adPlacement: .story, communityId: communityId, modelIdentifier: modelIdentifier)
     }
     
-    override func integrateRecommendedAds(contents: [T]) {
+    override func integrateRecommendedAds(defaultContents: [T], excludeId: String?) {
+        let contents = defaultContents
+        
         // Default snapshots without ads
         let getDefaultSnapshots: () -> Void = {
             self.snapshots = contents.map { .init(id: self.modelIdentifier($0), type: .content($0)) }

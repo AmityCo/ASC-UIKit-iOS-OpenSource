@@ -73,9 +73,6 @@ extension Date {
             dateFormatter.dateFormat = "d MMM"
             return dateFormatter.string(from: self)
         }
-        if isInYesterday {
-            return "1d"
-        }
         if daysFromNow > 0 {
             return "\(daysFromNow)d"
         }

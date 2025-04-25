@@ -20,6 +20,8 @@ public class CommunityProfileViewModel: ObservableObject {
     @Published var shouldShowPendingBanner: Bool = false
     @Published var startedScrollingToTop: Bool = false
     
+    @Published var showErrorState = false
+    
     private let communityManger = CommunityManager()
     private let storyManager = StoryManager()
     private let communityId: String
@@ -60,6 +62,12 @@ public class CommunityProfileViewModel: ObservableObject {
     func loadCommunity() {
         communityToken = nil
         communityToken = communityManger.getCommunity(withId: communityId).observe { [weak self] community, error in
+            
+            if let error {
+                self?.showErrorState = true
+                return
+            }
+            
             guard let communityObject = community.snapshot else { return }
             let community = AmityCommunityModel(object: communityObject)
             self?.community = community

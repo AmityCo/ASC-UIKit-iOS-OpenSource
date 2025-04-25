@@ -27,12 +27,12 @@ class FixedFrequencyAdsInjector {
         }
                 
         if adContentMap.isEmpty {
-            Log.adInjector.debug("❗️Inserting ads for first time per frequency")
+            // Log.adInjector.debug("❗️Inserting ads for first time per frequency")
             let mergedItems = self.insertAdEveryPosition(ads: ads, contents: contents, position: frequency, modelIdentifier: modelIdentifier)
             
             return mergedItems
         } else {
-            Log.adInjector.debug("‼️Inserting ads to its previous places..")
+            // Log.adInjector.debug("‼️Inserting ads to its previous places..")
             let mergedItems = self.insertAdAfterModel(ads: ads, contents: contents, frequency: frequency, modelIdentifier: modelIdentifier)
             
             return mergedItems

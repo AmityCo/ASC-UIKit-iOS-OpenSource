@@ -69,10 +69,7 @@ public struct AmityCommentTrayComponent: AmityComponentView {
             }
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
-        .environmentObject(viewConfig)
-        .onChange(of: colorScheme) { value in
-            viewConfig.updateTheme()
-        }
+        .updateTheme(with: viewConfig)
     }
     
     

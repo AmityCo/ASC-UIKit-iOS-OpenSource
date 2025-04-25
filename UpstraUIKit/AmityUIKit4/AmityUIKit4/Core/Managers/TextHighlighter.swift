@@ -142,4 +142,18 @@ class TextHighlighter {
         
         return attributedString
     }
+    
+    static func highlightTexts(texts: [(value: String, range: NSRange)], in string: AttributedString, attributes: [NSAttributedString.Key: Any] = [.foregroundColor : UIColor.systemBlue]) -> AttributedString {
+        
+        var finalStr = string
+        
+        for item in texts {
+            guard let range = Range(item.range, in: string) else { continue }
+            finalStr[range].foregroundColor = attributes[.foregroundColor] as? UIColor
+            finalStr[range].font = attributes[.font] as? UIFont
+        }
+        
+        return finalStr
+    }
+    
 }

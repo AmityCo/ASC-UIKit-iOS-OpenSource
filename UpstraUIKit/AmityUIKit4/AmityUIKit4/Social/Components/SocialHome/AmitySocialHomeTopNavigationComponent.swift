@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import AmitySDK
 
 public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
+    
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     public var pageId: PageId?
     
@@ -18,12 +20,21 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
     @StateObject private var viewConfig: AmityViewConfigController
     @State private var showPostCreationMenu: Bool = false
     private let selectedTab: AmitySocialHomePageTab
-    private var searchButtonAction: (() -> Void)?
     
-    public init(pageId: PageId? = nil, selectedTab: AmitySocialHomePageTab = .newsFeed, searchButtonAction: (() -> Void)? = nil) {
+    private var searchButtonAction: DefaultTapAction?
+    private var notificationButtonAction: DefaultTapAction?
+    
+    @StateObject var viewModel = SocialHomePageNavigationViewModel()
+    
+    public init(pageId: PageId? = nil,
+                selectedTab: AmitySocialHomePageTab = .newsFeed,
+                searchButtonAction: DefaultTapAction? = nil,
+                notificationButtonAction: DefaultTapAction? = nil
+    ) {
         self.pageId = pageId
         self.selectedTab = selectedTab
         self.searchButtonAction = searchButtonAction
+        self.notificationButtonAction = notificationButtonAction
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .socialHomePageTopNavigationComponent))
     }
     
@@ -39,6 +50,31 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
             
             Spacer()
             
+            Button(action: {
+                notificationButtonAction?()
+                
+                viewModel.resetNotificationStatus()
+            }, label: {
+                    VStack {
+                        let searchIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .notificationTrayButton, key: "icon", of: String.self) ?? "bellIcon")
+                        Image(searchIcon)
+                            .frame(size: CGSize(width: 21.0, height: 16.0))
+                    }
+                    .frame(size: CGSize(width: 32.0, height: 32.0))
+                    .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
+                    .clipShape(Circle())
+                    .overlay(
+                        NotificationIndicator()
+                            .offset(x: 13, y: -12)
+                            .visibleWhen(viewModel.hasUnseenNotification)
+                    )
+                    
+            })
+            .accessibilityIdentifier(AccessibilityID.Social.SocialHomePage.notificationTrayButton)
+            .onAppear {
+                viewModel.observeNotificationStatus()
+            }
+
             Button(action: {
                 searchButtonAction?()
             }, label: {
@@ -93,9 +129,84 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
         let context = AmitySocialHomeTopNavigationComponentBehavior.Context(component: self)
         AmityUIKitManagerInternal.shared.behavior.socialHomeTopNavigationComponentBehavior?.goToCreateCommunityPage(context: context)
     }
+    
+    struct NotificationIndicator: View {
+        @EnvironmentObject var viewConfig: AmityViewConfigController
+        
+        var body: some View {
+            ZStack {
+                Circle()
+                    .stroke(Color(viewConfig.theme.backgroundColor), lineWidth: 4)
+                    .frame(width: 10, height: 10)
+                
+                Circle()
+                    .fill(Color(viewConfig.theme.alertColor))
+                    .frame(width: 10, height: 10)
+            }
+        }
+    }
 }
 
+class SocialHomePageNavigationViewModel: ObservableObject {
+    private let trayManager = NotificationTrayManager()
+    private var timer: Timer?
+    private var token: AmityNotificationToken?
+    
+    let timerInterval: TimeInterval = 60
+    
+    @Published var hasUnseenNotification = false
+    
+    func observeNotificationStatus() {
+        if timer == nil {
+            // Trigger first fetch
+            self.checkNotificationStatus()
+            
+            // Schedule it
+            let jitter = Double.random(in: 0...1)
+            timer = Timer.scheduledTimer(withTimeInterval: timerInterval + jitter, repeats: true, block: { [weak self] timer in
+                self?.checkNotificationStatus()
+            })
+        }
+    }
+    
+    private func checkNotificationStatus() {
+        // Note:
+        // Live Object life cycle is tied to its token. If the token is invalidated or nil before the observer is notified, we will never get notification tray seen info.
+        // So even though the timer triggers every 1 seconds, we wait for the previous observer to be notified
+        // before sending the new request.
+        guard token == nil else { return }
+        
+        let cleanupToken = { [weak self] in
+            self?.token?.invalidate()
+            self?.token = nil
+        }
+        
+        token = trayManager.getNotificationTraySeenInfo().observe { [weak self] liveObject, error in
+            guard let self else { return }
+            
+            if let _ = error {
+                cleanupToken()
+                return
+            }
+            
+            guard let snapshot = liveObject.snapshot else {
+                cleanupToken()
+                return
+            }
+            
+            self.hasUnseenNotification = !snapshot.isSeen
 
+            cleanupToken()
+        }
+    }
+    
+    func resetNotificationStatus() {
+        guard hasUnseenNotification else { return }
+        
+        // To hide red dot once user opens up notification tray
+        hasUnseenNotification = false
+    }
+}
 
 #if DEBUG
 #Preview {

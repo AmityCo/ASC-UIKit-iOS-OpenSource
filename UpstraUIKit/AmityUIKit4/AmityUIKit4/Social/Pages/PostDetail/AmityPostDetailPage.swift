@@ -19,36 +19,25 @@ public struct AmityPostDetailPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     @State private var showBottomSheet: Bool = false
     
-    private var postCategory: AmityPostCategory = .general
-    private var hideTarget: Bool = false
     private var context: AmityPostContentComponent.Context?
+    private var commentId: String?
     
     public var id: PageId {
         .postDetailPage
     }
     
-    public init(id: String) {
+    public init(id: String, commentId: String? = nil, parentId: String? = nil) {
         let postDetailViewModel = AmityPostDetailPageViewModel(id: id)
+        self.commentId = commentId
+        self.context = AmityPostContentComponent.Context()
         self._viewModel = StateObject(wrappedValue: postDetailViewModel)
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId, targetCommentId: commentId, targetCommentParentId: parentId))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: id, referenceType: .post, community: postDetailViewModel.post?.targetCommunity, allowCreateComment: true))
-        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
-    }
-    
-    /// Convenience initializer
-    public init(post: AmityPost, category: AmityPostCategory = .general, hideTarget: Bool = false) {
-        self.postCategory = category
-        self.hideTarget = hideTarget
-        self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(post: post))
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
-        self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: post.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
     }
     
     // Post with context
     public init(post: AmityPost, context: AmityPostContentComponent.Context?) {
-        self.postCategory = context?.category ?? .general
-        self.hideTarget = context?.hidePostTarget ?? false
         self.context = context
         self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(post: post))
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
@@ -60,7 +49,7 @@ public struct AmityPostDetailPage: AmityPageView {
         ZStack {
             
             PostDetailEmptyStateView()
-            .opacity(viewModel.isPostDeleted ? 1 : 0)
+                .opacity(viewModel.isPostDeleted ? 1 : 0)
             
             VStack(spacing: 0) {
                 navigationBarView
@@ -106,9 +95,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                     PostContentSkeletonView()
                                 }
                             }
-                        },
-                                        viewModel: commentCoreViewModel,
-                                        commentButtonAction: self.commentButtonAction(_:))
+                        },viewModel: commentCoreViewModel, commentButtonAction: self.commentButtonAction(_:))
                         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
                                      height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? .fixed(204) : .fixed(148),
                                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
@@ -116,7 +103,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                 commentCoreViewModel.editingComment = comment
                             }
                         }
-
+                        
                         CommentComposerView(viewModel: commentComposerViewModel)
                             .isHidden(!(viewModel.post?.targetCommunity?.isJoined ?? true))
                     }
@@ -224,14 +211,8 @@ public struct AmityPostDetailPage: AmityPageView {
     }
     
     func getPostComponentContext() -> AmityPostContentComponent.Context {
-        let componentContext = context ?? AmityPostContentComponent.Context(category: postCategory, shouldHideTarget: hideTarget)
+        let componentContext = context ?? AmityPostContentComponent.Context(category: context?.category ?? .general, shouldHideTarget: context?.hidePostTarget ?? false)
         componentContext.hideMenuButton = true
         return componentContext
     }
 }
-
-#if DEBUG
-#Preview(body: {
-    AmityPostDetailPage(id: "")
-})
-#endif

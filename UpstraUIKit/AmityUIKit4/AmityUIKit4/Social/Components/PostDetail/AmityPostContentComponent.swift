@@ -598,7 +598,8 @@ extension AmityPostContentComponent {
         public init(shouldShowPollResults: Bool = false,
                     category: AmityPostCategory = .general,
                     shouldHideTarget: Bool = false,
-                    shouldHideMenuButton: Bool = false) {
+                    shouldHideMenuButton: Bool = false
+        ) {
             self.showPollResults = shouldShowPollResults
             self.category = category
             self.hidePostTarget = shouldHideTarget

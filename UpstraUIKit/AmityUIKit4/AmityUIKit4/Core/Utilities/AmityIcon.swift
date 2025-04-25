@@ -172,6 +172,10 @@ enum AmityIcon: String, ImageResourceProvider {
     case listRadioIcon = "listRadioIcon"
     case pollRadioIcon = "pollRadioIcon"
     
+    case bellIcon = "bellIcon"
+    case emptyNotificationList = "notificationTrayEmptyIcon"
+    case noInternetIcon = "noInternetIcon"
+    
     // Livestream icons
     enum LiveStream: String, ImageResourceProvider {
         case shutterButtonEnabled = "ic_stream_button"

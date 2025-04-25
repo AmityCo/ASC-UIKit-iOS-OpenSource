@@ -29,52 +29,59 @@ struct EndpointsView: View {
     
     var body: some View {
         
-        Picker(selection: $selectedEnv.onChange(valueChange), label: /*@START_MENU_TOKEN@*/Text("Picker")/*@END_MENU_TOKEN@*/) {
-            ForEach(EnvironmentType.allCases, id: \.self) { env in
-                Text(env.title).tag(env)
+        VStack {
+            Picker(selection: $selectedEnv.onChange(valueChange), label: Text("Environment")) {
+                ForEach(EnvironmentType.allCases, id: \.self) { env in
+                    Text(env.title).tag(env)
+                }
             }
-        }
-        .pickerStyle(WheelPickerStyle())
-        .padding()
-        
-        HStack {
-            Text("API Key")
-                .font(.caption)
-            TextField("", text: $apiKey)
-                .font(.subheadline)
-                .background(Color(.systemGray6))
-                .cornerRadius(3.0)
-        }
-        .padding()
-        
-        HStack {
-            Text("Endpoint")
-                .font(.caption)
-            TextField("", text: $httpEndpoint)
-                .font(.subheadline)
-                .background(Color(.systemGray6))
-                .cornerRadius(3.0)
-        }
-        .padding()
-        
-        HStack {
-            Text("UploadURL")
-                .font(.caption)
-            TextField("", text: $uploadURL)
-                .font(.subheadline)
-                .background(Color(.systemGray6))
-                .cornerRadius(3.0)
-        }
-        .padding()
-        
-        Button("Save") {
-            // Save selected environment and update values if any
-            EndpointManager.shared.update(environment: selectedEnv, apiKey: apiKey, httpEndpoint: httpEndpoint, socketEndpoint: httpEndpoint, uploadURL: uploadURL)
-            saveButtonDidTap?()
-        }
-        
-        Button("Reset") {
-            EndpointManager.shared.resetEnvironments()
+            .pickerStyle(.menu)
+            .padding()
+            
+            HStack {
+                Text("API Key")
+                    .font(.caption)
+                TextField("", text: $apiKey)
+                    .frame(height: 40)
+                    .font(.subheadline)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(3.0)
+            }
+            .padding()
+            
+            HStack {
+                Text("Endpoint")
+                    .font(.caption)
+                TextField("", text: $httpEndpoint)
+                    .frame(height: 40)
+                    .font(.subheadline)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(3.0)
+            }
+            .padding()
+            
+            HStack {
+                Text("UploadURL")
+                    .font(.caption)
+                TextField("", text: $uploadURL)
+                    .frame(height: 40)
+                    .font(.subheadline)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(3.0)
+            }
+            .padding()
+            
+            Button("Save") {
+                // Save selected environment and update values if any
+                EndpointManager.shared.update(environment: selectedEnv, apiKey: apiKey, httpEndpoint: httpEndpoint, socketEndpoint: httpEndpoint, uploadURL: uploadURL)
+                saveButtonDidTap?()
+            }
+            .padding()
+            
+            Button("Reset") {
+                EndpointManager.shared.resetEnvironments()
+            }
+            .padding()
         }
     }
     

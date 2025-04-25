@@ -34,7 +34,7 @@ class LivestreamVideoPlayerViewModel: ObservableObject {
         
         postToken = postManager.getPost(withId: postId).observe { [weak self] data, error in
             guard let self, let post = data.snapshot else { return }
-            
+                        
             if post.isDeleted {
                 isPostDeleted = true
                 unobservePostAndStream()
@@ -73,8 +73,6 @@ class LivestreamVideoPlayerViewModel: ObservableObject {
             
             if stream.status == .ended {
                 NotificationCenter.default.post(name: .didLivestreamStatusUpdated, object: self.post.object)
-                
-                unobservePostAndStream()
                 return
             }
         }

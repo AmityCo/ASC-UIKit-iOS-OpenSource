@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
-import AmitySDK
-import Combine
 
 struct CommentCoreView<Content>: View where Content:View {
+    
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    
     @ObservedObject private var viewModel: CommentCoreViewModel
     let commentButtonAction: AmityCommentButtonAction?
     let headerView: () -> Content
@@ -26,85 +27,13 @@ struct CommentCoreView<Content>: View where Content:View {
                             commentItems: viewModel.commentItems,
                             hideCommentButtons: viewModel.hideCommentButtons,
                             commentButtonAction: commentButtonAction ?? { _ in })
-                .environmentObject(viewModel)
+            .environmentObject(viewModel)
             
-            if !viewModel.hideEmptyText && viewModel.commentItems.isEmpty && viewModel.loadingStatus == .loaded {
-                Text(AmityLocalizedStringSet.Comment.noCommentAvailable.localizedString)
-                    .applyTextStyle(.body(Color(UIColor(hex: "#898E9E"))))
-                    .isHidden(viewModel.commentItems.count != 0)
-                    .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.emptyTextView)
-            }
-
+            Text(AmityLocalizedStringSet.Comment.noCommentAvailable.localizedString)
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
+                .isHidden(viewModel.commentItems.count != 0)
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.emptyTextView)
+                .visibleWhen(!viewModel.hideEmptyText && viewModel.commentItems.isEmpty && viewModel.loadingStatus == .loaded)
         }
     }
-}
-
-
-class CommentCoreViewModel: ObservableObject {
-    @Published var editingComment: AmityCommentModel?
-    @Published var commentItems: [PaginatedItem<AmityCommentModel>] = []
-    @Published var adSeetState: (isShown: Bool, ad: AmityAd?) = (false, nil)
-    @Published var loadingStatus: AmityLoadingStatus = .notLoading
-    @Published var hasScrolledToTop: Bool = true
-
-    private var commentCollection: AmityCollection<AmityComment>
-    private let commentManager = CommentManager()
-    var paginator: UIKitPaginator<AmityComment>
-    
-    let referenceId: String
-    let referenceType: AmityCommentReferenceType
-    let hideEmptyText: Bool
-    @Published var hideCommentButtons: Bool
-    
-    private var paginatorCancellable: AnyCancellable?
-    
-    init(referenceId: String, referenceType: AmityCommentReferenceType, hideEmptyText: Bool, hideCommentButtons: Bool, communityId: String? = nil) {
-        self.referenceId = referenceId
-        self.referenceType = referenceType
-        self.hideEmptyText = hideEmptyText
-        self.hideCommentButtons = hideCommentButtons
-        let queryOptions = AmityCommentQueryOptions(referenceId: referenceId,
-                                                    referenceType: referenceType,
-                                                    filterByParentId: true,
-                                                    orderBy: .descending,
-                                                    includeDeleted: true)
-        let collection = commentManager.getComments(queryOptions: queryOptions)
-        commentCollection = collection
-        paginator = UIKitPaginator(liveCollection: collection, adPlacement: .comment, communityId: communityId, modelIdentifier: { model in
-            return model.commentId
-        })
-        paginator.load()
-        
-        paginatorCancellable = paginator.$snapshots.sink { [weak self] items in
-            self?.loadingStatus = self?.commentCollection.loadingStatus ?? .error
-                        
-            self?.commentItems = items.map {
-                switch $0.type {
-                case .content(let comment):
-                    return PaginatedItem(id: $0.id, type: .content(AmityCommentModel(comment: comment)))
-                case .ad(let ad):
-                    return PaginatedItem(id: $0.id, type: .ad(ad))
-                }
-            }
-        }
-        
-
-    }
-    
-    func getChildComments(parentId: String) -> AmityCollection<AmityComment> {
-        let queryOptions = AmityCommentQueryOptions(referenceId: referenceId,
-                                                    referenceType: referenceType,
-                                                    filterByParentId: true,
-                                                    parentId: parentId,
-                                                    orderBy: .descending,
-                                                    includeDeleted: true)
-        return commentManager.getComments(queryOptions: queryOptions)
-    }
-    
-    @MainActor
-    func editComment(comment: AmityCommentModel) async throws {
-        let updateOptions = AmityCommentUpdateOptions(text: comment.text, metadata: comment.metadata, mentioneesBuilder: comment.mentioneeBuilder)
-        try await commentManager.editComment(withId: comment.id, options: updateOptions)
-    }
-    
 }

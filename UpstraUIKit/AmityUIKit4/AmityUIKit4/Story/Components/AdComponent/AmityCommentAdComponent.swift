@@ -124,7 +124,7 @@ struct AmityCommentAdComponent: View {
         }
         .contentShape(Rectangle())
         .background(Color(viewConfig.theme.backgroundColor))
-        .padding([.top, .bottom], 3)
+        .padding(.bottom, 8)
         .onAppear {
             AdEngine.shared.markAsSeen(ad: ad, placement: .comment)
         }

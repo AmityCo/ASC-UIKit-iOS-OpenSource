@@ -368,5 +368,8 @@ public struct AmityLocalizedStringSet {
         static let liveStreamTerminatedStreamerContentDesc = "live_stream_terminated_streamer_content_desc"
         
         static let liveStreamLabel = "live_stream_label"
+        
+        static let notificationTrayEmptyStateTitle = "notification_tray_empty_state_title"
+        static let notificationTrayTitle = "notification_tray_title"
     }
 }

@@ -41,6 +41,7 @@ class UIKitPaginator<T: AmityModel> {
     private let adPlacement: AmityAdPlacement
     let modelIdentifier: (T) -> String
     let communityId: String?
+    let excludedId: String?
 
     private var token: AmityNotificationToken?
     var ads: [AmityAd] = []
@@ -48,17 +49,18 @@ class UIKitPaginator<T: AmityModel> {
     let timeWindowAdInjector = TimeWindowAdsInjector()
     let fixedFrequencyAdInjector = FixedFrequencyAdsInjector()
     
-    init(liveCollection: AmityCollection<T>, adPlacement: AmityAdPlacement, communityId: String? = nil, modelIdentifier: @escaping (T) -> String) {
+    init(liveCollection: AmityCollection<T>, adPlacement: AmityAdPlacement, communityId: String? = nil, excludedId: String? = nil, modelIdentifier: @escaping (T) -> String) {
         self.liveCollection = liveCollection
         self.adPlacement = adPlacement
         self.modelIdentifier = modelIdentifier
         self.communityId = communityId
+        self.excludedId = excludedId
     }
     
     func load() {
         token?.invalidate()
         token = liveCollection?.observe { [weak self] collection, _, error in
-            self?.integrateRecommendedAds(contents: collection.snapshots)
+            self?.integrateRecommendedAds(defaultContents: collection.snapshots, excludeId: self?.excludedId)
         }
     }
     
@@ -93,7 +95,16 @@ class UIKitPaginator<T: AmityModel> {
     }
     
     // MARK:- Ads Integration
-    func integrateRecommendedAds(contents: [T]) {
+    func integrateRecommendedAds(defaultContents: [T], excludeId: String?) {
+        var contents = defaultContents
+        
+        if let excludeId {
+            contents = defaultContents.filter {
+                let modelId = self.modelIdentifier($0)
+                return modelId != excludeId
+            }
+        }
+        
         // Default snapshots without ads
         let getDefaultSnapshots: () -> Void = {
             self.snapshots = contents.map { .init(id: self.modelIdentifier($0), type: .content($0)) }
@@ -139,7 +150,7 @@ class UIKitPaginator<T: AmityModel> {
             let requiredAdCount = contents.count / frequency
             let loadedAdCount = ads.count
             
-            Log.ads.debug("Feed Ad Frequency: \(frequency), Loaded ads count: \(loadedAdCount), Required Ad: \(requiredAdCount) Type: \(String(describing: T.self))")
+//            Log.ads.debug("Feed Ad Frequency: \(frequency), Loaded ads count: \(loadedAdCount), Required Ad: \(requiredAdCount) Type: \(String(describing: T.self))")
             
             // If we have already loaded requireds ads in paginator before, just reuse it.
             if requiredAdCount > loadedAdCount {
@@ -153,7 +164,7 @@ class UIKitPaginator<T: AmityModel> {
                 self.ads.append(contentsOf: recommendedAds)
             }
             
-            Log.ads.debug("Merging \(self.ads.count) ads with \(contents.count) items")
+//            Log.ads.debug("Merging \(self.ads.count) ads with \(contents.count) items")
             
             let mergedItems = fixedFrequencyAdInjector.mergeAds(ads: ads, contents: contents, frequency: frequency, modelIdentifier: modelIdentifier)
             self.snapshots = mergedItems

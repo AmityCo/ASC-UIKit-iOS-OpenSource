@@ -201,6 +201,7 @@ struct AccessibilityID {
             static let newsFeedButton = "newsfeed_button"
             static let exploreButton = "explore_button"
             static let myCommunitiesButton = "my_communities_button"
+            static let notificationTrayButton = "notification_tray_button"
         }
         
         struct TopSearchBar {

@@ -56,6 +56,12 @@ class AmityPostDetailPageViewModel: ObservableObject {
         token = postObject?.observe({ [weak self] livePost, error in
             guard let self else { return }
             
+            if let error {
+                self.isLoading = false
+                self.isPostDeleted = true
+                return
+            }
+            
             self.isLoading = false
             
             if let snapshot = livePost.snapshot {

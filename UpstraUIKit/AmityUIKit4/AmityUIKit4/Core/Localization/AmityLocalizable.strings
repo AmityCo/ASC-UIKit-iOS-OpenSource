@@ -357,3 +357,6 @@
 "live_stream_label" = "Livestream";
 
 "no_internet_connection" = "No internet connection.";
+"notification_tray_empty_state_title" = "No notifications";
+"notification_tray_title" = "Notifications";
+

@@ -201,6 +201,9 @@
         "social_home_page/top_navigation/post_creation_button": {
             "icon": "plusIcon"
         },
+        "social_home_page/top_navigation/notification_tray_button": {
+            "icon": "bellIcon"
+        },
         "social_home_page/*/newsfeed_button": {
             "text": "Newsfeed"
         },
@@ -758,6 +761,25 @@
         },
         "edit_livestream_post_page/*/edit_livestream_preview_text": {
             "text": "value"
+        },
+        "notification_tray_page/*/*": {
+            "theme": {}
+        },
+        "notification_tray_page/*/back_button": {
+            "image": "value"
+        },
+        "notification_tray_page/*/title": {
+            "text": "Notifications"
+        },
+        "notification_tray_page/*/empty_notification": {
+            "image": "notificationTrayEmptyIcon",
+            "text": "No notifications"
+        },
+        "notification_tray_page/*/user_avatar": {
+        },
+        "notification_tray_page/*/no_internet_connection": {
+            "image": "noInternetIcon",
+            "text": "No internet connection"
         }
     }
 }

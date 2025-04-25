@@ -44,13 +44,13 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     open override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let _ = AmityUIKit4Manager.behaviour.swipeToBackGestureBehaviour {
+        if let _ = AmityUIKit4Manager.behaviour.swipeToBackGestureBehavior {
             interactivePopGestureRecognizer?.delegate = self
         }
     }
 
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        if let swipeBehavior = AmityUIKit4Manager.behaviour.swipeToBackGestureBehaviour {
+        if let swipeBehavior = AmityUIKit4Manager.behaviour.swipeToBackGestureBehavior {
             return swipeBehavior.gestureRecognizerShouldBegin(navigationController: self, gestureRecognizer)
         }
         
@@ -58,7 +58,7 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     }
     
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if let swipeBehavior = AmityUIKit4Manager.behaviour.swipeToBackGestureBehaviour {
+        if let swipeBehavior = AmityUIKit4Manager.behaviour.swipeToBackGestureBehavior {
             return swipeBehavior.gestureRecognizer(gestureRecognizer, shouldRecognizeSimultaneouslyWith: otherGestureRecognizer)
         }
         

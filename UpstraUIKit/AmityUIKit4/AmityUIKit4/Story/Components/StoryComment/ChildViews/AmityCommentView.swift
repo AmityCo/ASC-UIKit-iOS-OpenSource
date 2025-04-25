@@ -48,7 +48,7 @@ public struct AmityCommentView: View {
                 }
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.avatarImageView)
             
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 4) {
                         
@@ -156,7 +156,6 @@ public struct AmityCommentView: View {
                     }
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.meatballsButton)
                     .isHidden(hideButtonView)
-
                     
                     HStack(spacing: 4) {
                         Text(comment.reactionsCount.formattedCountString)
@@ -175,10 +174,13 @@ public struct AmityCommentView: View {
                     })
                     .isHidden(comment.reactionsCount == 0)
                 }
+                .padding(.bottom, 8)
                 .isHidden(hideButtonView && comment.reactionsCount == 0)
             }
+            
             Spacer(minLength: 16)
         }
+        .padding(.vertical, 4)
     }
     
     

@@ -48,7 +48,9 @@ open class AmityUIKitBehaviour {
     public var livestreamBehavior: AmityLivestreamBehavior?
     
     // We want swipe to back gesture behavior available by default.
-    public var swipeToBackGestureBehaviour: AmitySwipeToBackGestureBehavior? = AmitySwipeToBackGestureBehavior()    
+    public var swipeToBackGestureBehavior: AmitySwipeToBackGestureBehavior? = AmitySwipeToBackGestureBehavior()
+    
+    public var notificationTrayPageBehavior: AmityNotificationTrayPageBehavior = AmityNotificationTrayPageBehavior()
 }
 
 open class AmitySwipeToBackGestureBehavior {

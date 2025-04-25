@@ -40,7 +40,11 @@ public struct AmitySocialHomePage: AmityPageView {
                     let context = AmitySocialHomePageBehavior.Context(page: self)
                     AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToMyCommunitiesSearchPage(context: context)
                 }
-            })
+            }) {
+                let context = AmitySocialHomePageBehavior.Context(page: self)
+                AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToNotificationTrayPage(context: context)
+
+            }
             
             SocialHomePageTabView($viewModel.selectedTab)
                 .frame(height: 62)

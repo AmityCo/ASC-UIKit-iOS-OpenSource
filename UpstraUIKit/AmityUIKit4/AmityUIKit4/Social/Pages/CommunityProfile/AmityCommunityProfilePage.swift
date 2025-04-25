@@ -132,6 +132,9 @@ public struct AmityCommunityProfilePage: AmityPageView {
                         .padding(.bottom, 30)
                 }
             }
+            
+            PostDetailEmptyStateView()
+                .visibleWhen(viewModel.showErrorState)
         }
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
