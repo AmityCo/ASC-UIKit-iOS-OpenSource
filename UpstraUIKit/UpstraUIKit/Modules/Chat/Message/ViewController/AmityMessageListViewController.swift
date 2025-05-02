@@ -86,7 +86,6 @@ public final class AmityMessageListViewController: AmityViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         AmityKeyboardService.shared.delegate = self
-        screenViewModel.startReading()
         
         bottomConstraint.constant = .zero
         view.endEditing(true)
@@ -98,7 +97,6 @@ public final class AmityMessageListViewController: AmityViewController {
         
         screenViewModel.action.toggleKeyboardVisible(visible: false)
         screenViewModel.action.inputSource(for: .default)
-        screenViewModel.action.stopReading()
         
         AmityAudioPlayer.shared.stop()
         bottomConstraint.constant = .zero

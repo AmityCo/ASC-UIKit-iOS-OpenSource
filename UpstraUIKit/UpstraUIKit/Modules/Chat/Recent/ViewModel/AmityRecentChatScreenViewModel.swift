@@ -27,7 +27,7 @@ public struct AmityChannelModel {
         self.avatarURL = object.getAvatarInfo()?.fileURL ?? ""
         self.displayName = (object.displayName ?? "") == "" ? AmityLocalizedStringSet.General.anonymous.localizedString : object.displayName!
         self.memberCount = object.memberCount
-        self.unreadCount = object.defaultSubChannelUnreadCount
+        self.unreadCount = object.unreadCount
         self.lastActivity = object.lastActivity ?? Date()
         self.participation = object.participation
         self.channelType = object.channelType
