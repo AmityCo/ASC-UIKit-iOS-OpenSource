@@ -40,16 +40,37 @@ struct PostContentMediaView: View {
                                     })
                                     .environment(\.urlImageOptions, URLImageOptions.amityOptions)
                                 )
+                                .contentShape(Rectangle())
+                                .applyIf(media.getAltText() != nil) {
+                                    $0.accessibility(children: .ignore, labelKey: "Photo \(index + 1) of \(post.medias.count): \(media.getAltText()!)")
+                                }
+                                            
                         } else {
                             Color(viewConfig.theme.baseColorShade4)
                         }
                     }
                     
+                    // Display play button if the media is video
                     if media.type == .video {
                         Image(AmityIcon.videoControlIcon.getImageResource())
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 40, height: 40)
+                    }
+                    
+                    // +X ovelay view if the post has more than 4 medias
+                    if index == 3 && post.medias.count > 4 {
+                        ZStack {
+                            Rectangle()
+                                .fill(Color.black.opacity(0.25))
+                            
+                            Text("+\(post.medias.count - 3)")
+                                .applyTextStyle(.headline(.white))
+                        }
+                        .allowsHitTesting(false)
+                        .applyIf(media.getAltText() != nil) {
+                            $0.accessibility(children: .combine, labelKey: "Activate to view \(post.medias.count - 3) more photos")
+                        }
                     }
                 }
                 .compositingGroup()
@@ -67,7 +88,8 @@ struct PostContentMediaView: View {
                     medias: post.medias, 
                     startIndex: viewModel.selectedMediaIndex, 
                     viewConfig: viewConfig,
-                    closeAction: { viewModel.showMediaViewer.toggle() }
+                    closeAction: { viewModel.showMediaViewer.toggle() },
+                    showEditAction: post.isOwner
                 )
             }
         } else {
@@ -97,23 +119,10 @@ struct PostContentMediaView: View {
                     HStack(spacing: 4) {
                         ForEach(1..<data.count, id: \.self) { index in
                             if index < 4 {
-                                ZStack {
-                                    content(index as! Data.Index, data[index as! Data.Index])
-                                    
-                                    if index == 3 && data.count > 4 {
-                                        Rectangle()
-                                            .fill(Color.black.opacity(0.25))
-                                            .overlay (
-                                                Text("+\(data.count - 3)")
-                                                    .applyTextStyle(.headline(.white))
-                                            )
-                                            .allowsHitTesting(false)
-                                    }
-                                }
+                                content(index as! Data.Index, data[index as! Data.Index])
                             } else {
                                 EmptyView()
                             }
-                            
                         }
                     }
                     .frame(height: (geometry.size.height / 2) - 30)

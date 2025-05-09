@@ -13,6 +13,7 @@ struct PostBottomSheetView: View {
         case editPost
         case deletePost
         case closePoll
+        case reportPost
     }
     
     @EnvironmentObject private var viewConfig: AmityViewConfigController
@@ -46,7 +47,8 @@ struct PostBottomSheetView: View {
         .alert(isPresented: $isAlertShown, content: {
             
             switch activeAlert {
-            case .editPost, .deletePost:
+                // We do not need alert for report post
+            case .editPost, .deletePost, .reportPost:
                 Alert(title: Text(AmityLocalizedStringSet.Social.deletePostTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.deletePostMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
                     Task { @MainActor in
                         isShown.toggle()
@@ -164,23 +166,25 @@ struct PostBottomSheetView: View {
     
     private var flagSheetButton: some View {
         Button(action: {
-            Task { @MainActor in
-                do {
-                    if viewModel.isPostFlaggedByMe {
+            
+            if viewModel.isPostFlaggedByMe {
+                Task { @MainActor in
+                    do {
                         try await viewModel.unflagPost(id: post.postId)
-                    } else {
-                        try await viewModel.flagPost(id: post.postId)
+                        
+                        isShown.toggle()
+                        viewModel.updatePostFlaggedByMeState(id: post.postId)
+                        
+                        Toast.showToast(style: .success, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postReportedMessage.localizedString)
+                    } catch {
+                        isShown.toggle()
+                        Toast.showToast(style: .warning, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postFailedUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postFailedReportedMessage.localizedString)
                     }
-                    
-                    isShown.toggle()
-                    viewModel.updatePostFlaggedByMeState(id: post.postId)
-                    
-                    Toast.showToast(style: .success, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postReportedMessage.localizedString)
-                } catch {
-                    isShown.toggle()
-                    Toast.showToast(style: .warning, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postFailedUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postFailedReportedMessage.localizedString)
                 }
+            } else {
+                action?(.reportPost)
             }
+            
         }, label: {
             HStack(spacing: 12) {
                 Image(viewModel.isPostFlaggedByMe ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource())

@@ -60,7 +60,7 @@ public struct AmityPostComposerPage: AmityPageView {
                 wrappedValue: AmityTextEditorViewModel(
                     mentionManager: MentionManager(withType: .post(communityId: post.targetId))))
             self._mediaAttatchmentViewModel = StateObject(
-                wrappedValue: AmityMediaAttachmentViewModel(medias: post.medias))
+                wrappedValue: AmityMediaAttachmentViewModel(medias: post.medias, isPostEditing: true))
             self._viewConfig = StateObject(
                 wrappedValue: AmityViewConfigController(pageId: .postComposerPage))
 
@@ -72,7 +72,7 @@ public struct AmityPostComposerPage: AmityPageView {
                 wrappedValue: AmityTextEditorViewModel(
                     mentionManager: MentionManager(withType: .post(communityId: targetId))))
             self._mediaAttatchmentViewModel = StateObject(
-                wrappedValue: AmityMediaAttachmentViewModel(medias: []))
+                wrappedValue: AmityMediaAttachmentViewModel(medias: [], isPostEditing: false))
             self._viewConfig = StateObject(
                 wrappedValue: AmityViewConfigController(pageId: .postComposerPage))
         }

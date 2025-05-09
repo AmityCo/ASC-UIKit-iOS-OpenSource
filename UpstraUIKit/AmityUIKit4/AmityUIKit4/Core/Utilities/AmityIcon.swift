@@ -171,10 +171,12 @@ enum AmityIcon: String, ImageResourceProvider {
     case blockedFeedIcon = "blockedFeedIcon"
     case listRadioIcon = "listRadioIcon"
     case pollRadioIcon = "pollRadioIcon"
+    case checkMarkIcon = "checkMarkIcon"
     
     case bellIcon = "bellIcon"
     case emptyNotificationList = "notificationTrayEmptyIcon"
     case noInternetIcon = "noInternetIcon"
+    case reportSuccessIcon = "reportSuccessIcon"
     
     // Livestream icons
     enum LiveStream: String, ImageResourceProvider {

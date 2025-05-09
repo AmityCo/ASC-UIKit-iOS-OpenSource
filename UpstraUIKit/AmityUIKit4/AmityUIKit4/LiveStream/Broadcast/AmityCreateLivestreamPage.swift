@@ -142,12 +142,19 @@ public struct AmityCreateLivestreamPage: AmityPageView {
             case .ended(let reason):
                 let postId = viewModel.createdPost?.postId ?? ""
                 
-                if reason == .manual || reason == .connectionIssue {
+                if reason == .manual {
+                    
+                    self.dismissToPostDetailPage(postId: postId)
+                    
+                    return
+                }
+                
+                if reason == .connectionIssue {
                     
                     self.dismissToPostDetailPage(postId: postId)
                     
                     Toast.showToast(style: .warning, message: AmityLocalizedStringSet.General.noInternetConnection.localizedString)
-
+                    
                     return
                 }
                 

@@ -11,6 +11,8 @@ import AmitySDK
 import AVKit
 
 struct MediaViewer: View {
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    
     @State private var offset = CGSize.zero
     @State private var backgroundOpacity: CGFloat = 1.0
     @State private var page: Page
@@ -25,17 +27,22 @@ struct MediaViewer: View {
     @ObservedObject var viewConfig: AmityViewConfigController
     @State private var showScaleEffect: Bool = false
     @State private var isZooming: Bool = false
+    @State private var showBottomSheet: Bool = false
+    @State private var showAltTextComponent: Bool = false
     
     private let medias: [AmityMedia]
     private let closeAction: (() -> Void)?
     private var url: URL? = nil
+    private var showEditAction: Bool = false
+    private let fileRepositoryManager = FileRepositoryManager()
     
-    init(medias: [AmityMedia], startIndex: Int, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?) {
+    init(medias: [AmityMedia], startIndex: Int, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, showEditAction: Bool = false) {
         self._page = State(initialValue: Page.withIndex(startIndex))
         self._pageIndex = State(initialValue: startIndex + 1)
         self.medias = medias
         self.closeAction = closeAction
         self.viewConfig = viewConfig
+        self.showEditAction = showEditAction
     }
     
     init(url: URL?, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?) {
@@ -117,7 +124,22 @@ struct MediaViewer: View {
                             showVideoPlayer.toggle()
                         }
                     }
-                    
+                    .applyIf(media.getAltText() != nil) {
+                        $0
+                            .accessibility(children: .ignore, labelKey: "Photo \(pageIndex) of \(medias.count): \(media.getAltText()!)")
+                            .accessibilityHint("Swipe to move between images")
+                            .accessibilityScrollAction { edge in
+                                switch edge {
+                                case .leading:
+                                    page.update(.next)
+                                    UIAccessibility.post(notification: .announcement, argument: "Photo \(pageIndex) of \(medias.count): \(media.getAltText()!)")
+                                case .trailing:
+                                    page.update(.previous)
+                                    UIAccessibility.post(notification: .announcement, argument: "Photo \(pageIndex) of \(medias.count): \(media.getAltText()!)")
+                                default: break
+                                }
+                            }
+                    }
                 }
                 .allowsDragging(!isZooming)
                 .sensitivity(.high)
@@ -196,8 +218,20 @@ struct MediaViewer: View {
                             }
                         
                         Spacer()
+                        
+                        if showEditAction {
+                            Image(AmityIcon.meetballIcon.getImageResource())
+                                .resizable()
+                                .renderingMode(.template)
+                                .foregroundColor(Color.white)
+                                .aspectRatio(contentMode: .fit)
+                                .frame(size: CGSize(width: 18, height: 28))
+                                .onTapGesture {
+                                    showBottomSheet.toggle()
+                                }
+                        }
                     }
-                    .padding(.leading, 16)
+                    .padding(.horizontal, 16)
                     
                     Text("\(pageIndex) / \(page.totalPages)")
                         .applyTextStyle(.title(.white))
@@ -213,6 +247,19 @@ struct MediaViewer: View {
         }
         .background(ClearBackgroundView())
         .ignoresSafeArea(.all)
+        .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
+            bottomSheetView
+        })
+        .sheet(isPresented: $showAltTextComponent) {
+            let media = medias[page.index]
+            if let imageData = media.image {
+                let altText = media.getAltText(hasDefault: false)
+                AmityAltTextConfigComponent(mode: .edit(altText ?? "", .image(imageData)), result: { altText in
+                    media.altText = altText
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.altTextUpdated.localizedString)
+                })
+            }
+        }
         .fullScreenCover(isPresented: $showVideoPlayer) {
             if let videoURL = viewModel.videoURL {
                 AVPlayerView(url: videoURL)
@@ -220,6 +267,19 @@ struct MediaViewer: View {
             }
         }
     }
+    
+    private var bottomSheetView: some View {
+            VStack(spacing: 0) {
+                BottomSheetItemView(icon: AmityIcon.editCommentIcon.getImageResource(), text: "Edit alt text")
+                    .onTapGesture {
+                        showBottomSheet.toggle()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            showAltTextComponent.toggle()
+                        }
+                    }
+            }
+            .padding(.bottom, 32)
+        }
     
     private func updateOpacity(for yOffset: CGFloat, maxHeight: CGFloat) {
         let maximumDragDistance: CGFloat = 400

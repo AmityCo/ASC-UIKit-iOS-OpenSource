@@ -36,6 +36,15 @@ extension View {
         }
     }
     
+    @ViewBuilder
+    func applyIf<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+    
     func disableView(_ value: Bool) -> some View {
         return self.modifier(DisableView(disable: value))
     }
@@ -89,6 +98,12 @@ extension View {
         self
             .clipped()
             .clipShape(RoundedRectangle(cornerRadius: radius, style: .continuous))
+    }
+    
+    func accessibility(children: AccessibilityChildBehavior, labelKey: String) -> some View {
+        self
+            .accessibilityElement(children: children)
+            .accessibilityLabel(labelKey)
     }
 }
 

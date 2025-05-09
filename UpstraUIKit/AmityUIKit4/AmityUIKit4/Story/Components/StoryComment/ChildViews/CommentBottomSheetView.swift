@@ -11,11 +11,13 @@ struct CommentBottomSheetView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     @ObservedObject private var viewModel: CommentBottomSheetViewModel
     
-    let editingComment: ((AmityCommentModel?) -> Void)?
+    let editAction: ((AmityCommentModel?) -> Void)?
+    let reportAction: (AmityCommentModel?) -> Void
     
-    init(viewModel: CommentBottomSheetViewModel, editingComment: ((AmityCommentModel?) -> Void)? = nil) {
+    init(viewModel: CommentBottomSheetViewModel, editingComment: ((AmityCommentModel?) -> Void)? = nil, reportAction: @escaping (AmityCommentModel?) -> Void) {
         self.viewModel = viewModel
-        self.editingComment = editingComment
+        self.editAction = editingComment
+        self.reportAction = reportAction
     }
 
     var body: some View {
@@ -43,7 +45,7 @@ struct CommentBottomSheetView: View {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Button {
-                    editingComment?(viewModel.sheetState.comment)
+                    editAction?(viewModel.sheetState.comment)
                     viewModel.sheetState.isShown.toggle()
                 } label: {
                     let isReply = viewModel.sheetState.comment?.parentId != nil
@@ -121,22 +123,24 @@ struct CommentBottomSheetView: View {
                         return
                     }
                     
-                    Task { @MainActor in
-                        do {
-                            if viewModel.isCommentFlaggedByMe {
+                    if viewModel.isCommentFlaggedByMe {
+                        Task { @MainActor in
+                            do {
                                 try await viewModel.unflagComment(id: comment.id)
-                            } else {
-                                try await viewModel.flagComment(id: comment.id)
+                                
+                                viewModel.updateCommentFlaggedByMeState(id: comment.id)
+                                
+                                Toast.showToast(style: .success, message: viewModel.isCommentFlaggedByMe ? AmityLocalizedStringSet.Comment.commentUnReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentReportedMessage.localizedString)
+                            } catch {
+                                Toast.showToast(style: .warning, message: error.localizedDescription)
                             }
-                            
-                            viewModel.updateCommentFlaggedByMeState(id: comment.id)
-                            
-                            Toast.showToast(style: .success, message: viewModel.isCommentFlaggedByMe ? AmityLocalizedStringSet.Comment.commentUnReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentReportedMessage.localizedString)
-                        } catch {
-                            Toast.showToast(style: .warning, message: error.localizedDescription)
                         }
+                        viewModel.sheetState.isShown.toggle()
+                    } else {
+                        reportAction(comment)
+                        // Dismiss
+                        viewModel.sheetState.isShown.toggle()
                     }
-                    viewModel.sheetState.isShown.toggle()
                 } label: {
                     Text(viewModel.isCommentFlaggedByMe ? AmityLocalizedStringSet.Comment.unReportCommentBottomSheetTitle.localizedString : AmityLocalizedStringSet.Comment.reportCommentBottomSheetTitle.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))

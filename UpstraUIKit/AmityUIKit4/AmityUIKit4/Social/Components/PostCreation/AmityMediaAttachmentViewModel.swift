@@ -12,11 +12,13 @@ public class AmityMediaAttachmentViewModel: ObservableObject {
     @Published var medias: [AmityMedia] = []
     @Published var areAttachmentsReady: Bool = true
     @Published var isAnyMediaFailed: Bool = false
+    var isPostEditing: Bool = false
     
     private var cancellables = Set<AnyCancellable>()
     
-    public init(medias: [AmityMedia] = []) {
+    public init(medias: [AmityMedia] = [], isPostEditing: Bool) {
         self.medias = medias
+        self.isPostEditing = isPostEditing
         updateAttachmentReadiness()
         
         $medias

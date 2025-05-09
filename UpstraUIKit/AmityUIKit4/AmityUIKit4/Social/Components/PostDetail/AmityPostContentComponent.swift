@@ -229,6 +229,20 @@ public struct AmityPostContentComponent: AmityComponentView {
                                 }
                             case .closePoll, .deletePost:
                                 break
+                            case .reportPost:
+                                // Dismiss toggle
+                                showBottomSheet.toggle()
+                                
+                                // Dismiss bottom sheet
+                                host.controller?.dismiss(animated: false)
+                                
+                                let postId = post.postId
+                                
+                                let page = AmityContentReportPage(type: .post(id: postId))
+                                    .updateTheme(with: viewConfig)
+                                let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                                vc.isNavigationBarHidden = true
+                                self.host.controller?.present(vc, animated: true)
                             }
                         }
                     }

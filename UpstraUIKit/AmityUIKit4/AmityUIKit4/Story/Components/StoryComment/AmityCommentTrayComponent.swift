@@ -66,12 +66,22 @@ public struct AmityCommentTrayComponent: AmityComponentView {
                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
                 commentCoreViewModel.editingComment = comment
+            } reportAction: { comment in
+                let commentId = comment?.commentId ?? ""
+                
+                // Dismiss bottom sheet
+                host.controller?.dismiss(animated: false)
+                
+                let page = AmityContentReportPage(type: .comment(id: commentId))
+                    .updateTheme(with: viewConfig)
+                let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                vc.isNavigationBarHidden = true
+                self.host.controller?.present(vc, animated: true)
             }
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
     }
-    
     
     func commentButtonAction(_ type: AmityCommentButtonActionType) {
         switch type {

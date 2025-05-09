@@ -101,6 +101,17 @@ public struct AmityPostDetailPage: AmityPageView {
                                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                             CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
                                 commentCoreViewModel.editingComment = comment
+                            } reportAction: { comment in
+                                let commentId = comment?.commentId ?? ""
+                                
+                                // Dismiss bottom sheet
+                                host.controller?.dismiss(animated: false)
+                                
+                                let page = AmityContentReportPage(type: .comment(id: commentId))
+                                    .updateTheme(with: viewConfig)
+                                let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                                vc.isNavigationBarHidden = true
+                                self.host.controller?.present(vc, animated: true)
                             }
                         }
                         
@@ -167,6 +178,20 @@ public struct AmityPostDetailPage: AmityPageView {
                             host.controller?.navigationController?.popViewController(animated: true)
                         case .closePoll:
                             break
+                        case .reportPost:
+                            // Dismiss toggle
+                            showBottomSheet.toggle()
+                            
+                            // Dismiss bottom sheet
+                            host.controller?.dismiss(animated: false)
+                            
+                            let postId = postModel.postId
+                            
+                            let page = AmityContentReportPage(type: .post(id: postId))
+                                .updateTheme(with: viewConfig)
+                            let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                            vc.isNavigationBarHidden = true
+                            self.host.controller?.present(vc, animated: true)
                         }
                     }
                 }

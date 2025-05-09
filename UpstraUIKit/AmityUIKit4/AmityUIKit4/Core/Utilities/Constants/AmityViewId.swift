@@ -100,6 +100,7 @@ public enum ComponentId: String {
     case userFeed = "user_feed"
     case userImageFeed = "user_image_feed"
     case userVideoFeed = "user_video_feed"
+    case altTextConfig = "alt_text_config_component"
 }
 
 public enum ElementId: String {

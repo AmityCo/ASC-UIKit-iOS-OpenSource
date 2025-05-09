@@ -23,6 +23,7 @@
 "camera_access_denied" = "Please grant camera permission in iOS settings.";
 "on" = "On";
 "off" = "Off";
+"done" = "Done";
 
 // Create Story
 "created_story_successfully" = "Successfully shared story";
@@ -357,6 +358,31 @@
 "live_stream_label" = "Livestream";
 
 "no_internet_connection" = "No internet connection.";
+
+// Alt Text
+"alt_text_button_title" = "ALT";
+"alt_text_title" = "Alt text";
+"alt_text_edit_title" = "Edit alt text";
+"alt_text_placeholder" = "Describe this photo briefly to help visually impaired users understand its content";
+"alt_text_failed_to_add" = "Failed to add alt text. Please try again.";
+"alt_text_failed_to_edit" = "Failed to edit alt text. Please try again.";
+"alt_text_includes_banned_words" = "Your alt text contains an inappropriate word.";
+"alt_text_includes_not_allowed_link" = "Your alt text contains a link that is not allowed.";
+"alt_text_updated" = "Alt text updated.";
+
 "notification_tray_empty_state_title" = "No notifications";
 "notification_tray_title" = "Notifications";
 
+"report_page_submit_button" = "Submit";
+"report_page_info_label" = "Tell us why you're reporting this content. Your report will be reviewed by our moderators and kept confidential.";
+"report_reason_page_title" = "Report reason";
+"report_reason_others_page_title" = "Others";
+
+"report_reason_success_toast_message" = "%@ reported.";
+
+"report_reason_others_input_title" = "Describe your reason";
+"report_reason_others_input_placeholder" = "Share more details about this issue";
+"report_reason_close_button" = "Close";
+"report_reason_done_button" = "Done";
+
+"report_reason_error_toast_message" = "Failed to report %@. Please try again.";

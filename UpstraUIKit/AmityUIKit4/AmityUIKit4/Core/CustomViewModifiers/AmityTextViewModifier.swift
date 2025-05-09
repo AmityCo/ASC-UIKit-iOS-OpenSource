@@ -76,3 +76,9 @@ extension TextField {
         return self.modifier(AmityTextViewModifier(textStyle: style))
     }
 }
+
+extension TextEditor {
+    func applyTextStyle(_ style: AmityTextStyle) -> some View {
+        return self.modifier(AmityTextViewModifier(textStyle: style))
+    }
+}

@@ -34,6 +34,10 @@ class PostManager {
         try await postRepository.flagPost(withId: withId)
     }
     
+    func flagPost(withId: String, reason: AmityContentFlagReason) async throws {
+        try await postRepository.flagPost(withId: withId, reason: reason)
+    }
+    
     @discardableResult
     func unflagPost(withId: String) async throws -> Bool {
         try await postRepository.unflagPost(withId: withId)

@@ -26,6 +26,7 @@ public struct AmityLocalizedStringSet {
         static let off = "off"
         static let edit = "edit"
         static let noInternetConnection = "no_internet_connection"
+        static let done = "done"
     }
     
     public struct Story {
@@ -369,7 +370,32 @@ public struct AmityLocalizedStringSet {
         
         static let liveStreamLabel = "live_stream_label"
         
+        static let altTextButtonTitle = "alt_text_button_title"
+        static let altTextTitle = "alt_text_title"
+        static let altTextEditTitle = "alt_text_edit_title"
+        static let altTextPlaceholder = "alt_text_placeholder"
+        static let altTextFailedToAdd = "alt_text_failed_to_add"
+        static let altTextFailedToEdit = "alt_text_failed_to_edit"
+        static let altTextIncludesBannedWords = "alt_text_includes_banned_words"
+        static let altTextIncludesNotAllowedLink = "alt_text_includes_not_allowed_link"
+        static let altTextUpdated = "alt_text_updated"
+        
         static let notificationTrayEmptyStateTitle = "notification_tray_empty_state_title"
         static let notificationTrayTitle = "notification_tray_title"
+        
+        static let reportPageSubmitButton = "report_page_submit_button"
+        static let reportPageInfoLabel = "report_page_info_label"
+        static let reportReasonPageTitle = "report_reason_page_title"
+        static let reportReasonOthersPageTitle = "report_reason_others_page_title"
+
+        static let reportReasonSuccessToastMessage = "report_reason_success_toast_message"
+
+        static let reportReasonOthersInputTitle = "report_reason_others_input_title"
+        static let reportReasonOthersInputPlaceholder = "report_reason_others_input_placeholder"
+        static let reportReasonCloseButton = "report_reason_close_button"
+        static let reportReasonDoneButton = "report_reason_done_button"
+
+        static let reportReasonErrorToastMessage = "report_reason_error_toast_message"
+
     }
 }

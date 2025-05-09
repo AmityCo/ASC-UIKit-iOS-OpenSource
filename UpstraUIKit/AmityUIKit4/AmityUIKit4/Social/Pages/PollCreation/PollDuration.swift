@@ -160,41 +160,41 @@ struct PollDurationSelectionView: View {
             .padding(.horizontal)
         }
     }
+}
+
+struct OptionButton: View {
     
-    struct OptionButton: View {
-        
-        @EnvironmentObject private var viewConfig: AmityViewConfigController
-        
-        let title: String
-        let isSelected: Bool
-        let onTap: () -> Void
-        
-        var body: some View {
-            Button(action: {
-                onTap()
-            }, label: {
-                HStack {
-                    Text(title)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
+    
+    let title: String
+    let isSelected: Bool
+    let onTap: () -> Void
+    
+    var body: some View {
+        Button(action: {
+            onTap()
+        }, label: {
+            HStack {
+                Text(title)
+                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                
+                Spacer()
+                
+                ZStack {
+                    Circle()
+                        .stroke(lineWidth: 2.0)
+                        .fill(.gray)
+                        .frame(width: 16, height: 16)
+                        .opacity(isSelected ? 0 : 1)
                     
-                    Spacer()
-                    
-                    ZStack {
-                        Circle()
-                            .stroke(lineWidth: 2.0)
-                            .fill(.gray)
-                            .frame(width: 16, height: 16)
-                            .opacity(isSelected ? 0 : 1)
-                        
-                        Image(AmityIcon.pollRadioIcon.imageResource)
-                            .frame(width: 22, height: 22)
-                            .opacity(isSelected ? 1 : 0)
-                    }
+                    Image(AmityIcon.pollRadioIcon.imageResource)
+                        .frame(width: 22, height: 22)
+                        .opacity(isSelected ? 1 : 0)
                 }
-                .padding(.vertical, 16)
-                .contentShape(Rectangle())
-            })
-        }
+            }
+            .padding(.vertical, 16)
+            .contentShape(Rectangle())
+        })
     }
 }
 

@@ -53,15 +53,17 @@ struct PostCreationMediaAttachmentPreviewView: View {
 
 
 struct MediaAttachmentView: View {
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     
-    private let media: AmityMedia
+    @StateObject private var media: AmityMedia
     private let removeAction: () -> Void
     private let fileRepositoryManager = FileRepositoryManager()
     @StateObject private var networkMonitor = NetworkMonitor()
     @ObservedObject private var mediaViewModel: AmityMediaAttachmentViewModel
+    @State private var showAltTextConfig: Bool = false
     
     init(media: AmityMedia, mediaViewModel: AmityMediaAttachmentViewModel, removeAction: @escaping () -> Void) {
-        self.media = media
+        self._media = StateObject(wrappedValue: media)
         self.mediaViewModel = mediaViewModel
         self.removeAction = removeAction
         print(media.state)
@@ -166,6 +168,53 @@ struct MediaAttachmentView: View {
                     .frame(size: CGSize(width: 24, height: 24))
                     .padding(.all, 10)
             })
+            
+            ZStack(alignment: .bottomLeading) {
+                // Transparent rectangle to fill the space but not affect the layout
+                Rectangle()
+                    .fill(Color.clear)
+                
+                // Display alt text button only if the media is an image and from the local device
+                if media.isLocal() && media.type == .image {
+                    Button(action: {
+                        guard let imageData = media.image else { return }
+                        
+                        let configMode: AltTextConfigMode
+                        
+                        if let altText = media.altText, !altText.isEmpty {
+                            configMode = .edit(altText, .image(imageData))
+                        } else {
+                            configMode = .create(.image(imageData))
+                        }
+                        
+                        let component = AmityAltTextConfigComponent(mode: configMode) { altText in
+                            media.altText = altText
+                        }
+                        let vc = AmitySwiftUIHostingController(rootView: component)
+                        
+                        host.controller?.present(vc, animated: true)
+                       }) {
+                           HStack(spacing: 4) {
+                               Text(AmityLocalizedStringSet.Social.altTextButtonTitle.localizedString)
+                                   .applyTextStyle(AmityTextStyle.captionBold(.white))
+                               
+                               if let altText = media.altText ?? media.getAltText(hasDefault: false), !altText.isEmpty {
+                                   Image(AmityIcon.checkMarkIcon.getImageResource())
+                                       .resizable()
+                                       .scaledToFill()
+                                       .frame(width: 16, height: 12)
+                               }
+                           }
+                           .padding(.horizontal, 8)
+                           .padding(.vertical, 4)
+                           .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.black.opacity(0.5))
+                           )
+                       }
+                       .padding(8)
+                }
+            }
         }
         .cornerRadius(6)
         .contentShape(Rectangle())
@@ -272,6 +321,7 @@ struct MediaAttachmentView: View {
                 }
                 
                 Log.add(event: .info, "Image Uploaded!!!")
+                media.image = imageData
                 media.state = .uploadedImage(data: imageData)
                 
                 // Update view model state
@@ -334,6 +384,7 @@ struct MediaAttachmentView: View {
                 }
                 
                 Log.add(event: .info, "Video Uploaded!!!")
+                media.video = videoData
                 media.state = .uploadedVideo(data: videoData)
                 self.mediaViewModel.updateMediaState(media)
             } catch let error {

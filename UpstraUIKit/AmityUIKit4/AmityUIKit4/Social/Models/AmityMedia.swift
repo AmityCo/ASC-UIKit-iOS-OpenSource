@@ -9,6 +9,7 @@ import Foundation
 import AmitySDK
 import Photos
 import UIKit
+import Combine
 
 enum AmityMediaState {
     
@@ -31,14 +32,16 @@ enum AmityMediaType {
     case none
 }
 
-public class AmityMedia: Equatable, Hashable, Identifiable {
+public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
     
     public let id = UUID().uuidString
-    var state: AmityMediaState
+    @Published var state: AmityMediaState
     var type: AmityMediaType
     
     var image: AmityImageData?
     var video: AmityVideoData?
+    
+    @Published var altText: String?
     
     /// This property carry over when the state change from .localAsset to .uploadedVideo.
     var localAsset: PHAsset?
@@ -162,6 +165,20 @@ public class AmityMedia: Equatable, Hashable, Identifiable {
         return lhs.id == rhs.id
     }
     
+    // MARK: - Helpers
+    public func isLocal() -> Bool {
+        switch state {
+            
+        case .uploading(_), .uploadedImage(_), .uploadedVideo(_), .localAsset(_), .image(_), .localURL(_):
+            return true
+       
+        case .downloadableImage(_, _), .downloadableVideo(_, _):
+            return false
+            
+        default: return true
+        }
+    }
+    
     public func getImageURL() -> URL? {
         switch self.state {
             
@@ -176,5 +193,22 @@ public class AmityMedia: Equatable, Hashable, Identifiable {
         }
     }
     
+    public func getAltText(hasDefault: Bool = true) -> String? {
+        let fallback = "No description available"
+        
+        if altText != nil {
+            return altText
+        }
+        
+        switch self.state {
+        case .downloadableImage(imageData: let imageData, placeholder: _):
+            guard let altText = imageData.altText, !altText.isEmpty else {
+                return hasDefault ? fallback : nil
+            }
+            return altText
+            
+        default: return nil
+        }
+    }
 }
 
