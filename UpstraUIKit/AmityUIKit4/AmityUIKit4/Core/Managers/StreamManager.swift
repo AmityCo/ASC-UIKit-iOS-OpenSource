@@ -13,7 +13,7 @@ class StreamManager {
     private let streamRepository = AmityStreamRepository(client: AmityUIKitManagerInternal.shared.client)
     
     func createStream(title: String, description: String?, thumbnail: AmityImageData?, metadata: [String: Any]?) async throws -> AmityStream {
-        try await streamRepository.createStream(withTitle: title, description: description, thumbnailImage: thumbnail, meta: metadata)
+        try await streamRepository.createStream(title: title, description: description ?? "", thumbnailImage: thumbnail, metadata: metadata, resolution: .SD)
     }
     
     func getStream(id: String) -> AmityObject<AmityStream> {

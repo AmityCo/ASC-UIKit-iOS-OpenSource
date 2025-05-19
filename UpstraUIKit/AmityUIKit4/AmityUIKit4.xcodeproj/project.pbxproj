@@ -360,7 +360,6 @@
 		926C520D2CB7190B0085CA64 /* AmityLivestreamPlayerPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926C520C2CB7190B0085CA64 /* AmityLivestreamPlayerPage.swift */; };
 		926F079C2BB4DDB9000806CB /* Shimmer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926F079B2BB4DDB9000806CB /* Shimmer.swift */; };
 		926F079E2BB4E25B000806CB /* LiveChatMessageBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926F079D2BB4E25B000806CB /* LiveChatMessageBubble.swift */; };
-		9275531E2DCE072600526C49 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9275531D2DCE072600526C49 /* SharedFrameworks */; };
 		9280FDAA2C3C8A390052F01A /* AmityCommunityProfilePage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9280FDA92C3C8A380052F01A /* AmityCommunityProfilePage.swift */; };
 		9280FDD12C40D9B20052F01A /* AmityCommunityProfilePageBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9280FDD02C40D9B20052F01A /* AmityCommunityProfilePageBehavior.swift */; };
 		9280FDD42C40E9F90052F01A /* AmityCommunityHeaderComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9280FDD32C40E9F90052F01A /* AmityCommunityHeaderComponent.swift */; };
@@ -369,6 +368,7 @@
 		9280FDDB2C40EBFC0052F01A /* AmityCommunityProfileTabComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9280FDDA2C40EBFC0052F01A /* AmityCommunityProfileTabComponent.swift */; };
 		92891DE32BACE17100B5111E /* LiveChatMessageBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92891DE22BACE17100B5111E /* LiveChatMessageBubbleView.swift */; };
 		9295F1E42CC7972E0048603A /* AmityLivestreamBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9295F1E32CC7972E0048603A /* AmityLivestreamBehavior.swift */; };
+		929D8BC32DDB8A9D0006E0D7 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 929D8BC22DDB8A9D0006E0D7 /* SharedFrameworks */; };
 		92CC82702C332C4B0000B523 /* AmityCommentAdComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92CC826F2C332C4B0000B523 /* AmityCommentAdComponent.swift */; };
 		92D31B5C2BBCCDD000932DDA /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D31B5B2BBCCDD000932DDA /* NetworkMonitor.swift */; };
 		92EF987F2BC5F7D60029B420 /* AmityLiveChatMessageSenderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EF987E2BC5F7D60029B420 /* AmityLiveChatMessageSenderView.swift */; };
@@ -1107,7 +1107,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9275531E2DCE072600526C49 /* SharedFrameworks in Frameworks */,
+				929D8BC32DDB8A9D0006E0D7 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3848,7 +3848,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		9275531D2DCE072600526C49 /* SharedFrameworks */ = {
+		929D8BC22DDB8A9D0006E0D7 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
