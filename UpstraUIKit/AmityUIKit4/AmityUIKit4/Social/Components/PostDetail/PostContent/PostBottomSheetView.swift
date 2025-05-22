@@ -43,6 +43,7 @@ struct PostBottomSheetView: View {
         }
         .onAppear {
             viewModel.updatePostFlaggedByMeState(id: post.postId)
+            viewModel.checkDeletePermission(post: post)
         }
         .alert(isPresented: $isAlertShown, content: {
             
@@ -133,7 +134,7 @@ struct PostBottomSheetView: View {
                 .isHidden(post.isOwner)
             
             deleteSheetButton
-                .isHidden(!post.isOwner)
+                .isHidden(!(post.isOwner || viewModel.hasDeletePermission))
             Spacer()
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
@@ -260,6 +261,7 @@ class PostBottomSheetViewModel: ObservableObject {
     private let pollManager = PollManager()
     
     @Published var isPostFlaggedByMe: Bool = false
+    @Published var hasDeletePermission: Bool = false
     
     @MainActor
     func deletePost(id: String) async throws {
@@ -284,6 +286,19 @@ class PostBottomSheetViewModel: ObservableObject {
     func updatePostFlaggedByMeState(id: String) {
         Task { @MainActor in
             isPostFlaggedByMe = try await postManager.isFlagByMe(withId: id)
+        }
+    }
+    
+    func checkDeletePermission(post: AmityPostModel) {
+        if post.isOwner {
+            hasDeletePermission = true
+            return
+        }
+        
+        if let communityId = post.targetCommunity?.communityId {
+            Task { @MainActor in
+                hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)                
+            }
         }
     }
 }

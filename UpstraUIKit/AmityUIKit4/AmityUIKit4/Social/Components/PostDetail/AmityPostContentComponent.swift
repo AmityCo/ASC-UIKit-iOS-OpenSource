@@ -92,6 +92,9 @@ public struct AmityPostContentComponent: AmityComponentView {
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)
+        .onAppear {
+            viewModel.checkPermissions(post: post)
+        }
     }
     
     @ViewBuilder
@@ -194,8 +197,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     .isHidden(!(category == .pin || category == .pinAndAnnouncement) || viewConfig.isHidden(elementId: .pinBadge))
                     .accessibilityIdentifier(AccessibilityID.Social.PostContent.pinBadge)
                 
-                if !hideMenuButton {
-                    let bottomSheetHeight = calculateBottomSheetHeight(post: post)
+                if !hideMenuButton {                    
                     Button(action: {
                         showBottomSheet.toggle()
                     }, label: {
@@ -208,7 +210,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     })
                     .buttonStyle(PlainButtonStyle())
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
-                    .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                    .bottomSheet(isShowing: $showBottomSheet, height: .fixed(calculateBottomSheetHeight(post: post)), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                         PostBottomSheetView(isShown: $showBottomSheet, post: post) { postAction in
                             
                             switch postAction {
@@ -501,16 +503,16 @@ public struct AmityPostContentComponent: AmityComponentView {
         
         let baseBottomSheetHeight: CGFloat = 68
         let itemHeight: CGFloat = 48
+        
         let additionalItems = [
             true,  // Always add one item
-            post.hasModeratorPermission || post.isOwner,
+            post.hasModeratorPermission || viewModel.hasDeletePermission,
         ].filter { $0 }
         
         let additionalHeight = CGFloat(additionalItems.count) * itemHeight
         
         return baseBottomSheetHeight + additionalHeight
     }
-    
 }
 
 extension AmityPostContentComponent {
@@ -588,8 +590,24 @@ extension AmityPostContentComponent {
 
 class AmityPostContentComponentViewModel: ObservableObject {
     private let reactionManager = ReactionManager()
+    private let permissionChecker = CommunityPermissionChecker()
+    
+    @Published var hasDeletePermission: Bool = false
     
     init() {}
+    
+    func checkPermissions(post: AmityPostModel) {
+        if post.isOwner {
+            hasDeletePermission = true
+            return
+        }
+        
+        if let communityId = post.targetCommunity?.communityId {
+            Task { @MainActor in
+                hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
+            }
+        }
+    }
     
     func addReaction(id: String) async throws {
         try await reactionManager.addReaction(.like, referenceId: id, referenceType: .post)

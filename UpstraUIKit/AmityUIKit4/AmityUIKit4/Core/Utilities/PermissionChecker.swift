@@ -29,3 +29,15 @@ class ChatPermissionChecker {
         }
     }
 }
+
+class CommunityPermissionChecker {
+    static func hasDeleteCommunityPostPermission(communityId: String) async -> Bool {
+        await withCheckedContinuation { continuation in
+            Task { @MainActor in
+                AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunityPost, forCommunity: communityId) { hasPermission in
+                    continuation.resume(returning: hasPermission)
+                }
+            }
+        }
+    }
+}

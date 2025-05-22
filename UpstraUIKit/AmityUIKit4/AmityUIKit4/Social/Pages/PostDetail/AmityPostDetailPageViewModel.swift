@@ -16,6 +16,7 @@ class AmityPostDetailPageViewModel: ObservableObject {
     @Published var post: AmityPostModel?
     @Published var isPostDeleted = false
     @Published var isLoading = false
+    @Published var hasDeletePermission = false
     
     var token: AmityNotificationToken?
     
@@ -67,6 +68,14 @@ class AmityPostDetailPageViewModel: ObservableObject {
             if let snapshot = livePost.snapshot {
                 self.post = AmityPostModel(post: snapshot)
                 self.isPostDeleted = snapshot.isDeleted
+                
+                if self.post?.isOwner ?? false {
+                    self.hasDeletePermission = true
+                } else if let communityId = snapshot.targetCommunity?.communityId {
+                    Task { @MainActor in
+                        self.hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
+                    }
+                }
             }
         })
     }

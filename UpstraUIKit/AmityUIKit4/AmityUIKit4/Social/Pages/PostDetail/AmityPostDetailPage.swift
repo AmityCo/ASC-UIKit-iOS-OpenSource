@@ -209,11 +209,10 @@ public struct AmityPostDetailPage: AmityPageView {
         let itemHeight: CGFloat = 48
         let additionalItems = [
             true,  // Always add one item
-            post.hasModeratorPermission || post.isOwner,
+            post.hasModeratorPermission || viewModel.hasDeletePermission,
         ].filter { $0 }
         
         let additionalHeight = CGFloat(additionalItems.count) * itemHeight
-        
         
         return baseBottomSheetHeight + additionalHeight
     }
