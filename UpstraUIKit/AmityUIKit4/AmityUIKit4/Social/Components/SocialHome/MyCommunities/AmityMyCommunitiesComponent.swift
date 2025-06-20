@@ -68,7 +68,7 @@ class AmityMyCommunitiesComponentViewModel: ObservableObject {
     private var loadingCancellable: AnyCancellable?
     
     init() {
-        communityCollection = communityManager.searchCommunitites(keyword: "", filter: .userIsMember)
+        communityCollection = communityManager.getCommunities(filter: .userIsMember)
         loadingCancellable = communityCollection.$loadingStatus
             .sink(receiveValue: { [weak self] status in
                 self?.loadingStatus = status

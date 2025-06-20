@@ -163,6 +163,7 @@ public struct AmityLocalizedStringSet {
         
         static let communitySettingBasicInfoTitle = "community_setting_basic_info_title"
         static let communitySettingCommunityPermissionsTitle = "community_setting_community_permissions_title"
+        static let communitySettingNotificationsTitle = "community_setting_notifications_title"
         static let communitySettingEditProfile = "community_setting_edit_profile";
         static let communitySettingMembers = "community_setting_members";
         static let communitySettingNotifications = "community_setting_notifications";
@@ -396,6 +397,34 @@ public struct AmityLocalizedStringSet {
         static let reportReasonDoneButton = "report_reason_done_button"
 
         static let reportReasonErrorToastMessage = "report_reason_error_toast_message"
-
+        
+        static let communityUpdateSuccessToastMessage = "community_update_success_toast_message"
+        
+        static let pendingJoinRequestAlertTitle = "pending_join_request_alert_title"
+        static let pendingJoinRequestAlertMessage = "pending_join_request_alert_message"
+        
+        static let communityLeaveAlertTitle = "community_leave_alert_title"
+        static let communityLeaveAlertPendingRequestMessage = "community_leave_alert_pending_request_message"
+        
+        static let communityJoinToastSuccessMessage = "community_join_toast_success_message"
+        static let communityJoinToastRequestSuccessMessage = "community_join_toast_request_success_message"
+        static let communityJoinToastErrorMessage = "community_join_toast_error_message"
+        
+        static let userJoinAcceptedToastSuccessMessage = "user_join_accepted_toast_success_message"
+        static let userJoinAcceptedToastErrorMessage = "user_join_accepted_toast_error_message"
+        static let userJoinDeclinedToastSuccessMessage = "user_join_declined_toast_success_message"
+        static let userJoinDeclinedToastErrorMessage = "user_join_decliend_toast_error_message"
+        
+        static let userJoinRequestAcceptLabel = "user_join_request_accept_label"
+        static let userJoinRequestDeclineLabel = "user_join_request_decline_label"
+        
+        static let userJoinRequestDeclineAlertBannerMessage = "user_join_request_decline_alert_banner_message"
+        
+        static let communityPendingRequestTabPostsTitle = "community_pending_request_tab_posts_title"
+        static let communityPendingRequestTabJoinRequestsTitle = "community_pending_request_tab_join_requests_title"
+        static let communityPendingRequestPageTitle = "community_pending_request_page_title"
+        
+        static let communityJoinRequestEmptyStateTitle = "community_join_request_empty_state_title"
+        static let communityPendingPostsEmptyStateTitle = "community_pending_posts_empty_state_title"
     }
 }

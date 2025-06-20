@@ -5,12 +5,14 @@
 //  Created by Zay Yar Htun on 8/5/24.
 //
 
-import SwiftUI
-import AmitySDK
 import AVKit
+import AmitySDK
+import SwiftUI
 
 public enum AmityCommunitySetupPageMode: Equatable {
-    public static func == (lhs: AmityCommunitySetupPageMode, rhs: AmityCommunitySetupPageMode) -> Bool {
+    public static func == (lhs: AmityCommunitySetupPageMode, rhs: AmityCommunitySetupPageMode)
+    -> Bool
+    {
         switch (lhs, rhs) {
         case (.create, .create),
             (.edit, .edit):
@@ -35,27 +37,31 @@ public struct AmityCommunitySetupPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: AmityCommunitySetupPageViewModel
     
-    /// Community Avarta data
+    /// Community Avatar data
     @State private var showBottomSheet: Bool = false
-    @State private var showImagePicker: (isShown: Bool, mediaType: [UTType] , sourceType:  UIImagePickerController.SourceType) = (false, [UTType.image], .photoLibrary)
-    @StateObject private var imagePickerViewModel: ImageVideoPickerViewModel = ImageVideoPickerViewModel()
+    @State private var showImagePicker:
+    (isShown: Bool, mediaType: [UTType], sourceType: UIImagePickerController.SourceType) = (
+        false, [UTType.image], .photoLibrary
+    )
+    @StateObject private var imagePickerViewModel: ImageVideoPickerViewModel =
+    ImageVideoPickerViewModel()
     
     /// Community Name data
-    @State private var nameTextFieldModel: InfoTextFieldModel = InfoTextFieldModel(title: "Community name", placeholder: "Name your community", isMandatory: false, maxCharCount: 30)
-    @State private var nameText: String = ""
+    @State private var nameTextFieldModel: InfoTextFieldModel = InfoTextFieldModel(
+        title: "Community name", placeholder: "Name your community", isMandatory: false,
+        maxCharCount: 30)
     @State private var isTextValid: Bool = true
     
     /// About data
-    @State private var aboutTextFieldModel: InfoTextFieldModel = InfoTextFieldModel(title: "About", placeholder: "Enter Description", isMandatory: false, showOptionalTitle: true, isExpandable: true, maxCharCount: 180)
-    @State private var aboutText: String = ""
+    @State private var aboutTextFieldModel: InfoTextFieldModel = InfoTextFieldModel(
+        title: "About", placeholder: "Enter Description", isMandatory: false,
+        showOptionalTitle: true, isExpandable: true, maxCharCount: 180)
     
     /// Categories data
-    @State private var categoryTextFieldModel = InfoTextFieldModel(title: "Categories", placeholder: "Select Category", isMandatory: false, showOptionalTitle: true)
+    @State private var categoryTextFieldModel = InfoTextFieldModel(
+        title: "Categories", placeholder: "Select Category", isMandatory: false,
+        showOptionalTitle: true)
     @State private var categoryText: String = ""
-    @State private var selectedCategories: [AmityCommunityCategoryModel] = []
-    
-    /// Public|Private data
-    @State private var isPublicCommunity: Bool = true
     
     /// Add Member data
     @State private var selectedMembers: [AddMemberModel] = [AddMemberModel(type: .create)]
@@ -64,17 +70,32 @@ public struct AmityCommunitySetupPage: AmityPageView {
     /// Track data changes in editMode & create mode
     @State private var isExistingDataChanged: Bool = false
     
+    /// Members need to be invited if network setting is invitation mode
+    @State private var isMembershipInvitationEnabled: Bool = false
+    
+    // Draft contains all information inputted by user in this setup page
+    @StateObject var draft: CommunityDraft
+    
     public init(mode: AmityCommunitySetupPageMode) {
         self.pageMode = mode
-        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .communitySetupPage))
-        self._viewModel =  StateObject(wrappedValue: AmityCommunitySetupPageViewModel(mode: mode, communityId: nil))
+        self._viewConfig = StateObject(
+            wrappedValue: AmityViewConfigController(pageId: .communitySetupPage))
+        self._viewModel = StateObject(
+            wrappedValue: AmityCommunitySetupPageViewModel(mode: mode, communityId: nil))
+        
+        if let setting = AmityUIKitManagerInternal.shared.client.getSocialSettings()?
+            .membershipAcceptance
+        {
+            self._isMembershipInvitationEnabled = State(initialValue: setting == .invitation)
+        }
         
         if case .edit(let community) = mode {
-            self._nameText = State(initialValue: community.displayName)
-            self._aboutText = State(initialValue: community.communityDescription)
-            self._selectedCategories = State(initialValue: community.categories.map { AmityCommunityCategoryModel(object: $0) })
-            self._isPublicCommunity = State(initialValue: community.isPublic)
-            self._viewModel =  StateObject(wrappedValue: AmityCommunitySetupPageViewModel(mode: mode, communityId: community.communityId))
+            self._draft = StateObject(wrappedValue: CommunityDraft(community: community))
+            self._viewModel = StateObject(
+                wrappedValue: AmityCommunitySetupPageViewModel(
+                    mode: mode, communityId: community.communityId))
+        } else {
+            self._draft = StateObject(wrappedValue: CommunityDraft())
         }
     }
     
@@ -91,7 +112,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                 .overlay(
                                     ZStack {
                                         if case .edit(let community) = pageMode {
-                                            AsyncImage(url: URL(string: community.avatar?.largeFileURL ?? ""))
+                                            AsyncImage(
+                                                url: URL(
+                                                    string: community.avatar?.largeFileURL ?? ""))
                                         }
                                         
                                         if let image = imagePickerViewModel.selectedImage {
@@ -103,7 +126,6 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         
                                         Color.black
                                             .opacity(0.25)
-                                        
                                         
                                         Image(AmityIcon.cameraIcon.getImageResource())
                                             .resizable()
@@ -119,61 +141,164 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                 }
                             
                             VStack(alignment: .leading, spacing: 24) {
-                                InfoTextField(data: $nameTextFieldModel, text: $nameText, isValid: $isTextValid, titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup.communityNameTitle)
-                                    .alertColor(viewConfig.theme.alertColor)
-                                    .dividerColor(viewConfig.theme.baseColorShade4)
-                                    .infoTextColor(viewConfig.theme.baseColorShade2)
-                                    .textFieldTextColor(viewConfig.theme.baseColor)
+                                // Community Name
+                                InfoTextField(
+                                    data: $nameTextFieldModel, text: $draft.name,
+                                    isValid: $isTextValid,
+                                    titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup
+                                        .communityNameTitle
+                                )
+                                .alertColor(viewConfig.theme.alertColor)
+                                .dividerColor(viewConfig.theme.baseColorShade4)
+                                .infoTextColor(viewConfig.theme.baseColorShade2)
+                                .textFieldTextColor(viewConfig.theme.baseColor)
                                 
-                                InfoTextField(data: $aboutTextFieldModel, text: $aboutText, isValid: $isTextValid, titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup.communityAboutTitle)
-                                    .alertColor(viewConfig.theme.alertColor)
-                                    .dividerColor(viewConfig.theme.baseColorShade4)
-                                    .infoTextColor(viewConfig.theme.baseColorShade2)
-                                    .textFieldTextColor(viewConfig.theme.baseColor)
+                                // Community Description
+                                InfoTextField(
+                                    data: $aboutTextFieldModel, text: $draft.about,
+                                    isValid: $isTextValid,
+                                    titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup
+                                        .communityAboutTitle
+                                )
+                                .alertColor(viewConfig.theme.alertColor)
+                                .dividerColor(viewConfig.theme.baseColorShade4)
+                                .infoTextColor(viewConfig.theme.baseColorShade2)
+                                .textFieldTextColor(viewConfig.theme.baseColor)
                                 
+                                // Categories
                                 getAddCategoryView()
                                 
+                                // Privacy
                                 VStack(spacing: 16) {
                                     HStack {
-                                        let privacyTitle = viewConfig.getText(elementId: .communityPrivacyTitle) ?? ""
+                                        let privacyTitle =
+                                        viewConfig.getText(elementId: .communityPrivacyTitle)
+                                        ?? ""
                                         Text(privacyTitle)
-                                            .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-                                            .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityPrivacyTitle)
+                                            .applyTextStyle(
+                                                .titleBold(Color(viewConfig.theme.baseColor))
+                                            )
+                                            .accessibilityIdentifier(
+                                                AccessibilityID.Social.CommunitySetup
+                                                    .communityPrivacyTitle)
                                         
                                         Spacer()
                                     }
                                     
-                                    let publicTitle = viewConfig.getText(elementId: .communityPrivacyPublicTitle) ?? ""
-                                    let publicDesc = viewConfig.getText(elementId: .communityPrivacyPublicDescription) ?? ""
-                                    let publicIcon = viewConfig.getImage(elementId: .communityPrivacyPublicIcon)
-                                    PrivacyRadioButtonView(isSelected: isPublicCommunity, icon: publicIcon, title: publicTitle, description: publicDesc)
-                                        .onTapGesture {
-                                            isPublicCommunity = true
-                                        }
-                                        .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityPrivacyPublicTitle)
+                                    let publicTitle =
+                                    viewConfig.getText(elementId: .communityPrivacyPublicTitle)
+                                    ?? ""
+                                    let publicDesc =
+                                    viewConfig.getText(
+                                        elementId: .communityPrivacyPublicDescription) ?? ""
+                                    let publicIcon = viewConfig.getImage(
+                                        elementId: .communityPrivacyPublicIcon)
+                                    PrivacyRadioButtonView(
+                                        isSelected: draft.privacy == .public, icon: publicIcon,
+                                        title: publicTitle, description: publicDesc
+                                    )
+                                    .onTapGesture {
+                                        draft.requiresModeratorApproval = false
+                                        draft.privacy = .public
+                                    }
+                                    .accessibilityIdentifier(
+                                        AccessibilityID.Social.CommunitySetup
+                                            .communityPrivacyPublicTitle)
                                     
-                                    let privateTitle = viewConfig.getText(elementId: .communityPrivacyPrivateTitle) ?? ""
-                                    let privateDesc = viewConfig.getText(elementId: .communityPrivacyPrivateDescription) ?? ""
-                                    let privateIcon = viewConfig.getImage(elementId: .communityPrivacyPrivateIcon)
-                                    PrivacyRadioButtonView(isSelected: !isPublicCommunity, icon: privateIcon, title: privateTitle, description: privateDesc)
-                                        .onTapGesture {
-                                            isPublicCommunity = false
-                                        }
-                                        .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityPrivacyPrivateTitle)
+                                    PrivacyRadioButtonView(
+                                        isSelected: draft.privacy == .privateAndVisible,
+                                        icon: AmityIcon.globePrivateIcon.imageResource,
+                                        title: "Private & visible",
+                                        description:
+                                            "Community is discoverable by anyone. Content is hidden from non-members."
+                                    )
+                                    .onTapGesture {
+                                        draft.requiresModeratorApproval = true
+                                        draft.privacy = .privateAndVisible
+                                    }
+
+                                    let privateIcon = viewConfig.getImage(
+                                        elementId: .communityPrivacyPrivateIcon)
+                                    PrivacyRadioButtonView(
+                                        isSelected: draft.privacy == .privateAndHidden,
+                                        icon: privateIcon, title: "Private & hidden",
+                                        description:
+                                            "Community and content are hidden from non-members, and cannot be discovered via search."
+                                    )
+                                    .onTapGesture {
+                                        draft.requiresModeratorApproval = true
+                                        draft.privacy = .privateAndHidden
+                                    }
+                                    .accessibilityIdentifier(
+                                        AccessibilityID.Social.CommunitySetup
+                                            .communityPrivacyPrivateTitle)
                                 }
                                 
                                 Rectangle()
                                     .fill(Color(viewConfig.theme.baseColorShade4))
                                     .frame(height: 1)
-                                    .isHidden(isPublicCommunity, remove: false)
                                 
-                                getAddMemberView(geometry)
-                                    .isHidden(isPublicCommunity || pageMode != .create, remove: true)
-                                    .id("AddMemberView")
-                                    .onChange(of: isPublicCommunity) { _ in
-                                        scrollView.scrollTo("AddMemberView", anchor: .bottom)
+                                VStack(spacing: 16) {
+                                    let communityMembershipTitle = viewConfig.getText(elementId: .communityMembershipTitle) ?? ""
+                                    HStack {
+                                        Text(communityMembershipTitle)
+                                            .applyTextStyle(
+                                                .titleBold(Color(viewConfig.theme.baseColor)))
+                                        
+                                        Spacer()
                                     }
-                                    .padding(.bottom, 16) // need to set padding to this view directly to have padding in autoscrolling
+                                    
+                                    HStack(spacing: 10) {
+                                        let commMembershipDescription = viewConfig.getText(elementId: .communityMembershipDescription) ?? ""
+                                        VStack(spacing: 6) {
+                                            Text(commMembershipDescription)
+                                                .applyTextStyle(
+                                                    .bodyBold(Color(viewConfig.theme.baseColor))
+                                                )
+                                                .frame(maxWidth: .infinity, alignment: .leading)
+                                            
+                                            let commMembershipSubDescription = viewConfig.getText(elementId: .communityMembershipSubDescription) ?? ""
+                                            Text(commMembershipSubDescription)
+                                            .applyTextStyle(
+                                                .caption(Color(viewConfig.theme.baseColorShade1))
+                                            )
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                        }
+                                        
+                                        Toggle("", isOn: $draft.requiresModeratorApproval)
+                                            .toggleStyle(
+                                                SwitchToggleStyle(
+                                                    tint: Color(viewConfig.theme.primaryColor))
+                                            )
+                                            .frame(width: 48, height: 28)
+                                    }
+                                    .contentShape(Rectangle())
+                                }
+                                
+                                Rectangle()
+                                    .fill(Color(viewConfig.theme.baseColorShade4))
+                                    .frame(height: 1)
+                                    .isHidden(draft.privacy == .public, remove: false)
+                                
+                                if isMembershipInvitationEnabled {
+                                    getInviteMemberView(geometry)
+                                        .isHidden(draft.privacy == .public || pageMode != .create, remove: true) // Hide member view while editing public community
+                                        .id("InviteMemberView")
+                                        .onChange(of: draft.privacy) { _ in
+                                            guard draft.privacy == .privateAndVisible else { return }
+                                            
+                                            scrollView.scrollTo("InviteMemberView", anchor: .bottom)
+                                        }
+                                        .padding(.bottom, 16)
+                                } else {
+                                    getAddMemberView(geometry)
+                                        .isHidden(draft.privacy == .public || pageMode != .create, remove: true) // Hide member view while editing public community
+                                        .id("AddMemberView")
+                                        .onChange(of: draft.privacy) { _ in
+                                            scrollView.scrollTo("AddMemberView", anchor: .bottom)
+                                        }
+                                        .padding(.bottom, 16)  // need to set padding to this view directly to have padding in autoscrolling
+                                }
                             }
                             .padding([.leading, .trailing], 16)
                         }
@@ -187,38 +312,51 @@ public struct AmityCommunitySetupPage: AmityPageView {
                     }
             )
             
-            
             if case .edit(let community) = pageMode {
                 editCommunityButtonView
                     .onTapGesture {
                         guard isExistingDataChanged else { return }
                         
-                        let isCommunityPublicBeforeEdit = community.isPublic
-                        let isCommunityPrivateAfterEdit = !isPublicCommunity
-                        let handlePrivacyChange = isCommunityPublicBeforeEdit && isCommunityPrivateAfterEdit
+                        let requiredConfirmations = draft.requiresConfirmationForPrivacyChanges(with: CommunityDraft(community: community))
+                        var isConfirmationAlertShown = false
                         
-                        if viewModel.hasGlobalPinnedPost && handlePrivacyChange  {
-                            let title = AmityLocalizedStringSet.Social.globalFeaturedCommunityEditConfirmationTitle.localizedString
-                            let message = AmityLocalizedStringSet.Social.globalFeaturedCommunityEditConfirmationMessage.localizedString
+                        // Note:
+                        // We show maximum one confirmation alert (if required) for edit operation. Incase confirmation alert is not required, we continue with editing community
+                        for confirmation in requiredConfirmations {
                             
-                            let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
-                            let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.confirm.localizedString, style: .destructive) { action in
-                                editCommunity(community)
+                            if confirmation == .pendingJoinRequests {
+                                guard viewModel.hasPendingJoinRequests else { continue }
+                                
+                                isConfirmationAlertShown = true
+                                showConfirmationAlert(type: .pendingJoinRequests) {
+                                    // Do nothing
+                                }
+                                
+                                // Once alert is shown, we break out of the loop
+                                break
                             }
                             
-                            let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-                            
-                            alertController.addAction(cancelAction)
-                            alertController.addAction(confirmAction)
-                            host.controller?.present(alertController, animated: true)
-                        } else {
+                            if confirmation == .globalFeaturedPosts {
+                                guard viewModel.hasGlobalPinnedPost else { continue }
+                                
+                                isConfirmationAlertShown = true
+                                showConfirmationAlert(type: .globalFeaturedPosts) {
+                                    editCommunity(community)
+                                }
+                                
+                                // Once alert is shown, we break out of the loop
+                                break
+                            }
+                        }
+                        
+                        if !isConfirmationAlertShown {
                             editCommunity(community)
                         }
                     }
             } else {
                 createCommunityButtonView
                     .onTapGesture {
-                        guard !nameText.isEmpty else { return }
+                        guard !draft.name.isEmpty else { return }
                         createCommunity()
                     }
             }
@@ -226,16 +364,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
         .onChange(of: imagePickerViewModel) { _ in
             validateDataChanged()
         }
-        .onChange(of: nameText) { _ in
-            validateDataChanged()
-        }
-        .onChange(of: aboutText) { _ in
-            validateDataChanged()
-        }
-        .onChange(of: selectedCategories) { _ in
-            validateDataChanged()
-        }
-        .onChange(of: isPublicCommunity) { _ in
+        .onChange(of: draft) { _ in
             validateDataChanged()
         }
         .allowsHitTesting(enableTouchEvent)
@@ -246,15 +375,19 @@ public struct AmityCommunitySetupPage: AmityPageView {
             getBottomSheetView()
         }
         .fullScreenCover(isPresented: $showImagePicker.isShown) {
-            ImageVideoCameraPicker(viewModel: imagePickerViewModel, mediaType: $showImagePicker.mediaType, sourceType: $showImagePicker.sourceType)
-                .ignoresSafeArea()
+            ImageVideoCameraPicker(
+                viewModel: imagePickerViewModel, mediaType: $showImagePicker.mediaType,
+                sourceType: $showImagePicker.sourceType
+            )
+            .ignoresSafeArea()
         }
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
             
             nameTextFieldModel.title = viewConfig.getText(elementId: .communityNameTitle) ?? ""
             aboutTextFieldModel.title = viewConfig.getText(elementId: .communityAboutTitle) ?? ""
-            categoryTextFieldModel.title = viewConfig.getText(elementId: .communityCategoryTitle) ?? ""
+            categoryTextFieldModel.title =
+            viewConfig.getText(elementId: .communityCategoryTitle) ?? ""
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
@@ -271,27 +404,23 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .onTapGesture {
                     
                     // Do not show alert if existing data is not changed
-                    if pageMode == .create && !isExistingDataChanged {
-                        host.controller?.navigationController?.popViewController(animation: .presentation)
+                    if !isExistingDataChanged {
+                        host.controller?.navigationController?.popViewController(
+                            animation: .presentation)
                         return
                     }
                     
-                    let title = pageMode == .create ? AmityLocalizedStringSet.Social.communitySetupAlertTitle.localizedString :  AmityLocalizedStringSet.Social.communitySetupEditAlertTitle.localizedString
-                    let message = pageMode == .create ?  AmityLocalizedStringSet.Social.communitySetupAlertMessage.localizedString :  AmityLocalizedStringSet.Social.communitySetupEditAlertMessage.localizedString
-                    let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-                    let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
-                    let leaveAction = UIAlertAction(title: pageMode == .create ? AmityLocalizedStringSet.General.leave.localizedString : AmityLocalizedStringSet.General.discard.localizedString, style: .destructive) { action in
+                    showConfirmationAlert(type: .discard) {
                         host.controller?.navigationController?.popViewController(animation: .presentation)
                     }
-                    
-                    alertController.addAction(cancelAction)
-                    alertController.addAction(leaveAction)
-                    host.controller?.present(alertController, animated: true)
                 }
             
             Spacer()
             
-            let title = pageMode == .create ? viewConfig.getText(elementId: .title) ?? "" : viewConfig.getText(elementId: .communityEditTitle) ?? ""
+            let title =
+            pageMode == .create
+            ? viewConfig.getText(elementId: .title) ?? ""
+            : viewConfig.getText(elementId: .communityEditTitle) ?? ""
             Text(title)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.title)
@@ -303,10 +432,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
         }
     }
     
-    
     @ViewBuilder
     private func getAddCategoryView() -> some View {
-        if selectedCategories.isEmpty {
+        if draft.categories.isEmpty {
             ZStack {
                 ZStack(alignment: .trailing) {
                     Image(AmityIcon.arrowIcon.getImageResource())
@@ -317,22 +445,29 @@ public struct AmityCommunitySetupPage: AmityPageView {
                         .frame(width: 18, height: 18)
                         .offset(y: 10)
                     
-                    InfoTextField(data: $categoryTextFieldModel, text: $categoryText, isValid: $isTextValid, titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup.communityCategoryTitle)
-                        .alertColor(viewConfig.theme.alertColor)
-                        .dividerColor(viewConfig.theme.baseColorShade4)
-                        .infoTextColor(viewConfig.theme.baseColorShade2)
-                        .textFieldTextColor(viewConfig.theme.baseColor)
-                        .allowsHitTesting(false)
+                    InfoTextField(
+                        data: $categoryTextFieldModel, text: $categoryText, isValid: $isTextValid,
+                        titleTextAccessibilityId: AccessibilityID.Social.CommunitySetup
+                            .communityCategoryTitle
+                    )
+                    .alertColor(viewConfig.theme.alertColor)
+                    .dividerColor(viewConfig.theme.baseColorShade4)
+                    .infoTextColor(viewConfig.theme.baseColorShade2)
+                    .textFieldTextColor(viewConfig.theme.baseColor)
+                    .allowsHitTesting(false)
                 }
                 
                 Color.clear
                     .contentShape(Rectangle())
             }
             .onTapGesture {
-                let context = AmityCommunitySetupPageBehavior.Context(page: self, selectedCategories: selectedCategories, onCategoryAddedAction: { categories in
-                    self.selectedCategories = categories
-                })
-                AmityUIKitManagerInternal.shared.behavior.communitySetupPageBehavior?.goToAddCategoryPage(context)
+                let context = AmityCommunitySetupPageBehavior.Context(
+                    page: self, selectedCategories: draft.categories,
+                    onCategoryAddedAction: { categories in
+                        self.draft.categories = categories
+                    })
+                AmityUIKitManagerInternal.shared.behavior.communitySetupPageBehavior?
+                    .goToAddCategoryPage(context)
             }
         } else {
             VStack(alignment: .leading, spacing: 24) {
@@ -345,7 +480,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 
                 VStack(spacing: 16) {
                     ZStack(alignment: .topTrailing) {
-                        CategoryGridView(categories: $selectedCategories)
+                        CategoryGridView(categories: $draft.categories)
                             .environmentObject(viewConfig)
                             .padding(.trailing, 10)
                         
@@ -357,10 +492,13 @@ public struct AmityCommunitySetupPage: AmityPageView {
                             .frame(width: 18, height: 18)
                             .offset(y: 10)
                             .onTapGesture {
-                                let context = AmityCommunitySetupPageBehavior.Context(page: self, selectedCategories: selectedCategories, onCategoryAddedAction: { categories in
-                                    self.selectedCategories = categories
-                                })
-                                AmityUIKitManagerInternal.shared.behavior.communitySetupPageBehavior?.goToAddCategoryPage(context)
+                                let context = AmityCommunitySetupPageBehavior.Context(
+                                    page: self, selectedCategories: draft.categories,
+                                    onCategoryAddedAction: { categories in
+                                        self.draft.categories = categories
+                                    })
+                                AmityUIKitManagerInternal.shared.behavior
+                                    .communitySetupPageBehavior?.goToAddCategoryPage(context)
                             }
                     }
                     
@@ -372,97 +510,227 @@ public struct AmityCommunitySetupPage: AmityPageView {
         }
     }
     
-    
     private func getAddMemberView(_ geometry: GeometryProxy) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             HStack {
                 let addMemberTitle = viewConfig.getText(elementId: .communityAddMemberTitle) ?? ""
                 Text(addMemberTitle)
                     .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityAddMemberTitle)
+                    .accessibilityIdentifier(
+                        AccessibilityID.Social.CommunitySetup.communityAddMemberTitle)
                 
                 Spacer()
             }
             
-            let columns = self.columns(for: geometry.size.width, itemWidth: 68, spacing: 0)
-            
-            LazyVGrid(columns: columns, content: {
-                ForEach(Array(selectedMembers.enumerated()), id: \.element.id) { index, member in
-                    switch member.type {
-                        
-                    case .user:
-                        VStack(spacing: 8) {
-                            ZStack(alignment: .topTrailing) {
-                                AmityUserProfileImageView(displayName: member.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: member.user?.avatarURL ?? ""))
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.flexible()), count: 4),
+                content: {
+                    ForEach(Array(selectedMembers.enumerated()), id: \.element.id) {
+                        index, member in
+                        switch member.type {
+                            
+                        case .user:
+                            VStack(spacing: 8) {
+                                ZStack(alignment: .topTrailing) {
+                                    AmityUserProfileImageView(
+                                        displayName: member.user?.displayName
+                                        ?? AmityLocalizedStringSet.General.anonymous
+                                            .localizedString,
+                                        avatarURL: URL(string: member.user?.avatarURL ?? "")
+                                    )
                                     .frame(width: 40, height: 40)
                                     .clipShape(Circle())
+                                    
+                                    Circle()
+                                        .fill(.black.opacity(0.3))
+                                        .frame(width: 18, height: 18)
+                                        .overlay(
+                                            Image(AmityIcon.closeIcon.getImageResource())
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 18, height: 18)
+                                        )
+                                        .offset(x: 2, y: -3)
+                                        .onTapGesture {
+                                            selectedMembers.remove(at: index)
+                                        }
+                                }
                                 
-                                Circle()
-                                    .fill(.black.opacity(0.3))
-                                    .frame(width: 18, height: 18)
-                                    .overlay(
-                                        Image(AmityIcon.closeIcon.getImageResource())
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: 18, height: 18)
-                                    )
-                                    .offset(x: 2, y: -3)
-                                    .onTapGesture {
-                                        selectedMembers.remove(at: index)
-                                    }
+                                Text(member.user?.displayName ?? "Unknown")
+                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                                    .lineLimit(1)
                             }
+                            .frame(width: 64, height: 68)
                             
-                            
-                            Text(member.user?.displayName ?? "Unknown")
-                                .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
-                                .lineLimit(1)
-                        }
-                        .frame(width: 64, height: 68)
-                        
-                    case .create:
-                        VStack(spacing: 8) {
-                            Circle()
-                                .fill(Color(viewConfig.theme.baseColorShade4))
-                                .frame(width: 40, height: 40)
-                                .overlay(
-                                    Image(viewConfig.getImage(elementId: .communityAddMemberButton))
+                        case .create:
+                            VStack(spacing: 8) {
+                                Circle()
+                                    .fill(Color(viewConfig.theme.baseColorShade4))
+                                    .frame(width: 40, height: 40)
+                                    .overlay(
+                                        Image(
+                                            viewConfig.getImage(
+                                                elementId: .communityAddMemberButton)
+                                        )
                                         .renderingMode(.template)
                                         .resizable()
                                         .foregroundColor(Color(viewConfig.theme.baseColor))
                                         .aspectRatio(contentMode: .fill)
                                         .frame(width: 20, height: 20)
-                                        .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityAddMemberButton)
-                                )
-                            
-                            let addMemberText = viewConfig.getText(elementId: .communityAddMemberButton) ?? ""
-                            Text(addMemberText)
-                                .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
-                                .lineLimit(1)
-                        }
-                        .frame(width: 64, height: 68)
-                        .onTapGesture {
-                            let selectedUsers = selectedMembers.compactMap { member in
-                                if let user = member.user {
-                                    return user
+                                        .accessibilityIdentifier(
+                                            AccessibilityID.Social.CommunitySetup
+                                                .communityAddMemberButton)
+                                    )
+                                
+                                let addMemberText =
+                                viewConfig.getText(elementId: .communityAddMemberButton) ?? ""
+                                Text(addMemberText)
+                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                                    .lineLimit(1)
+                            }
+                            .frame(width: 64, height: 68)
+                            .onTapGesture {
+                                let selectedUsers = selectedMembers.compactMap { member in
+                                    if let user = member.user {
+                                        return user
+                                    }
+                                    
+                                    return nil
                                 }
                                 
-                                return nil
+                                let context = AmityCommunitySetupPageBehavior.Context(
+                                    page: self, selectedUsers: selectedUsers,
+                                    onUserAddedAction: { users in
+                                        self.selectedMembers = users.map({ user in
+                                            AddMemberModel(user: user, type: .user)
+                                        })
+                                        self.selectedMembers.append(.init(user: nil, type: .create))
+                                    })
+                                AmityUIKitManagerInternal.shared.behavior
+                                    .communitySetupPageBehavior?.goToAddMemberPage(context)
                             }
-                            
-                            let context = AmityCommunitySetupPageBehavior.Context(page: self, selectedUsers: selectedUsers, onUserAddedAction: { users in
-                                self.selectedMembers = users.map({ user in
-                                    AddMemberModel(user: user, type: .user)
-                                })
-                                self.selectedMembers.append(.init(user: nil, type: .create))
-                            })
-                            AmityUIKitManagerInternal.shared.behavior.communitySetupPageBehavior?.goToAddMemberPage(context)
                         }
                     }
-                }
-            })
+                })
         }
     }
     
+    private func getInviteMemberView(_ geometry: GeometryProxy) -> some View {
+        VStack(alignment: .leading, spacing: 24) {
+            HStack {
+                VStack(alignment: .leading, spacing: 8) {
+                    let inviteMemberTitle =
+                    viewConfig.getText(elementId: .communityInviteMemberTitle) ?? ""
+                    Text(inviteMemberTitle)
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                        .accessibilityIdentifier(
+                            AccessibilityID.Social.CommunitySetup.communityAddMemberTitle)
+                    
+                    let inviteMemberDesc =
+                    viewConfig.getText(elementId: .communityInviteMemberDescription) ?? ""
+                    Text(inviteMemberDesc)
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                }
+                
+                Spacer()
+            }
+            
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.flexible()), count: 4),
+                content: {
+                    ForEach(Array(selectedMembers.enumerated()), id: \.element.id) {
+                        index, member in
+                        switch member.type {
+                            
+                        case .user:
+                            VStack(spacing: 8) {
+                                ZStack(alignment: .topTrailing) {
+                                    AmityUserProfileImageView(
+                                        displayName: member.user?.displayName
+                                        ?? AmityLocalizedStringSet.General.anonymous
+                                            .localizedString,
+                                        avatarURL: URL(string: member.user?.avatarURL ?? "")
+                                    )
+                                    .frame(width: 40, height: 40)
+                                    .clipShape(Circle())
+                                    
+                                    Circle()
+                                        .fill(.black.opacity(0.3))
+                                        .frame(width: 18, height: 18)
+                                        .overlay(
+                                            Image(AmityIcon.closeIcon.getImageResource())
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(width: 18, height: 18)
+                                        )
+                                        .offset(x: 2, y: -3)
+                                        .onTapGesture {
+                                            selectedMembers.remove(at: index)
+                                        }
+                                }
+                                
+                                Text(member.user?.displayName ?? "Unknown")
+                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                                    .lineLimit(1)
+                            }
+                            .frame(width: 64, height: 68)
+                            
+                        case .create:
+                            VStack(spacing: 8) {
+                                Circle()
+                                    .fill(Color(viewConfig.theme.baseColorShade4))
+                                    .frame(width: 40, height: 40)
+                                    .overlay(
+                                        Image(
+                                            viewConfig.getImage(
+                                                elementId: .communityInviteMemberButton)
+                                        )
+                                        .renderingMode(.template)
+                                        .resizable()
+                                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(width: 20, height: 20)
+                                        .accessibilityIdentifier(
+                                            AccessibilityID.Social.CommunitySetup
+                                                .communityAddMemberButton)
+                                    )
+                                
+                                let inviteMemberText =
+                                viewConfig.getText(elementId: .communityInviteMemberButton)
+                                ?? ""
+                                Text(inviteMemberText)
+                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                                    .lineLimit(1)
+                            }
+                            .frame(width: 64, height: 68)
+                            .onTapGesture {
+                                let selectedUsers = selectedMembers.compactMap { member in
+                                    if let user = member.user {
+                                        return user
+                                    }
+                                    
+                                    return nil
+                                }
+                                
+                                let context = AmityCommunitySetupPageBehavior.Context(
+                                    page: self, selectedUsers: selectedUsers,
+                                    onMemberInvitedAction: { users in
+                                        self.selectedMembers.removeAll()
+                                        self.selectedMembers.append(.init(user: nil, type: .create))
+                                        self.selectedMembers.append(
+                                            contentsOf: users.map({ user in
+                                                AddMemberModel(user: user, type: .user)
+                                            }))
+                                        self.host.controller?.presentedViewController?.dismiss(animated: true)
+                                    })
+                                AmityUIKitManagerInternal.shared.behavior
+                                    .communitySetupPageBehavior?.goToInviteMemberPage(context)
+                            }
+                        }
+                    }
+                })
+        }
+    }
     
     private var createCommunityButtonView: some View {
         VStack(spacing: 16) {
@@ -474,9 +742,15 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .fill(.blue)
                 .frame(height: 40)
                 .cornerRadius(4)
-                .overlay (
+                .overlay(
+                    Rectangle()
+                        .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
+                        .isHidden(!draft.name.isEmpty)
+                )
+                .overlay(
                     HStack(spacing: 8) {
-                        let communityCreateButtonImage = viewConfig.getImage(elementId: .communityCreateButton)
+                        let communityCreateButtonImage = viewConfig.getImage(
+                            elementId: .communityCreateButton)
                         Image(communityCreateButtonImage)
                             .resizable()
                             .renderingMode(.template)
@@ -484,21 +758,16 @@ public struct AmityCommunitySetupPage: AmityPageView {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 20.0, height: 20.0)
                         
-                        let communityCreateButtonText = viewConfig.getText(elementId: .communityCreateButton) ?? ""
+                        let communityCreateButtonText =
+                        viewConfig.getText(elementId: .communityCreateButton) ?? ""
                         Text(communityCreateButtonText)
                             .applyTextStyle(.bodyBold(.white))
                     }
-                )
-                .overlay (
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.baseColorShade4).opacity(0.5))
-                        .isHidden(!nameText.isEmpty)
                 )
                 .padding([.leading, .trailing], 16)
         }
         .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityCreateButton)
     }
-    
     
     private var editCommunityButtonView: some View {
         VStack(spacing: 16) {
@@ -510,20 +779,19 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .fill(.blue)
                 .frame(height: 40)
                 .cornerRadius(4)
-                .overlay (
+                .overlay(
+                    Rectangle()
+                        .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
+                        .isHidden(isExistingDataChanged)
+                )
+                .overlay(
                     Text(viewConfig.getText(elementId: .communityEditButton) ?? "Save")
                         .applyTextStyle(.bodyBold(.white))
-                )
-                .overlay (
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.baseColorShade4).opacity(0.5))
-                        .isHidden(isExistingDataChanged)
                 )
                 .padding([.leading, .trailing], 16)
         }
         .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityEditButton)
     }
-    
     
     @ViewBuilder
     private func getBottomSheetView() -> some View {
@@ -531,41 +799,46 @@ public struct AmityCommunitySetupPage: AmityPageView {
             
             let cameraTitle = viewConfig.getText(elementId: .cameraButton) ?? "Camera"
             let cameraImage = viewConfig.getImage(elementId: .cameraButton)
-            getItemView(image: cameraImage, title: cameraTitle, onTapAction: {
-                /// Delay opening picker view a bit to avoid conflicts of opening & closing fullScreenCover views
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    showImagePicker.sourceType = .camera
-                    showImagePicker.isShown = true
-                }
-                
-                showBottomSheet.toggle()
-            })
+            getItemView(
+                image: cameraImage, title: cameraTitle,
+                onTapAction: {
+                    /// Delay opening picker view a bit to avoid conflicts of opening & closing fullScreenCover views
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        showImagePicker.sourceType = .camera
+                        showImagePicker.isShown = true
+                    }
+                    
+                    showBottomSheet.toggle()
+                })
             
             let photoTitle = viewConfig.getText(elementId: .imageButton) ?? "Photo"
             let photoImage = viewConfig.getImage(elementId: .imageButton)
-            getItemView(image: photoImage, title: photoTitle, onTapAction: {
-                /// Delay opening picker view a bit to avoid conflicts of opening & closing fullScreenCover views
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    showImagePicker.sourceType = .photoLibrary
-                    showImagePicker.isShown = true
-                }
-                
-                showBottomSheet.toggle()
-            })
+            getItemView(
+                image: photoImage, title: photoTitle,
+                onTapAction: {
+                    /// Delay opening picker view a bit to avoid conflicts of opening & closing fullScreenCover views
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        showImagePicker.sourceType = .photoLibrary
+                        showImagePicker.isShown = true
+                    }
+                    
+                    showBottomSheet.toggle()
+                })
             
             Spacer()
         }
         .padding(.top, 10)
     }
     
-    
     @ViewBuilder
-    private func getItemView(image: ImageResource, title: String, onTapAction: @escaping () -> Void) -> some View {
+    private func getItemView(image: ImageResource, title: String, onTapAction: @escaping () -> Void)
+    -> some View
+    {
         HStack(spacing: 12) {
             Rectangle()
                 .fill(Color(viewConfig.defaultLightTheme.baseColorShade4))
                 .frame(width: 32, height: 32)
-                .overlay (
+                .overlay(
                     Image(image)
                         .resizable()
                         .scaledToFill()
@@ -585,56 +858,35 @@ public struct AmityCommunitySetupPage: AmityPageView {
         }
     }
     
-    
-    private func columns(for width: CGFloat, itemWidth: CGFloat, spacing: CGFloat) -> [GridItem] {
-        return Array(repeating: GridItem(.flexible()), count: Int(width / itemWidth))
-    }
-    
-    
-    private func validateDataChanged(){
+    private func validateDataChanged() {
         if case .edit(let community) = pageMode {
-            isExistingDataChanged = !((nameText == community.displayName) && (aboutText == community.communityDescription) && (selectedCategories.elementsEqual(community.categories, by: { lhs, rhs in
-                lhs.categoryId == rhs.categoryId
-            })) && (isPublicCommunity == community.isPublic) && (imagePickerViewModel.selectedImage == nil))
+            isExistingDataChanged = draft.hasChanges(with: CommunityDraft(community: community)) || imagePickerViewModel.selectedImage != nil
         }
         
         if case .create = pageMode {
-            let isNameChanged = !nameText.isEmpty
-            let isAboutChanged = !aboutText.isEmpty
-            let isCategoryChanged = !selectedCategories.isEmpty
-            let isPrivacyChanged = !isPublicCommunity
-            let isAvatarChanged = imagePickerViewModel.selectedImage != nil
-            let isMemberListChanged = selectedMembers.count > 1 // First item would be of type add member
-            
-            isExistingDataChanged = isNameChanged || isAboutChanged || isCategoryChanged || isPrivacyChanged || isAvatarChanged || isMemberListChanged
+            isExistingDataChanged = draft.hasChanges(with: CommunityDraft()) || imagePickerViewModel.selectedImage != nil || selectedMembers.count > 1
         }
-        
     }
-        
+    
     private func createCommunity() {
         Task { @MainActor in
             enableTouchEvent = false
             
-            let userIds = selectedMembers.compactMap { member in
-                if let user = member.user {
-                    return user.userId
-                }
-                
-                return nil
-            }
+            let userIds = selectedMembers.compactMap { $0.user?.userId }
             
-            let model = CommunityModel(avatar: imagePickerViewModel.selectedImage,
-                                       displayName: nameText,
-                                       description: aboutText,
-                                       categoryIds: selectedCategories.map { $0.categoryId },
-                                       isPublic: isPublicCommunity,
-                                       userIds: userIds)
+            draft.avatar = imagePickerViewModel.selectedImage
+            draft.userIds = userIds
             
             do {
-                Toast.showToast(style: .loading, message: "Creating the community.", autoHide: false)
-                let community = try await viewModel.createCommunity(model)
+                let community = try await viewModel.createCommunity(draft)
                 
-                let communityProfilePage = AmityCommunityProfilePage(communityId: community.communityId)
+                // After community creation, invite members if needed
+                if isMembershipInvitationEnabled && !userIds.isEmpty {
+                    try await viewModel.inviteMembers(userIds, toCommunity: community)
+                }
+                
+                let communityProfilePage = AmityCommunityProfilePage(
+                    communityId: community.communityId)
                 let controller = AmitySwiftUIHostingController(rootView: communityProfilePage)
                 
                 // Get the current view controllers stack
@@ -643,12 +895,13 @@ public struct AmityCommunitySetupPage: AmityPageView {
                     viewControllers.append(controller)
                     
                     // Set the updated stack
-                    host.controller?.navigationController?.setViewControllers(viewControllers, animated: true)
+                    host.controller?.navigationController?.setViewControllers(
+                        viewControllers, animated: true)
                     Toast.showToast(style: .success, message: "Successfully created community!")
                 }
                 
             } catch {
-                Log.add(event: .error, error.localizedDescription)
+                Toast.showToast(style: .warning, message: "Failed to create community!")
             }
             
             enableTouchEvent = true
@@ -660,30 +913,99 @@ public struct AmityCommunitySetupPage: AmityPageView {
         Task { @MainActor in
             enableTouchEvent = false
             
-            let model = CommunityModel(avatar: imagePickerViewModel.selectedImage,
-                                       displayName: nameText,
-                                       description: aboutText,
-                                       categoryIds: selectedCategories.map { $0.categoryId },
-                                       isPublic: isPublicCommunity)
+            let userIds = selectedMembers.compactMap { $0.user?.userId }
+                        
+            draft.avatar = imagePickerViewModel.selectedImage
             
             do {
-                let _ = try await viewModel.editCommunity(id: community.communityId, model)
-                host.controller?.navigationController?.popViewController(animation: .presentation)
-                Toast.showToast(style: .success, message: "Successfully updated community profile!")
+                let _ = try await viewModel.editCommunity(id: community.communityId, draft)
+                
+                // After community edit, invite members if needed
+                if isMembershipInvitationEnabled && !userIds.isEmpty {
+                    try await viewModel.inviteMembers(userIds, toCommunity: community)
+                }
+                
+                host.controller?.navigationController?.popToViewController(AmityCommunityProfilePage.self, animated: true)
+
+                Toast.showToast(
+                    style: .success,
+                    message: AmityLocalizedStringSet.Social.communityUpdateSuccessToastMessage
+                        .localizedString)
             } catch {
-                Log.add(event: .error, error.localizedDescription)
+                Toast.showToast(
+                    style: .warning,
+                    message: "Failed to save your community profile. Please try again.")
             }
             
             enableTouchEvent = true
         }
     }
     
+    func showConfirmationAlert(type: CommunitySetupConfirmation, completion: @escaping () -> Void) {
+        let alertController: UIAlertController
+        let cancelAction = UIAlertAction(
+            title: AmityLocalizedStringSet.General.cancel.localizedString,
+            style: .cancel)
+        var actions: [UIAlertAction] = []
+        
+        switch type {
+        case .pendingJoinRequests:
+            alertController = UIAlertController(
+                title: AmityLocalizedStringSet.Social.pendingJoinRequestAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.pendingJoinRequestAlertMessage.localizedString, preferredStyle: .alert)
+            
+            let confirmAction = UIAlertAction(
+                title: AmityLocalizedStringSet.General.okay.localizedString,
+                style: .default) { action in
+                    completion()
+                }
+            actions.append(confirmAction)
+            
+        case .globalFeaturedPosts:
+            let title = AmityLocalizedStringSet.Social
+                .globalFeaturedCommunityEditConfirmationTitle.localizedString
+            let message = AmityLocalizedStringSet.Social
+                .globalFeaturedCommunityEditConfirmationMessage.localizedString
+            
+            let confirmAction = UIAlertAction(
+                title: AmityLocalizedStringSet.General.confirm.localizedString,
+                style: .destructive
+            ) { action in
+                completion()
+            }
+            
+            alertController = UIAlertController(
+                title: title, message: message, preferredStyle: .alert)
+            actions.append(cancelAction)
+            actions.append(confirmAction)
+        case .discard:
+            let title =
+            pageMode == .create
+            ? AmityLocalizedStringSet.Social.communitySetupAlertTitle.localizedString
+            : AmityLocalizedStringSet.Social.communitySetupEditAlertTitle
+                .localizedString
+            let message =
+            pageMode == .create
+            ? AmityLocalizedStringSet.Social.communitySetupAlertMessage.localizedString
+            : AmityLocalizedStringSet.Social.communitySetupEditAlertMessage
+                .localizedString
+            let leaveAction = UIAlertAction(
+                title: pageMode == .create
+                ? AmityLocalizedStringSet.General.leave.localizedString
+                : AmityLocalizedStringSet.General.discard.localizedString,
+                style: .destructive
+            ) { action in
+                completion()
+            }
+            
+            alertController = UIAlertController(
+                title: title, message: message, preferredStyle: .alert)
+            actions.append(cancelAction)
+            actions.append(leaveAction)
+        }
+        
+        actions.forEach { action in
+            alertController.addAction(action)
+        }
+        host.controller?.present(alertController, animated: true)
+    }
 }
-
-
-
-#if DEBUG
-#Preview(body: {
-    AmityCommunitySetupPage(mode: .create)
-})
-#endif

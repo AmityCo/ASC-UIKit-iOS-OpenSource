@@ -12,12 +12,17 @@ class CommunityManager {
     private let communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
     
     func searchCommunitites(keyword: String, filter: AmityCommunityQueryFilter) -> AmityCollection<AmityCommunity> {
-        let searchOptions = AmityCommunitySearchOptions(keyword: keyword, filter: filter, sortBy: .displayName, categoryId: nil, includeDeleted: false)
+        let searchOptions = AmityCommunitySearchOptions(keyword: keyword, filter: filter, sortBy: .displayName, categoryId: nil, includeDeleted: false, includeDiscoverablePrivateCommunity: true)
         return communityRepository.searchCommunities(with: searchOptions)
     }
     
     func getCommunity(withId: String) -> AmityObject<AmityCommunity> {
         communityRepository.getCommunity(withId: withId)
+    }
+    
+    func getCommunities(filter: AmityCommunityQueryFilter) -> AmityCollection<AmityCommunity> {
+        let queryOptions = AmityCommunityQueryOptions(filter: filter, sortBy: .lastCreated, includeDeleted: false)
+        return communityRepository.getCommunities(with: queryOptions)
     }
     
     @discardableResult
@@ -51,5 +56,12 @@ class CommunityManager {
                 completion?(AmityError(error: error) ?? .unknown)
             }
         }
+    }
+}
+
+extension CommunityManager {
+    
+    func getPendingJoinRequests(community: AmityCommunity) -> AmityCollection<AmityJoinRequest> {
+        return community.getJoinRequests(status: .pending)
     }
 }

@@ -52,4 +52,11 @@ extension UINavigationController {
             self.popViewController(animated: false)
         }
     }
+    
+    @discardableResult
+    public func popToViewController<Page: AmityPageView>(_ page: Page.Type, animated: Bool) -> AmitySwiftUIHostingController<Page>? {
+        guard let vc = self.viewControllers.last(where: { $0 is AmitySwiftUIHostingController<Page> }) else { return nil }
+        popToViewController(vc, animated: animated)
+        return vc as? AmitySwiftUIHostingController<Page>
+    }
 }

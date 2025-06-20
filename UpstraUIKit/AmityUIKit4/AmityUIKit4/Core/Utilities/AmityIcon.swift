@@ -142,9 +142,11 @@ enum AmityIcon: String, ImageResourceProvider {
     case communityThumbnail = "communityThumbnail"
     case emptyStateExplore = "emptyStateExplore"
     case communityNotFoundIcon = "communityNotFoundIcon"
+    case pendingInvitationIcon = "pendingInvitationIcon"
 
     case brandBadge = "brandBadgeIcon"
     case globeIcon = "globeIcon"
+    case globePrivateIcon = "globePrivateIcon"
     case checkboxIcon = "checkBoxIcon"
     case penIcon = "penIcon"
     case memberIcon = "memberIcon"
@@ -177,6 +179,8 @@ enum AmityIcon: String, ImageResourceProvider {
     case emptyNotificationList = "notificationTrayEmptyIcon"
     case noInternetIcon = "noInternetIcon"
     case reportSuccessIcon = "reportSuccessIcon"
+    
+    case cancelRequestIcon = "cancelRequestIcon"
     
     // Livestream icons
     enum LiveStream: String, ImageResourceProvider {

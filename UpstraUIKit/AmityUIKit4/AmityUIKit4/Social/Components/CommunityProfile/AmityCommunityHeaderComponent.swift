@@ -17,17 +17,23 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
     public var id: ComponentId {
         return .communityHeader
     }
-    private var onPendingPostsTapAction: (() -> Void)?
-    private var onMemberListTapAction: (() -> Void)?
+    private var onPendingRequestBannerTap: ((_ selectedTab: AmityPendingRequestPageTab) -> Void)?
+    private var onMemberCountLabelTap: (() -> Void)?
     
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject var viewModel: CommunityProfileViewModel
     
-    public init(community: AmityCommunityModel, pageId: PageId? = nil, viewModel: CommunityProfileViewModel? = nil, onPendingPostsTapAction: (() -> Void)? = nil, onMemberListTapAction: (() -> Void)? = nil) {
+    public init(
+        community: AmityCommunityModel,
+        pageId: PageId? = nil,
+        viewModel: CommunityProfileViewModel? = nil,
+        onPendingRequestBannerTap: ((_ selectedTab: AmityPendingRequestPageTab) -> Void)? = nil,
+        onMemberCountLabelTap: (() -> Void)? = nil
+    ) {
         self.community = community
         self.pageId = pageId
-        self.onPendingPostsTapAction = onPendingPostsTapAction
-        self.onMemberListTapAction = onMemberListTapAction
+        self.onPendingRequestBannerTap = onPendingRequestBannerTap
+        self.onMemberCountLabelTap = onMemberCountLabelTap
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityHeader))
         if let viewModel {
             self._viewModel = StateObject(wrappedValue: viewModel)
@@ -108,7 +114,8 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .padding(.leading, 4)
                 }                        
                 .onTapGesture {
-                    onMemberListTapAction?()
+                    guard community.isJoined else { return }
+                    onMemberCountLabelTap?()
                 }
                 
                 Spacer()
@@ -117,9 +124,44 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             .isHidden(viewConfig.isHidden(elementId: .communityInfo))
             .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityInfo)
             
+            // Hide if community is joined.
+            communityStatusButton
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .isHidden(viewConfig.isHidden(elementId: .communityJoinButton) || viewModel.pendingCommunityInvitation != nil)
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityJoinButton)
+
+            AmityStoryTabComponent(type: .communityFeed(community.communityId))
+                .padding(.top, 8)
+                .padding(.bottom, 12)
+                .padding(.horizontal, 16)
+                .isHidden(!(!viewModel.stories.isEmpty || viewModel.hasStoryManagePermission))
+            
+            // Pending Posts Banner
+            pendingRequestsBanner
+            
+        }
+        .background(Color(viewConfig.theme.backgroundColor))
+        .updateTheme(with: viewConfig)
+    }
+    
+    @ViewBuilder
+    var communityStatusButton: some View {
+        switch viewModel.joinStatus {
+        case .notJoined:
             Button(action: {
+                let requiresJoinApproval = community.requiresJoinApproval
+                
                 Task { @MainActor in
-                    try await viewModel.joinCommunity()
+                    do {
+                        try await viewModel.joinCommunity()
+                        
+                        let toastMessage = requiresJoinApproval ? "Requested to join. You will be notified once your request is accepted." : "You joined \(community.displayName)."
+                        Toast.showToast(style: .success, message: toastMessage)
+                        
+                    } catch {
+                        Toast.showToast(style: .warning, message: "Failed to join the community. Please try again.")
+                    }
                 }
             }, label: {
                 HStack(spacing: 8) {
@@ -130,60 +172,62 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .scaledToFit()
                         .frame(width: 20, height: 20)
                         .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                    
                     Text(AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString)
-                        .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.backgroundColor)))
                 }
                 .padding(.vertical, 10)
                 .frame(maxWidth: .infinity)
             })
             .background(Color(viewConfig.theme.primaryColor))
             .cornerRadius(8)
-            .padding(.all, 16)
-            .isHidden(community.isJoined || viewConfig.isHidden(elementId: .communityJoinButton))
-            .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityJoinButton)
-            
-            AmityStoryTabComponent(type: .communityFeed(community.communityId))
-                .padding(.top, 8)
-                .padding(.bottom, 12)
-                .padding(.horizontal, 16)
-                .isHidden(!(!viewModel.stories.isEmpty || viewModel.hasStoryManagePermission))
-            
-            VStack(alignment: .center) {
-                let pendingPostCountString = viewModel.pendingPostCount == 1 ? "" : "s"
-                HStack(alignment: .center,spacing: 7) {
-                    Image(AmityIcon.communityPendingPostIcon.imageResource)
-                        .renderingMode(.template)
-                        .scaledToFit()
-                        .frame(width: 6, height: 6)
-                        .foregroundColor(Color(viewConfig.theme.primaryColor))
-                    Text(AmityLocalizedStringSet.Social.communityPagePendingPostTitle.localizedString + pendingPostCountString)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+        case .requested:
+            Button {
+                Task { @MainActor in
+                    await viewModel.cancelJoinRequest()
                 }
-                .padding(.top, 12)
-                
-                Text(community.hasModeratorRole ? "\(viewModel.pendingPostCount) post\(pendingPostCountString) need approval" : "Your posts are pending for review")
-                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
-                    .padding(.bottom, 12)
+            } label: {
+                HStack {
+                    Image(AmityIcon.cancelRequestIcon.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                    
+                    Text("Cancel request")
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.secondaryColor)))
+                }
             }
-            .frame(maxWidth: .infinity)
-            .background(Color(viewConfig.theme.baseColorShade4))
-            .cornerRadius(4)
-            .padding([.horizontal, .bottom], 16)
-            .isHidden(!viewModel.shouldShowPendingBanner || !community.isPostReviewEnabled || viewConfig.isHidden(elementId: .communityPendingPost))
-            .onTapGesture {
-                onPendingPostsTapAction?()
-            }
-            .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityPendingPost)
-            
+            .buttonStyle(AmityLineButtonStyle(viewConfig: viewConfig, size: .expanded))
+        case .joined:
+            EmptyView()
         }
-        .background(Color(viewConfig.theme.backgroundColor))
-        .updateTheme(with: viewConfig)
     }
-    
+
+    @ViewBuilder
+    var pendingRequestsBanner: some View {
+        let shouldDefinitelyHideBanner = viewConfig.isHidden(elementId: .communityPendingPost) || viewModel.joinStatus != .joined
+        
+        if community.hasModeratorRole {
+            let pendingRequestWord = WordsGrammar(count: viewModel.pendingPostCount + viewModel.joinRequestCount, singular: "Pending request", plural: "Pending requests")
+            BannerView(title: pendingRequestWord.value, message: getTextForPendingRequestBanner())
+                .isHidden(!viewModel.shouldShowPendingBanner || shouldDefinitelyHideBanner)
+                .onTapGesture {
+                    let selectedTab: AmityPendingRequestPageTab = (viewModel.pendingPostCount == 0 && viewModel.joinRequestCount > 0) ? .joinRequests : .pendingPosts
+                    
+                    onPendingRequestBannerTap?(selectedTab)
+                }
+        } else {
+            let pendingRequestWord = WordsGrammar(count: viewModel.pendingPostCount, singular: "Pending request", plural: "Pending requests")
+            BannerView(title: pendingRequestWord.value, message: "Your posts are pending for review")
+                .isHidden(!viewModel.shouldShowPendingBanner || shouldDefinitelyHideBanner)
+                .onTapGesture {
+                    onPendingRequestBannerTap?(.pendingPosts)
+                }
+        }
+    }
     
     @ViewBuilder
     private func getCategoryView(_ categories: [String]) -> some View {
-        
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
                 ForEach(Array(categories.enumerated()), id: \.element) { index, category in
@@ -205,5 +249,59 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
         }
     }
     
+    private func getTextForPendingRequestBanner() -> String {
+        var values: [String] = []
+        
+        let postWord = WordsGrammar(count: viewModel.pendingPostCount, set: .post)
+        let requestWord = WordsGrammar(count: viewModel.joinRequestCount, singular: "join request", plural: "join requests")
+                
+        if viewModel.pendingPostCount > 0 {
+            let countValue = viewModel.pendingPostCount > 10 ? "10+" : "\(viewModel.pendingPostCount)"
+            values.append("\(countValue) \(postWord.value)")
+        }
+        
+        if viewModel.joinRequestCount > 0 {
+            let countValue = viewModel.joinRequestCount > 10 ? "10+" : "\(viewModel.joinRequestCount)"
+            values.append("\(countValue) \(requestWord.value)")
+        }
+        
+        let totalRequestCount = viewModel.pendingPostCount + viewModel.joinRequestCount
+        let requireVerb = WordsGrammar(count: totalRequestCount, singular: "requires", plural: "require")
+        
+        let combinedWords = values.joined(separator: " and ")
+        let finalText = combinedWords + " \(requireVerb.value) approval"
+        return finalText
+    }
+    
+    struct BannerView: View {
+        @EnvironmentObject var viewConfig: AmityViewConfigController
+        
+        let title: String
+        let message: String
+        
+        var body: some View {
+            VStack(alignment: .center) {
+                HStack(alignment: .center,spacing: 7) {
+                    Image(AmityIcon.communityPendingPostIcon.imageResource)
+                        .renderingMode(.template)
+                        .scaledToFit()
+                        .frame(width: 6, height: 6)
+                        .foregroundColor(Color(viewConfig.theme.primaryColor))
+                    Text(title)
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                }
+                .padding(.top, 12)
+                
+                Text(message)
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                    .padding(.bottom, 12)
+            }
+            .frame(maxWidth: .infinity)
+            .background(Color(viewConfig.theme.baseColorShade4))
+            .cornerRadius(4)
+            .padding([.horizontal, .bottom], 16)
+            .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityPendingPost)
+        }
+    }
 }
 

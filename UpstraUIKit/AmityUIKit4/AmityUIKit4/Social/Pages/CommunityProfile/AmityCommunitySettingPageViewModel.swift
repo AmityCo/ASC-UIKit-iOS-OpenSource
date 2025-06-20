@@ -10,6 +10,7 @@ import AmitySDK
 
 class AmityCommunitySettingPageViewModel: ObservableObject {
     @Published var shouldShowEditProfile: Bool = false
+    @Published var shouldShowPendingInvitations: Bool = false
     @Published var shouldShowNotifications: Bool = false
     @Published var isNotificationEnabled: Bool = false
     @Published var shouldShowPostPermissions: Bool = false
@@ -18,7 +19,7 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
     
     private let communityManager = CommunityManager()
     private let notificationManger = NotificationManager()
-    private let community: AmityCommunity
+    var community: AmityCommunity
     private let dispatchGroup = DispatchGroup()
     private var hasEditCommunityPermission: Bool = false
     private var hasDeleteCommunityPermission: Bool = false
@@ -67,6 +68,7 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
     private func setupData() {
         let isModerator = community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
         self.shouldShowEditProfile = hasEditCommunityPermission || isModerator
+        self.shouldShowPendingInvitations = isModerator
         self.shouldShowNotifications = isSocialUserNotificationEnabled && isSocialNetworkEnabled
         self.shouldShowPostPermissions = hasEditCommunityPermission || isModerator
         self.shouldShowStoryComments = hasEditCommunityPermission || isModerator
@@ -112,6 +114,15 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
             self?.isSocialNetworkEnabled = false
             self?.isNotificationEnabled = false
             completion?()
+        }
+    }
+    
+    func refreshCommunitySnapshot() {
+        let communityId = community.communityId
+        
+        // Get latest snapshot from local repository
+        if let updatedCommunity = communityManager.getCommunity(withId: communityId).snapshot {
+            self.community = updatedCommunity
         }
     }
 }

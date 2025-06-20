@@ -51,6 +51,7 @@ open class AmityUIKitBehaviour {
     public var swipeToBackGestureBehavior: AmitySwipeToBackGestureBehavior? = AmitySwipeToBackGestureBehavior()
     
     public var notificationTrayPageBehavior: AmityNotificationTrayPageBehavior = AmityNotificationTrayPageBehavior()
+    public var joinRequestContentComponentBehavior: AmityJoinRequestContentComponentBehavior = AmityJoinRequestContentComponentBehavior()
 }
 
 open class AmitySwipeToBackGestureBehavior {

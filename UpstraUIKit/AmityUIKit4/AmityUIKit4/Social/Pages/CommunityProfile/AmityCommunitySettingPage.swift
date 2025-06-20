@@ -12,7 +12,6 @@ public struct AmityCommunitySettingPage: AmityPageView {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: AmityCommunitySettingPageViewModel
-    private let community: AmityCommunity
     
     public var id: PageId {
         .communitySettingPage
@@ -21,7 +20,6 @@ public struct AmityCommunitySettingPage: AmityPageView {
     public init(community: AmityCommunity) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .communitySettingPage))
         self._viewModel = StateObject(wrappedValue:  AmityCommunitySettingPageViewModel(community: community))
-        self.community = community
     }
     
     public var body: some View {
@@ -38,8 +36,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
                 let editProfileText = viewConfig.getText(elementId: .editProfile) ?? AmityLocalizedStringSet.Social.communitySettingEditProfile.localizedString
                 getItemView(AmityIcon.penIcon.getImageResource(), editProfileText)
                     .onTapGesture {
-                        let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
-                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToEditCommunityPage(context)
+                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToEditCommunityPage(getPageBehaviorContext())
                     }
                     .isHidden(viewConfig.isHidden(elementId: .editProfile))
                     .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.editProfile)
@@ -48,32 +45,23 @@ public struct AmityCommunitySettingPage: AmityPageView {
             let communityMembersText = viewConfig.getText(elementId: .members) ?? AmityLocalizedStringSet.Social.communitySettingMembers.localizedString
             getItemView(AmityIcon.memberIcon.getImageResource(), communityMembersText)
                 .onTapGesture {
-                    let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
-                    AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToMembershipPage(context)
+                    AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToMembershipPage(getPageBehaviorContext())
                 }
                 .isHidden(viewConfig.isHidden(elementId: .members))
                 .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.members)
             
-            /// Notifications setting
-            if viewModel.shouldShowNotifications {
-                let notificationText = viewConfig.getText(elementId: .notifications) ?? AmityLocalizedStringSet.Social.communitySettingNotifications.localizedString
-                getItemView(AmityIcon.notificationIcon.getImageResource(), notificationText, disclosureText: viewModel.isNotificationEnabled ? AmityLocalizedStringSet.General.on.localizedString : AmityLocalizedStringSet.General.off.localizedString)
+            /// Community member pending Invitations setting
+            if viewModel.shouldShowPendingInvitations {
+                getItemView(AmityIcon.pendingInvitationIcon.getImageResource(), "Pending invitations")
                     .onTapGesture {
-                        let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
-                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToNotificationPage(context)
+                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToPendingInvitationsPage(getPageBehaviorContext())
                     }
-                    .onAppear {
-                        /// Check notification setting to update the on/off status on view appeared...
-                        viewModel.isSocialNetworkEnabled(nil)
-                    }
-                    .isHidden(viewConfig.isHidden(elementId: .notifications))
-                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.notifications)
+                
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
             }
-            
-            Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
-                .frame(height: 1)
-            
+                                    
             /// Community Permissions header
             if viewModel.shouldShowPostPermissions || viewModel.shouldShowStoryComments {
                 Text(AmityLocalizedStringSet.Social.communitySettingCommunityPermissionsTitle.localizedString)
@@ -86,8 +74,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
                 let postPermissionText = viewConfig.getText(elementId: .postPermission) ?? AmityLocalizedStringSet.Social.communitySettingPostPermissions.localizedString
                 getItemView(AmityIcon.postPermissionIcon.getImageResource(), postPermissionText)
                     .onTapGesture {
-                        let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
-                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToPostPermissionPage(context)
+                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToPostPermissionPage(getPageBehaviorContext())
                     }
                     .isHidden(viewConfig.isHidden(elementId: .postPermission))
                     .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.postPermission)
@@ -98,21 +85,48 @@ public struct AmityCommunitySettingPage: AmityPageView {
                 let storyCommentsText = viewConfig.getText(elementId: .storySetting) ?? AmityLocalizedStringSet.Social.communitySettingStoryComments.localizedString
                 getItemView(AmityIcon.createStoryMenuIcon.getImageResource(), storyCommentsText)
                     .onTapGesture {
-                        let context = AmityCommunitySettingPageBehavior.Context(page: self, community: community)
-                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToStorySettingPage(context)
+                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToStorySettingPage(getPageBehaviorContext())
                     }
                     .isHidden(viewConfig.isHidden(elementId: .storySetting))
                     .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.storySetting)
             }
             
-            if community.isJoined {
+            
+            /// Notifications setting
+            if viewModel.shouldShowNotifications {
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+                
+                Text(AmityLocalizedStringSet.Social.communitySettingNotificationsTitle.localizedString)
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                let notificationText = viewConfig.getText(elementId: .notifications) ?? AmityLocalizedStringSet.Social.communitySettingNotifications.localizedString
+                getItemView(AmityIcon.notificationIcon.getImageResource(), notificationText, disclosureText: viewModel.isNotificationEnabled ? AmityLocalizedStringSet.General.on.localizedString : AmityLocalizedStringSet.General.off.localizedString)
+                    .onTapGesture {
+                        AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToNotificationPage(getPageBehaviorContext())
+                    }
+                    .onAppear {
+                        /// Check notification setting to update the on/off status on view appeared...
+                        viewModel.isSocialNetworkEnabled(nil)
+                    }
+                    .isHidden(viewConfig.isHidden(elementId: .notifications))
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.notifications)
+                
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+            }
+            
+            if viewModel.community.isJoined {
                 let leaveCommunityText = viewConfig.getText(elementId: .leaveCommunity) ?? AmityLocalizedStringSet.Social.communitySettingLeaveCommunity.localizedString
                 Text(leaveCommunityText)
                     .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        if community.membersCount == 1 {
+                        if viewModel.community.membersCount == 1 {
                             let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString, message: "As you’re the last moderator and member, leaving will also close this community. All posts shared in community will be deleted. This cannot be undone.", preferredStyle: .alert)
                             let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
                             
@@ -125,7 +139,14 @@ public struct AmityCommunitySettingPage: AmityPageView {
                             host.controller?.present(alertController, animated: true)
                             
                         } else {
-                            let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertMessage.localizedString, preferredStyle: .alert)
+                            let alertTitle = AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString
+                            var alertMessage = AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertMessage.localizedString
+                            
+                            if viewModel.community.requiresJoinApproval {
+                                alertMessage = AmityLocalizedStringSet.Social.communityLeaveAlertPendingRequestMessage.localizedString
+                            }
+                            
+                            let alertController = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
                             let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
                             let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
                                 leaveCommunity()
@@ -136,13 +157,10 @@ public struct AmityCommunitySettingPage: AmityPageView {
                             host.controller?.present(alertController, animated: true)
                         }
                     }
+                    .padding(.bottom, 8)
                     .isHidden(viewConfig.isHidden(elementId: .leaveCommunity))
                     .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.leaveCommunity)
             }
-            
-            Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
-                .frame(height: 1)
             
             /// Close Community setting
             if viewModel.shouldShowCloseCommunity {
@@ -172,10 +190,6 @@ public struct AmityCommunitySettingPage: AmityPageView {
                 }
                 .isHidden(viewConfig.isHidden(elementId: .closeCommunity))
                 .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.closeCommunity)
-                
-                Rectangle()
-                    .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(height: 1)
             }
             
             Spacer()
@@ -202,7 +216,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
             
             Spacer()
             
-            Text(community.displayName)
+            Text(viewModel.community.displayName)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
             
@@ -255,7 +269,9 @@ public struct AmityCommunitySettingPage: AmityPageView {
             do {
                 try await viewModel.leaveCommunity()
                 Toast.showToast(style: .success, message: "Successfully leaved community!")
-                host.controller?.navigationController?.popToRootViewController(animated: true)
+                
+                // Pop to Community Profile Page
+                host.controller?.navigationController?.popToViewController(AmityCommunityProfilePage.self, animated: true)
             } catch {
                 if let error = AmityError(error: error), error == .unableToLeaveCommunity {
                     Toast.hideToastIfPresented()
@@ -285,5 +301,11 @@ public struct AmityCommunitySettingPage: AmityPageView {
             Toast.showToast(style: .success, message: "Successfully closed community!")
             host.controller?.navigationController?.popToRootViewController(animated: true)
         }
+    }
+    
+    func getPageBehaviorContext() -> AmityCommunitySettingPageBehavior.Context {
+        viewModel.refreshCommunitySnapshot()
+        let context = AmityCommunitySettingPageBehavior.Context(page: self, community: viewModel.community)
+        return context
     }
 }

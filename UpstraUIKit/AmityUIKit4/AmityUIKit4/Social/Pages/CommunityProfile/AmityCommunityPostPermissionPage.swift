@@ -69,7 +69,7 @@ public struct AmityCommunityPostPermissionPage: AmityPageView {
                     Task { @MainActor in
                         do {
                             try await viewModel.updateSetting()
-                            Toast.showToast(style: .success, message: "Successfully updated community profile!")
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityUpdateSuccessToastMessage.localizedString)
                             if let navigationController = host.controller?.navigationController, navigationController.viewControllers.count > 2 {
                                 navigationController.popToViewController(navigationController.viewControllers[1], animated: true)
                             }

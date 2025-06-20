@@ -85,6 +85,7 @@ class AmityNotificationTrayPageViewModel: ObservableObject {
         }
     }
 }
+
 struct NotificationSection: Identifiable {
     let id: UUID = UUID()
     let title: String
@@ -101,6 +102,7 @@ struct NotificationItem: Identifiable {
         case reactionOnComment = "reaction_on_comment"
         case reactionOnPost = "reaction_on_post"
         case reactionOnReply = "reaction_on_reply"
+        case respondOnJoinRequest = "respond_on_join_request"
         case none = ""
     }
     
@@ -111,6 +113,7 @@ struct NotificationItem: Identifiable {
         case reaction
         case mention
         case reply
+        case joinRequest = "join_request"
     }
     
     enum TargetType: String {
@@ -206,6 +209,8 @@ struct NotificationItem: Identifiable {
                 default:
                     break
                 }
+            case .joinRequest:
+                break
             }
             
             parentId = item.parentId

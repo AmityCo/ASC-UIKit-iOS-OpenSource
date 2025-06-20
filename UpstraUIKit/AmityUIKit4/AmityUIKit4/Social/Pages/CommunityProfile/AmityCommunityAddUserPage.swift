@@ -53,10 +53,14 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 
                 LazyVStack(spacing: 16, content: {
                     if viewModel.loadingStatus == .loading {
-                        ForEach(0..<10, id: \.self) { _ in
+                        ForEach(0..<3, id: \.self) { _ in
                             UserCellSkeletonView()
                                 .environmentObject(viewConfig)
                         }
+                    } else if viewModel.loadingStatus == .loaded && viewModel.searchKeyword.count < 3 && viewModel.searchedUsers.isEmpty {
+                        needEnoughCharToSearchView
+                    } else if viewModel.loadingStatus == .loaded && viewModel.searchedUsers.isEmpty {
+                        emptyView
                     } else {
                         ForEach(Array(viewModel.searchedUsers.enumerated()), id: \.element.userId) { index, user in
                             let isSelected = isSelectedUser(user)
@@ -122,8 +126,23 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .frame(width: 20, height: 16)
                 .padding(.leading, 12)
             
-            TextField("Search user", text: $viewModel.searchKeyword)
-                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+            ZStack(alignment: .trailing) {
+                TextField("Search user", text: $viewModel.searchKeyword)
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                
+                Button(
+                    action: {
+                        viewModel.searchKeyword = ""
+                    },
+                    label: {
+                        Image(AmityIcon.backgroundedCloseIcon.getImageResource())
+                            .resizable()
+                            .frame(width: 17, height: 17)
+                            .padding(.trailing, 12)
+                    }
+                )
+                .visibleWhen(!viewModel.searchKeyword.isEmpty)
+            }
         }
         .frame(height: 40)
         .background(Color(viewConfig.theme.baseColorShade4))
@@ -223,12 +242,12 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .cornerRadius(4)
                 .overlay (
                     ZStack {
+                        Rectangle()
+                            .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
+                            .isHidden(!selectedUsers.isEmpty, remove: true)
+                        
                         Text("Add member")
                             .applyTextStyle(.bodyBold(.white))
-                        
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4).opacity(0.5))
-                            .isHidden(!selectedUsers.isEmpty, remove: true)
                     }
                 )
                 .onTapGesture {
@@ -238,6 +257,37 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 }
                 .padding([.leading, .trailing], 16)
         }
+    }
+    
+    private var emptyView: some View {
+        VStack(spacing: 15) {
+            Image(AmityIcon.noSearchableIcon.getImageResource())
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
+                .frame(width: 60, height: 60)
+            
+            Text("No results found")
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
+        }
+        .padding(.top, 100)
+    }
+    
+    private var needEnoughCharToSearchView: some View {
+        VStack(spacing: 15) {
+            Image(AmityIcon.defaultSearchIcon.getImageResource())
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
+                .frame(width: 60, height: 60)
+        
+            Text("Start your search by typing at least 3 letters")
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 100)
     }
     
     private func isSelectedUser(_ user: AmityUserModel) -> Bool {

@@ -98,9 +98,3 @@ struct RecommendedCommunityView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
-
-#if DEBUG
-#Preview {
-    AmityRecommendedCommunitiesComponent()
-}
-#endif

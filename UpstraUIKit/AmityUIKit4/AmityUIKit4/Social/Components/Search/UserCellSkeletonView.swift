@@ -20,20 +20,11 @@ struct UserCellSkeletonView: View {
                 .clipShape(Circle())
                 .shimmering(gradient: shimmerGradient)
             
-            VStack(alignment: .leading, spacing: 8) {
-                
-                Rectangle()
-                    .fill(Color(viewConfig.theme.baseColorShade3))
-                    .frame(size: CGSize(width: 140, height: 8))
-                    .clipShape(RoundedCorner())
-                    .shimmering(gradient: shimmerGradient)
-                
-                Rectangle()
-                    .fill(Color(viewConfig.theme.baseColorShade3))
-                    .frame(size: CGSize(width: 108, height: 8))
-                    .clipShape(RoundedCorner())
-                    .shimmering(gradient: shimmerGradient)
-            }
+            Rectangle()
+                .fill(Color(viewConfig.theme.baseColorShade3))
+                .frame(size: CGSize(width: 120, height: 8))
+                .clipShape(RoundedCorner())
+                .shimmering(gradient: shimmerGradient)
             
             Spacer()
         }

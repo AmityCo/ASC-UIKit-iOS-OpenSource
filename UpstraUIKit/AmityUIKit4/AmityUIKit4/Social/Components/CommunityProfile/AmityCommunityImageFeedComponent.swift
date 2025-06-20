@@ -48,45 +48,49 @@ public struct AmityCommunityImageFeedComponent: AmityComponentView {
     @ViewBuilder
     private var imageFeedView: some View {
         VStack(spacing: 0) {
-            Color.clear
-                .frame(height: 16)
-            
-            LazyVGrid(columns: gridLayout, spacing: 8) {
-                if viewModel.loadingStatus == .loading && viewModel.medias.isEmpty {
-                    ForEach(0..<10, id: \.self) { _ in
-                        skeletonImageView
-                    }
-                } else {
-                    ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
-                        if let url = media.getImageURL() {
-                            getImageView(url)
-                                .frame(maxWidth: .infinity)
-                                .aspectRatio(1, contentMode: .fit)
-                                .background(Color.gray)
-                                .cornerRadius(10)
-                                .onTapGesture {
-                                    viewModel.selectedMediaIndex = index
-                                    withoutAnimation {
-                                        viewModel.showMediaViewer.toggle()
+            if viewModel.emptyFeedState == .private {
+                PrivateCommunityFeedView()
+            } else {
+                Color.clear
+                    .frame(height: 16)
+                
+                LazyVGrid(columns: gridLayout, spacing: 8) {
+                    if viewModel.loadingStatus == .loading && viewModel.medias.isEmpty {
+                        ForEach(0..<10, id: \.self) { _ in
+                            skeletonImageView
+                        }
+                    } else {
+                        ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
+                            if let url = media.getImageURL() {
+                                getImageView(url)
+                                    .frame(maxWidth: .infinity)
+                                    .aspectRatio(1, contentMode: .fit)
+                                    .background(Color.gray)
+                                    .cornerRadius(10)
+                                    .onTapGesture {
+                                        viewModel.selectedMediaIndex = index
+                                        withoutAnimation {
+                                            viewModel.showMediaViewer.toggle()
+                                        }
                                     }
-                                }
-                                .onAppear {
-                                    if index == viewModel.medias.count - 1 {
-                                        viewModel.loadMore()
+                                    .onAppear {
+                                        if index == viewModel.medias.count - 1 {
+                                            viewModel.loadMore()
+                                        }
                                     }
-                                }
+                            }
                         }
                     }
                 }
+                .padding(.horizontal, 16)
+                .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
+                    MediaViewer(medias: [viewModel.medias[viewModel.selectedMediaIndex]],
+                                startIndex: 0, viewConfig: viewConfig, closeAction: { viewModel.showMediaViewer.toggle() })
+                }
+                
+                Color.clear
+                    .frame(height: 16)
             }
-            .padding(.horizontal, 16)
-            .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
-                MediaViewer(medias: [viewModel.medias[viewModel.selectedMediaIndex]],
-                            startIndex: 0, viewConfig: viewConfig, closeAction: { viewModel.showMediaViewer.toggle() })
-            }
-            
-            Color.clear
-                .frame(height: 16)
         }
     }
     

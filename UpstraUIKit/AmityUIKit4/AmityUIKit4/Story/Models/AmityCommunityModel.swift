@@ -37,10 +37,15 @@ public struct AmityCommunityModel: Identifiable {
     let isStoryCommentsAllowed: Bool
     let participation: AmityCommunityMembership
     let isBrand: Bool
+    let isDiscoverable: Bool
+    let requiresJoinApproval: Bool
     
     public var object: AmityCommunity
     
-    init(object: AmityCommunity) {
+    var joinRequestStatus: AmityJoinRequestStatus?
+    var joinRequest: AmityJoinRequest?
+    
+    init(object: AmityCommunity, joinRequest: AmityJoinRequest? = nil) {
         self.object = object
         self.communityId = object.communityId
         self.description = object.communityDescription
@@ -65,6 +70,15 @@ public struct AmityCommunityModel: Identifiable {
         self.isPostReviewEnabled = object.isPostReviewEnabled
         self.isStoryCommentsAllowed = object.storySettings.allowComment
         self.isBrand = object.user?.isBrand ?? false
+        self.isDiscoverable = object.isDiscoverable
+        self.requiresJoinApproval = object.requiresJoinApproval
+        
+        self.joinRequest = joinRequest
+        if !object.requiresJoinApproval {
+            self.joinRequestStatus = object.isJoined ? .approved : .cancelled
+        } else {
+            self.joinRequestStatus = joinRequest?.status
+        }
     }
     
     /// Returns pending post count.

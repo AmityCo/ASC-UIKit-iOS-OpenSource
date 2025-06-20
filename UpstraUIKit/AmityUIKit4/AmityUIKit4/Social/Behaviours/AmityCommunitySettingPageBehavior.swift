@@ -34,6 +34,12 @@ open class AmityCommunitySettingPageBehavior {
         context.page.host.controller?.navigationController?.pushViewController(vc)
     }
     
+    open func goToPendingInvitationsPage(_ context: AmityCommunitySettingPageBehavior.Context) {
+        let page = AmityCommunityPendingInvitationPage(community: context.community)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(vc)
+    }
+    
     open func goToNotificationPage(_ context: AmityCommunitySettingPageBehavior.Context) {
         let page = AmityCommunityNotificationSettingPage(community: context.community)
         let vc = AmitySwiftUIHostingController(rootView: page)

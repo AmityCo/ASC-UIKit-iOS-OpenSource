@@ -45,7 +45,9 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
     @ViewBuilder
     func getPostListView() -> some View {
         LazyVStack(spacing: 0) {
-            if postFeedViewModel.postItems.isEmpty {
+            if let error = postFeedViewModel.feedError, AmityError(error: error) == .noUserAccessPermission {
+                PrivateCommunityFeedView()
+            } else if postFeedViewModel.postItems.isEmpty {
                 ForEach(0..<5, id: \.self) { index in
                     VStack(spacing: 0) {
                         PostContentSkeletonView()

@@ -43,7 +43,9 @@ public struct AmityCommunityPinnedPostComponent: AmityComponentView {
     @ViewBuilder
     func getPostListView() -> some View {
         LazyVStack(spacing: 0) {
-            if communityProfileViewModel.pinnedPosts.isEmpty {
+            if let error = communityProfileViewModel.pinnedFeedError, AmityError(error: error) == .noUserAccessPermission {
+                PrivateCommunityFeedView()
+            } else if communityProfileViewModel.pinnedPosts.isEmpty {
                 ForEach(0..<5, id: \.self) { index in
                     VStack(spacing: 0) {
                         PostContentSkeletonView()

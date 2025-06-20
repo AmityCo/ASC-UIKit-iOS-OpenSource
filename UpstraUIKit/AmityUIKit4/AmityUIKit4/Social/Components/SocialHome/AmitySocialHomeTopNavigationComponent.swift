@@ -66,7 +66,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                     .overlay(
                         NotificationIndicator()
                             .offset(x: 13, y: -12)
-                            .visibleWhen(viewModel.hasUnseenNotification)
+                            .visibleWhen(viewModel.hasUnseenNotification || viewModel.hasInvitations)
                     )
                     
             })
@@ -151,10 +151,13 @@ class SocialHomePageNavigationViewModel: ObservableObject {
     private let trayManager = NotificationTrayManager()
     private var timer: Timer?
     private var token: AmityNotificationToken?
+    private let invitationManager = InvitationManager()
+    private var invitaionsToken: AmityNotificationToken?
     
     let timerInterval: TimeInterval = 60
     
     @Published var hasUnseenNotification = false
+    @Published var hasInvitations = false
     
     func observeNotificationStatus() {
         if timer == nil {
@@ -198,9 +201,22 @@ class SocialHomePageNavigationViewModel: ObservableObject {
 
             cleanupToken()
         }
+        
+        invitaionsToken = invitationManager.getMyCommunityInvitations().observe { [weak self] collection, _ , error in
+            guard let self else { return }
+            hasInvitations = collection.snapshots.contains { $0.isSeen() == false }
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.invitaionsToken?.invalidate()
+            self.invitaionsToken = nil
+        }
     }
     
     func resetNotificationStatus() {
+        // Hacky way to merge invitaion status with notification status
+        hasInvitations = false
+        
         guard hasUnseenNotification else { return }
         
         // To hide red dot once user opens up notification tray

@@ -72,9 +72,3 @@ public struct AmityTrendingCommunitiesComponent: AmityComponentView {
         .padding(.horizontal)
     }
 }
-
-#if DEBUG
-#Preview {
-    AmityTrendingCommunitiesComponent()
-}
-#endif

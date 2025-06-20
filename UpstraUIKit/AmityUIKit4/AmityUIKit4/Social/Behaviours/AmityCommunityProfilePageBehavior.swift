@@ -15,15 +15,24 @@ open class AmityCommunityProfilePageBehavior {
         public let page: AmityCommunityProfilePage
         public var community: AmityCommunity?
         public let showPollResult: Bool
+        public let selectedTab: AmityPendingRequestPageTab
         
-        init(page: AmityCommunityProfilePage, community: AmityCommunity? = nil, showPollResult: Bool = false) {
+        init(page: AmityCommunityProfilePage, community: AmityCommunity? = nil, showPollResult: Bool = false, selectedTab: AmityPendingRequestPageTab = .pendingPosts) {
             self.page = page
             self.community = community
             self.showPollResult = showPollResult
+            self.selectedTab = selectedTab
         }
     }
     
     public init() {}
+    
+    open func goToPendingRequestsPage(context: AmityCommunityProfilePageBehavior.Context) {
+        guard let community = context.community else { return }
+        let page = AmityPendingRequestPage(community: community, selectedTab: context.selectedTab)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
     
     open func goToPendingPostPage(context: AmityCommunityProfilePageBehavior.Context) {
         guard let community = context.community else { return }

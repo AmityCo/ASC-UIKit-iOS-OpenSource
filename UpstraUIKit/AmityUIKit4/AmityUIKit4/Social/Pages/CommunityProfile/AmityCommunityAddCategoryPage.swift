@@ -115,12 +115,12 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
                 .cornerRadius(4)
                 .overlay (
                     ZStack {
+                        Rectangle()
+                            .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
+                            .isHidden(!selectedCategories.isEmpty, remove: true)
+                        
                         Text("Add Category")
                             .applyTextStyle(.bodyBold(.white))
-                        
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4).opacity(0.5))
-                            .isHidden(!selectedCategories.isEmpty, remove: true)
                     }
                 )
                 .onTapGesture {

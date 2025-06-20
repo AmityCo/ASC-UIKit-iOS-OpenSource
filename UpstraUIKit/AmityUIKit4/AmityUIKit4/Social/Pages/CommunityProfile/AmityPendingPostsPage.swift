@@ -9,6 +9,7 @@ import SwiftUI
 import AmitySDK
 import Combine
 
+@available(*, deprecated, message: "Pending Posts are now reusable under AmityPendingPostListComponent. This is used in PendingRequestPage")
 public struct AmityPendingPostsPage: AmityPageView {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @StateObject private var viewConfig: AmityViewConfigController
@@ -138,8 +139,11 @@ class AmityPendingPostPageViewModel: ObservableObject {
     private var feedCollection: AmityCollection<AmityPost>?
     var cancellables = Set<AnyCancellable>()
     
-    init(community: AmityCommunity) {
+    let onChange: ((Int) -> Void)?
+    
+    init(community: AmityCommunity, onChange: ((Int) -> Void)? = nil) {
         self.community = community
+        self.onChange = onChange
         getPendingCommunityFeedPosts()
         
         $posts
@@ -155,6 +159,7 @@ class AmityPendingPostPageViewModel: ObservableObject {
         feedCollection?.$snapshots
             .sink(receiveValue: { [weak self] posts in
                 self?.posts = posts
+                self?.onChange?(posts.count)
             })
             .store(in: &cancellables)
         

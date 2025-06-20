@@ -12,6 +12,7 @@ import Combine
 class PostFeedViewModel: ObservableObject {
     @Published var feedLoadingStatus: AmityLoadingStatus = .notLoading
     @Published var postItems: [PaginatedItem<AmityPostModel>] = []
+    @Published var feedError: Error? = nil
         
     private var postCollection: AmityCollection<AmityPost>?
     private var pinnedPostCollection: AmityCollection<AmityPinnedPost>?
@@ -24,6 +25,7 @@ class PostFeedViewModel: ObservableObject {
     // loadGlobalFeed can be called multiple times. We only want one subscriber at a time
     private var feedCancellable: AnyCancellable?
     private var loadingStateCancellable: AnyCancellable?
+    private var errorCancellable: AnyCancellable?
     private var pinnedPostCancellable: AnyCancellable?
     
     // cached recently created post by current user to show on top of post feed
@@ -90,6 +92,13 @@ class PostFeedViewModel: ObservableObject {
             .sink(receiveValue: { [weak self] status in
                 guard let self else { return }
                 self.feedLoadingStatus = status
+            })
+        
+        errorCancellable = nil
+        errorCancellable = postCollection?.$error
+            .sink(receiveValue: { [weak self] error in
+                guard let self else { return }
+                self.feedError = error
             })
         
         /// Observe didPostCreated event sent from AmityPostCreationPage

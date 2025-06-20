@@ -36,60 +36,6 @@ struct CommunityListItemView: View {
     }
 }
 
-struct CommunityJoinButton: View {
-    
-    @EnvironmentObject private var viewConfig: AmityViewConfigController
-    
-    let community: AmityCommunityModel
-    let tapAction: DefaultTapAction
-    
-    @State private var isJoined = false
-    
-    init(community: AmityCommunityModel, tapAction: @escaping DefaultTapAction) {
-        self.community = community
-        self.tapAction = tapAction
-        self._isJoined = State(initialValue: community.isJoined)
-    }
-    
-    var body: some View {
-        Button {
-            ImpactFeedbackGenerator.impactFeedback(style: .medium)
-            
-            tapAction()
-        } label: {
-            HStack(spacing: 0) {
-                Image(isJoined ? AmityIcon.tickIcon.imageResource : AmityIcon.plusIcon.imageResource)
-                    .resizable()
-                    .renderingMode(.template)
-                    .scaledToFit()
-                    .frame(width: 16, height: 16)
-                    .foregroundColor(Color(isJoined ? viewConfig.theme.baseColor : .white))
-                
-                Text(isJoined ? AmityLocalizedStringSet.Social.communityPageJoinedTitle.localizedString : AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString)
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundColor(Color(isJoined ? viewConfig.theme.baseColor : .white))
-                    .padding(.horizontal, 4)
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
-        }
-        .buttonStyle(.plain)
-        .background(Color(isJoined ? viewConfig.theme.backgroundColor : viewConfig.theme.primaryColor))
-        .cornerRadius(4, corners: .allCorners)
-        .overlay(
-            RoundedRectangle(cornerRadius: 4, style: .continuous)
-                .stroke(Color(isJoined ? viewConfig.theme.baseColorShade4 : viewConfig.theme.primaryColor), lineWidth: 1)
-        )
-        .onChange(of: community.isJoined, perform: { value in
-            withAnimation {
-                self.isJoined = value
-            }
-        })
-        .accessibilityIdentifier(AccessibilityID.Social.Explore.communityJoinButton)
-    }
-}
-
 struct CommunityInfoView: View {
     
     @EnvironmentObject private var viewConfig: AmityViewConfigController
@@ -98,13 +44,15 @@ struct CommunityInfoView: View {
     let community: AmityCommunityModel
     var showJoinButton: Bool = true
     
+    @State private var showLeaveCommunityAlert = false
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 0) {
                 if !community.isPublic {
                     Image(AmityIcon.lockBlackIcon.imageResource)
                         .renderingMode(.template)
-                        .frame(width: 20, height: 12)
+                        .frame(width: 18, height: 18)
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
                         .padding(.trailing, 4)
@@ -137,7 +85,7 @@ struct CommunityInfoView: View {
                         .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                         .accessibilityLabel(AccessibilityID.Social.Explore.communityMemberCount)
                     
-                   Spacer()
+                    Spacer()
                 }
                 
                 Spacer()
@@ -146,30 +94,173 @@ struct CommunityInfoView: View {
                     CommunityJoinButton(community: community, tapAction: {
                         let communityId = community.communityId
                         let isJoined = community.isJoined
+                        let requiresJoinApproval = community.requiresJoinApproval
+                        
                         Task { @MainActor in
                             if isJoined {
-                                let isSuccess = try await viewModel.leaveCommunity(communityId: communityId)
-                                Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
+                                if requiresJoinApproval {
+                                    showLeaveCommunityAlert.toggle()
+                                } else {
+                                    let isSuccess = try await viewModel.leaveCommunity(communityId: communityId)
+                                    Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
+                                }
                             } else {
-                                let isSuccess = try await viewModel.joinCommunity(communityId: communityId)
-                                Log.add(event: .info, "Joining Community Status: \(isSuccess)")
+                                let joinStatus = community.joinRequestStatus
+                                
+                                if joinStatus == .pending {
+                                    do {
+                                        try await community.joinRequest?.cancel()
+                                        Log.add(event: .success, "Join request cancelled for community \(community.displayName)")
+                                    } catch let error {
+                                        Log.warn("Error while cancelling join request \(error)")
+                                        Toast.showToast(style: .success, message: "Failed to cancel your request. Please try again.")
+                                    }
+                                } else {
+                                    do {
+                                        let result = try await community.object.join()
+                                        
+                                        switch result {
+                                        case .success:
+                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityJoinToastSuccessMessage.localized(arguments: community.displayName))
+                                        case .pending(_):
+                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityJoinToastRequestSuccessMessage.localizedString)
+                                        default:
+                                            break
+                                        }
+                                    } catch {
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinToastErrorMessage.localizedString)
+                                    }
+                                }
                             }
                         }
                     })
                 }
             }
             .frame(height: 48)
+            .alert(isPresented: $showLeaveCommunityAlert) {
+                
+                Alert(title: Text(AmityLocalizedStringSet.Social.communityLeaveAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.communityLeaveAlertPendingRequestMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.leave.localizedString), action: {
+                    
+                    Task { @MainActor in
+                        let isSuccess = try await viewModel.leaveCommunity(communityId: community.communityId)
+                        Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
+                    }
+                }))
+            }
         }
     }
 }
 
+struct CommunityJoinButton: View {
+    
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
+    
+    let community: AmityCommunityModel
+    let tapAction: DefaultTapAction
+    
+    @State private var isJoined = false
+    
+    init(community: AmityCommunityModel, tapAction: @escaping DefaultTapAction) {
+        self.community = community
+        self.tapAction = tapAction
+        self._isJoined = State(initialValue: community.isJoined)
+    }
+    
+    var body: some View {
+        if community.isJoined {
+            joinedButton
+        } else {
+            // if it requires join approval, state can be in pending
+            if community.requiresJoinApproval, let status = community.joinRequestStatus, status == .pending {
+                pendingButton
+            } else {
+                joinButton
+            }
+        }
+    }
+    
+    @ViewBuilder
+    var pendingButton: some View {
+        Button {
+            ImpactFeedbackGenerator.impactFeedback(style: .medium)
+            
+            tapAction()
+        } label: {
+            HStack(spacing: 4) {
+                Image(AmityIcon.cancelRequestIcon.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                
+                Text("Pending")
+                    .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
+            }
+        }
+        .buttonStyle(AmityLineButtonStyle(viewConfig: viewConfig, size: .compact, hPadding: 8, vPadding: 6, radius: 6))
+        .accessibilityIdentifier(AccessibilityID.Social.Explore.communityJoinButton)
+    }
+    
+    @ViewBuilder
+    var joinButton: some View {
+        Button {
+            ImpactFeedbackGenerator.impactFeedback(style: .medium)
+            
+            tapAction()
+        } label: {
+            HStack(spacing: 4) {
+                Image(AmityIcon.plusIcon.imageResource)
+                    .resizable()
+                    .renderingMode(.template)
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                    .foregroundColor(Color(.white))
+                
+                Text(AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString)
+                    .applyTextStyle(.captionBold(.white))
+                    .padding(.trailing, 4)
+            }
+        }
+        .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig, size: .compact, hPadding: 8, vPadding: 6, radius: 6))
+        .onChange(of: community.isJoined, perform: { value in
+            withAnimation {
+                self.isJoined = value
+            }
+        })
+    }
+    
+    @ViewBuilder
+    var joinedButton: some View {
+        Button {
+            ImpactFeedbackGenerator.impactFeedback(style: .medium)
+            
+            tapAction()
+        } label: {
+            HStack(spacing: 4) {
+                Image(AmityIcon.tickIcon.imageResource)
+                    .resizable()
+                    .renderingMode(.template)
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                
+                Text(AmityLocalizedStringSet.Social.communityPageJoinedTitle.localizedString)
+                    .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
+                    .padding(.trailing, 4)
+            }
+        }
+        .buttonStyle(AmityLineButtonStyle(viewConfig: viewConfig, size: .compact, hPadding: 8, vPadding: 6, radius: 6))
+        .onChange(of: community.isJoined, perform: { value in
+            withAnimation {
+                self.isJoined = value
+            }
+        })
+    }
+}
+
+
 class CommunityInfoViewModel: ObservableObject {
     
     let repository = AmityCommunityRepository(client: AmityUIKit4Manager.client)
-    
-    func joinCommunity(communityId: String) async throws -> Bool {
-        try await repository.joinCommunity(withId: communityId)
-    }
     
     func leaveCommunity(communityId: String) async throws -> Bool {
         try await repository.leaveCommunity(withId: communityId)

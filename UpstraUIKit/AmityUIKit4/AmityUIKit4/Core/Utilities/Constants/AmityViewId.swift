@@ -33,6 +33,8 @@ public enum PageId: String {
     case communitySetupPage = "community_setup_page"
     case communityAddCategoryPage = "community_add_category_page"
     case communityAddUserPage = "community_add_user_page"
+    case communityInviteMemberPage = "community_invite_member_page"
+    case communityPendingInvitationPage = "community_pending_invitation_page"
     case communitySettingPage = "community_setting_page"
     case communityMembershipPage = "community_membership_page"
     case communityNotificationSettingPage = "community_notification_page"
@@ -58,6 +60,8 @@ public enum PageId: String {
     case pollPostPage = "poll_post_composer_page"
     
     case notificationTrayPage = "notification_tray_page"
+    
+    case pendingRequestPage = "pending_request_page"
 }
 
 public enum ComponentId: String {
@@ -84,6 +88,7 @@ public enum ComponentId: String {
     case userSearchResultComponent = "user_search_result"
     case createPostMenu = "create_post_menu"
     case communityHeader = "community_header"
+    case communityInvitationBanner = "community_invitation_banner"
     case communityProfileTab = "community_profile_tab"
     case communityFeed = "community_feed"
     case communityPin = "community_pin"
@@ -101,6 +106,10 @@ public enum ComponentId: String {
     case userImageFeed = "user_image_feed"
     case userVideoFeed = "user_video_feed"
     case altTextConfig = "alt_text_config_component"
+    case invitationSection = "invitation_section"
+    
+    case joinRequestContent = "join_request_content"
+    case pendingPostListComponent = "pending_post_list"
 }
 
 public enum ElementId: String {
@@ -237,8 +246,21 @@ public enum ElementId: String {
     case communityPrivacyPublicDescription = "community_privacy_public_description"
     case communityAddMemberTitle = "community_add_member_title"
     case communityAddMemberButton = "community_add_member_button"
+    case communityInviteMemberTitle = "community_invite_member_title"
+    case communityInviteMemberDescription = "community_invite_member_description"
+    case communityInviteMemberButton = "community_invite_member_button"
     case communityCreateButton = "community_create_button"
     case communityEditButton = "community_edit_button"
+    
+    case communityMembershipTitle = "community_membership_title"
+    case communityMembershipDescription = "community_membership_description"
+    case communityMembershipSubDescription = "community_membership_sub_description"
+    case communityPrivacyPrivateAndVisibleTitle = "community_privacy_private_and_visible_title"
+    case communityPrivacyPrivateAndVisibleDescription = "community_privacy_private_and_visible_description"
+    
+    
+    // Invite Member Page
+    case inviteButton = "invite_button"
     
     // Pending Posts Page
     case postAcceptButton = "post_accept_button"
@@ -290,4 +312,7 @@ public enum ElementId: String {
     case userDisplayNameTitle = "user_display_name_title"
     case userAboutTitle = "user_about_title"
     case updateUserProfileButton = "update_user_profile_button"
+    
+    case joinDeclineButton = "join_decline_button"
+    case joinAcceptButton = "join_accept_button"
 }

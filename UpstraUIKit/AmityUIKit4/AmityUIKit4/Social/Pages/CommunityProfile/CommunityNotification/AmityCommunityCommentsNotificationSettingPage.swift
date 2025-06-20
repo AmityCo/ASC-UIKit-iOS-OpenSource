@@ -91,7 +91,7 @@ public struct AmityCommunityCommentsNotificationSettingPage: AmityPageView {
                             return
                         }
                         
-                        Toast.showToast(style: .success, message: "Successfully updated community profile!")
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityUpdateSuccessToastMessage.localizedString)
                         if let navigationController = host.controller?.navigationController, navigationController.viewControllers.count > 3 {
                             navigationController.popToViewController(navigationController.viewControllers[navigationController.viewControllers.count - 4], animated: true)
                         } else {

@@ -13,23 +13,25 @@ class RecommendedCommunityViewModel: ObservableObject {
     
     private let repository: AmityCommunityRepository = .init(client: AmityUIKit4Manager.client)
     private var token: AmityNotificationToken?
+    private var joinRequestToken: AmityNotificationToken?
     private var communityCollection: AmityCollection<AmityCommunity>?
+    private var joinRequestManager = JoinRequestManager()
     
     @Published var communities: [AmityCommunityModel] = []
     @Published var queryState: QueryState = .idle
     
     var queryStateObserver: AnyCancellable?
     var refreshStateObserver: AnyCancellable?
-
+    
     func fetchCommunities(limit: Int? = 4) {
         guard queryState != .loading else { return }
         
         queryState = .loading
         
-        communityCollection = repository.getRecommendedCommunities()
+        communityCollection = repository.getRecommendedCommunities(includeDiscoverablePrivateCommunity: true)
         token = communityCollection?.observe { [weak self] liveCollection, _, error in
             guard let self else { return }
-                        
+            
             if let error {
                 self.queryState = .error
                 self.token?.invalidate()
@@ -39,17 +41,47 @@ class RecommendedCommunityViewModel: ObservableObject {
             }
             
             if let limit, limit > 0 {
-                let notJoinedCommunities = liveCollection.snapshots.filter { !$0.isJoined }
-                let items = Array(notJoinedCommunities.prefix(limit).map { AmityCommunityModel(object: $0)} )
-                self.communities = items
+                self.processRecommendedCommunities(liveCollection.snapshots, limit: limit)
             } else {
-                let items = liveCollection.snapshots.map {
-                    AmityCommunityModel(object: $0)
-                }
+                let items = liveCollection.snapshots.map { AmityCommunityModel(object: $0) }
                 self.communities = items
+                self.queryState = .loaded
             }
-            
+        }
+    }
+    
+    func processRecommendedCommunities(_ communities: [AmityCommunity], limit: Int) {
+        // Filter out joined communities
+        let unjoinedCommunities = communities.filter { !$0.isJoined }
+        
+        // We consider more than required communities because some of them might be in pending state
+        // which needs to be filtered out.
+        let initialLimit = min(unjoinedCommunities.count, limit * 2)
+        let recommendedCommunities = unjoinedCommunities.prefix(initialLimit)
+        
+        // We query join requests for those communities which requires join approval
+        let joinApprovalRequiredCommIds = recommendedCommunities.filter { $0.requiresJoinApproval }.map { $0.communityId }
+        
+        if joinApprovalRequiredCommIds.isEmpty {
+            self.communities = recommendedCommunities.prefix(limit).map { AmityCommunityModel(object: $0) }
             self.queryState = .loaded
+        } else {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.joinRequestManager.fetchJoinRequests(communityIds: joinApprovalRequiredCommIds) { statusInfo in
+                   
+                    let filteredCommunities = recommendedCommunities.filter {
+                        // Return those communities which are not in pending state or requires join approval
+                        if let joinRequestStatus = $0.joinRequest?.status {
+                            return joinRequestStatus != .pending
+                        } else {
+                            return !$0.requiresJoinApproval
+                        }
+                    }.prefix(limit)
+                    
+                    self.communities = filteredCommunities.map { AmityCommunityModel(object: $0) }
+                    self.queryState = .loaded
+                }
+            }
         }
     }
     
@@ -57,34 +89,34 @@ class RecommendedCommunityViewModel: ObservableObject {
         refreshStateObserver = ExploreComponentsStateManager.shared.$recommendedCommunitiesState
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in
-            guard let self else { return }
-            
-            switch state {
-            case .refreshing:
-                self.fetchCommunities()
-            default:
-                break
+                guard let self else { return }
+                
+                switch state {
+                case .refreshing:
+                    self.fetchCommunities()
+                default:
+                    break
+                }
             }
-        }
         
         queryStateObserver = $queryState
             .receive(on: DispatchQueue.main)
             .sink { state in
-            switch state {
-            case .error:
-                ExploreComponentsStateManager.shared.recommendedCommunitiesState = .error
-            case .idle:
-                ExploreComponentsStateManager.shared.recommendedCommunitiesState = .initial
-            case .loaded:
-                if self.communities.isEmpty {
-                    ExploreComponentsStateManager.shared.recommendedCommunitiesState = .dataEmpty
-                } else {
-                    ExploreComponentsStateManager.shared.recommendedCommunitiesState = .dataAvailable
+                switch state {
+                case .error:
+                    ExploreComponentsStateManager.shared.recommendedCommunitiesState = .error
+                case .idle:
+                    ExploreComponentsStateManager.shared.recommendedCommunitiesState = .initial
+                case .loaded:
+                    if self.communities.isEmpty {
+                        ExploreComponentsStateManager.shared.recommendedCommunitiesState = .dataEmpty
+                    } else {
+                        ExploreComponentsStateManager.shared.recommendedCommunitiesState = .dataAvailable
+                    }
+                case .loading:
+                    ExploreComponentsStateManager.shared.recommendedCommunitiesState = .loading
                 }
-            case .loading:
-                ExploreComponentsStateManager.shared.recommendedCommunitiesState = .loading
             }
-        }
     }
     
     func unObserveState() {

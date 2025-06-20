@@ -155,9 +155,10 @@
 "livestream_player_upcoming_live" = "UPCOMING LIVE";
 
 // Community Setting
-"community_setting_basic_info_title" = "Basic Info";
+"community_setting_basic_info_title" = "Community information";
 "community_setting_community_permissions_title" = "Community permissions";
-"community_setting_edit_profile" = "Edit Profile";
+"community_setting_notifications_title" = "Your preferences";
+"community_setting_edit_profile" = "Community profile";
 "community_setting_members" = "Members";
 "community_setting_notifications" = "Notifications";
 "community_setting_post_permissions" = "Post permissions";
@@ -166,8 +167,8 @@
 "community_setting_close_community" = "Close community";
 "community_setting_close_community_description" = "Closing this community will remove the community  page and all its content and comments.";
 
-"community_setting_leave_community_alert_title" = "Leave community";
-"community_setting_leave_community_alert_message" = "Leave the community. You will no longer be able to post and interact in this community.";
+"community_setting_leave_community_alert_title" = "Leave community?";
+"community_setting_leave_community_alert_message" = "You will no longer be able to post and interact in this community.";
 "community_setting_leave_community_failed_alert_title" = "Unable to leave community";
 "community_setting_leave_community_failed_alert_message" = "You’re the only moderator in this group. To leave community, nominate other members to moderator role.";
 "community_setting_close_community_alert_title" = "Close community?";
@@ -386,3 +387,32 @@
 "report_reason_done_button" = "Done";
 
 "report_reason_error_toast_message" = "Failed to report %@. Please try again.";
+
+"community_update_success_toast_message" = "Successfully updated community profile.";
+
+"pending_join_request_alert_title" = "You have pending join requests";
+"pending_join_request_alert_message" = "Please address these requests before switching off membership approval.";
+
+"community_leave_alert_title" = "Leave community?";
+"community_leave_alert_pending_request_message" = "If you change your mind, you’ll have to request to join again.";
+
+"community_join_toast_success_message" = "You joined %@.";
+"community_join_toast_request_success_message" = "Requested to join. You will be notified once your request is accepted.";
+"community_join_toast_error_message" = "Failed to join the community. Please try again.";
+
+"user_join_accepted_toast_success_message" = "Join request accepted.";
+"user_join_accepted_toast_error_message" = "Failed to accept join request. Please try again.";
+
+"user_join_declined_toast_success_message" = "Join request declined.";
+"user_join_decliend_toast_error_message" = "Failed to decline join request. Please try again.";
+
+"user_join_request_accept_label" = "Accept";
+"user_join_request_decline_label" = "Decline";
+
+"user_join_request_decline_alert_banner_message" = "Declining a join request is irreversible. The user must send a new request if declined.";
+
+"community_pending_request_tab_posts_title" = "Posts (%@)";
+"community_pending_request_tab_join_requests_title" = "Join requests (%@)";
+"community_pending_request_page_title" = "Pending requests";
+"community_join_request_empty_state_title" = "No pending requests";
+"community_pending_posts_empty_state_title" = "No pending posts";

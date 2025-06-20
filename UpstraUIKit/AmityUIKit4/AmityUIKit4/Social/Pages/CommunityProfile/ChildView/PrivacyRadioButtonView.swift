@@ -34,7 +34,7 @@ struct PrivacyRadioButtonView: View {
                             .renderingMode(.template)
                             .resizable()
                             .foregroundColor(Color(viewConfig.theme.baseColor))
-                            .aspectRatio(contentMode: .fill)
+                            .aspectRatio(contentMode: .fit)
                             .frame(width: 24, height:  20)
                     )
                     .frame(width: 40, height: 40)
@@ -68,6 +68,7 @@ struct PrivacyRadioButtonView: View {
                     .frame(width: 24, height: 24)
                 
             }
+            .contentShape(Rectangle())
             
             Spacer()
         }

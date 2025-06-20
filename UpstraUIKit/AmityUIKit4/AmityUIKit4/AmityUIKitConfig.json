@@ -30,13 +30,30 @@
             "highlight_color": "#1054DE"
         }
     },
-    "excludes": ["*/post_content/share_button"],
+    "excludes": [
+        "*/post_content/share_button"
+    ],
     "message_reactions": [
-        { "name": "heart", "image": "messageReactionHeart"},
-        { "name": "like", "image": "messageReactionLike"},
-        { "name": "fire", "image": "messageReactionFire"},
-        { "name": "grinning", "image": "messageReactionGrinning"},
-        { "name": "sad", "image": "messageReactionSad"}
+        {
+            "name": "heart",
+            "image": "messageReactionHeart"
+        },
+        {
+            "name": "like",
+            "image": "messageReactionLike"
+        },
+        {
+            "name": "fire",
+            "image": "messageReactionFire"
+        },
+        {
+            "name": "grinning",
+            "image": "messageReactionGrinning"
+        },
+        {
+            "name": "sad",
+            "image": "messageReactionSad"
+        }
     ],
     "customizations": {
         "camera_page/*/*": {
@@ -142,7 +159,6 @@
         "*/*/close_button": {
             "close_icon": "closeIcon"
         },
-        
         "live_chat/*/*": {
             "theme": {
                 "light": {
@@ -182,16 +198,15 @@
             "message_limit": 200,
             "placeholder_text": "Write a message"
         },
-        "live_chat/message_list/message_reaction_preview": { },
+        "live_chat/message_list/message_reaction_preview": {},
         "live_chat/message_list/message_quick_reaction": {
             "reactions": "heart"
         },
-        "live_chat/message_list/message_reaction_picker": { },
-        "live_chat_page/reaction_list/*": { },
-        "live_chat_page/reaction_list/user_avatar_view": { },
-        "live_chat_page/reaction_list/user_display_name": { },
-        "live_chat_page/reaction_list/reaction_image_view": { },
-        
+        "live_chat/message_list/message_reaction_picker": {},
+        "live_chat_page/reaction_list/*": {},
+        "live_chat_page/reaction_list/user_avatar_view": {},
+        "live_chat_page/reaction_list/user_display_name": {},
+        "live_chat_page/reaction_list/reaction_image_view": {},
         "social_home_page/top_navigation/header_label": {
             "text": "Community"
         },
@@ -307,15 +322,13 @@
         },
         "my_communities_search_page/*/community_category_name": {},
         "my_communities_search_page/*/community_members_count": {},
-        
-        "message_reaction_list_page/*/*": { },
-        "message_reaction_list_page/message_reaction_list_header/*": { },
-        "message_reaction_list_page/message_reaction_list_header/message_reaction_list_tab": { },
-        "message_reaction_list_page/message_reaction_list/*": { },
-        "message_reaction_list_page/message_reaction_list/user_avatar_view": { },
-        "message_reaction_list_page/message_reaction_list/user_display_name": { },
-        "message_reaction_list_page/message_reaction_list/reaction_image_view": { },
-        
+        "message_reaction_list_page/*/*": {},
+        "message_reaction_list_page/message_reaction_list_header/*": {},
+        "message_reaction_list_page/message_reaction_list_header/message_reaction_list_tab": {},
+        "message_reaction_list_page/message_reaction_list/*": {},
+        "message_reaction_list_page/message_reaction_list/user_avatar_view": {},
+        "message_reaction_list_page/message_reaction_list/user_display_name": {},
+        "message_reaction_list_page/message_reaction_list/reaction_image_view": {},
         "community_profile_page/*/*": {},
         "community_profile_page/community_header/*": {},
         "community_profile_page/community_header/community_cover": {},
@@ -349,6 +362,9 @@
         "community_profile_page/community_pin/*": {},
         "community_profile_page/community_pin/community_create_post_button": {
             "image": "plusIcon"
+        },
+        "community_profile_page/community_header/community_cancel_request_button": {
+            "image": "value"
         },
         "community_setup_page/*/*": {},
         "community_setup_page/*/close_button": {
@@ -388,13 +404,23 @@
             "text": "Public"
         },
         "community_setup_page/*/community_privacy_public_description": {
-            "text": "Anyone can join, view, and search the posts in this community."
+            "text": "Community is discoverable by anyone. Content is visible to anyone.",
         },
         "community_setup_page/*/community_add_member_title": {
             "text": "Member"
         },
         "community_setup_page/*/community_add_member_button": {
             "text": "Add",
+            "image": "plusIcon"
+        },
+        "community_setup_page/*/community_invite_member_title": {
+            "text": "Invite members"
+        },
+        "community_setup_page/*/community_invite_member_description": {
+            "text": "They will join as members after accepting your invitation."
+        },
+        "community_setup_page/*/community_invite_member_button": {
+            "text": "Invite",
             "image": "plusIcon"
         },
         "community_setup_page/*/community_create_button": {
@@ -413,8 +439,41 @@
             "text": "Camera",
             "image": "cameraAttatchmentIcon"
         },
+        "community_setup_page/*/community_membership_title": {
+            "text": "Membership"
+        },
+        "community_setup_page/*/community_membership_description": {
+            "text": "Requires moderator approval"
+        },
+        "community_setup_page/*/community_membership_sub_description": {
+            "text": "Users will become members only when their join request is approved by a moderator of this community."
+        },
+        "community_setup_page/*/community_privacy_private_and_visible_icon": {
+            "image": "globePrivateIcon"
+        },
+        "community_setup_page/*/community_privacy_private_and_visible_title": {
+            "text": "Private & visible"
+        },
+        "community_setup_page/*/community_privacy_private_and_visible_description": {
+            "text": "Community is discoverable by anyone. Content is hidden from non-members."
+        },
+        "community_setup_page/*/community_privacy_private_and_hidden_icon": {
+            "image": "lockBlackIcon"
+        },
+        "community_setup_page/*/community_privacy_private_and_hidden_title": {
+            "text": "Private & hidden"
+        },
+        "community_setup_page/*/community_privacy_private_and_hidden_description": {
+            "text": "Community and content are hidden from non-members."
+        },
         "community_add_category_page/*/*": {},
         "community_add_member_page/*/*": {},
+        "community_invite_member_page/*/title": {
+            "text": "Invite member"
+        },
+        "community_invite_member_page/*/invite_button": {
+            "text": "Invite"
+        },
         "pending_posts_page/*/*": {},
         "pending_posts_page/*/back_button": {
             "image": "backIcon"
@@ -432,30 +491,29 @@
         },
         "community_membership_page/*/*": {},
         "community_setting_page/*/*": {},
-        
-        "community_setting_page/*/edit_profile":{
-            "text":"Edit profile"
+        "community_setting_page/*/edit_profile": {
+            "text": "Community profile"
         },
-        "community_setting_page/*/members":{
-            "text":"Members"
+        "community_setting_page/*/members": {
+            "text": "Members"
         },
-        "community_setting_page/*/notifications":{
-            "text":"Notifications"
+        "community_setting_page/*/notifications": {
+            "text": "Notifications"
         },
-        "community_setting_page/*/post_permission":{
-            "text":"Post permission"
+        "community_setting_page/*/post_permission": {
+            "text": "Post permission"
         },
-        "community_setting_page/*/story_setting":{
-            "text":"Story comments"
+        "community_setting_page/*/story_setting": {
+            "text": "Story comments"
         },
-        "community_setting_page/*/leave_community":{
-            "text":"Leave community"
+        "community_setting_page/*/leave_community": {
+            "text": "Leave community"
         },
-        "community_setting_page/*/close_community":{
-            "text":"Close community"
+        "community_setting_page/*/close_community": {
+            "text": "Close community"
         },
-        "community_setting_page/*/close_community_description":{
-            "text":"Closing this community will remove the community  page and all its content and comments."
+        "community_setting_page/*/close_community_description": {
+            "text": "Closing this community will remove the community  page and all its content and comments."
         },
         "community_post_permission_page/*/*": {},
         "community_story_setting_page/*/*": {},
@@ -775,11 +833,43 @@
             "image": "notificationTrayEmptyIcon",
             "text": "No notifications"
         },
-        "notification_tray_page/*/user_avatar": {
-        },
+        "notification_tray_page/*/user_avatar": {},
         "notification_tray_page/*/no_internet_connection": {
             "image": "noInternetIcon",
             "text": "No internet connection"
+        },
+        "pending_request_page/*/*": {},
+        "pending_request_page/*/back_button": {
+            "image": "backIcon"
+        },
+        "pending_request_page/*/title": {
+            "text": "Pending requests"
+        },
+        "pending_request_page/pending_post_list/*": {},
+        "pending_request_page/pending_post_list/timestamp": {},
+        "pending_request_page/pending_post_list/post_accept_button": {
+            "text": "Accept"
+        },
+        "pending_request_page/pending_post_list/post_decline_button": {
+            "text": "Decline"
+        },
+        "pending_request_page/*/posts_button_tab": {
+            "text": "Posts"
+        },
+        "pending_request_page/pending_post_list/posts_tab_description": {
+            "text": "Decline pending post will permanently delete the selected post from community."
+        },
+        "pending_request_page/*/join_requests_button_tab": {
+            "text": "Join requests"
+        },
+        "pending_request_page/join_request_content/join_requests_tab_description": {
+            "text": "Declining a join request is irreversible. The user must send a new request if declined."
+        },
+        "pending_request_page/join_request_content/join_accept_button": {
+            "text": "Accept"
+        },
+        "pending_request_page/join_request_content/join_decline_button": {
+            "text": "Decline"
         }
     }
 }

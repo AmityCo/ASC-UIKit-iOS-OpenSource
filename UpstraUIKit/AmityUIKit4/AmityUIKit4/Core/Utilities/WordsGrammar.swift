@@ -5,16 +5,26 @@
 //  Created by Nishan Niraula on 28/2/25.
 //
 
-// Use localized stringsdict later on
+// NOTE:
+// Migrate to localized stringsdict later on
 class WordsGrammar {
     
     enum StringSet {
         case reply
+        case post
+        case request
+        case member
         
         var singular: String {
             switch self {
             case .reply:
                 return "reply"
+            case .post:
+                return "post"
+            case .request:
+                return "request"
+            case .member:
+                return "member"
             }
         }
         
@@ -22,6 +32,12 @@ class WordsGrammar {
             switch self {
             case .reply:
                 return "replies"
+            case .post:
+                return "posts"
+            case .request:
+                return "requests"
+            case .member:
+                return "members"
             }
         }
     }

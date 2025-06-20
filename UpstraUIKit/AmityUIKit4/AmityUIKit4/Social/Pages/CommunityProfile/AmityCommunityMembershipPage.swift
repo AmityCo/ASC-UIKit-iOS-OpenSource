@@ -16,6 +16,9 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     @StateObject private var viewModel = AmityCommunityMembershipPageViewModel()
     private let community: AmityCommunity
     
+    /// Members need to be invited if network setting is invitation mode
+    @State private var isMembershipInvitationEnabled: Bool = false
+    
     public var id: PageId {
         .communityMembershipPage
     }
@@ -23,6 +26,10 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     public init(community: AmityCommunity) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .communityMembershipPage))
         self.community = community
+        
+        if let setting = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.membershipAcceptance {
+            self._isMembershipInvitationEnabled = State(initialValue: setting == .invitation)
+        }
     }
     
     
@@ -84,19 +91,11 @@ public struct AmityCommunityMembershipPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .frame(width: 22, height: 20)
                 .onTapGesture {
-                    let onAddedAction: ([AmityUserModel]) -> Void = { users in
-                        Task { @MainActor in
-                            do {
-                                let _ = try await community.membership.addMembers(users.map {$0.userId})
-                                Toast.showToast(style: .success, message: "Successfully added members to this community!")
-                            } catch {
-                                Toast.showToast(style: .warning, message: "Failed to add members to this community")
-                            }
-                        }
+                    if isMembershipInvitationEnabled {
+                        goToInviteMemberPage()
+                    } else {
+                        goToAddUserPage()
                     }
-                    
-                    let context = AmityCommunityMembershipPageBehavior.Context(page: self, addUserPageCompletion: onAddedAction)
-                    AmityUIKitManagerInternal.shared.behavior.communityMembershipPageBehavior?.goToAddMemberPage(context)
                 }
         }
     }
@@ -107,6 +106,39 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             CommunityMembershipBottomSheetView(showBottomSheet: $viewModel.showBottomSheet, community: community, communityMember: member)
                 .environmentObject(viewConfig)
         }
+    }
+    
+    private func goToAddUserPage() {
+        let onAddedAction: ([AmityUserModel]) -> Void = { users in
+            Task { @MainActor in
+                do {
+                    let _ = try await community.membership.addMembers(users.map {$0.userId})
+                    Toast.showToast(style: .success, message: "Successfully added members to this community!")
+                } catch {
+                    Toast.showToast(style: .warning, message: "Failed to add members to this community")
+                }
+            }
+        }
+        
+        let context = AmityCommunityMembershipPageBehavior.Context(page: self, addUserPageCompletion: onAddedAction)
+        AmityUIKitManagerInternal.shared.behavior.communityMembershipPageBehavior?.goToAddMemberPage(context)
+    }
+    
+    private func goToInviteMemberPage() {
+        let onInvitedAction: ([AmityUserModel]) -> Void = { users in
+            Task { @MainActor in
+                do {
+                    try await community.createInvitations(users.map { $0.userId })
+                    self.host.controller?.presentedViewController?.dismiss(animated: true)
+                    Toast.showToast(style: .success, message: "Successfully invited members to this community.")
+                } catch {
+                    Toast.showToast(style: .warning, message: "Failed to invite members. Please try again.")
+                }
+            }
+        }
+        
+        let context = AmityCommunityMembershipPageBehavior.Context(page: self, inviteMemberPageCompletion: onInvitedAction)
+        AmityUIKitManagerInternal.shared.behavior.communityMembershipPageBehavior?.goToInviteMemberPage(context)
     }
     
     private func goToUserProfilePage(_ userId: String) {

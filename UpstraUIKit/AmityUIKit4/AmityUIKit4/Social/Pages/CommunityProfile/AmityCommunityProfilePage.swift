@@ -13,7 +13,6 @@ public struct AmityCommunityProfilePage: AmityPageView {
     
     public let communityId: String
     
-    @State private var currentTab = 0
     @State private var showBottomSheet: Bool = false
     @State private var isRefreshing = false
     @State private var headerComponentHeight: CGFloat = 0.0
@@ -67,20 +66,20 @@ public struct AmityCommunityProfilePage: AmityPageView {
                         let context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: componentContext?.showPollResults ?? false)
                         AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: componentContext?.category ?? .general)
                     })
-                        .isHidden(currentTab != 0)
+                    .isHidden(viewModel.currentTab != 0)
                     
                     AmityCommunityPinnedPostComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, postContext in
                         
                         let context = AmityCommunityProfilePageBehavior.Context(page: self, showPollResult: postContext?.showPollResults ?? false)
                         AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostDetailPage(context: context, post: post, category: postContext?.category ?? .pinAndAnnouncement)
                     })
-                        .isHidden(currentTab != 1)
+                    .isHidden(viewModel.currentTab != 1)
                     
                     AmityCommunityImageFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
-                        .isHidden(currentTab != 2)
+                    .isHidden(viewModel.currentTab != 2)
                     
                     AmityCommunityVideoFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
-                        .isHidden(currentTab != 3)
+                    .isHidden(viewModel.currentTab != 3)
                     
                 }
                 .background(GeometryReader { geometry in
@@ -106,7 +105,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                     ImpactFeedbackGenerator.impactFeedback(style: .light)
                     isRefreshing = true
                     Task { @MainActor in
-                        viewModel.refreshFeed(currentTab: currentTab)
+                        viewModel.refreshFeed()
                         await refreshData()
                         await MainActor.run {
                             isRefreshing = false
@@ -148,17 +147,20 @@ public struct AmityCommunityProfilePage: AmityPageView {
         VStack(spacing: 0) {
             if let community = viewModel.community {
                 
-                AmityCommunityHeaderComponent(community: community, pageId: id, viewModel: viewModel, onPendingPostsTapAction: {
-                    
-                    let context = AmityCommunityProfilePageBehavior.Context(page: self, community: community.object)
-                    AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPendingPostPage(context: context)
-                }, onMemberListTapAction: {
-                    
+                AmityCommunityHeaderComponent(community: community, pageId: id, viewModel: viewModel, onPendingRequestBannerTap: { selectedTab in
+                    let context = AmityCommunityProfilePageBehavior.Context(page: self, community: community.object, selectedTab: selectedTab)
+                    AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPendingRequestsPage(context: context)
+                }, onMemberCountLabelTap: {
                     let context = AmityCommunityProfilePageBehavior.Context(page: self)
                     AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToMemberListPage(context: context, community: viewModel.community)
                 })
                 
-                AmityCommunityProfileTabComponent(currentTab: $currentTab, pageId: .communityProfilePage)
+                // Show the invitation banner only if the community has invitation to the user
+                if let _ = viewModel.pendingCommunityInvitation {
+                    AmityCommunityInvitationBanner(community: community.object, viewModel: viewModel, pageId: id)
+                }
+                
+                AmityCommunityProfileTabComponent(currentTab: $viewModel.currentTab, pageId: .communityProfilePage)
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
                     .frame(height: 1)
@@ -205,7 +207,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                 .padding(.all, 16)
                 .isHidden(viewModel.community?.isJoined ?? false)
 
-                AmityCommunityProfileTabComponent(currentTab: $currentTab, pageId: .communityProfilePage)
+                AmityCommunityProfileTabComponent(currentTab: $viewModel.currentTab, pageId: .communityProfilePage)
                 
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
@@ -390,6 +392,7 @@ extension AmityCommunityProfilePage {
                     let context = AmityCommunityProfilePageBehavior.Context(page: self, community: viewModel.community?.object)
                     AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToCommunitySettingPage(context: context)
                 }
+                .visibleWhen(viewModel.community?.isJoined ?? false)
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)
@@ -459,7 +462,7 @@ extension AmityCommunityProfilePage {
                     
                 }
                 
-                AmityCommunityProfileTabComponent(currentTab: $currentTab, pageId: .communityProfilePage)
+                AmityCommunityProfileTabComponent(currentTab: $viewModel.currentTab, pageId: .communityProfilePage)
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)

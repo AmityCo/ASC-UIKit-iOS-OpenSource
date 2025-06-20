@@ -42,7 +42,6 @@ struct CommunityCellView: View {
                         Image(lockIcon)
                             .renderingMode(.template)
                             .frame(width: 20, height: 20)
-                            .offset(y: -1)
                             .foregroundColor(Color(viewConfig.theme.baseColor))
                             .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
                             .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityPrivateBadge)

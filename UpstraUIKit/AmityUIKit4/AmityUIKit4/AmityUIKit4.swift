@@ -23,6 +23,7 @@ public final class AmityUIKit4Manager {
     ///   - apiKey: ApiKey provided by Amity
     ///   - region: The region to which this UIKit connects to. By default, region is .global
     public static func setup(apiKey: String, region: AmityRegion = .SG) {
+        RemoteConfig.setup(apiKey: apiKey, httpEndpoint: region.httpUrl)
         AmityUIKitManagerInternal.shared.setup(apiKey, region: region)
     }
     
@@ -37,6 +38,7 @@ public final class AmityUIKit4Manager {
     ///   - apiKey: ApiKey provided by Amity
     ///   - endpoint: Custom Endpoint to which this UIKit connects to.
     public static func setup(apiKey: String, endpoint: AmityEndpoint) {
+        RemoteConfig.setup(apiKey: apiKey, httpEndpoint: endpoint.httpUrl ?? "")
         AmityUIKitManagerInternal.shared.setup(apiKey, endpoint: endpoint)
     }
     
@@ -350,6 +352,9 @@ final class AmityUIKitManagerInternal: NSObject {
         
         let notificationTrayPageBehavior = AmityNotificationTrayPageBehavior()
         behavior.notificationTrayPageBehavior = notificationTrayPageBehavior
+        
+        let joinRequestComponentBehavior = AmityJoinRequestContentComponentBehavior()
+        behavior.joinRequestContentComponentBehavior = joinRequestComponentBehavior
     }
     
     func registerDevice(_ userId: String,

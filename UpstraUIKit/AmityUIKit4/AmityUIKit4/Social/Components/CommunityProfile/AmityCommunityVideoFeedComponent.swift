@@ -48,55 +48,59 @@ public struct AmityCommunityVideoFeedComponent: AmityComponentView {
     @ViewBuilder
     private var videoFeedView: some View {
         VStack(spacing: 0) {
-            Color.clear
-                .frame(height: 16)
-            
-            LazyVGrid(columns: gridLayout, spacing: 8) {
-                if viewModel.loadingStatus == .loading && viewModel.medias.isEmpty {
-                    ForEach(0..<10, id: \.self) { _ in
-                        skeletonImageView
-                    }
-                } else {
-                    ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
-                        if let url = media.getImageURL(),
-                           let attributes = media.video?.attributes,
-                           let meta = attributes["metadata"] as? [String: Any],
-                           let videoMeta = meta["video"] as? [String: Any],
-                           let duration = videoMeta["duration"] as? TimeInterval {
-                            getVideoView(url, duration)
-                                .frame(maxWidth: .infinity)
-                                .aspectRatio(1, contentMode: .fit)
-                                .background(Color.gray)
-                                .cornerRadius(10)
-                                .onTapGesture {
-                                    if let urlStr = media.video?.getVideo(resolution: .original) {
-                                        viewModel.videoURL = URL(string: urlStr)
-                                    } else {
-                                        viewModel.videoURL = URL(string: media.video?.fileURL ?? "")
-                                    }
-                                     
-                                    viewModel.showMediaViewer.toggle()
-                                }
-                                .onAppear {
-                                    if index == viewModel.medias.count - 1 {
-                                        viewModel.loadMore()
-                                    }
-                                }
+            if viewModel.emptyFeedState == .private {
+                PrivateCommunityFeedView()
+            } else {
+                Color.clear
+                    .frame(height: 16)
+                
+                LazyVGrid(columns: gridLayout, spacing: 8) {
+                    if viewModel.loadingStatus == .loading && viewModel.medias.isEmpty {
+                        ForEach(0..<10, id: \.self) { _ in
+                            skeletonImageView
                         }
-                        
+                    } else {
+                        ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
+                            if let url = media.getImageURL(),
+                               let attributes = media.video?.attributes,
+                               let meta = attributes["metadata"] as? [String: Any],
+                               let videoMeta = meta["video"] as? [String: Any],
+                               let duration = videoMeta["duration"] as? TimeInterval {
+                                getVideoView(url, duration)
+                                    .frame(maxWidth: .infinity)
+                                    .aspectRatio(1, contentMode: .fit)
+                                    .background(Color.gray)
+                                    .cornerRadius(10)
+                                    .onTapGesture {
+                                        if let urlStr = media.video?.getVideo(resolution: .original) {
+                                            viewModel.videoURL = URL(string: urlStr)
+                                        } else {
+                                            viewModel.videoURL = URL(string: media.video?.fileURL ?? "")
+                                        }
+                                         
+                                        viewModel.showMediaViewer.toggle()
+                                    }
+                                    .onAppear {
+                                        if index == viewModel.medias.count - 1 {
+                                            viewModel.loadMore()
+                                        }
+                                    }
+                            }
+                            
+                        }
                     }
                 }
-            }
-            .padding(.horizontal, 16)
-            .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
-                if let videoURL = viewModel.videoURL {
-                    AVPlayerView(url: videoURL, autoPlay: false)
-                        .ignoresSafeArea(.all)
+                .padding(.horizontal, 16)
+                .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
+                    if let videoURL = viewModel.videoURL {
+                        AVPlayerView(url: videoURL, autoPlay: false)
+                            .ignoresSafeArea(.all)
+                    }
                 }
+                
+                Color.clear
+                    .frame(height: 16)
             }
-            
-            Color.clear
-                .frame(height: 16)
         }
     }
     

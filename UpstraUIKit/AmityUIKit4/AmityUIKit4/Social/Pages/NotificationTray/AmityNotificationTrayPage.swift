@@ -12,6 +12,7 @@ public struct AmityNotificationTrayPage: AmityPageView {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel = AmityNotificationTrayPageViewModel()
+    @StateObject private var invitaionSectionViewModel = AmityInvitationSectionViewModel()
     
     @State private var didMarkTrayAsSeen = false
     
@@ -30,6 +31,9 @@ public struct AmityNotificationTrayPage: AmityPageView {
             ZStack {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(alignment: .leading, spacing: 0) {
+                        
+                        AmityInvitationSection(viewModel: invitaionSectionViewModel)
+                            .visibleWhen(invitaionSectionViewModel.loadingStatus != .loading && !viewModel.isLoading && !invitaionSectionViewModel.invitations.isEmpty)
                         
                         ForEach(viewModel.sections) { section in
                             NotificationTraySectionTitle(title: section.title)
@@ -58,7 +62,7 @@ public struct AmityNotificationTrayPage: AmityPageView {
                 
                 emptyNotificationState
                     .padding()
-                    .visibleWhen(!viewModel.isLoading && viewModel.sections.isEmpty)
+                    .visibleWhen(!viewModel.isLoading && viewModel.sections.isEmpty && invitaionSectionViewModel.invitations.isEmpty)
                 
                 skeletonState
                     .padding()
@@ -88,6 +92,8 @@ public struct AmityNotificationTrayPage: AmityPageView {
             }
         case .comment, .reply, .reaction, .mention:
             AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: idInfo.commentId, parentCommentId: idInfo.parentId, communityId: nil))
+        case .joinRequest:
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToCommunityProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId))
         }
     }
     
@@ -155,51 +161,5 @@ public struct AmityNotificationTrayPage: AmityPageView {
             Spacer()
         }
         .padding(.vertical, 12)
-    }
-}
-
-struct NotificationTrayItemView: View {
-    
-    @EnvironmentObject var viewConfig: AmityViewConfigController
-    let item: NotificationItem
-    
-    var body: some View {
-        HStack(spacing: 0) {
-            AmityUserProfileImageView(displayName: item.users.first?.displayName ?? "", avatarURL: URL(string: item.users.first?.avatarURL ?? ""))
-                .frame(width: 32, height: 32)
-                .clipShape(Circle())
-            
-            // "Hasan John mentioned you in a poll on their feed"
-            if #available(iOS 15, *) {
-                // Work with attributed text here
-                Text(item.getHighlightedText())
-                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
-                    .padding(.leading, 12)
-            } else {
-                Text(item.text)
-                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
-                    .padding(.leading, 12)
-            }
-            
-            Spacer(minLength: 12)
-            
-            Text(item.timestamp.relativeTime)
-                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
-        }
-        .padding(16)
-        .background(Color(item.isSeen ? viewConfig.theme.backgroundColor : viewConfig.theme.primaryColor.blend(.shade3)))
-    }
-}
-
-struct NotificationTraySectionTitle: View {
-    
-    let title: String
-    @EnvironmentObject var viewConfig: AmityViewConfigController
-    
-    var body: some View {
-        Text(title)
-            .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
     }
 }

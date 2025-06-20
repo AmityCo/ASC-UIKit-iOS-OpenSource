@@ -15,17 +15,20 @@ open class AmityCommunitySetupPageBehavior {
         public let onCategoryAddedAction: (([AmityCommunityCategoryModel]) -> Void)?
         public let selectedUsers: [AmityUserModel]
         public let onUserAddedAction: (([AmityUserModel]) -> Void)?
+        public let onMemberInvitedAction: (([AmityUserModel]) -> Void)?
         
         init(page: AmityCommunitySetupPage, 
              selectedCategories: [AmityCommunityCategoryModel] = [],
              onCategoryAddedAction: (([AmityCommunityCategoryModel]) -> Void)? = nil,
              selectedUsers: [AmityUserModel] = [],
-             onUserAddedAction: (([AmityUserModel]) -> Void)? = nil) {
+             onUserAddedAction: (([AmityUserModel]) -> Void)? = nil,
+             onMemberInvitedAction: (([AmityUserModel]) -> Void)? = nil) {
             self.page = page
             self.selectedCategories = selectedCategories
             self.onCategoryAddedAction = onCategoryAddedAction
             self.selectedUsers = selectedUsers
             self.onUserAddedAction = onUserAddedAction
+            self.onMemberInvitedAction = onMemberInvitedAction
         }
     }
     
@@ -40,6 +43,13 @@ open class AmityCommunitySetupPageBehavior {
     
     open func goToAddMemberPage(_ context: AmityCommunitySetupPageBehavior.Context) {
         let view = AmityCommunityAddUserPage(users: context.selectedUsers, onAddedAction: context.onUserAddedAction ?? { _ in })
+        let vc = AmitySwiftUIHostingController(rootView: view)
+        vc.modalPresentationStyle = .overFullScreen
+        context.page.host.controller?.present(vc, animated: true)
+    }
+    
+    open func goToInviteMemberPage(_ context: AmityCommunitySetupPageBehavior.Context) {
+        let view = AmityCommunityInviteMemberPage(users: context.selectedUsers, onInvitedAction: context.onMemberInvitedAction ?? { _ in })
         let vc = AmitySwiftUIHostingController(rootView: view)
         vc.modalPresentationStyle = .overFullScreen
         context.page.host.controller?.present(vc, animated: true)
