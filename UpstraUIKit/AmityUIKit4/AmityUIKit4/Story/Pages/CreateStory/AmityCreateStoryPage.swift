@@ -182,9 +182,7 @@ public struct AmityCreateStoryPage: AmityPageView {
             allowedCaptureVideoLength = value
         }
         .background(Color.black.ignoresSafeArea())
-        
     }
-    
     
     func getImageCaptureButtonView() -> some View {
         Button {
@@ -200,7 +198,6 @@ public struct AmityCreateStoryPage: AmityPageView {
         .buttonStyle(.plain)
         .accessibilityIdentifier(AccessibilityID.Story.AmityCreateStoryPage.cameraShutterButton)
     }
-    
     
     func getVideoCaptureButtonView() -> some View {
         Button {} label: {
@@ -223,6 +220,7 @@ public struct AmityCreateStoryPage: AmityPageView {
             .frame(width: 72, height: 72)
             .offset(x: 0, y: -32)
         }
+        .buttonStyle(.plain)
         .overlay(
             GestureView(onTouchAndHoldStart: {
                 guard cameraManager.cameraIsReady else { return }
@@ -301,10 +299,10 @@ public struct AmityCreateStoryPage: AmityPageView {
         }
     }
     
-    
     func stopVideoCaptureTimer() {
         videoCaptureProgress = 0.0
         videoCaputreDuration = 0.0
+        
         videoCaptureTimer?.invalidate()
         videoCaptureTimer = nil
     }
@@ -346,10 +344,16 @@ class AmityCreateStoryPageViewModel: ObservableObject {
 struct CameraPreviewView: UIViewRepresentable {
     
     let cameraManager: CameraManager
+    let outputMode: CameraOutputMode
+    
+    init(cameraManager: CameraManager, outputMode: CameraOutputMode = .stillImage) {
+        self.cameraManager = cameraManager
+        self.outputMode = outputMode
+    }
     
     func makeUIView(context: Context) -> some UIView {
         let view = UIView()
-        cameraManager.addPreviewLayerToView(view, newCameraOutputMode: CameraOutputMode.stillImage)
+        cameraManager.addPreviewLayerToView(view, newCameraOutputMode: outputMode)
         return view
     }
     

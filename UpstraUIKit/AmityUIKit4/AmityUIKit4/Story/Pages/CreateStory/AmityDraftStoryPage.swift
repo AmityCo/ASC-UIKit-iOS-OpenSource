@@ -23,7 +23,7 @@ public struct AmityDraftStoryPage: AmityPageView {
     }
     
     @StateObject private var viewModel: AmityDraftStoryPageViewModel
-    @State private var previewDisplayMode: ContentMode = .fit
+    @State private var previewDisplayMode: ContentMode = .fill
     @State private var animateActivityIndicator: Bool = false
     @State private var userInteractionEnabled: Bool = true
     @State private var isAlertShown = false

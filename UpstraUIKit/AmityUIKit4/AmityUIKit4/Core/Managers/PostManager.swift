@@ -8,8 +8,9 @@
 import Foundation
 import AmitySDK
 
+// FIXME: Use PostDataType instead
 enum PostTypeFilter: String {
-    case image, video
+    case image, video, clip
 }
 
 class PostManager {
@@ -24,9 +25,13 @@ class PostManager {
         postRepository.getPosts(options)
     }
     
+    func getPosts(ids: [String]) -> AmityCollection<AmityPost> {
+        postRepository.getPosts(postIds: ids)
+    }
+    
     @discardableResult
     func deletePost(withId: String) async throws -> Bool {
-        try await postRepository.hardDeletePost(withId: withId, parentId: nil)
+        try await postRepository.softDeletePost(withId: withId, parentId: nil)
     }
     
     @discardableResult

@@ -14,6 +14,7 @@ public enum AmitySocialHomePageTab: String, CaseIterable, Identifiable {
     
     case newsFeed = "NewsFeed"
     case explore = "Explore"
+    case clips = "Clips"
     case myCommunities = "MyCommunities"
 }
 
@@ -22,8 +23,11 @@ struct SocialHomePageTabView: View {
     @State private var tabItems: [TabItem]
     @Binding var selectedTab: AmitySocialHomePageTab
     
-    init(_ selectedTab: Binding<AmitySocialHomePageTab>) {
+    let onSelection: (AmitySocialHomePageTab) -> Void
+    
+    init(_ selectedTab: Binding<AmitySocialHomePageTab>, onSelection: @escaping (AmitySocialHomePageTab) -> Void) {
         self._selectedTab = selectedTab
+        self.onSelection = onSelection
         
         let items = AmitySocialHomePageTab.allCases.map { tab in
             TabItem(tab: tab, selected: tab == selectedTab.wrappedValue)
@@ -38,7 +42,11 @@ struct SocialHomePageTabView: View {
                 ForEach(tabItems) { item in
                     TabButtonView(title: getTitle(tab: item.tab), selected: item.selected)
                         .onTapGesture {
-                            selectedTab = item.tab
+                            onSelection(item.tab)
+                            
+                            if item.tab != .clips {
+                                selectedTab = item.tab
+                            }
                         }
                         .accessibilityIdentifier(getAccessibilityID(tab: item.tab))
                 }
@@ -74,11 +82,13 @@ struct SocialHomePageTabView: View {
     private func getTitle(tab: AmitySocialHomePageTab) -> String {
         switch tab {
         case .newsFeed:
-            return viewConfig.getConfig(elementId: .newsFeedButton, key: "text", of: String.self) ?? ""
+            return viewConfig.forElement(.newsFeedButton).text ?? ""
         case .explore:
-            return viewConfig.getConfig(elementId: .exploreButton, key: "text", of: String.self) ?? ""
+            return viewConfig.forElement(.exploreButton).text ?? ""
+        case .clips:
+            return viewConfig.forElement(.clipsButton).text ?? ""
         case .myCommunities:
-            return viewConfig.getConfig(elementId: .myCommunitiesButton, key: "text", of: String.self) ?? ""
+            return viewConfig.forElement(.myCommunitiesButton).text ?? ""
         }
     }
     
@@ -87,6 +97,7 @@ struct SocialHomePageTabView: View {
         case .newsFeed: AccessibilityID.Social.SocialHomePage.newsFeedButton
         case .explore: AccessibilityID.Social.SocialHomePage.exploreButton
         case .myCommunities: AccessibilityID.Social.SocialHomePage.myCommunitiesButton
+        case .clips: AccessibilityID.Social.SocialHomePage.clipsButton
         }
     }
     
@@ -117,7 +128,7 @@ private struct TabButtonView: View {
     var body: some View {
         HStack {
             Text(title)
-                .applyTextStyle(selected ? .titleBold(Color(viewConfig.defaultLightTheme.backgroundColor)) : .title(Color(viewConfig.theme.secondaryColor.blend(.shade1))))
+                .applyTextStyle(selected ? .titleBold(Color(viewConfig.defaultLightTheme.backgroundColor)) : .title(Color(viewConfig.theme.secondaryColorShade1)))
                 .padding([.leading, .trailing], 12)
                 .frame(width: buttonWidth)
         }

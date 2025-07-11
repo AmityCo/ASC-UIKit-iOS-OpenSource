@@ -7,14 +7,17 @@
 
 import Foundation
 import UIKit
+import AmitySDK
 
 open class AmityUserProfilePageBehavior {
     
     open class Context {
         public let page: AmityUserProfilePage
+        let clipProvider: ClipService?
         
-        init(page: AmityUserProfilePage) {
+        init(page: AmityUserProfilePage, clipProvider: ClipService? = nil) {
             self.page = page
+            self.clipProvider = clipProvider
         }
     }
     
@@ -64,5 +67,23 @@ open class AmityUserProfilePageBehavior {
         navController.navigationBar.isHidden = true
         
         context.page.host.controller?.present(navController, animated: true)
+    }
+    
+    open func goToClipComposerPage(context: AmityUserProfilePageBehavior.Context) {
+        let view = AmityCreateClipPostPage(targetId: AmityUIKitManagerInternal.shared.currentUserId, targetType: .user, community: nil)
+        
+        let navigationController = AmitySwiftUIHostingNavigationController(rootView: view)
+        navigationController.modalPresentationStyle = .fullScreen
+        navigationController.navigationBar.isHidden = true
+
+        context.page.host.controller?.present(navigationController, animated: true)
+    }
+    
+    open func goToClipFeedPage(context: AmityUserProfilePageBehavior.Context) {
+        guard let provider = context.clipProvider else { return }
+        let page = AmityClipFeedPage(provider: provider)
+        
+        let controller = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(controller, animated: true)
     }
 }

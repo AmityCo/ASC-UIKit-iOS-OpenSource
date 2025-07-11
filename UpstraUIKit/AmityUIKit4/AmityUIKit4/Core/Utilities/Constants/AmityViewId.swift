@@ -62,6 +62,11 @@ public enum PageId: String {
     case notificationTrayPage = "notification_tray_page"
     
     case pendingRequestPage = "pending_request_page"
+    
+    case createClipPostPage = "create_clip_post_page"
+    case draftClipPage = "draft_clip_page"
+    case clipFeedPage = "clip_feed_page"
+    
 }
 
 public enum ComponentId: String {
@@ -95,6 +100,7 @@ public enum ComponentId: String {
     case mediaAttachment = "media_attachment"
     case detailedMediaAttachment = "detailed_media_attachment"
     case communityImageFeed = "community_image_feed"
+    case communityVideoFeed = "community_video_feed"
     case pendingPostContentComponent = "pending_post_content"
 
     case recommendedCommunities = "recommended_communities"
@@ -162,6 +168,7 @@ public enum ElementId: String {
     case postCreationButton = "post_creation_button"
     case newsFeedButton = "newsfeed_button"
     case exploreButton = "explore_button"
+    case clipsButton = "clipsfeed_button"
     case myCommunitiesButton = "my_communities_button"
     
     // EmptyNewsFeed

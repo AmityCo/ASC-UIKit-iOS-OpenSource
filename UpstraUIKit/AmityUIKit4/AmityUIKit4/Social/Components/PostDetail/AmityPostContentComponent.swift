@@ -181,9 +181,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                             .isHidden(viewConfig.isHidden(elementId: .timestamp))
                             .accessibilityIdentifier(AccessibilityID.Social.PostContent.timestamp)
-                        
                     }
-                    
                 }
                 
                 Spacer()
@@ -260,7 +258,7 @@ public struct AmityPostContentComponent: AmityComponentView {
     }
     
     private func showPostEditScreen() {
-        let editOption = AmityPostComposerOptions.editOptions(post: post)
+        let editOption = AmityPostComposerOptions.editOptions(mode: post.dataTypeInternal == .clip ? .editClip : .edit, post: post)
         let view = AmityPostComposerPage(options: editOption)
         let controller = AmitySwiftUIHostingController(rootView: view)
         
@@ -276,7 +274,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             switch post.dataTypeInternal {
             case .text:
                 postContentTextView()
-                
+                                
                 PreviewLinkView(post: post)
                 
             case .image, .video:
@@ -302,6 +300,16 @@ public struct AmityPostContentComponent: AmityComponentView {
                 
                 PostContentLiveStreamView(post: post)
                     .padding([.leading, .trailing, .top], -16)
+                
+            case .clip:
+                postContentTextView()
+                
+                PostContentClipView(post: post)
+                    .onTapGesture {
+                        let context = Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton, isClipPost: true)
+                        onTapAction?(context)
+                    }
+                
             case .unknown:
                 EmptyView()
             }
@@ -626,16 +634,20 @@ extension AmityPostContentComponent {
         var category: AmityPostCategory
         var hidePostTarget: Bool
         var hideMenuButton: Bool
+        var isClipPost: Bool
+        
         
         public init(shouldShowPollResults: Bool = false,
                     category: AmityPostCategory = .general,
                     shouldHideTarget: Bool = false,
-                    shouldHideMenuButton: Bool = false
+                    shouldHideMenuButton: Bool = false,
+                    isClipPost: Bool = false,
         ) {
             self.showPollResults = shouldShowPollResults
             self.category = category
             self.hidePostTarget = shouldHideTarget
             self.hideMenuButton = shouldHideMenuButton
+            self.isClipPost = isClipPost
         }
     }
 }

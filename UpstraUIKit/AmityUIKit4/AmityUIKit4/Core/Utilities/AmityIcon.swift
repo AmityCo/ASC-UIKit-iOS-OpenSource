@@ -113,6 +113,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case createStoryMenuIcon = "createStoryMenuIcon"
     case createPollMenuIcon = "createPollMenuIcon"
     case createLivestreamMenuIcon = "createLivestreamMenuIcon"
+    case createClipMenuIcon = "createClipMenuIcon"
     case cameraAttatchmentIcon = "cameraAttatchmentIcon"
     case photoAttatchmentIcon = "photoAttatchmentIcon"
     case videoAttatchmentIcon = "videoAttatchmentIcon"
@@ -135,6 +136,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case communityProfileEmptyPostIcon = "communityProfileEmptyPostIcon"
     case communityProfileEmptyImageIcon = "communityProfileEmptyImageIcon"
     case communityProfileEmptyVideoIcon = "communityProfileEmptyVideoIcon"
+    case communityProfileEmptyClipIcon = "emptyClipIcon"
     case communityPendingPostIcon = "communityPendingPostIcon"
     case tickIcon = "tickIcon"
     case communityCategoryPlaceholder = "categoriesPlaceholder"
@@ -181,6 +183,27 @@ enum AmityIcon: String, ImageResourceProvider {
     case reportSuccessIcon = "reportSuccessIcon"
     
     case cancelRequestIcon = "cancelRequestIcon"
+    case clipFlashIcon = "clipFlashButton"
+    case clipThumbnailIcon = "clipThumbnailIcon"
+    
+    case clipVideoStartButton = "clipVideoStartButton"
+    case clipVideoStopButton = "clipVideoStopButton"
+    
+    case rightArrowIcon = "rightArrowIcon"
+    
+    case emptyClipFeedIcon = "emptyClipFeedIcon"
+    
+    case clipCommentIcon = "clipCommentIcon"
+    case clipMuteIcon = "clipMuteIcon"
+    case clipReactionIcon = "clipReactionIcon"
+    case clipReactIconLike = "clipReactIconLike"
+    case clipUnmuteIcon = "clipUnmuteIcon"
+    
+    case viewPostIcon = "viewPostIcon"
+    case clipLoadingErrorIcon = "clipLoadingErrorIcon"
+    case clipFeedCameraIcon = "clipFeedCameraIcon"
+    case clipDeletedIcon = "clipDeletedIcon"
+    case clipGlobeIcon = "clipGlobeIcon"
     
     // Livestream icons
     enum LiveStream: String, ImageResourceProvider {

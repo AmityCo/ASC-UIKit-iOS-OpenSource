@@ -73,13 +73,22 @@ struct AmityLineButtonStyle: ButtonStyle {
     private let hPadding: CGFloat
     private let size: ButtonSize
     private let radius: CGFloat
+    private let borderColor: UIColor?
     
-    init(viewConfig: AmityViewConfigController, size: ButtonSize = .expanded, hPadding: CGFloat = 16, vPadding: CGFloat = 12, radius: CGFloat = 8) {
+    init(
+        viewConfig: AmityViewConfigController,
+        size: ButtonSize = .expanded,
+        hPadding: CGFloat = 16,
+        vPadding: CGFloat = 12,
+        radius: CGFloat = 8,
+        borderColor: UIColor? = nil,
+    ) {
         self.viewConfig = viewConfig
         self.vPadding = vPadding
         self.hPadding = hPadding
         self.size = size
         self.radius = radius
+        self.borderColor = borderColor
     }
     
     func makeBody(configuration: Configuration) -> some View {
@@ -87,7 +96,7 @@ struct AmityLineButtonStyle: ButtonStyle {
             .contentShape(Rectangle())
             .overlay(
                 RoundedRectangle(cornerRadius: radius)
-                    .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 1)
+                    .stroke(Color(borderColor ?? viewConfig.theme.baseColorShade3), lineWidth: 1)
             )
             .cornerRadius(radius)
     }

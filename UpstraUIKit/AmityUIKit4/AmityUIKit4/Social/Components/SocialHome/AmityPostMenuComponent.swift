@@ -13,9 +13,10 @@ enum PostMenuType: String, CaseIterable, Identifiable {
     }
     
     case post = "Post"
-    case story = "Story"
     case poll = "Poll"
     case liveStream = "Livestream"
+    case story = "Story"
+    case clip = "Clip"
 }
 
 public struct AmityCreatePostMenuComponent: AmityComponentView {
@@ -64,14 +65,14 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
     @ViewBuilder
     private func getMenuView() -> some View {
         VStack(spacing: 24) {
-            ForEach(postTypes, id: \.rawValue) { type in
+            ForEach(postTypes) { type in
                 switch type {
                 case .post:
                     let createPostButton = viewConfig.getConfig(elementId: .createPostButton, key: "image", of: String.self) ?? ""
                     let createPostTitle = viewConfig.getConfig(elementId: .createPostButton, key: "text", of: String.self) ?? ""
                     getItemView(image: AmityIcon.getImageResource(named: createPostButton), title: createPostTitle)
                         .onTapGesture {
-                            goToPostCreation()
+                            handlePostMenuAction(type)
                         }
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createPostButton)
                 case .story:
@@ -79,7 +80,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                     let createStoryTitle = viewConfig.getConfig(elementId: .createStoryButton, key: "text", of: String.self) ?? ""
                     getItemView(image: AmityIcon.getImageResource(named: createStoryButton), title: createStoryTitle)
                         .onTapGesture {
-                            goToStoryCreation()
+                            handlePostMenuAction(type)
                         }
                         .isHidden(!allowAllUserToCreateStory)
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createStoryButton)
@@ -87,13 +88,19 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                     let icon = AmityIcon.createPollMenuIcon
                     getItemView(image: icon.getImageResource(), title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
-                            goToPollCreation()
+                            handlePostMenuAction(type)
                         }
                 case .liveStream:
                     let icon = AmityIcon.createLivestreamMenuIcon
                     getItemView(image: icon.getImageResource(), title: type.rawValue)
                         .onTapGesture {
-                            goToLiveStreamCreation()
+                            handlePostMenuAction(type)
+                        }
+                case .clip:
+                    let icon = AmityIcon.createClipMenuIcon
+                    getItemView(image: icon.getImageResource(), title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
+                        .onTapGesture {
+                            handlePostMenuAction(type)
                         }
                 }
             }
@@ -137,47 +144,25 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
         }
     }
     
-    private func goToPostCreation() {
+    private func handlePostMenuAction(_ type: PostMenuType) {
         withoutAnimation {
             isPresented.toggle()
         }
-        
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
             let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
-            AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectPostTargetPage(context: context)
-        }
-    }
-    
-    private func goToStoryCreation() {
-        withoutAnimation {
-            isPresented.toggle()
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
-            AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectStoryTargetPage(context: context)
-        }
-    }
-    
-    private func goToPollCreation() {
-        withoutAnimation {
-            isPresented.toggle()
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
-            AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectPollPostTargetPage(context: context)
-        }
-    }
-    
-    private func goToLiveStreamCreation() {
-        withoutAnimation {
-            isPresented.toggle()
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            let context = AmityCreatePostMenuComponentBehavior.Context(component: self)
-            AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior?.goToSelectLiveStreamPostTargetPage(context: context)
+            let behavior = AmityUIKitManagerInternal.shared.behavior.createPostMenuComponentBehavior
+            switch type {
+            case .post:
+                behavior?.goToSelectPostTargetPage(context: context)
+            case .story:
+                behavior?.goToSelectStoryTargetPage(context: context)
+            case .poll:
+                behavior?.goToSelectPollPostTargetPage(context: context)
+            case .liveStream:
+                behavior?.goToSelectLiveStreamPostTargetPage(context: context)
+            case .clip:
+                behavior?.goToSelectClipPostTargetPage(context: context)
+            }
         }
     }
 }

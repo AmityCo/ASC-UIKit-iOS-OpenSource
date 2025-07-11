@@ -111,7 +111,7 @@ struct ReplyCommentView: View {
                     let word = WordsGrammar(count: repliesCount, set: .reply)
                     let finalText = hasTargetReply ? "View more replies" : "View \(repliesCount) \(word.value)"
                     Text(finalText)
-                        .applyTextStyle(.captionBold(Color(viewConfig.theme.secondaryColor.blend(.shade1))))
+                        .applyTextStyle(.captionBold(Color(viewConfig.theme.secondaryColorShade1)))
                         .padding(.trailing, 8)
                 }
                 .frame(height: 28, alignment: .leading)

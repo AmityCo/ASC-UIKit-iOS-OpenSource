@@ -30,15 +30,13 @@ public struct AmityEmptyStateView: View {
             
             if let title = configuration.title {
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                     .padding(.top, 24)
             }
             
             if let subtitle = configuration.subtitle {
                 Text(subtitle)
-                    .font(.system(size: 15))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade3)))
                     .multilineTextAlignment(.center)
                     .padding(.top, configuration.title == nil ? 24 : 4)
             }

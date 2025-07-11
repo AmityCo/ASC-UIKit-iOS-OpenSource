@@ -541,10 +541,9 @@ struct VisibleModifier: ViewModifier {
 
 extension View {
     
+    /// Convenience modifier. Does not remove the view and modifies opacity only.
     func visibleWhen(_ condition: Bool) -> some View {
         self
             .modifier(VisibleModifier(condition: condition))
     }
 }
-
-// social home page - target selection (present)

@@ -51,14 +51,16 @@ public struct ExpandableText: View {
     internal var metadata: [String: Any]?
     internal var mentionees: [AmityMentionees]?
     internal var onTapMentionee: ((String) -> Void)?
+    internal var defaultAction: (() -> Void)?
     
     /**
      Initializes a new `ExpandableText` instance with the specified text string, trimmed of any leading or trailing whitespace and newline characters.
      - Parameter text: The initial text string to display in the `ExpandableText` view.
      - Returns: A new `ExpandableText` instance with the specified text string and trimming applied.
      */
-    public init(_ text: String, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, onTapMentionee: ((String) -> Void)? = nil) {
+    public init(_ text: String, defaultAction: (() -> Void)? = nil, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, onTapMentionee: ((String) -> Void)? = nil) {
         self.text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        self.defaultAction = defaultAction
         self.metadata = metadata
         self.mentionees = mentionees
         self.onTapMentionee = onTapMentionee
@@ -90,10 +92,15 @@ public struct ExpandableText: View {
             )
             .contentShape(Rectangle())
             .onTapGesture {
-                if (isExpanded && collapseEnabled) ||
-                     shouldShowMoreButton {
-                    // we expand without expand animation as it looks ugly
-                    isExpanded.toggle()
+                // If there is default action, handle it through default action
+                if let defaultAction {
+                    defaultAction()
+                } else {
+                    if (isExpanded && collapseEnabled) ||
+                         shouldShowMoreButton {
+                        // we expand without expand animation as it looks ugly
+                        isExpanded.toggle()
+                    }
                 }
             }
             .modifier(OverlayAdapter(alignment: .trailingLastTextBaseline, view: {

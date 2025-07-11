@@ -112,8 +112,8 @@
 "delete_post_bottom_sheet_title" = "Delete post";
 "report_post_bottom_sheet_title" = "Report post";
 "unreport_post_bottom_sheet_title" = "Unreport post";
-"delete_post_title" = "Delete post";
-"delete_post_message" = "This post will be permanently removed.";
+"delete_post_title" = "Delete this post?";
+"delete_post_message" = "This post will be permanently deleted. You'll no longer see and find this post.";
 "post_reported_message" = "Post reported.";
 "post_unreported_message" = "Post unreported.";
 "post_failed_unreported_message" = "Failed to report post. Please try again.";

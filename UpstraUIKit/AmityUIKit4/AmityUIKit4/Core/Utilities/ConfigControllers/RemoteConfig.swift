@@ -20,7 +20,6 @@ public class RemoteConfig {
     @MainActor
     func getRemoteConfig() async throws {
         guard let url = URL(string: "\(RemoteConfig.httpEndpoint)/api/v3/network-settings/uikit") else {
-            print("Invalid URL")
             return
         }
         

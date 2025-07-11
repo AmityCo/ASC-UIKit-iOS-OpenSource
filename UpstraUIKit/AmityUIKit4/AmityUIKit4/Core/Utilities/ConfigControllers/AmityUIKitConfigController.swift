@@ -126,6 +126,7 @@ class AmityUIKitConfigController {
     private func getThemeColor(theme: AmityTheme, fallbackTheme: AmityTheme) -> AmityThemeColor {
         return AmityThemeColor(primaryColor: theme.primaryColor ?? fallbackTheme.primaryColor!,
                                secondaryColor: theme.secondaryColor ?? fallbackTheme.secondaryColor!,
+                               secondaryColorShade1: theme.secondaryColorShade1 ?? fallbackTheme.secondaryColorShade1!,
                                baseColor: theme.baseColor ?? fallbackTheme.baseColor!,
                                baseColorShade1: theme.baseColorShade1 ?? fallbackTheme.baseColorShade1!,
                                baseColorShade2: theme.baseColorShade2 ?? fallbackTheme.baseColorShade2!,

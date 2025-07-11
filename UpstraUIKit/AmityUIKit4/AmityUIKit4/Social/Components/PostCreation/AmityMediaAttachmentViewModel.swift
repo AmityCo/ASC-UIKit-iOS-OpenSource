@@ -41,11 +41,11 @@ public class AmityMediaAttachmentViewModel: ObservableObject {
             // Consider media ready ONLY if it's in a final uploaded state
             areAttachmentsReady = !medias.contains { media in
                 switch media.state {
-                case .uploadedImage, .uploadedVideo, .downloadableImage, .downloadableVideo:
+                case .uploadedImage, .uploadedVideo, .downloadableImage, .downloadableVideo, .downloadableClip:
                     // These states are fully processed and ready
                     return false
                 default:
-                    // Any other state (including localURL, image, uploading, error) 
+                    // Any other state (including localURL, image, uploading, error)
                     // means we're not ready yet
                     return true
                 }

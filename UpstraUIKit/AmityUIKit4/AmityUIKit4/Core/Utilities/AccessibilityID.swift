@@ -200,6 +200,7 @@ struct AccessibilityID {
             static let postCreationButton = "post_creation_button"
             static let newsFeedButton = "newsfeed_button"
             static let exploreButton = "explore_button"
+            static let clipsButton = "clips_button"
             static let myCommunitiesButton = "my_communities_button"
             static let notificationTrayButton = "notification_tray_button"
         }
@@ -366,6 +367,7 @@ struct AccessibilityID {
             static let blockedUserImageFeed = "blocked_user_image_feed"
             static let blockedUserImageFeedInfo = "blocked_user_image_feed_info"
             static let emptyUserVideoFeed = "empty_user_video_feed"
+            static let emptyUserClipFeed = "empty_user_clip_feed"
             static let privateUserVideoFeed = "private_user_video_feed"
             static let privateUserVideoFeedInfo = "private_user_video_feed_info"
             static let blockedUserVideoFeed = "blocked_user_video_feed"

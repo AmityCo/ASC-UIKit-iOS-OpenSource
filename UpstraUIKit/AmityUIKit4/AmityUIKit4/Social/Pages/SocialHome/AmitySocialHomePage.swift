@@ -35,24 +35,46 @@ public struct AmitySocialHomePage: AmityPageView {
                 if viewModel.selectedTab == .newsFeed || viewModel.selectedTab == .explore {
                     let context = AmitySocialHomePageBehavior.Context(page: self)
                     AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToGlobalSearchPage(context: context)
-                    
                 } else if viewModel.selectedTab == .myCommunities {
                     let context = AmitySocialHomePageBehavior.Context(page: self)
                     AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToMyCommunitiesSearchPage(context: context)
                 }
-            }) {
+            }, notificationButtonAction: {
                 let context = AmitySocialHomePageBehavior.Context(page: self)
                 AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToNotificationTrayPage(context: context)
-
-            }
+            })
             
-            SocialHomePageTabView($viewModel.selectedTab)
-                .frame(height: 62)
+            SocialHomePageTabView($viewModel.selectedTab, onSelection: { tab in
+                if tab == .clips {
+                    let feedPage = AmityClipFeedPage(provider: GlobalFeedClipService()) { action in
+                        
+                        switch action {
+                        case .exploreCommunity:
+                            self.host.controller?.navigationController?.popViewController(animated: true)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                self.viewModel.selectedTab = .explore
+                            }
+                        case .createCommunity:
+                            self.host.controller?.navigationController?.popViewController(animated: false)
+                            
+                            let page = AmityCommunitySetupPage(mode: .create)
+                            let vc = AmitySwiftUIHostingController(rootView: page)
+                            host.controller?.navigationController?.pushViewController(vc, animation: .presentation)
+                        default:
+                            break
+                        }
+                        
+                    }
+                    let vc = AmitySwiftUIHostingController(rootView: feedPage)
+                    host.controller?.navigationController?.pushViewController(vc, animated: true)
+                }
+            })
+            .frame(height: 62)
             
             Rectangle()
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 8)
-
+            
             SocialHomeContainerView($viewModel.selectedTab, pageId: id)
         }
         .background(Color(viewConfig.theme.backgroundColor))
@@ -79,6 +101,6 @@ class AmitySocialHomePageViewModel: ObservableObject {
     }
     
     @objc private func didPostCreated(_ notification: Notification) {
-//        selectedTab = .newsFeed
+        //        selectedTab = .newsFeed
     }
 }

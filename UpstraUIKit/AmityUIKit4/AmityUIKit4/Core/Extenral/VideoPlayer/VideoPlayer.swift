@@ -208,6 +208,7 @@ extension VideoPlayer: UIViewRepresentable {
         uiView.isMuted = config.mute
         uiView.isAutoReplay = config.autoReplay
         uiView.speedRate = config.speedRate
+        uiView.contentMode = config.contentMode
         
         if let observerTime = context.coordinator.observerTime, time != observerTime {
             uiView.seek(to: time, toleranceBefore: time, toleranceAfter: time, completion: { _ in })
@@ -225,6 +226,7 @@ extension VideoPlayer: UIViewRepresentable {
         var observerTime: CMTime?
         var observerBuffer: Double?
         var hasLoaded = false
+        var isPlaying = false
 
         init(_ videoPlayer: VideoPlayer) {
             self.videoPlayer = videoPlayer

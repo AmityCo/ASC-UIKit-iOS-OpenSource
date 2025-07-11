@@ -49,14 +49,14 @@ public struct AmityNewsFeedComponent: AmityComponentView {
     func getContentView() -> some View {
         if #available(iOS 15.0, *) {
             getPostListView()
-            .refreshable {
-                // just to show/hide story view
-                viewModel.loadStoryTargets()
-                // refresh global feed
-                // swiftUI cannot update properly if we use nested Observable Object
-                // that is the reason why postFeedViewModel is not moved into viewModel
-                postFeedViewModel.loadFeed(feedType: .globalFeed)
-            }
+                .refreshable {
+                    // just to show/hide story view
+                    viewModel.loadStoryTargets()
+                    // refresh global feed
+                    // swiftUI cannot update properly if we use nested Observable Object
+                    // that is the reason why postFeedViewModel is not moved into viewModel
+                    postFeedViewModel.loadFeed(feedType: .globalFeed)
+                }
         } else {
             getPostListView()
         }
@@ -94,7 +94,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                         case .ad(let ad):
                             VStack(spacing: 0) {
                                 AmityFeedAdContentComponent(ad: ad)
-
+                                
                                 Rectangle()
                                     .fill(Color(viewConfig.theme.baseColorShade4))
                                     .frame(height: 8)
@@ -104,8 +104,22 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                             
                             VStack(spacing: 0){
                                 AmityPostContentComponent(post: post.object, category: post.isPinned ? .global : .general, onTapAction: { tapContext in
-                                    let context = AmityNewsFeedComponentBehavior.Context(component: self, post: post, showPollResult: tapContext?.showPollResults ?? false)
-                                    AmityUIKitManagerInternal.shared.behavior.newsFeedComponentBehavior?.goToPostDetailPage(context: context)
+                                    
+                                    if post.dataTypeInternal == .clip {
+                                        
+                                        if let media = post.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
+                                            let clipPost = ClipPost(id: post.postId, url: mediaURL, model: post)
+                                            let provider = GlobalFeedClipService(clipPost: clipPost)
+                                            let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                                            let hostingView = AmitySwiftUIHostingController(rootView: feedView)
+                                            
+                                            self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
+                                        }
+                                        
+                                    } else {
+                                        let context = AmityNewsFeedComponentBehavior.Context(component: self, post: post, showPollResult: tapContext?.showPollResults ?? false)
+                                        AmityUIKitManagerInternal.shared.behavior.newsFeedComponentBehavior?.goToPostDetailPage(context: context)
+                                    }
                                 }, pageId: pageId)
                                 .contentShape(Rectangle())
                                 .background(GeometryReader { geometry in

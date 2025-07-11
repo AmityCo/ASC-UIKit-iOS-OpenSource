@@ -11,7 +11,7 @@ enum EmptyUserFeedViewState {
 }
 
 enum EmptyUserFeedViewType {
-    case post, image, video
+    case post, image, video, clip
 }
 
 struct EmptyUserFeedView: View {
@@ -45,7 +45,7 @@ struct EmptyUserFeedView: View {
             privateFeedInfoId = .privateUserImageFeedInfo
             blockedFeedId = .blockedUserImageFeed
             blockedFeedInfoId = .blockedUserImageFeedInfo
-        case .video:
+        case .video, .clip:
             emptyFeedId = .emptyUserVideoFeed
             privateFeedId = .privateUserVideoFeed
             privateFeedInfoId = .privateUserVideoFeedInfo
@@ -58,6 +58,13 @@ struct EmptyUserFeedView: View {
             icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: emptyFeedId, key: "image", of: String.self) ?? "")
             title = viewConfig.getConfig(elementId: emptyFeedId, key: "text", of: String.self) ?? ""
             description = ""
+            
+            if feedType == .clip {
+                icon = AmityIcon.communityProfileEmptyClipIcon.imageResource
+                title = "No clips yet"
+                description = ""
+            }
+            
         case .private:
             icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: privateFeedId, key: "image", of: String.self) ?? "")
             title = viewConfig.getConfig(elementId: privateFeedId, key: "text", of: String.self) ?? ""
@@ -91,7 +98,6 @@ struct EmptyUserFeedView: View {
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade3)))
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
         .padding(.horizontal, 16)
         .padding(.vertical, 140)
         .frame(maxWidth: 387)
@@ -109,6 +115,8 @@ struct EmptyUserFeedView: View {
                 AccessibilityID.Social.UserFeed.emptyUserImageFeed
             case .video:
                 AccessibilityID.Social.UserFeed.emptyUserVideoFeed
+            case .clip:
+                AccessibilityID.Social.UserFeed.emptyUserClipFeed
             }
             
         case .private:
@@ -117,7 +125,7 @@ struct EmptyUserFeedView: View {
                 AccessibilityID.Social.UserFeed.privateUserFeed
             case .image:
                 AccessibilityID.Social.UserFeed.privateUserImageFeed
-            case .video:
+            case .video, .clip:
                 AccessibilityID.Social.UserFeed.privateUserVideoFeed
             }
             
@@ -127,7 +135,7 @@ struct EmptyUserFeedView: View {
                 AccessibilityID.Social.UserFeed.blockedUserFeed
             case .image:
                 AccessibilityID.Social.UserFeed.blockedUserImageFeed
-            case .video:
+            case .video, .clip:
                 AccessibilityID.Social.UserFeed.blockedUserVideoFeed
             }
         }

@@ -10,8 +10,6 @@ import SwiftUI
 import AmitySDK
 
 struct PostContentMediaView: View {
-    @State private var offset = CGSize.zero
-    @Namespace private var animationNamespace
     @StateObject private var viewModel: PostContentMediaViewModel = PostContentMediaViewModel()
     @ObservedObject var viewConfig: AmityViewConfigController
     let post: AmityPostModel
@@ -52,7 +50,7 @@ struct PostContentMediaView: View {
                     
                     // Display play button if the media is video
                     if media.type == .video {
-                        Image(AmityIcon.videoControlIcon.getImageResource())
+                        Image(AmityIcon.videoControlIcon.imageResource)
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 40, height: 40)
@@ -97,7 +95,6 @@ struct PostContentMediaView: View {
         }
     }
     
-    
     @ViewBuilder
     private func getGridView<Content: View, Data: RandomAccessCollection>(data: Data, @ViewBuilder content: @escaping (Data.Index, Data.Element) -> Content) -> some View where Data.Element: Identifiable {
         GeometryReader { geometry in
@@ -132,7 +129,6 @@ struct PostContentMediaView: View {
         }
     }
 }
-
 
 class PostContentMediaViewModel: ObservableObject {
     @Published var showMediaViewer: Bool = false

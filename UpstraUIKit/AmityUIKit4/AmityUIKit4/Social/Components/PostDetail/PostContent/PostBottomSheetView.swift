@@ -68,7 +68,8 @@ struct PostBottomSheetView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                                 Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.postDeletedToastMessage.localizedString)
                             }
-                        } catch _ {                            
+                        } catch let error {
+                            Log.add(event: .info, "Error deleting post \(error)")
                             /// Delay showing toast as deleting post will effect post data source
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                                 Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postDeleteError.localizedString)

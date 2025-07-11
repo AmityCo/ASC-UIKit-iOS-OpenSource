@@ -87,7 +87,19 @@ public struct AmityPostDetailPage: AmityPageView {
                         CommentCoreView(headerView: {
                             VStack(spacing: 4) {
                                 if let postModel = viewModel.post {
-                                    AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext())
+                                    AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext()) { tapContext in
+                                        
+                                        if postModel.dataTypeInternal == .clip {
+                                            if let media = postModel.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
+                                                let clipPost = ClipPost(id: postModel.postId, url: mediaURL, model: postModel)
+                                                let provider = SingleClipService(clipPost: clipPost)
+                                                let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                                                let hostingView = AmitySwiftUIHostingController(rootView: feedView)
+                                                
+                                                self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
+                                            }
+                                        }
+                                    }
                                     Rectangle()
                                         .fill(Color(viewConfig.theme.baseColorShade4))
                                         .frame(height: 1)
@@ -166,7 +178,7 @@ public struct AmityPostDetailPage: AmityPageView {
                             // Dismiss bottomsheet
                             host.controller?.dismiss(animated: false)
                             
-                            let editOption = AmityPostComposerOptions.editOptions(post: postModel)
+                            let editOption = AmityPostComposerOptions.editOptions(mode: postModel.dataTypeInternal == .clip ? .editClip : .edit, post: postModel)
                             let view = AmityPostComposerPage(options: editOption)
                             let controller = AmitySwiftUIHostingController(rootView: view)
                             

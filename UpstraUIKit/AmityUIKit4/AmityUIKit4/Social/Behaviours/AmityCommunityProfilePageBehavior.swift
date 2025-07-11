@@ -16,12 +16,14 @@ open class AmityCommunityProfilePageBehavior {
         public var community: AmityCommunity?
         public let showPollResult: Bool
         public let selectedTab: AmityPendingRequestPageTab
+        public let clipProvider: ClipService?
         
-        init(page: AmityCommunityProfilePage, community: AmityCommunity? = nil, showPollResult: Bool = false, selectedTab: AmityPendingRequestPageTab = .pendingPosts) {
+        init(page: AmityCommunityProfilePage, community: AmityCommunity? = nil, showPollResult: Bool = false, selectedTab: AmityPendingRequestPageTab = .pendingPosts, clipProvider: ClipService? = nil) {
             self.page = page
             self.community = community
             self.showPollResult = showPollResult
             self.selectedTab = selectedTab
+            self.clipProvider = clipProvider
         }
     }
     
@@ -109,7 +111,6 @@ open class AmityCommunityProfilePageBehavior {
             context.page.host.controller?.present(navigationController, animated: true)
             
         }
-        
     }
     
     open func goToMemberListPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
@@ -119,7 +120,6 @@ open class AmityCommunityProfilePageBehavior {
             context.page.host.controller?.navigationController?.pushViewController(controller, animated: true)
         }
     }
-    
     
     open func goToPostDetailPage(context: AmityCommunityProfilePageBehavior.Context, post: AmityPostModel?, category: AmityPostCategory = .general) {
         
@@ -131,4 +131,22 @@ open class AmityCommunityProfilePageBehavior {
         }
     }
     
+    open func goToClipComposerPage(context: AmityCommunityProfilePageBehavior.Context, community: AmityCommunityModel?) {
+        
+        let page = AmityCreateClipPostPage(targetId: community?.communityId ?? "", targetType: .community, community: community)
+        
+        let navigationController = AmitySwiftUIHostingNavigationController(rootView: page)
+        navigationController.modalPresentationStyle = .fullScreen
+        navigationController.navigationBar.isHidden = true
+
+        context.page.host.controller?.present(navigationController, animated: true)
+    }
+    
+    open func goToClipFeedPage(context: AmityCommunityProfilePageBehavior.Context) {
+        guard let provider = context.clipProvider else { return }
+        let page = AmityClipFeedPage(provider: provider)
+        
+        let controller = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(controller, animated: true)
+    }
 }

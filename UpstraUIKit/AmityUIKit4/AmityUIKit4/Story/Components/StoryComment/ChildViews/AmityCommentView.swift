@@ -29,6 +29,7 @@ public struct AmityCommentView: View {
     @State var showReactionSheet: Bool = false
     
     @EnvironmentObject var viewConfig: AmityViewConfigController
+    @EnvironmentObject var commentCoreViewModel: CommentCoreViewModel
     
     public init(comment: AmityCommentModel, hideReplyButton: Bool = false, hideButtonView: Bool = false, commentButtonAction: @escaping AmityCommentButtonAction) {
         self.comment = comment
@@ -123,11 +124,25 @@ public struct AmityCommentView: View {
                         Button(feedbackStyle: .light) {
                             // Reaction action cannot be decoupled since it is having rendering orchestration issue.
                             // It may be SwiftUI bug.
-                            Task {
-                                if comment.isLiked {
-                                    try await reactionManager.removeReaction(.like, referenceId: comment.commentId, referenceType: .comment)
-                                } else {
-                                    try await reactionManager.addReaction(.like, referenceId: comment.commentId, referenceType: .comment)
+                            Task { @MainActor in
+                                
+                                do {
+                                    if comment.isLiked {
+                                        try await reactionManager.removeReaction(.like, referenceId: comment.commentId, referenceType: .comment)
+                                    } else {
+                                        try await reactionManager.addReaction(.like, referenceId: comment.commentId, referenceType: .comment)
+                                    }
+                                } catch let error {
+                                    if error.isAmityErrorCode(.itemNotFound) {
+                                        let message: String
+                                        if let post = commentCoreViewModel.post, post.dataTypeInternal == .clip {
+                                            message = "This clip is no longer available."
+                                        } else {
+                                            message = "This post is no longer available."
+                                        }
+                                        
+                                        Toast.showToast(style: .warning, message: message)
+                                    }
                                 }
                             }
                         } label: {

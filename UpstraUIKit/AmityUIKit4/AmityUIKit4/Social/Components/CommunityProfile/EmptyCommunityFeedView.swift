@@ -8,7 +8,7 @@
 import SwiftUI
 
 public enum EmptyCommunityFeedViewType {
-    case post, image, video
+    case post, image, video, clip
     
     var icon: ImageResource {
         switch self {
@@ -18,6 +18,8 @@ public enum EmptyCommunityFeedViewType {
             AmityIcon.communityProfileEmptyImageIcon.imageResource
         case .video:
             AmityIcon.communityProfileEmptyVideoIcon.imageResource
+        case .clip:
+            AmityIcon.communityProfileEmptyClipIcon.imageResource
         }
     }
     
@@ -29,6 +31,8 @@ public enum EmptyCommunityFeedViewType {
             "No photos yet"
         case .video:
             "No videos yet"
+        case .clip:
+            "No clips yet"
         }
     }
 }

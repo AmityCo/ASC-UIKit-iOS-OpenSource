@@ -12,9 +12,11 @@ open class AmitySocialHomePageBehavior {
     
     open class Context {
         public let page: AmitySocialHomePage
+        let clipFeedAction: ((ClipFeedAction) -> Void)?
         
-        init(page: AmitySocialHomePage) {
+        init(page: AmitySocialHomePage, clipFeedAction: ((ClipFeedAction) -> Void)? = nil) {
             self.page = page
+            self.clipFeedAction = clipFeedAction
         }
     }
     
@@ -38,6 +40,12 @@ open class AmitySocialHomePageBehavior {
     
     open func goToNotificationTrayPage(context: AmitySocialHomePageBehavior.Context) {
         let page = AmityNotificationTrayPage()
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    open func goToClipFeedPage(context: AmitySocialHomePageBehavior.Context) {
+        let page = AmityClipFeedPage(provider: GlobalFeedClipService(), onTapAction: context.clipFeedAction)
         let vc = AmitySwiftUIHostingController(rootView: page)
         context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
     }

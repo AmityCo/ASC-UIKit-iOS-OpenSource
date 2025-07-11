@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AmityUserProfileImageView: View {
+    
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     let displayName: String

@@ -38,12 +38,12 @@ public class AmityUserProfilePageViewModel: ObservableObject {
     
     func refreshFeed(currentTab: Int) {
         profileHeaderViewModel.load()
+        // Note:
+        // For video tab, loading of videos or clips is handled from inside the component itself.
         if currentTab == 0 {
             userFeedViewModel.loadPostFeed()
         } else if currentTab == 1 {
             imageFeedViewModel.loadMediaFeed()
-        } else if currentTab == 2 {
-            videoFeedViewModel.loadMediaFeed()
         }
     }
     

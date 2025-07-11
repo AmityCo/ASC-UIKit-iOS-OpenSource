@@ -65,9 +65,26 @@ public struct AmityUserFeedComponent: AmityComponentView {
                 ForEach(Array(viewModel.posts.enumerated()), id: \.element.postId) { index, post in
                     VStack(spacing: 0){
                         AmityPostContentComponent(post: post, onTapAction: { context in
-                            let page = AmityPostDetailPage(post: post, context: context)
-                            let vc = AmitySwiftUIHostingController(rootView: page)
-                            host.controller?.navigationController?.pushViewController(vc, animated: true)
+                            
+                            let model = AmityPostModel(post: post)
+                            if model.dataTypeInternal == .clip {
+                                
+                                if let media = model.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
+                                    let clipPost = ClipPost(id: model.postId, url: mediaURL, model: model)
+                                    
+                                    let provider = TargetFeedClipService(targetId: post.postedUserId, targetType: .user, clipPost: clipPost)
+                                    let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                                    let hostingView = AmitySwiftUIHostingController(rootView: feedView)
+                                    
+                                    self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
+                                }
+                                
+                            } else {
+                                let page = AmityPostDetailPage(post: post, context: context)
+                                let vc = AmitySwiftUIHostingController(rootView: page)
+                                host.controller?.navigationController?.pushViewController(vc, animated: true)
+                            }
+                            
                         }, pageId: pageId)
                         .contentShape(Rectangle())
                         

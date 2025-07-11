@@ -25,28 +25,16 @@ public struct AmityStoryTargetSelectionPage: AmityPageIdentifiable, View {
     
     public var body: some View {
         VStack {
-            HStack {
-                let closeButtonIcon = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
-                Image(AmityIcon.getImageResource(named: closeButtonIcon))
-                    .renderingMode(.template)
-                    .frame(width: 24, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .padding(.leading, 12)
-                    .onTapGesture {
-                        if let navigationController = host.controller?.navigationController {
-                            navigationController.dismiss(animated: true)
-                        } else {
-                            host.controller?.dismiss(animated: true)
-                        }
-                    }
-                
-                Spacer()
+            let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? ""
+            let closeButtonIcon = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
+
+            AmityPostTargetSelectionPage.HeaderView(title: title, closeIcon: closeButtonIcon) {
+                if let navigationController = host.controller?.navigationController {
+                    navigationController.dismiss(animated: true)
+                } else {
+                    host.controller?.dismiss(animated: true)
+                }
             }
-            .overlay(
-                Text(viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "")
-                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-            )
-            .frame(height: 58)
             
             TargetSelectionView(communityOnTapAction: { communityModel in
                 

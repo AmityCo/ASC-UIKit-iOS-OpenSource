@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AmitySDK
 
 open class AmityPostTargetSelectionPageBehavior {
     
@@ -35,4 +36,18 @@ open class AmityPostTargetSelectionPageBehavior {
         context.page.host.controller?.navigationController?.pushViewController(controller, animated: true)
     }
     
+    open func goToClipComposerPage(context: AmityPostTargetSelectionPageBehavior.Context) {
+        
+        var targetId: String = AmityUIKitManagerInternal.shared.currentUserId
+        var targetType: AmityPostTargetType = .user
+        
+        if let community = context.community {
+            targetId = community.communityId
+            targetType = .community
+        }
+        
+        let view = AmityCreateClipPostPage(targetId: targetId, targetType: targetType, community: context.community)
+        let controller = AmitySwiftUIHostingController(rootView: view)
+        context.page.host.controller?.navigationController?.pushViewController(controller, animated: true)
+    }
 }

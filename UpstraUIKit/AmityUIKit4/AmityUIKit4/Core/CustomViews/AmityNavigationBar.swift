@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AmityNavigationBar: View {
-        
+    
     // Inherited from parent
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
     @EnvironmentObject var viewConfig: AmityViewConfigController
@@ -18,6 +18,8 @@ struct AmityNavigationBar: View {
     let trailingView: AnyView?
     let leadingView: AnyView?
     let showDivider: Bool
+    let isTransparent: Bool
+    let tintColor: UIColor?
     
     /// Navigation Bar with title at center
     init(title: String) {
@@ -26,42 +28,52 @@ struct AmityNavigationBar: View {
         self.leadingView = nil
         self.isBackButtonEnabled = false
         self.showDivider = false
+        self.isTransparent = false
+        self.tintColor = nil
     }
     
     /// Navigation Bar with back button & divider customization
-    init(title: String, showBackButton: Bool, showDivider: Bool = false) {
+    init(title: String, showBackButton: Bool, showDivider: Bool = false, isTransparent: Bool = false, tintColor: UIColor? = nil) {
         self.title = title
         self.isBackButtonEnabled = showBackButton
         self.leadingView = nil
         self.trailingView = nil
         self.showDivider = showDivider
+        self.isTransparent = isTransparent
+        self.tintColor = tintColor
     }
     
     /// Navigation Bar with title, leading view & empty trailing view customization
-    init<LeadingView: View>(title: String, showDivider: Bool = false, @ViewBuilder leading: () -> LeadingView) {
+    init<LeadingView: View>(title: String, showDivider: Bool = false, isTransparent: Bool = false, tintColor: UIColor? = nil, @ViewBuilder leading: () -> LeadingView) {
         self.title = title
         self.isBackButtonEnabled = false
         self.showDivider = showDivider
         self.leadingView = AnyView(leading())
         self.trailingView = nil
+        self.isTransparent = isTransparent
+        self.tintColor = tintColor
     }
     
     /// Navigation Bar with title, back button, divider & trailing view customization
-    init<TrailingView: View>(title: String, showBackButton: Bool, showDivider: Bool = false, @ViewBuilder trailing: () -> TrailingView) {
+    init<TrailingView: View>(title: String, showBackButton: Bool, showDivider: Bool = false, isTransparent: Bool = false, @ViewBuilder trailing: () -> TrailingView) {
         self.title = title
         self.isBackButtonEnabled = showBackButton
         self.showDivider = showDivider
         self.leadingView = nil
         self.trailingView = AnyView(trailing())
+        self.isTransparent = isTransparent
+        self.tintColor = nil
     }
     
     /// Navigation Bar with title, divider, leading & trailing view customization
-    init<LeadingView: View, TrailingView: View>(title: String, showDivider: Bool = false, @ViewBuilder leading: () -> LeadingView, @ViewBuilder trailing: () -> TrailingView) {
+    init<LeadingView: View, TrailingView: View>(title: String, showDivider: Bool = false, isTransparent: Bool = false,  @ViewBuilder leading: () -> LeadingView, @ViewBuilder trailing: () -> TrailingView) {
         self.title = title
         self.showDivider = showDivider
         self.leadingView = AnyView(leading())
         self.trailingView = AnyView(trailing())
         self.isBackButtonEnabled = false
+        self.isTransparent = isTransparent
+        self.tintColor = nil
     }
     
     var body: some View {
@@ -72,7 +84,7 @@ struct AmityNavigationBar: View {
                         leadingView
                             .padding(.leading, 8)
                     } else if isBackButtonEnabled  {
-                        BackButton()
+                        BackButton(tintColor: tintColor)
                             .padding(.leading, 8)
                     }
                     
@@ -82,20 +94,17 @@ struct AmityNavigationBar: View {
                 .frame(maxWidth: .infinity)
 
                 Text(title)
-                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                    .applyTextStyle(.titleBold(Color(tintColor ?? viewConfig.theme.baseColor)))
                     .padding(.horizontal, 8)
                     .lineLimit(1)
                     .layoutPriority(2)
 
                 HStack {
+                    Spacer()
                     
                     if let trailingView {
-                        Spacer()
-                        
                         trailingView
-                            .padding(.trailing, 16)
-                    } else {
-                        Spacer(minLength: 24)
+                            .padding(.trailing, 12)
                     }
                 }
                 .layoutPriority(1)
@@ -103,7 +112,7 @@ struct AmityNavigationBar: View {
             }
             .padding(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
             .frame(minHeight: host.controller?.navigationController?.navigationBar.frame.height ?? 44)
-            .background(Color(viewConfig.theme.backgroundColor))
+            .background(isTransparent ? Color.clear : Color(viewConfig.theme.backgroundColor))
             
             if showDivider {
                 Rectangle()
@@ -119,6 +128,14 @@ struct AmityNavigationBar: View {
         @EnvironmentObject var host: AmitySwiftUIHostWrapper
         @EnvironmentObject var viewConfig: AmityViewConfigController
         
+        let tintColor: UIColor?
+        var action: (() -> Void)?
+        
+        init(tintColor: UIColor? = nil, action: (() -> Void)? = nil) {
+            self.action = action
+            self.tintColor = tintColor
+        }
+        
         var body: some View {
             let backIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .backButtonElement, key: "icon", of: String.self) ?? "backIcon")
             Image(backIcon)
@@ -126,13 +143,17 @@ struct AmityNavigationBar: View {
                 .renderingMode(.template)
                 .scaledToFit()
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .foregroundColor(Color(tintColor ?? viewConfig.theme.baseColor))
                 .frame(width: 24, height: 20)
+                .padding(.vertical, 8)
                 .onTapGesture {
-                    host.controller?.navigationController?.popViewController(animated: true)
+                    if let action {
+                        action()
+                    } else {
+                        host.controller?.navigationController?.popViewController(animated: true)
+                    }
                 }
                 .isHidden(viewConfig.isHidden(elementId: .backButtonElement))
-                .padding(.vertical, 8)
         }
     }
 }
@@ -141,7 +162,7 @@ struct AmityNavigationBar: View {
 #Preview {
     ZStack(alignment: .top) {
         Color.green.opacity(0.1)
-
+        
         VStack {
             AmityNavigationBar(title: "My Page")
             

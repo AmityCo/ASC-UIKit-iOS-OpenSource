@@ -138,6 +138,23 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                     // Empty Implementation
                 }
                 
+            case .clip:
+                postContentTextView()
+                
+                PostContentClipView(post: post)
+                    .onTapGesture {
+                        if post.dataTypeInternal == .clip {
+                            if let media = post.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
+                                let clipPost = ClipPost(id: post.postId, url: mediaURL, model: post, isInteractionEnabled: false)
+                                let provider = SingleClipService(clipPost: clipPost)
+                                let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                                let hostingView = AmitySwiftUIHostingController(rootView: feedView)
+                                
+                                self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
+                            }
+                        }
+                    }
+                
             case .liveStream:
                 EmptyView()
                 

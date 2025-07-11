@@ -95,15 +95,26 @@ public struct AmityCommentTrayComponent: AmityComponentView {
             commentBottomSheetViewModel.sheetState.isShown.toggle()
             commentBottomSheetViewModel.sheetState.comment = comment
         case .userProfile(let userId):
-            host.controller?.presentedViewController?.dismiss(animated: false)
-            let context = AmityCommentTrayComponentBehavior.Context(component: self, userId: userId)
-            AmityUIKitManagerInternal.shared.behavior.commentTrayComponentBehavior?.goToUserProfilePage(context: context)
+            
+            // Preserving existing behavior. Investigate why its needed
+            if let presentedController = host.controller?.presentedViewController {
+                presentedController.dismiss(animated: false)
+                
+                let context = AmityCommentTrayComponentBehavior.Context(component: self, userId: userId)
+                AmityUIKitManagerInternal.shared.behavior.commentTrayComponentBehavior?.goToUserProfilePage(context: context)
+            } else {
+                host.controller?.dismiss(animated: true) {
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        let topController = UIApplication.topViewController()
+                                                
+                        let page = AmityUserProfilePage(userId: userId)
+                        let vc = AmitySwiftUIHostingController(rootView: page)
+                        topController?.navigationController?.pushViewController(vc, animated: true)
+
+                    }
+                }
+            }
         }
     }
 }
-
-#if DEBUG
-#Preview {
-    AmityCommentTrayComponent(referenceId: "", referenceType: .story)
-}
-#endif

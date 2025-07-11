@@ -4,245 +4,62 @@
 //
 //  Created by Zay Yar Htun on 5/7/24.
 //
-
 import Foundation
 import AmitySDK
 import UIKit
-
-extension AmityPostModel {
-    
-    public class PollModel {
-        
-        // Public
-        public let id: String
-        public let question: String
-        public let answers: [Answer]
-        public let canVoteMultipleOptions: Bool
-        public let status: String
-        public let isClosed: Bool
-        public let isVoted: Bool
-        public let closedIn: UInt64 // This time is in milliseconds.
-        public let voteCount: Int
-        public let createdAt: Date
-        
-        public let isOpen: Bool
-        
-        public init(poll: AmityPoll) {
-            self.id = poll.pollId
-            self.question = poll.question
-            self.canVoteMultipleOptions = poll.isMultipleVote
-            self.status = poll.status
-            self.isClosed = poll.isClosed
-            self.isVoted = poll.isVoted
-            self.closedIn = UInt64(poll.closedIn)
-            self.voteCount = Int(poll.voteCount)
-            self.answers = poll.answers.map { Answer(answer: $0) }
-            self.createdAt = poll.createdAt
-            self.isOpen = !poll.isClosed || !poll.isVoted
-        }
-        
-        public class Answer: Identifiable {
-            public let id: String
-            public let dataType: String
-            public let text: String
-            public let isVotedByUser: Bool
-            public let voteCount: Int
-            
-            public init(answer: AmityPollAnswer) {
-                self.id = answer.answerId
-                self.dataType = answer.dataType
-                self.text = answer.text
-                self.isVotedByUser = answer.isVotedByUser
-                self.voteCount = Int(answer.voteCount)
-            }
-        }
-    }
-
-}
-
-extension AmityPostModel {
-    
-    public enum PostDisplayType {
-        case feed
-        case postDetail
-    }
-    
-    
-    public enum LivestreamState {
-        case live
-        case ended
-        case terminated
-        case recorded
-        case idle
-        case none
-        
-        var badgeTitle: String {
-            switch self {
-            case .live:
-                return AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString
-            case .recorded:
-                return AmityLocalizedStringSet.Social.livestreamPlayerRecorded.localizedString
-            case .idle:
-                return AmityLocalizedStringSet.Social.livestreamPlayerUpcomingLive.localizedString
-            case .none, .ended, .terminated:
-                return ""
-            }
-        }
-    }
-    
-    public class Author {
-        public let avatarURL: String?
-        public let displayName: String?
-        public let isGlobalBan: Bool
-        public let isBrand: Bool
-        
-        public init( avatarURL: String?, displayName: String?, isGlobalBan: Bool, isBrand: Bool) {
-            self.avatarURL = avatarURL
-            self.displayName = displayName
-            self.isGlobalBan = isGlobalBan
-            self.isBrand = isBrand
-        }
-    }
-    
-    open class AmityPostAppearance {
-        
-        public init () { }
-        
-        /**
-         * The displayType of view `Feed/PostDetail`
-         */
-        public var displayType: PostDisplayType = .feed
-        
-        /**
-         * The flag for showing comunity name
-         */
-        public var shouldShowCommunityName: Bool = true
-        
-        /**
-         * The flag marking a post for how it will display
-         *  - true : display a full content
-         *  - false : display a partial content with read more button
-         */
-        public var isExpanding: Bool = false
-        
-        /**
-         * The flag for handling content expansion state
-         */
-        public var shouldContentExpand: Bool {
-            switch displayType {
-            case .feed:
-                return isExpanding
-            case .postDetail:
-                return true
-            }
-        }
-        
-        /**
-         * The flag for showing option
-         */
-        public var shouldShowOption: Bool {
-            switch displayType {
-            case .feed:
-                return true
-            case .postDetail:
-                return false
-            }
-        }
-    }
-    
-}
+import SwiftUI
 
 public class AmityPostModel: Identifiable {
     
-    enum DataType: String {
-        case text
-        case image
-        case file
-        case video
-        case poll
-        case liveStream
-        case unknown
-    }
-    
-    // MARK: - Public variables
-    
-    /**
-     * The unique identifier for the post
-     */
+    /// The unique identifier for the post
     public let postId: String
     
-    /**
-     * The unique identifier for the post user id
-     */
+    /// The unique identifier for the post user id
     public let postedUserId: String
     
-    /**
-     * The data type of the post
-     */
+    /// The data type of the post
     public let dataType: String
     
-    /**
-     * The reactions of the post
-     */
+    /// The reactions of the post
     public let myReactions: [ReactionType]
     
-    /**
-     * All reactions of the post includes unsupported types
-     */
+    /// All reactions of the post includes unsupported types
     public let allReactions: [String]
     
     /// List of all reactions in this post with count.
     public let reactions: [String: Int]
     
-    /**
-     * Id of the target this post belongs to.
-     */
+    /// Id of the target this post belongs to.
     public let targetId: String
     
-    /**
-     * The custom data of the post
-     */
+    /// The custom data of the post
     public let data: [String: Any]
     
-    /**
-      Media data of the post
-     */
+    /// Media data of the post
     public var medias: [AmityMedia] = []
     
-    /**
-     * The post target community
-     */
+    /// The post target community
     public let targetCommunity: AmityCommunity?
     
-    /**
-     * The post metadata
-     */
+    /// The post metadata
     public let metadata: [String: Any]?
     
-    /**
-     * The post mentionees
-     */
+    /// The post mentionees
     public let mentionees: [AmityMentionees]?
     
-    /**
-     * The post target type
-     */
+    /// The post target type
     public var postTargetType: AmityPostTargetType {
         return targetCommunity == nil ? .user : .community
     }
     
-    /**
-     * The post is owner flag
-     */
+    /// The post is owner flag
     public var isOwner: Bool {
         return postedUserId == AmityUIKitManagerInternal.shared.client.currentUserId
     }
     
     public var isEdited: Bool
     
-    /**
-     * The post commentable flag
-     */
+    /// The post commentable flag
     public var isCommentable: Bool {
         if let targetCommunity = self.targetCommunity {
             // Community feed requires membership before commenting.
@@ -252,50 +69,31 @@ public class AmityPostModel: Identifiable {
         return true
     }
     
-    /**
-     * The post is group member flag
-     */
+    /// The post is group member flag
     public var isGroupMember: Bool {
         return targetCommunity?.isJoined ?? false
     }
     
-    /**
-     * The post user data of the post
-     */
+    /// The post user data of the post
     public var postedUser: AmityPostModel.Author?
     
-    /**
-     * Posted user display name
-     */
+    /// Posted user display name
     public var displayName: String {
         return postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
     }
     
-    /**
-     Timestamp string of the post
-     */
+    /// Timestamp string of the post
     public let timestamp: String
         
-    /**
-     * A reaction count of post
-     */
+    /// A reaction count of post
     public let reactionsCount: Int
     
-    /**
-     * A comment count of post
-     */
+    /// A comment count of post
     public let allCommentCount: Int
     
-    /**
-     * A share count of post
-     */
+    /// A share count of post
     public let sharedCount: Int
-    
-    /**
-     * The post appearance settings
-     */
-    public var appearance: AmityPostAppearance
-    
+        
     public var poll: AmityPostModel.PollModel?
     
     public var isPinned: Bool
@@ -333,8 +131,14 @@ public class AmityPostModel: Identifiable {
     var isLiked: Bool {
         return myReactions.contains(.like)
     }
-    
+        
     private(set) var feedType: AmityFeedType = .published
+    
+    var isDeleted: Bool
+    
+    // Note:
+    // Used only in clip & text post as the moment
+    var content: PostContent = .text(value: "")
     
     // MARK: - Initializer
     
@@ -361,7 +165,6 @@ public class AmityPostModel: Identifiable {
         myReactions = allReactions.compactMap(ReactionType.init)
         feedType = post.getFeedType()
         data = post.data ?? [:]
-        appearance = AmityPostAppearance()
         metadata = post.metadata
         mentionees = post.mentionees
         isEdited = post.isEdited
@@ -388,34 +191,11 @@ public class AmityPostModel: Identifiable {
             self.targetUser = post.targetUser
         }
         
+        self.isDeleted = post.isDeleted
+        
         extractPostData()
     }
-    
-    // MARK: - Helper methods
-    
-    public var maximumLastestComments: Int {
-        return min(2, latestComments.count)
-    }
-    
-    public var viewAllCommentSection: Int {
-        return latestComments.count > 2 ? 1 : 0
-    }
-    
-    // Comment will show below last component
-    public func getComment(at indexPath: IndexPath, totalComponent index: Int) -> AmityCommentModel? {
-        let comments = Array(latestComments.suffix(maximumLastestComments).reversed())
-        return comments.count > 0 ? comments[indexPath.row - index] : nil
-    }
-    
-    // Returns post id for file id
-    func getPostId(forFileId fileId: String) -> String? {
-        guard let postId = fileMap[fileId] else {
-            assertionFailure("A fileId must exist")
-            return nil
-        }
-        return postId
-    }
-    
+        
     // Each post has a property called childrenPosts. This contains an array of AmityPost object.
     // If a post contains files or images, those are present as children posts. So we need
     // to go through that array to determine the post type.
@@ -423,6 +203,8 @@ public class AmityPostModel: Identifiable {
         
         text = data[DataType.text.rawValue] as? String ?? ""
         dataTypeInternal = DataType(rawValue: dataType) ?? .unknown
+        
+        content = .text(value: text)
         
         // Get media data if parent post itself is not text type.
         // If the posts are queried with a specific data type, parent post is the post of data type and it does not have any child posts.
@@ -513,85 +295,79 @@ public class AmityPostModel: Identifiable {
                     livestreamState = .idle
                 }
             }
+        case "clip":
+            
+            let isMuted = post.data?["isMuted"] as? Bool ?? false
+            let displayMode = AmityClipDisplayMode(rawValue: post.data?["displayMode"] as? String ?? "") ?? .fit
+            
+            let clipData = post.getClipInfo()
+            let thumbnail = post.getVideoThumbnailInfo()
+            
+            
+            let clipMetadata = clipData?.attributes["metadata"] as? [String: Any]
+            let clipVideoMetadata = clipMetadata?["video"] as? [String: Any]
+            let duration = clipVideoMetadata?["duration"] as? TimeInterval
+            
+            self.content = PostContent.clip(data: ClipContent(text: self.text, url: clipData?.fileURL ?? "", thumbnailUrl: thumbnail?.fileURL ?? "", isMuted: isMuted, displayMode: displayMode, duration: duration ?? 0))
+            
+            if let clipData {
+                let state = AmityMediaState.downloadableClip(
+                    clipData: clipData,
+                    thumbnailUrl: thumbnail?.fileURL
+                )
+                let media = AmityMedia(state: state, type: .video)
+                media.clip = clipData
+                medias.append(media)
+                fileMap[clipData.fileId] = post.postId
+            } else {
+                // Create placeholder for missing video
+                let media = AmityMedia(state: .none, type: .video)
+                medias.append(media)
+            }
+            
+            dataTypeInternal = .clip
+            
         default:
             dataTypeInternal = .unknown
         }
     }
 }
 
+enum PostContent {
+    case text(value: String)
+    case clip(data: AmityPostModel.ClipContent)
+}
 
-class PollStatus {
-    var statusInfo: String = ""
-    var isInPendingFeed: Bool
-
-    init(poll: AmityPostModel.PollModel, isInPendingFeed: Bool) {
-        self.isInPendingFeed = isInPendingFeed
-        if poll.isClosed {
-            statusInfo = AmityLocalizedStringSet.Social.pollStatusEnded.localizedString
-        } else {
-            let closedInDate = poll.createdAt.addingTimeInterval(Double(poll.closedIn) / 1000)
-            computeRemainingTime(closedInDate: closedInDate, isInPendingFeed: isInPendingFeed)
-        }
-    }
+extension AmityPostModel {
     
-    private func computeRemainingTime(closedInDate: Date, isInPendingFeed: Bool) {
-        let currentDate = Date()
+    struct ClipContent {
+        let text: String
+        let url: String
+        let thumbnailUrl: String
+        let isMuted: Bool
+        let displayMode: AmityClipDisplayMode
+        let duration: TimeInterval
         
-        if closedInDate > currentDate {
-            
-            if isInPendingFeed {
-                statusInfo = AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationFormatter.string(from: closedInDate)
-                return
-            }
-            
-            let difference = Calendar.current.dateComponents([.day,.hour,.minute], from: currentDate, to: closedInDate)
-            
-            if let remainingDays = difference.day, remainingDays > 0 {
-                // In case of 3 days, 22 hour, we will display 4 days
-                let remainingHours = difference.hour ?? 0
-                let roundUpValue = remainingHours > 0 ? 1 : 0
-                statusInfo = RemainingTime.days(count: remainingDays + roundUpValue).info
-                return
-            }
-            
-            if let remainingHours = difference.hour, remainingHours > 0 {
-                statusInfo = RemainingTime.hours(count: remainingHours).info
-                return
-            }
-            
-            if let remainingMinutes = difference.minute, remainingMinutes > 0 {
-                statusInfo = RemainingTime.minutes(count: remainingMinutes).info
-                return
-            } else {
-                // We don't want to show remaining time in seconds. So we just show `1 minute`
-                statusInfo = RemainingTime.minutes(count: 1).info
-                return
-            }
-            
-        } else {
-            statusInfo = AmityLocalizedStringSet.Social.pollStatusEnded.localizedString
+        init(text: String, url: String, thumbnailUrl: String, isMuted: Bool, displayMode: AmityClipDisplayMode, duration: TimeInterval = 0) {
+            self.text = text
+            self.url = url
+            self.thumbnailUrl = thumbnailUrl
+            self.isMuted = isMuted
+            self.displayMode = displayMode
+            self.duration = duration
         }
     }
 }
 
-extension PollStatus {
+extension AmityClipDisplayMode {
     
-    private enum RemainingTime {
-        case days(count: Int)
-        case hours(count: Int)
-        case minutes(count: Int)
-        
-        var info: String {
-            switch self {
-            case .days(let remainingDays):
-                return "\(remainingDays)" + AmityLocalizedStringSet.Social.pollRemainingDaysLeft.localizedString
-                
-            case .hours(let remainingHours):
-                return "\(remainingHours)" + AmityLocalizedStringSet.Social.pollRemainingHoursLeft.localizedString
-                
-            case .minutes(let remainingMinutes):
-                return "\(remainingMinutes)" + AmityLocalizedStringSet.Social.pollRemainingMinutesLeft.localizedString
-            }
+    // SwiftUI content mode mapped with display mode
+    var contentMode: ContentMode {
+        switch self {
+        case .fill:
+            return .fill
+        default:
+            return .fit
         }
     }
 }

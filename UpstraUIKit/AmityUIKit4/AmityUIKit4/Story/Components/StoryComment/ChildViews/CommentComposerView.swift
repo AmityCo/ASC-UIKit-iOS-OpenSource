@@ -81,6 +81,12 @@ struct CommentComposerView: View {
                                 message = AmityLocalizedStringSet.Comment.commentWithBannedWordsErrorMessage.localizedString
                             } else if error.isAmityErrorCode(.linkNotAllowed) {
                                 message = AmityLocalizedStringSet.Comment.commentWithNotAllowedLink.localizedString
+                            } else if error.isAmityErrorCode(.itemNotFound) {
+                                if let post = viewModel.post, post.dataTypeInternal == .clip {
+                                    message = "This clip is no longer available."
+                                } else {
+                                    message = "This post is no longer available."
+                                }
                             } else {
                                 message = error.localizedDescription
                             }
@@ -138,12 +144,20 @@ class CommentComposerViewModel: ObservableObject {
     @Published var mentionData: MentionData = MentionData()
     
     private let commentManager = CommentManager()
+    private let postManager = PostManager()
+    
+    var post: AmityPostModel?
     
     init(referenceId: String, referenceType: AmityCommentReferenceType, community: AmityCommunity?, allowCreateComment: Bool) {
         self.referenceId = referenceId
         self.referenceType = referenceType
         self.community = community
         self.allowCreateComment = allowCreateComment
+        if referenceType == .post {
+            if let localPost = postManager.getPost(withId: referenceId).snapshot {
+                self.post = AmityPostModel(post: localPost)
+            }
+        }
     }
     
     @MainActor

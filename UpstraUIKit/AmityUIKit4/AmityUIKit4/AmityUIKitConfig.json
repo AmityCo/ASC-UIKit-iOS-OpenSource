@@ -870,6 +870,100 @@
         },
         "pending_request_page/join_request_content/join_decline_button": {
             "text": "Decline"
+        },
+        "social_home_page/create_post_menu/create_clip_button": {
+            "text": "Clip",
+            "image": "createClipMenuIcon"
+        },
+        "social_home_page/*/clipsfeed_button": {
+            "text": "Clips",
+        },
+        "clip_feed_page/*/*": {
+            "theme": {}
+        },
+        "clip_feed_page/*/back_button": {
+            "image": "value"
+        },
+        "clip_feed_page/*/title": {
+            "text": "value"
+        },
+        "clip_feed_page/*/create_new_clip_button": {
+            "image": "value"
+        },
+        "clip_feed_page/*/reaction_button": {
+            "image": "value"
+        },
+        "clip_feed_page/*/comment_button": {
+            "image": "value"
+        },
+        "clip_feed_page/*/mute_button": {
+            "image": "value"
+        },
+        "clip_feed_page/*/option_button": {
+            "image": "value"
+        },
+        "clip_feed_page/*/community_display_name": {},
+        "clip_feed_page/*/community_private_badge": {
+            "image": "lockIcon"
+        },
+        "clip_feed_page/*/community_official_badge": {
+            "image": "officialBadgeIcon"
+        },
+        "create_clip_post_page/*/*": {
+            "theme": {}
+        },
+        "create_clip_post_page/*/start_record_button": {
+            "image": "value"
+        },
+        "create_clip_post_page/*/stop_record_button": {
+            "image": "value"
+        },
+        "create_clip_post_page/*/record_timer_status": {
+            "text": "value"
+        },
+        "create_clip_post_page/*/cancel_create_clip_button": {
+            "image": "value"
+        },
+        "create_clip_post_page/*/add_thumbnail_button": {
+            "image": "value"
+        },
+        "create_clip_post_page/*/switch_camera_button": {
+            "image": "value"
+        },
+        "draft_clip_page/*/*": {
+            "theme": {}
+        },
+        "draft_clip_page/*/back_button": {
+            "image": "value"
+        },
+        "draft_clip_page/*/mute_button": {
+            "image": "value"
+        },
+        "draft_clip_page/*/aspect_ratio_button": {
+            "image": "value"
+        },
+        "draft_clip_page/*/next_button": {
+            "image": "value"
+        },
+        "user_profile_page/user_video_feed/videos_button": {
+            "text": "Videos"
+        },
+        "user_profile_page/user_video_feed/clips_button": {
+            "text": "Clips"
+        },
+        "user_profile_page/user_video_feed/empty_clip_feed": {
+            "text": "No clips yet",
+            "image": "emptyClipIcon"
+        },
+        "community_profile_page/community_video_feed/videos_button": {
+            "text": "Videos"
+        },
+        "community_profile_page/community_video_feed/clips_button": {
+            "text": "Clips"
+        },
+        "community_profile_page/community_video_feed/empty_clip_feed": {
+            "text": "No clips yet",
+            "image": "emptyClipIcon"
         }
     }
 }

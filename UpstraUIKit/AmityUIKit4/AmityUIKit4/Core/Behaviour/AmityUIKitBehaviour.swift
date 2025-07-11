@@ -52,6 +52,9 @@ open class AmityUIKitBehaviour {
     
     public var notificationTrayPageBehavior: AmityNotificationTrayPageBehavior = AmityNotificationTrayPageBehavior()
     public var joinRequestContentComponentBehavior: AmityJoinRequestContentComponentBehavior = AmityJoinRequestContentComponentBehavior()
+    
+    public var clipFeedPageBehavior: AmityClipFeedPageBehavior = AmityClipFeedPageBehavior()
+    public var draftClipPageBehavior: AmityDraftClipPageBehavior = AmityDraftClipPageBehavior()
 }
 
 open class AmitySwipeToBackGestureBehavior {

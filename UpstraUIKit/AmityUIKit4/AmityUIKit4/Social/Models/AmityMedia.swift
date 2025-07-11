@@ -21,6 +21,7 @@ enum AmityMediaState {
     case localURL(url: URL)
     case downloadableImage(imageData: AmityImageData, placeholder: UIImage)
     case downloadableVideo(videoData: AmityVideoData, thumbnailUrl: String?)
+    case downloadableClip(clipData: AmityClipData, thumbnailUrl: String?)
     case none
     case error
     
@@ -40,6 +41,7 @@ public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
     
     var image: AmityImageData?
     var video: AmityVideoData?
+    var clip: AmityClipData?
     
     @Published var altText: String?
     
@@ -186,6 +188,9 @@ public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
             return URL(string: "\(imageData.fileURL)?size=medium")
             
         case .downloadableVideo(videoData: _, thumbnailUrl: let thumbnailUrl):
+            return URL(string: "\(thumbnailUrl ?? "")?size=medium")
+            
+        case .downloadableClip(clipData: _, let thumbnailUrl):
             return URL(string: "\(thumbnailUrl ?? "")?size=medium")
             
         default: return nil

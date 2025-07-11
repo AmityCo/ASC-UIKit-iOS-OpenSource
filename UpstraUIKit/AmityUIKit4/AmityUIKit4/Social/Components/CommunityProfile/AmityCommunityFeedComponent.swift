@@ -38,11 +38,6 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
     }
     
     @ViewBuilder
-    func getContentView() -> some View {
-        getPostListView()
-    }
-    
-    @ViewBuilder
     func getPostListView() -> some View {
         LazyVStack(spacing: 0) {
             if let error = postFeedViewModel.feedError, AmityError(error: error) == .noUserAccessPermission {
@@ -64,8 +59,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                 if let announcementPost = communityProfileViewModel.announcementPost {
                     VStack(spacing: 0) {
                         let category: AmityPostCategory = communityProfileViewModel.isAnnouncementPostPinned() ? .pinAndAnnouncement : .announcement
-                        AmityPostContentComponent(post: announcementPost.object, style: .feed, category: category, hideTarget: true, onTapAction: { postContext in
-                            onTapAction?(AmityPostModel(post: announcementPost.object), postContext)
+                        AmityPostContentComponent(post: announcementPost.object, style: .feed, category: category, hideTarget: true, onTapAction: { postContext in   handlePostTap(model: AmityPostModel(post: announcementPost.object), context: postContext)
                         }, pageId: pageId)
                         .contentShape(Rectangle())
                         
@@ -95,7 +89,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                             VStack(spacing: 0) {
                                 let category: AmityPostCategory = communityProfileViewModel.pinnedPosts.contains(where: {$0.postId == post.postId}) ? .pin : .general
                                 AmityPostContentComponent(post: post.object, category: category, hideTarget: true, onTapAction: { postContext in
-                                    onTapAction?(post, postContext)
+                                    handlePostTap(model: post, context: postContext)
                                 }, pageId: pageId)
                                 .contentShape(Rectangle())
                                 .background(GeometryReader { geometry in
@@ -125,7 +119,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
     
     public var body: some View {
         ZStack(alignment: .top) {
-            getContentView()
+            getPostListView()
                 .isHidden(postFeedViewModel.postItems.isEmpty && postFeedViewModel.feedLoadingStatus == .loaded)
             
             EmptyCommunityFeedView()
@@ -134,6 +128,26 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
         .updateTheme(with: viewConfig)
     }
     
+    func handlePostTap(model: AmityPostModel, context: AmityPostContentComponent.Context?) {
+        
+        if model.dataTypeInternal == .clip {
+            // Extract media first
+            if let media = model.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
+                
+                let targetId = model.targetId
+                let clipPost = ClipPost(id: model.postId, url: mediaURL, model: model)
+                
+                let provider = TargetFeedClipService(targetId: targetId, targetType: .community, clipPost: clipPost)
+                let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                let hostingView = AmitySwiftUIHostingController(rootView: feedView)
+                
+                self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
+            }
+            
+        } else {
+            onTapAction?(model, context)
+        }
+    }
     
     private func checkVisibilityAndMarkSeen(postContentFrame: CGRect, post: AmityPostModel) {
         let screenHeight = UIScreen.main.bounds.height

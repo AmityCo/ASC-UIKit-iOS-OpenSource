@@ -137,7 +137,9 @@ class FixedFrequencyAdsInjector {
                     lastInsertModelId = modelId
                     
                     // Remove ad from the list
-                    availableAds.removeFirst()
+                    if !availableAds.isEmpty {
+                        availableAds.removeFirst()
+                    }
                     
                     // Reset counter
                     positionCounter = 0

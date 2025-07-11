@@ -56,4 +56,14 @@ open class AmityCreatePostMenuComponentBehavior {
         navigationController.navigationBar.isHidden = true
         context.component.host.controller?.present(navigationController, animated: true)
     }
+    
+    open func goToSelectClipPostTargetPage(context: AmityCreatePostMenuComponentBehavior.Context) {
+        let view = AmityPostTargetSelectionPage(context: AmityPostTargetSelectionPage.Context(isClipPost: true))
+        let controller = AmitySwiftUIHostingController(rootView: view)
+        
+        let navigationController = UINavigationController(rootViewController: controller)
+        navigationController.modalPresentationStyle = .fullScreen
+        navigationController.navigationBar.isHidden = true
+        context.component.host.controller?.present(navigationController, animated: true)
+    }
 }

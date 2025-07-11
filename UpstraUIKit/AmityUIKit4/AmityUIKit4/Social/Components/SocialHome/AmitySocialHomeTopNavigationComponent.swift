@@ -38,10 +38,9 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .socialHomePageTopNavigationComponent))
     }
     
-    
     public var body: some View {
         HStack(spacing: 10) {
-            let headerLabel = viewConfig.getConfig(elementId: .headerLabel, key: "text", of: String.self) ?? ""
+            let headerLabel = viewConfig.forElement(.headerLabel).text ?? ""
             Text(headerLabel)
                 .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
                 .padding([.top, .bottom], 15.5)
@@ -50,49 +49,30 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
             
             Spacer()
             
-            Button(action: {
+            // Notification Bell Button
+            TopNavigationIconButton(elementId: .notificationTrayButton) {
                 notificationButtonAction?()
                 
                 viewModel.resetNotificationStatus()
-            }, label: {
-                    VStack {
-                        let searchIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .notificationTrayButton, key: "icon", of: String.self) ?? "bellIcon")
-                        Image(searchIcon)
-                            .frame(size: CGSize(width: 21.0, height: 16.0))
-                    }
-                    .frame(size: CGSize(width: 32.0, height: 32.0))
-                    .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
-                    .clipShape(Circle())
-                    .overlay(
-                        NotificationIndicator()
-                            .offset(x: 13, y: -12)
-                            .visibleWhen(viewModel.hasUnseenNotification || viewModel.hasInvitations)
-                    )
-                    
-            })
-            .accessibilityIdentifier(AccessibilityID.Social.SocialHomePage.notificationTrayButton)
+            }
+            .overlay(
+                NotificationIndicator()
+                    .offset(x: 13, y: -12)
+                    .visibleWhen(viewModel.hasUnseenNotification || viewModel.hasInvitations)
+            )
             .onAppear {
                 viewModel.observeNotificationStatus()
             }
-
-            Button(action: {
-                searchButtonAction?()
-            }, label: {
-                VStack {
-                    let searchIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .globalSearchButton, key: "icon", of: String.self) ?? "")
-                    Image(searchIcon)
-                        .frame(size: CGSize(width: 21.0, height: 16.0))
-                }
-                .frame(size: CGSize(width: 32.0, height: 32.0))
-                .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
-                .clipShape(Circle())
-            })
-            .isHidden(viewConfig.isHidden(elementId: .globalSearchButton), remove: true)
-            .accessibilityIdentifier(AccessibilityID.Social.SocialHomePage.globalSearchButton)
             
+            // Search Button
+            TopNavigationIconButton(elementId: .globalSearchButton) {
+                searchButtonAction?()
+            }
+            .isHidden(viewConfig.isHidden(elementId: .globalSearchButton), remove: true)
+            
+            // Add Button
             if selectedTab != .explore {
-                Button(action: {
-                    
+                TopNavigationIconButton(elementId: .postCreationButton) {
                     if selectedTab == .myCommunities {
                         goToCommunitySetupPage()
                     } else {
@@ -100,18 +80,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                             showPostCreationMenu.toggle()
                         }
                     }
-                    
-                }, label: {
-                    VStack {
-                        let createButtonIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .postCreationButton, key: "icon", of: String.self) ?? "")
-                        Image(createButtonIcon)
-                            .frame(size: CGSize(width: 21.0, height: 16.0))
-                    }
-                    .frame(size: CGSize(width: 32.0, height: 32.0))
-                    .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
-                    .clipShape(Circle())
-                    .accessibilityIdentifier(AccessibilityID.Social.SocialHomePage.postCreationButton)
-                })
+                }
                 .fullScreenCover(isPresented: $showPostCreationMenu) {
                     AmityCreatePostMenuComponent(isPresented: $showPostCreationMenu, pageId: pageId)
                         .background(ClearBackgroundView())
@@ -142,6 +111,49 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                 Circle()
                     .fill(Color(viewConfig.theme.alertColor))
                     .frame(width: 10, height: 10)
+            }
+        }
+    }
+    
+    struct TopNavigationIconButton: View {
+        
+        @EnvironmentObject var viewConfig: AmityViewConfigController
+        
+        let elementId: ElementId
+        let action: () -> Void
+        
+        init(elementId: ElementId, action: @escaping () -> Void) {
+            self.elementId = elementId
+            self.action = action
+        }
+        
+        var body: some View {
+            Button {
+                action()
+            } label: {
+                let icon = AmityIcon.getImageResource(named: viewConfig.forElement(elementId).icon ?? "")
+                VStack {
+                    Image(icon)
+                        .frame(size: CGSize(width: 21.0, height: 16.0))
+                }
+                .frame(size: CGSize(width: 32.0, height: 32.0))
+                .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
+                .clipShape(Circle())
+                .accessibilityIdentifier(getAccessibilityID(elementId: elementId))
+            }
+            .buttonStyle(.plain)
+        }
+        
+        private func getAccessibilityID(elementId: ElementId) -> String {
+            switch elementId {
+            case .notificationTrayButton:
+                AccessibilityID.Social.SocialHomePage.notificationTrayButton
+            case .globalSearchButton:
+                AccessibilityID.Social.SocialHomePage.globalSearchButton
+            case .postCreationButton:
+                AccessibilityID.Social.SocialHomePage.postCreationButton
+            default:
+                AccessibilityID.Social.SocialHomePage.clipsButton
             }
         }
     }
@@ -223,9 +235,3 @@ class SocialHomePageNavigationViewModel: ObservableObject {
         hasUnseenNotification = false
     }
 }
-
-#if DEBUG
-#Preview {
-    AmitySocialHomeTopNavigationComponent(pageId: nil)
-}
-#endif

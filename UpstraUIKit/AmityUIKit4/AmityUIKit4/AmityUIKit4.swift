@@ -355,6 +355,12 @@ final class AmityUIKitManagerInternal: NSObject {
         
         let joinRequestComponentBehavior = AmityJoinRequestContentComponentBehavior()
         behavior.joinRequestContentComponentBehavior = joinRequestComponentBehavior
+        
+        let clipFeedPageBehavior = AmityClipFeedPageBehavior()
+        behavior.clipFeedPageBehavior = clipFeedPageBehavior
+        
+        let draftClipPageBehavior = AmityDraftClipPageBehavior()
+        behavior.draftClipPageBehavior = draftClipPageBehavior
     }
     
     func registerDevice(_ userId: String,

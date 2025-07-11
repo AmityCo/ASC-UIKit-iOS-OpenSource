@@ -29,6 +29,8 @@ struct SocialHomeContainerView: View {
                 AmityExplorePageContainer()
             case .myCommunities:
                 AmityMyCommunitiesComponent(pageId: pageId)
+            case .clips:
+                Text("Clips")
             }
         }
         .allowsDragging(false)

@@ -38,6 +38,9 @@ class CommentCoreViewModel: ObservableObject {
     let targetCommentFetcher = TargetCommentFetcher()
     var isTargetCommentFetched = false
     
+    private let postManager = PostManager()
+    var post: AmityPostModel?
+    
     init(referenceId: String,
          referenceType: AmityCommentReferenceType,
          hideEmptyText: Bool,
@@ -52,6 +55,13 @@ class CommentCoreViewModel: ObservableObject {
         self.hideCommentButtons = hideCommentButtons
         self.targetCommentId = targetCommentId
         self.targetCommentParentId = targetCommentParentId
+        
+        // Fetch target post
+        if referenceType == .post {
+            if let localPost = postManager.getPost(withId: referenceId).snapshot {
+                self.post = AmityPostModel(post: localPost)
+            }
+        }
         
         let queryOptions = AmityCommentQueryOptions(referenceId: referenceId,
                                                     referenceType: referenceType,

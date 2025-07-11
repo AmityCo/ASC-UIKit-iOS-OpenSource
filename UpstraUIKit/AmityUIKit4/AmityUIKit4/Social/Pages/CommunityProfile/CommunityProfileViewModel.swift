@@ -181,6 +181,8 @@ public class CommunityProfileViewModel: ObservableObject {
         loadCommunity()
         loadStories()
         
+        // Note:
+        // For video tab, loading of videos or clips is handled from inside the component itself.
         if currentTab == 0 {
             loadPinnedFeed()
             postFeedViewModel.loadFeed(feedType: .community(communityId: communityId))
@@ -188,8 +190,6 @@ public class CommunityProfileViewModel: ObservableObject {
             loadPinnedFeed()
         } else if currentTab == 2 {
             imageFeedViewModel.loadMediaFeed()
-        } else if currentTab == 3 {
-            videoFeedViewModel.loadMediaFeed()
         }
     }
     
