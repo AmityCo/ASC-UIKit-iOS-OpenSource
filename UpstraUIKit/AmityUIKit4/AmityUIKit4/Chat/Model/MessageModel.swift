@@ -11,6 +11,7 @@ import AmitySDK
 public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     
     public let id: String
+    public let uniqueId: String
     public let displayName: String
     public let text: String
     public let isEdited: Bool
@@ -36,6 +37,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     public init(message: AmityMessage, hasModeratorPermission: Bool = false) {
         self.message = message
         self.id = message.messageId
+        self.uniqueId = message.uniqueId
         self.type = message.messageType
         self.text = message.data?["text"] as? String ?? type.description
         self.hasReaction = message.reactionCount > 0
@@ -97,6 +99,7 @@ extension MessageModel {
     
     internal init(id: String, text: String, type: AmityMessageType, hasReaction: Bool, parentId: String?) {
         self.id = id
+        self.uniqueId = UUID().uuidString
         self.text = text
         self.type = type
         self.hasReaction = hasReaction
@@ -120,4 +123,10 @@ extension MessageModel {
     
     static let preview = MessageModel.init(id: UUID().uuidString, text: "Let's catch up!", type: .text, hasReaction: false, parentId: nil)
     static let previewWithParent = MessageModel.init(id: UUID().uuidString, text: "Let's catch up! Its been a long time since we met", type: .text, hasReaction: false, parentId: "1234")
+}
+
+extension MessageModel: Equatable {
+    public static func == (lhs: MessageModel, rhs: MessageModel) -> Bool {
+        return lhs.id == rhs.id
+    }
 }

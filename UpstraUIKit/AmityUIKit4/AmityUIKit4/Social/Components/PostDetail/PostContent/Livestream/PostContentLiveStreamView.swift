@@ -16,10 +16,14 @@ struct PostContentLiveStreamView: View {
     @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: nil)
     let post: AmityPostModel
     let livestream: AmityStream?
+    let isStreamDeleted: Bool
+    let isStreamBanned: Bool
     
     init(post: AmityPostModel) {
         self.post = post
         self.livestream = post.liveStream
+        self.isStreamDeleted = livestream?.isDeleted ?? false
+        self.isStreamBanned = livestream?.isBanned ?? false
     }
     
     var body: some View {
@@ -28,7 +32,6 @@ struct PostContentLiveStreamView: View {
             Rectangle()
                 .foregroundColor(Color.black)
             
-            let isStreamDeleted = livestream?.isDeleted ?? false
             if isStreamDeleted {
                 VStack(alignment: .center) {
                     Image(AmityIcon.livestreamErrorIcon.getImageResource())
@@ -39,6 +42,17 @@ struct PostContentLiveStreamView: View {
                     
                     Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableTitle.localizedString)
                         .applyTextStyle(.titleBold(Color.white))
+                }
+                .padding(.horizontal, 16)
+            } else if isStreamBanned {
+                VStack(alignment: .center) {
+                    Text(AmityLocalizedStringSet.Social.livestreamPlayerBannedTitle.localizedString)
+                        .applyTextStyle(.titleBold(.white))
+                        .padding(.bottom, 4)
+                    
+                    Text( AmityLocalizedStringSet.Social.livestreamPlayerBannedMessage.localizedString)
+                        .applyTextStyle(.caption(.white))
+                        .multilineTextAlignment(.center)
                 }
                 .padding(.horizontal, 16)
             } else {
@@ -103,6 +117,8 @@ struct PostContentLiveStreamView: View {
         }
         .frame(height: 208)
         .onTapGesture {
+            guard !isStreamBanned else { return }
+            
             switch post.livestreamState {
             case .live, .recorded:
                 let livestreamPlayerPage = AmityLivestreamPlayerPage(post: post.object)

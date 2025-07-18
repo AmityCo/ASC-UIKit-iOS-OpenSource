@@ -15,6 +15,7 @@ enum LiveStreamEndReason: String {
     case maxDuration
     case connectionIssue
     case terminated
+    case notApproved
 }
 
 enum LiveStreamUIState: Equatable {
@@ -71,6 +72,7 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
     private var userManager = UserManager()
     private var postManager = PostManager()
     private var streamManager = StreamManager()
+    private var channelManager = ChannelManager()
     private var fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
     
     private var targetObjectToken: AmityNotificationToken?
@@ -79,7 +81,7 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
     
     // Target
     private var targetId: String
-    private var targetType: AmityPostTargetType
+    var targetType: AmityPostTargetType
     @Published var targetDisplayName: String = AmityLocalizedStringSet.Social.liveStreamMyTimelineLabel.localizedString
     
     // Broadcaster
@@ -110,6 +112,11 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
     // Stream Information
     @Published var streamTitle: String = ""
     @Published var streamDescription: String = ""
+    
+    // Settings
+    @Published var isLiveChatDisabled: Bool = false
+    @Published var liveStreamChatViewModel: AmityLiveStreamChatViewModel?
+    
     /// We use this post to start publishing live stream, and navigate to post detail page, after the user finish streaming.
     var createdPost: AmityPost?
     var createdStream: AmityStream?
@@ -202,7 +209,7 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
         Task { @MainActor in
             do {
                 // #3 Create Stream
-                let stream = try await streamManager.createStream(title: sanitizedTitle, description: sanitizedDescription.isEmpty ? nil : sanitizedDescription, thumbnail: thumbnailData, metadata: nil)
+                let stream = try await streamManager.createStream(title: sanitizedTitle, description: sanitizedDescription.isEmpty ? nil : sanitizedDescription, thumbnail: thumbnailData, metadata: nil, chatEnabled: true)
                 self.createdStream = stream
                 Log.add(event: .info, "Stream Created: \(stream.streamId)")
 
@@ -213,8 +220,17 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
                 let post = try await postManager.createStreamPost(builder: streamPostBuilder, targetId: self.targetId, targetType: self.targetType, metadata: nil, mentionees: nil)
                 self.createdPost = post
                 Log.add(event: .info, "Post Created: \(post.postId)")
+                
+                // #5 Create Live Stream Channel
+                if let channel = try await stream.getLiveChat() {
+                    // If live chat is enabled, we will mute the channel since the beginning of live stream
+                    if isLiveChatDisabled {
+                        try await channelManager.muteChannel(channelId: channel.channelId)
+                    }
+                    self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(stream: stream)
+                }
 
-                // #5 Start publishing
+                // #6 Start publishing
                 broadcaster.startPublish(existingStreamId: streamId)
                 Log.add(event: .info, "Broadcast started...")
                                 
@@ -252,6 +268,21 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
         
         cleanup()
     }
+    
+    func editLiveStream(chatDisabled: Bool) {
+        guard let createdStream else { return }
+        Task.runOnMainActor {
+            do {
+                if chatDisabled {
+                    try await self.channelManager.muteChannel(channelId: createdStream.channel?.channelId ?? "")
+                } else {
+                    try await self.channelManager.unmuteChannel(channelId: createdStream.channel?.channelId ?? "")
+                }
+            } catch {
+                Log.add(event: .error, "Error while editing live stream \(error.localizedDescription)")
+            }
+        }
+    }
         
     deinit {
         cleanup()
@@ -273,9 +304,11 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
         selectedImage = nil
         thumbnailData = nil
         
-        createdPost?.unsubscribeEvent(.post, withCompletion: { success, error in
-            Log.add(event: .info, "Unsubscribing post event status: \(success) Error: \(String(describing: error))")
-        })
+        if createdPost?.isInvalidated == false {
+            createdPost?.unsubscribeEvent(.post, withCompletion: { success, error in
+                Log.add(event: .info, "Unsubscribing post event status: \(success) Error: \(String(describing: error))")
+            })
+        }
         
         if !currentAppIdleTimerDisabled {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -299,6 +332,10 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
         
         livePostToken = postManager.getPost(withId: postId).observe{ [weak self] liveObject, error in
             guard let self, let snapshot = liveObject.snapshot else { return }
+            
+            if snapshot.getFeedType() == .declined {
+                self.endLiveStream(reason: .notApproved)
+            }
             
             if snapshot.isDeleted {
                 livePostToken?.invalidate()

@@ -51,6 +51,11 @@ struct AmityContentReportInputPage: View {
                     
                     VStack(alignment: .leading, spacing: 0) {
                         InfoTextField(data: $textViewModel, text: $text, isValid: $isTextValid)
+                            .alertColor(viewConfig.theme.alertColor)
+                            .dividerColor(viewConfig.theme.baseColorShade4)
+                            .titleTextColor(viewConfig.theme.baseColor)
+                            .infoTextColor(viewConfig.theme.baseColorShade2)
+                            .textFieldTextColor(viewConfig.theme.baseColorShade2)
                             .padding(.top, 24)
                             .padding([.horizontal, .bottom], 16)
                         
@@ -84,6 +89,6 @@ struct AmityContentReportInputPage: View {
                 }).visibleWhen(viewModel.submissionState == .contentError)
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
     }
 }

@@ -27,9 +27,12 @@ public struct AmityCreateLivestreamPage: AmityPageView {
             
     @State private var showThumbnailEditSheet = false
     @State private var showMediaPicker = false
+    @State private var showSettingSheet = false
+    
+    let liveChatFeedHeight = (UIScreen.main.bounds.height - 50) / 2.5
     
     public init(targetId: String, targetType: AmityPostTargetType) {
-        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .userProfilePage))
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .createLivestreamPage))
         self._viewModel = StateObject(wrappedValue: AmityCreateLiveStreamViewModel(targetId: targetId, targetType: targetType))
     }
     
@@ -42,7 +45,8 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                     .readSize { previewSize in
                         viewModel.setupBroadcaster(previewSize: previewSize)
                     }
-                    .edgesIgnoringSafeArea(.top)
+                    .dismissKeyboardOnDrag()
+                    .ignoresSafeArea(.keyboard, edges: .all)
             }
             
             // Overlay State:
@@ -66,8 +70,38 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                 Color.black
                     .edgesIgnoringSafeArea(.bottom)
                     .frame(height: 50)
+                    .bottomSheet(isShowing: $showSettingSheet, height: .fixed(300.0), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                        settingBottomSheetView
+                    }
+                    .onChange(of: viewModel.isLiveChatDisabled) { isDisabled in
+                        viewModel.editLiveStream(chatDisabled: isDisabled)
+                    }
                 
-                // Stack #2 Editor
+                // Stack #2
+                // Live Chat Feed View & flowing animated reaction view
+                VStack(alignment: .trailing, spacing: 0) {
+                    liveReactionView
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 16)
+                        .visibleWhen(viewModel.currentState != .setup)
+                        .isHidden(viewModel.targetType == .user)
+                        .id("liveReactionView")
+                    
+                    liveChatFeedView
+                        .visibleWhen(viewModel.currentState != .setup)
+                        .isHidden(viewModel.targetType == .user)
+                }
+                .padding(.bottom, 50) // Padding to avoid overlapping with footer view
+                
+                
+                // Stack #3
+                // Show reaction bar when reaction button in compose bar is long pressed
+                if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+                    reactionBarOverlay
+                        .visibleWhen(liveChatViewModel.showReactionBar)
+                }
+                
+                // Stack #4 Editor
                 VStack(spacing: 0) {
                     ZStack(alignment: .top) {
                         VStack(spacing: 0) {
@@ -83,6 +117,9 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                                 .opacity(viewModel.currentState != .setup ? 0 : 1)
                         }
                         
+                        pendingPostReviewView
+                            .visibleWhen(viewModel.createdPost?.getFeedType() == .reviewing)
+                        
                         liveStreamStartingState
                             .visibleWhen(viewModel.currentState == .started)
                         
@@ -92,6 +129,7 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                         
                         liveStreamEndingCountdownState
                             .visibleWhen(viewModel.isLiveStreamEndCountdownStarted)
+                        
                     }
                     
                     footerView
@@ -107,8 +145,16 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                 LiveStreamPermissionView(info: .cameraAndMicrophone)
             }
             .opacity(isPermissionDenied ? 1 : 0)
+            
+            // Stack #4 Post is not approved by moderator
+            if case .ended(let reason) = viewModel.currentState, reason == .notApproved {
+                PostDetailEmptyStateView(action: {
+                    host.controller?.dismiss(animated: true)
+                })
+                .ignoresSafeArea()
+            }
         }
-        .ignoresSafeArea(.keyboard)
+        .background(Color.black.ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
@@ -252,8 +298,8 @@ public struct AmityCreateLivestreamPage: AmityPageView {
     @ViewBuilder
     var headerView: some View {
         HStack {
-            if viewModel.currentState == .setup {
-                Button {
+            Button {
+                if viewModel.currentState == .setup {
                     let dismissAction = {
                         host.controller?.dismiss(animated: true)
                     }
@@ -264,20 +310,26 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                     } else {
                         dismissAction()
                     }
-                } label: {
-                    Image(AmityIcon.LiveStream.close.imageResource)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 24, height: 24)
-                        .foregroundColor(Color.white)
-                        .padding(2)
-                        .background(Color.black.opacity(0.5))
-                        .clipped()
-                        .clipShape(Circle())
+                } else {
+                    liveStreamAlert.show(for: .streamEndedManually(action: {
+                        viewModel.endLiveStream(reason: .manual)
+                    }))
                 }
-                
-                Spacer(minLength: 24)
-                
+            } label: {
+                Image(AmityIcon.LiveStream.close.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(Color.white)
+                    .padding(2)
+                    .background(Color.black.opacity(0.5))
+                    .clipped()
+                    .clipShape(Circle())
+            }
+            
+            Spacer(minLength: 24)
+            
+            if viewModel.currentState == .setup {
                 Button {
                     let context = AmityLivestreamPostTargetSelectionPage.Context(onSelection: { selectedTarget in
                         if let selectedTarget {
@@ -310,8 +362,7 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                             .foregroundColor(Color.white)
                     }
                 }
-            }
-            else {
+            } else {
                 Text(AmityLocalizedStringSet.Social.liveStreamDurationLabel.localized(arguments: "\(viewModel.liveDuration)"))
                     .applyTextStyle(.captionBold(.white))
                     .padding(.horizontal, 8)
@@ -320,15 +371,25 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                     .cornerRadius(4, corners: .allCorners)
                     .visibleWhen(viewModel.currentState.isStreaming)
                 
-                Spacer()
+                Button {
+                    showSettingSheet.toggle()
+                } label: {
+                    Image(AmityIcon.threeDotIcon.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .rotationEffect(.degrees(90))
+                        .frame(width: 32, height: 28)
+                        .foregroundColor(Color.white)
+                }
+                .isHidden(viewModel.targetType == .user)
             }
         }
     }
     
     @ViewBuilder
     var footerView: some View {
-        HStack {
-            if viewModel.currentState == .setup {
+        if viewModel.currentState == .setup {
+            HStack(spacing: 16) {
                 thumbnailButton
                     .bottomSheet(isShowing: $showThumbnailEditSheet, height: .contentSize, sheetContent: {
                         VStack(spacing: 0) {
@@ -360,40 +421,51 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                         // Upload thumbnail
                         viewModel.uploadThumbnail(image: newValue.first)
                     }
-            } else {
+                
+                Spacer()
+                
                 Button {
-                    liveStreamAlert.show(for: .streamEndedManually(action: {
-                        viewModel.endLiveStream(reason: .manual)
-                    }))
+                    showSettingSheet.toggle()
                 } label: {
-                    Text(AmityLocalizedStringSet.Social.liveStreamEndLiveLabel.localizedString)
-                        .applyTextStyle(.bodyBold(Color.white))
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 10)
-                        .border(radius: 8, borderColor: Color.white, borderWidth: 1)
+                    Image(AmityIcon.settingIcon.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .padding(.vertical, 4)
                 }
-                .buttonStyle(.plain)
-                .visibleWhen(viewModel.currentState == .streaming)
+                .isHidden(viewModel.targetType == .user)
+                
+                Button {
+                    viewModel.switchCamera()
+                } label: {
+                    Image(AmityIcon.LiveStream.switchCamera.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .padding(.vertical, 4)
+                }
             }
-            
-            Spacer()
-            
-            Button {
-                viewModel.switchCamera()
-            } label: {
-                Image(AmityIcon.LiveStream.switchCamera.imageResource)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 30, height: 30)
-                    .padding(.vertical, 4)
+            .padding(.leading, 16)
+            .padding(.trailing, 24)
+            .padding(.vertical, 21)
+            .background(Color.black)
+        } else {
+            // Hide chat if it is on userfeed for now and post is in reviewing state
+            if viewModel.liveStreamChatViewModel?.isStreamer ?? false && (viewModel.createdStream?.community == nil || viewModel.createdPost?.getFeedType() == .reviewing) {
+                defaultComposeBar
+            } else if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+                AmityLiveStreamChatComposeBar(viewModel: liveChatViewModel)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.black)
+                    .onAppear {
+                        liveChatViewModel.swapCameraAction = { [weak viewModel] in
+                            viewModel?.switchCamera()
+                        }
+                    }
             }
         }
-        .padding(.leading, 16)
-        .padding(.trailing, 24)
-        .padding(.vertical, 21)
-        .background(Color.black)
     }
-    
     
     @ViewBuilder
     var thumbnailButton: some View {
@@ -439,7 +511,123 @@ public struct AmityCreateLivestreamPage: AmityPageView {
             }
         }
     }
-
+    
+    @ViewBuilder
+    private var liveReactionView: some View {
+        if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+            LiveReactionView(viewModel: liveChatViewModel.liveReactionViewModel)
+                .frame(width: liveChatViewModel.liveReactionViewModel.width, height: liveChatViewModel.isTextEditorFocused ? 0.1 : liveChatViewModel.liveReactionViewModel.height)
+        }
+    }
+    
+    @ViewBuilder
+    private var liveChatFeedView: some View {
+        if let liveChatViewModel = viewModel.liveStreamChatViewModel, liveChatViewModel.isTextEditorFocused == false {
+            AmityLiveStreamChatFeed(viewModel: liveChatViewModel, pageId: id)
+                .frame(height: liveChatViewModel.isTextEditorFocused ? 0.1 : liveChatFeedHeight)
+        }
+    }
+    
+    @ViewBuilder
+    private var reactionBarOverlay: some View {
+        ZStack {
+            // Full screen overlay with tap gesture to dismiss
+            Color.clear
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        viewModel.liveStreamChatViewModel?.showReactionBar = false
+                    }
+                }
+            
+            // Reaction bar positioned at trailing bottom
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    AmityReactionBar(targetType: viewModel.createdStream?.referenceType ?? "", targetId: viewModel.createdStream?.referenceId ?? "", streamId: viewModel.createdStream?.streamId ?? "", onReactionTap: { reaction in
+                        if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+                            liveChatViewModel.liveReactionViewModel.addReaction(reaction)
+                            
+                            // Hide reaction bar after selection
+                            withAnimation(.easeOut(duration: 0.2)) {
+                                liveChatViewModel.showReactionBar = false
+                            }
+                        }
+                    })
+                    .padding(.trailing, 24)
+                    .scaleEffect(viewModel.liveStreamChatViewModel?.showReactionBar ?? false  ? 1.0 : 0.0, anchor: .bottomTrailing)
+                    .padding(.bottom, 58)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    @ViewBuilder
+    private var defaultComposeBar: some View {
+        HStack {
+            Spacer()
+            Button {
+                viewModel.switchCamera()
+            } label: {
+                Image(AmityIcon.LiveStream.switchCamera.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .padding(.vertical, 4)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 21)
+        .background(Color.black)
+    }
+    
+    @ViewBuilder
+    private var settingBottomSheetView: some View {
+        VStack(spacing: 0) {
+            SettingToggleButtonView(isEnabled: $viewModel.isLiveChatDisabled,
+                                    title: AmityLocalizedStringSet.Social.liveStreamSettingReadOnlyTitle.localizedString,
+                                    description: AmityLocalizedStringSet.Social.liveStreamSettingReadOnlyDescription.localizedString)
+                .contentShape(Rectangle())
+                .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
+            
+            Spacer()
+        }
+        .padding(.bottom, 64)
+    }
+    
+    @ViewBuilder
+    private var pendingPostReviewView: some View {
+        VStack(spacing: 8) {
+            Spacer()
+            
+            // Icon
+            Image(AmityIcon.blindIcon.imageResource)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 48, height: 36)
+                .foregroundColor(.white)
+            
+            // Title
+            Text("Waiting for approval")
+                .applyTextStyle(.titleBold(.white))
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+                .padding(.top, 8)
+            
+            // Description
+            Text("This livestream has started. However, it will have limited visibility until your post has been approved.")
+                .applyTextStyle(.caption(.white))
+                .foregroundColor(.white.opacity(0.8))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+    }
 }
 
 struct LiveStreamSetupView: View {

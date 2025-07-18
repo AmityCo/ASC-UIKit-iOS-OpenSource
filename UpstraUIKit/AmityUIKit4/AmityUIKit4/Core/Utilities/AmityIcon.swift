@@ -25,6 +25,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case unflagIcon = "unflagIcon"
     case lockIcon = "lockIcon"
     case lockBlackIcon = "lockBlackIcon"
+    case settingIcon = "settingIcon"
     
     // AmityCreateStoryPage Icons
     case backgroundedCloseIcon = "backgroundedCloseIcon"
@@ -94,6 +95,7 @@ enum AmityIcon: String, ImageResourceProvider {
         case redFlagIcon = "redFlagIcon"
         case mutedIcon = "mutedIcon"
         case unknownReaction = "reactionUnknown"
+        case sendActionIcon = "sendActionIcon"
     }
     
     // MARK: Social
@@ -108,7 +110,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case videoControlIcon = "videoControlIcon"
     case circleCloseIcon = "circleCloseIcon"
     case previewLinkDefaultIcon = "previewLinkDefaultIcon"
-    case previewLinkErrorIcon = "previewLinkErrorIcon"
+    case triangleErrorIcon = "triangleErrorIcon"
     case createPostMenuIcon = "createPostMenuIcon"
     case createStoryMenuIcon = "createStoryMenuIcon"
     case createPollMenuIcon = "createPollMenuIcon"
@@ -204,6 +206,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case clipFeedCameraIcon = "clipFeedCameraIcon"
     case clipDeletedIcon = "clipDeletedIcon"
     case clipGlobeIcon = "clipGlobeIcon"
+    case blindIcon = "blindIcon"
     
     // Livestream icons
     enum LiveStream: String, ImageResourceProvider {
@@ -213,11 +216,20 @@ enum AmityIcon: String, ImageResourceProvider {
         case close = "ic_close"
         case thumbnail = "ic_thumbnail"
         case switchCamera = "ic_camera_flip"
+        case disabledChatIcon = "disabledChatIcon"
         
         case terminatedPageStreamer = "livestream_terminated_streaming"
         case terminatedPageWatcher = "livestream_terminated_watching"
         case terminatedContentViewer = "livestream_terminated_trash"
         case terminatedContentPlayback = "livestream_terminated_block"
+    }
+    
+    enum Reaction: String, ImageResourceProvider {
+        case like = "messageReactionLike"
+        case love = "messageReactionHeart"
+        case grinning = "messageReactionGrinning"
+        case fire = "messageReactionFire"
+        case sad = "messageReactionSad"
     }
 
     func getURL() -> URL {
@@ -252,5 +264,9 @@ extension ImageResourceProvider where Self.RawValue == String {
     
     var imageResource: ImageResource {
         ImageResource(name: self.rawValue, bundle: AmityUIKit4Manager.bundle)
+    }
+    
+    var image: UIImage? {
+        UIImage(named: self.rawValue, in: AmityUIKit4Manager.bundle, compatibleWith: nil)
     }
 }

@@ -20,7 +20,7 @@ struct PreviewLinkView: View {
     var body: some View {
         if let url = viewModel.previewLinkData.url {
             VStack(alignment: .leading, spacing: 0) {
-                let fallbackImage = viewModel.previewLinkData.metadata == nil ? AmityIcon.previewLinkErrorIcon : AmityIcon.previewLinkDefaultIcon
+                let fallbackImage = viewModel.previewLinkData.metadata == nil ? AmityIcon.triangleErrorIcon : AmityIcon.previewLinkDefaultIcon
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
                     .frame(height: 210)

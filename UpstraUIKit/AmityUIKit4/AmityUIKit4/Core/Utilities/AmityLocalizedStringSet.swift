@@ -114,6 +114,14 @@ public struct AmityLocalizedStringSet {
         static let reachMentionLimitMessage = "chat_reach_mention_limit_Message"
     }
     
+    public struct LiveChat {
+        static let deleteMessage = "live_chat_delete_message"
+        static let reportMessage = "live_chat_report_message"
+        static let unreportMessage = "live_chat_unreport_message"
+        static let toastReportMessage = "live_chat_toast_report_message"
+        static let toastUnReportMessage = "live_chat_toast_unreport_message"
+    }
+    
     public struct Reaction {
         static let unableToLoadTitle = "reaction_list_unable_to_load_title"
         static let unableToLoadSubtitle = "reaction_list_unrable_to_load_subtitle"
@@ -153,6 +161,8 @@ public struct AmityLocalizedStringSet {
         static let livestreamPlayerEndedMessage = "livestream_player_ended_message"
         static let livestreamPlayerTerminatedTitle = "livestream_player_terminated_title"
         static let livestreamPlayerTerminatedMessage = "livestream_player_terminated_message"
+        static let livestreamPlayerBannedTitle = "livestream_player_banned_title"
+        static let livestreamPlayerBannedMessage = "livestream_player_banned_message"
         static let livestreamPlayerUnavailableTitle = "livestream_player_unavailable_title"
         static let livestreamPlayerUnavailableMessage = "livestream_player_unavailable_message"
         static let livestreamPlayerReconnectingTitle = "livestream_player_reconnecting_title"
@@ -160,6 +170,8 @@ public struct AmityLocalizedStringSet {
         static let livestreamPlayerLive = "livestream_player_live"
         static let livestreamPlayerRecorded = "livestream_player_recorded"
         static let livestreamPlayerUpcomingLive = "livestream_player_upcoming_live"
+        static let liveStreamSettingReadOnlyTitle = "live_stream_setting_readonly_title"
+        static let liveStreamSettingReadOnlyDescription = "live_stream_setting_readonly_description"
         
         static let communitySettingBasicInfoTitle = "community_setting_basic_info_title"
         static let communitySettingCommunityPermissionsTitle = "community_setting_community_permissions_title"

@@ -6,6 +6,7 @@
 //
 
 import AmitySDK
+import Combine
 
 class LivestreamVideoPlayerViewModel: ObservableObject {
     
@@ -14,6 +15,7 @@ class LivestreamVideoPlayerViewModel: ObservableObject {
     
     var streamToken: AmityNotificationToken?
     var postToken: AmityNotificationToken?
+    private var chatViewModelCancellable: AnyCancellable?
     
     let post: AmityPostModel
     
@@ -21,11 +23,28 @@ class LivestreamVideoPlayerViewModel: ObservableObject {
     @Published var stream: AmityStream?
     @Published var isStreamTerminated = false
     @Published var isPostDeleted = false
+    @Published var isBannedFromStream = false
+    @Published var liveStreamChatViewModel: AmityLiveStreamChatViewModel? {
+        didSet {
+            setupChatViewModelObservation()
+        }
+    }
     
     init(post: AmityPostModel) {
         self.post = post
         observeStream(streamId: post.liveStream?.streamId ?? "")
         observePost(postId: post.postId)
+        
+        // Create live stream chat view model
+        guard let stream = post.liveStream else { return }
+        Task.runOnMainActor {
+            do {
+                guard let _ = try await stream.getLiveChat() else { return }
+                self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(stream: stream)
+            } catch {
+                Log.add(event: .error, "Failed to get live chat channel: \(error.localizedDescription)")
+            }
+        }
     }
     
     private func observePost(postId: String) {
@@ -56,6 +75,10 @@ class LivestreamVideoPlayerViewModel: ObservableObject {
             
             self.isLoaded = true
             
+            if stream.isBanned {
+                self.isBannedFromStream = true
+            }
+            
             if stream.status != .idle {
                 self.stream = stream
             }
@@ -78,12 +101,29 @@ class LivestreamVideoPlayerViewModel: ObservableObject {
         }
     }
     
+    private func setupChatViewModelObservation() {
+        chatViewModelCancellable?.cancel()
+        chatViewModelCancellable = nil
+        
+        guard let chatViewModel = liveStreamChatViewModel else { return }
+        
+        chatViewModelCancellable = chatViewModel.objectWillChange
+            .sink { [weak self] _ in
+                DispatchQueue.main.async {
+                    self?.objectWillChange.send()
+                }
+            }
+    }
+    
     func unobservePostAndStream() {
         self.streamToken?.invalidate()
         self.streamToken = nil
         
         self.postToken?.invalidate()
         self.postToken = nil
+        
+        self.chatViewModelCancellable?.cancel()
+        self.chatViewModelCancellable = nil
                 
         self.post.object.unsubscribeEvent(.post) { success, error in
             Log.add(event: .info, "Unsubscribing post event status: \(success) Error: \(String(describing: error))")

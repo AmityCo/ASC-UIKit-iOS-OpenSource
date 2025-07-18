@@ -132,7 +132,6 @@ extension FeatureViewController: UITableViewDelegate {
                 }
             }
         }
-
     }
 }
 

@@ -156,7 +156,10 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                     }
                 
             case .liveStream:
-                EmptyView()
+                livestreamPostContentTextView()
+                
+                PostContentLiveStreamView(post: post)
+                    .padding([.leading, .trailing, .top], -16)
                 
             case .unknown:
                 EmptyView()
@@ -231,6 +234,47 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
         .frame(height: 40)
     }
     
+    @ViewBuilder
+    private func livestreamPostContentTextView() -> some View {
+        if let livestream = post.liveStream {
+            
+            VStack(spacing: 0) {
+                let title = livestream.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                let description = livestream.streamDescription?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                
+                if !title.isEmpty {
+                    
+                    if #available(iOS 15, *) {
+                        let highlightedTitle = title.highlight(mentions: nil, highlightLink: true, highlightAttributes: [.foregroundColor: viewConfig.theme.primaryColor, .font: UIFont.systemFont(ofSize: AmityTextStyle.bodyBold(.white).getStyle().fontSize, weight: .semibold)])
+                        Text(highlightedTitle)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, description.isEmpty ? 16 : 20)
+                        
+                    } else {
+                        Text(title)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, description.isEmpty ? 16 : 20)
+                    }
+                }
+                
+                if !description.isEmpty {
+                    ExpandableText(description)
+                        .lineLimit(8)
+                        .moreButtonText("...See more")
+                        .font(AmityTextStyle.body(.clear).getFont())
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .attributedColor(viewConfig.theme.primaryColor)
+                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .expandAnimation(.easeOut(duration: 0.25))
+                        .lineSpacing(5)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 16)
+                }
+            }
+        }
+    }
     
     private func getItemView(_ icon: ImageResource, text: String, isDestructive: Bool = false) -> some View {
         HStack(spacing: 12) {

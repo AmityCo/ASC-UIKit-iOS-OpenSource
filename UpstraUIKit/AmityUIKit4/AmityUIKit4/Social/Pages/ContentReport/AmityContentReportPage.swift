@@ -131,7 +131,7 @@ struct AmityContentReportPage: View {
                 .visibleWhen(viewModel.submissionState == .contentError)
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
     }
 }
 

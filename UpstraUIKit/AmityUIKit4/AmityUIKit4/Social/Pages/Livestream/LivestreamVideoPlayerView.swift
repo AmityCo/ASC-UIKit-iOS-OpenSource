@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LivestreamVideoPlayerView: View {
     
-    @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: nil)
+    @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: .livestreamPlayerPage)
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @State private var showOverlay = false
     @State private var opacity = 0.0
@@ -19,6 +19,7 @@ struct LivestreamVideoPlayerView: View {
     
     private let debouncer = Debouncer(delay: 2)
     @StateObject var viewModel: LivestreamVideoPlayerViewModel
+    let liveChatFeedHeight = (UIScreen.main.bounds.height - 50) / 2.5
     
     init(post: AmityPostModel) {
         self._viewModel = StateObject(wrappedValue: LivestreamVideoPlayerViewModel(post: post))
@@ -63,23 +64,28 @@ struct LivestreamVideoPlayerView: View {
                     .padding(.horizontal, 16)
                     
                 } else {
-                    VStack(alignment: .leading, spacing: 4) {
-                        
-                        HStack {
-                            Text(AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString)
-                                .applyTextStyle(.captionBold(Color.white))
-                                .padding(.vertical, 4)
-                                .padding(.horizontal, 8)
-                                .background(Color(UIColor(hex: "FF305A")))
-                                .cornerRadius(4, corners: .allCorners)
-                                .padding(.all, 16)
-                        }
-                        
+                    ZStack(alignment: .topTrailing) {
+                        // Video player fills entire screen
                         if let view = AmityUIKitManagerInternal.shared.behavior.livestreamBehavior?.createLivestreamPlayer(stream: stream, client: AmityUIKit4Manager.client, isPlaying: $isPlaying.wrappedValue && networkMonitor.isConnected) {
                             AnyView(view)
-                                .padding(.bottom, 70)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .clipped()
+                                .onTapGesture {
+                                    displayOverlay()
+                                    isPlaying.toggle()
+                                }
                         }
+                        
+                        // Live badge overlay in original position (top-leading)
+                        Text(AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString)
+                            .applyTextStyle(.captionBold(Color.white))
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 8)
+                            .background(Color(UIColor(hex: "FF305A")))
+                            .cornerRadius(4, corners: .allCorners)
+                            .padding(.all, 16)
                     }
+                    .ignoresSafeArea(.keyboard, edges: .all)
                 }
                 // Stream is not available but request to fetch stream is complete.
             } else if viewModel.isLoaded {
@@ -100,6 +106,35 @@ struct LivestreamVideoPlayerView: View {
                 }
                 .padding(.horizontal, 16)
             }
+            
+            
+            ZStack(alignment: .bottom) {
+                // live chat feed and compose bar
+                VStack(alignment: .trailing, spacing: 0) {
+                    liveReactionView
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 16)
+                        .isHidden(viewModel.post.targetCommunity == nil)
+                        .id("liveReactionView")
+                    
+                    liveChatFeedView
+                        .isHidden(viewModel.post.targetCommunity == nil)
+                    
+                    if viewModel.post.feedType == .reviewing {
+                        inPostReviewComposeBar
+                    } else {
+                        liveChatComposeBar
+                            .isHidden(viewModel.post.targetCommunity == nil)
+                    }
+                }
+                
+                // Reaction bar overlay
+                if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+                    reactionBarOverlay
+                        .visibleWhen(liveChatViewModel.showReactionBar)
+                }
+            }
+            .visibleWhen(viewModel.stream?.status ?? .none != .ended)
             
             ZStack {
                 Color.black.opacity(0.5)
@@ -131,37 +166,85 @@ struct LivestreamVideoPlayerView: View {
             }
             .opacity(networkMonitor.isConnected ? 0 : 1)
                         
-            VStack {
-                HStack {
-                    Image(AmityIcon.livestreamCloseIcon.imageResource)
-                        .scaledToFit()
-                        .frame(width: 16, height: 16)
-                        .onTapGesture {
-                            viewModel.unobservePostAndStream()
+            ZStack(alignment: .bottom) {
+                VStack {
+                    VStack(spacing: 0) {
+                        HStack(spacing: 8) {
+                            Image(AmityIcon.LiveStream.close.imageResource)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(Color.white)
+                                .padding(2)
+                                .onTapGesture {
+                                    viewModel.unobservePostAndStream()
+                                    
+                                    host.controller?.dismiss(animated: true)
+                                }
                             
-                            host.controller?.dismiss(animated: true)
+                            // Community and streamer info
+                            if let stream = viewModel.stream {
+                                HStack(spacing: 8) {
+                                    // Community profile image
+                                    if let community = stream.community {
+                                        AmityUserProfileImageView(
+                                            displayName: community.displayName,
+                                            avatarURL: URL(string: community.avatar?.mediumFileURL ?? "")
+                                        )
+                                        .frame(width: 32, height: 32)
+                                        .clipShape(Circle())
+                                        
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            // Community name
+                                            if let community = stream.community {
+                                                Text(community.displayName)
+                                                    .applyTextStyle(.captionBold(Color.white))
+                                                    .lineLimit(1)
+                                                
+                                                // Streamer info
+                                                if let streamer = stream.user {
+                                                    Text("By \(streamer.displayName ?? "")")
+                                                        .applyTextStyle(.captionSmall(Color.white.opacity(0.8)))
+                                                        .lineLimit(1)
+                                                }
+                                            }
+                                        }
+                                    } else if let streamer = stream.user {
+                                        AmityUserProfileImageView(
+                                            displayName: streamer.displayName ?? "",
+                                            avatarURL: URL(string: streamer.getAvatarInfo()?.mediumFileURL ?? "")
+                                        )
+                                        .frame(width: 32, height: 32)
+                                        .clipShape(Circle())
+                                        
+                                        Text(streamer.displayName ?? "")
+                                            .applyTextStyle(.captionBold(Color.white))
+                                            .lineLimit(1)
+                                    }
+                                    
+                                    Spacer()
+                                }
+                            }
+                            
+                            Spacer()
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
+                    }
                     
                     Spacer()
+                    
+                    Image(isPlaying ? AmityIcon.livestreamPauseIcon.getImageResource() : AmityIcon.videoControlIcon.getImageResource())
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
+                        .opacity(opacity)
+                        .animation(.easeInOut(duration: opacity == 0 ? 1.0 : 0), value: opacity)
+                    
+                    Spacer()
+                    Spacer()
                 }
-                .padding(.leading, 36)
-                .padding(.top, 10)
-                
-                Spacer()
-                
-                Image(isPlaying ? AmityIcon.livestreamPauseIcon.getImageResource() : AmityIcon.videoControlIcon.getImageResource())
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 40, height: 40)
-                    .onTapGesture {
-                        displayOverlay()
-                        isPlaying.toggle()
-                    }
-                
-                Spacer()
             }
-            .opacity(opacity)
-            .animation(.easeInOut(duration: opacity == 0 ? 1.0 : 0), value: opacity)
             
             PostDetailEmptyStateView(action: {
                 viewModel.unobservePostAndStream()
@@ -191,6 +274,109 @@ struct LivestreamVideoPlayerView: View {
             
             // Stop player
             isPlaying = false
+        }
+        .onChange(of: viewModel.isBannedFromStream) { isBanned in
+            guard isBanned else { return }
+            
+            // unobserve post and stream
+            viewModel.unobservePostAndStream()
+            
+            // Stop player
+            isPlaying = false
+            
+            // Show banned screen
+            let bannedVC = AmitySwiftUIHostingController(rootView: AmityLivestreamBannedPage(onDismiss: {
+                // Move to post detail page
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    let postDetailPage = AmityPostDetailPage(id: viewModel.post.postId)
+                    let topController = UIApplication.topViewController()
+                    topController?.navigationController?.pushViewController(AmitySwiftUIHostingController(rootView: postDetailPage))
+                }
+            }))
+            bannedVC.modalPresentationStyle = .overFullScreen
+            self.host.controller?.navigationController?.pushViewController(bannedVC, animated: false)
+        }
+        .environmentObject(viewConfig)
+    }
+    
+    @ViewBuilder
+    private var liveReactionView: some View {
+        if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+            LiveReactionView(viewModel: liveChatViewModel.liveReactionViewModel)
+                .frame(width: liveChatViewModel.liveReactionViewModel.width, height: liveChatViewModel.isTextEditorFocused ? 0.1 : liveChatViewModel.liveReactionViewModel.height)
+        }
+    }
+    
+    @ViewBuilder
+    private var liveChatFeedView: some View {
+        if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+            AmityLiveStreamChatFeed(viewModel: liveChatViewModel, pageId: .createLivestreamPage)
+                .frame(height: liveChatViewModel.isTextEditorFocused ? 0.1 : liveChatFeedHeight)
+        }
+    }
+    
+    @ViewBuilder
+    private var liveChatComposeBar: some View {
+        ZStack {
+            Color.black
+                .frame(height: 50)
+            
+            if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+                AmityLiveStreamChatComposeBar(viewModel: liveChatViewModel)
+                    .padding(.leading, 16)
+                    .padding(.trailing, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.black)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var reactionBarOverlay: some View {
+        ZStack {
+            // Full screen overlay with tap gesture to dismiss
+            Color.clear
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        viewModel.liveStreamChatViewModel?.showReactionBar = false
+                    }
+                }
+            
+            // Reaction bar positioned at trailing bottom
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    AmityReactionBar(targetType: viewModel.stream?.referenceType ?? "", targetId: viewModel.stream?.referenceId ?? "", streamId: viewModel.stream?.streamId ?? "", onReactionTap: { reaction in
+                        if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+                            liveChatViewModel.liveReactionViewModel.addReaction(reaction)
+                        }
+                        
+                    })
+                    .padding(.trailing, 24)
+                    .scaleEffect(viewModel.liveStreamChatViewModel?.showReactionBar ?? false ? 1.0 : 0.0, anchor: .bottomTrailing)
+                    .padding(.bottom, 58)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    @ViewBuilder
+    private var inPostReviewComposeBar: some View {
+        ZStack {
+            Color.black
+                .frame(height: 50)
+            
+            Text("This live stream has started, but with limited visibility until the post has been approved.")
+                .applyTextStyle(.body(Color(viewConfig.theme.secondaryColor.blend(.shade2))))
+                .multilineTextAlignment(.center)
+                .padding(.leading, 32)
+                .padding(.trailing, 32)
+                .padding(.vertical, 6)
+                .background(Color.black)
         }
     }
     

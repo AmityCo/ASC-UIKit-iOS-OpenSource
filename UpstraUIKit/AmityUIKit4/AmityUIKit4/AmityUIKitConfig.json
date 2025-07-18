@@ -55,6 +55,13 @@
             "image": "messageReactionSad"
         }
     ],
+    "reactions": [
+        { "name": "like", "image": "messageReactionLike"},
+        { "name": "heart", "image": "messageReactionHeart"},
+        { "name": "fire", "image": "messageReactionFire"},
+        { "name": "grinning", "image": "messageReactionGrinning"},
+        { "name": "sad", "image": "messageReactionSad"}
+    ],
     "customizations": {
         "camera_page/*/*": {
             "resolution": "720p"
@@ -753,7 +760,36 @@
             "text": "Live on"
         },
         "create_livestream_page/*/*": {
-            "theme": {}
+            "theme": {
+                "light": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                },
+                "dark": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                }
+            }
         },
         "create_livestream_page/*/start_livestream_button": {
             "image": "value"
@@ -838,6 +874,8 @@
             "image": "noInternetIcon",
             "text": "No internet connection"
         },
+        "*/livestream_chat_feed/*": {},
+        "*/livestream_chat_compose_bar/*": {},
         "pending_request_page/*/*": {},
         "pending_request_page/*/back_button": {
             "image": "backIcon"

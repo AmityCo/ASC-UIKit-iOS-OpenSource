@@ -17,11 +17,14 @@ enum ContentReportSubmissionState {
 }
 
 enum ContentReportType {
+    case message(id: String)
     case post(id: String)
     case comment(id: String)
     
     var description: String {
         switch self {
+        case .message:
+            return "message"
         case .post:
             return "post"
         case .comment:
@@ -51,6 +54,8 @@ class AmityContentReportPageViewModel: ObservableObject {
         
         do {
             switch type {
+            case .message(id: let id):
+                try await chatManager.flagMessage(messageId: id, reason: reason)
             case .post(let id):
                 try await postManager.flagPost(withId: id, reason: reason)
             case .comment(let id):

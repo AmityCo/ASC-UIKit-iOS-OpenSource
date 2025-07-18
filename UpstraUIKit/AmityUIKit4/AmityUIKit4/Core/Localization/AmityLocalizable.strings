@@ -146,6 +146,8 @@
 "livestream_player_ended_message" = "Playback will be available for you to watch shortly.";
 "livestream_player_terminated_title" = "This stream has been terminated.";
 "livestream_player_terminated_message" = "It looks like this livestream goes against our content moderation guidelines.";
+"livestream_player_banned_title" = "You’ve been banned.";
+"livestream_player_banned_message" = "You can no longer access this live stream.";
 "livestream_player_unavailable_title" = "This stream is currently unavailable.";
 "livestream_player_unavailable_message" = "Please try again later.";
 "livestream_player_reconnecting_title" = "Reconnecting";
@@ -360,6 +362,9 @@
 
 "no_internet_connection" = "No internet connection.";
 
+"live_stream_setting_readonly_title" = "Set live stream to read-only";
+"live_stream_setting_readonly_description" = "Members who are not streamer can read messages but cannot send any messages.";
+
 // Alt Text
 "alt_text_button_title" = "ALT";
 "alt_text_title" = "Alt text";
@@ -387,6 +392,13 @@
 "report_reason_done_button" = "Done";
 
 "report_reason_error_toast_message" = "Failed to report %@. Please try again.";
+
+// Live Chat
+"live_chat_delete_message" = "Delete messaage";
+"live_chat_report_message" = "Report message";
+"live_chat_unreport_message" = "UnReport message";
+"live_chat_toast_report_message" = "Message reported.";
+"live_chat_toast_unreport_message" = "Message unreported.";
 
 "community_update_success_toast_message" = "Successfully updated community profile.";
 

@@ -641,7 +641,7 @@ extension AmityPostContentComponent {
                     category: AmityPostCategory = .general,
                     shouldHideTarget: Bool = false,
                     shouldHideMenuButton: Bool = false,
-                    isClipPost: Bool = false,
+                    isClipPost: Bool = false
         ) {
             self.showPollResults = shouldShowPollResults
             self.category = category

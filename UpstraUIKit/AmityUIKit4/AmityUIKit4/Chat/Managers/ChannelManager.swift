@@ -19,4 +19,16 @@ class ChannelManager {
     func getChannel(channelId: String) -> AmityObject<AmityChannel> {
         return repository.getChannel(channelId)
     }
+    
+    func joinChannel(channelId: String) async throws -> AmityChannel? {
+        return try await repository.joinChannel(channelId: channelId)
+    }
+    
+    func muteChannel(channelId: String) async throws {
+        try await repository.muteChannel(channelId: channelId, mutePeriod: 600)
+    }
+    
+    func unmuteChannel(channelId: String) async throws {
+        try await repository.unmuteChannel(channelId: channelId)
+    }
 }

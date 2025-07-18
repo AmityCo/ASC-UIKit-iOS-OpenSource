@@ -81,7 +81,7 @@ struct AmityLineButtonStyle: ButtonStyle {
         hPadding: CGFloat = 16,
         vPadding: CGFloat = 12,
         radius: CGFloat = 8,
-        borderColor: UIColor? = nil,
+        borderColor: UIColor? = nil
     ) {
         self.viewConfig = viewConfig
         self.vPadding = vPadding

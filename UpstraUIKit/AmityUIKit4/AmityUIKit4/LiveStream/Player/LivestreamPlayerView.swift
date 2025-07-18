@@ -59,6 +59,7 @@ public struct LivestreamPlayerView: UIViewRepresentable {
         let videoView = UIView(frame: view.bounds)
         videoView.isUserInteractionEnabled = false
         videoView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        videoView.contentMode = .scaleAspectFill
         view.addSubview(videoView)
 
         coordinator.player.renderView = videoView

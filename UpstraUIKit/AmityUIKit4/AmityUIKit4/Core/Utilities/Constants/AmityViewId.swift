@@ -27,6 +27,7 @@ public enum PageId: String {
     case pollTargetSelectionPage = "select_poll_target_page"
     case liveStreamTargetSelectionPage = "livestream_post_target_selection_page"
     case liveStreamTerminatedPage = "livestream_terminated_page"
+    case liveStreamBannedPage = "livestream_banned_page"
     
     case communityProfilePage = "community_profile_page"
     
@@ -112,6 +113,10 @@ public enum ComponentId: String {
     case userImageFeed = "user_image_feed"
     case userVideoFeed = "user_video_feed"
     case altTextConfig = "alt_text_config_component"
+    
+    case livestreamChatFeed = "livestream_chat_feed"
+    case livestreamChatComposeBar = "livestream_chat_compose_bar"
+    case reactionBar = "reaction_bar"
     case invitationSection = "invitation_section"
     
     case joinRequestContent = "join_request_content"
