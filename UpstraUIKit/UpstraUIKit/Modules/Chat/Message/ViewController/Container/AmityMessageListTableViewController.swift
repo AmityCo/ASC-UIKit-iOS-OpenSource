@@ -187,7 +187,7 @@ extension AmityMessageListTableViewController: AmityMessageCellDelegate {
         case .audio:
             switch events {
             case .audioPlaying:
-                tableView.reloadData()
+                break
             case .audioFinishPlaying:
                 tableView.reloadRows(at: [cell.indexPath], with: .none)
             default:

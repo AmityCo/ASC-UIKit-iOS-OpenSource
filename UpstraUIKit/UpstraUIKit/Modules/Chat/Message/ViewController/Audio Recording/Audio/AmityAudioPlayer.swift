@@ -9,17 +9,9 @@
 import UIKit
 import AVFoundation
 
-protocol AmityAudioPlayerDelegate: AnyObject {
-    func playing()
-    func stopPlaying()
-    func finishPlaying()
-    func displayDuration(_ duration: String)
-}
-
 final class AmityAudioPlayer: NSObject {
     
     static let shared = AmityAudioPlayer()
-    weak var delegate: AmityAudioPlayerDelegate?
     
     var fileName: String?
     var path: URL?
@@ -61,7 +53,7 @@ final class AmityAudioPlayer: NSObject {
             player.stop()
             player = nil
             resetTimer()
-            delegate?.stopPlaying()
+            onStop?()
         }
     }
     
@@ -87,7 +79,8 @@ final class AmityAudioPlayer: NSObject {
             timer?.tolerance = 0.2
             guard let timer = timer else { return }
             RunLoop.main.add(timer, forMode: .common)
-            delegate?.playing()
+            
+            self.onPlay?()
         } catch {
             Log.add("Error while playing audio \(error.localizedDescription)")
             player = nil
@@ -99,13 +92,19 @@ final class AmityAudioPlayer: NSObject {
         let minutes = Int(time) / 60 % 60
         let seconds = Int(time) % 60
         let display = String(format:"%01i:%02i", minutes, seconds)
-        delegate?.displayDuration(display)
+        
+        self.onDurationChange?(display)
     }
     
     private func resetTimer() {
         duration = 0
         timer?.invalidate()
     }
+    
+    var onPlay: (() -> Void)?
+    var onStop: (() -> Void)?
+    var onFinish: (() -> Void)?
+    var onDurationChange: ((_ duration: String) -> Void)?
 }
 
 extension AmityAudioPlayer: AVAudioPlayerDelegate {
@@ -113,7 +112,8 @@ extension AmityAudioPlayer: AVAudioPlayerDelegate {
         self.player = nil
         fileName = nil
         resetTimer()
-        delegate?.finishPlaying()
+        
+        onFinish?()
     }
     
     func audioPlayerDecodeErrorDidOccur(_ player: AVAudioPlayer, error: Error?) {

@@ -38,6 +38,9 @@ final class AmityMessageAudioTableViewCell: AmityMessageTableViewCell {
     
     override func display(message: AmityMessageModel) {
         if !message.isDeleted {
+            
+            let attachment = message.object.getFileInfo()
+            
             if message.isOwner {
                 durationLabel.textColor = AmityColorSet.baseInverse
                 actionImageView.tintColor = AmityColorSet.baseInverse
@@ -78,9 +81,11 @@ final class AmityMessageAudioTableViewCell: AmityMessageTableViewCell {
 }
 
 extension AmityMessageAudioTableViewCell {
+    
     @IBAction func playTap(_ sender: UIButton) {
         if !message.isDeleted && message.syncState == .synced {
             sender.isEnabled = false
+            
             AmityUIKitManagerInternal.shared.messageMediaService.download(for: message.object) { [weak self] in
                 self?.durationLabel.alpha = 0
                 self?.activityIndicatorView.startAnimating()
@@ -88,10 +93,8 @@ extension AmityMessageAudioTableViewCell {
                 guard let strongSelf = self else { return }
                 switch result {
                 case .success(let url):
-                    AmityAudioPlayer.shared.delegate = self
-                    AmityAudioPlayer.shared.fileName = strongSelf.message.messageId
-                    AmityAudioPlayer.shared.path = url
-                    AmityAudioPlayer.shared.play()
+                    self?.playAudio(fileName: strongSelf.message.messageId, path: url)
+                    
                     sender.isEnabled = true
                     strongSelf.activityIndicatorView.stopAnimating()
                     strongSelf.durationLabel.alpha = 1
@@ -101,25 +104,32 @@ extension AmityMessageAudioTableViewCell {
             }
         }
     }
-}
-
-extension AmityMessageAudioTableViewCell: AmityAudioPlayerDelegate {
-    func playing() {
-        actionImageView.image = AmityIconSet.Chat.iconPause
-        delegate?.performEvent(self, events: .audioPlaying)
-    }
     
-    func stopPlaying() {
-        actionImageView.image = AmityIconSet.Chat.iconPlay
-        durationLabel.text = "0:00"
-    }
-    
-    func finishPlaying() {
-        actionImageView.image = AmityIconSet.Chat.iconPlay
-        durationLabel.text = "0:00"
-    }
-    
-    func displayDuration(_ duration: String) {
-        durationLabel.text = duration
+    func playAudio(fileName: String, path: URL) {
+        AmityAudioPlayer.shared.stop()
+        AmityAudioPlayer.shared.fileName = fileName
+        AmityAudioPlayer.shared.path = path
+        
+        AmityAudioPlayer.shared.onPlay = { [weak self] in
+            guard let self else { return }
+            actionImageView.image = AmityIconSet.Chat.iconPause
+            delegate?.performEvent(self, events: .audioPlaying)
+        }
+        
+        AmityAudioPlayer.shared.onStop = { [weak self] in
+            self?.actionImageView.image = AmityIconSet.Chat.iconPlay
+            self?.durationLabel.text = "0:00"
+        }
+        
+        AmityAudioPlayer.shared.onFinish = { [weak self] in
+            self?.actionImageView.image = AmityIconSet.Chat.iconPlay
+            self?.durationLabel.text = "0:00"
+        }
+        
+        AmityAudioPlayer.shared.onDurationChange = { [weak self] duration in
+            self?.durationLabel.text = duration
+        }
+        
+        AmityAudioPlayer.shared.play()
     }
 }
