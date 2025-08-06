@@ -127,7 +127,7 @@
 		D4AFF1CF25ECE8AD002C001C /* PostPreviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */; };
 		D4AFF23225ED1E7C002C001C /* GlobalPostsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */; };
 		D4AFF23625ED1F88002C001C /* GlobalPostsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */; };
-		ED37F92D2E4200A4006698F0 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED37F92C2E4200A4006698F0 /* SharedFrameworks */; };
+		ED99AAD32E4313410072BE6E /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED99AAD22E4313410072BE6E /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -281,7 +281,7 @@
 			files = (
 				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
-				ED37F92D2E4200A4006698F0 /* SharedFrameworks in Frameworks */,
+				ED99AAD32E4313410072BE6E /* SharedFrameworks in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -605,7 +605,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				ED37F92C2E4200A4006698F0 /* SharedFrameworks */,
+				ED99AAD22E4313410072BE6E /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -1293,7 +1293,7 @@
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
 		};
-		ED37F92C2E4200A4006698F0 /* SharedFrameworks */ = {
+		ED99AAD22E4313410072BE6E /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

@@ -37,7 +37,7 @@ extension GoLive {
             
             Task { @MainActor in
                 do {
-                    let stream = try await streamRepository.createStream(withTitle: title, description: streamDescription, thumbnailImage: coverImageData, meta: meta)
+                    let stream = try await streamRepository.createStream(withTitle: title, description: streamDescription, thumbnailImage: coverImageData, meta: meta, isSecure: true)
                     self.result = .success(stream)
                     self.finish()
                 } catch let error {
