@@ -198,7 +198,10 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         title: publicTitle, description: publicDesc
                                     )
                                     .onTapGesture {
-                                        draft.requiresModeratorApproval = false
+                                        if pageMode == .create {
+                                            draft.requiresModeratorApproval = false
+                                        }
+                                        
                                         draft.privacy = .public
                                     }
                                     .accessibilityIdentifier(
@@ -213,7 +216,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                             "Community is discoverable by anyone. Content is hidden from non-members."
                                     )
                                     .onTapGesture {
-                                        draft.requiresModeratorApproval = true
+                                        if pageMode == .create {
+                                            draft.requiresModeratorApproval = true
+                                        }
                                         draft.privacy = .privateAndVisible
                                     }
 
@@ -226,7 +231,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                             "Community and content are hidden from non-members, and cannot be discovered via search."
                                     )
                                     .onTapGesture {
-                                        draft.requiresModeratorApproval = true
+                                        if pageMode == .create {
+                                            draft.requiresModeratorApproval = true
+                                        }
                                         draft.privacy = .privateAndHidden
                                     }
                                     .accessibilityIdentifier(

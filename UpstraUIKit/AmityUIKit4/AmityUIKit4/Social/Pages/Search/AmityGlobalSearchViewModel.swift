@@ -9,7 +9,7 @@ import Combine
 import AmitySDK
 
 public enum SearchType {
-    case community, user, myCommunities
+    case posts, community, user, myCommunities
 }
 
 
@@ -20,34 +20,72 @@ public class AmityGlobalSearchViewModel: ObservableObject {
     private let userManager = UserManager()
     private var userCollection: AmityCollection<AmityUser>?
     
+    private let postManager = PostManager()
+    private var postCollection: AmityCollection<AmityPost>?
+    
     private var cancellable: Set<AnyCancellable> = Set()
     public var searchType: SearchType
     
     @Published public var searchKeyword: String = ""
     @Published public var communities: [AmityCommunity] = []
     @Published public var users: [AmityUser] = []
+    @Published public var posts: [AmityPost] = []
     @Published public var loadingState: AmityLoadingStatus = .notLoading
     @Published public var isFirstTimeSearching: Bool = true
     
-    public init(searchType: SearchType = .community) {
+    public init(searchType: SearchType = .community, searchKeyword: String? = nil) {
         self.searchType = searchType
+        
+        if let searchKeyword {
+            self.searchKeyword = searchKeyword
+        }
     
         $searchKeyword
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
             .sink(receiveValue: { [weak self] value in
                 guard let self else { return }
-                
                 isFirstTimeSearching = false
                 
-                if self.searchType == .community {
+                switch self.searchType {
+                case .posts:
+                    self.searchPosts(keyword: value)
+                case .community:
                     self.searchCommunities(keyword: value)
-                } else if self.searchType == .user {
+                case .user:
                     self.searchUsers(keyword: value)
-                } else {
+                case .myCommunities:
                     self.searchMyCommunities(keyword: value)
                 }
+
             })
             .store(in: &cancellable)
+    }
+    
+    private func searchPosts(keyword: String) {
+        if keyword.hasPrefix("#") {
+            let hashtag = keyword.filter { $0 != "#" }
+            postCollection = postManager.searchPosts(hashtags: [hashtag])
+        } else {
+            postCollection = postManager.searchPosts(keyword: keyword)
+        }
+        
+        postCollection?.$snapshots.sink(receiveValue: { posts in
+            self.posts = posts
+        })
+        .store(in: &cancellable)
+        
+        postCollection?.$loadingStatus
+            .sink(receiveValue: { [weak self] status in
+                self?.loadingState = status
+                Log.add(event: .info, "Search State: \(status)")
+            })
+            .store(in: &cancellable)
+    }
+    
+    public func loadMorePosts() {
+        if let postCollection, postCollection.hasNext {
+            postCollection.nextPage()
+        }
     }
     
     /// Search Communities globally

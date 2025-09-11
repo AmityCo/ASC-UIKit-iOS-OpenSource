@@ -11,8 +11,9 @@ import AmitySDK
 public class AmityUserProfilePageViewModel: ObservableObject {
     @Published var user: AmityUserModel?
     
-    private var cancellable: AnyCancellable?
-    private var liveObject: AmityObject<AmityUser>
+    private var userCancellable: AnyCancellable?
+    private var feedStateCancellable: AnyCancellable?
+    private var liveObject: AmityObject<AmityUser>?
     private let userManager = UserManager()
     private let userId: String
     
@@ -21,22 +22,58 @@ public class AmityUserProfilePageViewModel: ObservableObject {
     let videoFeedViewModel: MediaFeedViewModel
     let userFeedViewModel: AmityUserFeedComponentViewModel
     
+    @Published var feedState: EmptyUserFeedViewState = .empty
+    
+    enum ProfileFeedSource {
+        case all, community, user
+        
+        var feedSources: [AmityFeedSource] {
+            switch self {
+            case .all:
+                return [.community, .user]
+            case .community:
+                return [.community]
+            case .user:
+                return [.user]
+            }
+        }
+        
+        var text: String {
+            switch self {
+            case .all:
+                return AmityLocalizedStringSet.Social.userProfileAllPostTitle.localizedString
+            case .community:
+                return AmityLocalizedStringSet.Social.userProfileCommunityPostTitle.localizedString
+            case .user:
+                return AmityLocalizedStringSet.Social.userProfileUserPostTitle.localizedString
+            }
+        }
+    }
+    
+    var currentFeedSource: ProfileFeedSource = .all
+    
     public init(_ userId: String) {
         self.profileHeaderViewModel = AmityUserProfileHeaderComponentViewModel(userId)
         self.imageFeedViewModel = MediaFeedViewModel(feedType: .user(userId: userId), postType: .image)
         self.videoFeedViewModel = MediaFeedViewModel(feedType: .user(userId: userId), postType: .video)
         self.userFeedViewModel = AmityUserFeedComponentViewModel(userId)
         self.userId = userId
-        
+    }
+    
+    func loadUser() {
         self.liveObject = userManager.getUser(withId: userId)
-        self.cancellable = liveObject.$snapshot
+        self.userCancellable = liveObject?.$snapshot
             .sink(receiveValue: { [weak self] user in
                 guard let user else { return }
                 self?.user = AmityUserModel(user: user)
         })
+        
+        feedStateCancellable = userFeedViewModel.$emptyFeedState.sink { state in
+            self.feedState = state ?? .empty
+        }
     }
     
-    func refreshFeed(currentTab: Int) {
+    func refreshFeed(currentTab: Int, feedSources: [AmityFeedSource]? = nil) {
         profileHeaderViewModel.load()
         // Note:
         // For video tab, loading of videos or clips is handled from inside the component itself.
@@ -45,6 +82,16 @@ public class AmityUserProfilePageViewModel: ObservableObject {
         } else if currentTab == 1 {
             imageFeedViewModel.loadMediaFeed()
         }
+    }
+    
+    func refreshAllFeeds(profileFeedSource: ProfileFeedSource) {
+        profileHeaderViewModel.load()
+        
+        currentFeedSource = profileFeedSource
+        
+        userFeedViewModel.loadPostFeed(feedSources: profileFeedSource.feedSources)
+        imageFeedViewModel.loadMediaFeed(feedSources: profileFeedSource.feedSources)
+        videoFeedViewModel.currentFeedSources = profileFeedSource.feedSources
     }
     
     func block() async throws {

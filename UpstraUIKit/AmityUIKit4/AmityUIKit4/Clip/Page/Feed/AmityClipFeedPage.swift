@@ -33,6 +33,12 @@ public struct AmityClipFeedPage: AmityPageView {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .clipFeedPage))
     }
     
+    public init(postId: String, onTapAction: ((ClipFeedAction) -> Void)? = nil) {
+        self._provider = StateObject(wrappedValue: SingleClipService(postId: postId))
+        self.onTapAction = onTapAction
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .clipFeedPage))
+    }
+    
     public var body: some View {
         ClipFeedView(clipProvider: provider, onTapAction: onTapAction)
             .updateTheme(with: viewConfig)

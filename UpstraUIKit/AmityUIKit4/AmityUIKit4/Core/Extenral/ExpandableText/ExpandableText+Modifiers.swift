@@ -1,6 +1,6 @@
 //
 //  ExpandableText+Modifiers.swift
-//  
+//
 //
 //  Created by ned on 25/02/23.
 //
@@ -33,6 +33,17 @@ public extension ExpandableText {
     }
     
     /**
+     Sets the background color of the text view in the `ExpandableText` instance.
+     - Parameter color: The background color of the text view. Defaults to `white`
+     - Returns: A new `ExpandableText` instance.
+     */
+    func backgroundColor(_ color: Color) -> Self {
+        var copy = self
+        copy.backgroundColor = color
+        return copy
+    }
+    
+    /**
      Sets the color for the attributed string in the `ExpandableText` instance.
      - Parameter color: The color to use for attributed string. Defaults to `UIColor.systemBlue`
      - Returns: A new `ExpandableText` instance with the specified color applied.
@@ -40,6 +51,17 @@ public extension ExpandableText {
     func attributedColor(_ color: UIColor) -> Self {
         var copy = self
         copy.attributedColor = color
+        return copy
+    }
+    
+    /**
+     Sets the color for the attributed string in the `ExpandableText` instance.
+     - Parameter color: The color to use for attributed string. Defaults to `UIColor.systemBlue`
+     - Returns: A new `ExpandableText` instance with the specified color applied.
+     */
+    func hashtagColor(_ color: UIColor) -> Self {
+        var copy = self
+        copy.hashtagColor = color
         return copy
     }
     

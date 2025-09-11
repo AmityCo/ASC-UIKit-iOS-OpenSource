@@ -60,6 +60,8 @@ public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
     /// - 2. `type == .video`
     var generatedThumbnailImage: UIImage?
     
+    var parentPostId: String?
+    
     init(state: AmityMediaState, type: AmityMediaType) {
         self.state = state
         self.type = type

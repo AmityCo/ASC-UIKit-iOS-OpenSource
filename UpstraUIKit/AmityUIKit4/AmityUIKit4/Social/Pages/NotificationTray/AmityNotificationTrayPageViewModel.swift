@@ -36,8 +36,16 @@ class AmityNotificationTrayPageViewModel: ObservableObject {
             guard let self else { return }
             
             if let error {
-                Log.warn("Error while fetching notification items \(error.localizedDescription)")
-                Toast.showToast(style: .warning, message: "Oops, something went wrong")
+                // Note: Investigate more on this later...
+                // When a live collection observation token is still valid & user logs out, sdk logic invalidates all live collection. This also notifies all live collection
+                // observers with error with error code unknown (80000). In our usecase this can happen if user login / logout / login immediately.
+                // So we prevent showing toast in this case.
+                if error.isAmityErrorCode(.unknown) {
+                    return
+                } else {
+                    Toast.showToast(style: .warning, message: "Oops, something went wrong")
+                }
+                
                 return
             }
             
@@ -113,6 +121,7 @@ struct NotificationItem: Identifiable {
         case reaction
         case mention
         case reply
+        case follow
         case joinRequest = "join_request"
     }
     
@@ -178,6 +187,7 @@ struct NotificationItem: Identifiable {
         var postId: String?
         var commentId: String?
         var parentId: String?
+        var userId: String?
         
         init(item: NotificationItem) {
             switch item.actionType {
@@ -211,6 +221,8 @@ struct NotificationItem: Identifiable {
                 }
             case .joinRequest:
                 break
+            case .follow:
+                userId = item.users.first?.userId
             }
             
             parentId = item.parentId

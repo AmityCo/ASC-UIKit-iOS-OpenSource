@@ -31,6 +31,7 @@ open class AmityUIKitBehaviour {
     public var socialGlobalSearchPageBehavior: AmitySocialGlobalSearchPageBehavior?
     public var socialHomeTopNavigationComponentBehavior: AmitySocialHomeTopNavigationComponentBehavior?
     public var myCommunitiesSearchPageBehavior: AmityMyCommunitiesSearchPageBehavior?
+    public var postSearchResultComponentBehavior: AmityPostSearchResultComponentBehavior?
     public var communitySearchResultComponentBehavior: AmityCommunitySearchResultComponentBehavior?
     public var userSearchResultComponentBehavior: AmityUserSearchResultComponentBehavior?
     public var postComposerPageBehavior: AmityPostComposerPageBehavior?

@@ -223,7 +223,13 @@ public struct AmityTextEditorView: View {
 public class AmityTextEditorViewModel: ObservableObject {
     let textView: UITextView = UITextView(frame: .zero)
     let mentionManager: MentionManager
+    let textStyle: AmityTextStyle?
     @Published var reachMentionLimit = false
+    var existingHashtags: [AmityHashtagModel] = []
+    @Published var reachHashtagLimit = false
+    
+    // Callback to reapply hashtag highlighting after mention processing
+    var reapplyHashtagHighlighting: (() -> Void)?
     
     // Attributes used to highlight mentions
     var highlightAttributes: [NSAttributedString.Key: Any] = [
@@ -235,25 +241,47 @@ public class AmityTextEditorViewModel: ObservableObject {
         .font: UIFont.systemFont(ofSize: 15),
         .foregroundColor: UIColor(hex: "#ffffff")]
     
-    init(mentionManager: MentionManager) {
+    init(mentionManager: MentionManager, textStyle: AmityTextStyle? = nil) {
         self.mentionManager = mentionManager
         let existingInset = textView.textContainerInset
+        if let textStyle {
+            self.typingAttributes = [
+                .font: UIFont.systemFont(ofSize: textStyle.getStyle().fontSize, weight: textStyle.getStyle().weight.convertToUIFontWeight()),
+                .foregroundColor: UIColor(hex: "#ffffff")]
+            
+            self.highlightAttributes = [
+                .font: UIFont.systemFont(ofSize: textStyle.getStyle().fontSize, weight: .bold),
+                .foregroundColor: UIColor.systemBlue]
+        }
         
         self.textView.textContainerInset = UIEdgeInsets(top: 8, left: existingInset.left, bottom: 8, right: existingInset.right)
         self.textView.typingAttributes = typingAttributes
 
         self.mentionManager.typingAttributes = typingAttributes
         self.mentionManager.highlightAttributes = highlightAttributes
+        self.textStyle = textStyle
     }
     
     func updateAttributes(hightlightColor: UIColor, textColor: UIColor) {
-        self.highlightAttributes = [
-            .font: UIFont.systemFont(ofSize: 15, weight: .regular),
-            .foregroundColor: hightlightColor]
+        if let textStyle {
+            self.typingAttributes = [
+                .font: UIFont.systemFont(ofSize: textStyle.getStyle().fontSize, weight: textStyle.getStyle().weight.convertToUIFontWeight()),
+                .foregroundColor: textColor]
+            
+            self.highlightAttributes = [
+                .font: UIFont.systemFont(ofSize: textStyle.getStyle().fontSize, weight: .bold),
+                .foregroundColor: hightlightColor]
+        } else {
+            
+            self.highlightAttributes = [
+                .font: UIFont.systemFont(ofSize: 15, weight: .regular),
+                .foregroundColor: hightlightColor]
+            
+            self.typingAttributes = [
+                .font: UIFont.systemFont(ofSize: 15),
+                .foregroundColor: textColor]
+        }
         
-        self.typingAttributes = [
-            .font: UIFont.systemFont(ofSize: 15),
-            .foregroundColor: textColor]
         
         self.textView.typingAttributes = typingAttributes
 
@@ -369,12 +397,15 @@ internal struct TextEditorView: UIViewRepresentable {
             // Also reset typing attributes if we stop showing mention users.
             if users.isEmpty {
                 parentView.viewModel.textView.typingAttributes = parentView.viewModel.typingAttributes
-            }
+            } 
         }
         
         func didCreateAttributedString(attributedString: NSAttributedString) {
             parentView.viewModel.textView.attributedText = attributedString
             parentView.viewModel.textView.typingAttributes = parentView.viewModel.typingAttributes
+            
+            // Reapply hashtag highlighting if callback is set
+            parentView.viewModel.reapplyHashtagHighlighting?()
         }
 
     }

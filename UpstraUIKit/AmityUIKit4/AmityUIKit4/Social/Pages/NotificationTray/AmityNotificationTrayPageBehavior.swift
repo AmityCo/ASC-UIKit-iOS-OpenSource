@@ -13,13 +13,15 @@ open class AmityNotificationTrayPageBehavior {
         public let commentId: String?
         public let parentCommentId: String?
         public let communityId: String?
+        public let userId: String?
         
-        public init(page: AmityNotificationTrayPage, postId: String?, commentId: String?, parentCommentId: String?, communityId: String?) {
+        public init(page: AmityNotificationTrayPage, postId: String?, commentId: String?, parentCommentId: String?, communityId: String?, userId: String?) {
             self.page = page
             self.postId = postId
             self.commentId = commentId
             self.parentCommentId = parentCommentId
             self.communityId = communityId
+            self.userId = userId
         }
     }
     
@@ -34,6 +36,12 @@ open class AmityNotificationTrayPageBehavior {
     open func goToCommunityProfilePage(context: AmityNotificationTrayPageBehavior.Context) {
         
         let page = AmityCommunityProfilePage(communityId: context.communityId ?? "")
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    open func goToUserProfilePage(context: AmityNotificationTrayPageBehavior.Context) {
+        let page = AmityUserProfilePage(userId: context.userId ?? "")
         let vc = AmitySwiftUIHostingController(rootView: page)
         context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
     }

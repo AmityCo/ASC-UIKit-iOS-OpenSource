@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+
 enum EmptyUserFeedViewState {
     case empty, `private`, blocked
 }

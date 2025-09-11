@@ -48,6 +48,8 @@ public struct AmityPostComposerPage: AmityPageView {
     @State private var isLoading: Bool = false
     @State private var areAttachmentsReady: Bool = true
     private let options: AmityPostComposerOptions
+    // Track original media file IDs for comparison when post is updated
+    @State private var originalMediaFileIds: [String] = []
     
     @State private var postErrorMessage = AmityLocalizedStringSet.Social.postCreateError
         .localizedString
@@ -96,6 +98,19 @@ public struct AmityPostComposerPage: AmityPageView {
             self._viewConfig = StateObject(
                 wrappedValue: AmityViewConfigController(pageId: .postComposerPage))
             
+            // Store the original file IDs for later comparison (including all media types)
+            self._originalMediaFileIds = State(initialValue: post.medias.compactMap { media in
+                // Handle image files
+                if let fileId = media.image?.fileId {
+                    return fileId
+                }
+                // Handle video files
+                else if let fileId = media.video?.fileId {
+                    return fileId
+                }
+                return nil
+            })
+            
         case .createOptions(let mode, let targetId, let targetType, let community):
             self._viewModel = StateObject(
                 wrappedValue: AmityPostComposerViewModel(
@@ -140,6 +155,16 @@ public struct AmityPostComposerPage: AmityPageView {
                         }
                     }
                     
+                    ExpandableTextEditorView(isTextEditorFocused: .constant(false), input: $viewModel.postTitle)
+                        .placeholder("Title (Optional)")
+                        .font(AmityTextStyle.titleBold(.clear).getFont())
+                        .placeholderColor(Color(viewConfig.theme.baseColorShade2))
+                        .textColor(Color(viewConfig.theme.baseColor))
+                        .lineLimit(10)
+                        .maxCharCount(viewModel.postTitleMaxCount)
+                        .disableNewlines(true)
+                        .padding(.horizontal, 4)
+                    
                     AmityMessageTextEditorView(
                         textEditorViewModel,
                         text: $viewModel.postText,
@@ -149,7 +174,17 @@ public struct AmityPostComposerPage: AmityPageView {
                     )
                     .placeholder(viewModel.postText.isEmpty ? placeholderText : "")
                     .maxExpandableHeight(99999)
+                    .enableHashtagHighlighting(true)
+                    .maxHashtagCount(30)
                     .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+                    .onChange(of: textEditorViewModel.reachHashtagLimit) { reached in
+                        if reached {
+                            let alert = UIAlertController(title: "Hashtag limit reached", message: "You can only add hashtag up to 30 hashtags per post.", preferredStyle: .alert)
+                            let action = UIAlertAction(title: "OK", style: .cancel)
+                            alert.addAction(action)
+                            host.controller?.present(alert, animated: true)
+                        }
+                    }
                     
                     if !viewModel.isInClipComposerMode {
                         PostCreationMediaAttachmentPreviewView(viewModel: mediaAttatchmentViewModel)
@@ -303,7 +338,7 @@ public struct AmityPostComposerPage: AmityPageView {
             let hasContent = !viewModel.postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !mediaAttatchmentViewModel.medias.isEmpty || viewModel.isInClipComposerMode
             let canCreatePost = hasContent && !isLoading && mediaAttatchmentViewModel.areAttachmentsReady
             
-            let hasChanges = viewModel.hasPostChanges(currentText: viewModel.postText, currentMedias: mediaAttatchmentViewModel.medias)
+            let hasChanges = viewModel.hasPostChanges(currentTitle: viewModel.postTitle, currentText: viewModel.postText, currentMedias: mediaAttatchmentViewModel.medias)
             let canEditPost = hasContent && hasChanges && !isLoading && mediaAttatchmentViewModel.areAttachmentsReady
             
             let createButtonColor = canCreatePost ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.primaryColor.blend(.shade2))
@@ -319,7 +354,7 @@ public struct AmityPostComposerPage: AmityPageView {
             .accessibilityIdentifier(viewModel.isInCreateMode ? AccessibilityID.Social.PostComposer.createNewPostButton : AccessibilityID.Social.PostComposer.editPostButton)
         }
         .alert(isPresented: $showDismissAlert) {
-            Alert(title: Text("Discard this post?"), message: Text("The post will be permanently deleted. It cannot be undone."), primaryButton: .cancel(Text("Keep editing")), secondaryButton: .destructive(Text("Discard"), action: {
+            Alert(title: Text(AmityLocalizedStringSet.Social.postDiscardAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.postDiscardAlertMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.Social.postDiscardAlertButtonKeepEditing.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: {
                 
                 switch viewModel.mode {
                 case .createClip:
@@ -419,9 +454,33 @@ public struct AmityPostComposerPage: AmityPageView {
                 // Create or edit post
                 let post: AmityPost?
                 if isInCreateMode {
-                    post = try await viewModel.createPost(medias: mediaAttatchmentViewModel.medias, files: [])
+                    post = try await viewModel.createPost(medias: mediaAttatchmentViewModel.medias, files: [], hashtags: textEditorViewModel.existingHashtags)
                 } else {
-                    post = try await viewModel.editPost(medias: mediaAttatchmentViewModel.medias, files: [])
+                    post = try await viewModel.editPost(medias: mediaAttatchmentViewModel.medias, files: [], hashtags: textEditorViewModel.existingHashtags)
+                    
+                    // Determine which media files were deleted (including all media types)
+                    let currentMediaFileIds = mediaAttatchmentViewModel.medias.compactMap { media -> String? in
+                        if let fileId = media.image?.fileId {
+                            return fileId
+                        }
+                        else if let fileId = media.video?.fileId {
+                            return fileId
+                        }
+                        return nil
+                    }
+                    
+                    let deletedMediaFileIds = originalMediaFileIds.filter { fileId in
+                        !currentMediaFileIds.contains(fileId)
+                    }
+                    
+                    // Notify that post images have been updated after successful edit
+                    // Include the post and deleted file IDs as userInfo
+                    print("DeletedFileIds \(deletedMediaFileIds)" )
+                    NotificationCenter.default.post(
+                        name: .didPostImageUpdated,
+                        object: post,
+                        userInfo: ["deletedFileIds": deletedMediaFileIds]
+                    )
                 }
                 
                 isLoading = false

@@ -20,7 +20,7 @@ class Log {
     
     // Prints on console for Debug purpose. This log will not be printed on release build.
     // › [Amity]: [ViewController.methodName()] : My Log
-    static func add(event: LogEvent, _ info: Any, fileName:String = #file, methodName:String = #function) {
+    static func add(event: LogEvent = .info, _ info: Any, fileName:String = #file, methodName:String = #function) {
         #if DEBUG
         print("› [AmityUIKit]: \(event.rawValue) [\(fileName.components(separatedBy: "/").last!.components(separatedBy: ".").first!).\(methodName)] : \(info)")
         #endif

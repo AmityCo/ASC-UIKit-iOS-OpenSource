@@ -58,7 +58,6 @@ class ClipFeedViewCell: UICollectionViewCell {
             Log.warn("❌ PlayerController is already setup for this cell - \(clip.model.postId)")
             return
         }
-        print("> Setting up Player")
         
         let playerLayer = AVPlayerLayerCache.shared.getPlayerLayer(for: clip.url, id: clip.id)
         playerController.configure(playerLayer: playerLayer)

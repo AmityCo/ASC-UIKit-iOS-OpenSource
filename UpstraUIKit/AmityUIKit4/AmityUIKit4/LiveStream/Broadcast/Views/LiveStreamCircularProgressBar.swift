@@ -9,7 +9,7 @@ import SwiftUI
 
 /// Progress
 struct LiveStreamCircularProgressBar: View {
-    @Binding var progress: Double
+    @Binding var progress: Double // In range 1 - 100
     let config: LiveStreamCircularProgressBar.Config
     
     init(progress: Binding<Double>, config: LiveStreamCircularProgressBar.Config) {

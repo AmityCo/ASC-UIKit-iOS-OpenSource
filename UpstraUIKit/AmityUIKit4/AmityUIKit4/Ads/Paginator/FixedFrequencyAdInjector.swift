@@ -195,9 +195,9 @@ class FixedFrequencyAdsInjector {
         items.enumerated().forEach { index, item in
             switch item.type {
             case .ad(let ad):
-                print("[\(index)] - 🐶 Ad \(ad.adId)")
+                Log.add(event: .info, "[\(index)] - 🐶 Ad \(ad.adId)")
             case .content(let value):
-                print("[\(index)] - Content \(modelIdentifier(value))")
+                Log.add(event: .info, "[\(index)] - Content \(modelIdentifier(value))")
             }
         }
     }

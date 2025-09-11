@@ -12,7 +12,6 @@ import AmitySDK
 class AmityUserFeedComponentViewModel: ObservableObject {
     @Published var posts: [AmityPost] = []
     @Published var emptyFeedState: EmptyUserFeedViewState?
-    @Published var blockedFeedState: EmptyUserFeedViewState?
     @Published var loadingStatus: AmityLoadingStatus = .notLoading
     private let userId: String
     
@@ -29,24 +28,30 @@ class AmityUserFeedComponentViewModel: ObservableObject {
         return AmityUIKitManagerInternal.shared.currentUserId == userId
     }
     
+    var currentFeedSources: [AmityFeedSource]
+    
     init(_ userId: String) {
         self.userId = userId
+        self.currentFeedSources = [.user, .community]
     }
     
-    func loadPostFeed() {
-        loadFollowInfo()
+    func loadPostFeed(feedSources: [AmityFeedSource]? = nil) {
+        if let feedSources {
+            currentFeedSources = feedSources
+        }
+        loadFollowInfo(feedSources: currentFeedSources)
     }
     
-    private func loadFollowInfo() {
+    private func loadFollowInfo(feedSources: [AmityFeedSource]) {
         if isOwnUser {
             myFollowInfoObject = userManager.getMyFollowInfo()
             cancellable = myFollowInfoObject?.$snapshot
                 .sink(receiveValue: { [weak self] followInfo in
                     guard let followInfo else { return }
                     let model = AmityFollowInfoModel(followInfo)
-                    self?.blockedFeedState = model.status == .blocked ? .blocked : nil
+                    self?.emptyFeedState = model.status == .blocked ? .blocked : nil
                     if model.status != .blocked {
-                        self?.loadPosts()
+                        self?.loadPosts(feedSources: feedSources)
                     }
                 })
         } else {
@@ -55,16 +60,16 @@ class AmityUserFeedComponentViewModel: ObservableObject {
                 .sink(receiveValue: { [weak self] followInfo in
                     guard let followInfo else { return }
                     let model = AmityFollowInfoModel(followInfo)
-                    self?.blockedFeedState = model.status == .blocked ? .blocked : nil
+                    self?.emptyFeedState = model.status == .blocked ? .blocked : nil
                     if model.status != .blocked {
-                        self?.loadPosts()
+                        self?.loadPosts(feedSources: feedSources)
                     }
                 })
         }
     }
     
-    private func loadPosts() {
-        userFeedCollection = feedManager.getUserFeed(userId: userId)
+    private func loadPosts(feedSources: [AmityFeedSource]) {
+        userFeedCollection = feedManager.getUserFeed(userId: userId, feedSources: feedSources)
         token = userFeedCollection?.observe({ [weak self] (collection, changes, error) in
             if let error {
                 self?.debouner.run {
@@ -93,8 +98,6 @@ class AmityUserFeedComponentViewModel: ObservableObject {
         userFeedCollection?.$loadingStatus
             .assign(to: &$loadingStatus)
     }
-    
-    
     
     func loadMore() {
         guard let userFeedCollection, userFeedCollection.hasNext else { return }

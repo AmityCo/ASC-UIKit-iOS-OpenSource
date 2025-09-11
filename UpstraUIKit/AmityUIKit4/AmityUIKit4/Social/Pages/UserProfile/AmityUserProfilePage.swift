@@ -24,10 +24,15 @@ public struct AmityUserProfilePage: AmityPageView {
     @State private var isRefreshing: Bool = false
     @State private var showBottomSheet: Bool = false
     @State private var postCreationBottomSheet: Bool = false
+    @State private var showPostFilterBottomSheet: Bool = false
     @State private var isUserReported: Bool = false
     private let userId: String
     
+    @State private var showShareSheet = false
+    
     @Namespace var namespace
+    
+    @State private var showPollSelectionView = false
     
     public init(userId: String) {
         self.userId = userId
@@ -40,9 +45,17 @@ public struct AmityUserProfilePage: AmityPageView {
             navigationBarView
                 .padding(.bottom, 10)
             
-            tabBarView
-                .padding(.top, 10)
-                .isHidden(!showStickyHeader)
+            VStack(spacing: 0) {
+                tabBarView
+                    .padding(.top, 10)
+                    .background(Color(viewConfig.theme.backgroundColor))
+                    .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+                
+                selectFeedSourceView
+                    .isHidden(viewModel.feedState == .blocked || viewModel.feedState == .private)
+            }
+            .isHidden(!showStickyHeader)
+            .zIndex(1)
             
             ZStack(alignment: .bottomTrailing) {
                 ScrollView(showsIndicators: false) {
@@ -61,11 +74,15 @@ public struct AmityUserProfilePage: AmityPageView {
                                 UserProfileHeaderSkeletonView()
                             }
                             
-                            tabBarView
-                                .padding(.top, 22)
-                                .isHidden(showStickyHeader)
+                            VStack(spacing: 0) {
+                                tabBarView
+                                    .padding(.top, 22)
+                                
+                                selectFeedSourceView
+                                    .isHidden(viewModel.feedState == .blocked || viewModel.feedState == .private)
+                            }
+                            .isHidden(showStickyHeader)
                         }
-                        .offset(y: scrollOffsetY)
                         
                         if let user = viewModel.user {
                             AmityUserFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
@@ -122,10 +139,19 @@ public struct AmityUserProfilePage: AmityPageView {
         .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
             bottomSheetView
         })
+        .bottomSheet(isShowing: $showPostFilterBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
+            postFilterBottomSheetView
+        })
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .environmentObject(host)
+        .sheet(isPresented: $showShareSheet) {
+            let profileLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .user, id: userId)
+            ShareActivitySheetView(link: profileLink)
+        }
         .onAppear {
+            viewModel.loadUser()
+            
             host.controller?.navigationController?.isNavigationBarHidden = true
         }
     }
@@ -185,6 +211,33 @@ public struct AmityUserProfilePage: AmityPageView {
         .padding(.bottom, 1)
     }
     
+    private var selectFeedSourceView: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text(viewModel.currentFeedSource.text)
+                    .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade1)))
+                
+                Spacer()
+                
+                Image(AmityIcon.downArrowIcon.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .frame(size: CGSize(width: 12, height: 12))
+            }
+            .frame(height: 43)
+            .padding(.horizontal, 16)
+            
+            Rectangle()
+                .fill(Color(viewConfig.theme.baseColorShade4))
+                .frame(height: 1)
+        }
+        .background(Color(viewConfig.theme.backgroundColor))
+        .onTapGesture {
+            showPostFilterBottomSheet.toggle()
+        }
+    }
+    
     @ViewBuilder
     private var bottomSheetView: some View {
         if userId == AmityUIKitManagerInternal.shared.currentUserId {
@@ -213,6 +266,10 @@ public struct AmityUserProfilePage: AmityPageView {
                         AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToBlockedUsersPage(context: context)
                     }
                 }
+            
+            if AmityUIKitManagerInternal.shared.canShareLink(for: .user) {
+                shareableLinkItemView
+            }
         }
         .padding(.bottom, 32)
     }
@@ -283,6 +340,10 @@ public struct AmityUserProfilePage: AmityPageView {
                         }
                     }
                 }
+            
+            if AmityUIKitManagerInternal.shared.canShareLink(for: .user) {
+                shareableLinkItemView
+            }
         }
         .padding(.bottom, 32)
     }
@@ -339,9 +400,9 @@ public struct AmityUserProfilePage: AmityPageView {
                 BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollLabel.localizedString)
                     .onTapGesture {
                         postCreationBottomSheet.toggle()
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            let context = AmityUserProfilePageBehavior.Context(page: self)
-                            AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToPollPostComposerPage(context: context)
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            showPollSelectionView.toggle()
                         }
                     }
                 
@@ -366,6 +427,73 @@ public struct AmityUserProfilePage: AmityPageView {
             }
             .padding(.bottom, 32)
         }
+        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, sheetContent: {
+            PollTypeSelectionView(onNextAction: { pollType in
+                
+                showPollSelectionView = false
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    let context = AmityUserProfilePageBehavior.Context(page: self)
+                    AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToPollPostComposerPage(context: context, pollType: pollType)
+                }
+
+            })
+            .environmentObject(viewConfig)
+        })
     }
     
+    @ViewBuilder
+    private var postFilterBottomSheetView: some View {
+        VStack(spacing: 0) {
+            let allPostTitle = AmityLocalizedStringSet.Social.userProfileAllPostTitle.localizedString
+            let communityPostTitle = AmityLocalizedStringSet.Social.userProfileCommunityPostTitle.localizedString
+            let userPostTitle = AmityLocalizedStringSet.Social.userProfileUserPostTitle.localizedString
+            
+            BottomSheetRadioItemView(isSelected: viewModel.currentFeedSource == .all, text: allPostTitle)
+                .onTapGesture {
+                    showPostFilterBottomSheet.toggle()
+                    viewModel.refreshAllFeeds(profileFeedSource: .all)
+                }
+            
+            BottomSheetRadioItemView(isSelected: viewModel.currentFeedSource == .community, text: communityPostTitle)
+                .onTapGesture {
+                    showPostFilterBottomSheet.toggle()
+                    viewModel.refreshAllFeeds(profileFeedSource: .community)
+                }
+            
+            BottomSheetRadioItemView(isSelected: viewModel.currentFeedSource == .user, text: userPostTitle)
+                .onTapGesture {
+                    showPostFilterBottomSheet.toggle()
+                    viewModel.refreshAllFeeds(profileFeedSource: .user)
+                }
+        }
+        .padding(.bottom, 32)
+    }
+    
+    @ViewBuilder
+    var shareableLinkItemView: some View {
+        let copyLinkConfig = viewConfig.forElement(.copyLink)
+        let shareLinkConfig = viewConfig.forElement(.shareLink)
+
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "")
+            .onTapGesture {
+                showBottomSheet.toggle()
+                
+                let profileLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .user, id: userId)
+                UIPasteboard.general.string = profileLink
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .success, message: "Link copied")
+                }
+            }
+        
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "")
+            .onTapGesture {
+                showBottomSheet.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    showShareSheet = true
+                }
+            }
+    }
 }

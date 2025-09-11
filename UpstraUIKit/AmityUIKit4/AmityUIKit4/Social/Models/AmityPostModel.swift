@@ -20,15 +20,6 @@ public class AmityPostModel: Identifiable {
     /// The data type of the post
     public let dataType: String
     
-    /// The reactions of the post
-    public let myReactions: [ReactionType]
-    
-    /// All reactions of the post includes unsupported types
-    public let allReactions: [String]
-    
-    /// List of all reactions in this post with count.
-    public let reactions: [String: Int]
-    
     /// Id of the target this post belongs to.
     public let targetId: String
     
@@ -85,9 +76,6 @@ public class AmityPostModel: Identifiable {
     /// Timestamp string of the post
     public let timestamp: String
         
-    /// A reaction count of post
-    public let reactionsCount: Int
-    
     /// A comment count of post
     public let allCommentCount: Int
     
@@ -113,6 +101,7 @@ public class AmityPostModel: Identifiable {
     let latestComments: [AmityCommentModel]
     let postAsModerator: Bool = false
     private(set) var text: String = ""
+    private(set) var title: String = ""
     private(set) var liveStream: AmityStream?
     private(set) var livestreamState: LivestreamState = .none
     let object: AmityPost
@@ -128,10 +117,6 @@ public class AmityPostModel: Identifiable {
     // Owner of the feed if targetType is user
     var targetUser: AmityUser?
     
-    var isLiked: Bool {
-        return myReactions.contains(.like)
-    }
-        
     private(set) var feedType: AmityFeedType = .published
     
     var isDeleted: Bool
@@ -139,6 +124,28 @@ public class AmityPostModel: Identifiable {
     // Note:
     // Used only in clip & text post as the moment
     var content: PostContent = .text(value: "")
+    
+    // Computed property to get the latest comment that is not flagged or deleted
+    var inlineComment: AmityCommentModel? {
+        return latestComments.last { comment in
+            !comment.isDeleted && comment.flagCount == 0
+        }
+    }
+    
+    /// Reaction data of the post
+    
+    /// All reactions of the post includes multiple types
+    /// e.g. ["like", "love", "haha"]
+    public let allReactions: [String]
+    
+    /// Current user's reaction to the post
+    var myReaction: AmityReactionType? {
+        guard let reaction = object.myReactions.last else { return nil }
+        return SocialReactionConfiguration.shared.getReaction(withName: reaction)
+    }
+    
+    /// All reaction count of the post
+    var reactionsCount: Int
     
     // MARK: - Initializer
     
@@ -158,11 +165,36 @@ public class AmityPostModel: Identifiable {
         timestamp = post.createdAt.relativeTime
         postedUserId = post.postedUserId
         sharedCount = Int(post.sharedCount)
-        reactionsCount = Int(post.reactionsCount)
-        reactions = post.reactions as? [String: Int] ?? [:]
         allCommentCount = Int(post.commentsCount)
-        allReactions = post.myReactions
-        myReactions = allReactions.compactMap(ReactionType.init)
+        
+        // reactions are ordered by the count. if the count is equal, order by alphabet
+        // if the count is 1 and the reaction is the same as current user's first reaction, remove it from the list
+        // as current user already added a new reaction.
+        var sortedReactions = post.reactions?.compactMap({ key, value in
+            if (value as? Int) ?? 0 > 0 {
+                return (key: key, count: (value as? Int) ?? 0)
+            }
+            return nil
+        })
+        .sorted { first, second in
+            if first.count != second.count {
+                return first.count > second.count
+            }
+            return first.key < second.key
+        }
+        .filter { !($0.count == 1 && post.myReactions.count > 1 && $0.key == post.myReactions.first) }
+        
+        // if the count is more than 1 and the reaction is the same as current user's first reaction, reduce count 1
+        // as current user already added a new reaction.
+        if post.myReactions.count > 1 {
+            if let index = sortedReactions?.firstIndex(where: { $0.key == post.myReactions.first }) {
+                sortedReactions?[index].count -= 1
+            }
+        }
+        
+        allReactions = sortedReactions?.map { $0.key } ?? []
+        reactionsCount = sortedReactions?.reduce(0) { $0 + $1.count } ?? 0
+        
         feedType = post.getFeedType()
         data = post.data ?? [:]
         metadata = post.metadata
@@ -202,6 +234,7 @@ public class AmityPostModel: Identifiable {
     private func extractPostData() {
         
         text = data[DataType.text.rawValue] as? String ?? ""
+        title = data["title"] as? String ?? ""
         dataTypeInternal = DataType(rawValue: dataType) ?? .unknown
         
         content = .text(value: text)
@@ -231,12 +264,14 @@ public class AmityPostModel: Identifiable {
                 )
                 let media = AmityMedia(state: state, type: .image)
                 media.image = imageData
+                media.parentPostId = post.parentPostId
                 medias.append(media)
                 fileMap[imageData.fileId] = post.postId
             } else {
                 // Still create a media object with placeholder state when image data is missing
                 // This ensures the UI can show something (gray placeholder) for the missing image
                 let media = AmityMedia(state: .none, type: .image)
+                media.parentPostId = post.parentPostId
                 medias.append(media)
             }
             
@@ -254,11 +289,13 @@ public class AmityPostModel: Identifiable {
                 )
                 let media = AmityMedia(state: state, type: .video)
                 media.video = videoData
+                media.parentPostId = post.parentPostId
                 medias.append(media)
                 fileMap[videoData.fileId] = post.postId
             } else {
                 // Create placeholder for missing video
                 let media = AmityMedia(state: .none, type: .video)
+                media.parentPostId = post.parentPostId
                 medias.append(media)
             }
             
@@ -317,11 +354,13 @@ public class AmityPostModel: Identifiable {
                 )
                 let media = AmityMedia(state: state, type: .video)
                 media.clip = clipData
+                media.parentPostId = post.parentPostId
                 medias.append(media)
                 fileMap[clipData.fileId] = post.postId
             } else {
                 // Create placeholder for missing video
                 let media = AmityMedia(state: .none, type: .video)
+                media.parentPostId = post.parentPostId
                 medias.append(media)
             }
             

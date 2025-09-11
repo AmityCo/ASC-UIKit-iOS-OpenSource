@@ -14,14 +14,15 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
         .socialGlobalSearchPage
     }
     
-    @StateObject private var viewModel: AmityGlobalSearchViewModel = AmityGlobalSearchViewModel()
+    @StateObject private var viewModel: AmityGlobalSearchViewModel
     @StateObject private var viewConfig: AmityViewConfigController
     
     @State private var tabIndex: Int = 0
-    @State private var tabs: [String] = ["Communities", "Users"]
+    @State private var tabs: [String] = ["Posts", "Communities", "Users"]
     
-    public init() {
+    public init(searchKeyword: String? = nil) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .socialGlobalSearchPage))
+        self._viewModel = StateObject(wrappedValue: AmityGlobalSearchViewModel(searchType: .posts, searchKeyword: searchKeyword))
     }
     
     public var body: some View {
@@ -34,7 +35,18 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
                 TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
                     .selectedTabColor(viewConfig.theme.highlightColor)
                     .onChange(of: tabIndex) { value in
-                        viewModel.searchType = value == 0 ? .community : .user
+                        
+                        switch value {
+                        case 0:
+                            viewModel.searchType = .posts
+                        case 1:
+                            viewModel.searchType = .community
+                        case 2:
+                            viewModel.searchType = .user
+                        default:
+                            viewModel.searchType = .community
+                        }
+                        
                         viewModel.searchKeyword = viewModel.searchKeyword
                     }
                     .padding(.horizontal)
@@ -47,11 +59,14 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
             
             ZStack(alignment: .top) {
                 TabView(selection: $tabIndex) {
-                    AmityCommunitySearchResultComponent(viewModel: viewModel, pageId: id)
+                    AmityPostSearchResultComponent(viewModel: viewModel, pageId: id)
                         .tag(0)
                     
-                    AmityUserSearchResultComponent(viewModel: viewModel, pageId: id)
+                    AmityCommunitySearchResultComponent(viewModel: viewModel, pageId: id)
                         .tag(1)
+                    
+                    AmityUserSearchResultComponent(viewModel: viewModel, pageId: id)
+                        .tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }

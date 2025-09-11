@@ -17,6 +17,10 @@ struct PollAnswerResultView: View {
     let totalVote: Int
     let highestVote: Int
     
+    var isHighlighted: Bool {
+        return answer.voteCount == highestVote && highestVote > 0
+    }
+    
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 0) {
@@ -52,7 +56,7 @@ struct PollAnswerResultView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 12)
-        .border(radius: 8, borderColor: Color(answer.voteCount == highestVote && highestVote > 0  ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade4 ), borderWidth: 1)
+        .border(radius: 8, borderColor: Color(isHighlighted  ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade4 ), borderWidth: isHighlighted ? 2 : 1)
         .contentShape(Rectangle())
     }
     

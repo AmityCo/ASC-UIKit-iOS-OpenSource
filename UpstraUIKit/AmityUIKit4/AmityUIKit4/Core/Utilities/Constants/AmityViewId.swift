@@ -91,6 +91,7 @@ public enum ComponentId: String {
     case myCommunitiesComponent = "my_communities"
     case topSearchBarComponent = "top_search_bar"
     case communitySearchResultComponent = "community_search_result"
+    case postSearchResultComponent = "post_search_result"
     case userSearchResultComponent = "user_search_result"
     case createPostMenu = "create_post_menu"
     case communityHeader = "community_header"
@@ -327,4 +328,7 @@ public enum ElementId: String {
     
     case joinDeclineButton = "join_decline_button"
     case joinAcceptButton = "join_accept_button"
+    
+    case copyLink = "copy_link"
+    case shareLink = "share_link"
 }

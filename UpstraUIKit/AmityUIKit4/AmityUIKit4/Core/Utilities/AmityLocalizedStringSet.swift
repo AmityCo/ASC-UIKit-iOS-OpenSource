@@ -253,6 +253,11 @@ public struct AmityLocalizedStringSet {
         static let userProfileEditAlertMessage = "user_profile_edit_alert_message"
         static let userProfileFollowRequestTitle = "user_profile_follow_request_title"
         
+        
+        static let userProfileAllPostTitle = "Public community & profile posts"
+        static let userProfileCommunityPostTitle = "Public community posts"
+        static let userProfileUserPostTitle = "Profile posts"
+        
         // Poll
         static let pollCloseAlertTitle = "poll_close_alert_title"
         static let pollCloseAlertDesc = "poll_close_alert_desc"
@@ -266,11 +271,15 @@ public struct AmityLocalizedStringSet {
         static let pollRemainingMinutesLeft = "poll_remaining_minutes_left"
 
         static let pollQuestionTitle = "poll_question_title"
+        static let pollPostTitle = "poll_post_title"
+        static let pollPostTitleOptional = "poll_post_title_optional"
+        static let pollPostTitleTextfieldPlaceholder = "poll_post_title_textfield_placeholder"
         static let pollQuestionTextfieldPlaceholder = "poll_question_textfield_placeholder"
         static let pollMultipleSelectionTitle = "poll_multiple_selection_title"
         static let pollMultipleSelectionDesc = "poll_multiple_selection_desc"
 
         static let pollPostCreateError = "poll_post_create_error"
+        static let pollPostCreateBanWordError = "poll_post_create_ban_word_error"
         static let pollCreatePostingToast = "poll_create_posting_toast"
 
         static let pollDurationTitle = "poll_duration_title"
@@ -306,11 +315,13 @@ public struct AmityLocalizedStringSet {
 
         static let pollVoteCounts = "poll_vote_counts"
         static let pollVoteButton = "poll_vote_button"
+        static let pollUnvoteButton = "poll_unvote_button"
         
         static let pollLabel = "poll_label"
         
         static let pollOptionCharLimitError = "poll_option_char_limit_error"
         static let pollQuestionCharLimitError = "poll_question_char_limit_error"
+        static let pollTitleCharLimitError = "poll_title_char_limit_error"
         
         static let pollTargetMyTimeline = "poll_target_my_timeline"
         

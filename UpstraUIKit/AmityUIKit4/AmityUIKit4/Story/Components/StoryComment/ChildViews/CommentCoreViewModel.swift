@@ -37,6 +37,7 @@ class CommentCoreViewModel: ObservableObject {
     
     let targetCommentFetcher = TargetCommentFetcher()
     var isTargetCommentFetched = false
+    let preloadRepliesOfComment: Bool
     
     private let postManager = PostManager()
     var post: AmityPostModel?
@@ -47,7 +48,8 @@ class CommentCoreViewModel: ObservableObject {
          hideCommentButtons: Bool,
          communityId: String? = nil,
          targetCommentId: String? = nil,
-         targetCommentParentId: String? = nil
+         targetCommentParentId: String? = nil,
+         preloadRepliesOfComment: Bool = false
     ) {
         self.referenceId = referenceId
         self.referenceType = referenceType
@@ -55,6 +57,7 @@ class CommentCoreViewModel: ObservableObject {
         self.hideCommentButtons = hideCommentButtons
         self.targetCommentId = targetCommentId
         self.targetCommentParentId = targetCommentParentId
+        self.preloadRepliesOfComment = preloadRepliesOfComment
         
         // Fetch target post
         if referenceType == .post {
@@ -189,9 +192,6 @@ class TargetCommentFetcher {
                     completion(parentComment, replyComment)
                 }
             } else {
-                token?.invalidate()
-                token = nil
-                
                 // This comment does not have parent
                 completion(comment, nil)
             }
@@ -208,10 +208,7 @@ class TargetCommentFetcher {
                 completion(nil)
                 return
             }
-            
-            token?.invalidate()
-            token = nil
-            
+                        
             completion(liveComment.snapshot)
         })
     }

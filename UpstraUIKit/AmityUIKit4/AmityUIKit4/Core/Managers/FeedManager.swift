@@ -27,7 +27,7 @@ class FeedManager {
         feedRepository.getCommunityFeed(withCommunityId: communityId, sortBy: .lastCreated, includeDeleted: false, feedType: .reviewing)
     }
     
-    func getUserFeed(userId: String) -> AmityCollection<AmityPost> {
-        feedRepository.getUserFeed(userId, sortBy: .lastCreated, includeDeleted: false)
+    func getUserFeed(userId: String, feedSources: [AmityFeedSource], dataTypes: [AmityPostDataType]? = nil, matchingOnlyParentPost: Bool = true) -> AmityCollection<AmityPost> {
+        feedRepository.getUserFeed(userId, feedSources: feedSources, dataTypes: dataTypes, sortBy: .lastCreated, includeDeleted: false, matchingOnlyParentPost: matchingOnlyParentPost)
     }
 }

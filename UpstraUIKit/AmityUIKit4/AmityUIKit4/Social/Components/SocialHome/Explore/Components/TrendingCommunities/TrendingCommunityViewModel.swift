@@ -20,6 +20,8 @@ class TrendingCommunityViewModel: ObservableObject {
     @Published var communities: [AmityCommunityModel] = []
     @Published var queryState: QueryState = .idle
     
+    let debouncer = Debouncer(delay: 0.5)
+    
     lazy var digitFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.minimumIntegerDigits = 2
@@ -46,15 +48,17 @@ class TrendingCommunityViewModel: ObservableObject {
                 return
             }
             
-            if let limit, limit > 0 {
-                self.processTrendingCommunities(liveCollection.snapshots, limit: limit)
-            } else {
-                let items = liveCollection.snapshots.map {
-                    AmityCommunityModel(object: $0)
-                }
-                self.communities = items
-                self.queryState = .loaded
+            // Since we need to query for join requests for each communities, live collection can trigger
+            // multiple times within short duration. To fix it, we debounce the operation.
+            debouncer.run {
+                self.processSnapshots(liveCollection: liveCollection, limit: limit)
             }
+        }
+    }
+    
+    func processSnapshots(liveCollection: AmityCollection<AmityCommunity>, limit: Int?) {
+        if let limit, limit > 0 {
+            self.processTrendingCommunities(liveCollection.snapshots, limit: limit)
         }
     }
     
@@ -129,23 +133,6 @@ class TrendingCommunityViewModel: ObservableObject {
     func unObserveState() {
         queryStateObserver = nil
         refreshStateObserver = nil
-    }
-    
-    func fetchJoinRequestStatus(ids: [String], completion: @escaping ([String: AmityJoinRequest]) -> Void) {
-        joinRequestToken = repository.getJoinRequestList(communityIds: ids).observe { [weak self] liveCollection, _, error in
-            guard let self else { return }
-            
-            // Stop observing
-            joinRequestToken?.invalidate()
-            joinRequestToken = nil
-            
-            var statusMap: [String: AmityJoinRequest] = [:]
-            liveCollection.snapshots.forEach { request in
-                statusMap[request.targetId] = request
-            }
-            
-            completion(statusMap)
-        }
     }
 }
 

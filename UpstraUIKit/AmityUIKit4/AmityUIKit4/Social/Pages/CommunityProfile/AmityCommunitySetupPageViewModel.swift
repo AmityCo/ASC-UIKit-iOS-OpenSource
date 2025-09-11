@@ -71,7 +71,7 @@ class AmityCommunitySetupPageViewModel: ObservableObject {
         case .privateAndHidden:
             createOptions.setIsPublic(false)
             createOptions.setIsDiscoverable(false)
-            createOptions.setRequiresJoinApproval(true)
+            createOptions.setRequiresJoinApproval(model.requiresModeratorApproval)
         }
         
         if !isMembershipInvitationEnabled {
@@ -107,7 +107,7 @@ class AmityCommunitySetupPageViewModel: ObservableObject {
         case .privateAndHidden:
             updateOptions.setIsPublic(false)
             updateOptions.setIsDiscoverable(false)
-            updateOptions.setRequiresJoinApproval(true)
+            updateOptions.setRequiresJoinApproval(model.requiresModeratorApproval)
         }
         
         if !model.about.isEmpty {

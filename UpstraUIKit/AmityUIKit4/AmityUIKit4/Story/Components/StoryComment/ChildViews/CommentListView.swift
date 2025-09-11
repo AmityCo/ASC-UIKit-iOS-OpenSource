@@ -139,8 +139,10 @@ struct CommentListView<Content>: View where Content: View {
                         }
                         
                         if comment.childrenNumber != 0 {
-                            let viewModel = ReplyCommentViewModel(comment)
+                            let preloadReplyComments = comment.commentId == commentCoreViewModel.targetCommentId && commentCoreViewModel.preloadRepliesOfComment
+                            let viewModel = ReplyCommentViewModel(comment, preloadReplyComments: preloadReplyComments)
                             ReplyCommentView(viewModel, hideCommentButtons: hideCommentButtons, commentButtonAction: commentButtonAction)
+                                .padding(.top, comment.reactionsCount == 0 ? 8 : 4)
                         }
                     }
                 }

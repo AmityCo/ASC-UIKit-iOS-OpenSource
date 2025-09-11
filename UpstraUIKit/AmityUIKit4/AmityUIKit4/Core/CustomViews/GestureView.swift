@@ -124,3 +124,88 @@ class GestureUIView: UIView {
         }
     }
 }
+
+
+struct InteractionReaderViewModifier: ViewModifier {
+    
+    var longPressSensitivity: Int
+    var tapAction: () -> Void
+    var longPressAction: () -> Void
+    var dragChangedAction: (CGPoint) -> Void
+    var dragEndedAction: (CGPoint) -> Void
+    var scaleEffect: Bool = false
+    
+    @State private var isPressing: Bool = Bool()
+    @State private var currentDismissId: DispatchTime = DispatchTime.now()
+    @State private var lastInteractionKind: String = String()
+    
+    func body(content: Content) -> some View {
+        
+        let processedContent = content
+            .gesture(gesture)
+            .onChange(of: isPressing) { newValue in
+                
+                currentDismissId = DispatchTime.now() + .milliseconds(longPressSensitivity)
+                let dismissId: DispatchTime = currentDismissId
+                
+                if isPressing {
+                    DispatchQueue.main.asyncAfter(deadline: dismissId) {
+                        if isPressing {
+                            if (dismissId == currentDismissId) {
+                                lastInteractionKind = "longPress";
+                                longPressAction()
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (lastInteractionKind != "longPress") {
+                        lastInteractionKind = "tap"
+                        tapAction()
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50)) {
+                        lastInteractionKind = "none"
+                    }
+                }
+                
+            }
+        
+        return processedContent
+    }
+    
+    var gesture: some Gesture {
+        DragGesture(minimumDistance: 0.0, coordinateSpace: .global)
+            .onChanged() { value in
+                if !isPressing {
+                    isPressing = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(longPressSensitivity + 10)) {
+                        dragChangedAction(value.location)
+                    }
+                } else {
+                    dragChangedAction(value.location)
+                }
+            }
+            .onEnded() {
+                value in
+                isPressing = false
+                dragEndedAction(value.location)
+            }
+    }
+    
+}
+
+
+extension View {
+    func tapAndDragSimutaneousGesture(longPressSensitivity: Int,
+                           tapAction: @escaping () -> Void,
+                           longPressAction: @escaping () -> Void,
+                           dragChangedAction: @escaping (CGPoint) -> Void,
+                           dragEndedAction: @escaping (CGPoint) -> Void) -> some View {
+        return self.modifier(InteractionReaderViewModifier(longPressSensitivity: longPressSensitivity,
+                                                           tapAction: tapAction,
+                                                           longPressAction: longPressAction,
+                                                           dragChangedAction: dragChangedAction,
+                                                           dragEndedAction: dragEndedAction))
+    }
+}

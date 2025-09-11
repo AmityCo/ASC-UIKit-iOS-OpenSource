@@ -68,40 +68,70 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
             BottomSheetDragIndicator()
                 .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade3))
             
-            NavigationView {
-                VStack(spacing: 0) {
-                    Rectangle()
-                        .frame(height: 1)
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade4))
-                        .padding(.top, 4)
-                    
-                    // Image display
-                    AsyncImage(placeholderView: {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                    }, url: URL(string: image?.mediumFileURL ?? "") ?? URL(string: ""))
-                    .frame(width: 80, height: 80)
-                    .clipped()
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 16)
-                    
-                    // Alt text field
-                    TextEditor(text: $altText)
-                        .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
-                        .padding(.horizontal, 8)
-                        .overlay(
-                            Group {
-                                if altText.isEmpty {
-                                    Text(AmityLocalizedStringSet.Social.altTextPlaceholder.localizedString)
-                                        .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade3)))
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 8)
-                                        .allowsHitTesting(false)
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                                }
+            let title = isEditMode ? AmityLocalizedStringSet.Social.altTextEditTitle.localizedString : AmityLocalizedStringSet.Social.altTextTitle.localizedString
+            AmityNavigationBar(title: title, showDivider: true) {
+                Image(AmityIcon.closeIcon.getImageResource())
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .frame(width: 24, height: 24)
+                    .onTapGesture {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+            } trailing: {
+                let btnTitle = isEditMode ? AmityLocalizedStringSet.General.save.localizedString : AmityLocalizedStringSet.General.done.localizedString
+                Button(btnTitle) {
+                    Task { @MainActor in
+                        do {
+                            try await checkValidation(altText: altText)
+                            try await fileRepositoryManager.fileRepository.updateAltText(fileId: image?.fileId ?? "", altText: altText)
+                            result(altText)
+                            presentationMode.wrappedValue.dismiss()
+                        } catch {
+                            var errorMessage = isEditMode ? AmityLocalizedStringSet.Social.altTextFailedToEdit.localizedString : AmityLocalizedStringSet.Social.altTextFailedToAdd.localizedString
+                            if error.isAmityErrorCode(.banWordFound) {
+                                errorMessage = AmityLocalizedStringSet.Social.altTextIncludesBannedWords.localizedString
+                            } else if error.isAmityErrorCode(.linkNotAllowed) {
+                                errorMessage = AmityLocalizedStringSet.Social.altTextIncludesNotAllowedLink.localizedString
                             }
-                        )
-                        .focused()
+                            
+                            Toast.showToast(style: .warning, message: errorMessage, bottomPadding: isKeyboardOnScreen ? 150 : 0)
+                        }
+                    }
+                }
+                .disabled(shouldDisableDoneButton())
+                .foregroundColor(shouldDisableDoneButton() ? Color(viewConfig.theme.primaryColor.blend(.shade2)) : Color(viewConfig.theme.primaryColor))
+            }
+            
+            VStack(spacing: 0) {
+                // Image display
+                AsyncImage(placeholderView: {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle())
+                }, url: URL(string: image?.mediumFileURL ?? "") ?? URL(string: ""))
+                .frame(width: 80, height: 80)
+                .clipped()
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
+                
+                // Alt text field
+                TextEditor(text: $altText)
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                    .padding(.horizontal, 8)
+                    .overlay(
+                        Group {
+                            if altText.isEmpty {
+                                Text(AmityLocalizedStringSet.Social.altTextPlaceholder.localizedString)
+                                    .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade3)))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 8)
+                                    .allowsHitTesting(false)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                            }
+                        }
+                    )
+                    .focused()
                     .onChange(of: altText) { newValue in
                         characterCount = newValue.count
                         if characterCount > maxCharacterCount {
@@ -110,59 +140,10 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
                             characterCount = maxCharacterCount
                         }
                     }
-                    
-                    Spacer()
-                }
-                .navigationBarTitle("", displayMode: .inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        VStack {
-                            let title = isEditMode ? AmityLocalizedStringSet.Social.altTextEditTitle.localizedString : AmityLocalizedStringSet.Social.altTextTitle.localizedString
-                            Text(title)
-                                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-                            Text("\(characterCount)/\(maxCharacterCount)")
-                                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
-                        }
-                    }
-                    
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Image(AmityIcon.closeIcon.getImageResource())
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
-                            .frame(width: 24, height: 24)
-                            .onTapGesture {
-                                presentationMode.wrappedValue.dismiss()
-                            }
-                    }
-                    
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        let btnTitle = isEditMode ? AmityLocalizedStringSet.General.save.localizedString : AmityLocalizedStringSet.General.done.localizedString
-                        Button(btnTitle) {
-                            Task { @MainActor in
-                                do {
-                                    try await checkValidation(altText: altText)
-                                    try await fileRepositoryManager.fileRepository.updateAltText(fileId: image?.fileId ?? "", altText: altText)
-                                    result(altText)
-                                    presentationMode.wrappedValue.dismiss()
-                                } catch {
-                                    var errorMessage = isEditMode ? AmityLocalizedStringSet.Social.altTextFailedToEdit.localizedString : AmityLocalizedStringSet.Social.altTextFailedToAdd.localizedString
-                                    if error.isAmityErrorCode(.banWordFound) {
-                                        errorMessage = AmityLocalizedStringSet.Social.altTextIncludesBannedWords.localizedString
-                                    } else if error.isAmityErrorCode(.linkNotAllowed) {
-                                        errorMessage = AmityLocalizedStringSet.Social.altTextIncludesNotAllowedLink.localizedString
-                                    }
-                                    
-                                    Toast.showToast(style: .warning, message: errorMessage, bottomPadding: isKeyboardOnScreen ? 150 : 0)
-                                }
-                            }
-                        }
-                        .disabled(shouldDisableDoneButton())
-                        .foregroundColor(shouldDisableDoneButton() ? Color(viewConfig.theme.primaryColor.blend(.shade2)) : Color(viewConfig.theme.primaryColor))
-                    }
-                }
+                
+                Spacer()
             }
+            .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         }
         .onChange(of: networkMonitor.isConnected) { isConnected in
             Log.add(event: .info, "NetworkConnect: \(isConnected ? "Connected" : "Disconnected")")
@@ -175,6 +156,7 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
             isKeyboardOnScreen = keyboardEvent.isAppeared
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .updateTheme(with: viewConfig)
     }
     
     private func shouldDisableDoneButton() -> Bool {

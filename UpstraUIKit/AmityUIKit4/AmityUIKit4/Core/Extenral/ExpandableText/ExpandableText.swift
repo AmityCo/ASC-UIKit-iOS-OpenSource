@@ -43,6 +43,8 @@ public struct ExpandableText: View {
     internal var moreButtonFont: Font?
     internal var moreButtonColor: Color = .accentColor
     internal var attributedColor: UIColor = UIColor.systemBlue
+    internal var backgroundColor: Color = .white
+    internal var hashtagColor: UIColor = UIColor.systemBlue
     internal var expandAnimation: Animation = .default
     internal var collapseEnabled: Bool = false
     // NOTE:
@@ -51,19 +53,23 @@ public struct ExpandableText: View {
     internal var metadata: [String: Any]?
     internal var mentionees: [AmityMentionees]?
     internal var onTapMentionee: ((String) -> Void)?
+    internal var onTapHashtag: ((String) -> Void)?
     internal var defaultAction: (() -> Void)?
+    internal var highlights: String?
     
     /**
      Initializes a new `ExpandableText` instance with the specified text string, trimmed of any leading or trailing whitespace and newline characters.
      - Parameter text: The initial text string to display in the `ExpandableText` view.
      - Returns: A new `ExpandableText` instance with the specified text string and trimming applied.
      */
-    public init(_ text: String, defaultAction: (() -> Void)? = nil, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, onTapMentionee: ((String) -> Void)? = nil) {
-        self.text = text.trimmingCharacters(in: .whitespacesAndNewlines)
+    public init(_ text: String, defaultAction: (() -> Void)? = nil, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, highlightedText: String? = nil, onTapMentionee: ((String) -> Void)? = nil, onTapHashtag: ((String) -> Void)? = nil) {
+        self.text = text.trimmingCharacters(in: .newlines)
         self.defaultAction = defaultAction
         self.metadata = metadata
         self.mentionees = mentionees
         self.onTapMentionee = onTapMentionee
+        self.onTapHashtag = onTapHashtag
+        self.highlights = highlightedText
     }
     
     public var body: some View {
@@ -106,8 +112,12 @@ public struct ExpandableText: View {
             .modifier(OverlayAdapter(alignment: .trailingLastTextBaseline, view: {
                 if shouldShowMoreButton {
                     Button {
-                        // we expand without expand animation as it looks ugly
-                        isExpanded.toggle()
+                        if let defaultAction {
+                            defaultAction()
+                        } else {
+                            // we expand without expand animation as it looks ugly
+                            isExpanded.toggle()
+                        }
                     } label: {
                         Text(moreButtonText)
                             .font(moreButtonFont ?? font)
@@ -120,8 +130,8 @@ public struct ExpandableText: View {
     @ViewBuilder
     private var content: some View {
         if #available(iOS 15, *) {
-            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 14, weight: .bold))
-            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 14, weight: .bold))
+            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color)
+            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color)
             
             Text(trimMultipleNewlinesWhenTruncated
                  ? (shouldShowMoreButton ? trimmedText : text)
@@ -134,6 +144,12 @@ public struct ExpandableText: View {
                 if url.deletingLastPathComponent().absoluteString == TextHighlighter.mentionURL {
                     let userId = url.lastPathComponent
                     onTapMentionee?(userId)
+                    return .discarded
+                }
+                
+                if url.deletingLastPathComponent().absoluteString == TextHighlighter.hashtagURL {
+                    let hashtag = url.lastPathComponent
+                    onTapHashtag?(hashtag)
                     return .discarded
                 }
                 
@@ -164,9 +180,9 @@ public struct ExpandableText: View {
 
 extension ExpandableText {
     @available(iOS 15, *)
-    func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], font: UIFont) -> AttributedString {
+    private func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], font: UIFont, attributedColor: UIColor, hashtagColor: UIColor, highlights: String?, color: Color) -> AttributedString {
         
-        let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: UIFont.systemFont(ofSize: 15, weight: .regular)]
+        let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: AmityTextStyle.bodyBold(.clear).getFont()]
         
         //let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
         //let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
@@ -175,12 +191,34 @@ extension ExpandableText {
         var highlightedText = AttributedString(contentText)
         
         // If mention is present, highlight mentions first.
-        highlightedText = TextHighlighter.highlightMentions(for: contentText, metadata: metadata, mentionees: mentionees, highlightAttributes: highlightAttributes)
+        let attributedString = TextHighlighter.highlightMentions(for: contentText, metadata: metadata, mentionees: mentionees, highlightAttributes: highlightAttributes)
+        
+        // If hashtags is present, highlight hashtags
+        let hashtagAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: hashtagColor, .font: AmityTextStyle.bodyBold(.clear).getFont()]
+        TextHighlighter.highlightHashtags(attributedString, metadata: metadata, highlightAttributes: hashtagAttributes)
+        
+        highlightedText = AttributedString(attributedString)
         
         // If links is present, highlight links
         let links = TextHighlighter.detectLinks(in: contentText)
         if !links.isEmpty {
             highlightedText = TextHighlighter.highlightLinks(links: links, in: highlightedText, attributes: highlightAttributes)
+        }
+        
+        // If the text need to highlight is a hashtag search keyword
+        if let searchKeyword = highlights, searchKeyword.hasPrefix("#") {
+            let textToHighlight: [(value: String, range: NSRange)] = AmityMetadataMapper.hashtags(fromMetadata: metadata).filter { hashtag in
+                let highlightText = searchKeyword.replacingOccurrences(of: "#", with: "")
+                return hashtag.text == highlightText
+            }.map { hashtag in
+                return (hashtag.text, NSRange(location: hashtag.index, length: hashtag.length + 1))
+            }
+            
+            let searchHighlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: hashtagColor, .font: AmityTextStyle.custom(15, .bold, .clear).getUIFont(), .backgroundColor: hashtagColor.withAlphaComponent(0.1)]
+            highlightedText = TextHighlighter.highlightTexts(texts: textToHighlight, in: highlightedText, attributes: searchHighlightAttributes)
+        } else if let searchKeyword = highlights, !searchKeyword.isEmpty {
+            let searchHighlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: hashtagColor, .font: AmityTextStyle.custom(15, .bold, .clear).getUIFont(), .backgroundColor: hashtagColor.withAlphaComponent(0.1)]
+            highlightedText = TextHighlighter.highlightKeyword(keyword: searchKeyword, in: highlightedText, attributes: searchHighlightAttributes)
         }
         
         return highlightedText

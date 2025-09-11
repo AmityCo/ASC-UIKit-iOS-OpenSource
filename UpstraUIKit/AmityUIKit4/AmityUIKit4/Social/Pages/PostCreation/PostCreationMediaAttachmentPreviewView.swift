@@ -30,6 +30,8 @@ struct PostCreationMediaAttachmentPreviewView: View {
         
         LazyVGrid(columns: columns, spacing: 5) {
             ForEach(Array(mediaAttachmentViewModel.medias.enumerated()), id: \.element.id) { index, media in
+                let _ = print("media check \(media.state)")
+
                 MediaAttachmentView(
                     media: media, 
                     mediaViewModel: mediaAttachmentViewModel,
@@ -66,8 +68,6 @@ struct MediaAttachmentView: View {
         self._media = StateObject(wrappedValue: media)
         self.mediaViewModel = mediaViewModel
         self.removeAction = removeAction
-        print(media.state)
-        print(media.type)
     }
     
     var body: some View {

@@ -13,16 +13,22 @@ struct BottomSheetItemView: View {
     private let text: String
     private let iconSize: CGSize
     private let isDestructive: Bool
+    private let tintColor: UIColor?
     
-    init(icon: ImageResource, text: String, iconSize: CGSize = CGSize(width: 20, height: 24), isDestructive: Bool = false) {
+    init(icon: ImageResource, text: String, iconSize: CGSize = CGSize(width: 20, height: 24), tintColor: UIColor? = nil, isDestructive: Bool = false) {
         self.icon = icon
         self.text = text
         self.iconSize = iconSize
         self.isDestructive = isDestructive
+        self.tintColor = tintColor
     }
     
     var body: some View {
         getItemView(icon, text: text, isDestructive: isDestructive)
+    }
+    
+    var foregroundTintColor: UIColor {
+        return tintColor ?? (isDestructive ? viewConfig.theme.alertColor : viewConfig.theme.baseColor)
     }
     
     private func getItemView(_ icon: ImageResource, text: String, isDestructive: Bool = false) -> some View {
@@ -32,14 +38,14 @@ struct BottomSheetItemView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: iconSize.width, height: iconSize.height)
-                .foregroundColor(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor))
+                .foregroundColor(Color(foregroundTintColor))
             
             Text(text)
-                .applyTextStyle(.bodyBold(isDestructive ? Color(viewConfig.theme.alertColor): Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.bodyBold(Color(foregroundTintColor)))
             
             Spacer()
         }
         .contentShape(Rectangle())
-        .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
+        .padding(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20))
     }
 }

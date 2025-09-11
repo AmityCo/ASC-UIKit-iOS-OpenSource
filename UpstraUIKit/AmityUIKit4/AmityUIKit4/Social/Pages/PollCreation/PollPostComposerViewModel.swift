@@ -19,7 +19,10 @@ class PollPostComposerViewModel: ObservableObject {
     
     @Published var pollTarget = AmityLocalizedStringSet.Social.pollTargetMyTimeline.localizedString
     @Published var isCreatingPollPost = false
-    @Published var options: [PollOption] = [PollOption(index: 0), PollOption(index: 1)]
+    @Published var textOptions: [PollOption] = [PollOption(index: 0), PollOption(index: 1)]
+    @Published var imageOptions: [PollImageOption] = [PollImageOption(), PollImageOption()]
+    
+    let fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
     
     init(targetId: String?, targetType: AmityPostTargetType) {
         self.targetId = targetId
@@ -39,37 +42,116 @@ class PollPostComposerViewModel: ObservableObject {
     }
     
     @MainActor
-    func createPollPost(question: String, answers: [String], isMultipleSelection: Bool, closedIn: Int, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws {
+    func createImagePollPost(title: String = "", question: String, answers: [(image: AmityImageData, text: String?)], isMultipleSelection: Bool, closedIn: Int, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?, hashtags: AmitySDK.AmityHashtagBuilder?) async throws -> AmityPost {
         
         let sanitizedQuestion = question.trimmingCharacters(in: .whitespacesAndNewlines)
+        let sanitizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         
         isCreatingPollPost = true
         // Create Poll
-        let pollId = try await pollManager.createPoll(question: sanitizedQuestion, answers: answers, isMultipleSelection: isMultipleSelection, closedIn: closedIn)
+        let pollId = try await pollManager.createImagePoll(question: sanitizedQuestion, answers: answers, isMultipleSelection: isMultipleSelection, closedIn: closedIn)
         
         // Create Post
         let pollPostBuilder = AmityPollPostBuilder()
         pollPostBuilder.setText(sanitizedQuestion)
+        pollPostBuilder.setTitle(sanitizedTitle)
         pollPostBuilder.setPollId(pollId)
         
-        let post = try await postManager.postRepository.createPollPost(pollPostBuilder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+        let post = try await postManager.postRepository.createPollPost(pollPostBuilder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees, hashtags: hashtags)
         
         /// Send didPostCreated event to mod global feed listing
         /// This event is observed in PostFeedViewModel
         NotificationCenter.default.post(name: .didPostCreated, object: post)
+        
+        return post
     }
     
-    func removePollOption(at index: Int) {
-        options.remove(at: index)
+    @MainActor
+    func createTextPollPost(title: String = "", question: String, answers: [String], isMultipleSelection: Bool, closedIn: Int, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?, hashtags: AmitySDK.AmityHashtagBuilder?) async throws -> AmityPost {
+        
+        let sanitizedQuestion = question.trimmingCharacters(in: .whitespacesAndNewlines)
+        let sanitizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        isCreatingPollPost = true
+        // Create Poll
+        let pollId = try await pollManager.createTextPoll(question: sanitizedQuestion, answers: answers, isMultipleSelection: isMultipleSelection, closedIn: closedIn)
+        
+        // Create Post
+        let pollPostBuilder = AmityPollPostBuilder()
+        pollPostBuilder.setTitle(sanitizedTitle)
+        pollPostBuilder.setText(sanitizedQuestion)
+        pollPostBuilder.setPollId(pollId)
+        
+        let post = try await postManager.postRepository.createPollPost(pollPostBuilder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees, hashtags: hashtags)
+        
+        /// Send didPostCreated event to mod global feed listing
+        /// This event is observed in PostFeedViewModel
+        NotificationCenter.default.post(name: .didPostCreated, object: post)
+        
+        return post
+    }
+    
+    func removeTextOption(at index: Int) {
+        textOptions.remove(at: index)
         
         // Update options with correct index
         var curIndex = 0
-        let updatedOptions = options.map {
+        let updatedOptions = textOptions.map {
             let newOption = PollOption(text: $0.text, index: curIndex)
             curIndex += 1
             return newOption
         }
         
-        self.options = updatedOptions
+        self.textOptions = updatedOptions
+    }
+    
+    func isAnyPollOptionEdited() -> Bool {
+        let editedTextOptions = textOptions.filter { !$0.text.isEmpty }
+        let editedImageOptions = imageOptions.filter { $0.uploadState != .empty || !$0.text.isEmpty }
+        
+        return !editedTextOptions.isEmpty || !editedImageOptions.isEmpty
+    }
+}
+
+// Image Poll Options
+extension PollPostComposerViewModel {
+    
+    func addImageOption() {
+        imageOptions.append(PollImageOption())
+    }
+    
+    func removeImageOption(at index: Int) {
+        imageOptions.remove(at: index)
+    }
+    
+    func updateText(for option: PollImageOption, text: String) {
+        if let index = imageOptions.firstIndex(where: { $0.id == option.id }) {
+            imageOptions[index].text = text
+        }
+    }
+    
+    func updateImage(for option: PollImageOption, image: UIImage?) {
+        if let index = imageOptions.firstIndex(where: { $0.id == option.id }) {
+            imageOptions[index].image = image
+        }
+    }
+    
+    func updateUploadState(for option: PollImageOption, state: PollImageOptionState, imageData: AmityImageData?) {
+        if let index = imageOptions.firstIndex(where: { $0.id == option.id }) {
+            imageOptions[index].uploadState = state
+            imageOptions[index].imageData = imageData
+        }
+    }
+    
+    func updateAltText(for option: PollImageOption, text: String) {
+        if let index = imageOptions.firstIndex(where: { $0.id == option.id }) {
+            imageOptions[index].altText = text
+        }
+    }
+    
+    func updateUploadState(for option: PollImageOption, state: PollImageOptionState, fileId: String?) {
+        if let index = imageOptions.firstIndex(where: { $0.id == option.id }) {
+            imageOptions[index].uploadState = state
+        }
     }
 }

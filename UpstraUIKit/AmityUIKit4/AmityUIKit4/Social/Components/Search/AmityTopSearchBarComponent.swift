@@ -30,6 +30,14 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
     
     public var body: some View {
         HStack(spacing: 12) {
+            AmityNavigationBar.BackButton(action: {
+                if let nav = host.controller?.navigationController {
+                    nav.popViewController(animated: true)
+                } else {
+                    host.controller?.dismiss(animated: false)
+                }
+            })
+            
             HStack(spacing: 0) {
                 let searchIcon = AmityIcon.getImageResource(
                     named: viewConfig.getConfig(
@@ -76,20 +84,6 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
             .frame(maxWidth: .infinity)
             .background(Color(viewConfig.theme.baseColorShade4))
             .clipShape(RoundedCorner(radius: 8))
-            
-            Button(
-                action: {
-                    host.controller?.dismiss(animated: false)
-                },
-                label: {
-                    let cancelButtonTitle =
-                    viewConfig.getConfig(
-                        elementId: .cancelButtonElement, key: "text", of: String.self) ?? ""
-                    Text(cancelButtonTitle)
-                        .applyTextStyle(AmityTextStyle.body(Color(viewConfig.theme.primaryColor)))
-                }
-            )
-            .isHidden(viewConfig.isHidden(elementId: .cancelButtonElement), remove: true)
         }
         .updateTheme(with: viewConfig)
         .padding(.horizontal, 16)

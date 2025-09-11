@@ -14,6 +14,7 @@ struct PostBottomSheetView: View {
         case deletePost
         case closePoll
         case reportPost
+        case sharePost
     }
     
     @EnvironmentObject private var viewConfig: AmityViewConfigController
@@ -22,9 +23,9 @@ struct PostBottomSheetView: View {
     private let action: ((PostAction) -> Void)?
     
     @Binding private var isShown: Bool
-    @State private var isAlertShown: Bool = false
+    @State private var showConfirmationAlert: Bool = false
     @State private var activeAlert: PostAction = .editPost
-        
+    
     @StateObject private var viewModel: PostBottomSheetViewModel = PostBottomSheetViewModel()
     
     init(isShown: Binding<Bool>, post: AmityPostModel, action: ((PostAction) -> Void)?) {
@@ -34,26 +35,29 @@ struct PostBottomSheetView: View {
     }
     
     var body: some View {
-        ZStack {
+        VStack(spacing: 0) {
             if post.hasModeratorPermission {
                 moderatorView
             } else {
                 memberView
             }
         }
+        .padding(.bottom, 64)
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .onAppear {
             viewModel.updatePostFlaggedByMeState(id: post.postId)
             viewModel.checkDeletePermission(post: post)
         }
-        .alert(isPresented: $isAlertShown, content: {
+        .alert(isPresented: $showConfirmationAlert, content: {
             
             switch activeAlert {
                 // We do not need alert for report post
-            case .editPost, .deletePost, .reportPost:
-                Alert(title: Text(AmityLocalizedStringSet.Social.deletePostTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.deletePostMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
+            case .editPost, .deletePost, .reportPost, .sharePost:
+                return Alert(title: Text(AmityLocalizedStringSet.Social.deletePostTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.deletePostMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
                     Task { @MainActor in
                         isShown.toggle()
-                        
+                        NotificationCenter.default.post(name: .didPostLocallyDeleted, object: nil, userInfo: ["postId" : post.postId])
+
                         action?(.deletePost)
                         
                         do {
@@ -78,7 +82,7 @@ struct PostBottomSheetView: View {
                     }
                 }))
             case .closePoll:
-                Alert(title: Text(AmityLocalizedStringSet.Social.pollCloseAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.pollCloseAlertDesc.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.pollCloseButton.localizedString), action: {
+                return Alert(title: Text(AmityLocalizedStringSet.Social.pollCloseAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.pollCloseAlertDesc.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.pollCloseButton.localizedString), action: {
                     Task { @MainActor in
                         isShown.toggle()
                         
@@ -101,159 +105,136 @@ struct PostBottomSheetView: View {
     }
     
     
+    @ViewBuilder
     private var moderatorView: some View {
-        VStack {
-            editSheetButton
-                .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream) // We cannot edit poll post & live stream post
-            
-            if let poll = post.poll, !poll.isClosed {
-                closePollButton
-                    .isHidden(!post.isOwner || post.dataTypeInternal != .poll)
-            }
-            
-            flagSheetButton
-                .isHidden(post.isOwner)
-            
-            deleteSheetButton
-            
-            Spacer()
+        editSheetButton
+            .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream) // We cannot edit poll post & live stream post
+        
+        if let poll = post.poll, !poll.isClosed {
+            closePollButton
+                .isHidden(!post.isOwner || post.dataTypeInternal != .poll)
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        
+        flagSheetButton
+            .isHidden(post.isOwner)
+        
+        shareableLinkItemView
+            .isHidden(!canUserSharePost())
+        
+        deleteSheetButton
     }
     
+    @ViewBuilder
     private var memberView: some View {
-        VStack {
-            editSheetButton
-                .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream)
-            
-            if let poll = post.poll, !poll.isClosed {
-                closePollButton
-                    .isHidden(!post.isOwner || post.dataTypeInternal != .poll)
-            }
-            
-            flagSheetButton
-                .isHidden(post.isOwner)
-            
-            deleteSheetButton
-                .isHidden(!(post.isOwner || viewModel.hasDeletePermission))
-            Spacer()
+        editSheetButton
+            .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream)
+        
+        if let poll = post.poll, !poll.isClosed {
+            closePollButton
+                .isHidden(!post.isOwner || post.dataTypeInternal != .poll)
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        
+        flagSheetButton
+            .isHidden(post.isOwner)
+        
+        shareableLinkItemView
+            .isHidden(!canUserSharePost())
+        
+        deleteSheetButton
+            .isHidden(!(post.isOwner || viewModel.hasDeletePermission))
     }
     
+    func canUserSharePost() -> Bool {
+        let isShareableLinkConfigured = AmityUIKitManagerInternal.shared.canShareLink(for: .post)
+        
+        // Shareable link should be configured
+        guard isShareableLinkConfigured else { return false }
+        
+        // In user feed, we do not want to show share option when tapping on 3 dots
+        let isTargetUserFeed: Bool = post.postTargetType == .user
+        guard !isTargetUserFeed else { return false }
+        
+        // Post should have target community at this point.
+        guard let community = post.targetCommunity else { return false }
+        
+        // In community feed, we want to show share option when "tapping on 3 dots" only when
+        // - User hasn't joined the community
+        // - And the community is public
+        // If the community is public, an explicit share button will appear in posts anyway
+        return !community.isJoined && community.isPublic
+    }
     
     private var deleteSheetButton: some View {
-        Button(action: {
-            activeAlert = .deletePost
-            isAlertShown.toggle()
-        }, label: {
-            HStack(spacing: 12) {
-                Image(AmityIcon.trashBinIcon.getImageResource())
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 20, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.alertColor))
-                
-                Text(AmityLocalizedStringSet.Social.deletePostBottomSheetTitle.localizedString)
-                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
-                
-                Spacer()
+        BottomSheetItemView(icon: AmityIcon.trashBinIcon.getImageResource(), text: AmityLocalizedStringSet.Social.deletePostBottomSheetTitle.localizedString, isDestructive: true)
+            .onTapGesture {
+                activeAlert = .deletePost
+                showConfirmationAlert.toggle()
             }
-            .contentShape(Rectangle())
-        })
-        .buttonStyle(.plain)
-        .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
     }
     
     private var flagSheetButton: some View {
-        Button(action: {
-            
-            if viewModel.isPostFlaggedByMe {
-                Task { @MainActor in
-                    do {
-                        try await viewModel.unflagPost(id: post.postId)
-                        
-                        isShown.toggle()
-                        viewModel.updatePostFlaggedByMeState(id: post.postId)
-                        
-                        Toast.showToast(style: .success, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postReportedMessage.localizedString)
-                    } catch {
-                        isShown.toggle()
-                        Toast.showToast(style: .warning, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postFailedUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postFailedReportedMessage.localizedString)
+        BottomSheetItemView(icon: viewModel.isPostFlaggedByMe ? AmityIcon.unflagIcon.imageResource : AmityIcon.flagIcon.imageResource, text: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.unreportPostBottomSheetTitle.localizedString : AmityLocalizedStringSet.Social.reportPostBottomSheetTitle.localizedString)
+            .onTapGesture {
+                if viewModel.isPostFlaggedByMe {
+                    Task { @MainActor in
+                        do {
+                            try await viewModel.unflagPost(id: post.postId)
+                            
+                            isShown.toggle()
+                            viewModel.updatePostFlaggedByMeState(id: post.postId)
+                            
+                            Toast.showToast(style: .success, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postReportedMessage.localizedString)
+                        } catch {
+                            isShown.toggle()
+                            Toast.showToast(style: .warning, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postFailedUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postFailedReportedMessage.localizedString)
+                        }
                     }
+                } else {
+                    action?(.reportPost)
                 }
-            } else {
-                action?(.reportPost)
             }
-            
-        }, label: {
-            HStack(spacing: 12) {
-                Image(viewModel.isPostFlaggedByMe ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource())
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 20, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                
-                Text(viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.unreportPostBottomSheetTitle.localizedString : AmityLocalizedStringSet.Social.reportPostBottomSheetTitle.localizedString)
-                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
-                
-                Spacer()
-            }
-            .contentShape(Rectangle()) // Make whole row tappable
-        })
-        .buttonStyle(.plain)
-        .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
     }
     
     private var closePollButton: some View {
-        Button(action: {
-            activeAlert = .closePoll
-            isAlertShown.toggle()
-        }, label: {
-            HStack(spacing: 12) {
-                Image(AmityIcon.createPollMenuIcon.getImageResource())
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                
-                Text(AmityLocalizedStringSet.Social.pollCloseButton.localizedString)
-                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
-                
-                Spacer()
+        BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollCloseButton.localizedString)
+            .onTapGesture {
+                activeAlert = .closePoll
+                showConfirmationAlert.toggle()
             }
-            .contentShape(Rectangle())
-        })
-        .buttonStyle(.plain)
-        .accessibilityIdentifier(AmityLocalizedStringSet.Social.pollCloseButton.localizedString)
-        .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
     }
     
     private var editSheetButton: some View {
-        Button(action: {
-            action?(.editPost)
-        }, label: {
-            HStack(spacing: 12) {
-                Image(AmityIcon.editCommentIcon.getImageResource())
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 20, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                
-                Text(AmityLocalizedStringSet.Social.editPostBottomSheetTitle.localizedString)
-                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
-                
-                Spacer()
+        BottomSheetItemView(icon: AmityIcon.editCommentIcon.imageResource, text: AmityLocalizedStringSet.Social.editPostBottomSheetTitle.localizedString)
+            .onTapGesture {
+                action?(.editPost)
             }
-            .contentShape(Rectangle())
-        })
-        .buttonStyle(.plain)
-        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
-        .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
+    }
+    
+    @ViewBuilder
+    var shareableLinkItemView: some View {
+        let copyLinkConfig = viewConfig.forElement(.copyLink)
+        let shareLinkConfig = viewConfig.forElement(.shareLink)
+        
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "")
+            .onTapGesture {
+                isShown.toggle()
+                
+                let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .post, id: post.postId)
+                UIPasteboard.general.string = shareLink
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .success, message: "Link copied")
+                }
+            }
+        
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "")
+            .onTapGesture {
+                isShown.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    action?(.sharePost)
+                }
+            }
     }
 }
 
@@ -298,7 +279,7 @@ class PostBottomSheetViewModel: ObservableObject {
         
         if let communityId = post.targetCommunity?.communityId {
             Task { @MainActor in
-                hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)                
+                hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
             }
         }
     }

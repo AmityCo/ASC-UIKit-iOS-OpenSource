@@ -15,6 +15,7 @@ public struct AmityUserImageFeedComponent: AmityComponentView {
         .userImageFeed
     }
     
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @StateObject private var viewModel: MediaFeedViewModel
     @StateObject private var viewConfig: AmityViewConfigController
     
@@ -85,9 +86,37 @@ public struct AmityUserImageFeedComponent: AmityComponentView {
                 }
             }
             .padding(.horizontal, 16)
-            .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
-                MediaViewer(medias: [viewModel.medias[viewModel.selectedMediaIndex]],
-                             startIndex: 0, viewConfig: viewConfig, closeAction: { viewModel.showMediaViewer.toggle() })
+            .onChange(of: viewModel.showMediaViewer) { _ in
+                if viewModel.showMediaViewer {
+                    // Get the selected media
+                    let selectedMedia = viewModel.medias[viewModel.selectedMediaIndex]
+                    // Get the parent post from cache if available
+                    
+                    var parentPostModel: AmityPostModel?
+                    if let parentPost = selectedMedia.parentPostId.flatMap({ viewModel.postsCache[$0] }) {
+                        parentPostModel = AmityPostModel(post: parentPost)
+                    }
+                    
+                    let nav = UINavigationController()
+                    nav.navigationBar.isHidden = true
+                    let view = MediaViewer(
+                        medias: [viewModel.medias[viewModel.selectedMediaIndex]],
+                        startIndex: viewModel.selectedMediaIndex,
+                        viewConfig: viewConfig,
+                        closeAction: {
+                            nav.dismiss(animated: true) {
+                                viewModel.showMediaViewer = false
+                            }
+                        },
+                        post: parentPostModel
+                    )
+                        .environmentObject(viewConfig)
+                    
+                    let controller = AmitySwiftUIHostingController(rootView: view)
+                    nav.viewControllers = [controller]
+                    nav.modalPresentationStyle = .fullScreen
+                    host.controller?.present(nav, animated: true)
+                }
             }
             
             Color.clear

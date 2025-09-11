@@ -30,5 +30,4 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
             }
         }
     }
-    
 }

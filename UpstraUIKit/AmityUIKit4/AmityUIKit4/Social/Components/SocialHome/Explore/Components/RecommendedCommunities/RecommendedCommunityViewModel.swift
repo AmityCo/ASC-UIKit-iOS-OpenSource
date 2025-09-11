@@ -23,6 +23,8 @@ class RecommendedCommunityViewModel: ObservableObject {
     var queryStateObserver: AnyCancellable?
     var refreshStateObserver: AnyCancellable?
     
+    let debouncer = Debouncer(delay: 0.5)
+
     func fetchCommunities(limit: Int? = 4) {
         guard queryState != .loading else { return }
         
@@ -32,21 +34,24 @@ class RecommendedCommunityViewModel: ObservableObject {
         token = communityCollection?.observe { [weak self] liveCollection, _, error in
             guard let self else { return }
             
-            if let error {
+            if let _ = error {
                 self.queryState = .error
                 self.token?.invalidate()
+                self.token = nil
                 self.communityCollection = nil
                 self.unObserveState()
                 return
             }
             
-            if let limit, limit > 0 {
-                self.processRecommendedCommunities(liveCollection.snapshots, limit: limit)
-            } else {
-                let items = liveCollection.snapshots.map { AmityCommunityModel(object: $0) }
-                self.communities = items
-                self.queryState = .loaded
+            debouncer.run {
+                self.processSnapshots(liveCollection: liveCollection, limit: limit)
             }
+        }
+    }
+    
+    func processSnapshots(liveCollection: AmityCollection<AmityCommunity>, limit: Int?) {
+        if let limit, limit > 0 {
+            self.processRecommendedCommunities(liveCollection.snapshots, limit: limit)
         }
     }
     
@@ -72,13 +77,13 @@ class RecommendedCommunityViewModel: ObservableObject {
                     let filteredCommunities = recommendedCommunities.filter {
                         // Return those communities which are not in pending state or requires join approval
                         if let joinRequestStatus = $0.joinRequest?.status {
-                            return joinRequestStatus != .pending
+                            return joinRequestStatus != .pending && joinRequestStatus != .approved
                         } else {
                             return !$0.requiresJoinApproval
                         }
                     }.prefix(limit)
                     
-                    self.communities = filteredCommunities.map { AmityCommunityModel(object: $0) }
+                    self.communities = filteredCommunities.prefix(limit).map { AmityCommunityModel(object: $0) }
                     self.queryState = .loaded
                 }
             }

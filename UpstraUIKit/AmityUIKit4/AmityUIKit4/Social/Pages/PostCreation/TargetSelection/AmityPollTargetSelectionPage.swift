@@ -16,6 +16,9 @@ public struct AmityPollTargetSelectionPage: AmityPageView {
     
     @StateObject private var viewConfig: AmityViewConfigController
     
+    @State private var showPollSelectionView = false
+    @State private var communityModel: AmityCommunityModel?
+    
     public init() {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postTargetSelectionPage))
     }
@@ -34,16 +37,31 @@ public struct AmityPollTargetSelectionPage: AmityPageView {
             
             TargetSelectionView(headerView: {
                 AmityPostTargetSelectionPage.MyTimelineView {
-                    let context = AmityPollTargetSelectionPageBehavior.Context(page: self, community: nil)
-                    AmityUIKitManagerInternal.shared.behavior.pollTargetSelectionPageBehavior?.goToPollPostComposerPage(context: context)
+                    showPollSelectionView.toggle()
                 }
             }, communityOnTapAction: { communityModel in
-                let context = AmityPollTargetSelectionPageBehavior.Context(page: self, community: communityModel)
-                AmityUIKitManagerInternal.shared.behavior.pollTargetSelectionPageBehavior?.goToPollPostComposerPage(context: context)
-
+                self.communityModel = communityModel
+                showPollSelectionView.toggle()
             }, contentType: .post)
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, sheetContent: {
+            PollTypeSelectionView(onNextAction: { pollType in
+                
+                showPollSelectionView = false
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    if let communityModel {
+                        let context = AmityPollTargetSelectionPageBehavior.Context(page: self, community: communityModel, pollType: pollType)
+                        AmityUIKitManagerInternal.shared.behavior.pollTargetSelectionPageBehavior?.goToPollPostComposerPage(context: context)
+                    } else {
+                        let context = AmityPollTargetSelectionPageBehavior.Context(page: self, community: nil, pollType: pollType)
+                        AmityUIKitManagerInternal.shared.behavior.pollTargetSelectionPageBehavior?.goToPollPostComposerPage(context: context)
+                    }
+                }
+            })
+            .environmentObject(viewConfig)
+        })
         .updateTheme(with: viewConfig)
     }
 }
@@ -53,10 +71,12 @@ open class AmityPollTargetSelectionPageBehavior {
     open class Context {
         public let page: AmityPollTargetSelectionPage
         public let community: AmityCommunityModel?
+        public let pollType: AmityPollType
         
-        init(page: AmityPollTargetSelectionPage, community: AmityCommunityModel?) {
+        init(page: AmityPollTargetSelectionPage, community: AmityCommunityModel?, pollType: AmityPollType) {
             self.page = page
             self.community = community
+            self.pollType = pollType
         }
     }
     
@@ -66,9 +86,9 @@ open class AmityPollTargetSelectionPageBehavior {
         
         let view: AmityPollPostComposerPage
         if let community = context.community {
-            view = AmityPollPostComposerPage(targetId: community.communityId, targetType: .community)
+            view = AmityPollPostComposerPage(targetId: community.communityId, targetType: .community, pollType: context.pollType)
         } else {
-            view = AmityPollPostComposerPage(targetId: nil, targetType: .user)
+            view = AmityPollPostComposerPage(targetId: nil, targetType: .user, pollType: context.pollType)
         }
         
         let controller = AmitySwiftUIHostingController(rootView: view)

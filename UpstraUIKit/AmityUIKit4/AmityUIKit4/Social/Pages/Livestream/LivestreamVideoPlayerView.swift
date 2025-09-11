@@ -17,6 +17,10 @@ struct LivestreamVideoPlayerView: View {
     @StateObject var networkMonitor = NetworkMonitor()
     @State var degreesRotating = 0.0
     
+    @State private var showBottomSheet = false
+    @State private var showShareSheet = false
+    
+    
     private let debouncer = Debouncer(delay: 2)
     @StateObject var viewModel: LivestreamVideoPlayerViewModel
     let liveChatFeedHeight = (UIScreen.main.bounds.height - 50) / 2.5
@@ -76,14 +80,37 @@ struct LivestreamVideoPlayerView: View {
                                 }
                         }
                         
-                        // Live badge overlay in original position (top-leading)
-                        Text(AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString)
-                            .applyTextStyle(.captionBold(Color.white))
-                            .padding(.vertical, 4)
-                            .padding(.horizontal, 8)
-                            .background(Color(UIColor(hex: "FF305A")))
-                            .cornerRadius(4, corners: .allCorners)
-                            .padding(.all, 16)
+                        HStack {
+                            // Live badge overlay in original position (top-leading)
+                            Text(AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString)
+                                .applyTextStyle(.captionBold(Color.white))
+                                .padding(.vertical, 4)
+                                .padding(.horizontal, 8)
+                                .background(Color(UIColor(hex: "FF305A")))
+                                .cornerRadius(4, corners: .allCorners)
+                                .padding([.leading, .vertical], 16)
+                            
+                            Image(AmityIcon.LiveStream.menu.imageResource)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(Color.white)
+                                .padding(.trailing, 16)
+                                .padding(.leading, 4)
+                                .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.defaultDarkTheme.backgroundColor)) {
+                                    VStack(spacing: 0) {
+                                        shareableLinkItemView
+                                    }
+                                    .padding(.bottom, 64)
+                                }
+                                .sheet(isPresented: $showShareSheet) {
+                                    let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .livestream, id: viewModel.post.postId)
+                                    ShareActivitySheetView(link: shareLink)
+                                }
+                                .onTapGesture {
+                                    showBottomSheet.toggle()
+                                }
+                        }
                     }
                     .ignoresSafeArea(.keyboard, edges: .all)
                 }
@@ -187,10 +214,9 @@ struct LivestreamVideoPlayerView: View {
                                 HStack(spacing: 8) {
                                     // Community profile image
                                     if let community = stream.community {
-                                        AmityUserProfileImageView(
-                                            displayName: community.displayName,
-                                            avatarURL: URL(string: community.avatar?.mediumFileURL ?? "")
-                                        )
+                                        AsyncImage(placeholder: AmityIcon.defaultCommunity.imageResource,
+                                                   url: URL(string: community.avatar?.mediumFileURL ?? ""),
+                                                   contentMode: .fill)
                                         .frame(width: 32, height: 32)
                                         .clipShape(Circle())
                                         
@@ -365,6 +391,32 @@ struct LivestreamVideoPlayerView: View {
     }
     
     @ViewBuilder
+    var shareableLinkItemView: some View {
+        let copyLinkConfig = viewConfig.forElement(.copyLink)
+        let shareLinkConfig = viewConfig.forElement(.shareLink)
+        
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "", tintColor: .white)
+            .onTapGesture {
+                showBottomSheet.toggle()
+                
+                let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .livestream, id: viewModel.post.postId)
+                UIPasteboard.general.string = shareLink
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .success, message: "Link copied")
+                }
+            }
+        
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "", tintColor: .white)
+            .onTapGesture {
+                showBottomSheet.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    showShareSheet = true
+                }
+            }
+    }
+    
     private var inPostReviewComposeBar: some View {
         ZStack {
             Color.black

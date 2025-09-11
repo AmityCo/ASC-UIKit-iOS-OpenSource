@@ -143,7 +143,7 @@ struct ClipFeedGradientLayer: View {
                 .foregroundColor(.clear)
                 .background(
                     LinearGradient(stops: [
-                        Gradient.Stop(color: gradientColor.opacity(0.35), location: 0.00),
+                        Gradient.Stop(color: gradientColor.opacity(0.8), location: 0.00),
                         Gradient.Stop(color: gradientColor.opacity(0), location: 1.00),
                     ], startPoint: .bottom, endPoint: .center)
                     .edgesIgnoringSafeArea(.bottom)

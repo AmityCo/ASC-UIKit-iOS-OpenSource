@@ -91,8 +91,15 @@ struct VideoFeedComponent: View {
         .onChange(of: currentTab) { tab in
             viewModel.loadMediaFeed(feedTab: tab)
         }
-        .onAppear {
+        .onChange(of: viewModel.currentFeedSources) { _ in
             viewModel.loadMediaFeed(feedTab: currentTab)
+        }
+        .onAppear {
+            if viewModel.hasNavigatedToPostDetail {
+                viewModel.hasNavigatedToPostDetail = false                
+            } else {
+                viewModel.loadMediaFeed(feedTab: currentTab)
+            }
         }
     }
     
@@ -120,8 +127,37 @@ struct VideoFeedComponent: View {
                                 .background(Color.gray)
                                 .cornerRadius(10)
                                 .onTapGesture {
+                                    viewModel.hasNavigatedToPostDetail = true
+                                    
                                     viewModel.videoURL = URL(string: media.video?.getVideo(resolution: .original) ?? "")
-                                    viewModel.showMediaViewer.toggle()
+                                    
+                                    let selectedMedia = viewModel.getVideoContent(at: index)
+                                    // Get the parent post from cache if available
+                                    
+                                    var parentPostModel: AmityPostModel?
+                                    if let parentPost = selectedMedia?.parentPostId.flatMap({ viewModel.postsCache[$0] }) {
+                                        parentPostModel = AmityPostModel(post: parentPost)
+                                    }
+                                                                        
+                                    if let videoURL = viewModel.videoURL {
+                                        
+                                        let nav = UINavigationController()
+                                        nav.navigationBar.isHidden = true
+                                        
+                                        
+                                        let playerView = AmityVideoPlayerView(url: videoURL, post: parentPostModel, closeAction: {
+                                            nav.dismiss(animated: true) {
+                                                viewModel.showMediaViewer = false
+                                            }
+                                        })
+                                            .ignoresSafeArea(.all)
+                                            .environmentObject(viewConfig)
+                                        
+                                        let controller = AmitySwiftUIHostingController(rootView: playerView)
+                                        nav.viewControllers = [controller]
+                                        nav.modalPresentationStyle = .fullScreen
+                                        host.controller?.present(nav, animated: true)
+                                    }
                                 }
                                 .onAppear {
                                     if index == viewModel.medias.count - 1 {
@@ -173,6 +209,7 @@ struct VideoFeedComponent: View {
                                 .background(Color.gray)
                                 .cornerRadius(10)
                                 .onTapGesture {
+                                    viewModel.hasNavigatedToPostDetail = true
                                     
                                     let targetId: String
                                     let targetType: AmityPostTargetType
@@ -190,7 +227,7 @@ struct VideoFeedComponent: View {
                                     if let postCollection = viewModel.postCollection {
                                         let provider = TargetFeedClipService(targetId: targetId, targetType: targetType, postCollection: postCollection, startIndex: index, postsCache: viewModel.postsCache)
                                         
-                                        let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                                        let feedView = AmityClipFeedPage(provider: provider)
                                         let hostingView = AmitySwiftUIHostingController(rootView: feedView)
                                         
                                         self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)

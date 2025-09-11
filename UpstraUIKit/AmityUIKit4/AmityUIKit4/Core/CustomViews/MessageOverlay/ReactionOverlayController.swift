@@ -6,9 +6,9 @@
 //
 
 import SwiftUI
+import AmitySDK
 
 public class ReactionOverlayController {
-    
     public static func showOverlay<Content: View>(message: MessageModel, messageAction: AmityMessageAction, nameSpace: Namespace.ID, messageFrame: CGRect, content: @escaping () -> Content) {
         let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
         guard let window = keyWindow else { return }

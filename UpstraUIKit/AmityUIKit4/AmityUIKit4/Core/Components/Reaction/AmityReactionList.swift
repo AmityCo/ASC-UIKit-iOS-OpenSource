@@ -10,6 +10,14 @@ import AmitySDK
 import Combine
 
 public struct AmityReactionList: AmityComponentView {
+    
+    enum ReactionListType {
+        case message
+        case post
+        case comment
+        case none
+    }
+    
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     public var pageId: PageId?
@@ -25,9 +33,11 @@ public struct AmityReactionList: AmityComponentView {
     @StateObject private var page = Page.withIndex(0)
     
     @Environment(\.presentationMode) var dismissScreen
+    private let type: ReactionListType
     
     public init(referenceId: String, referenceType: AmityReactionReferenceType, pageId: PageId? = nil) {
         self.pageId = pageId
+        self.type = .none
         self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: referenceId, referenceType: referenceType))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
         self._tabBarItems = State(wrappedValue: setupTabItems(reactions: [:], reactionCount: 0))
@@ -41,6 +51,7 @@ public struct AmityReactionList: AmityComponentView {
     /// Convenience initializer
     init(message: AmityMessage, pageId: PageId? = nil) {
         self.pageId = pageId
+        self.type = .message
         self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: message.messageId, referenceType: .message))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
         self._tabBarItems = State(wrappedValue: setupTabItems(reactions: message.reactions as? [String: Int] ?? [:], reactionCount: message.reactionCount))
@@ -49,17 +60,21 @@ public struct AmityReactionList: AmityComponentView {
     /// Convenience initializer
     init(comment: AmityComment, pageId: PageId? = nil) {
         self.pageId = pageId
+        self.type = .comment
         self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: comment.commentId, referenceType: .comment))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
-        self._tabBarItems = State(wrappedValue: setupTabItems(reactions: comment.reactions as? [String: Int] ?? [:], reactionCount: comment.reactionsCount))
+        let model = AmityCommentModel(comment: comment)
+        self._tabBarItems = State(wrappedValue: setupTabItems(reactions: comment.reactions as? [String: Int] ?? [:], reactionCount: model.reactionsCount))
     }
     
     /// Convenience initializer
     public init(post: AmityPost, pageId: PageId? = nil) {
         self.pageId = pageId
+        self.type = .post
         self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: post.postId, referenceType: .post))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
-        self._tabBarItems = State(wrappedValue: setupTabItems(reactions: post.reactions as? [String: Int] ?? [:], reactionCount: post.reactionsCount))
+        let model = AmityPostModel(post: post)
+        self._tabBarItems = State(wrappedValue: setupTabItems(reactions: post.reactions as? [String: Int] ?? [:], reactionCount: model.reactionsCount))
     }
     
     public var body: some View {
@@ -72,7 +87,7 @@ public struct AmityReactionList: AmityComponentView {
             
             // Reaction user list swipable pages
             Pager(page: page, data: tabBarItems, id: \.id) { tabItem in
-                ReactionListContent(viewModel: ReactionLoader(referenceId: viewModel.referenceId, referenceType: viewModel.referenceType, reactionName: getReactionType(for: tabItem.index)))
+                ReactionListContent(viewModel: ReactionLoader(referenceId: viewModel.referenceId, referenceType: viewModel.referenceType, reactionName: getReactionType(for: tabItem.index), type: type))
             }
             .onPageWillChange({ pageIndex in
                 currentTab = pageIndex
@@ -100,26 +115,34 @@ public struct AmityReactionList: AmityComponentView {
         var tabIndex = -1
         var tabs = [ReactionTabItem]()
         
-        let filteredReactions = reactions.filter { $0.value > 0 }
-        if filteredReactions.count > 1 {
+        let sortedReactions = reactions.compactMap({ key, value in
+            if value > 0 {
+                return (key: key, count: value)
+            }
+            return nil
+        })
+        .sorted { first, second in
+            if first.count != second.count {
+                return first.count > second.count
+            }
+            return first.key < second.key
+        }
+        
+        if sortedReactions.count > 1 {
             tabIndex += 1
             let allTabs = ReactionTabItem(index: tabIndex, name: AmityLocalizedStringSet.Reaction.allTab.localizedString, image: nil, count: reactionCount)
             tabs.append(allTabs)
         }
         
-        // In descending order of reaction count.
-        let sortedReactions = filteredReactions.sorted {
-            // If reaction count is same, sort based on key name
-            if $0.value == $1.value {
-                return $0.key < $1.key
-            }
-            return $0.value > $1.value
-        }
-        
         sortedReactions.forEach { item in
-            let reactionConfig = MessageReactionConfiguration.shared.getReaction(withName: item.key)
+            let reactionConfig: AmityReactionType
+            if type == .post || type == .comment {
+                reactionConfig = SocialReactionConfiguration.shared.getReaction(withName: item.key)
+            } else {
+                reactionConfig = MessageReactionConfiguration.shared.getReaction(withName: item.key)
+            }
             tabIndex += 1
-            let reactionTab = ReactionTabItem(index: tabIndex, name: item.key, image: reactionConfig.image, count: item.value)
+            let reactionTab = ReactionTabItem(index: tabIndex, name: item.key, image: reactionConfig.image, count: item.count)
             tabs.append(reactionTab)
         }
         

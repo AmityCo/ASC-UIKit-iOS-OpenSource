@@ -37,9 +37,12 @@ public struct AmityPostContentComponent: AmityComponentView {
     @StateObject private var viewConfig: AmityViewConfigController
     
     @StateObject private var viewModel = AmityPostContentComponentViewModel()
+    @StateObject private var commentCoreViewModel: CommentCoreViewModel
     @State private var showReactionList: Bool = false
     @State private var showBottomSheet: Bool = false
     @State private var showEditAlert: Bool = false
+    @State private var showShareSheet: Bool = false
+    @State private var showShareBottomSheet: Bool = false
     
     private let style: AmityPostContentComponentStyle
     private let category: AmityPostCategory
@@ -57,6 +60,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         self.pageId = pageId
         self.category = category
         self.context = nil
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
     
@@ -71,6 +75,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         self.pageId = pageId
         self.category = context.category
         self.context = context
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
     
@@ -83,6 +88,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             postEngagementActionView(post)
                 .contentShape(Rectangle())
                 .padding(.top, -4)
+            postInlineCommentView(post)
         }
         .contentShape(Rectangle())
         .padding(.bottom, 12)
@@ -195,7 +201,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     .isHidden(!(category == .pin || category == .pinAndAnnouncement) || viewConfig.isHidden(elementId: .pinBadge))
                     .accessibilityIdentifier(AccessibilityID.Social.PostContent.pinBadge)
                 
-                if !hideMenuButton {                    
+                if !hideMenuButton {
                     Button(action: {
                         showBottomSheet.toggle()
                     }, label: {
@@ -208,7 +214,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     })
                     .buttonStyle(PlainButtonStyle())
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
-                    .bottomSheet(isShowing: $showBottomSheet, height: .fixed(calculateBottomSheetHeight(post: post)), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                    .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                         PostBottomSheetView(isShown: $showBottomSheet, post: post) { postAction in
                             
                             switch postAction {
@@ -243,6 +249,8 @@ public struct AmityPostContentComponent: AmityComponentView {
                                 let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                 vc.isNavigationBarHidden = true
                                 self.host.controller?.present(vc, animated: true)
+                            case .sharePost:
+                                showShareSheet = true
                             }
                         }
                     }
@@ -255,6 +263,10 @@ public struct AmityPostContentComponent: AmityComponentView {
                 self.showPostEditScreen()
             }), secondaryButton: .cancel(Text(AmityLocalizedStringSet.General.cancel.localizedString)))
         })
+        .sheet(isPresented: $showShareSheet) {
+            let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .post, id: post.postId)
+            ShareActivitySheetView(link: shareLink)
+        }
     }
     
     private func showPostEditScreen() {
@@ -321,19 +333,35 @@ public struct AmityPostContentComponent: AmityComponentView {
     
     @ViewBuilder
     private func postContentTextView() -> some View {
-        if !post.text.isEmpty {
-            ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
-                goToUserProfilePage(userId)
-            })
-            .lineLimit(style == .detail ? 1000 : 8)
-            .moreButtonText("...See more")
-            .font(AmityTextStyle.body(.clear).getFont())
-            .foregroundColor(Color(viewConfig.theme.baseColor))
-            .attributedColor(viewConfig.theme.primaryColor)
-            .moreButtonColor(Color(viewConfig.theme.primaryColor))
-            .expandAnimation(.easeOut(duration: 0.25))
-            .lineSpacing(5)
-            .frame(maxWidth: .infinity, alignment: .leading)
+        if !post.title.isEmpty || !post.text.isEmpty {
+            VStack(alignment: .leading, spacing: 16) {
+                // Post title
+                if !post.title.isEmpty {
+                    Text(post.title)
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Post text content
+                if !post.text.isEmpty {
+                    ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, highlightedText: context?.searchKeyword, onTapMentionee: { userId in
+                        goToUserProfilePage(userId)
+                    }, onTapHashtag: { hashtag in
+                        // \u{200E} make the hashtag text left to right in all languages
+                        goToSearchPage("#\(hashtag)")
+                    })
+                    .lineLimit(style == .detail ? 1000 : 8)
+                    .moreButtonText("...See more")
+                    .font(AmityTextStyle.body(.clear).getFont())
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .attributedColor(viewConfig.theme.primaryColor)
+                    .hashtagColor(viewConfig.theme.primaryColor)
+                    .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                    .expandAnimation(.easeOut(duration: 0.25))
+                    .lineSpacing(5)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
         }
     }
     
@@ -382,37 +410,50 @@ public struct AmityPostContentComponent: AmityComponentView {
     
     @ViewBuilder
     private func postEngagementView(_ post: AmityPostModel) -> some View {
-        if style == .detail {
-            VStack(spacing: 8) {
+        VStack(spacing: 8) {
+            HStack(spacing: 0) {
                 HStack(spacing: 4) {
-                    Group {
-                        Image(AmityIcon.likeReactionIcon.getImageResource())
-                            .resizable()
-                            .frame(width: 20.0, height: 20.0)
-                            .isHidden(post.reactionsCount == 0, remove: true)
-                        
-                        Text("\(post.reactionsCount.formattedCountString) \(post.reactionsCount == 1 ? "like" : "likes")")
-                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
-                    }
-                    .onTapGesture {
-                        showReactionList.toggle()
+                    HStack(spacing: -8) {
+                        ForEach(Array(post.allReactions.prefix(SocialReactionConfiguration.shared.renderReactionCount).enumerated()), id: \.element) { index, reaction in
+                            let reactionType = SocialReactionConfiguration.shared.getReaction(withName: reaction)
+                            Circle()
+                                .fill(Color(viewConfig.theme.backgroundColor))
+                                .frame(width: 22.0, height: 22.0)
+                                .overlay(
+                                    Image(reactionType.image)
+                                        .resizable()
+                                        .frame(width: 20.0, height: 20.0)
+                                        .clipShape(Circle())
+                                )
+                                .zIndex(Double(post.allReactions.count - index))
+                        }
                     }
                     
-                    Spacer()
-                    
-                    Text("\(post.allCommentCount.formattedCountString) \(post.allCommentCount == 1 ? "comment" : "comments")")
+                    Text("\(post.reactionsCount.formattedCountString)")
                         .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
+                    
+                    Spacer(minLength: 0)
                 }
-                .frame(height: 20)
+                .onTapGesture {
+                    showReactionList.toggle()
+                }
+                .isHidden(post.allReactions.count == 0)
+                
+                Text("\(post.allCommentCount.formattedCountString) \(post.allCommentCount == 1 ? "comment" : "comments")")
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
+                    .isHidden(post.allCommentCount == 0)
+                
+                Spacer()
+                    .isHidden(post.allReactions.count != 0)
             }
-            .padding([.leading, .trailing], 16)
-            .sheet(isPresented: $showReactionList) {
-                AmityReactionList(post: post.object, pageId: pageId)
-                    .environmentObject(host)
-            }
+            .frame(height: 20)
         }
+        .padding([.leading, .trailing], 16)
+        .sheet(isPresented: $showReactionList) {
+            reactionListSheet
+        }
+        .isHidden(post.allCommentCount == 0 && post.allReactions.count == 0)
     }
-    
     
     @ViewBuilder
     private func postEngagementActionView(_ post: AmityPostModel) -> some View {
@@ -425,12 +466,33 @@ public struct AmityPostContentComponent: AmityComponentView {
                 .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColorShade2)))
                 .isHidden(self.post.targetCommunity?.isJoined ?? true || viewConfig.isHidden(elementId: .nonMemberSection))
                 .accessibilityIdentifier(AccessibilityID.Social.PostContent.nonMemberSection)
+                .onTapGesture {
+                    goToCommunityProfilePage()
+                }
             
             HStack(spacing: 4) {
-                Button(feedbackStyle: .light, action: {
+                let reactionIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .reactionButton, key: "icon", of: String.self) ?? "")
+                let reactionTitle = viewConfig.getConfig(elementId: .reactionButton, key: "text", of: String.self) ?? ""
+                HStack(spacing: 3) {
+                    Color.clear
+                        .frame(width: 0, height: 0)
+                        .captureViewFrameInWindow(onFrame: { rect in
+                            viewModel.reactionBarFrame = rect
+                        })
+                    
+                    Image(post.myReaction != nil ? post.myReaction!.image : reactionIcon)
+                        .resizable()
+                        .frame(width: 20.0, height: 20.0)
+
+                    Text(post.myReaction != nil ? post.myReaction!.name.capitalizeFirstLetter() : reactionTitle)
+                        .applyTextStyle(.bodyBold(Color(post.myReaction != nil ? viewConfig.theme.baseColor : viewConfig.theme.baseColorShade2)))
+                        .lineLimit(1)
+                }
+                .tapAndDragSimutaneousGesture(longPressSensitivity: 150, tapAction: {
+                    ImpactFeedbackGenerator.impactFeedback(style: .light)
                     Task { @MainActor in
-                        if post.isLiked {
-                            try await viewModel.removeReaction(id: post.postId)
+                        if let myReaction = post.myReaction {
+                            try await viewModel.removeReaction(id: post.postId, name: myReaction.name)
                         } else {
                             try await viewModel.addReaction(id: post.postId)
                         }
@@ -439,25 +501,18 @@ public struct AmityPostContentComponent: AmityComponentView {
                         /// This event is observed in PostFeedViewModel
                         NotificationCenter.default.post(name: .didPostReacted, object: post.object)
                     }
-                }) {
-                    let reactionIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .reactionButton, key: "icon", of: String.self) ?? "")
-                    let reactionTitle = viewConfig.getConfig(elementId: .reactionButton, key: "text", of: String.self) ?? ""
-                    HStack(spacing: 3) {
-                        Image(post.isLiked ? AmityIcon.likeReactionIcon.getImageResource() : reactionIcon)
-                            .resizable()
-                            .frame(width: 20.0, height: 20.0)
-                        if style == .feed {
-                            Text(post.reactionsCount == 0 ? "0" : "\(post.reactionsCount.formattedCountString)")
-                                .applyTextStyle(.bodyBold(Color(post.isLiked ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade2)))
-                        } else if style == .detail {
-                            Text(reactionTitle)
-                                .applyTextStyle(.bodyBold(Color(post.isLiked ? viewConfig.theme.primaryColor : viewConfig.theme.baseColorShade2)))
-                        }
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
+                }, longPressAction: {
+                    ImpactFeedbackGenerator.impactFeedback(style: .heavy)
+                    let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .post, referenceId: post.postId, currentReaction: post.myReaction?.name)
+                    AmitySocialReactionPickerOverlay.shared.show(frame: viewModel.reactionBarFrame, viewModel: reactionPickerViewModel)
+                }, dragChangedAction: { point in
+                    AmitySocialReactionPickerOverlay.shared.checkHoveredReactionOnDrag(at: point)
+                }, dragEndedAction: { point in
+                    AmitySocialReactionPickerOverlay.shared.addHoveredReactionDragEnded(at: point)
+                })
                 .isHidden(viewConfig.isHidden(elementId: .reactionButton), remove: true)
                 .accessibilityIdentifier(AccessibilityID.Social.PostContent.reactionButton)
+                
                 
                 Button(feedbackStyle: .light, action: {
                     let context = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
@@ -470,13 +525,8 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .resizable()
                             .frame(width: 20.0, height: 20.0)
                         
-                        if style == .feed {
-                            Text(post.allCommentCount == 0 ? "0" : "\(post.allCommentCount)")
-                                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColorShade2)))
-                        } else if style == .detail {
-                            Text(commentTitle)
-                                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColorShade2)))
-                        }
+                        Text(commentTitle)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColorShade2)))
                     }
                 }
                 .buttonStyle(PlainButtonStyle())
@@ -486,40 +536,148 @@ public struct AmityPostContentComponent: AmityComponentView {
                 
                 Spacer()
                 
-                Button(feedbackStyle: .light, action: {}) {
-                    let shareIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .shareButton, key: "icon", of: String.self) ?? "")
-                    let shareTitle = viewConfig.getConfig(elementId: .shareButton, key: "text", of: String.self) ?? ""
-                    HStack(spacing: 3) {
-                        Image(shareIcon)
-                            .resizable()
-                            .frame(width: 20.0, height: 20.0)
-                        Text(shareTitle)
-                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColorShade2)))
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-                .isHidden(viewConfig.isHidden(elementId: .shareButton), remove: true)
-                .accessibilityIdentifier(AccessibilityID.Social.PostContent.shareButton)
+                shareLinkButton
             }
             .isHidden(!(self.post.targetCommunity?.isJoined ?? true))
         }
-        .padding([.leading, .trailing], 16)
+        .padding(.trailing, 16)
+        .padding(.leading, 14)
+    }
+    
+    @ViewBuilder
+    private func postInlineCommentView(_ post: AmityPostModel) -> some View {
+        if style == .feed, let comment = post.inlineComment {
+            VStack(spacing: 0) {
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
+                
+                AmityCommentView(
+                    comment: comment,
+                    hideMeatballButton: true,
+                    hideButtonView: !(post.targetCommunity?.isJoined ?? true),
+                    seeMoreLineLimit: 3
+                ) { actionType in
+                    handleCommentAction(actionType, post: post)
+                }
+                .onTapGesture {
+                    goToComment(comment.commentId)
+                }
+                .environmentObject(viewConfig)
+                .padding(.top, 10)
+                
+                if comment.childrenNumber > 0 {
+                    Button {
+                        goToComment(comment.id, showReplies: true)
+                    } label: {
+                        HStack {
+                            HStack(spacing: 4) {
+                                Image(AmityIcon.replyArrowIcon.getImageResource())
+                                    .resizable()
+                                    .frame(width: 16, height: 16)
+                                    .padding(.leading, 8)
+                                
+                                let repliesCount = comment.childrenNumber
+                                let word = WordsGrammar(count: repliesCount, set: .reply)
+                                let finalText = "View \(repliesCount) \(word.value)"
+                                Text(finalText)
+                                    .applyTextStyle(.captionBold(Color(viewConfig.theme.secondaryColorShade1)))
+                                    .padding(.trailing, 8)
+                            }
+                            .frame(height: 28, alignment: .leading)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 4)
+                                    .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 0.4)
+                            )
+                            
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.leading, 52)
+                    .padding(.top, !(post.targetCommunity?.isJoined ?? true) && comment.reactionsCount == 0 ? 8 : 4)
+                }
+            }
+            .environmentObject(commentCoreViewModel)
+        }
+    }
+    
+    private func handleCommentAction(_ actionType: AmityCommentButtonActionType, post: AmityPostModel) {
+        switch actionType {
+        case .react(_):
+            break
+        case .reply(let comment):
+            goToComment(comment.id, showReplyToComment: true)
+        case .meatball(_):
+            break
+        case .userProfile(let userId):
+            goToUserProfilePage(userId)
+        }
     }
     
     
-    func calculateBottomSheetHeight(post: AmityPostModel) -> CGFloat {
+    func canUserSharePost() -> Bool {
+        let canSharePostLink = AmityUIKitManagerInternal.shared.canShareLink(for: .post)
+        var isPrivateCommunity = false
+        if let community = post.targetCommunity, !community.isPublic {
+            isPrivateCommunity = true
+        }
         
-        let baseBottomSheetHeight: CGFloat = 68
-        let itemHeight: CGFloat = 48
+        return canSharePostLink && !isPrivateCommunity
+    }
+    
+    @ViewBuilder
+    var shareLinkButton: some View {
+        let canSharePostLink = canUserSharePost()
         
-        let additionalItems = [
-            true,  // Always add one item
-            post.hasModeratorPermission || viewModel.hasDeletePermission,
-        ].filter { $0 }
+        Button(feedbackStyle: .light, action: {
+            showShareBottomSheet = true
+        }) {
+            let shareIcon = AmityIcon.shareToIcon.imageResource
+            HStack(spacing: 3) {
+                Image(shareIcon)
+                    .resizable()
+                    .renderingMode(.template)
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .frame(width: 20.0, height: 20.0)
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+        .accessibilityIdentifier(AccessibilityID.Social.PostContent.shareButton)
+        .bottomSheet(isShowing: $showShareBottomSheet, height: .contentSize) {
+            VStack(spacing: 0) {
+                shareableLinkItemView
+            }
+            .padding(.bottom, 32)
+        }
+        .visibleWhen(canSharePostLink)
+    }
         
-        let additionalHeight = CGFloat(additionalItems.count) * itemHeight
+    @ViewBuilder
+    var shareableLinkItemView: some View {
+        let copyLinkConfig = viewConfig.forElement(.copyLink)
+        let shareLinkConfig = viewConfig.forElement(.shareLink)
+
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "")
+            .onTapGesture {
+                showShareBottomSheet.toggle()
+                
+                let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .post, id: post.postId)
+                UIPasteboard.general.string = shareLink
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .success, message: "Link copied")
+                }
+            }
         
-        return baseBottomSheetHeight + additionalHeight
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "")
+            .onTapGesture {
+                showShareBottomSheet.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    showShareSheet = true
+                }
+            }
     }
 }
 
@@ -560,8 +718,7 @@ extension AmityPostContentComponent {
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
                 .onTapGesture {
-                    let context = AmityPostContentComponentBehavior.Context(component: self)
-                    AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
+                    goToCommunityProfilePage()
                 }
             
             if post.isTargetOfficialCommunity {
@@ -583,15 +740,42 @@ extension AmityPostContentComponent {
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
                 .onTapGesture {
-                    let context = AmityPostContentComponentBehavior.Context(component: self)
-                    AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
+                    goToCommunityProfilePage()
                 }
+        }
+    }
+    
+    @ViewBuilder
+    private var reactionListSheet: some View {
+        if #available(iOS 16.0, *) {
+            AmityReactionList(post: post.object, pageId: pageId)
+                            .environmentObject(host)
+                            .presentationDetents([.fraction(0.5)])
+        } else {
+            AmityReactionList(post: post.object, pageId: pageId)
+                            .environmentObject(host)
         }
     }
     
     private func goToUserProfilePage(_ userId: String) {
         let context = AmityPostContentComponentBehavior.Context(component: self, userId: userId)
         AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToUserProfilePage(context: context)
+    }
+    
+    private func goToComment(_ commentId: String, showReplyToComment: Bool = false, showReplies: Bool = false) {
+        let page = AmityPostDetailPage(id: post.postId, commentId: commentId, showReplyToComment: showReplyToComment, preloadRepliesOfComment: showReplies)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    private func goToSearchPage(_ keyword: String) {
+        let context = AmityPostContentComponentBehavior.Context(component: self, searchKeyword: keyword)
+        AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToSocialGlobalSearchPage(context: context)
+    }
+    
+    private func goToCommunityProfilePage() {
+        let context = AmityPostContentComponentBehavior.Context(component: self)
+        AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
     }
 }
 
@@ -601,6 +785,8 @@ class AmityPostContentComponentViewModel: ObservableObject {
     private let permissionChecker = CommunityPermissionChecker()
     
     @Published var hasDeletePermission: Bool = false
+    
+    var reactionBarFrame: CGRect = .zero
     
     init() {}
     
@@ -621,8 +807,8 @@ class AmityPostContentComponentViewModel: ObservableObject {
         try await reactionManager.addReaction(.like, referenceId: id, referenceType: .post)
     }
     
-    func removeReaction(id: String) async throws {
-        try await reactionManager.removeReaction(.like, referenceId: id, referenceType: .post)
+    func removeReaction(id: String, name: String) async throws {
+        try await reactionManager.removeReaction(name, referenceId: id, referenceType: .post)
     }
 }
 
@@ -635,19 +821,22 @@ extension AmityPostContentComponent {
         var hidePostTarget: Bool
         var hideMenuButton: Bool
         var isClipPost: Bool
+        var searchKeyword: String
         
         
         public init(shouldShowPollResults: Bool = false,
                     category: AmityPostCategory = .general,
                     shouldHideTarget: Bool = false,
                     shouldHideMenuButton: Bool = false,
-                    isClipPost: Bool = false
+                    isClipPost: Bool = false,
+                    searchKeyword: String = ""
         ) {
             self.showPollResults = shouldShowPollResults
             self.category = category
             self.hidePostTarget = shouldHideTarget
             self.hideMenuButton = shouldHideMenuButton
             self.isClipPost = isClipPost
+            self.searchKeyword = searchKeyword
         }
     }
 }

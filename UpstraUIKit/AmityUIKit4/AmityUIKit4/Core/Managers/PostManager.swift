@@ -74,15 +74,21 @@ class PostManager {
     }
     
     @discardableResult
-    func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
-        if let mentionees, let metadata {
-            try await postRepository.editPost(withId: withId, builder: builder, metadata: metadata, mentionees: mentionees)
-        } else {
-            try await postRepository.editPost(withId: withId, builder: builder)
-        }
+    func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?, hashtags: AmitySDK.AmityHashtagBuilder?) async throws -> AmityPost {
+        try await postRepository.editPost(withId: withId, builder: builder, metadata: metadata, mentionees: mentionees, hashtags: hashtags)
     }
     
     func createStreamPost(builder: AmityLiveStreamPostBuilder, targetId: String?, targetType: AmityPostTargetType, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
         return try await postRepository.createLiveStreamPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+    }
+    
+    func searchPosts(keyword: String) -> AmityCollection<AmityPost> {
+        let searchOptions = AmityPostSemanticSearchOptions(query: keyword, targetId: nil, targetType: nil, matchingOnlyParentPost: true)
+        return postRepository.semanticSearchPosts(options: searchOptions)
+    }
+    
+    func searchPosts(hashtags: [String]) -> AmityCollection<AmityPost> {
+        let searchOptions = AmityPostHashtagSearchOptions(hashtags: hashtags)
+        return postRepository.searchPostsByHashtag(options: searchOptions)
     }
 }

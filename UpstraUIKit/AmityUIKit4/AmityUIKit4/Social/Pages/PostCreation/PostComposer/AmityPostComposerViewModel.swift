@@ -20,11 +20,15 @@ class AmityPostComposerViewModel: ObservableObject {
 
     @Published var displayName: String
 
+    let postTitleMaxCount: Int = 150
+    var postTitleCount: Int = 0
+    @Published var postTitle: String = ""
     @Published var postText: String = ""
     @Published var mentionData: MentionData = MentionData()
     @Published var mentionedUsers: [AmityMentionUserModel] = []
 
     private let originalPostText: String
+    private let originalPostTitle: String
     private let originalMedias: [AmityMedia]
     
     var isInCreateMode: Bool {
@@ -55,6 +59,7 @@ class AmityPostComposerViewModel: ObservableObject {
             targetType == .community ? community?.displayName ?? "Unknown" : "My Timeline"
         self.originalPostText = ""
         self.originalMedias = []
+        self.originalPostTitle = ""
     }
 
     // Edit mode
@@ -65,23 +70,29 @@ class AmityPostComposerViewModel: ObservableObject {
         self.post = post
         self.community = nil
         self.displayName = "Edit Post"
+        self.postTitle = post.title
         self.postText = post.text
         self.originalPostText = post.text
+        self.originalPostTitle = post.title
         self.originalMedias = post.medias
         self.mentionData.metadata = post.metadata
     }
 
     // Add a function to check if post has changes in edit mode
-    func hasPostChanges(currentText: String, currentMedias: [AmityMedia]) -> Bool {
+    func hasPostChanges(currentTitle: String, currentText: String, currentMedias: [AmityMedia]) -> Bool {
         // Check for text changes (ignoring only whitespace changes)
         let trimmedOriginalText = originalPostText.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedCurrentText = currentText.trimmingCharacters(in: .whitespacesAndNewlines)
         let hasTextChanges = trimmedOriginalText != trimmedCurrentText
+        
+        let trimmedOriginalTitle = originalPostTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedCurrentTitle = currentTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasTitleChanges = trimmedOriginalTitle != trimmedCurrentTitle
 
         // Check for media changes (count, content)
         let hasMediaChanges = !areMediasEqual(originalMedias, currentMedias)
 
-        return hasTextChanges || hasMediaChanges
+        return hasTextChanges || hasMediaChanges || hasTitleChanges
     }
 
     // Helper function to compare two media arrays
@@ -115,7 +126,7 @@ class AmityPostComposerViewModel: ObservableObject {
     }
 
     @discardableResult
-    func createPost(medias: [AmityMedia], files: [AmityFile]) async throws -> AmityPost {
+    func createPost(medias: [AmityMedia], files: [AmityFile], hashtags: [AmityHashtagModel]) async throws -> AmityPost {
         guard networkMonitor.isConnected else {
             throw NSError(domain: "Internet is not connected.", code: 500)
         }
@@ -126,6 +137,11 @@ class AmityPostComposerViewModel: ObservableObject {
         let imagesData = getImagesData(from: medias)
         let videosData = getVideosData(from: medias)
         let filesData = getFilesData(from: files)
+        
+        let mentions = AmityMetadataMapper.mentions(fromMetadata: mentionData.metadata ?? [:])
+        let hashtags = hashtags.map { AmityHashtag(text: $0.text, index: $0.range.location, length: $0.range.length)}
+        let metadata = AmityMetadataMapper.metadata(mentions: mentions, hashtags: hashtags)
+        
 
         if !imagesData.isEmpty {
             // Image Post
@@ -134,12 +150,13 @@ class AmityPostComposerViewModel: ObservableObject {
 
             let imagePostBuilder = AmityImagePostBuilder()
             imagePostBuilder.setText(postText)
+            imagePostBuilder.setTitle(postTitle)
             imagePostBuilder.setImages(imagesData)
             postBuilder = imagePostBuilder
 
             return try await postManager.postRepository.createImagePost(
                 imagePostBuilder, targetId: targetId, targetType: targetType,
-                metadata: mentionData.metadata, mentionees: mentionData.mentionee)
+                metadata: metadata, mentionees: mentionData.mentionee)
 
         } else if !videosData.isEmpty {
             // Video Post
@@ -148,12 +165,13 @@ class AmityPostComposerViewModel: ObservableObject {
 
             let videoPostBuilder = AmityVideoPostBuilder()
             videoPostBuilder.setText(postText)
+            videoPostBuilder.setTitle(postTitle)
             videoPostBuilder.setVideos(videosData)
             postBuilder = videoPostBuilder
 
             return try await postManager.postRepository.createVideoPost(
                 videoPostBuilder, targetId: targetId, targetType: targetType,
-                metadata: mentionData.metadata, mentionees: mentionData.mentionee)
+                metadata: metadata, mentionees: mentionData.mentionee)
         } else if !filesData.isEmpty {
             // File Post
             Log.add(event: .info, "Creating file post with \(filesData.count) files")
@@ -161,23 +179,25 @@ class AmityPostComposerViewModel: ObservableObject {
 
             let fileBuilder = AmityFilePostBuilder()
             fileBuilder.setText(postText)
+            fileBuilder.setTitle(postTitle)
             fileBuilder.setFiles(getFilesData(from: files))
             postBuilder = fileBuilder
 
             return try await postManager.postRepository.createFilePost(
                 fileBuilder, targetId: targetId, targetType: targetType,
-                metadata: mentionData.metadata, mentionees: mentionData.mentionee)
+                metadata: metadata, mentionees: mentionData.mentionee)
         } else if isInClipComposerMode {
             if case .createClip(_, let draft) = mode {
                 let clipBuilder = AmityClipPostBuilder()
                 clipBuilder.setClip(draft.clipData)
                 clipBuilder.setText(postText)
+                clipBuilder.setTitle(postTitle)
                 clipBuilder.setIsMuted(draft.isMuted)
                 clipBuilder.setDisplayMode(draft.displayMode)
                 
                 return try await postManager.postRepository.createClipPost(
                     clipBuilder, targetId: targetId, targetType: targetType,
-                    metadata: mentionData.metadata, mentionees: mentionData.mentionee)
+                    metadata: metadata, mentionees: mentionData.mentionee)
             } else {
                 fatalError("Clip post information is not available")
             }
@@ -185,15 +205,20 @@ class AmityPostComposerViewModel: ObservableObject {
             // Text Post
             let textPostBuilder = AmityTextPostBuilder()
             textPostBuilder.setText(postText)
+            textPostBuilder.setTitle(postTitle)
             postBuilder = textPostBuilder
+            
+            let hashtagBuilder = AmityHashtagBuilder()
+            let hashtags = hashtags.map { $0.text }
+            hashtagBuilder.hashtags(hashtags: hashtags)
 
             return try await postManager.postRepository.createTextPost(
                 textPostBuilder, targetId: targetId, targetType: targetType,
-                metadata: mentionData.metadata, mentionees: mentionData.mentionee)
+                metadata: metadata, mentionees: mentionData.mentionee, hashtags: hashtagBuilder)
         }
     }
 
-    func editPost(medias: [AmityMedia], files: [AmityFile]) async throws -> AmityPost? {
+    func editPost(medias: [AmityMedia], files: [AmityFile], hashtags: [AmityHashtagModel]) async throws -> AmityPost? {
         var postBuilder: AmityPostBuilder
         
         // If all media have been removed, use the appropriate empty builder based on original media type
@@ -205,6 +230,7 @@ class AmityPostComposerViewModel: ObservableObject {
                     Log.add(event: .info, "Removing all images from image post")
                     let imagePostBuilder = AmityImagePostBuilder()
                     imagePostBuilder.setText(postText)
+                    imagePostBuilder.setTitle(postTitle)
                     imagePostBuilder.setImages([]) // Empty image array
                     postBuilder = imagePostBuilder
                     
@@ -212,6 +238,7 @@ class AmityPostComposerViewModel: ObservableObject {
                     Log.add(event: .info, "Removing all videos from video post")
                     let videoPostBuilder = AmityVideoPostBuilder()
                     videoPostBuilder.setText(postText)
+                    videoPostBuilder.setTitle(postTitle)
                     videoPostBuilder.setVideos([]) // Empty video array
                     postBuilder = videoPostBuilder
                     
@@ -220,6 +247,7 @@ class AmityPostComposerViewModel: ObservableObject {
                     Log.add(event: .info, "Using text post builder")
                     let textPostBuilder = AmityTextPostBuilder()
                     textPostBuilder.setText(postText)
+                    textPostBuilder.setTitle(postTitle)
                     postBuilder = textPostBuilder
                 }
             } else {
@@ -227,6 +255,7 @@ class AmityPostComposerViewModel: ObservableObject {
                 Log.add(event: .info, "Using text post builder (no original media)")
                 let textPostBuilder = AmityTextPostBuilder()
                 textPostBuilder.setText(postText)
+                textPostBuilder.setTitle(postTitle)
                 postBuilder = textPostBuilder
             }
         } else {
@@ -241,6 +270,7 @@ class AmityPostComposerViewModel: ObservableObject {
 
                 let imagePostBuilder = AmityImagePostBuilder()
                 imagePostBuilder.setText(postText)
+                imagePostBuilder.setTitle(postTitle)
                 imagePostBuilder.setImages(imagesData)
                 postBuilder = imagePostBuilder
             } else if !videosData.isEmpty {
@@ -250,6 +280,7 @@ class AmityPostComposerViewModel: ObservableObject {
 
                 let videoPostBuilder = AmityVideoPostBuilder()
                 videoPostBuilder.setText(postText)
+                videoPostBuilder.setTitle(postTitle)
                 videoPostBuilder.setVideos(videosData)
                 postBuilder = videoPostBuilder
             } else if !filesData.isEmpty {
@@ -259,12 +290,14 @@ class AmityPostComposerViewModel: ObservableObject {
 
                 let fileBuilder = AmityFilePostBuilder()
                 fileBuilder.setText(postText)
+                fileBuilder.setTitle(postTitle)
                 fileBuilder.setFiles(getFilesData(from: files))
                 postBuilder = fileBuilder
             } else if isInClipComposerMode {
                 Log.add(event: .info, "Editing clip post")
                 let clipBuilder = AmityClipPostBuilder()
                 clipBuilder.setText(postText)
+                clipBuilder.setTitle(postTitle)
                 
                 postBuilder = clipBuilder
             } else {
@@ -272,14 +305,22 @@ class AmityPostComposerViewModel: ObservableObject {
                 Log.add(event: .info, "Editing text post")
                 let textPostBuilder = AmityTextPostBuilder()
                 textPostBuilder.setText(postText)
+                textPostBuilder.setTitle(postTitle)
                 postBuilder = textPostBuilder
             }
         }
+        
+        let mentions = AmityMetadataMapper.mentions(fromMetadata: mentionData.metadata ?? [:])
+        let hashtags = hashtags.map { AmityHashtag(text: $0.text, index: $0.range.location, length: $0.range.length)}
+        let metadata = AmityMetadataMapper.metadata(mentions: mentions, hashtags: hashtags)
+        
+        let hashtagBuilder = AmityHashtagBuilder()
+        hashtagBuilder.hashtags(hashtags: hashtags.map { $0.text })
 
         if let postId = post?.postId {
             return try await postManager.editPost(
-                withId: postId, builder: postBuilder, metadata: mentionData.metadata,
-                mentionees: mentionData.mentionee)
+                withId: postId, builder: postBuilder, metadata: metadata,
+                mentionees: mentionData.mentionee, hashtags: hashtagBuilder)
         }
         return nil
     }

@@ -295,7 +295,7 @@ class ClipFeedViewController: UIViewController {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .moviePlayback)
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-            print("Failed to setup audio session: \(error)")
+            Log.warn("Failed to setup audio session: \(error)")
         }
     }
     

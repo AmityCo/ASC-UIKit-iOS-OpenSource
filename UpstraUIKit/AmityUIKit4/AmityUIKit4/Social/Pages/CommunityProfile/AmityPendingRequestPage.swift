@@ -93,7 +93,7 @@ public struct AmityPendingRequestPage: AmityPageView {
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
     }
     

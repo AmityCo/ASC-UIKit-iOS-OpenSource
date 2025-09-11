@@ -31,7 +31,7 @@
         }
     },
     "excludes": [
-        "*/post_content/share_button"
+        
     ],
     "message_reactions": [
         {
@@ -48,6 +48,28 @@
         },
         {
             "name": "grinning",
+            "image": "messageReactionGrinning"
+        },
+        {
+            "name": "sad",
+            "image": "messageReactionSad"
+        }
+    ],
+    "social_reactions": [
+        {
+            "name": "like",
+            "image": "messageReactionLike"
+        },
+        {
+            "name": "love",
+            "image": "messageReactionHeart"
+        },
+        {
+            "name": "fire",
+            "image": "messageReactionFire"
+        },
+        {
+            "name": "happy",
             "image": "messageReactionGrinning"
         },
         {
@@ -561,6 +583,9 @@
         "select_story_target_page/*/title": {
             "text": "Share To"
         },
+        "poll_post_composer_page/*/post_title": {
+            "text": "Post title",
+        },
         "post_composer_page/*/*": {},
         "post_composer_page/*/close_button": {
             "image": "closeIcon"
@@ -1002,6 +1027,65 @@
         "community_profile_page/community_video_feed/empty_clip_feed": {
             "text": "No clips yet",
             "image": "emptyClipIcon"
+        },
+        "livestream_player_page/*/share_link": {
+            "image": "shareToIcon",
+            "text": "Share to"
+        },
+        "livestream_player_page/*/copy_link": {
+            "image": "copyLinkIcon",
+            "text": "Copy live stream link"
+        },
+        "create_livestream_page/*/share_link": {
+            "image": "shareToIcon",
+            "text": "Share to"
+        },
+        "create_livestream_page/*/copy_link": {
+            "image": "copyLinkIcon",
+            "text": "Copy live stream link"
+        },
+
+        "clip_feed_page/*/share_link": {
+            "image": "shareToIcon",
+            "text": "Share to"
+        },
+        "clip_feed_page/*/copy_link": {
+            "image": "copyLinkIcon",
+            "text": "Copy clip link"
+        },
+        "post_detail_page/*/share_link": {
+            "image": "shareToIcon",
+            "text": "Share to"
+        },
+        "post_detail_page/*/copy_link": {
+            "image": "copyLinkIcon",
+            "text": "Copy post link"
+        },
+        "*/post_content/share_link": {
+            "image": "shareToIcon",
+            "text": "Share to"
+        },
+        "*/post_content/copy_link": {
+            "image": "copyLinkIcon",
+            "text": "Copy post link"
+        },
+        "user_profile_page/*/share_link": {
+            "image": "shareToIcon",
+            "text": "Share to"
+        },
+        "user_profile_page/*/copy_link": {
+            "image": "copyLinkIcon",
+            "text": "Copy profile link"
+        },
+        "community_profile_page/*/share_link": {
+            "image": "shareToIcon",
+            "text": "Share to"
+        },
+        "community_profile_page/*/copy_link": {
+            "image": "copyLinkIcon",
+            "text": "Copy profile link"
         }
+        
+        
     }
 }

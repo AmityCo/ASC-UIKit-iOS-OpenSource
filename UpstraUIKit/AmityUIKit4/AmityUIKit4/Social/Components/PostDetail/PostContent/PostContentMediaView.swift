@@ -87,8 +87,11 @@ struct PostContentMediaView: View {
                     startIndex: viewModel.selectedMediaIndex, 
                     viewConfig: viewConfig,
                     closeAction: { viewModel.showMediaViewer.toggle() },
-                    showEditAction: post.isOwner
+                    showEditAction: post.isOwner,
+                    post: post,
+                    showViewParentPost: false
                 )
+                
             }
         } else {
             EmptyView()

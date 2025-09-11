@@ -175,15 +175,17 @@ class ReactionLoader: ObservableObject {
     let referenceId: String
     let referenceType: AmityReactionReferenceType
     let reactionType: String?
+    let type: AmityReactionList.ReactionListType
 
     var reactionCollectionToken: AmityNotificationToken?
     
     @Published var emptyStateConfiguration = AmityEmptyStateView.Configuration(image: AmityIcon.Chat.greyRetryIcon.rawValue, title: AmityLocalizedStringSet.Reaction.unableToLoadTitle.localizedString, subtitle: nil, tapAction: nil)
     
-    init(referenceId: String, referenceType: AmityReactionReferenceType, reactionName: String?) {
+    init(referenceId: String, referenceType: AmityReactionReferenceType, reactionName: String?, type: AmityReactionList.ReactionListType) {
         self.referenceId = referenceId
         self.referenceType = referenceType
         self.reactionType = reactionName
+        self.type = type
     }
     
     func getReactedUsers() {
@@ -215,7 +217,7 @@ class ReactionLoader: ObservableObject {
             
             // Map reactions
             let reactions = liveCollection.allObjects()
-            self.reactedUsers = reactions.map { ReactionUser(reaction: $0) }
+            self.reactedUsers = reactions.map { ReactionUser(reaction: $0, type: self.type) }
             
             // Reacted Users
             if reactedUsers.isEmpty {
@@ -267,13 +269,19 @@ struct ReactionUser {
     let avatarURL: String
     let reactionName: String
     let reactionImage: ImageResource
+    let type: AmityReactionList.ReactionListType
     
-    init(reaction: AmityReaction) {
+    init(reaction: AmityReaction, type: AmityReactionList.ReactionListType) {
         self.userId = reaction.creator?.userId ?? ""
         self.displayName = reaction.creator?.displayName ?? ""
         self.avatarURL = reaction.creator?.getAvatarInfo()?.fileURL ?? ""
         self.reactionName = reaction.reactionName
-        self.reactionImage = MessageReactionConfiguration.shared.getReaction(withName: reaction.reactionName).image
+        self.type = type
+        if type == .post || type == .comment {
+            self.reactionImage = SocialReactionConfiguration.shared.getReaction(withName: reaction.reactionName).image
+        } else {
+            self.reactionImage = MessageReactionConfiguration.shared.getReaction(withName: reaction.reactionName).image
+        }
     }
     
     var isLoggedInUser: Bool {
@@ -286,6 +294,7 @@ struct ReactionUser {
         self.avatarURL = avatarURL
         self.reactionName = reactionName
         self.reactionImage = MessageReactionConfiguration.shared.getReaction(withName: reactionName).image
+        self.type = .none
     }
     
     // Used for skeleton loading

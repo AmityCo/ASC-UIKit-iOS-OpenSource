@@ -743,7 +743,6 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
      */
     open func startRecordingVideo() {
         guard cameraOutputMode != .stillImage else {
-            print(">>> Camera output mode is stillImage...")
             _show(NSLocalizedString("Capture session output still image", comment: ""), message: NSLocalizedString("I can only take pictures", comment: ""))
             return
         }

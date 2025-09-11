@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "socialReactionGrinning.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

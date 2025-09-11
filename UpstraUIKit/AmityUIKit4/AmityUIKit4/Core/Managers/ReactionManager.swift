@@ -39,8 +39,14 @@ class ReactionManager {
     
     @MainActor
     @discardableResult
-    func removeReaction(_ reactionType: String, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
-        return try await reactionRepository.removeReaction(reactionType, referenceId: referenceId, referenceType: referenceType)
+    func addReaction(_ reaction: String, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
+        return try await reactionRepository.addReaction(reaction, referenceId: referenceId, referenceType: referenceType)
+    }
+    
+    @MainActor
+    @discardableResult
+    func removeReaction(_ reaction: String, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
+        return try await reactionRepository.removeReaction(reaction, referenceId: referenceId, referenceType: referenceType)
     }
     
     func getReactions(_ reactionType: String?, referenceId: String, referenceType: AmityReactionReferenceType) -> AmityCollection<AmityReaction> {

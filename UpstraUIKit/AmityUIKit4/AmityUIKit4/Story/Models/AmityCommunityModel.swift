@@ -73,7 +73,7 @@ public struct AmityCommunityModel: Identifiable {
         self.isDiscoverable = object.isDiscoverable
         self.requiresJoinApproval = object.requiresJoinApproval
         
-        self.joinRequest = joinRequest
+        self.joinRequest = object.joinRequest ?? joinRequest
         if !object.requiresJoinApproval {
             self.joinRequestStatus = object.isJoined ? .approved : .cancelled
         } else {

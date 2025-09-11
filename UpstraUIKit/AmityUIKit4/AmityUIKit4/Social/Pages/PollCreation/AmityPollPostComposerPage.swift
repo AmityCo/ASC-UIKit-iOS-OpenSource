@@ -9,6 +9,11 @@ import SwiftUI
 import Foundation
 import AmitySDK
 
+public enum AmityPollType: String {
+    case image
+    case text
+}
+
 public struct AmityPollPostComposerPage: AmityPageView {
     
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
@@ -20,29 +25,39 @@ public struct AmityPollPostComposerPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: PollPostComposerViewModel
     @StateObject private var editorViewModel: AmityTextEditorViewModel
+    @StateObject private var titleEitorViewModel: AmityTextEditorViewModel
+    @State private var pollPostErrorMessage = AmityLocalizedStringSet.Social.pollPostCreateError.localizedString
     
     @State private var question: String = ""
+    @State private var title: String = ""
     @State private var isMultipleSelection = false
     @State private var showPollDurationSheet = false
     @State private var selectedDuration: PollDuration = .day30
+    @State private var toastMessage: String = AmityLocalizedStringSet.Social.pollPostCreateError.localizedString
     @State private var isToastVisible = false
     @State private var isCreatingPost = false
     @State private var isInputValid = false
     
     struct Constants {
         static let questionMaxCharLimit = 500
+        static let titleMaxCharLimit = 150
         static let answerMaxCharLimit = 60
     }
     
     @State private var mentionData: MentionData = MentionData()
     @State private var mentionedUsers: [AmityMentionUserModel] = []
     @State private var isQuestionCharLimitError = false
+    @State private var isTitleCharLimitError = false
+
     @State private var showCloseAlert = false
+    let pollType: AmityPollType
     
-    public init(targetId: String?, targetType: AmityPostTargetType) {
+    public init(targetId: String?, targetType: AmityPostTargetType, pollType: AmityPollType = .text) {
         self._viewModel = StateObject(wrappedValue: PollPostComposerViewModel(targetId: targetId, targetType: targetType))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .pollPostPage))
         self._editorViewModel = StateObject(wrappedValue: AmityTextEditorViewModel(mentionManager: MentionManager(withType: .post(communityId: targetType == .community ? targetId : ""))))
+        self.pollType = pollType
+        self._titleEitorViewModel = StateObject(wrappedValue: AmityTextEditorViewModel(mentionManager: MentionManager(withType: .post(communityId: targetType == .community ? targetId : "")), textStyle: .titleBold(.black)))
     }
     
     public var body: some View {
@@ -60,7 +75,11 @@ public struct AmityPollPostComposerPage: AmityPageView {
                         .frame(width: 24, height: 20)
                         .padding(.vertical, 8)
                         .onTapGesture {
-                            showCloseAlert.toggle()
+                            if hasContentToDiscard() {
+                                showCloseAlert.toggle()
+                            } else {
+                                host.controller?.navigationController?.dismiss(animated: true)
+                            }
                         }
                         .alert(isPresented: $showCloseAlert) {
                             Alert(title: Text(AmityLocalizedStringSet.Social.postDiscardAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.postDiscardAlertMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.Social.postDiscardAlertButtonKeepEditing.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: {
@@ -71,34 +90,12 @@ public struct AmityPollPostComposerPage: AmityPageView {
                 } trailing: {
                     
                     Button {
-                        
-                        var pollClosedInMilliSeconds: Int = 0
-                        switch selectedDuration {
-                        case .day1, .day3, .day7, .day14, .day30:
-                            pollClosedInMilliSeconds = selectedDuration.unit * 1000 * 60 * 60 * 24
-                        case .custom(let date):
-                            let timeInterval = date.timeIntervalSince(Date())
-                            pollClosedInMilliSeconds = Int(timeInterval * 1000)
+                        switch pollType {
+                        case .image:
+                            createImagePollPost()
+                        case .text:
+                            createTextPollPost()
                         }
-                        
-                        let answers = viewModel.options.map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
-                        
-                        isCreatingPost = true
-                        Task { @MainActor in
-                            
-                            do {
-                                try await viewModel.createPollPost(question: question, answers: answers, isMultipleSelection: isMultipleSelection, closedIn: pollClosedInMilliSeconds, metadata: mentionData.metadata, mentionees: mentionData.mentionee)
-                                
-                                isCreatingPost = false
-                                
-                                host.controller?.navigationController?.dismiss(animated: true)
-                            } catch {
-                                withAnimation {
-                                    isToastVisible = true
-                                }
-                            }
-                        }
-                        
                     } label: {
                         Text(AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
                             .applyTextStyle(.body(Color(viewConfig.theme.primaryColor)))
@@ -110,7 +107,47 @@ public struct AmityPollPostComposerPage: AmityPageView {
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 24) {
                         
-                        VStack(spacing: 0) {
+                        VStack(spacing: 4) {
+                            
+                            HStack(spacing: 0) {
+                                Text(AmityLocalizedStringSet.Social.pollPostTitle.localizedString)
+                                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                                
+                                Text(AmityLocalizedStringSet.Social.pollPostTitleOptional.localizedString)
+                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade3)))
+                                    .padding(.leading, 4)
+                                
+                                Spacer()
+                                
+                                Text("\(title.count)/\(Constants.titleMaxCharLimit)")
+                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                                    .accessibilityIdentifier("titleCharCountTextAccessibilityId")
+                            }
+                            .padding(.bottom, 20)
+                            
+                            AmityMessageTextEditorView(titleEitorViewModel, text: $title, mentionData: $mentionData, mentionedUsers: $mentionedUsers, initialEditorHeight: 34, maxNumberOfLines: 12, placeholderPadding: 4)
+                                .placeholder(AmityLocalizedStringSet.Social.pollPostTitleTextfieldPlaceholder.localizedString)
+                                .characterLimit(Constants.titleMaxCharLimit)
+                                .onChange(of: title) { newValue in
+                                    validateInputs()
+                                }
+                            
+                            Rectangle()
+                                .frame(height: 1)
+                                .foregroundColor(isTitleCharLimitError ? Color(viewConfig.theme.alertColor) : Color(viewConfig.theme.baseColorShade4))
+                                .padding(.top, 4)
+                            
+                            if isTitleCharLimitError {
+                                HStack {
+                                    Text(AmityLocalizedStringSet.Social.pollTitleCharLimitError.localized(arguments: Constants.titleMaxCharLimit))
+                                        .applyTextStyle(.caption(Color(viewConfig.theme.alertColor)))
+                                        .padding(.top, 4)
+                                        .transition(.opacity)
+                                    
+                                    Spacer()
+                                }
+                            }
+                            
                             HStack {
                                 Text(AmityLocalizedStringSet.Social.pollQuestionTitle.localizedString)
                                     .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
@@ -121,39 +158,36 @@ public struct AmityPollPostComposerPage: AmityPageView {
                                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                                     .accessibilityIdentifier("charCountTextAccessibilityId")
                             }
+                            .padding(.top, 24)
                             .padding(.bottom, 20)
                             
                             AmityMessageTextEditorView(editorViewModel, text: $question, mentionData: $mentionData, mentionedUsers: $mentionedUsers, initialEditorHeight: 34, maxNumberOfLines: 12, placeholderPadding: 4)
                                 .placeholder(AmityLocalizedStringSet.Social.pollQuestionTextfieldPlaceholder.localizedString)
+                                .characterLimit(Constants.questionMaxCharLimit)
+                                .enableHashtagHighlighting(true)
+                                .maxHashtagCount(30)
                                 .onChange(of: question) { newValue in
-                                    withAnimation {
-                                        isQuestionCharLimitError = newValue.count > Constants.questionMaxCharLimit
-                                    }
-                                    
                                     validateInputs()
                                 }
                             
                             Rectangle()
                                 .frame(height: 1)
-                                .foregroundColor(isQuestionCharLimitError ? Color(viewConfig.theme.alertColor) : Color(viewConfig.theme.baseColorShade4))
+                                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                                 .padding(.top, 4)
-                            
-                            if isQuestionCharLimitError {
-                                HStack {
-                                    Text(AmityLocalizedStringSet.Social.pollQuestionCharLimitError.localized(arguments: Constants.questionMaxCharLimit))
-                                        .applyTextStyle(.caption(Color(viewConfig.theme.alertColor)))
-                                        .padding(.top, 4)
-                                        .transition(.opacity)
-                                    
-                                    Spacer()
-                                }
-                            }
                         }
                         
-                        PollOptionSection(viewModel: viewModel)
-                            .onChange(of: viewModel.options) { newValue in
-                                validateInputs()
-                            }
+                        switch pollType {
+                        case .image:
+                            PollImageOptionSection(viewModel: viewModel)
+                                .onChange(of: viewModel.imageOptions) { newValue in
+                                    validateInputs()
+                                }
+                        case .text:
+                            PollTextOptionSection(viewModel: viewModel)
+                                .onChange(of: viewModel.textOptions) { newValue in
+                                    validateInputs()
+                                }
+                        }
                         
                         Divider()
                         
@@ -163,7 +197,6 @@ public struct AmityPollPostComposerPage: AmityPageView {
                         
                         PollDurationSection(duration: $selectedDuration, onTapAction: {
                             hideKeyboard()
-                            
                             showPollDurationSheet = true
                         })
                         
@@ -200,7 +233,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
-        .showToast(isPresented: $isToastVisible, style: .warning, message: AmityLocalizedStringSet.Social.pollPostCreateError.localizedString, bottomPadding: 24)
+        .showToast(isPresented: $isToastVisible, style: .warning, message: pollPostErrorMessage, bottomPadding: 24)
     }
     
     @ViewBuilder
@@ -215,9 +248,31 @@ public struct AmityPollPostComposerPage: AmityPageView {
     
     func validateInputs() {
         let isQuestionValid = validatePollQuestion()
-        let isOptionsValid = validatePollOptions()
         
-        isInputValid = isQuestionValid && isOptionsValid
+        var isOptionsValid = true
+        
+        switch pollType {
+        case .image:
+            isOptionsValid = validateImagePollOptions()
+        case .text:
+            isOptionsValid = validateTextPollOptions()
+        }
+        
+        let isTitleValid = validatePollTitle()
+        
+        isInputValid = isQuestionValid && isOptionsValid && isTitleValid
+    }
+    
+    func validatePollTitle() -> Bool {
+        let sanitizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // Question cannot be empty
+        // guard !sanitizedTitle.isEmpty else { return false }
+        
+        // Question character count should be less than 500
+        guard sanitizedTitle.count <= Constants.titleMaxCharLimit else { return false }
+        
+        return true
     }
     
     func validatePollQuestion() -> Bool {
@@ -232,8 +287,8 @@ public struct AmityPollPostComposerPage: AmityPageView {
         return true
     }
     
-    func validatePollOptions() -> Bool {
-        let sanitizedOptions = viewModel.options.compactMap {
+    func validateTextPollOptions() -> Bool {
+        let sanitizedOptions = viewModel.textOptions.compactMap {
             let sanitizedOption = $0.text.trimmingCharacters(in: .whitespacesAndNewlines)
             return sanitizedOption.isEmpty ? nil : sanitizedOption
         }
@@ -251,103 +306,138 @@ public struct AmityPollPostComposerPage: AmityPageView {
         
         return isAllOptionsValid
     }
-}
-
-#if DEBUG
-#Preview {
-    AmityPollPostComposerPage(targetId: nil, targetType: .community)
-        .environmentObject(AmityViewConfigController(pageId: .pollPostPage))
-}
-#endif
-
-struct PollDurationSection: View {
     
-    @EnvironmentObject var viewConfig: AmityViewConfigController
-    
-    @Binding var duration: PollDuration
-    var onTapAction: () -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading) {
-            PollSectionHeader(title: AmityLocalizedStringSet.Social.pollDurationTitle.localizedString, description: AmityLocalizedStringSet.Social.pollDurationDesc.localizedString)
+    func validateImagePollOptions() -> Bool {
+        let validOptions = viewModel.imageOptions.compactMap { option in
+            if let _ = option.imageData {
+                return option
+            }
             
-            Button(action: {
-                onTapAction()
-            }, label: {
-                VStack(spacing: 0) {
-                    HStack {
-                        Text(duration.value)
-                            .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
-                        
-                        Spacer()
-                        
-                        Image(systemName: "chevron.down")
-                    }
-                    .padding(.bottom, 16)
-                    .padding(.top, 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    
-                    Divider()
-                }
-            })
+            return nil
+        }
+        
+        // At least 2 options should be valid with images uploaded
+        guard validOptions.count >= 2 else { return false }
+        
+        let uploadingOptions = viewModel.imageOptions.filter { $0.uploadState == .uploading }
+        
+        // No options should be in uploading state
+        guard uploadingOptions.count == 0 else { return false }
+        
+        return true
+    }
+    
+    func createTextPollPost() {
+        let pollClosedInMilliSeconds: Int = getPollCloseDurationInMilliSeconds()
+        
+        let answers = viewModel.textOptions.map { $0.text.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        
+        isCreatingPost = true
+        Task { @MainActor in
             
-            if !duration.isCustomDate {
-                let endDate = Calendar.current.date(byAdding: .day, value: duration.unit, to: Date())
-                Text(AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationFormatter.string(from: endDate ?? Date()))
-                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+            do {
+                let mentions = AmityMetadataMapper.mentions(fromMetadata: mentionData.metadata ?? [:])
+                let hashtags = editorViewModel.existingHashtags.map { AmityHashtag(text: $0.text, index: $0.range.location, length: $0.range.length)}
+                let metadata = AmityMetadataMapper.metadata(mentions: mentions, hashtags: hashtags)
+                
+                let hashtagBuilder = AmityHashtagBuilder()
+                hashtagBuilder.hashtags(hashtags: hashtags.map { $0.text })
+                
+                let post = try await viewModel.createTextPollPost(title: title, question: question, answers: answers, isMultipleSelection: isMultipleSelection, closedIn: pollClosedInMilliSeconds, metadata: metadata, mentionees: mentionData.mentionee, hashtags: hashtagBuilder)
+                
+                isCreatingPost = false
+                
+                handleSuccess(post: post)
+            } catch {
+                isCreatingPost = false
+                
+                handleError(error: error)
             }
         }
     }
-}
-
-struct PollOptionSection: View {
     
-    @EnvironmentObject private var viewConfig: AmityViewConfigController
-    @ObservedObject var viewModel: PollPostComposerViewModel
-    
-    private let maxNoOfOptions = 10
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            
-            PollSectionHeader(title: AmityLocalizedStringSet.Social.pollOptionsTitle.localizedString, description: AmityLocalizedStringSet.Social.pollOptionsDesc.localizedString)
-                .padding(.bottom, 20)
-            
-            ForEach($viewModel.options) { option in
-                PollAnswerView(option: option) {
-                    let offset = option.index
-                    withAnimation {
-                        viewModel.removePollOption(at: offset.wrappedValue)
-                    }
-                }
+    func createImagePollPost() {
+        let pollClosedInMilliSeconds: Int = getPollCloseDurationInMilliSeconds()
+        
+        // answers
+        let validAnswers = viewModel.imageOptions.compactMap {
+            if let imageData = $0.imageData {
+                return (imageData, $0.text)
             }
             
-            if viewModel.options.count < maxNoOfOptions {
-                Button(action: {
-                    withAnimation {
-                        let lastIndex = viewModel.options.count
-                        viewModel.options.append(PollOption(index: lastIndex))
-                    }
-                }, label: {
-                    HStack {
-                        Spacer()
-                        
-                        Image(systemName: "plus")
-                        
-                        Text(AmityLocalizedStringSet.Social.pollAddOption.localizedString)
-                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
-                        
-                        Spacer()
-                    }
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 10)
-                    .border(radius: 8, borderColor: Color(viewConfig.theme.baseColorShade3), borderWidth: 1)
-                })
-                .padding(.trailing, 32) // Align with poll options textfield
+            return nil
+        }
+        
+        isCreatingPost = true
+        Task { @MainActor in
+            do {
+                let mentions = AmityMetadataMapper.mentions(fromMetadata: mentionData.metadata ?? [:])
+                let hashtags = editorViewModel.existingHashtags.map { AmityHashtag(text: $0.text, index: $0.range.location, length: $0.range.length)}
+                let metadata = AmityMetadataMapper.metadata(mentions: mentions, hashtags: hashtags)
+                
+                let hashtagBuilder = AmityHashtagBuilder()
+                hashtagBuilder.hashtags(hashtags: hashtags.map { $0.text })
+                
+                // create image poll post
+                let post = try await viewModel.createImagePollPost(title: title, question: question, answers: validAnswers, isMultipleSelection: isMultipleSelection, closedIn: pollClosedInMilliSeconds, metadata: metadata, mentionees: mentionData.mentionee, hashtags: hashtagBuilder)
+                
+                isCreatingPost = false
+                
+                handleSuccess(post: post)
+            } catch {
+                isCreatingPost = false
+                
+                handleError(error: error)
             }
         }
+    }
+    
+    func handleSuccess(post: AmityPost) {
+        host.controller?.navigationController?.dismiss(animated: true, completion: {
+            if post.getFeedType() == .reviewing {
+                let alertController = UIAlertController(title: "Post sent for review", message: "Your post has been submitted to the pending list. It will be published once approved by the group moderator.", preferredStyle: .alert)
+                
+                let okAction = UIAlertAction(title: AmityLocalizedStringSet.General.okay.localizedString, style: .cancel)
+                alertController.addAction(okAction)
+                
+                UIApplication.topViewController()?.present(alertController, animated: true)
+            }
+        })
+    }
+    
+    func handleError(error: Error) {
+        if error.isAmityErrorCode(.banWordFound) {
+            toastMessage = "Your post wasn't posted as it contains an inappropriate word."
+        } else if error.isAmityErrorCode(.linkNotAllowed) {
+            toastMessage = "Your post wasn't posted as it contains a link that's not allowed."
+        } else {
+            toastMessage = AmityLocalizedStringSet.Social.pollPostCreateError.localizedString
+        }
+        
+        // Show toast
+        withAnimation {
+            isToastVisible = true
+        }
+    }
+    
+    func getPollCloseDurationInMilliSeconds() -> Int {
+        var pollClosedInMilliSeconds: Int = 0
+        switch selectedDuration {
+        case .day1, .day3, .day7, .day14, .day30:
+            pollClosedInMilliSeconds = selectedDuration.unit * 1000 * 60 * 60 * 24
+        case .custom(let date):
+            let timeInterval = date.timeIntervalSince(Date())
+            pollClosedInMilliSeconds = Int(timeInterval * 1000)
+        }
+        return pollClosedInMilliSeconds
+    }
+    
+    func hasContentToDiscard() -> Bool {
+        let pollTitle = self.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let pollQuestion = self.question.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hasPollOption = viewModel.isAnyPollOptionEdited()
+        
+        return !pollTitle.isEmpty || !pollQuestion.isEmpty || hasPollOption
     }
 }
 
@@ -373,67 +463,6 @@ struct PollOption: Identifiable, Equatable  {
         hasher.combine(index)
     }
     
-}
-
-struct PollAnswerView: View {
-    
-    @EnvironmentObject var viewConfig: AmityViewConfigController
-    
-    @Binding var option: PollOption
-    let onDelete: () -> Void
-    let maxCharCount = 60
-    
-    @State private var mentionData = MentionData()
-    @StateObject var viewModel = AmityTextEditorViewModel(mentionManager: MentionManager(withType: .post(communityId: nil)))
-    @State private var isCharLimitError = false
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(spacing: 12) {
-                
-                // 15 + 10 + 10
-                AmityMessageTextEditorView(viewModel, text: $option.text, mentionData: $mentionData, mentionedUsers: .constant([]), textViewHeight: 35)
-                    .placeholder("\(AmityLocalizedStringSet.Social.pollOptionLabel.localizedString) \(option.index + 1)")
-                    .padding([.horizontal], 12)
-                    .padding([.vertical], 4)
-                    .background(Color(viewConfig.theme.baseColorShade4))
-                    .cornerRadius(8, corners: .allCorners)
-                    .border(radius: 8, borderColor: .red, borderWidth: isCharLimitError ? 1 : 0)
-                    .onChange(of: option.text) { newValue in
-                        withAnimation {
-                            isCharLimitError = newValue.count > maxCharCount
-                        }
-                        
-                        // Note:
-                        // Whenever we delete any poll option, the text value of textfield is not getting updated correctly even when the poll options datasource is correctly updated.
-                        // So we forcefully update underlying UITextView in that case.
-                        if viewModel.textView.text != newValue {
-                            viewModel.textView.text = newValue
-                        }
-                    }
-                
-                Button(action: {
-                    onDelete()
-                }, label: {
-                    Image(AmityIcon.trashBinIcon.imageResource)
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                    
-                })
-            }
-            
-            if isCharLimitError {
-                Text(AmityLocalizedStringSet.Social.pollOptionCharLimitError.localized(arguments: maxCharCount))
-                    .applyTextStyle(.caption(Color(viewConfig.theme.alertColor)))
-                    .padding(.top, 4)
-                    .transition(.opacity)
-            }
-        }
-        .padding(.bottom, 12)
-    }
 }
 
 struct PollSectionHeader: View {

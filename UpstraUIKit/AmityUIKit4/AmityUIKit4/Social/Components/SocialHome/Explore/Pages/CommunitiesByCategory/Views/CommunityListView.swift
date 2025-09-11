@@ -60,6 +60,8 @@ class CommunityListViewModel: ObservableObject {
     @Published var queryState: QueryState = .idle
     @Published var categoryName: String = ""
     
+    private let joinRequestManager = JoinRequestManager()
+    
     init(categoryId: String) {
         self.categoryId = categoryId
         self.categoryToken = categoryRepository.getCategory(withId: categoryId).observe({ [weak self] liveObject, error in
@@ -89,12 +91,21 @@ class CommunityListViewModel: ObservableObject {
                 return
             }
             
-            let items = liveCollection.snapshots.map {
-                AmityCommunityModel(object: $0)
+            var joinApprovalRequiredCommIds: [String] = []
+            liveCollection.snapshots.forEach {
+                if $0.requiresJoinApproval {
+                    joinApprovalRequiredCommIds.append($0.communityId)
+                }
             }
-            self.communities = items
             
-            self.queryState = .loaded
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                self.joinRequestManager.fetchJoinRequests(communityIds: joinApprovalRequiredCommIds) { statusInfo in
+                    
+                    let items = liveCollection.snapshots.map { AmityCommunityModel(object: $0, joinRequest: $0.joinRequest) }
+                    self.communities = items
+                    self.queryState = .loaded
+                }
+            }
         }
     }
     

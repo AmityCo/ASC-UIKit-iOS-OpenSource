@@ -9,7 +9,7 @@ import AmitySDK
 import Combine
 import SwiftUI
 
-enum CommunityJoinState {
+enum CommunityJoinState: String {
     // Default case. isJoined is false
     case notJoined
     // requires moderator approval & isJoined is false

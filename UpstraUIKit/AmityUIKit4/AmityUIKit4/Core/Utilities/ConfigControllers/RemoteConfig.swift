@@ -58,11 +58,11 @@ public class RemoteConfig {
                 let data = try Data(contentsOf: fileURL)
                 return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
             } else {
-                print("Config file does not exist")
+                Log.warn("Config file does not exist")
                 return nil
             }
         } catch {
-            print("Error reading config file: \(error)")
+            Log.warn("Error reading config file: \(error)")
             return nil
         }
     }
@@ -90,7 +90,7 @@ public class RemoteConfig {
                     return jsonResult
                 }
             } catch {
-                print("Error loading local config: \(error)")
+                Log.warn("Error loading local config: \(error)")
                 return [:]
             }
         }

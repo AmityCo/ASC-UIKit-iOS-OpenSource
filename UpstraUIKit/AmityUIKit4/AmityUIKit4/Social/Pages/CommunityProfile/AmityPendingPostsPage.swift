@@ -114,6 +114,7 @@ public struct AmityPendingPostsPage: AmityPageView {
                     Rectangle()
                         .fill(Color(viewConfig.theme.baseColorShade4))
                         .frame(height: 8)
+                        .isHidden(index == viewModel.posts.count - 1)
                 }
                 .listRowInsets(EdgeInsets())
                 .modifier(HiddenListSeparator())

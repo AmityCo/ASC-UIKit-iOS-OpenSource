@@ -101,8 +101,7 @@ struct CommunityInfoView: View {
                                 if requiresJoinApproval {
                                     showLeaveCommunityAlert.toggle()
                                 } else {
-                                    let isSuccess = try await viewModel.leaveCommunity(communityId: communityId)
-                                    Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
+                                    joinAction()
                                 }
                             } else {
                                 let joinStatus = community.joinRequestStatus
@@ -116,20 +115,7 @@ struct CommunityInfoView: View {
                                         Toast.showToast(style: .success, message: "Failed to cancel your request. Please try again.")
                                     }
                                 } else {
-                                    do {
-                                        let result = try await community.object.join()
-                                        
-                                        switch result {
-                                        case .success:
-                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityJoinToastSuccessMessage.localized(arguments: community.displayName))
-                                        case .pending(_):
-                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityJoinToastRequestSuccessMessage.localizedString)
-                                        default:
-                                            break
-                                        }
-                                    } catch {
-                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinToastErrorMessage.localizedString)
-                                    }
+                                    joinAction()
                                 }
                             }
                         }
@@ -146,6 +132,33 @@ struct CommunityInfoView: View {
                         Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
                     }
                 }))
+            }
+        }
+    }
+    
+    private func joinAction() {
+        let communityId = community.communityId
+        let isJoined = community.isJoined
+        Task { @MainActor in
+            if isJoined {
+                let isSuccess = try await viewModel.leaveCommunity(communityId: communityId)
+                Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
+                Toast.showToast(style: .success, message: "You unjoined \(community.displayName)!")
+            } else {
+                do {
+                    let result = try await community.object.join()
+                    
+                    switch result {
+                    case .success:
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityJoinToastSuccessMessage.localized(arguments: community.displayName))
+                    case .pending(_):
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityJoinToastRequestSuccessMessage.localizedString)
+                    default:
+                        break
+                    }
+                } catch {
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinToastErrorMessage.localizedString)
+                }
             }
         }
     }

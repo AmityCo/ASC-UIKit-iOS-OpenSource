@@ -32,11 +32,9 @@ public struct AmityUserFeedComponent: AmityComponentView {
     public var body: some View {
         ZStack(alignment: .top) {
             userFeedView
-                .isHidden(viewModel.blockedFeedState != nil || viewModel.emptyFeedState != nil)
+                .isHidden(viewModel.emptyFeedState != nil)
             
-            if let _ = viewModel.blockedFeedState {
-                EmptyUserFeedView(feedType: .post, feedState: .blocked, viewConfig: viewConfig)
-            } else if let feedState = viewModel.emptyFeedState {
+            if let feedState = viewModel.emptyFeedState {
                 EmptyUserFeedView(feedType: .post, feedState: feedState, viewConfig: viewConfig)
             }
         }
@@ -73,7 +71,7 @@ public struct AmityUserFeedComponent: AmityComponentView {
                                     let clipPost = ClipPost(id: model.postId, url: mediaURL, model: model)
                                     
                                     let provider = TargetFeedClipService(targetId: post.postedUserId, targetType: .user, clipPost: clipPost)
-                                    let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                                    let feedView = AmityClipFeedPage(provider: provider)
                                     let hostingView = AmitySwiftUIHostingController(rootView: feedView)
                                     
                                     self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)

@@ -10,6 +10,8 @@ import Foundation
 extension Notification.Name {
     public static let didPostCreated = Notification.Name("didPostCreated")
     public static let didPostDeleted = Notification.Name("didPostDeleted")
+    public static let didPostLocallyDeleted = Notification.Name("didPostLocallyDeleted")
+    public static let didPostImageUpdated = Notification.Name("didPostImageUpdated")
     public static let didPostReacted = Notification.Name("didPostReacted")
     public static let didVotePoll = Notification.Name("didVotePoll")
     public static let didLivestreamStatusUpdated = Notification.Name("didLivestreamStatusUpdated")

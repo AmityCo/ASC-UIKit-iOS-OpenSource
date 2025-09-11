@@ -23,8 +23,8 @@ extension AmityPostModel {
         public let closedIn: UInt64 // This time is in milliseconds.
         public let voteCount: Int
         public let createdAt: Date
-        
         public let isOpen: Bool
+        public let isImagePoll: Bool
         
         public init(poll: AmityPoll) {
             self.id = poll.pollId
@@ -38,6 +38,7 @@ extension AmityPostModel {
             self.answers = poll.answers.map { Answer(answer: $0) }
             self.createdAt = poll.createdAt
             self.isOpen = !poll.isClosed || !poll.isVoted
+            self.isImagePoll = poll.answers.first?.dataType == "image"
         }
         
         public class Answer: Identifiable {
@@ -46,6 +47,7 @@ extension AmityPostModel {
             public let text: String
             public let isVotedByUser: Bool
             public let voteCount: Int
+            public let image: AmityImageData?
             
             public init(answer: AmityPollAnswer) {
                 self.id = answer.answerId
@@ -53,6 +55,17 @@ extension AmityPostModel {
                 self.text = answer.text
                 self.isVotedByUser = answer.isVotedByUser
                 self.voteCount = Int(answer.voteCount)
+                self.image = answer.image
+            }
+            
+            // For testing purpose
+            init(text: String) {
+                self.id = UUID().uuidString
+                self.dataType = "image"
+                self.text = text
+                self.isVotedByUser = false
+                self.voteCount = 0
+                self.image = nil
             }
         }
     }

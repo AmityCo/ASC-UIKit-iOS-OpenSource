@@ -103,9 +103,11 @@ public struct AmityJoinRequestContentComponent: AmityComponentView {
                     Rectangle()
                         .fill(Color(viewConfig.theme.baseColorShade4))
                         .frame(height: 8)
+                        .isHidden(viewModel.joinRequests.last?.joinRequestId == joinRequest.joinRequestId)
                 }
                 .listRowInsets(EdgeInsets())
                 .modifier(HiddenListSeparator())
+                .background(Color(viewConfig.theme.backgroundColor))
                 .onAppear {
                     if index == viewModel.joinRequests.count - 1 {
                         viewModel.loadMore()
@@ -165,7 +167,7 @@ public struct AmityJoinRequestContentComponent: AmityComponentView {
                             try await viewModel.accept(request: joinRequest)
                             Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userJoinAcceptedToastSuccessMessage.localizedString)
                         } catch {
-                            if error.isAmityErrorCode(.unknown) {
+                            if error.isAmityErrorCode(.itemNotFound) {
                                 Toast.showToast(style: .warning, message: "This join request is no longer available.")
                             } else {
                                 Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userJoinAcceptedToastErrorMessage.localizedString)
@@ -191,7 +193,7 @@ public struct AmityJoinRequestContentComponent: AmityComponentView {
                             try await viewModel.reject(request: joinRequest)
                             Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userJoinDeclinedToastSuccessMessage.localizedString)
                         } catch let error {
-                            if error.isAmityErrorCode(.unknown) {
+                            if error.isAmityErrorCode(.itemNotFound) {
                                 Toast.showToast(style: .warning, message: "This join request is no longer available.")
                             } else {
                                 Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userJoinDeclinedToastErrorMessage.localizedString)

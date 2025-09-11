@@ -110,8 +110,8 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                                         if let media = post.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
                                             let clipPost = ClipPost(id: post.postId, url: mediaURL, model: post)
                                             let provider = GlobalFeedClipService(clipPost: clipPost)
-                                            let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
-                                            let hostingView = AmitySwiftUIHostingController(rootView: feedView)
+                                            let feedPage = AmityClipFeedPage(provider: provider)
+                                            let hostingView = AmitySwiftUIHostingController(rootView: feedPage)
                                             
                                             self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
                                         }

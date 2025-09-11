@@ -70,6 +70,7 @@ public struct AmityNotificationTrayPage: AmityPageView {
             }
             .background(Color(viewConfig.theme.backgroundColor))
         }
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
     }
     
@@ -85,15 +86,17 @@ public struct AmityNotificationTrayPage: AmityPageView {
         case .post, .poll:
             if item.targetType == .community {
                 // Notification: Created a post | Started a poll in community
-                AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToCommunityProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId))
+                AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToCommunityProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId, userId: nil))
             } else {
                 // Notification: Created a post | Started a poll in other feed
-                AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: nil, parentCommentId: nil, communityId: nil))
+                AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: nil, parentCommentId: nil, communityId: nil, userId: nil))
             }
         case .comment, .reply, .reaction, .mention:
-            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: idInfo.commentId, parentCommentId: idInfo.parentId, communityId: nil))
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: idInfo.commentId, parentCommentId: idInfo.parentId, communityId: nil, userId: nil))
         case .joinRequest:
-            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToCommunityProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId))
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToCommunityProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId, userId: nil))
+        case .follow:
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToUserProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: nil, userId: idInfo.userId))
         }
     }
     

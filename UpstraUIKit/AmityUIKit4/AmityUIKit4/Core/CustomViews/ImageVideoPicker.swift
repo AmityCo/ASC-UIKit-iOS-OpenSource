@@ -93,5 +93,13 @@ class ImageVideoPickerViewModel: ObservableObject, Identifiable, Equatable {
     static func == (lhs: ImageVideoPickerViewModel, rhs: ImageVideoPickerViewModel) -> Bool {
         lhs.id == rhs.id
     }
+    
+    func reset() {
+        selectedImage = nil
+        selectedMedia = nil
+        selectedMediaURL = nil
+        selectedVidoesURLs = []
+        selectedImages = []
+    }
 }
 

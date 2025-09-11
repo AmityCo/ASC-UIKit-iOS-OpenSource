@@ -21,17 +21,19 @@ public struct AmityPostDetailPage: AmityPageView {
     
     private var context: AmityPostContentComponent.Context?
     private var commentId: String?
+    private var showReplyToComment: Bool = false
     
     public var id: PageId {
         .postDetailPage
     }
     
-    public init(id: String, commentId: String? = nil, parentId: String? = nil) {
+    public init(id: String, commentId: String? = nil, parentId: String? = nil, showReplyToComment: Bool = false, preloadRepliesOfComment: Bool = false) {
         let postDetailViewModel = AmityPostDetailPageViewModel(id: id)
         self.commentId = commentId
+        self.showReplyToComment = showReplyToComment
         self.context = AmityPostContentComponent.Context()
         self._viewModel = StateObject(wrappedValue: postDetailViewModel)
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId, targetCommentId: commentId, targetCommentParentId: parentId))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId, targetCommentId: commentId, targetCommentParentId: parentId, preloadRepliesOfComment: preloadRepliesOfComment))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: id, referenceType: .post, community: postDetailViewModel.post?.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
     }
@@ -93,7 +95,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                             if let media = postModel.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
                                                 let clipPost = ClipPost(id: postModel.postId, url: mediaURL, model: postModel)
                                                 let provider = SingleClipService(clipPost: clipPost)
-                                                let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                                                let feedView = AmityClipFeedPage(provider: provider)
                                                 let hostingView = AmitySwiftUIHostingController(rootView: feedView)
                                                 
                                                 self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
@@ -142,12 +144,21 @@ public struct AmityPostDetailPage: AmityPageView {
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .onAppear {
-            host.controller?.navigationController?.isNavigationBarHidden = true
-            
-            if let targetCommunity = viewModel.post?.targetCommunity {
-                commentCoreViewModel.hideCommentButtons = !targetCommunity.isJoined
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if showReplyToComment,
+                    let item = commentCoreViewModel.targetComment,
+                    case .content(let comment) = item.type {
+                    commentComposerViewModel.replyState = (true, comment)
+                }
             }
             
+            host.controller?.navigationController?.isNavigationBarHidden = true
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                if let targetCommunity = viewModel.post?.targetCommunity {
+                    commentCoreViewModel.hideCommentButtons = !targetCommunity.isJoined
+                }
+            }
         }
     }
     
@@ -155,7 +166,6 @@ public struct AmityPostDetailPage: AmityPageView {
         return AmityNavigationBar(title: AmityLocalizedStringSet.Social.postDetailPageTitle.localizedString, showBackButton: true) {
             
             if let postModel = viewModel.post {
-                let bottomSheetHeight = calculateBottomSheetHeight(post: postModel)
                 Button(action: {
                     showBottomSheet.toggle()
                 }, label: {
@@ -167,7 +177,7 @@ public struct AmityPostDetailPage: AmityPageView {
                         .frame(width: 24, height: 24)
                 })
                 .isHidden(viewConfig.isHidden(elementId: .menuButton))
-                .bottomSheet(isShowing: $showBottomSheet, height: .fixed(bottomSheetHeight), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                     
                     PostBottomSheetView(isShown: $showBottomSheet, post: postModel) { postAction in
                         
@@ -204,6 +214,8 @@ public struct AmityPostDetailPage: AmityPageView {
                             let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                             vc.isNavigationBarHidden = true
                             self.host.controller?.present(vc, animated: true)
+                        case .sharePost:
+                            break
                         }
                     }
                 }
@@ -213,20 +225,6 @@ public struct AmityPostDetailPage: AmityPageView {
                     .frame(width: 24, height: 24)
             }
         }
-    }
-    
-    func calculateBottomSheetHeight(post: AmityPostModel) -> CGFloat {
-        
-        let baseBottomSheetHeight: CGFloat = 68
-        let itemHeight: CGFloat = 48
-        let additionalItems = [
-            true,  // Always add one item
-            post.hasModeratorPermission || viewModel.hasDeletePermission,
-        ].filter { $0 }
-        
-        let additionalHeight = CGFloat(additionalItems.count) * itemHeight
-        
-        return baseBottomSheetHeight + additionalHeight
     }
     
     func commentButtonAction(_ type: AmityCommentButtonActionType) {

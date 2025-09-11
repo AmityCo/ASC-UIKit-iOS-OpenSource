@@ -105,6 +105,10 @@ extension View {
             .accessibilityElement(children: children)
             .accessibilityLabel(labelKey)
     }
+    
+    func captureViewFrameInWindow(onFrame: @escaping (CGRect) -> Void) -> some View {
+        self.modifier(CaptureWindowFrameModifier(onFrame: onFrame))
+    }
 }
 
 // MARK: Button
@@ -343,3 +347,73 @@ extension View {
         }
     }
 }
+
+class WindowFrameCaptureUIView: UIView {
+    var onFrame: ((CGRect) -> Void)?
+    private var displayLink: CADisplayLink?
+    private var lastReportedFrame: CGRect = .zero
+    
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        
+        if window != nil {
+            startTracking()
+        } else {
+            stopTracking()
+        }
+    }
+    
+    private func startTracking() {
+        displayLink = CADisplayLink(target: self, selector: #selector(updateFrame))
+        displayLink?.add(to: .main, forMode: .common)
+    }
+    
+    private func stopTracking() {
+        displayLink?.invalidate()
+        displayLink = nil
+    }
+    
+    @objc private func updateFrame() {
+        guard let window = window else { return }
+        
+        let currentFrame = convert(bounds, to: window)
+        
+        // Only call the callback if the frame actually changed
+        if !currentFrame.equalTo(lastReportedFrame) {
+            lastReportedFrame = currentFrame
+            onFrame?(currentFrame)
+        }
+    }
+    
+    deinit {
+        stopTracking()
+    }
+}
+
+struct WindowFrameCaptureView: UIViewRepresentable {
+    var onFrame: (CGRect) -> Void
+    
+    func makeUIView(context: Context) -> WindowFrameCaptureUIView {
+        let view = WindowFrameCaptureUIView()
+        view.backgroundColor = .clear
+        view.isUserInteractionEnabled = false
+        view.onFrame = onFrame
+        return view
+    }
+    
+    func updateUIView(_ uiView: WindowFrameCaptureUIView, context: Context) {
+        uiView.onFrame = onFrame
+    }
+}
+
+struct CaptureWindowFrameModifier: ViewModifier {
+    var onFrame: (CGRect) -> Void
+    
+    func body(content: Content) -> some View {
+        content.overlay(
+            WindowFrameCaptureView(onFrame: onFrame)
+                .frame(width: 0, height: 0), alignment: .topLeading
+        )
+    }
+}
+

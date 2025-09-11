@@ -66,6 +66,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                         Rectangle()
                             .fill(Color(viewConfig.theme.baseColorShade4))
                             .frame(height: 8)
+                            .opacity(postFeedViewModel.postItems.count == 1 ? 0 : 1)
                     }
                     .listRowInsets(EdgeInsets())
                     .modifier(HiddenListSeparator())
@@ -82,6 +83,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                                 Rectangle()
                                     .fill(Color(viewConfig.theme.baseColorShade4))
                                     .frame(height: 8)
+                                    .opacity(postFeedViewModel.postItems.count - 1 == index ? 0 : 1)
                             }
                             
                         case .content(let post):
@@ -102,6 +104,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                                 Rectangle()
                                     .fill(Color(viewConfig.theme.baseColorShade4))
                                     .frame(height: 8)
+                                    .opacity(postFeedViewModel.postItems.count - 1 == index ? 0 : 1)
                             }
                         }
                     }
@@ -138,7 +141,7 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                 let clipPost = ClipPost(id: model.postId, url: mediaURL, model: model)
                 
                 let provider = TargetFeedClipService(targetId: targetId, targetType: .community, clipPost: clipPost)
-                let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                let feedView = AmityClipFeedPage(provider: provider)
                 let hostingView = AmitySwiftUIHostingController(rootView: feedView)
                 
                 self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)

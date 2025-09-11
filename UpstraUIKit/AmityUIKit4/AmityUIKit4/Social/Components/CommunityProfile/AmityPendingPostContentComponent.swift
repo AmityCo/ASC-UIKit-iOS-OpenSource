@@ -147,7 +147,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                             if let media = post.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
                                 let clipPost = ClipPost(id: post.postId, url: mediaURL, model: post, isInteractionEnabled: false)
                                 let provider = SingleClipService(clipPost: clipPost)
-                                let feedView = ClipFeedView(clipProvider: provider).updateTheme(with: viewConfig)
+                                let feedView = AmityClipFeedPage(provider: provider)
                                 let hostingView = AmitySwiftUIHostingController(rootView: feedView)
                                 
                                 self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
@@ -170,19 +170,32 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
     
     @ViewBuilder
     private func postContentTextView() -> some View {
-        if !post.text.isEmpty {
-            ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
-                goToUserProfilePage(userId)
-            })
-            .lineLimit(8)
-            .moreButtonText("...See more")
-            .font(AmityTextStyle.body(.clear).getFont())
-            .foregroundColor(Color(viewConfig.theme.baseColor))
-            .attributedColor(viewConfig.theme.primaryColor)
-            .moreButtonColor(Color(viewConfig.theme.primaryColor))
-            .expandAnimation(.easeOut(duration: 0.25))
-            .lineSpacing(5)
-            .frame(maxWidth: .infinity, alignment: .leading)
+        if !post.title.isEmpty || !post.text.isEmpty {
+            VStack(alignment: .leading, spacing: 16) {
+                // Post title
+                if !post.title.isEmpty {
+                    Text(post.title)
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Post text content
+                if !post.text.isEmpty {
+                    ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
+                        goToUserProfilePage(userId)
+                    })
+                    .lineLimit(8)
+                    .moreButtonText("...See more")
+                    .font(AmityTextStyle.body(.clear).getFont())
+                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .backgroundColor(Color(viewConfig.theme.backgroundColor))
+                    .attributedColor(viewConfig.theme.highlightColor)
+                    .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                    .expandAnimation(.easeOut(duration: 0.25))
+                    .lineSpacing(5)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
         }
     }
     

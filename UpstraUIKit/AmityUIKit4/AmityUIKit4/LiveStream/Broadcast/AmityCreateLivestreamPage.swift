@@ -28,6 +28,7 @@ public struct AmityCreateLivestreamPage: AmityPageView {
     @State private var showThumbnailEditSheet = false
     @State private var showMediaPicker = false
     @State private var showSettingSheet = false
+    @State private var showShareSheet = false
     
     let liveChatFeedHeight = (UIScreen.main.bounds.height - 50) / 2.5
     
@@ -70,7 +71,7 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                 Color.black
                     .edgesIgnoringSafeArea(.bottom)
                     .frame(height: 50)
-                    .bottomSheet(isShowing: $showSettingSheet, height: .fixed(300.0), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+                    .bottomSheet(isShowing: $showSettingSheet, height: .fixed(400), backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                         settingBottomSheetView
                     }
                     .onChange(of: viewModel.isLiveChatDisabled) { isDisabled in
@@ -381,6 +382,10 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                         .frame(width: 32, height: 28)
                         .foregroundColor(Color.white)
                 }
+                .sheet(isPresented: $showShareSheet) {
+                    let profileLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .livestream, id: viewModel.createdPost?.postId ?? "")
+                    ShareActivitySheetView(link: profileLink)
+                }
                 .isHidden(viewModel.targetType == .user)
             }
         }
@@ -593,12 +598,42 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                 .contentShape(Rectangle())
                 .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
             
+            if AmityUIKitManagerInternal.shared.canShareLink(for: .livestream) {
+                shareableLinkItemView
+            }
+            
             Spacer()
         }
         .padding(.bottom, 64)
     }
     
     @ViewBuilder
+    var shareableLinkItemView: some View {
+        let copyLinkConfig = viewConfig.forElement(.copyLink)
+        let shareLinkConfig = viewConfig.forElement(.shareLink)
+        
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "", tintColor: .white)
+            .onTapGesture {
+                showSettingSheet.toggle()
+                
+                let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .post, id: viewModel.createdPost?.postId ?? "")
+                UIPasteboard.general.string = shareLink
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .success, message: "Link copied")
+                }
+            }
+        
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "", tintColor: .white)
+            .onTapGesture {
+                showSettingSheet.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    showShareSheet = true
+                }
+            }
+    }
+    
     private var pendingPostReviewView: some View {
         VStack(spacing: 8) {
             Spacer()
@@ -618,7 +653,7 @@ public struct AmityCreateLivestreamPage: AmityPageView {
                 .padding(.top, 8)
             
             // Description
-            Text("This livestream has started. However, it will have limited visibility until your post has been approved.")
+            Text("This live stream has started. However, it will have limited visibility until your post has been approved.")
                 .applyTextStyle(.caption(.white))
                 .foregroundColor(.white.opacity(0.8))
                 .multilineTextAlignment(.center)
@@ -682,7 +717,7 @@ struct LiveStreamSetupView: View {
                 .font(.system(size: 24, weight: .bold))
                 .onChange(of: viewModel.streamTitle) { newValue in
                     guard newValue.count > liveStreamTitleCharLimit else { return }
-                    viewModel.streamTitle = String(newValue.prefix(30))
+                    viewModel.streamTitle = String(newValue.prefix(liveStreamTitleCharLimit))
                 }
         }
     }

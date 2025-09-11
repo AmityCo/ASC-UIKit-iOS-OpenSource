@@ -53,9 +53,10 @@ extension String {
         
         // If mention is present, highlight mentions first.
         if let mentions {
-            highlightedText = TextHighlighter.highlightMentions(for: contentText, metadata: mentions.metadata, mentionees: mentions.mentionees, highlightAttributes: highlightAttributes)
+            let attributedString = TextHighlighter.highlightMentions(for: contentText, metadata: mentions.metadata, mentionees: mentions.mentionees, highlightAttributes: highlightAttributes)
+            highlightedText = AttributedString(attributedString)
         }
-        
+    
         // If links is present, highlight links
         if highlightLink {
             let links = TextHighlighter.detectLinks(in: contentText)

@@ -151,7 +151,7 @@
 "livestream_player_unavailable_title" = "This stream is currently unavailable.";
 "livestream_player_unavailable_message" = "Please try again later.";
 "livestream_player_reconnecting_title" = "Reconnecting";
-"livestream_player_reconnecting_message" = "Due to poor connection, this livestream has been paused. It will resume automatically once the connection is stable.";
+"livestream_player_reconnecting_message" = "Due to poor connection, this live stream has been paused. It will resume automatically once the connection is stable.";
 "livestream_player_live" = "LIVE";
 "livestream_player_recorded" = "RECORDED";
 "livestream_player_upcoming_live" = "UPCOMING LIVE";
@@ -243,11 +243,15 @@
 "poll_remaining_minutes_left" = "m left";
 
 "poll_question_title" = "Poll question";
+"poll_post_title" = "Post title";
+"poll_post_title_optional" = "(Optional)";
+"poll_post_title_textfield_placeholder" = "Give your poll a headline";
 "poll_question_textfield_placeholder" = "What's your poll question?";
 "poll_multiple_selection_title" = "Multiple selection";
 "poll_multiple_selection_desc" = "Let participants vote more than one option";
 
 "poll_post_create_error" = "Failed to create post. Please try again.";
+"poll_post_create_ban_word_error" = "Your post wasn't posted as it contains an inappropriate word.";
 "poll_create_posting_toast" = "Posting...";
 
 "poll_duration_title" = "Poll duration";
@@ -277,15 +281,17 @@
 
 "poll_see_full_results_label" = "See full results";
 "poll_see_results_label" = "See results";
-"poll_back_to_vote_label" = "Back to vote";
+"poll_back_to_vote_label" = "Back to poll";
 "poll_see_more_options_label" = "See %d more options";
 
 "poll_vote_counts" = "%@ votes";
 "poll_vote_button" = "Vote";
+"poll_unvote_button" = "Unvote";
 "poll_label" = "Poll";
 
 "poll_option_char_limit_error" = "Poll option cannot exceed %d characters.";
 "poll_question_char_limit_error" = "Poll question cannot exceed %d characters.";
+"poll_title_char_limit_error" = "Poll title cannot exceed %d characters.";
 
 "poll_target_my_timeline" = "My Timeline";
 
@@ -293,8 +299,8 @@
 "post_create_error" = "Failed to create post. Please try again.";
 "post_edit_error" = "Failed to edit post. Please try again.";
 
-"post_discard_alert_title" = "Discard Changes?";
-"post_discard_alert_message" = "Do you want to discard your changes to this post?";
+"post_discard_alert_title" = "Discard this post?";
+"post_discard_alert_message" = "The post will be permanently discarded. It cannot be undone.";
 "post_discard_alert_button_keep_editing" = "Keep editing";
 
 "search_no_results_found_title" = "No results found";
@@ -358,7 +364,7 @@
 "live_stream_terminated_playback_desc" = "There will be no playback of this live stream on any feeds.";
 "live_stream_terminated_streamer_content_desc" = "The live stream has also been terminated for all your viewers.";
 
-"live_stream_label" = "Livestream";
+"live_stream_label" = "Live stream";
 
 "no_internet_connection" = "No internet connection.";
 

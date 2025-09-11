@@ -90,6 +90,12 @@ struct ReplyCommentView: View {
                 
             }
         }
+        .onAppear {
+            if viewModel.preloadReplyComments {
+                collection = commentCoreViewModel.getChildComments(parentId: viewModel.parentComment.commentId)
+                hideViewReplyCommentButton = true
+            }
+        }
     }
     
     @ViewBuilder
@@ -255,9 +261,11 @@ struct ReplyCommentListView<Content>: View where Content: View {
 
 class ReplyCommentViewModel: ObservableObject {
     @Published var parentComment: AmityCommentModel
+    let preloadReplyComments: Bool
     
-    init(_ parentComment: AmityCommentModel) {
+    init(_ parentComment: AmityCommentModel, preloadReplyComments: Bool = false) {
         self.parentComment = parentComment
+        self.preloadReplyComments = preloadReplyComments
     }
 }
 

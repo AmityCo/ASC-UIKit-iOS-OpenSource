@@ -28,6 +28,8 @@ struct ClipFeedItemOverlayView: View {
     @StateObject var viewModel: ClipFeedOverlayViewModel
     let onTapAction: ((ClipFeedAction) -> Void)?
     
+    @State private var expandableTextHeight: CGFloat = 0.0
+    
     init(post: AmityPostModel, playerController: AmityMediaPlayerController, isInteractionEnabled: Bool, onTapAction: ((ClipFeedAction) -> Void)?) {
         self.post = post
         self.isInteractionEnabled = isInteractionEnabled
@@ -38,6 +40,10 @@ struct ClipFeedItemOverlayView: View {
     
     @State private var sliderValue: Double = 0
     @State private var showMoreOption: Bool = false
+    @State private var showShareSheet: Bool = false
+    
+    @State private var postContentLineLimit = 3
+    @State private var isPostContentExpanded = false
     
     var body: some View {
         ZStack {
@@ -63,57 +69,10 @@ struct ClipFeedItemOverlayView: View {
                         // Left side - User info and caption
                         VStack(alignment: .leading, spacing: 10) {
                             // User info
-                            HStack(spacing: 8) {
-                                
-                                AmityUserProfileImageView(displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: post.postedUser?.avatarURL ?? ""))
-                                    .frame(size: CGSize(width: 32, height: 32))
-                                    .clipShape(Circle())
-                                    .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
-                                    .onTapGesture {
-                                        onTapAction?(.userProfile(userId: post.postedUserId))
-                                    }
-                                
-                                VStack(alignment: .leading, spacing: 2) {
-                                    HStack(spacing: 0) {
-                                        authorDisplayNameLabel
-                                            .layoutPriority(1)
-                                        
-                                        Text("•")
-                                            .applyTextStyle(.caption(Color.white))
-                                            .padding(.horizontal, 4)
-                                            .layoutPriority(2)
-                                        
-                                        Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
-                                            .applyTextStyle(.caption(Color.white))
-                                            .isHidden(viewConfig.isHidden(elementId: .timestamp))
-                                            .accessibilityIdentifier(AccessibilityID.Social.PostContent.timestamp)
-                                            .layoutPriority(2)
-                                    }
-                                    
-                                    // Moderator Badge
-                                    if post.isModerator {
-                                        let elementConfig = viewConfig.forElement(.moderatorBadge, pageId: nil, componentId: .postContentComponent)
-                                        HStack(spacing: 3) {
-                                            Image(AmityIcon.getImageResource(named: elementConfig.icon ?? "moderatorBadgeIcon"))
-                                                .resizable()
-                                                .frame(width: 12, height: 12)
-                                                .padding(.leading, 6)
-                                            Text(elementConfig.text ?? "Moderator")
-                                                .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
-                                                .padding(.trailing, 6)
-                                        }
-                                        .frame(height: 20)
-                                        .background(Color(viewConfig.theme.primaryColor.blend(.shade3)))
-                                        .clipShape(RoundedCorner(radius: 10))
-                                        .accessibilityIdentifier(AccessibilityID.Social.PostContent.moderatorBadge)
-                                    }
-                                }
-                                
-                                Spacer()
-                            }
+                            postAuthorInfo
                             
                             // Caption
-                            postContentTextView()
+                            postContent
                         }
                         .padding(.horizontal, 16)
                     }
@@ -121,50 +80,71 @@ struct ClipFeedItemOverlayView: View {
                     // Right side - Action buttons
                     VStack(spacing: 0) {
                         if isInteractionEnabled {
+                            Color
+                                .clear
+                                .frame(width: 0, height: 0)
+                                .captureViewFrameInWindow(onFrame: { rect in
+                                    viewModel.reactionBarFrame = rect
+                                })
+                            
                             // Like button
                             VStack(spacing: 4) {
-                                Button(action: {
-                                    var canUpdateReaction = true
-                                    
-                                    if let targetCommunity = post.targetCommunity, !targetCommunity.isJoined {
-                                        canUpdateReaction = false
-                                    }
-                                    
-                                    if canUpdateReaction {
-                                        Task { @MainActor in
-                                            do {
-                                                if viewModel.isPostLiked {
-                                                    try await viewModel.removeReaction(id: post.postId)
-                                                } else {
-                                                    try await viewModel.addReaction(id: post.postId)
-                                                }
-                                            } catch let error {
-                                                // Clip Deleted
-                                                if error.isAmityErrorCode(.itemNotFound) {
-                                                    // Stop playing
-                                                    playerController.pause()
-                                                    
-                                                    viewModel.localIsClipDeleted = true
-                                                    
-                                                    // Forcefully update the cache
-                                                    viewModel.updatePostCache(postId: post.postId)
-                                                }
-                                            }
+                                let icon = viewModel.myReaction != nil ? viewModel.myReaction!.image : AmityIcon.clipReactionIcon.imageResource
+                                Image(icon)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 32, height: 32)
+                                    .foregroundColor(.white)
+                                    .tapAndDragSimutaneousGesture(longPressSensitivity: 150, tapAction: {
+                                        var canUpdateReaction = true
+                                        
+                                        if let targetCommunity = post.targetCommunity, !targetCommunity.isJoined {
+                                            canUpdateReaction = false
                                         }
                                         
-                                        /// Send didPostReacted event to update global feed data source
-                                        /// This event is observed in PostFeedViewModel
-                                        NotificationCenter.default.post(name: .didPostReacted, object: post.object)
-                                    } else {
-                                        Toast.showToast(style: .warning, message: "Join community to interact with this clip.")
-                                    }
-                                }) {
-                                    Image(viewModel.isPostLiked ? AmityIcon.clipReactIconLike.imageResource : AmityIcon.clipReactionIcon.imageResource)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 32, height: 32)
-                                        .foregroundColor(.white)
-                                }
+                                        if canUpdateReaction {
+                                            Task { @MainActor in
+                                                do {
+                                                    if let myReaction = viewModel.myReaction {
+                                                        try await viewModel.removeReaction(id: post.postId, name: myReaction.name)
+                                                    } else {
+                                                        try await viewModel.addReaction(id: post.postId)
+                                                    }
+                                                } catch let error {
+                                                    // Clip Deleted
+                                                    if error.isAmityErrorCode(.itemNotFound) {
+                                                        // Stop playing
+                                                        playerController.pause()
+                                                        
+                                                        viewModel.localIsClipDeleted = true
+                                                        
+                                                        // Forcefully update the cache
+                                                        viewModel.updatePostCache(postId: post.postId)
+                                                    }
+                                                }
+                                            }
+                                            
+                                            /// Send didPostReacted event to update global feed data source
+                                            /// This event is observed in PostFeedViewModel
+                                            NotificationCenter.default.post(name: .didPostReacted, object: post.object)
+                                        } else {
+                                            Toast.showToast(style: .warning, message: "Join community to interact with this clip.")
+                                        }
+                                    }, longPressAction: {
+                                        ImpactFeedbackGenerator.impactFeedback(style: .heavy)
+                                        let frame = CGRect(origin: CGPoint(x: viewModel.reactionBarFrame.origin.x + 16, y: viewModel.reactionBarFrame.origin.y), size: viewModel.reactionBarFrame.size)
+                                        let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .post, referenceId: post.postId, currentReaction: viewModel.myReaction?.name, onReactionAdded: { name in
+                                            viewModel.updateLocalDataOnReactionAdded(name)
+                                        }, onReactionRemoved: { name in
+                                            viewModel.updateLocalDataOnReactionRemoved()
+                                        })
+                                        AmitySocialReactionPickerOverlay.shared.show(frame: frame, viewModel: reactionPickerViewModel, alignRight: true)
+                                    }, dragChangedAction: { point in
+                                        AmitySocialReactionPickerOverlay.shared.checkHoveredReactionOnDrag(at: point)
+                                    }, dragEndedAction: { point in
+                                        AmitySocialReactionPickerOverlay.shared.addHoveredReactionDragEnded(at: point)
+                                    })
+                                
                                 Text(viewModel.reactionsCount.formattedCountString)
                                     .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(.white)
@@ -285,9 +265,44 @@ struct ClipFeedItemOverlayView: View {
                             onTapAction?(.postDetail(post: post))
                         }
                     }
+                
+                if AmityUIKitManagerInternal.shared.canShareLink(for: .post) {
+                    shareableLinkItemView
+                }
             }
             .padding(.bottom, 64)
         }
+        .sheet(isPresented: $showShareSheet) {
+            let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .post, id: post.postId)
+            ShareActivitySheetView(link: shareLink)
+        }
+    }
+    
+    @ViewBuilder
+    var shareableLinkItemView: some View {
+        let copyLinkConfig = viewConfig.forElement(.copyLink)
+        let shareLinkConfig = viewConfig.forElement(.shareLink)
+        
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "")
+            .onTapGesture {
+                showMoreOption.toggle()
+                
+                let profileLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .post, id: post.postId)
+                UIPasteboard.general.string = profileLink
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .success, message: "Link copied")
+                }
+            }
+        
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "")
+            .onTapGesture {
+                showMoreOption.toggle()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    showShareSheet = true
+                }
+            }
     }
 }
 
@@ -315,28 +330,122 @@ extension ClipFeedItemOverlayView {
     }
     
     @ViewBuilder
-    private func postContentTextView() -> some View {
+    var postContent: some View {
         if !post.text.isEmpty {
-            ExpandableText(post.text, defaultAction: {
-                onTapAction?(.postDetail(post: post))
-            }, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
-                // We do not support expanding text in this view, so we redirect to post detail page
-                onTapAction?(.postDetail(post: post))
-            })
-            .lineLimit(3)
-            .moreButtonText("...See more")
-            .font(AmityTextStyle.body(.clear).getFont())
-            .foregroundColor(Color.white)
-            .attributedColor(UIColor.white)
-            .moreButtonColor(Color.white)
-            .moreButtonFont(AmityTextStyle.bodyBold(.white).getFont())
-            .expandAnimation(.easeOut(duration: 0.25))
-            .lineSpacing(5)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .onTapGesture {
-                onTapAction?(.postDetail(post: post))
+            if isPostContentExpanded {
+                let scrollableThreshold = UIScreen.main.bounds.height * 0.4
+                let shouldMakeContentScrollable = expandableTextHeight >= scrollableThreshold
+
+                if shouldMakeContentScrollable {
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Spacer(minLength: 0)
+                            
+                            postExpandableContent
+                        }
+                    }
+                    .frame(height: UIScreen.main.bounds.height * 0.4)
+                } else {
+                    postExpandableContent
+                }
+                
+                Button {
+                    togglePostContentExpantion()
+                } label: {
+                    Text("See less")
+                        .applyTextStyle(.bodyBold(.white))
+                }
+                .padding(.top, 12)
+            }
+            else {
+                postExpandableContent
             }
         }
+    }
+    
+    @ViewBuilder
+    private var postAuthorInfo: some View {
+        // User info
+        HStack(spacing: 8) {
+            
+            AmityUserProfileImageView(displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: post.postedUser?.avatarURL ?? ""))
+                .frame(size: CGSize(width: 32, height: 32))
+                .clipShape(Circle())
+                .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+                .onTapGesture {
+                    onTapAction?(.userProfile(userId: post.postedUserId))
+                }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 0) {
+                    authorDisplayNameLabel
+                        .layoutPriority(1)
+                    
+                    Text("•")
+                        .applyTextStyle(.caption(Color.white))
+                        .padding(.horizontal, 4)
+                        .layoutPriority(2)
+                    
+                    Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
+                        .applyTextStyle(.caption(Color.white))
+                        .isHidden(viewConfig.isHidden(elementId: .timestamp))
+                        .accessibilityIdentifier(AccessibilityID.Social.PostContent.timestamp)
+                        .layoutPriority(2)
+                }
+                
+                // Moderator Badge
+                if post.isModerator {
+                    let elementConfig = viewConfig.forElement(.moderatorBadge, pageId: nil, componentId: .postContentComponent)
+                    HStack(spacing: 3) {
+                        Image(AmityIcon.getImageResource(named: elementConfig.icon ?? "moderatorBadgeIcon"))
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                            .padding(.leading, 6)
+                        Text(elementConfig.text ?? "Moderator")
+                            .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
+                            .padding(.trailing, 6)
+                    }
+                    .frame(height: 20)
+                    .background(Color(viewConfig.theme.primaryColor.blend(.shade3)))
+                    .clipShape(RoundedCorner(radius: 10))
+                    .accessibilityIdentifier(AccessibilityID.Social.PostContent.moderatorBadge)
+                }
+            }
+            
+            Spacer()
+        }
+    }
+    
+    @ViewBuilder
+    private var postExpandableContent: some View {
+        ExpandableText(post.text, defaultAction: {
+            togglePostContentExpantion()
+        }, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
+            // We do not support expanding text in this view, so we redirect to post detail page
+            onTapAction?(.userProfile(userId: userId))
+        })
+        .lineLimit(postContentLineLimit)
+        .moreButtonText("...See more")
+        .font(AmityTextStyle.body(.clear).getFont())
+        .foregroundColor(Color.white)
+        .attributedColor(UIColor.white)
+        .hashtagColor(viewConfig.theme.primaryColor)
+        .moreButtonColor(Color.white)
+        .moreButtonFont(AmityTextStyle.bodyBold(.white).getFont())
+        .expandAnimation(.easeOut(duration: 0.25))
+        .lineSpacing(5)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .onTapGesture {
+            togglePostContentExpantion()
+        }
+        .readSize { size in
+            expandableTextHeight = size.height
+        }
+    }
+    
+    func togglePostContentExpantion() {
+        isPostContentExpanded.toggle()
+        postContentLineLimit = isPostContentExpanded ? 1000 : 3
     }
 }
 
@@ -366,23 +475,24 @@ class ClipFeedOverlayViewModel: ObservableObject {
     
     let reactionManager = ReactionManager()
     
-    @Published var isPostLiked = false
     @Published var reactionsCount: Int = 0
+    @Published var myReaction: AmityReactionType?
+    var reactionBarFrame: CGRect = .zero
     
     // In some cases, we do mapping between parent & child post while observing "child" post live collection. In those scenario,
     // this view will not update when reaction is added / removed as reactions are added to parent post live collection.
     // So we maintain local state to handle that scenario
-    var localIsPostLiked: Bool?
-    var localReactionCount: Int?
+    private var localReactionCount: Int?
     @Published var localIsClipDeleted = false
     
     private let postManager = PostManager()
     private var token: AmityNotificationToken?
     
     init(post: AmityPostModel) {
-        isPostLiked = post.isLiked
         reactionsCount = post.reactionsCount
         localIsClipDeleted = post.isDeleted
+        
+        myReaction = post.myReaction
         
         if let localReactionCount, localReactionCount != reactionsCount {
             reactionsCount = localReactionCount
@@ -392,20 +502,24 @@ class ClipFeedOverlayViewModel: ObservableObject {
     @MainActor
     func addReaction(id: String) async throws {
         try await reactionManager.addReaction(.like, referenceId: id, referenceType: .post)
-        
-        isPostLiked = true
-        localIsPostLiked = true
+        updateLocalDataOnReactionAdded(ReactionType.like.rawValue)
+    }
+    
+    @MainActor
+    func removeReaction(id: String, name: String) async throws {
+        try await reactionManager.removeReaction(name, referenceId: id, referenceType: .post)
+        updateLocalDataOnReactionRemoved()
+    }
+    
+    func updateLocalDataOnReactionAdded(_ name: String) {
+        myReaction = SocialReactionConfiguration.shared.getReaction(withName: name)
         
         localReactionCount = reactionsCount + 1
         reactionsCount = localReactionCount ?? 0
     }
     
-    @MainActor
-    func removeReaction(id: String) async throws {
-        try await reactionManager.removeReaction(.like, referenceId: id, referenceType: .post)
-        
-        isPostLiked = false
-        localIsPostLiked = false
+    func updateLocalDataOnReactionRemoved() {
+        myReaction = nil
         
         localReactionCount = max(0, reactionsCount - 1)
         reactionsCount = localReactionCount ?? 0

@@ -14,7 +14,7 @@ enum PostMenuType: String, CaseIterable, Identifiable {
     
     case post = "Post"
     case poll = "Poll"
-    case liveStream = "Livestream"
+    case liveStream = "Live stream"
     case story = "Story"
     case clip = "Clip"
 }
