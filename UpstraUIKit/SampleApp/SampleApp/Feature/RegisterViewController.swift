@@ -10,6 +10,7 @@ import UIKit
 import AmityUIKit
 import AmitySDK
 import SwiftUI
+import AmityUIKit4
 
 class RegisterViewController: UIViewController {
     
@@ -19,6 +20,8 @@ class RegisterViewController: UIViewController {
     @IBOutlet private var textField: UITextField!
     @IBOutlet private var tableView: UITableView!
     @IBOutlet private var endpointsButton: UIBarButtonItem!
+    
+    @IBOutlet weak var loginAsGuestButton: UIButton!
     
     private let cellIdentifier = "cell"
     private let defaultUser = "victimIOS"
@@ -50,8 +53,19 @@ class RegisterViewController: UIViewController {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         tableView.delegate = self
         tableView.dataSource = self
+        
+        loginAsGuestButton.addTarget(self, action: #selector(onLoginAsGuestButtonTap), for: .touchUpInside)
     }
-
+    
+    @objc func onLoginAsGuestButtonTap() {
+        let view = GuestLoginView { isSecureMode, authSignature, authSignatureExpiry in
+            self.dismiss(animated: true)
+            AppManager.shared.registerVisitor(authSignature: isSecureMode ? authSignature : nil, authSignatureExpiryAt: isSecureMode ? authSignatureExpiry : nil)
+        }
+        let host = UIHostingController(rootView: view)
+        self.present(host, animated: true)
+    }
+    
     @IBAction func addUserIDsTap() {
         addUser()
         

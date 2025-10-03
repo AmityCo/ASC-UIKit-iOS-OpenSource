@@ -492,18 +492,20 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             .background(reactionBtnBgColor)
             .clipShape(RoundedRectangle(cornerRadius: 20))
             .onTapGesture {
-                guard isCommunityMember else {
-                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Story.nonMemberReactStoryMessage.localizedString)
-                    return
-                }
-                
                 ImpactFeedbackGenerator.impactFeedback(style: .light)
-                
-                Task {
-                    if story.isLiked {
-                        try await viewModel.removeReaction(storyId: story.storyId)
-                    } else {
-                        try await viewModel.addReaction(storyId: story.storyId)
+
+                AmityUserAction.perform(host: host) {
+                    guard isCommunityMember else {
+                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Story.nonMemberReactStoryMessage.localizedString)
+                        return
+                    }
+                    
+                    Task {
+                        if story.isLiked {
+                            try await viewModel.removeReaction(storyId: story.storyId)
+                        } else {
+                            try await viewModel.addReaction(storyId: story.storyId)
+                        }
                     }
                 }
             }
@@ -629,13 +631,12 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     func getCommentSheetContentView() -> some View {
         if let item = storyTarget.items.element(at: viewModel.storySegmentIndex),
            case let .content(story) = item.type {
-            let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
             let allowCreateComment = story.storyTarget?.community?.storySettings.allowComment ?? false
             
             AmityCommentTrayComponent(referenceId: story.storyId,
                                       referenceType: .story,
                                       community: story.storyTarget?.community,
-                                      shouldAllowInteraction: isCommunityMember,
+                                      shouldAllowInteraction: true,
                                       shouldAllowCreation: allowCreateComment)
         }
     }

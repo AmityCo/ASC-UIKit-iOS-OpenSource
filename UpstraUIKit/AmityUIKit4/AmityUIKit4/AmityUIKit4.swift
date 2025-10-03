@@ -73,9 +73,16 @@ public final class AmityUIKit4Manager {
         authToken: String? = nil,
         sessionHandler: SessionHandler,
         completion: AmityRequestCompletion? = nil) {
-        AmityUIKitManagerInternal.shared.registerDevice(userId, displayName: displayName, authToken: authToken, sessionHandler: sessionHandler, completion: completion)
-    }
+            AmityUIKitManagerInternal.shared.registerDevice(userId, displayName: displayName, authToken: authToken, sessionHandler: sessionHandler, completion: completion)
+        }
     
+    @MainActor
+    public static func registerDeviceAsVisitor(
+        authSignature: String?,
+        authSignatureExpiresAt: Date?,
+        sessionHandler: SessionHandler) async throws {
+            try await AmityUIKitManagerInternal.shared.registerDeviceAsGuest(authSignature: authSignature, authSignatureExpiresAt: authSignatureExpiresAt, sessionHandler: sessionHandler)
+        }
     /// Unregisters current user. This removes all data related to current user & terminates conenction with server. This is analogous to "logout" process.
     /// Once this method is called, the only way to re-establish connection would be to call `registerDevice` method again.
     ///
@@ -132,11 +139,9 @@ public final class AmityUIKit4Manager {
         return Bundle(for: self)
     }
     
-    
     public static func syncNetworkConfig() async throws {
         try await AmityUIKitManagerInternal.shared.syncNetworkConfig()
     }
-    
 }
 
 final class AmityUIKitManagerInternal: NSObject {
@@ -155,7 +160,7 @@ final class AmityUIKitManagerInternal: NSObject {
     
     var currentUserId: String { return client.currentUserId ?? "" }
     let remoteConfig = RemoteConfig()
-
+    
     var client: AmityClient {
         guard let client = _client else {
             fatalError("Something went wrong. Please ensure `AmityUIKitManager.setup(:_)` get called before accessing client.")
@@ -169,13 +174,13 @@ final class AmityUIKitManagerInternal: NSObject {
     
     // MARK: - Initializer
     
-    private override init() { 
+    private override init() {
         super.init()
         setupUIKitBehaviour()
     }
     
     // MARK: - Setup functions
-
+    
     func setup(_ apiKey: String, region: AmityRegion) {
         guard let client = try? AmityClient(apiKey: apiKey, region: region) else { return }
         
@@ -229,7 +234,7 @@ final class AmityUIKitManagerInternal: NSObject {
         // StoryTabComponent
         let storyTabComponentBehaviour = AmityStoryTabComponentBehaviour()
         behavior.storyTabComponentBehaviour = storyTabComponentBehaviour
-    
+        
         // ViewStoryPage
         let viewStoryPageBehaviour = AmityViewStoryPageBehaviour()
         behavior.viewStoryPageBehaviour = viewStoryPageBehaviour
@@ -349,7 +354,7 @@ final class AmityUIKitManagerInternal: NSObject {
         // Poll Post
         let pollTargetSelectionPageBehavior = AmityPollTargetSelectionPageBehavior()
         behavior.pollTargetSelectionPageBehavior = pollTargetSelectionPageBehavior
-
+        
         let livestreamBehavior = AmityLivestreamBehavior()
         behavior.livestreamBehavior = livestreamBehavior
         
@@ -367,6 +372,9 @@ final class AmityUIKitManagerInternal: NSObject {
         
         let draftClipPageBehavior = AmityDraftClipPageBehavior()
         behavior.draftClipPageBehavior = draftClipPageBehavior
+        
+        let globalBehavior = AmityGlobalBehavior()
+        behavior.globalBehavior = globalBehavior
     }
     
     func registerDevice(_ userId: String,
@@ -384,6 +392,15 @@ final class AmityUIKitManagerInternal: NSObject {
                 completion?(false, error)
             }
         }
+    }
+    
+    @MainActor
+    func registerDeviceAsGuest(authSignature: String?,
+                               authSignatureExpiresAt: Date?,
+                               sessionHandler: SessionHandler) async throws {
+        
+        try await client.loginAsVisitor(authSignature: authSignature, authSignatureExpiresAt: authSignatureExpiresAt, sessionHandler: sessionHandler)
+        didUpdateClient()
     }
     
     func unregisterDevice() {
@@ -408,7 +425,7 @@ final class AmityUIKitManagerInternal: NSObject {
             } catch let error {
                 completion?(false, error)
             }
-
+            
         }
     }
     
@@ -439,7 +456,7 @@ final class AmityUIKitManagerInternal: NSObject {
                 }
             }
         })
-            
+        
     }
     
     func didUpdateClient() {
@@ -491,6 +508,14 @@ final class AmityUIKitManagerInternal: NSObject {
             Log.add(event: .info, "Shareable link configuration error: \(error.localizedDescription)")
             shareableLinkConfig = nil
         }
+    }
+    
+    public var currentUserType: AmityUserType {
+        return client.currentUserType
+    }
+    
+    public var isGuestUser: Bool {
+        return client.currentUserType == .visitor || client.currentUserType == .bot
     }
 }
 

@@ -96,49 +96,54 @@ struct ClipFeedItemOverlayView: View {
                                     .frame(width: 32, height: 32)
                                     .foregroundColor(.white)
                                     .tapAndDragSimutaneousGesture(longPressSensitivity: 150, tapAction: {
-                                        var canUpdateReaction = true
-                                        
-                                        if let targetCommunity = post.targetCommunity, !targetCommunity.isJoined {
-                                            canUpdateReaction = false
-                                        }
-                                        
-                                        if canUpdateReaction {
-                                            Task { @MainActor in
-                                                do {
-                                                    if let myReaction = viewModel.myReaction {
-                                                        try await viewModel.removeReaction(id: post.postId, name: myReaction.name)
-                                                    } else {
-                                                        try await viewModel.addReaction(id: post.postId)
-                                                    }
-                                                } catch let error {
-                                                    // Clip Deleted
-                                                    if error.isAmityErrorCode(.itemNotFound) {
-                                                        // Stop playing
-                                                        playerController.pause()
-                                                        
-                                                        viewModel.localIsClipDeleted = true
-                                                        
-                                                        // Forcefully update the cache
-                                                        viewModel.updatePostCache(postId: post.postId)
-                                                    }
-                                                }
+                                        AmityUserAction.perform(host: host) {
+                                            var canUpdateReaction = true
+                                            
+                                            if let targetCommunity = post.targetCommunity, !targetCommunity.isJoined {
+                                                canUpdateReaction = false
                                             }
                                             
-                                            /// Send didPostReacted event to update global feed data source
-                                            /// This event is observed in PostFeedViewModel
-                                            NotificationCenter.default.post(name: .didPostReacted, object: post.object)
-                                        } else {
-                                            Toast.showToast(style: .warning, message: "Join community to interact with this clip.")
+                                            if canUpdateReaction {
+                                                Task { @MainActor in
+                                                    do {
+                                                        if let myReaction = viewModel.myReaction {
+                                                            try await viewModel.removeReaction(id: post.postId, name: myReaction.name)
+                                                        } else {
+                                                            try await viewModel.addReaction(id: post.postId)
+                                                        }
+                                                    } catch let error {
+                                                        // Clip Deleted
+                                                        if error.isAmityErrorCode(.itemNotFound) {
+                                                            // Stop playing
+                                                            playerController.pause()
+                                                            
+                                                            viewModel.localIsClipDeleted = true
+                                                            
+                                                            // Forcefully update the cache
+                                                            viewModel.updatePostCache(postId: post.postId)
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                /// Send didPostReacted event to update global feed data source
+                                                /// This event is observed in PostFeedViewModel
+                                                NotificationCenter.default.post(name: .didPostReacted, object: post.object)
+                                            } else {
+                                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                                            }
                                         }
                                     }, longPressAction: {
                                         ImpactFeedbackGenerator.impactFeedback(style: .heavy)
-                                        let frame = CGRect(origin: CGPoint(x: viewModel.reactionBarFrame.origin.x + 16, y: viewModel.reactionBarFrame.origin.y), size: viewModel.reactionBarFrame.size)
-                                        let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .post, referenceId: post.postId, currentReaction: viewModel.myReaction?.name, onReactionAdded: { name in
-                                            viewModel.updateLocalDataOnReactionAdded(name)
-                                        }, onReactionRemoved: { name in
-                                            viewModel.updateLocalDataOnReactionRemoved()
-                                        })
-                                        AmitySocialReactionPickerOverlay.shared.show(frame: frame, viewModel: reactionPickerViewModel, alignRight: true)
+                                        
+                                        AmityUserAction.perform(host: host) {
+                                            let frame = CGRect(origin: CGPoint(x: viewModel.reactionBarFrame.origin.x + 16, y: viewModel.reactionBarFrame.origin.y), size: viewModel.reactionBarFrame.size)
+                                            let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .post, referenceId: post.postId, currentReaction: viewModel.myReaction?.name, onReactionAdded: { name in
+                                                viewModel.updateLocalDataOnReactionAdded(name)
+                                            }, onReactionRemoved: { name in
+                                                viewModel.updateLocalDataOnReactionRemoved()
+                                            })
+                                            AmitySocialReactionPickerOverlay.shared.show(frame: frame, viewModel: reactionPickerViewModel, alignRight: true)
+                                        }
                                     }, dragChangedAction: { point in
                                         AmitySocialReactionPickerOverlay.shared.checkHoveredReactionOnDrag(at: point)
                                     }, dragEndedAction: { point in

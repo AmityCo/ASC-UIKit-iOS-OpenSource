@@ -23,6 +23,7 @@ class AmityUserFeedComponentViewModel: ObservableObject {
     private var userFollowInfoObject: AmityObject<AmityUserFollowInfo>?
     private var cancellable: AnyCancellable?
     private var token: AmityNotificationToken?
+    private var userFollowInfoToken: AmityNotificationToken?
     
     private var isOwnUser: Bool {
         return AmityUIKitManagerInternal.shared.currentUserId == userId
@@ -56,15 +57,21 @@ class AmityUserFeedComponentViewModel: ObservableObject {
                 })
         } else {
             userFollowInfoObject = userManager.getFollowInfo(withId: userId)
-            cancellable = userFollowInfoObject?.$snapshot
-                .sink(receiveValue: { [weak self] followInfo in
-                    guard let followInfo else { return }
+            userFollowInfoToken = userFollowInfoObject?.observe({ [weak self] liveObject, error in
+                guard let self else { return }
+                if let error, error.isAmityErrorCode(.visitorPermissionDenied) {
+                    self.emptyFeedState = .private
+                    return
+                }
+                
+                if let followInfo = liveObject.snapshot {
                     let model = AmityFollowInfoModel(followInfo)
-                    self?.emptyFeedState = model.status == .blocked ? .blocked : nil
+                    self.emptyFeedState = model.status == .blocked ? .blocked : nil
                     if model.status != .blocked {
-                        self?.loadPosts(feedSources: feedSources)
+                        self.loadPosts(feedSources: feedSources)
                     }
-                })
+                }
+            })
         }
     }
     

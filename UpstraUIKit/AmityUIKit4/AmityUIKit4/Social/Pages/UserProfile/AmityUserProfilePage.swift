@@ -252,18 +252,24 @@ public struct AmityUserProfilePage: AmityPageView {
             BottomSheetItemView(icon: AmityIcon.editCommentIcon.getImageResource(), text: "Edit Profile")
                 .onTapGesture {
                     showBottomSheet.toggle()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                        let context = AmityUserProfilePageBehavior.Context(page: self)
-                        AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToEditUserPage(context: context)
+                    
+                    AmityUserAction.perform(host: host) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            let context = AmityUserProfilePageBehavior.Context(page: self)
+                            AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToEditUserPage(context: context)
+                        }
                     }
                 }
             
             BottomSheetItemView(icon: AmityIcon.blockUserIcon.getImageResource(), text: "Manage blocked users")
                 .onTapGesture {
                     showBottomSheet.toggle()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                        let context = AmityUserProfilePageBehavior.Context(page: self)
-                        AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToBlockedUsersPage(context: context)
+                    
+                    AmityUserAction.perform(host: host) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            let context = AmityUserProfilePageBehavior.Context(page: self)
+                            AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToBlockedUsersPage(context: context)
+                        }
                     }
                 }
             
@@ -279,22 +285,24 @@ public struct AmityUserProfilePage: AmityPageView {
             BottomSheetItemView(icon: isUserReported ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource(), text: isUserReported ? "Unreport user" :"Report user")
                 .onTapGesture {
                     showBottomSheet.toggle()
-    
-                    Task { @MainActor in
-                        if isUserReported {
-                            do {
-                                try await viewModel.unflag()
-                                Toast.showToast(style: .success, message: "User unreported.")
-                            } catch {
-                                Toast.showToast(style: .warning, message: "Failed to unreport user. Please try again.")
-                            }
-                            
-                        } else {
-                            do {
-                                try await viewModel.flag()
-                                Toast.showToast(style: .success, message: "User reported.")
-                            } catch {
-                                Toast.showToast(style: .warning, message: "Failed to report user. Please try again.")
+                    
+                    AmityUserAction.perform(host: host) {
+                        Task { @MainActor in
+                            if isUserReported {
+                                do {
+                                    try await viewModel.unflag()
+                                    Toast.showToast(style: .success, message: "User unreported.")
+                                } catch {
+                                    Toast.showToast(style: .warning, message: "Failed to unreport user. Please try again.")
+                                }
+                                
+                            } else {
+                                do {
+                                    try await viewModel.flag()
+                                    Toast.showToast(style: .success, message: "User reported.")
+                                } catch {
+                                    Toast.showToast(style: .warning, message: "Failed to report user. Please try again.")
+                                }
                             }
                         }
                     }
@@ -310,35 +318,39 @@ public struct AmityUserProfilePage: AmityPageView {
                 .onTapGesture {
                     showBottomSheet.toggle()
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        Task { @MainActor in
-                            if isBlockedUser {
-                                showAlert(title: "Unblock user?", message: "\(viewModel.user?.displayName ?? "") will now be able to see posts and comments that you’ve created. They won’t be notified that you’ve unblocked them.", btnTitle: "Unblock", btnAction: {
-                                    Task { @MainActor in
-                                        do {
-                                            try await viewModel.unblock()
-                                            Toast.showToast(style: .success, message: "User unblocked.")
-                                        } catch {
-                                            Toast.showToast(style: .warning, message: "Failed to unblocked user. Please try again.")
+                    AmityUserAction.perform(host: host) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            Task { @MainActor in
+                                if isBlockedUser {
+                                    showAlert(title: "Unblock user?", message: "\(viewModel.user?.displayName ?? "") will now be able to see posts and comments that you’ve created. They won’t be notified that you’ve unblocked them.", btnTitle: "Unblock", btnAction: {
+                                        Task { @MainActor in
+                                            do {
+                                                try await viewModel.unblock()
+                                                Toast.showToast(style: .success, message: "User unblocked.")
+                                            } catch {
+                                                Toast.showToast(style: .warning, message: "Failed to unblocked user. Please try again.")
+                                            }
                                         }
-                                    }
-                                })
+                                    })
 
-                            } else {
-                                showAlert(title: "Block user?", message: "\(viewModel.user?.displayName ?? "") won’t be able to see posts and comments that you’ve created. They won’t be notified that you’ve blocked them.", btnTitle: "Block", btnAction: {
-                                    Task { @MainActor in
-                                        do {
-                                            try await viewModel.block()
-                                            Toast.showToast(style: .success, message: "User blocked.")
-                                        } catch {
-                                            Toast.showToast(style: .warning, message: "Failed to block user. Please try again.")
+                                } else {
+                                    showAlert(title: "Block user?", message: "\(viewModel.user?.displayName ?? "") won’t be able to see posts and comments that you’ve created. They won’t be notified that you’ve blocked them.", btnTitle: "Block", btnAction: {
+                                        Task { @MainActor in
+                                            do {
+                                                try await viewModel.block()
+                                                Toast.showToast(style: .success, message: "User blocked.")
+                                            } catch {
+                                                Toast.showToast(style: .warning, message: "Failed to block user. Please try again.")
+                                            }
                                         }
-                                    }
-                                })
+                                    })
 
+                                }
                             }
                         }
                     }
+                    
+                    
                 }
             
             if AmityUIKitManagerInternal.shared.canShareLink(for: .user) {
@@ -368,7 +380,9 @@ public struct AmityUserProfilePage: AmityPageView {
     @ViewBuilder
     private var createPostView: some View {
         Button(action: {
-            postCreationBottomSheet.toggle()
+            AmityUserAction.perform(host: host) {
+                postCreationBottomSheet.toggle()
+            }
         }, label: {
             ZStack {
                 Rectangle()

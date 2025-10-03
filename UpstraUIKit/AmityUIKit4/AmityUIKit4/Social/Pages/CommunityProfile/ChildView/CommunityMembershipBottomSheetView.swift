@@ -45,25 +45,28 @@ struct CommunityMembershipBottomSheetView: View {
                     }
             }
             
-            
             getItemView(viewModel.isReportedByMe ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource(), text: viewModel.isReportedByMe ? "Unreport user" : "Report user")
                 .onTapGesture {
-                    Task { @MainActor in
+                    
+                    AmityUserAction.perform {
                         showBottomSheet.toggle()
-                        if viewModel.isReportedByMe {
-                            do {
-                                let _ = try await viewModel.unReportUser()
-                                Toast.showToast(style: .success, message: "Member unreported.")
-                            } catch {
-                                Toast.showToast(style: .warning, message: "Failed to unreport member. Please try again.")
-                            }
-                            
-                        } else {
-                            do {
-                                let _ = try await viewModel.reportUser()
-                                Toast.showToast(style: .success, message: "Member reported.")
-                            } catch {
-                                Toast.showToast(style: .success, message: "Failed to report member. Please try again.")
+                        
+                        Task { @MainActor in
+                            if viewModel.isReportedByMe {
+                                do {
+                                    let _ = try await viewModel.unReportUser()
+                                    Toast.showToast(style: .success, message: "Member unreported.")
+                                } catch {
+                                    Toast.showToast(style: .warning, message: "Failed to unreport member. Please try again.")
+                                }
+                                
+                            } else {
+                                do {
+                                    let _ = try await viewModel.reportUser()
+                                    Toast.showToast(style: .success, message: "Member reported.")
+                                } catch {
+                                    Toast.showToast(style: .success, message: "Failed to report member. Please try again.")
+                                }
                             }
                         }
                     }

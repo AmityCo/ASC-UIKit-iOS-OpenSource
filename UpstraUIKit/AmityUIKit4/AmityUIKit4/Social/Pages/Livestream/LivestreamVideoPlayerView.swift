@@ -353,6 +353,14 @@ struct LivestreamVideoPlayerView: View {
                     .padding(.trailing, 16)
                     .padding(.vertical, 8)
                     .background(Color.black)
+                    .onTapGesture {
+                        AmityUserAction.perform(host: host) {
+                            if !liveChatViewModel.isCommunityMember {
+                                AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+                                return
+                            }
+                        }
+                    }
             }
         }
     }
@@ -378,6 +386,10 @@ struct LivestreamVideoPlayerView: View {
                     AmityReactionBar(targetType: viewModel.stream?.referenceType ?? "", targetId: viewModel.stream?.referenceId ?? "", streamId: viewModel.stream?.streamId ?? "", onReactionTap: { reaction in
                         if let liveChatViewModel = viewModel.liveStreamChatViewModel {
                             liveChatViewModel.liveReactionViewModel.addReaction(reaction)
+                            
+                            AmityUserAction.perform(host: host) {
+                                // Intentionally left empty to show toast only for guest user
+                            }
                         }
                         
                     })

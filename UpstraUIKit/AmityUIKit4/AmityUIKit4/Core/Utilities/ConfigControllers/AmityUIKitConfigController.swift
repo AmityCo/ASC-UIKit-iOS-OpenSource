@@ -12,6 +12,7 @@ class AmityUIKitConfigController {
     static let shared = AmityUIKitConfigController()
     private(set) var config: [String: Any] = [:]
     private var excludedList: Set<String> = []
+    private(set) var featureFlag: AmityFeatureFlag?
     
     private init() {
         loadConfig()
@@ -27,6 +28,9 @@ class AmityUIKitConfigController {
         }
         
         excludedList = Set(config["excludes"] as? [String] ?? [])
+        
+        let featureConfig = config["feature_flags"] as? [String: Any] ?? [:]
+        self.featureFlag = try? AmityFeatureFlag.decode(from: featureConfig)
     }
     
     func refreshConfig() {
@@ -41,9 +45,9 @@ class AmityUIKitConfigController {
         guard id.count == 3 else { return false }
         
         return excludedList.contains(configId) ||
-            excludedList.contains("*/\(id[1])/*") ||
-            excludedList.contains("*/\(id[1])/\(id[2])") ||
-            excludedList.contains("*/*/\(id[2])")
+        excludedList.contains("*/\(id[1])/*") ||
+        excludedList.contains("*/\(id[1])/\(id[2])") ||
+        excludedList.contains("*/*/\(id[2])")
     }
     
     func getTheme(configId: String? = nil) -> AmityThemeColor {
@@ -63,7 +67,6 @@ class AmityUIKitConfigController {
         let id = configId.components(separatedBy: "/")
         guard id.count == 3 else { return getThemeColor(theme: globalTheme, fallbackTheme: fallbackTheme) }
         
-
         let pageTheme = customizationConfig?[keyPath: "\(id[0])/*/*.theme.\(style.rawValue)"] as? [String: Any]
         let componentTheme = customizationConfig?[keyPath: "*/\(id[1])/*.theme.\(style.rawValue)"] as? [String: Any]
         
@@ -133,7 +136,7 @@ class AmityUIKitConfigController {
                                baseColorShade3: theme.baseColorShade3 ?? fallbackTheme.baseColorShade3!,
                                baseColorShade4: theme.baseColorShade4 ?? fallbackTheme.baseColorShade4!,
                                alertColor: theme.alertColor ?? fallbackTheme.alertColor!,
-                               backgroundColor: theme.backgroundColor ?? fallbackTheme.backgroundColor!, 
+                               backgroundColor: theme.backgroundColor ?? fallbackTheme.backgroundColor!,
                                baseInverseColor: theme.baseInverseColor ?? fallbackTheme.baseInverseColor!,
                                backgroundShade1Color: theme.backgroundShade1Color ?? fallbackTheme.backgroundShade1Color!,
                                highlightColor: theme.highlightColor ?? fallbackTheme.highlightColor!
@@ -161,4 +164,59 @@ class AmityUIKitConfigController {
         let style: AmityThemeStyle = configStyle == .system ? (systemStyle == .light ? .light : .dark) : (configStyle == .light ? .light : .dark)
         return style
     }
+}
+
+struct AmityFeatureFlag: Codable {
+    let post: PostFeatures
+    
+    enum CodingKeys: String, CodingKey {
+        case post
+    }
+    
+    static func decode(from dictionary: [String: Any]) throws -> AmityFeatureFlag {
+        // Convert dictionary to JSON Data
+        let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: [])
+        
+        // Decode using JSONDecoder
+        let decoder = JSONDecoder()
+        return try decoder.decode(AmityFeatureFlag.self, from: jsonData)
+    }
+}
+
+struct PostFeatures: Codable {
+    let clip: ClipFeatures
+    
+    enum CodingKeys: String, CodingKey {
+        case clip
+    }
+}
+
+struct ClipFeatures: Codable {
+    let canCreate: AccessLevel
+    let canViewTab: AccessLevel
+    
+    enum CodingKeys: String, CodingKey {
+        case canCreate = "can_create"
+        case canViewTab = "can_view_tab"
+    }
+    
+    // Initialize with default values
+    init(canCreate: AccessLevel = .signedInUserOnly, canViewTab: AccessLevel = .signedInUserOnly) {
+        self.canCreate = canCreate
+        self.canViewTab = canViewTab
+    }
+    
+    // Custom decoder to handle default values
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.canCreate = try container.decodeIfPresent(AccessLevel.self, forKey: .canCreate) ?? .signedInUserOnly
+        self.canViewTab = try container.decodeIfPresent(AccessLevel.self, forKey: .canViewTab) ?? .signedInUserOnly
+    }
+}
+
+enum AccessLevel: String, Codable, CaseIterable {
+    case all = "all"
+    case signedInUserOnly = "signed_in_user_only"
+    case none = "none"
 }

@@ -29,8 +29,9 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
     public var body: some View {
         HStack(spacing: 12) {
             switch viewModel.composeBarState {
-            case .normal:
+            case .normal, .disabled:
                 inputView
+                    .allowsHitTesting(!AmityUIKitManagerInternal.shared.isGuestUser)
                 rightButton
 
             case .muted:
@@ -42,9 +43,6 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                 getInfoView(icon: AmityIcon.LiveStream.disabledChatIcon.imageResource, text: "This live stream is now read-only.")
                 Spacer()
                 rightButton
-                
-            case .disabled:
-                getInfoView(text: "Join community to interact with live stream.")
             }
         }
     }

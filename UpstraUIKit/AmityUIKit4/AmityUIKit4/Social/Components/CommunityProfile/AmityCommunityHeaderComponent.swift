@@ -114,7 +114,6 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .padding(.leading, 4)
                 }                        
                 .onTapGesture {
-                    guard community.isJoined else { return }
                     onMemberCountLabelTap?()
                 }
                 
@@ -152,15 +151,17 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             Button(action: {
                 let requiresJoinApproval = community.requiresJoinApproval
                 
-                Task { @MainActor in
-                    do {
-                        try await viewModel.joinCommunity()
-                        
-                        let toastMessage = requiresJoinApproval ? "Requested to join. You will be notified once your request is accepted." : "You joined \(community.displayName)."
-                        Toast.showToast(style: .success, message: toastMessage)
-                        
-                    } catch {
-                        Toast.showToast(style: .warning, message: "Failed to join the community. Please try again.")
+                AmityUserAction.perform(host: host) {
+                    Task { @MainActor in
+                        do {
+                            try await viewModel.joinCommunity()
+                            
+                            let toastMessage = requiresJoinApproval ? "Requested to join. You will be notified once your request is accepted." : "You joined \(community.displayName)."
+                            Toast.showToast(style: .success, message: toastMessage)
+                            
+                        } catch {
+                            Toast.showToast(style: .warning, message: "Failed to join the community. Please try again.")
+                        }
                     }
                 }
             }, label: {
@@ -183,8 +184,10 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             .cornerRadius(8)
         case .requested:
             Button {
-                Task { @MainActor in
-                    await viewModel.cancelJoinRequest()
+                AmityUserAction.perform(host: host) {
+                    Task { @MainActor in
+                        await viewModel.cancelJoinRequest()
+                    }
                 }
             } label: {
                 HStack {

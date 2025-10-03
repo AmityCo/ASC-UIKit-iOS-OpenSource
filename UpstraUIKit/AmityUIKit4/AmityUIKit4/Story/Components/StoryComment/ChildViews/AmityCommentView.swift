@@ -7,6 +7,22 @@
 
 import SwiftUI
 
+enum PostTargetMembershipStatus {
+    /// Member of a community where post is created
+    case member
+    /// Not a member of a community where post is created
+    case nonMember
+    /// Post target may not require membership. i.e post.targetCommunity might be nil
+    case unknown
+    
+    // Helper
+    static func determineStatus(isJoined: Bool?) -> PostTargetMembershipStatus {
+        guard let isJoined else { return .unknown }
+        
+        return isJoined ? .member : .nonMember
+    }
+}
+
 public enum AmityCommentButtonActionType {
     case react(AmityCommentModel)
     case reply(AmityCommentModel)
@@ -16,8 +32,9 @@ public enum AmityCommentButtonActionType {
 
 public typealias AmityCommentButtonAction = (AmityCommentButtonActionType) -> Void
 
-
 public struct AmityCommentView: View {
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     private let commentManager: CommentManager = CommentManager()
     
     let comment: AmityCommentModel
@@ -187,33 +204,52 @@ public struct AmityCommentView: View {
                             .lineLimit(1)
                             .tapAndDragSimutaneousGesture(longPressSensitivity: 150, tapAction: {
                                 ImpactFeedbackGenerator.impactFeedback(style: .light)
-                                // Reaction action cannot be decoupled since it is having rendering orchestration issue.
-                                // It may be SwiftUI bug.
-                                Task { @MainActor in
+                                
+                                AmityUserAction.perform(host: host) {
                                     
-                                    do {
-                                        if let myReaction = comment.myReaction {
-                                            try await viewModel.removeReaction(id: comment.commentId, name: myReaction.name)
-                                        } else {
-                                            try await viewModel.addReaction(id: comment.commentId)
-                                        }
-                                    } catch let error {
-                                        if error.isAmityErrorCode(.itemNotFound) {
-                                            let message: String
-                                            if let post = commentCoreViewModel.post, post.dataTypeInternal == .clip {
-                                                message = "This clip is no longer available."
+                                    let targetMembershipStatus = commentCoreViewModel.targetMembershipStatus
+                                    if targetMembershipStatus == .nonMember {
+                                        AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+                                        return
+                                    }
+                                    
+                                    // Reaction action cannot be decoupled since it is having rendering orchestration issue.
+                                    // It may be SwiftUI bug.
+                                    Task { @MainActor in
+                                        
+                                        do {
+                                            if let myReaction = comment.myReaction {
+                                                try await viewModel.removeReaction(id: comment.commentId, name: myReaction.name)
                                             } else {
-                                                message = "This post is no longer available."
+                                                try await viewModel.addReaction(id: comment.commentId)
                                             }
-                                            
-                                            Toast.showToast(style: .warning, message: message)
+                                        } catch let error {
+                                            if error.isAmityErrorCode(.itemNotFound) {
+                                                let message: String
+                                                if let post = commentCoreViewModel.post, post.dataTypeInternal == .clip {
+                                                    message = "This clip is no longer available."
+                                                } else {
+                                                    message = "This post is no longer available."
+                                                }
+                                                
+                                                Toast.showToast(style: .warning, message: message)
+                                            }
                                         }
                                     }
                                 }
                             }, longPressAction: {
                                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
-                                let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .comment, referenceId: comment.commentId, currentReaction: comment.myReaction?.name)
-                                AmitySocialReactionPickerOverlay.shared.show(frame: viewModel.reactionBarFrame, viewModel: reactionPickerViewModel)
+                                
+                                AmityUserAction.perform(host: host) {
+                                    let targetMembershipStatus = commentCoreViewModel.targetMembershipStatus
+                                    if targetMembershipStatus == .nonMember {
+                                        AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+                                        return
+                                    }
+                                    
+                                    let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .comment, referenceId: comment.commentId, currentReaction: comment.myReaction?.name)
+                                    AmitySocialReactionPickerOverlay.shared.show(frame: viewModel.reactionBarFrame, viewModel: reactionPickerViewModel)
+                                }
                             }, dragChangedAction: { point in
                                 AmitySocialReactionPickerOverlay.shared.checkHoveredReactionOnDrag(at: point)
                             }, dragEndedAction: { point in
@@ -222,7 +258,16 @@ public struct AmityCommentView: View {
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.reactionButton)
                         
                         Button {
-                            commentButtonAction(.reply(comment))
+                            AmityUserAction.perform(host: host) {
+                                
+                                let targetMembershipStatus = commentCoreViewModel.targetMembershipStatus
+                                if targetMembershipStatus == .nonMember {
+                                    AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+                                    return
+                                }
+                                
+                                commentButtonAction(.reply(comment))
+                            }
                         } label: {
                             Text(AmityLocalizedStringSet.Comment.replyButtonText.localizedString)
                                 .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))

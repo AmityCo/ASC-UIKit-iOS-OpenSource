@@ -121,16 +121,19 @@ public struct AmityPostDetailPage: AmityPageView {
                                 // Dismiss bottom sheet
                                 host.controller?.dismiss(animated: false)
                                 
-                                let page = AmityContentReportPage(type: .comment(id: commentId))
-                                    .updateTheme(with: viewConfig)
-                                let vc = AmitySwiftUIHostingNavigationController(rootView: page)
-                                vc.isNavigationBarHidden = true
-                                self.host.controller?.present(vc, animated: true)
+                                AmityUserAction.perform(host: host) {
+                                    let page = AmityContentReportPage(type: .comment(id: commentId))
+                                        .updateTheme(with: viewConfig)
+                                    let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                                    vc.isNavigationBarHidden = true
+                                    self.host.controller?.present(vc, animated: true)
+                                }
                             }
                         }
                         
+                        let isComposerHidden = !(viewModel.post?.targetCommunity?.isJoined ?? true) || AmityUIKitManagerInternal.shared.isGuestUser
                         CommentComposerView(viewModel: commentComposerViewModel)
-                            .isHidden(!(viewModel.post?.targetCommunity?.isJoined ?? true))
+                            .isHidden(isComposerHidden)
                     }
                     .opacity(viewModel.isPostDeleted ? 0 : 1)
                 }
@@ -153,12 +156,6 @@ public struct AmityPostDetailPage: AmityPageView {
             }
             
             host.controller?.navigationController?.isNavigationBarHidden = true
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                if let targetCommunity = viewModel.post?.targetCommunity {
-                    commentCoreViewModel.hideCommentButtons = !targetCommunity.isJoined
-                }
-            }
         }
     }
     
@@ -204,16 +201,18 @@ public struct AmityPostDetailPage: AmityPageView {
                             // Dismiss toggle
                             showBottomSheet.toggle()
                             
-                            // Dismiss bottom sheet
-                            host.controller?.dismiss(animated: false)
-                            
-                            let postId = postModel.postId
-                            
-                            let page = AmityContentReportPage(type: .post(id: postId))
-                                .updateTheme(with: viewConfig)
-                            let vc = AmitySwiftUIHostingNavigationController(rootView: page)
-                            vc.isNavigationBarHidden = true
-                            self.host.controller?.present(vc, animated: true)
+                            AmityUserAction.perform {
+                                // Dismiss bottom sheet
+                                host.controller?.dismiss(animated: false)
+                                
+                                let postId = postModel.postId
+                                
+                                let page = AmityContentReportPage(type: .post(id: postId))
+                                    .updateTheme(with: viewConfig)
+                                let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                                vc.isNavigationBarHidden = true
+                                self.host.controller?.present(vc, animated: true)
+                            }
                         case .sharePost:
                             break
                         }

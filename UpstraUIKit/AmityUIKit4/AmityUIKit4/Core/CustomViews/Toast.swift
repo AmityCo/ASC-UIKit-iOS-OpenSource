@@ -61,7 +61,7 @@ public struct ToastView: View {
         case .success:
             return AmityIcon.statusSuccessIcon.getImageResource()
         case .warning:
-            return AmityIcon.statusWarningIcon.getImageResource()
+            return AmityIcon.toastStatusWarningIcon.getImageResource()
         case .loading:
             return AmityIcon.statusLoadingIcon.getImageResource()
         }

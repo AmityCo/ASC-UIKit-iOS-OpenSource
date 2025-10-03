@@ -17,6 +17,11 @@ public class StoryManager {
         reactionManager = ReactionManager()
     }
     
+    @discardableResult
+    func getStory(withId: String) -> AmityObject<AmityStory> {
+        repository.getStory(storyId: withId)
+    }
+    
     public func getGlobaFeedStoryTargets(options: AmityGlobalStoryTargetsQueryOption) -> AmityCollection<AmityStoryTarget> {
         repository.getGlobalStoryTargets(option: options)
     }

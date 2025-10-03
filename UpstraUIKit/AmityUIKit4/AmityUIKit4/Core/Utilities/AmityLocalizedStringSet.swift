@@ -449,5 +449,7 @@ public struct AmityLocalizedStringSet {
         
         static let communityJoinRequestEmptyStateTitle = "community_join_request_empty_state_title"
         static let communityPendingPostsEmptyStateTitle = "community_pending_posts_empty_state_title"
+        
+        static let errorGuestUser = "error_guest_user"
     }
 }

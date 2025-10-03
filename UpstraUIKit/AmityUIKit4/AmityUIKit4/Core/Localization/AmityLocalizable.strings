@@ -37,7 +37,7 @@
 "failed_story_banner_message" = "Failed to upload";
 "failed_story_alert_title" = "Failed to upload story";
 "failed_story_alert_message" = "Would you like to discard or retry uploading?";
-"non_member_react_story_message" = "Join community to interact with all posts";
+"non_member_react_story_message" = "Join community to interact.";
 
 
 // Comment Tray
@@ -125,7 +125,7 @@
 "community_page_join_title" = "Join";
 "community_page_joined_title" = "Joined";
 "community_page_pending_post_title" = "Pending post";
-"non_member_react_post_message" = "Join community to interact with all posts";
+"non_member_react_post_message" = "Join community to interact.";
 
 "reaction_list_unable_to_load_title" = "Unable to load reactions";
 "reaction_list_unrable_to_load_subtitle" = "Reactions aren't available for this message";
@@ -434,3 +434,5 @@
 "community_pending_request_page_title" = "Pending requests";
 "community_join_request_empty_state_title" = "No pending requests";
 "community_pending_posts_empty_state_title" = "No pending posts";
+
+"error_guest_user" = "Create an account or sign in to continue.";

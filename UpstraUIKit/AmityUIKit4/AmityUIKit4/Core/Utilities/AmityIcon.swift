@@ -19,6 +19,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case statusSuccessIcon = "statusSuccessIcon"
     case statusWarningIcon = "statusWarningIcon"
     case statusLoadingIcon = "statusLoadingIcon"
+    case toastStatusWarningIcon = "toastStatusWarningIcon"
     case defaultCommunityAvatar = "defaultCommunityAvatar"
     case flagIcon = "flagIcon"
     case unflagIcon = "unflagIcon"

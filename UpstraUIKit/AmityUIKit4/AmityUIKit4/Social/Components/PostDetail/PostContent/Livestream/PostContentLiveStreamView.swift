@@ -13,7 +13,6 @@ struct PostContentLiveStreamView: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     
     @State var showVideoPlayer: Bool = false
-    @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: nil)
     let post: AmityPostModel
     let livestream: AmityStream?
     let isStreamDeleted: Bool

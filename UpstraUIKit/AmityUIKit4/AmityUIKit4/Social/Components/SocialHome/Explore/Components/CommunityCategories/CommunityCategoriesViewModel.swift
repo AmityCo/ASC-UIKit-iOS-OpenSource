@@ -47,7 +47,7 @@ class CommunityCategoriesViewModel: ObservableObject {
         categoryCollection = commRepo.getCategories(sortBy: .displayName, includeDeleted: false)
         token = categoryCollection?.observe { [weak self] liveCollection, _, error in
             guard let self else { return }
-                        
+                                    
             if let error {
                 self.queryState = .error
                 self.token?.invalidate()

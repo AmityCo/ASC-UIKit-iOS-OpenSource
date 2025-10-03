@@ -309,7 +309,8 @@ struct MediaViewer: View {
                 .background(Color.black.opacity(0.5))
                 .transition(.opacity.combined(with: .scale))
                 .isHidden(!showScaleEffect)
-                .opacity(hideOverlay ? 0 : 1)
+                .opacity(hideOverlay ? 0 : 1) // Hide it when video player is shown
+                .opacity(backgroundOpacity == 1 ? 1 : 0) // Hide it when dragging
             }
         }
         .background(ClearBackgroundView())

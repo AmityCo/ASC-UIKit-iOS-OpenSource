@@ -142,8 +142,13 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
             }
             .isHidden(viewConfig.isHidden(elementId: .userFollowing) || user.isBrand)
             .onTapGesture {
-                guard user.isCurrentUser || viewModel.followInfo?.status == .accepted else { return }
-                goToUserRelationshipPage(user.userId, .following)
+                AmityUserAction.perform(host: host) {
+                    guard user.isCurrentUser || viewModel.followInfo?.status == .accepted else {
+                        AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleNonFollowerAction(context: .init(host: host))
+                        return
+                    }
+                    goToUserRelationshipPage(user.userId, .following)
+                }
             }
             .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userFollowing)
             
@@ -165,8 +170,13 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
             }
             .isHidden(viewConfig.isHidden(elementId: .userFollower))
             .onTapGesture {
-                guard user.isCurrentUser || viewModel.followInfo?.status == .accepted else { return }
-                goToUserRelationshipPage(user.userId, .follower)
+                AmityUserAction.perform(host: host) {
+                    guard user.isCurrentUser || viewModel.followInfo?.status == .accepted else {
+                        AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleNonFollowerAction(context: .init(host: host))
+                        return
+                    }
+                    goToUserRelationshipPage(user.userId, .follower)
+                }
             }
             .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userFollower)
             
@@ -210,14 +220,17 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
         getRelationshipButton(followUserIcon, followUserText, Color(viewConfig.theme.primaryColor))
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
-                Task { @MainActor in
-                    do {
-                        try await viewModel.follow()
-                    } catch {
-                        let alert = UIAlertController(title: "Unable to follow this user", message: "Oops! something went wrong. Please try again later.", preferredStyle: .alert)
-                        let action = UIAlertAction(title: "OK", style: .cancel)
-                        alert.addAction(action)
-                        host.controller?.present(alert, animated: true)
+                
+                AmityUserAction.perform(host: host) {
+                    Task { @MainActor in
+                        do {
+                            try await viewModel.follow()
+                        } catch {
+                            let alert = UIAlertController(title: "Unable to follow this user", message: "Oops! something went wrong. Please try again later.", preferredStyle: .alert)
+                            let action = UIAlertAction(title: "OK", style: .cancel)
+                            alert.addAction(action)
+                            host.controller?.present(alert, animated: true)
+                        }
                     }
                 }
             }
@@ -232,8 +245,11 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
         getRelationshipButton(pendingUserIcon, pendingUserText, .clear)
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
-                Task { @MainActor in
-                    try await viewModel.unfollow()
+                
+                AmityUserAction.perform(host: host) {
+                    Task { @MainActor in
+                        try await viewModel.unfollow()
+                    }
                 }
             }
             .isHidden(viewConfig.isHidden(elementId: .pendingUserButton))
@@ -247,7 +263,9 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
         getRelationshipButton(followingUserIcon, followingUserText, .clear)
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
-                showBottomSheet.toggle()
+                AmityUserAction.perform(host: host) {
+                    showBottomSheet.toggle()
+                }
             }
             .isHidden(viewConfig.isHidden(elementId: .followingUserButton))
             .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.followingUserButton)
@@ -260,16 +278,19 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
         getRelationshipButton(unblockUserIcon, unblockUserText, .clear)
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
-                showAlert(title: "Unblock user?", message: "\(user.displayName) will now be able to see posts and comments that you’ve created. They won’t be notified that you’ve unblocked them.", btnTitle: "Unblock", btnAction: {
-                    Task { @MainActor in
-                        do {
-                            try await viewModel.unblock()
-                            Toast.showToast(style: .success, message: "User unblocked.")
-                        } catch {
-                            Toast.showToast(style: .warning, message: "Failed to unblocked user. Please try again.")
+                
+                AmityUserAction.perform(host: host) {
+                    showAlert(title: "Unblock user?", message: "\(user.displayName) will now be able to see posts and comments that you’ve created. They won’t be notified that you’ve unblocked them.", btnTitle: "Unblock", btnAction: {
+                        Task { @MainActor in
+                            do {
+                                try await viewModel.unblock()
+                                Toast.showToast(style: .success, message: "User unblocked.")
+                            } catch {
+                                Toast.showToast(style: .warning, message: "Failed to unblocked user. Please try again.")
+                            }
                         }
-                    }
-                })
+                    })
+                }
             }
             .isHidden(viewConfig.isHidden(elementId: .unblockUserButton))
             .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.unblockUserButton)
@@ -307,12 +328,15 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
             BottomSheetItemView(icon: AmityIcon.unfollowingUserIcon.getImageResource(), text: "Unfollow")
                 .onTapGesture {
                     showBottomSheet.toggle()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        showAlert(title: "Unfollow this user?", message: "If you change your mind, you’ll have to request to follow them again.", btnTitle: "Unfollow", btnAction: {
-                            Task { @MainActor in
-                                try await viewModel.unfollow()
-                            }
-                        })
+                    
+                    AmityUserAction.perform(host: host) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            showAlert(title: "Unfollow this user?", message: "If you change your mind, you’ll have to request to follow them again.", btnTitle: "Unfollow", btnAction: {
+                                Task { @MainActor in
+                                    try await viewModel.unfollow()
+                                }
+                            })
+                        }
                     }
                 }
         }

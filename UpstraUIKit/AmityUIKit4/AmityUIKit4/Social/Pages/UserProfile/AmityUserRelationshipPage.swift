@@ -9,7 +9,6 @@ import SwiftUI
 
 public enum AmityUserRelationshipPageTab {
     case following, follower
-    
 }
 
 public struct AmityUserRelationshipPage: AmityPageView {
@@ -99,25 +98,25 @@ public struct AmityUserRelationshipPage: AmityPageView {
                 .onTapGesture {
                     showBottomSheet.isShown.toggle()
                     
-                    Task { @MainActor in
-                        if isSelectedUserReported {
-                            do {
-                                try await viewModel.unflaguser(userId: showBottomSheet.userId)
-                                Toast.showToast(style: .success, message: "User unreported.")
-                            } catch {
-                                Toast.showToast(style: .warning, message: "Failed to unreport user. Please try again.")
+                    AmityUserAction.perform(host: host) {
+                        Task { @MainActor in
+                            if isSelectedUserReported {
+                                do {
+                                    try await viewModel.unflaguser(userId: showBottomSheet.userId)
+                                    Toast.showToast(style: .success, message: "User unreported.")
+                                } catch {
+                                    Toast.showToast(style: .warning, message: "Failed to unreport user. Please try again.")
+                                }
+        
+                            } else {
+                                do {
+                                    try await viewModel.flagUser(userId: showBottomSheet.userId)
+                                    Toast.showToast(style: .success, message: "User reported.")
+                                } catch {
+                                    Toast.showToast(style: .warning, message: "Failed to report user. Please try again.")
+                                }
                             }
-    
-                        } else {
-                            do {
-                                try await viewModel.flagUser(userId: showBottomSheet.userId)
-                                Toast.showToast(style: .success, message: "User reported.")
-                            } catch {
-                                Toast.showToast(style: .warning, message: "Failed to report user. Please try again.")
-                            }
-                            
                         }
-                        
                     }
                 }
                 .onAppear {
@@ -130,18 +129,20 @@ public struct AmityUserRelationshipPage: AmityPageView {
                 .onTapGesture {
                     showBottomSheet.isShown.toggle()
                     
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        showAlert(title: "Block user?", message: "\(viewModel.user?.displayName ?? "") won’t be able to see posts and comments that you’ve created. They won’t be notified that you’ve blocked them.", btnTitle: "Block", btnAction: {
-                            Task { @MainActor in
-                                do {
-                                    try await viewModel.block(userId: showBottomSheet.userId)
-                                    Toast.showToast(style: .success, message: "User blocked.")
-                                } catch {
-                                    Toast.showToast(style: .warning, message: "Failed to block user. Please try again.")
+                    AmityUserAction.perform(host: host) {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            showAlert(title: "Block user?", message: "\(viewModel.user?.displayName ?? "") won’t be able to see posts and comments that you’ve created. They won’t be notified that you’ve blocked them.", btnTitle: "Block", btnAction: {
+                                Task { @MainActor in
+                                    do {
+                                        try await viewModel.block(userId: showBottomSheet.userId)
+                                        Toast.showToast(style: .success, message: "User blocked.")
+                                    } catch {
+                                        Toast.showToast(style: .warning, message: "Failed to block user. Please try again.")
+                                    }
                                 }
-                            }
-                        })
+                            })
 
+                        }
                     }
                 }
                 .isHidden(userId != AmityUIKitManagerInternal.shared.currentUserId)

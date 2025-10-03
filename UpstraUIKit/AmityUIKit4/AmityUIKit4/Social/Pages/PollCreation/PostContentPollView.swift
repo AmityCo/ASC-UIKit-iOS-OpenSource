@@ -142,9 +142,18 @@ struct PostContentPollView: View {
                 
                 // Vote Poll
                 Button(action: {
-                    guard !selectedAnswers.isEmpty else { return }
-                    
-                    viewModel.vote(poll: poll, answers: Array(selectedAnswers))
+                    AmityUserAction.perform {
+                        guard !selectedAnswers.isEmpty else { return }
+                        
+                        // If user is member
+                        let isCommunityJoined = post.targetCommunity?.isJoined ?? true
+                        if !isCommunityJoined {
+                            AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: nil)
+                            return
+                        }
+
+                        viewModel.vote(poll: poll, answers: Array(selectedAnswers))
+                    }
                 }, label: {
                     HStack {
                         Spacer()

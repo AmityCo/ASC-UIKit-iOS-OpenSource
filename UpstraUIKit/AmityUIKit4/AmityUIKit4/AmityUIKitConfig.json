@@ -33,6 +33,14 @@
     "excludes": [
         
     ],
+    "feature_flags": {
+        "post": {
+            "clip": {
+                "can_create":  "all",
+                "can_view_tab": "all"
+            }
+        }
+    },
     "message_reactions": [
         {
             "name": "heart",

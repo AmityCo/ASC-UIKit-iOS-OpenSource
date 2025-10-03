@@ -92,33 +92,35 @@ struct CommunityInfoView: View {
                 
                 if showJoinButton {
                     CommunityJoinButton(community: community, tapAction: {
-                        let communityId = community.communityId
                         let isJoined = community.isJoined
                         let requiresJoinApproval = community.requiresJoinApproval
                         
-                        Task { @MainActor in
-                            if isJoined {
-                                if requiresJoinApproval {
-                                    showLeaveCommunityAlert.toggle()
-                                } else {
-                                    joinAction()
-                                }
-                            } else {
-                                let joinStatus = community.joinRequestStatus
-                                
-                                if joinStatus == .pending {
-                                    do {
-                                        try await community.joinRequest?.cancel()
-                                        Log.add(event: .success, "Join request cancelled for community \(community.displayName)")
-                                    } catch let error {
-                                        Log.warn("Error while cancelling join request \(error)")
-                                        Toast.showToast(style: .success, message: "Failed to cancel your request. Please try again.")
+                        AmityUserAction.perform {
+                            Task { @MainActor in
+                                if isJoined {
+                                    if requiresJoinApproval {
+                                        showLeaveCommunityAlert.toggle()
+                                    } else {
+                                        joinAction()
                                     }
                                 } else {
-                                    joinAction()
+                                    let joinStatus = community.joinRequestStatus
+                                    
+                                    if joinStatus == .pending {
+                                        do {
+                                            try await community.joinRequest?.cancel()
+                                            Log.add(event: .success, "Join request cancelled for community \(community.displayName)")
+                                        } catch let error {
+                                            Log.warn("Error while cancelling join request \(error)")
+                                            Toast.showToast(style: .success, message: "Failed to cancel your request. Please try again.")
+                                        }
+                                    } else {
+                                        joinAction()
+                                    }
                                 }
                             }
                         }
+                        
                     })
                 }
             }

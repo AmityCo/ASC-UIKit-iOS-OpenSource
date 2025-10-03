@@ -29,7 +29,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     private var messageCollection: AmityCollection<AmityMessage>?
     private var channelMembershipCancellable: AnyCancellable?
     
-    private var isCommunityMember: Bool = true
+    private(set) var isCommunityMember: Bool = true
     private var isChannelEnabled: Bool = true
     private var isUserMuted: Bool = false
     

@@ -206,8 +206,16 @@ public struct AmityCommunityProfilePage: AmityPageView {
                     let context = AmityCommunityProfilePageBehavior.Context(page: self, community: community.object, selectedTab: selectedTab)
                     AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPendingRequestsPage(context: context)
                 }, onMemberCountLabelTap: {
-                    let context = AmityCommunityProfilePageBehavior.Context(page: self)
-                    AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToMemberListPage(context: context, community: viewModel.community)
+                    AmityUserAction.perform(host: host) {
+                        // Need to show toast based on join status
+                        let isJoined = community.isJoined
+                        if isJoined {
+                            let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToMemberListPage(context: context, community: viewModel.community)
+                        } else {
+                            AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+                        }
+                    }
                 })
                 
                 // Show the invitation banner only if the community has invitation to the user
@@ -308,7 +316,9 @@ extension AmityCommunityProfilePage {
     @ViewBuilder
     var createPostView: some View {
         Button(action: {
-            showCreateBottomSheet.toggle()
+            AmityUserAction.perform(host: host) {
+                showCreateBottomSheet.toggle()
+            }
         }, label: {
             ZStack {
                 Rectangle()

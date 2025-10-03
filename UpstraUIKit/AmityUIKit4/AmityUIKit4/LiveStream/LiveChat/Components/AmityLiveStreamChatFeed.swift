@@ -207,17 +207,20 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                     .onTapGesture {
                         guard let message = viewModel.showBottomSheet.message else { return }
                         viewModel.showBottomSheet.show.toggle()
-                        if isFlagged {
-                            Task.runOnMainActor {
-                                try await viewModel.unflagMessage(message.id)
-                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.toastUnReportMessage.localizedString)
-                            }
-                        } else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                let page = AmityContentReportPage(type: .message(id: message.id)).environmentObject(viewConfig)
-                                let vc = AmitySwiftUIHostingNavigationController(rootView: page)
-                                vc.isNavigationBarHidden = true
-                                host.controller?.present(vc, animated: true)
+                        
+                        AmityUserAction.perform(host: host) {
+                            if isFlagged {
+                                Task.runOnMainActor {
+                                    try await viewModel.unflagMessage(message.id)
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.toastUnReportMessage.localizedString)
+                                }
+                            } else {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    let page = AmityContentReportPage(type: .message(id: message.id)).environmentObject(viewConfig)
+                                    let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                                    vc.isNavigationBarHidden = true
+                                    host.controller?.present(vc, animated: true)
+                                }
                             }
                         }
                     }

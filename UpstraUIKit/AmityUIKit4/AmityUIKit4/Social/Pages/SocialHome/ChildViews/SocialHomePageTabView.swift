@@ -29,8 +29,19 @@ struct SocialHomePageTabView: View {
         self._selectedTab = selectedTab
         self.onSelection = onSelection
         
-        let items = AmitySocialHomePageTab.allCases.map { tab in
-            TabItem(tab: tab, selected: tab == selectedTab.wrappedValue)
+        let clipViewAccess = AmityUIKitConfigController.shared.featureFlag?.post.clip.canViewTab ?? .signedInUserOnly
+        
+        var items: [TabItem] = []
+        if AmityUIKitManagerInternal.shared.isGuestUser {
+            items.append(TabItem(tab: .explore, selected: selectedTab.wrappedValue == .explore))
+
+            if clipViewAccess == .all {
+                items.append(TabItem(tab: .clips, selected: selectedTab.wrappedValue == .clips))
+            }
+        } else {
+            items = AmitySocialHomePageTab.allCases.map { tab in
+                TabItem(tab: tab, selected: tab == selectedTab.wrappedValue)
+            }
         }
         
         self._tabItems = State(initialValue: items)
@@ -38,7 +49,7 @@ struct SocialHomePageTabView: View {
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: 8) {
+            HStack(spacing: 8) {
                 ForEach(tabItems) { item in
                     TabButtonView(title: getTitle(tab: item.tab), selected: item.selected)
                         .onTapGesture {
@@ -76,6 +87,8 @@ struct SocialHomePageTabView: View {
                 
                 return item
             })
+            
+            print("Filtered Tab Items: \(tabItems.count)")
         }
     }
     

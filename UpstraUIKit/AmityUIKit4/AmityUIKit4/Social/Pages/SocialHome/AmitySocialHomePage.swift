@@ -91,6 +91,9 @@ class AmitySocialHomePageViewModel: ObservableObject {
     @Published var selectedTab: AmitySocialHomePageTab = .newsFeed
     
     init() {
+        if AmityUIKitManagerInternal.shared.isGuestUser {
+            selectedTab = .explore
+        }
         /// Observe didPostCreated event sent from AmityPostCreationPage
         /// We need to explicitly change the tab to Newsfeed.
         NotificationCenter.default.addObserver(self, selector: #selector(didPostCreated(_:)), name: .didPostCreated, object: nil)

@@ -71,7 +71,9 @@ class LiveReactionViewModel {
         
         containerView?.addReaction(newReaction)
         
-        self.reactionManger.createLiveReaction(reaction.reactionName, referenceId: reaction.referenceId, referenceType: reaction.referenceType, streamId: reaction.streamId)
+        if !AmityUIKitManagerInternal.shared.isGuestUser {
+            self.reactionManger.createLiveReaction(reaction.reactionName, referenceId: reaction.referenceId, referenceType: reaction.referenceType, streamId: reaction.streamId)
+        }
     }
     
     /// Observe live reactions for the given stream and process them

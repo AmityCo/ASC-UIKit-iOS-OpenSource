@@ -56,6 +56,8 @@ open class AmityUIKitBehaviour {
     
     public var clipFeedPageBehavior: AmityClipFeedPageBehavior = AmityClipFeedPageBehavior()
     public var draftClipPageBehavior: AmityDraftClipPageBehavior = AmityDraftClipPageBehavior()
+    
+    public var globalBehavior: AmityGlobalBehavior? = AmityGlobalBehavior()
 }
 
 open class AmitySwipeToBackGestureBehavior {
@@ -71,5 +73,31 @@ open class AmitySwipeToBackGestureBehavior {
     open func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         
         return true
+    }
+}
+
+open class AmityGlobalBehavior {
+    
+    open class Context {
+        
+        let host: AmitySwiftUIHostWrapper?
+        
+        public init(host: AmitySwiftUIHostWrapper?) {
+            self.host = host
+        }
+    }
+    
+    public init() { }
+    
+    open func handleGuestUserAction(context: Context?) {
+        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.errorGuestUser.localizedString)
+    }
+    
+    open func handleNonMemberAction(context: Context?) {
+        Toast.showToast(style: .warning, message: "Join community to interact.")
+    }
+    
+    open func handleNonFollowerAction(context: Context?) {
+        Toast.showToast(style: .warning, message: "Follow user to interact.")
     }
 }

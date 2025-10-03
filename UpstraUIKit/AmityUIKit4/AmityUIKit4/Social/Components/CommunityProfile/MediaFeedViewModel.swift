@@ -46,6 +46,7 @@ class MediaFeedViewModel: ObservableObject {
     // Parent Post Id : Post
     var postsCache: [String: AmityPost] = [:]
     var parentPostsToken: AmityNotificationToken?
+    var userFollowInfoToken: AmityNotificationToken?
     
     init(feedType: MediaFeedType, postType: PostTypeFilter) {
         self.feedType = feedType
@@ -121,17 +122,23 @@ class MediaFeedViewModel: ObservableObject {
     }
     
     private func loadUserFollowInfo(userId: String, dataTypes: [AmityPostDataType], isClipFeed: Bool) {
-        
         userFollowInfoObject = userManager.getFollowInfo(withId: userId)
-        cancellable = userFollowInfoObject?.$snapshot
-            .sink(receiveValue: { [weak self] followInfo in
-                guard let followInfo else { return }
+        userFollowInfoToken = userFollowInfoObject?.observe({ [weak self] liveObject, error in
+            guard let self else { return }
+            
+            if let error, error.isAmityErrorCode(.visitorPermissionDenied) {
+                self.emptyFeedState = .private
+                return
+            }
+            
+            if let followInfo = liveObject.snapshot {
                 let model = AmityFollowInfoModel(followInfo)
-                self?.blockedFeedState = model.status == .blocked ? .blocked : nil
+                self.blockedFeedState = model.status == .blocked ? .blocked : nil
                 if model.status != .blocked {
-                    self?.loadUserPosts(userId: userId, isClipFeed: isClipFeed, dataTypes: dataTypes)
+                    self.loadUserPosts(userId: userId, isClipFeed: isClipFeed, dataTypes: dataTypes)
                 }
-            })
+            }
+        })
     }
     
     private func loadUserPosts(userId: String, isClipFeed: Bool, dataTypes: [AmityPostDataType]) {

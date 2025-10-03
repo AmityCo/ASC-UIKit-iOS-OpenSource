@@ -239,16 +239,18 @@ public struct AmityPostContentComponent: AmityComponentView {
                                 // Dismiss toggle
                                 showBottomSheet.toggle()
                                 
-                                // Dismiss bottom sheet
-                                host.controller?.dismiss(animated: false)
-                                
-                                let postId = post.postId
-                                
-                                let page = AmityContentReportPage(type: .post(id: postId))
-                                    .updateTheme(with: viewConfig)
-                                let vc = AmitySwiftUIHostingNavigationController(rootView: page)
-                                vc.isNavigationBarHidden = true
-                                self.host.controller?.present(vc, animated: true)
+                                AmityUserAction.perform {
+                                    // Dismiss bottom sheet
+                                    host.controller?.dismiss(animated: false)
+                                    
+                                    let postId = post.postId
+                                    
+                                    let page = AmityContentReportPage(type: .post(id: postId))
+                                        .updateTheme(with: viewConfig)
+                                    let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                                    vc.isNavigationBarHidden = true
+                                    self.host.controller?.present(vc, animated: true)
+                                }
                             case .sharePost:
                                 showShareSheet = true
                             }
@@ -435,7 +437,9 @@ public struct AmityPostContentComponent: AmityComponentView {
                     Spacer(minLength: 0)
                 }
                 .onTapGesture {
-                    showReactionList.toggle()
+                    AmityUserAction.perform {
+                        showReactionList.toggle()
+                    }
                 }
                 .isHidden(post.allReactions.count == 0)
                 
@@ -462,14 +466,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 1)
             
-            Text(AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
-                .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColorShade2)))
-                .isHidden(self.post.targetCommunity?.isJoined ?? true || viewConfig.isHidden(elementId: .nonMemberSection))
-                .accessibilityIdentifier(AccessibilityID.Social.PostContent.nonMemberSection)
-                .onTapGesture {
-                    goToCommunityProfilePage()
-                }
-            
+            // We do not show "Join community to interact" view anymore
             HStack(spacing: 4) {
                 let reactionIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .reactionButton, key: "icon", of: String.self) ?? "")
                 let reactionTitle = viewConfig.getConfig(elementId: .reactionButton, key: "text", of: String.self) ?? ""
@@ -490,21 +487,41 @@ public struct AmityPostContentComponent: AmityComponentView {
                 }
                 .tapAndDragSimutaneousGesture(longPressSensitivity: 150, tapAction: {
                     ImpactFeedbackGenerator.impactFeedback(style: .light)
-                    Task { @MainActor in
-                        if let myReaction = post.myReaction {
-                            try await viewModel.removeReaction(id: post.postId, name: myReaction.name)
-                        } else {
-                            try await viewModel.addReaction(id: post.postId)
+                    
+                    AmityUserAction.perform(host: host) {
+                        let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
+                        
+                        if !shouldAllowInteraction {
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                            return
                         }
                         
-                        /// Send didPostReacted event to update global feed data source
-                        /// This event is observed in PostFeedViewModel
-                        NotificationCenter.default.post(name: .didPostReacted, object: post.object)
+                        Task { @MainActor in
+                            if let myReaction = post.myReaction {
+                                try await viewModel.removeReaction(id: post.postId, name: myReaction.name)
+                            } else {
+                                try await viewModel.addReaction(id: post.postId)
+                            }
+                            
+                            /// Send didPostReacted event to update global feed data source
+                            /// This event is observed in PostFeedViewModel
+                            NotificationCenter.default.post(name: .didPostReacted, object: post.object)
+                        }
                     }
                 }, longPressAction: {
                     ImpactFeedbackGenerator.impactFeedback(style: .heavy)
-                    let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .post, referenceId: post.postId, currentReaction: post.myReaction?.name)
-                    AmitySocialReactionPickerOverlay.shared.show(frame: viewModel.reactionBarFrame, viewModel: reactionPickerViewModel)
+                    
+                    AmityUserAction.perform(host: host) {
+                        let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
+                        
+                        if !shouldAllowInteraction {
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                            return
+                        }
+                        
+                        let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .post, referenceId: post.postId, currentReaction: post.myReaction?.name)
+                        AmitySocialReactionPickerOverlay.shared.show(frame: viewModel.reactionBarFrame, viewModel: reactionPickerViewModel)
+                    }
                 }, dragChangedAction: { point in
                     AmitySocialReactionPickerOverlay.shared.checkHoveredReactionOnDrag(at: point)
                 }, dragEndedAction: { point in
@@ -513,10 +530,18 @@ public struct AmityPostContentComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .reactionButton), remove: true)
                 .accessibilityIdentifier(AccessibilityID.Social.PostContent.reactionButton)
                 
-                
                 Button(feedbackStyle: .light, action: {
-                    let context = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
-                    onTapAction?(context)
+                    AmityUserAction.perform(host: host) {
+                        let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
+                        
+                        if !shouldAllowInteraction {
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                            return
+                        }
+                        
+                        let context = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
+                        onTapAction?(context)
+                    }
                 }) {
                     let commentIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .commentButton, key: "icon", of: String.self) ?? "")
                     let commentTitle = viewConfig.getConfig(elementId: .commentButton, key: "text", of: String.self) ?? ""
@@ -538,7 +563,6 @@ public struct AmityPostContentComponent: AmityComponentView {
                 
                 shareLinkButton
             }
-            .isHidden(!(self.post.targetCommunity?.isJoined ?? true))
         }
         .padding(.trailing, 16)
         .padding(.leading, 14)
@@ -551,11 +575,11 @@ public struct AmityPostContentComponent: AmityComponentView {
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
                     .frame(height: 1)
-                
+                                
                 AmityCommentView(
                     comment: comment,
                     hideMeatballButton: true,
-                    hideButtonView: !(post.targetCommunity?.isJoined ?? true),
+                    hideButtonView: false,
                     seeMoreLineLimit: 3
                 ) { actionType in
                     handleCommentAction(actionType, post: post)

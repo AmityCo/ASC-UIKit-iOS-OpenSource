@@ -23,7 +23,7 @@
 		682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; };
 		682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		684097562B30607F00697E1B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 684097552B30607F00697E1B /* GoogleService-Info.plist */; };
-		68F2B9E92E72D40100B611C0 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 68F2B9E82E72D40100B611C0 /* SharedFrameworks */; };
+		6852D3692E8FDB1E00178603 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 6852D3682E8FDB1E00178603 /* SharedFrameworks */; };
 		68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; };
 		68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7214C9CB2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */; };
@@ -128,6 +128,8 @@
 		D4AFF1CF25ECE8AD002C001C /* PostPreviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */; };
 		D4AFF23225ED1E7C002C001C /* GlobalPostsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */; };
 		D4AFF23625ED1F88002C001C /* GlobalPostsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */; };
+		EDF77D6E2E841857005776DA /* GuestLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF77D6D2E841857005776DA /* GuestLoginView.swift */; };
+		EDF77D6F2E841857005776DA /* GuestLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF77D6D2E841857005776DA /* GuestLoginView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -255,6 +257,7 @@
 		D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostPreviewTableViewCell.swift; sourceTree = "<group>"; };
 		D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalPostsFeedViewController.swift; sourceTree = "<group>"; };
 		D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalPostsDataSource.swift; sourceTree = "<group>"; };
+		EDF77D6D2E841857005776DA /* GuestLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestLoginView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -279,7 +282,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68F2B9E92E72D40100B611C0 /* SharedFrameworks in Frameworks */,
+				6852D3692E8FDB1E00178603 /* SharedFrameworks in Frameworks */,
 				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
@@ -542,6 +545,7 @@
 				D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */,
 				D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */,
 				A9FF80E52BBD10010088A317 /* LiveChatListView.swift */,
+				EDF77D6D2E841857005776DA /* GuestLoginView.swift */,
 			);
 			path = Feature;
 			sourceTree = "<group>";
@@ -605,7 +609,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				68F2B9E82E72D40100B611C0 /* SharedFrameworks */,
+				6852D3682E8FDB1E00178603 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -805,6 +809,7 @@
 				92DBE8C02ACA98CF007D873C /* AppManager.swift in Sources */,
 				92DBE8C12ACA98CF007D873C /* CustomFeedEventHandler.swift in Sources */,
 				92DBE8C22ACA98CF007D873C /* Theme.swift in Sources */,
+				EDF77D6F2E841857005776DA /* GuestLoginView.swift in Sources */,
 				92DBE8C32ACA98CF007D873C /* SettingViewController.swift in Sources */,
 				92DBE8C42ACA98CF007D873C /* ThumbsupPostComponent.swift in Sources */,
 				92DBE8C52ACA98CF007D873C /* EndpointsView.swift in Sources */,
@@ -849,6 +854,7 @@
 				7288E96C2630139E004535DD /* AppManager.swift in Sources */,
 				721AF3CA26088884005BA15F /* CustomFeedEventHandler.swift in Sources */,
 				B78FC54124CAAA2F0083CBB4 /* Theme.swift in Sources */,
+				EDF77D6E2E841857005776DA /* GuestLoginView.swift in Sources */,
 				B754DBEC24C6F6B5005A8282 /* SettingViewController.swift in Sources */,
 				0D73ACA425DB93A2000D73CA /* ThumbsupPostComponent.swift in Sources */,
 				72AACE0B273931F100E59D55 /* EndpointsView.swift in Sources */,
@@ -1288,7 +1294,7 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		68F2B9E82E72D40100B611C0 /* SharedFrameworks */ = {
+		6852D3682E8FDB1E00178603 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

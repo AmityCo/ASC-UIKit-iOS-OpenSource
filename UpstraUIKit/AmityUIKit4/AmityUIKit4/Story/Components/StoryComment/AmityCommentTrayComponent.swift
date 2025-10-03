@@ -10,6 +10,7 @@ import AmitySDK
 
 public struct AmityCommentTrayComponent: AmityComponentView {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    
     public var pageId: PageId?
     
     public var id: ComponentId {
@@ -54,12 +55,14 @@ public struct AmityCommentTrayComponent: AmityComponentView {
             
             CommentCoreView(viewModel: commentCoreViewModel, commentButtonAction: self.commentButtonAction(_:))
             
-            Rectangle()
-                .frame(height: 1)
-                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
-    
-            CommentComposerView(viewModel: commentComposerViewModel)
-                .isHidden(commentCoreViewModel.hideCommentButtons, remove: true)
+            if !AmityUIKitManagerInternal.shared.isGuestUser {
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade4))
+        
+                CommentComposerView(viewModel: commentComposerViewModel)
+                    .isHidden(commentCoreViewModel.hideCommentButtons, remove: true)
+            }
         }
         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
                      height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? .fixed(204) : .fixed(148),
@@ -67,16 +70,19 @@ public struct AmityCommentTrayComponent: AmityComponentView {
             CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
                 commentCoreViewModel.editingComment = comment
             } reportAction: { comment in
+                
                 let commentId = comment?.commentId ?? ""
                 
                 // Dismiss bottom sheet
                 host.controller?.dismiss(animated: false)
                 
-                let page = AmityContentReportPage(type: .comment(id: commentId))
-                    .updateTheme(with: viewConfig)
-                let vc = AmitySwiftUIHostingNavigationController(rootView: page)
-                vc.isNavigationBarHidden = true
-                self.host.controller?.present(vc, animated: true)
+                AmityUserAction.perform(host: host) {
+                    let page = AmityContentReportPage(type: .comment(id: commentId))
+                        .updateTheme(with: viewConfig)
+                    let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                    vc.isNavigationBarHidden = true
+                    self.host.controller?.present(vc, animated: true)
+                }
             }
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())

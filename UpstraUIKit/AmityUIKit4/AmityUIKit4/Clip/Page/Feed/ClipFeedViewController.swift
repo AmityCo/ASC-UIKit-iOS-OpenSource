@@ -106,6 +106,8 @@ struct ClipFeedView: View {
                 Image(AmityIcon.clipFeedCameraIcon.imageResource)
                     .padding(6)
             }
+            .opacity(AmityUIKitManagerInternal.shared.isGuestUser ? 0 : 1)
+            .disabled(AmityUIKitManagerInternal.shared.isGuestUser)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 16)

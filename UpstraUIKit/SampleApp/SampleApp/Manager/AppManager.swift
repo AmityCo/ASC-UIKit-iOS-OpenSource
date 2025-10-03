@@ -70,7 +70,7 @@ class AppManager {
     }
     
     func register(withUserId userId: String) {
-        AmityUIKitManager.registerDevice(withUserId: userId, displayName: nil, sessionHandler: SampleSessionHandler()) { [weak self] success, error in
+        AmityUIKit4Manager.registerDevice(withUserId: userId, displayName: nil, sessionHandler: SampleSessionHandler()) { [weak self] success, error in
             print("[Sample App] register device with userId '\(userId)' \(success ? "successfully" : "failed")")
             if let error = error {
                 AmityHUD.show(.error(message: "Could not register user: \(error.localizedDescription)"))
@@ -84,6 +84,23 @@ class AppManager {
         UIApplication.shared.windows.first?.rootViewController = TabbarViewController()
         UIApplication.shared.windows.first?.makeKeyAndVisible()
         
+    }
+    
+    func registerVisitor(authSignature: String?, authSignatureExpiryAt: Date?) {
+        Task { @MainActor in
+            do {
+                try await AmityUIKit4Manager.registerDeviceAsVisitor(authSignature: authSignature, authSignatureExpiresAt: authSignatureExpiryAt, sessionHandler: SampleSessionHandler())
+                
+                let guestUserId = AmityUIKitManager.client.currentUserId
+                print("UIKit Guest User Id: \(String(describing: guestUserId))")
+                
+                UserDefaults.standard.setValue(guestUserId, forKey: UserDefaultsKey.userId)
+                UIApplication.shared.windows.first?.rootViewController = TabbarViewController()
+                UIApplication.shared.windows.first?.makeKeyAndVisible()
+            } catch {
+                AmityHUD.show(.error(message: "Could not register user: \(error.localizedDescription)"))
+            }
+        }
     }
     
     private func registerDevicePushNotification() {
@@ -158,7 +175,6 @@ class AppManager {
         }
 
     }
-    
 }
 
 
@@ -185,3 +201,38 @@ class CustomV4LivestreamBehavior: AmityLivestreamBehavior {
     }
 }
 #endif
+
+extension DateFormatter {
+    
+    // Note:
+    // Our backend supports ISO8601 / RFC3309 Format but ios date formatter does not support it out of the box.
+    //
+    // The `.withFractionalSeconds` format options for `ISO8601DateFormatter` requires the date format to have
+    // fractional seconds. This date format cannot be used alone.
+    // - If this format option is used alone, then it returns wrong date for any date input 2000-01-01 00:00:00 +0000
+    // - If this format option is used with other option, but the input doesn't contain fractional seconds, it will return nil
+    // so we use two date formatters to support both usecases.
+    static func ascDateFromISO8601String(_ dateString: String?) -> Date? {
+        guard let dateInput = dateString else { return nil }
+        
+        // Note: Most of the dates in backend contains fractional seconds
+        let date = ascISO8601FractionalSecondsFormatter.date(from: dateInput) ?? ascISO8601RFC3309Formatter.date(from: dateInput)
+        return date
+    }
+    
+    /// Supports date with fractional seconds like "2023-02-07T22:06:04.830Z".
+    /// For date format like "2024-06-16T20:51:21Z", this will return nil
+    static var ascISO8601FractionalSecondsFormatter: ISO8601DateFormatter = {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return dateFormatter
+    }()
+    
+    /// Supports date without fractional seconds like "2024-06-16T20:51:21Z"
+    /// For date format like "2023-02-07T22:06:04.830Z", this will return nil.
+    static var ascISO8601RFC3309Formatter: ISO8601DateFormatter = {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime]
+        return dateFormatter
+    }()
+}

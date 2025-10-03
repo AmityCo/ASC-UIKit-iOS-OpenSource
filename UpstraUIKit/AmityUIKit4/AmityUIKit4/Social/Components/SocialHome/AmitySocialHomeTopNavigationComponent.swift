@@ -49,19 +49,21 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
             
             Spacer()
             
-            // Notification Bell Button
-            TopNavigationIconButton(elementId: .notificationTrayButton) {
-                notificationButtonAction?()
-                
-                viewModel.resetNotificationStatus()
-            }
-            .overlay(
-                NotificationIndicator()
-                    .offset(x: 13, y: -12)
-                    .visibleWhen(viewModel.hasUnseenNotification || viewModel.hasInvitations)
-            )
-            .onAppear {
-                viewModel.observeNotificationStatus()
+            if !AmityUIKitManagerInternal.shared.isGuestUser {
+                // Notification Bell Button
+                TopNavigationIconButton(elementId: .notificationTrayButton) {
+                    notificationButtonAction?()
+                    
+                    viewModel.resetNotificationStatus()
+                }
+                .overlay(
+                    NotificationIndicator()
+                        .offset(x: 13, y: -12)
+                        .visibleWhen(viewModel.hasUnseenNotification || viewModel.hasInvitations)
+                )
+                .onAppear {
+                    viewModel.observeNotificationStatus()
+                }
             }
             
             // Search Button
@@ -71,7 +73,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
             .isHidden(viewConfig.isHidden(elementId: .globalSearchButton), remove: true)
             
             // Add Button
-            if selectedTab != .explore {
+            if selectedTab != .explore && !AmityUIKitManagerInternal.shared.isGuestUser {
                 TopNavigationIconButton(elementId: .postCreationButton) {
                     if selectedTab == .myCommunities {
                         goToCommunitySetupPage()

@@ -40,7 +40,11 @@ class CommentCoreViewModel: ObservableObject {
     let preloadRepliesOfComment: Bool
     
     private let postManager = PostManager()
+    private let storyManager = StoryManager()
     var post: AmityPostModel?
+    var story: AmityStoryModel?
+    
+    var targetMembershipStatus: PostTargetMembershipStatus = .unknown
     
     init(referenceId: String,
          referenceType: AmityCommentReferenceType,
@@ -63,6 +67,12 @@ class CommentCoreViewModel: ObservableObject {
         if referenceType == .post {
             if let localPost = postManager.getPost(withId: referenceId).snapshot {
                 self.post = AmityPostModel(post: localPost)
+                self.targetMembershipStatus = PostTargetMembershipStatus.determineStatus(isJoined: post?.targetCommunity?.isJoined)
+            }
+        } else if referenceType == .story {
+            if let localStory = storyManager.getStory(withId: referenceId).snapshot {
+                self.story = AmityStoryModel(story: localStory)
+                self.targetMembershipStatus = PostTargetMembershipStatus.determineStatus(isJoined: story?.community?.isJoined)
             }
         }
         
