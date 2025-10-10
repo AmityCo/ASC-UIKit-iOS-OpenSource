@@ -55,13 +55,14 @@ public struct AmityEditUserProfilePage: AmityPageView {
                     VStack(spacing: 24) {
                         userProifleAvatarView
                         
+                        let canEditDisplayName = AmityUIKitManagerInternal.shared.client.getCoreUserSettings()?.isAllowUpdateDisplayName ?? false
                         InfoTextField(data: $displayNameTextFieldModel, text: $displayNameText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userDisplayNameTitle)
                             .alertColor(viewConfig.theme.alertColor)
                             .dividerColor(viewConfig.theme.baseColorShade4)
                             .titleTextColor(viewConfig.theme.baseColor)
                             .infoTextColor(viewConfig.theme.baseColorShade2)
-                            .textFieldTextColor(viewConfig.theme.baseColorShade2)
-                            .allowsHitTesting(false)
+                            .textFieldTextColor(canEditDisplayName ? viewConfig.theme.baseColor : viewConfig.theme.baseColorShade2)
+                            .allowsHitTesting(canEditDisplayName)
                         
                         InfoTextField(data: $aboutTextFieldModel, text: $aboutText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userAboutTitle)
                             .alertColor(viewConfig.theme.alertColor)
@@ -113,6 +114,9 @@ public struct AmityEditUserProfilePage: AmityPageView {
             validateDataChanged()
         }
         .onChange(of: aboutText) { _ in
+            validateDataChanged()
+        }
+        .onChange(of: displayNameText) { _ in
             validateDataChanged()
         }
         .onAppear {
@@ -197,7 +201,7 @@ public struct AmityEditUserProfilePage: AmityPageView {
                     guard isExistingDataChanged else { return }
                     Task { @MainActor in
                         do {
-                            try await viewModel.updateUser(UserModel(about: aboutText, avatar: imagePickerViewModel.selectedImage))
+                            try await viewModel.updateUser(UserModel(displayName: displayNameText, about: aboutText, avatar: imagePickerViewModel.selectedImage))
                             Toast.showToast(style: .success, message: "Successfully updated your profile!")
                             host.controller?.navigationController?.popViewController()
                         } catch {
@@ -210,6 +214,16 @@ public struct AmityEditUserProfilePage: AmityPageView {
     }
     
     private func validateDataChanged(){
-        isExistingDataChanged = imagePickerViewModel.selectedImage != nil || aboutText != viewModel.user?.about ?? ""
+        
+        let isImageChanged = imagePickerViewModel.selectedImage != nil
+        let isAboutChanged = aboutText != viewModel.user?.about ?? ""
+        var isDisplayNameChanged = false
+        
+        let canEditDisplayName = AmityUIKitManagerInternal.shared.client.getCoreUserSettings()?.isAllowUpdateDisplayName ?? false
+        if canEditDisplayName {
+            isDisplayNameChanged = !displayNameText.isEmpty && displayNameText != viewModel.user?.displayName ?? ""
+        }
+
+        isExistingDataChanged = isImageChanged || isAboutChanged || isDisplayNameChanged
     }
 }

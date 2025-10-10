@@ -10,6 +10,7 @@ import AmitySDK
 import Combine
 
 struct UserModel {
+    var displayName: String
     var about: String
     var avatar: UIImage?
 }

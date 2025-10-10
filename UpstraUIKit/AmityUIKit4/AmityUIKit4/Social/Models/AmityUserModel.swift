@@ -32,6 +32,6 @@ public struct AmityUserModel: Equatable {
     }
     
     public static func == (lhs: AmityUserModel, rhs: AmityUserModel) -> Bool {
-        lhs.userId == rhs.userId
+        lhs.userId == rhs.userId && lhs.displayName == rhs.displayName && lhs.about == rhs.about
     }
 }
