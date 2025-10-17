@@ -159,7 +159,7 @@ class AmityPendingPostPageViewModel: ObservableObject {
         feedCollection = feedManager.getPendingCommunityFeedPosts(communityId: community.communityId)
         feedCollection?.$snapshots
             .sink(receiveValue: { [weak self] posts in
-                self?.posts = posts
+                self?.posts = posts.filter { !$0.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" } }
                 self?.onChange?(posts.count)
             })
             .store(in: &cancellables)

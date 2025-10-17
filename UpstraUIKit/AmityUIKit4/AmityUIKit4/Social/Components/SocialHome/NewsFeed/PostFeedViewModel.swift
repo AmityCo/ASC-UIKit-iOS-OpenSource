@@ -265,7 +265,7 @@ extension PostFeedViewModel {
     }
     
     private func canRenderPost(post: AmityPost) -> Bool {
-        let filterCondition = !post.childrenPosts.contains { $0.dataType == "file" }
+        let filterCondition = !post.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" }
         return filterCondition
     }
 }

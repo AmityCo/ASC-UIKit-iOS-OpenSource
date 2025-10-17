@@ -110,6 +110,7 @@ struct AccessibilityID {
             static let editSaveButton = "edit_comment_component/save_button"
             static let viewReplyButton = "comment_list/comment_bubble_view_reply_button"
             static let deletedComment = "comment_list/comment_bubble_deleted_view"
+            static let commentItem = "commentlist/*"
         }
         
         struct BottomSheet {

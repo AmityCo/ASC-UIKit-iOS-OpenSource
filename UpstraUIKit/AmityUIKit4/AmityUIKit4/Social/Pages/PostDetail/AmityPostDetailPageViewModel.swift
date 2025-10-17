@@ -69,6 +69,11 @@ class AmityPostDetailPageViewModel: ObservableObject {
                 self.post = AmityPostModel(post: snapshot)
                 self.isPostDeleted = snapshot.isDeleted
                 
+                // If the post is mixed media post, display error state
+                if self.post?.dataType == "file" || self.post?.dataType == "audio" || self.post?.structureType == "mixed" {
+                    self.isPostDeleted = true
+                }
+                
                 if self.post?.isOwner ?? false {
                     self.hasDeletePermission = true
                 } else if let communityId = snapshot.targetCommunity?.communityId {

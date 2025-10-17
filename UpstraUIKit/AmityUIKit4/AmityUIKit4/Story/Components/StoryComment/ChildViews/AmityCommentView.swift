@@ -298,6 +298,7 @@ public struct AmityCommentView: View {
             Spacer(minLength: 16)
         }
         .padding(.vertical, 4)
+        .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentItem)
     }
     
     

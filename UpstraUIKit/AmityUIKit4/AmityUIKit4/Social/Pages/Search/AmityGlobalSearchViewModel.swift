@@ -70,7 +70,7 @@ public class AmityGlobalSearchViewModel: ObservableObject {
         }
         
         postCollection?.$snapshots.sink(receiveValue: { posts in
-            self.posts = posts
+            self.posts = posts.filter { !$0.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" } }
         })
         .store(in: &cancellable)
         

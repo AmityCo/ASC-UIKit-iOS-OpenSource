@@ -98,7 +98,7 @@ class AmityUserFeedComponentViewModel: ObservableObject {
                 self?.emptyFeedState = nil
                 let posts = collection.allObjects()
                 
-                self?.posts = posts.filter { !$0.childrenPosts.contains { $0.dataType == "file" } }
+                self?.posts = posts.filter { !$0.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" } }
             }
         })
         

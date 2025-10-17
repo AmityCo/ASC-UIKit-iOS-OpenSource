@@ -20,6 +20,9 @@ public class AmityPostModel: Identifiable {
     /// The data type of the post
     public let dataType: String
     
+    /// The structure type of the post
+    public let structureType: String
+    
     /// Id of the target this post belongs to.
     public let targetId: String
     
@@ -154,6 +157,7 @@ public class AmityPostModel: Identifiable {
         postId = post.postId
         latestComments = post.latestComments.map(AmityCommentModel.init)
         dataType = post.dataType
+        structureType = post.structureType
         targetId = post.targetId
         targetCommunity = post.targetCommunity
         childrenPosts = post.childrenPosts

@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		92952FDF2CC0E78E0012B2B9 /* LivestreamPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92952FDE2CC0E78E0012B2B9 /* LivestreamPlayerView.swift */; };
 		92952FE52CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92952FE42CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift */; };
-		92D780DD2E98FBC1002E5550 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92D780DC2E98FBC1002E5550 /* SharedFrameworks */; };
+		92B8C9AE2EA25B6B003AF280 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92B8C9AD2EA25B6B003AF280 /* SharedFrameworks */; };
 		A0B68B3026E07278007D7B5B /* LiveStreamViewController+GoLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B2F26E07278007D7B5B /* LiveStreamViewController+GoLive.swift */; };
 		A0B68B3626E07824007D7B5B /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B3526E07824007D7B5B /* AsyncOperation.swift */; };
 		A0B68B3F26E07912007D7B5B /* CreatePost.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B3E26E07912007D7B5B /* CreatePost.swift */; };
@@ -75,7 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92D780DD2E98FBC1002E5550 /* SharedFrameworks in Frameworks */,
+				92B8C9AE2EA25B6B003AF280 /* SharedFrameworks in Frameworks */,
 				A0BD0B3426DDD9820054088B /* AmityUIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -254,7 +254,7 @@
 			);
 			name = AmityUIKitLiveStream;
 			packageProductDependencies = (
-				92D780DC2E98FBC1002E5550 /* SharedFrameworks */,
+				92B8C9AD2EA25B6B003AF280 /* SharedFrameworks */,
 			);
 			productName = AmityUIKitLiveStream;
 			productReference = A0BD0B1526DCE4F50054088B /* AmityUIKitLiveStream.framework */;
@@ -541,7 +541,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		92D780DC2E98FBC1002E5550 /* SharedFrameworks */ = {
+		92B8C9AD2EA25B6B003AF280 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
