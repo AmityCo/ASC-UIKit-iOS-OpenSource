@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6817EAA82EB0BEF100456199 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 6817EAA72EB0BEF100456199 /* SharedFrameworks */; };
 		684AE0FC2B0C5B0200FD7270 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */; };
 		684AE1012B0C5B0200FD7270 /* AmityUIKit4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1002B0C5B0200FD7270 /* AmityUIKit4Tests.swift */; };
 		685F16C22BFCABAD0016685F /* AmityReactionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C12BFCABAD0016685F /* AmityReactionList.swift */; };
 		685F16C62BFCABB50016685F /* ReactionTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C52BFCABB50016685F /* ReactionTabBarView.swift */; };
-		92B8C9AA2EA25B54003AF280 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92B8C9A92EA25B54003AF280 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +34,7 @@
 		684AE10F2B0C5D2000FD7270 /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = ../EkoMessagingSDKUIKitIOS/UpstraUIKit/Shared/Realm.xcframework; sourceTree = "<group>"; };
 		684AE1102B0C5D2000FD7270 /* RealmSwift.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = ../EkoMessagingSDKUIKitIOS/UpstraUIKit/Shared/RealmSwift.xcframework; sourceTree = "<group>"; };
 		684AE1332B0C968F00FD7270 /* AmitySDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmitySDK.xcframework; path = ../Shared/AmitySDK.xcframework; sourceTree = "<group>"; };
-		684AE1342B0C968F00FD7270 /* Realm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = ../Shared/Realm.xcframework; sourceTree = "<group>"; };
+		684AE1342B0C968F00FD7270 /* Realm.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Amity Technologies (Thailand) Co., Ltd."; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = ../Shared/Realm.xcframework; sourceTree = "<group>"; };
 		684AE1352B0C968F00FD7270 /* RealmSwift.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Eko Corporation Company Limited"; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = ../Shared/RealmSwift.xcframework; sourceTree = "<group>"; };
 		685F16C12BFCABAD0016685F /* AmityReactionList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmityReactionList.swift; path = AmityUIKit4/Core/Components/Reaction/AmityReactionList.swift; sourceTree = SOURCE_ROOT; };
 		685F16C32BFCABB10016685F /* ReactionListHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReactionListHeader.swift; path = AmityUIKit4/Core/Components/Reaction/ReactionListHeader.swift; sourceTree = SOURCE_ROOT; };
@@ -654,7 +654,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92B8C9AA2EA25B54003AF280 /* SharedFrameworks in Frameworks */,
+				6817EAA82EB0BEF100456199 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1127,7 +1127,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		92B8C9A92EA25B54003AF280 /* SharedFrameworks */ = {
+		6817EAA72EB0BEF100456199 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
