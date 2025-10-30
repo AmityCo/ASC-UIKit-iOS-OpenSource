@@ -8,12 +8,12 @@
 import Foundation
 
 extension Notification.Name {
-    public static let didPostCreated = Notification.Name("didPostCreated")
-    public static let didPostDeleted = Notification.Name("didPostDeleted")
-    public static let didPostLocallyDeleted = Notification.Name("didPostLocallyDeleted")
-    public static let didPostImageUpdated = Notification.Name("didPostImageUpdated")
-    public static let didPostReacted = Notification.Name("didPostReacted")
-    public static let didVotePoll = Notification.Name("didVotePoll")
-    public static let didLivestreamStatusUpdated = Notification.Name("didLivestreamStatusUpdated")
+    static let didPostCreated = Notification.Name("didPostCreated")
+    static let didPostDeleted = Notification.Name("didPostDeleted")
+    static let didPostLocallyDeleted = Notification.Name("didPostLocallyDeleted")
+    static let didPostImageUpdated = Notification.Name("didPostImageUpdated")
+    static let didPostReacted = Notification.Name("didPostReacted")
+    static let didVotePoll = Notification.Name("didVotePoll")
+    static let didLivestreamStatusUpdated = Notification.Name("didLivestreamStatusUpdated")
     static let configDidUpdate = Notification.Name("amityConfigDidUpdate")
 }

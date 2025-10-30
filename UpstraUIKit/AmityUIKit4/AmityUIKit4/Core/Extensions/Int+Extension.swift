@@ -19,7 +19,7 @@ private extension Double {
 
 extension Int {
     
-    public var formattedCountString: String {
+    var formattedCountString: String {
         let n = self
         let num = abs(Double(n))
 

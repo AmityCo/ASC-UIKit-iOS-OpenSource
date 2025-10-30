@@ -102,7 +102,7 @@ struct ToastModifier: ViewModifier {
 
 /// To use with SwiftUI way
 extension View {
-    public func showToast(isPresented: Binding<Bool>, style: ToastStyle, message: String, bottomPadding: CGFloat = 60) -> some View {
+    func showToast(isPresented: Binding<Bool>, style: ToastStyle, message: String, bottomPadding: CGFloat = 60) -> some View {
         self.modifier(ToastModifier(showToast: isPresented, message: message, style: style, bottomPadding: bottomPadding))
     }
 }

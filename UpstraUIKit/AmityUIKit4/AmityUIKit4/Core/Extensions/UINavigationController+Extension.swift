@@ -8,11 +8,11 @@
 import UIKit
 
 extension UINavigationController {
-    public enum UINavigationControllerAnimation {
+    enum _UINavigationControllerAnimation {
         case `default`, presentation
     }
     
-    public func pushViewController(_ viewController: UIViewController, animation: UINavigationControllerAnimation = .default) {
+    func pushViewController(_ viewController: UIViewController, animation: _UINavigationControllerAnimation = .default) {
         switch animation {
         case .default:
             self.pushViewController(viewController, animated: true)
@@ -33,7 +33,7 @@ extension UINavigationController {
         
     }
     
-    public func popViewController(animation: UINavigationControllerAnimation = .default) {
+    func popViewController(animation: _UINavigationControllerAnimation = .default) {
         switch animation {
         case .default:
             self.popViewController(animated: true)
@@ -54,7 +54,7 @@ extension UINavigationController {
     }
     
     @discardableResult
-    public func popToViewController<Page: AmityPageView>(_ page: Page.Type, animated: Bool) -> AmitySwiftUIHostingController<Page>? {
+    func popToViewController<Page: AmityPageView>(_ page: Page.Type, animated: Bool) -> AmitySwiftUIHostingController<Page>? {
         guard let vc = self.viewControllers.last(where: { $0 is AmitySwiftUIHostingController<Page> }) else { return nil }
         popToViewController(vc, animated: animated)
         return vc as? AmitySwiftUIHostingController<Page>
