@@ -20,10 +20,10 @@
 		0D8FFC2A25DCBFD900943538 /* AmityCustomFooterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2825DCBFD900943538 /* AmityCustomFooterTableViewCell.xib */; };
 		680DC0032C8ABE09006D8764 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */; };
 		680DC0042C8AC2B2006D8764 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */; };
-		6817EAAE2EB0BF1600456199 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 6817EAAD2EB0BF1600456199 /* SharedFrameworks */; };
 		682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; };
 		682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		684097562B30607F00697E1B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 684097552B30607F00697E1B /* GoogleService-Info.plist */; };
+		68E188B62EC1B65A008BC648 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 68E188B52EC1B65A008BC648 /* SharedFrameworks */; };
 		68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; };
 		68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7214C9CB2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */; };
@@ -282,7 +282,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6817EAAE2EB0BF1600456199 /* SharedFrameworks in Frameworks */,
+				68E188B62EC1B65A008BC648 /* SharedFrameworks in Frameworks */,
 				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
@@ -609,7 +609,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				6817EAAD2EB0BF1600456199 /* SharedFrameworks */,
+				68E188B52EC1B65A008BC648 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -1294,7 +1294,7 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6817EAAD2EB0BF1600456199 /* SharedFrameworks */ = {
+		68E188B52EC1B65A008BC648 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
