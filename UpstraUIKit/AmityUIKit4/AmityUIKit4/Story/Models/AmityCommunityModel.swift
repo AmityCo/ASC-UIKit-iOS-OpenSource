@@ -45,6 +45,10 @@ public struct AmityCommunityModel: Identifiable {
     var joinRequestStatus: AmityJoinRequestStatus?
     var joinRequest: AmityJoinRequest?
     
+    public init(object: AmityCommunity) {
+        self.init(object: object, joinRequest: nil)
+    }
+    
     init(object: AmityCommunity, joinRequest: AmityJoinRequest? = nil) {
         self.object = object
         self.communityId = object.communityId

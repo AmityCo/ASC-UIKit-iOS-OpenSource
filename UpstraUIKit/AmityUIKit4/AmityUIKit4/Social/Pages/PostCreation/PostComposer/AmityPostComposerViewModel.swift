@@ -12,7 +12,8 @@ class AmityPostComposerViewModel: ObservableObject {
     private let communityManager = CommunityManager()
     private let postManager = PostManager()
     private let targetId: String?
-    private let community: AmityCommunityModel?
+    private var community: AmityCommunityModel?
+    private var communityToken: AmityNotificationToken?
     private let post: AmityPostModel?
     let mode: AmityPostComposerMode
     let targetType: AmityPostTargetType
@@ -56,10 +57,14 @@ class AmityPostComposerViewModel: ObservableObject {
         self.mode = mode
         self.post = nil
         self.displayName =
-            targetType == .community ? community?.displayName ?? "Unknown" : "My Timeline"
+            targetType == .community ? community?.displayName ?? "" : "My Timeline"
         self.originalPostText = ""
         self.originalMedias = []
         self.originalPostTitle = ""
+        
+        if let communityId = targetId , targetType == .community {
+            self.loadTargetCommunity(id: communityId)
+        }
     }
 
     // Edit mode
@@ -76,6 +81,25 @@ class AmityPostComposerViewModel: ObservableObject {
         self.originalPostTitle = post.title
         self.originalMedias = post.medias
         self.mentionData.metadata = post.metadata
+    }
+    
+    func loadTargetCommunity(id: String) {
+        communityToken = nil
+        communityToken = communityManager.getCommunity(withId: id).observe { [weak self] liveObject, error in
+            if let error {
+                self?.communityToken?.invalidate()
+                self?.communityToken = nil
+                return
+            }
+            
+            if let snapshot = liveObject.snapshot {
+                self?.community = AmityCommunityModel(object: snapshot)
+                self?.displayName = snapshot.displayName
+            }
+            
+            self?.communityToken?.invalidate()
+            self?.communityToken = nil
+        }
     }
 
     // Add a function to check if post has changes in edit mode

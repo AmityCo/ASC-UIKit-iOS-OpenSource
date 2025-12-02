@@ -175,7 +175,7 @@ public class CommunityProfileViewModel: ObservableObject {
         }
     }
     
-    func refreshFeed() {
+    public func refreshFeed() {
         firstLoadTask.reset()
         
         loadCommunity()
