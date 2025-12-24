@@ -46,18 +46,22 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                     showCamera.type = [UTType.image, UTType.movie]
                 }
                 
+                pickerViewModel.reset()
+                
                 showCamera.source = .camera
                 showCamera.isShown.toggle()
             }
             .isHidden(viewConfig.isHidden(elementId: .cameraButton))
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.cameraButton)
                         
-            
             let imageButtonIcon = viewConfig.getConfig(elementId: .imageButton, key: "image", of: String.self) ?? ""
             let imageButtonTitle = viewConfig.getConfig(elementId: .imageButton, key: "text", of: String.self) ?? ""
             getItemView(image: AmityIcon.getImageResource(named: imageButtonIcon),
                         title: imageButtonTitle,
                         isHidden: viewModel.medias.first?.type ?? .image != .image) {
+                
+                pickerViewModel.reset()
+                
                 showMediaPicker.type = .images
                 showMediaPicker.source = .photoLibrary
                 showMediaPicker.isShown.toggle()
@@ -70,6 +74,9 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
             getItemView(image: AmityIcon.getImageResource(named: videoButtonIcon),
                         title: videoButtonTitle,
                         isHidden: viewModel.medias.first?.type ?? .video != .video) {
+                
+                pickerViewModel.reset()
+                
                 showMediaPicker.type = .videos
                 showMediaPicker.source = .photoLibrary
                 showMediaPicker.isShown.toggle()
@@ -78,12 +85,17 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.videoButton)
         }
         .onChange(of: pickerViewModel) { _ in
-                        
+            
+            // Note:
+            // This onChange(of: pickerViewModel) is being called multiple times
+            // leading to app freeze issue.
+            guard pickerViewModel.haveSelection else {
+                return
+            }
+                                    
             guard viewModel.medias.count <= 10 else {
                 Log.add(event: .error, "Media item count limit reached.")
-                pickerViewModel.selectedMedia = nil
-                pickerViewModel.selectedImage = nil
-                pickerViewModel.selectedMediaURL = nil
+                pickerViewModel.reset()
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     showMaximumMediaAlert.toggle()
@@ -96,7 +108,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
             // Camera mode
             if let selectedMedia = pickerViewModel.selectedMedia, let url = pickerViewModel.selectedMediaURL {
                 let mediaType: AmityMediaType = selectedMedia == UTType.image.identifier ? .image : .video
-                var media = AmityMedia(state: .localURL(url: url), type: mediaType)
+                let media = AmityMedia(state: .localURL(url: url), type: mediaType)
                 media.localUrl = url
                 viewModel.medias.append(media)
             }
@@ -117,11 +129,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                 }
             }
             
-            pickerViewModel.selectedMedia = nil
-            pickerViewModel.selectedVidoesURLs = []
-            pickerViewModel.selectedImages = []
-            pickerViewModel.selectedImage = nil
-            pickerViewModel.selectedMediaURL = nil
+            pickerViewModel.reset()
         }
         .alert(isPresented: $showMaximumMediaAlert) {
             let typeString = currentType == .image ? "images" : "videoes"

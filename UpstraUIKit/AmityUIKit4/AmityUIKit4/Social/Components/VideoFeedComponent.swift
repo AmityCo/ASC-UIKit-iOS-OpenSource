@@ -11,11 +11,12 @@ import AmitySDK
 /// Shared View for VideoFeedComponent in UserProfile & CommunityProfilePage
 struct VideoFeedComponent: View {
     
-    @EnvironmentObject var viewConfig: AmityViewConfigController
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
     
-    @State private var currentTab: VideoFeedTab = .videos
+    @State private var selectedType: VideoFeedType = .videos
+    
     @StateObject private var viewModel: MediaFeedViewModel
+    @StateObject private var viewConfig: AmityViewConfigController
     
     private var gridLayout: [GridItem] {
         [
@@ -24,28 +25,15 @@ struct VideoFeedComponent: View {
         ]
     }
     
-    public init(mediaFeedViewModel: MediaFeedViewModel) {
+    public init(mediaFeedViewModel: MediaFeedViewModel, type: VideoFeedType, pageId: PageId?, componentId: ComponentId?) {
         self._viewModel = StateObject(wrappedValue: mediaFeedViewModel)
+        self._selectedType = State(wrappedValue: type)
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: componentId))
     }
     
     public var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                VideoFeedTabButton(title: "Videos", selected: currentTab == .videos) {
-                    currentTab = .videos
-                }
-                
-                VideoFeedTabButton(title: "Clips", selected: currentTab == .clips) {
-                    currentTab = .clips
-                }
-                
-                Spacer()
-                
-            }
-            .padding(.top, 14)
-            .padding(.horizontal, 16)
-            
-            switch currentTab {
+            switch selectedType {
             case .videos:
                 ZStack(alignment: .top) {
                     videoFeedView
@@ -88,17 +76,17 @@ struct VideoFeedComponent: View {
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)
-        .onChange(of: currentTab) { tab in
+        .onChange(of: selectedType) { tab in
             viewModel.loadMediaFeed(feedTab: tab)
         }
         .onChange(of: viewModel.currentFeedSources) { _ in
-            viewModel.loadMediaFeed(feedTab: currentTab)
+            viewModel.loadMediaFeed(feedTab: selectedType)
         }
         .onAppear {
             if viewModel.hasNavigatedToPostDetail {
                 viewModel.hasNavigatedToPostDetail = false                
             } else {
-                viewModel.loadMediaFeed(feedTab: currentTab)
+                viewModel.loadMediaFeed(feedTab: selectedType)
             }
         }
     }

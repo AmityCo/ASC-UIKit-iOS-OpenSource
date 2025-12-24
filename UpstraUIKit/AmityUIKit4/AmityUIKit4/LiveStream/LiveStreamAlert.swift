@@ -18,6 +18,10 @@ class LiveStreamAlert: ObservableObject {
     
     enum State {
         case streamEndedManually(action: AlertAction)
+        case cancelCoHostInvitation(action: AlertAction)
+        case coHostLeave(action: AlertAction)
+        case leaveAsCoHost(action: AlertAction)
+        case removeCoHost(action: AlertAction)
         case streamEndedDueToMaxDuration(action: AlertAction)
         case streamDiscard(action: AlertAction)
         case streamError
@@ -27,6 +31,14 @@ class LiveStreamAlert: ObservableObject {
             switch self {
             case .streamEndedManually:
                 AmityLocalizedStringSet.Social.liveStreamAlertEndLiveTitle.localizedString
+            case .cancelCoHostInvitation:
+                AmityLocalizedStringSet.Social.livestreamAlertCancelCoHostInvitationTitle.localizedString
+            case .coHostLeave:
+                AmityLocalizedStringSet.Social.livestreamAlertCoHostLeaveTitle.localizedString
+            case .leaveAsCoHost:
+                AmityLocalizedStringSet.Social.livestreamAlertLeaveAsCoHostTile.localizedString
+            case .removeCoHost:
+                AmityLocalizedStringSet.Social.livestreamAlertRemoveCoHostTitle.localizedString
             case .streamEndedDueToMaxDuration:
                 AmityLocalizedStringSet.Social.liveStreamAlertEndAtMaxDurationTitle.localizedString
             case .streamDiscard:
@@ -42,6 +54,14 @@ class LiveStreamAlert: ObservableObject {
             switch self {
             case .streamEndedManually:
                 AmityLocalizedStringSet.Social.liveStreamAlertEndLiveDesc.localizedString
+            case .cancelCoHostInvitation:
+                AmityLocalizedStringSet.Social.livestreamAlertCancelCoHostInvitationMessage.localizedString
+            case .coHostLeave:
+                AmityLocalizedStringSet.Social.livestreamAlertCoHostLeaveMessage.localizedString
+            case .leaveAsCoHost:
+                AmityLocalizedStringSet.Social.livestreamAlertLeaveAsCoHostMessage.localizedString
+            case .removeCoHost:
+                AmityLocalizedStringSet.Social.livestreamAlertRemoveCoHostMessage.localizedString
             case .streamEndedDueToMaxDuration:
                 AmityLocalizedStringSet.Social.liveStreamAlertEndAtMaxDurationMessage.localizedString
             case .streamDiscard:
@@ -71,6 +91,12 @@ class LiveStreamAlert: ObservableObject {
             switch self {
             case .streamEndedManually(let action):
                 return .destructive(Text(AmityLocalizedStringSet.Social.liveStreamAlertEndButton.localizedString), action: action)
+            case .cancelCoHostInvitation(let action):
+                return .default(Text(AmityLocalizedStringSet.Social.livestreamAlertConfirmButton.localizedString), action: action)
+            case .coHostLeave(let action), .leaveAsCoHost(action: let action):
+                return .destructive(Text(AmityLocalizedStringSet.General.leave.localizedString), action: action)
+            case .removeCoHost(let action):
+                return .destructive(Text(AmityLocalizedStringSet.Social.livestreamAlertRemoveButton.localizedString), action: action)
             case .streamDiscard(let action):
                 return .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: action)
             default:

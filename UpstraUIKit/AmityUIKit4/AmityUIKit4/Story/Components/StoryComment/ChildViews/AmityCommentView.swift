@@ -117,7 +117,7 @@ public struct AmityCommentView: View {
                             .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
                             .padding([.leading, .bottom, .trailing], 12)
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentTextView)
-                        
+                            .id(comment.text)
                         }
                         .background(Color(viewConfig.theme.baseColorShade4))
                         .clipShape(RoundedCorner(radius: 12, corners: [.topRight, .bottomLeft, .bottomRight]))

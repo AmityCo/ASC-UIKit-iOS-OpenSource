@@ -31,7 +31,7 @@ struct CommunityCellView: View {
             AsyncImage(placeholder: AmityIcon.communityThumbnail.imageResource, url: URL(string: model.avatarURL))
                 .frame(size: CGSize(width: 80, height: 80))
                 .clipped()
-                .cornerRadius(8, corners: .allCorners)
+                .cornerRadius(4, corners: .allCorners)
                 .isHidden(viewConfig.isHidden(elementId: .communityAvatar))
                 .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityAvatar)
             

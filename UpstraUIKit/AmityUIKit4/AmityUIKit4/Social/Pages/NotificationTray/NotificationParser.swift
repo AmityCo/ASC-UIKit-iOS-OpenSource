@@ -8,8 +8,8 @@
 class NotificationTemplateData {
     var text: String = ""// displayed text
     var range: NSRange = NSRange.init() // range of text
-    var type: String = "" // user | community
-    var id: String = "" // userId | communityId
+    var type: String = "" // user | community | text | event
+    var id: String = "" // userId | communityId | eventId
     
     var description: String {
         return """
@@ -29,6 +29,7 @@ class NotificationParser {
         let userTemplateFormat = "<user-template>"
         let commTemplateFormat = "<comm-template>"
         let textTemplateFormat = "<text-template>"
+        let eventTemplateFormat = "<event-template>"
         
         let compatibleTemplate = template as NSString
         let matches = regex.matches(in: template, options: [], range: NSRange(location: 0, length: compatibleTemplate.length))
@@ -71,6 +72,10 @@ class NotificationParser {
                 
                 info.id = contents[1]
                 info.type = "text"
+            } else if item.contains("eventId") {
+                processedTemplateText = processedTemplateText.replacingOccurrences(of: item, with: eventTemplateFormat)
+                info.id = contents[1]
+                info.type = "event"
             }
             
             placeholders.append(info)

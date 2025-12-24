@@ -120,7 +120,7 @@ struct AmityContentReportPage: View {
                         }
                         
                     }
-                    .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig, isDisabled: viewModel.selectedReason == nil))
+                    .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig, backgroundColor: viewConfig.theme.primaryColor))
                     .disabled(viewModel.selectedReason == nil || viewModel.submissionState == .submitting)
                     .padding(16)
                 }

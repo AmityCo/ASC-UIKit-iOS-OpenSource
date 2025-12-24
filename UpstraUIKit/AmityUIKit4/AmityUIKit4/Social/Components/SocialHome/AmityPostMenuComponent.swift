@@ -17,6 +17,20 @@ enum PostMenuType: String, CaseIterable, Identifiable {
     case liveStream = "Live stream"
     case story = "Story"
     case clip = "Clip"
+    case event = "Event"
+}
+
+class AmityCreatePostMenuViewModel: ObservableObject {
+    @Published var hasCreateEventPermission: Bool = false
+    
+    init() {
+        // Event Permission
+        AmityUIKit4Manager.client.hasPermission(.createEvent) { [weak self] hasPermission in
+            guard let self else { return }
+            
+            self.hasCreateEventPermission = hasPermission
+        }
+    }
 }
 
 public struct AmityCreatePostMenuComponent: AmityComponentView {
@@ -27,6 +41,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
     
     @StateObject private var viewConfig: AmityViewConfigController
     @Binding private var isPresented: Bool
+    @StateObject private var viewModel = AmityCreatePostMenuViewModel()
     
     @State private var showPostCreationMenuScaleEffect: Bool = false
     private let allowAllUserToCreateStory = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
@@ -86,22 +101,29 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createStoryButton)
                 case .poll:
                     let icon = AmityIcon.createPollMenuIcon
-                    getItemView(image: icon.getImageResource(), title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
+                    getItemView(image: icon.imageResource, title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
                 case .liveStream:
                     let icon = AmityIcon.createLivestreamMenuIcon
-                    getItemView(image: icon.getImageResource(), title: type.rawValue)
+                    getItemView(image: icon.imageResource, title: type.rawValue)
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
                 case .clip:
                     let icon = AmityIcon.createClipMenuIcon
-                    getItemView(image: icon.getImageResource(), title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
+                    getItemView(image: icon.imageResource, title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
+                case .event:
+                    let icon = AmityIcon.createEventMenuIcon
+                    getItemView(image: icon.imageResource, title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
+                        .onTapGesture {
+                            handlePostMenuAction(type)
+                        }
+                        .isHidden(!viewModel.hasCreateEventPermission)
                 }
             }
         }
@@ -162,6 +184,8 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                 behavior?.goToSelectLiveStreamPostTargetPage(context: context)
             case .clip:
                 behavior?.goToSelectClipPostTargetPage(context: context)
+            case .event:
+                behavior?.goToSelectEventTargetPage(context: context)
             }
         }
     }

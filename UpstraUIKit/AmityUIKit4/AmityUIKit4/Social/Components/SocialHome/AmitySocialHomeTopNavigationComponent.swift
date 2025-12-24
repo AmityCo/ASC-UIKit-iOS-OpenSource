@@ -75,12 +75,8 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
             // Add Button
             if selectedTab != .explore && !AmityUIKitManagerInternal.shared.isGuestUser {
                 TopNavigationIconButton(elementId: .postCreationButton) {
-                    if selectedTab == .myCommunities {
-                        goToCommunitySetupPage()
-                    } else {
-                        withoutAnimation {
-                            showPostCreationMenu.toggle()
-                        }
+                    withoutAnimation {
+                        showPostCreationMenu.toggle()
                     }
                 }
                 .fullScreenCover(isPresented: $showPostCreationMenu) {
@@ -90,7 +86,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .postCreationButton), remove: true)
             }
         }
-        .padding([.leading, .trailing], 15.5)
+        .padding([.leading, .trailing], 16)
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
     }

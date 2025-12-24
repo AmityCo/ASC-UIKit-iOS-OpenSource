@@ -35,7 +35,7 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
             Rectangle()
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 1)
-                        
+            
             searchUserView
                 .padding(EdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 16))
             
@@ -179,9 +179,7 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
                                 }
                         }
                         
-                        Text(user.displayName)
-                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
-                            .lineLimit(1)
+                        UserDisplayNameLabel(name: user.displayName, isBrand: user.isBrand, spacing: 2)
                     }
                     .frame(width: 68)
                 }
@@ -283,14 +281,14 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
                 .scaledToFit()
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 .frame(width: 60, height: 60)
-        
+            
             Text("Start your search by typing at least 3 letters")
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 100)
     }
-        
+    
     private func isSelectedUser(_ user: AmityUserModel) -> Bool {
         return selectedUsers.contains { $0.userId == user.userId }
     }

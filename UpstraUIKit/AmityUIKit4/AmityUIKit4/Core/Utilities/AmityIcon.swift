@@ -116,6 +116,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case createPollMenuIcon = "createPollMenuIcon"
     case createLivestreamMenuIcon = "createLivestreamMenuIcon"
     case createClipMenuIcon = "createClipMenuIcon"
+    case createEventMenuIcon = "createEventMenuIcon"
     case cameraAttatchmentIcon = "cameraAttatchmentIcon"
     case photoAttatchmentIcon = "photoAttatchmentIcon"
     case videoAttatchmentIcon = "videoAttatchmentIcon"
@@ -149,6 +150,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case pendingInvitationIcon = "pendingInvitationIcon"
     case videoNotAvailableIcon = "videoNotAvailableIcon"
     case imageNotAvailableIcon = "imageNotAvailableIcon"
+    case inviteUserIcon = "inviteUserIcon"
 
     case brandBadge = "brandBadgeIcon"
     case globeIcon = "globeIcon"
@@ -221,6 +223,19 @@ enum AmityIcon: String, ImageResourceProvider {
     case imagePollOption = "imagePollOption"
     case imagePollOptionSelected = "imagePollOptionSelected"
     case pollImageNotAvailableIcon = "pollImageNotAvailableIcon"
+    case externalPlatformIcon = "externalPlatformIcon"
+    case eventLocationIcon = "eventLocationIcon"
+    case mediaFeedIcon = "mediaFeedIcon"
+    case eventEmptyStateIcon = "eventEmptyStateIcon"
+    case eventImagePlaceholder = "eventImagePlaceholder"
+    case eventHostBadge = "eventHostBadge"
+    case eventDiscussionTabIcon = "eventDiscussionTabIcon"
+    case copyTextIcon = "copyTextIcon"
+    case eventAddToCalendarIcon = "eventAddToCalendarIcon"
+    case addToCalendarButtonIcon = "addToCalendarButtonIcon"
+    case communityPeopleIcon = "communityPeopleIcon"
+    case eventAttendeeIcon = "eventAttendeeIcon"
+    case eventRSVPBellIcon = "eventRSVPBellIcon"
     
     // Livestream icons
     enum LiveStream: String, ImageResourceProvider {
@@ -231,12 +246,16 @@ enum AmityIcon: String, ImageResourceProvider {
         case thumbnail = "ic_thumbnail"
         case switchCamera = "ic_camera_flip"
         case disabledChatIcon = "disabledChatIcon"
+        case mic = "micIcon"
+        case unmuteMic = "unmuteMicIcon"
         
         case terminatedPageStreamer = "livestream_terminated_streaming"
         case terminatedPageWatcher = "livestream_terminated_watching"
         case terminatedContentViewer = "livestream_terminated_trash"
         case terminatedContentPlayback = "livestream_terminated_block"
         case menu = "livestreamMenuIcon"
+        case hostIcon = "streamHostIcon"
+        case leaveIcon = "leaveIcon"
     }
     
     enum Reaction: String, ImageResourceProvider {

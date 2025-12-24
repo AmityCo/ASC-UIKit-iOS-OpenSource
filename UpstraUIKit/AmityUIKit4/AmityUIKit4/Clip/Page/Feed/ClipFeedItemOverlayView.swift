@@ -296,7 +296,7 @@ struct ClipFeedItemOverlayView: View {
                 UIPasteboard.general.string = profileLink
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    Toast.showToast(style: .success, message: "Link copied")
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventInfoLinkCopied.localizedString)
                 }
             }
         

@@ -140,6 +140,7 @@ class JoinRequestManager {
     
     private var token: AmityNotificationToken?
     private var cache: [String: AmityJoinRequest] = [:]
+    private var queryCache: Set<String> = [] // Cache of communityId being queried.
     private let repository: AmityCommunityRepository = .init(client: AmityUIKit4Manager.client)
     private var isFetching = false
     
@@ -148,13 +149,21 @@ class JoinRequestManager {
         let newData = communityIds.filter { cache[$0] == nil }
         
         guard !newData.isEmpty else {
-            Log.add(event: .info, "Returning join requests data from cache")
             completion(cache)
             return
         }
         
+        // Prevent querying of join requests
+        let newQueryIds = Set(communityIds)
+        if queryCache == newQueryIds {
+            completion(cache)
+            return
+        }
+        queryCache = newQueryIds
+        
         guard !isFetching else { return }
         isFetching = true
+        
         token = repository.getJoinRequestList(communityIds: communityIds).observe({ [weak self] liveCollection, _, error in
             guard let self else { return }
             
@@ -166,10 +175,19 @@ class JoinRequestManager {
                 self.cache[request.targetId] = request
             }
             
-            Log.add(event: .info, "Returning fresh join requests data from server")
             completion(cache)
             
             isFetching = false
         })
+    }
+    
+    func clearCache() {
+        queryCache = []
+        cache = [:]
+    }
+    
+    deinit {
+        token?.invalidate()
+        token = nil
     }
 }

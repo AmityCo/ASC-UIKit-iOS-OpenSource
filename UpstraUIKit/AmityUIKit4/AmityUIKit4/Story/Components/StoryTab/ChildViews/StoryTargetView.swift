@@ -14,8 +14,10 @@ struct StoryTargetView<Content: View>: View {
     @ObservedObject private var storyTarget: AmityStoryTargetModel
     private let storyTargetName: String
     private let hideLockIcon: Bool
+    private let radius: CGFloat
     
-    init(componentId: ComponentId, storyTarget: AmityStoryTargetModel, storyTargetName: String? = nil, hideLockIcon: Bool, @ViewBuilder cornerImage: @escaping () -> Content) {
+    init(radius: CGFloat, componentId: ComponentId, storyTarget: AmityStoryTargetModel, storyTargetName: String? = nil, hideLockIcon: Bool, @ViewBuilder cornerImage: @escaping () -> Content) {
+        self.radius = radius
         self.componentId = componentId
         self.storyTarget = storyTarget
         self.hideLockIcon = hideLockIcon
@@ -41,11 +43,11 @@ struct StoryTargetView<Content: View>: View {
         return VStack {
             ZStack {
                 AmityStoryRingElement(componentId: componentId, showRing: showRing, animateRing: animateRing, showErrorRing: showErrorRing)
-                    .frame(width: 64, height: 64)
+                    .frame(width: radius, height: radius)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.storyRingView)
                 
                 AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: avatar)
-                    .frame(width: 56, height: 56)
+                    .frame(width: radius - 6, height: radius - 6)
                     .clipShape(Circle())
                     .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.avatarImageView)
                 

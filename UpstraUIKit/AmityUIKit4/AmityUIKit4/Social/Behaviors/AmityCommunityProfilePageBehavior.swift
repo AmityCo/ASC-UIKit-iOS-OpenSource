@@ -149,4 +149,17 @@ open class AmityCommunityProfilePageBehavior {
         let controller = AmitySwiftUIHostingController(rootView: page)
         context.page.host.controller?.navigationController?.pushViewController(controller, animated: true)
     }
+    
+    open func goToEventSetupPage(context: AmityCommunityProfilePageBehavior.Context) {
+        guard let community = context.community else { return }
+        
+        let page = AmityEventSetupPage(mode: .create(targetId: community.communityId, targetName: community.displayName))
+        let controller = AmitySwiftUIHostingController(rootView: page)
+        
+        let navigationController = UINavigationController(rootViewController: controller)
+        navigationController.modalPresentationStyle = .fullScreen
+        navigationController.navigationBar.isHidden = true
+        
+        context.page.host.controller?.present(navigationController, animated: true)
+    }
 }

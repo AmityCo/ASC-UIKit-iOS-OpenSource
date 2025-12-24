@@ -33,7 +33,7 @@ class LiveReactionViewModel {
     let height: CGFloat = 320
     
     weak var containerView: LiveReactionUIView?
-    private let stream: AmityStream
+    private let room: AmityRoom
     
     private let reactionEngine = LiveReactionEngine()
     private let reactionManger = ReactionManager()
@@ -43,15 +43,11 @@ class LiveReactionViewModel {
     // Track whether animations are in progress for each lane
     private var isAnimatingLane = [Bool](repeating: false, count: 5)
     
-    init(stream: AmityStream) {
-        self.stream = stream
+    init(room: AmityRoom) {
+        self.room = room
         getReactionDataFromConfig()
-        subscribeLiveReactionEvent(stream)
-        observeLiveReactions(stream)
-    }
-    
-    deinit {
-        unsubscribeLiveReactionEvent(stream)
+        subscribeLiveReactionEvent(room)
+        observeLiveReactions(room)
     }
     
     /// Add a reaction to the container view and animate it
@@ -76,10 +72,10 @@ class LiveReactionViewModel {
         }
     }
     
-    /// Observe live reactions for the given stream and process them
-    private func observeLiveReactions(_ stream: AmityStream) {
-        guard let post = stream.post else { return }
-        cancellable = reactionManger.getLiveReactions(referenceId: post.postId, referenceType: .post, streamId: stream.streamId)
+    /// Observe live reactions for the given room and process them
+    private func observeLiveReactions(_ room: AmityRoom) {
+        guard let post = room.post else { return }
+        cancellable = reactionManger.getLiveReactions(referenceId: post.postId, referenceType: .post, streamId: room.roomId)
             .sink { [weak self] reactions in
                 self?.processReactions(reactions.map {
                     AmityLiveReactionModel(reactionName: $0.reactionName,
@@ -177,24 +173,29 @@ class LiveReactionViewModel {
     }
         
     
-    private func subscribeLiveReactionEvent(_ stream: AmityStream) {
-        stream.post?.subscribeEvent(.liveReaction) { success, error in
+    private func subscribeLiveReactionEvent(_ room: AmityRoom) {
+        room.post?.subscribeEvent(.liveReaction) { success, error in
             if error != nil {
                 Log.add(event: .error, "Failed to subscribe to live reaction event: \(error!.localizedDescription)")
             } else {
-                Log.add(event: .info, "Subscribed to live reaction event for post: \(stream.post?.postId ?? "unknown")")
+                Log.add(event: .info, "Subscribed to live reaction event for post: \(room.post?.postId ?? "unknown")")
             }
         }
     }
     
-    private func unsubscribeLiveReactionEvent(_ stream: AmityStream) {
-        stream.post?.unsubscribeEvent(.liveReaction) { success, error in
+    private func unsubscribeLiveReactionEvent(_ room: AmityRoom) {
+        room.post?.unsubscribeEvent(.liveReaction) { success, error in
             if error != nil {
                 Log.add(event: .error, "Failed to unsubscribe from live reaction event: \(error!.localizedDescription)")
             } else {
-                Log.add(event: .info, "Unsubscribed from live reaction event for post: \(stream.post?.postId ?? "unknown")")
+                Log.add(event: .info, "Unsubscribed from live reaction event for post: \(room.post?.postId ?? "unknown")")
             }
         }
+    }
+    
+    func cleanup() {
+        cancellable?.cancel()
+        unsubscribeLiveReactionEvent(room)
     }
 }
 

@@ -184,9 +184,6 @@ extension ExpandableText {
         
         let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: AmityTextStyle.bodyBold(.clear).getFont()]
         
-        //let detector = try! NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
-        //let matches = detector.matches(in: text, options: [], range: NSRange(location: 0, length: text.utf16.count))
-        
         let contentText = text
         var highlightedText = AttributedString(contentText)
         

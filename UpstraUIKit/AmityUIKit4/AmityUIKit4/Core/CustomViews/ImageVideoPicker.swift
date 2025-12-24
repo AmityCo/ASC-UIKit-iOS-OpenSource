@@ -101,5 +101,8 @@ class ImageVideoPickerViewModel: ObservableObject, Identifiable, Equatable {
         selectedVidoesURLs = []
         selectedImages = []
     }
+    
+    var haveSelection: Bool {
+        return selectedMedia != nil || selectedImage != nil || selectedMediaURL != nil || !selectedVidoesURLs.isEmpty || !selectedImages.isEmpty
+    }
 }
-

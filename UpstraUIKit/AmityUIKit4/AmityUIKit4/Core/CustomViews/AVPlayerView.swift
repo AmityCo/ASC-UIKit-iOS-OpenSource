@@ -12,14 +12,12 @@ import SwiftUI
 struct AVPlayerView: UIViewControllerRepresentable {
     private let url: URL
     private let autoPlay: Bool
-    private let post: AmityPostModel?
     
     init(url: URL, 
          autoPlay: Bool = true,
          post: AmityPostModel? = nil) {
         self.url = url
         self.autoPlay = autoPlay
-        self.post = post
     }
     
     func makeUIViewController(context: Context) -> AVPlayerViewController {

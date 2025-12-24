@@ -12,6 +12,7 @@ import SwiftUI
 struct UserCellSkeletonView: View {
     
     @EnvironmentObject private var viewConfig: AmityViewConfigController
+    
     var body: some View {
         HStack(spacing: 16) {
             Rectangle()

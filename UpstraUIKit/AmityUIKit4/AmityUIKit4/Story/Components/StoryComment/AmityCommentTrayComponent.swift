@@ -76,8 +76,13 @@ public struct AmityCommentTrayComponent: AmityComponentView {
                 // Dismiss bottom sheet
                 host.controller?.dismiss(animated: false)
                 
+                if commentCoreViewModel.targetMembershipStatus == .nonMember {
+                    AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+                    return
+                }
+                
                 AmityUserAction.perform(host: host) {
-                    let page = AmityContentReportPage(type: .comment(id: commentId))
+                    let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil))
                         .updateTheme(with: viewConfig)
                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                     vc.isNavigationBarHidden = true

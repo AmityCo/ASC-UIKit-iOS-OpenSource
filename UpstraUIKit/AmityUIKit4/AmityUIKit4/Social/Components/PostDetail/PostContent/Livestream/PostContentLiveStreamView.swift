@@ -14,15 +14,16 @@ struct PostContentLiveStreamView: View {
     
     @State var showVideoPlayer: Bool = false
     let post: AmityPostModel
-    let livestream: AmityStream?
+    let room: AmityRoom?
     let isStreamDeleted: Bool
     let isStreamBanned: Bool
     
     init(post: AmityPostModel) {
         self.post = post
-        self.livestream = post.liveStream
-        self.isStreamDeleted = livestream?.isDeleted ?? false
-        self.isStreamBanned = livestream?.isBanned ?? false
+        self.room = post.room
+        self.isStreamDeleted = room?.isDeleted ?? false
+        self.isStreamBanned = false
+//        self.isStreamBanned = room?.isBanned ?? false
     }
     
     var body: some View {
@@ -58,7 +59,7 @@ struct PostContentLiveStreamView: View {
                 switch post.livestreamState {
                 case .idle, .live, .recorded:
                     
-                    let thumbnailImageUrl = livestream?.thumbnail?.mediumFileURL ?? ""
+                    let thumbnailImageUrl = room?.getThumbnail()?.mediumFileURL ?? ""
                     AsyncImage(placeholder: AmityIcon.livestreamPlaceholderGray.imageResource, url: URL(string: thumbnailImageUrl), contentMode: .fill)
                     
                     VStack(alignment: .leading) {
@@ -82,6 +83,7 @@ struct PostContentLiveStreamView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
+                        .isHidden(post.livestreamState == .idle)
                     
                 case .ended:
                     VStack(alignment: .center) {
@@ -91,6 +93,24 @@ struct PostContentLiveStreamView: View {
                             .padding(.bottom, 4)
                         
                         Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedMessage.localizedString)
+                            .applyTextStyle(.caption(.white))
+                            .multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 16)
+                    
+                case .error:
+                    VStack(alignment: .center) {
+                        Image(AmityIcon.livestreamErrorIcon.imageResource)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 32, height: 32)
+                            .padding(.bottom, 12)
+                        
+                        Text(AmityLocalizedStringSet.Social.livestreamPlayerErrorTitle.localizedString)
+                            .applyTextStyle(.titleBold(.white))
+                            .padding(.bottom, 4)
+                        
+                        Text(AmityLocalizedStringSet.Social.livestreamPlayerErrorMessage.localizedString)
                             .applyTextStyle(.caption(.white))
                             .multilineTextAlignment(.center)
                     }

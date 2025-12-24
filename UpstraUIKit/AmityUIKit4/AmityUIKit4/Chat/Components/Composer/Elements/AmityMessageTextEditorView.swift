@@ -29,6 +29,10 @@ extension AmityMessageTextEditorView: AmityViewBuildable {
         mutating(keyPath: \.enableHashtagHighlighting, value: value)
     }
     
+    public func enableLinkHighlight(_ value: Bool) -> Self {
+        mutating(keyPath: \.enableLinkHighlight, value: value)
+    }
+    
     public func maxHashtagCount(_ value: Int) -> Self {
         mutating(keyPath: \.maxHashtagCount, value: value)
     }
@@ -39,6 +43,7 @@ public struct AmityMessageTextEditorView: View {
     @Binding private var text: String
     @Binding private var mentionData: MentionData
     @Binding private var mentionedUsers: [AmityMentionUserModel]
+    @Binding private var links: [LinkDetail]?
     
     @State private var textEditorHeight: CGFloat = 0.0
     @State private var hidePlaceholder: Bool = false
@@ -53,18 +58,23 @@ public struct AmityMessageTextEditorView: View {
     private var characterLimit: Int = 0
     private var placeholderPadding: CGFloat = 5
     private var enableHashtagHighlighting: Bool = false
+    private var enableLinkHighlight: Bool = false
     private var maxHashtagCount: Int = 5
     
-    public init(_ viewModel: AmityTextEditorViewModel, text: Binding<String>, mentionData: Binding<MentionData>, mentionedUsers: Binding<[AmityMentionUserModel]>, textViewHeight: CGFloat, textEditorMaxHeight: CGFloat = 106) {
+    public init(_ viewModel: AmityTextEditorViewModel, text: Binding<String>, mentionData: Binding<MentionData>, mentionedUsers: Binding<[AmityMentionUserModel]>, links: Binding<[LinkDetail]?>? = nil, textViewHeight: CGFloat, textEditorMaxHeight: CGFloat = 106, placeholderPadding: CGFloat = 5) {
         self._text = text
         self._mentionData = mentionData
         self._textEditorHeight = State(initialValue: textViewHeight)
         self._mentionedUsers = mentionedUsers
         self._viewModel = StateObject(wrappedValue: viewModel)
         self.textEditorMaxHeight = textEditorMaxHeight
+        self.placeholderPadding = placeholderPadding
         self._hidePlaceholder = State(initialValue: !text.wrappedValue.isEmpty ? true : false)
+        self._links = links ?? Binding.constant(nil)
     }
     
+    /// Note:
+    /// maxNumberOfLines is used to determine max height for text editor.
     public init(
         _ viewModel: AmityTextEditorViewModel,
         text: Binding<String>,
@@ -82,6 +92,7 @@ public struct AmityMessageTextEditorView: View {
         self.textEditorMaxHeight = CGFloat(maxNumberOfLines) * 18 + viewModel.textView.textContainerInset.top + viewModel.textView.textContainerInset.bottom
         self.placeholderPadding = placeholderPadding
         self._hidePlaceholder = State(initialValue: !text.wrappedValue.isEmpty ? true : false)
+        self._links = Binding.constant(nil)
     }
     
     public var body: some View {
@@ -101,11 +112,21 @@ public struct AmityMessageTextEditorView: View {
                         if enableHashtagHighlighting {
                             // Apply hashtag highlighting immediately when the view appears
                             applyHashtagHighlighting(to: viewModel.textView)
-                            
-                            // Reapply hashtag highlighting when mentionee are highlighted
-                            viewModel.reapplyHashtagHighlighting = {
-                                DispatchQueue.main.async {
+                        }
+                        
+                        if enableLinkHighlight {
+                            applyLinkHighlight(to: viewModel.textView)
+                        }
+                        
+                        // Reapply hashtag highlighting when mentionee are highlighted
+                        viewModel.didFinishMentionHighlight = {
+                            DispatchQueue.main.async {
+                                if enableHashtagHighlighting {
                                     self.applyHashtagHighlighting(to: self.viewModel.textView)
+                                }
+                                
+                                if enableLinkHighlight {
+                                    self.applyLinkHighlight(to: self.viewModel.textView)
                                 }
                             }
                         }
@@ -138,6 +159,10 @@ public struct AmityMessageTextEditorView: View {
                         if enableHashtagHighlighting {
                             applyHashtagHighlighting(to: viewModel.textView)
                         }
+                        
+                        if enableLinkHighlight {
+                            applyLinkHighlight(to: viewModel.textView)
+                        }
                     })
                 
                 Text(placeholder)
@@ -155,6 +180,10 @@ public struct AmityMessageTextEditorView: View {
             // Reapply hashtag highlighting when theme changes
             if enableHashtagHighlighting {
                 applyHashtagHighlighting(to: viewModel.textView)
+            }
+            
+            if enableLinkHighlight {
+                applyLinkHighlight(to: viewModel.textView)
             }
         })
         .frame(height: textEditorHeight)
@@ -233,6 +262,46 @@ public struct AmityMessageTextEditorView: View {
         } catch {
             Log.warn("Hashtag regex error: \(error)")
         }
+    }
+    
+    private func applyLinkHighlight(to textView: UITextView) {
+        guard let attributedText = textView.attributedText?.mutableCopy() as? NSMutableAttributedString else {
+            return
+        }
+        
+        // Store current cursor position
+        let selectedRange = textView.selectedRange
+        
+        let text = attributedText.string
+        let fullRange = NSRange(location: 0, length: text.utf16.count)
+        
+        let extractedLinks = viewModel.linkManager.extractLinks(from: text)
+        
+        if !extractedLinks.isEmpty {
+            self.links = extractedLinks
+        }
+        
+        if extractedLinks.isEmpty && !(self.links?.isEmpty ?? false) {
+            self.links = []
+        }
+        
+        // Remove all link attributes from existing attributed text
+        attributedText.enumerateAttributes(in: fullRange) { attribute, range, _ in
+            if attribute[.link] as? Bool == true {
+                attributedText.removeAttribute(.foregroundColor, range: range)
+                attributedText.removeAttribute(.link, range: range)
+            }
+        }
+
+        // Apply link highlights
+        for link in extractedLinks {
+            attributedText.addAttribute(.foregroundColor, value: viewModel.highlightAttributes[.foregroundColor] ?? UIColor(), range: link.range)
+            attributedText.addAttribute(.link, value: true, range: link.range)
+        }
+        
+        textView.attributedText = attributedText
+        textView.selectedRange = selectedRange
+        textView.typingAttributes = viewModel.typingAttributes
     }
 }
 

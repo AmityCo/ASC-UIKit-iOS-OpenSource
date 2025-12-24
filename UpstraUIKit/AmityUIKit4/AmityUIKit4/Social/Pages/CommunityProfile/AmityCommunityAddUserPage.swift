@@ -178,9 +178,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                                 }
                         }
                         
-                        Text(user.displayName)
-                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
-                            .lineLimit(1)
+                        UserDisplayNameLabel(name: user.displayName, isBrand: user.isBrand, spacing: 2)
                     }
                     .frame(width: 68)
                 }

@@ -52,8 +52,8 @@ public struct AmityPollPostComposerPage: AmityPageView {
     @State private var showCloseAlert = false
     let pollType: AmityPollType
     
-    public init(targetId: String?, targetType: AmityPostTargetType, pollType: AmityPollType = .text) {
-        self._viewModel = StateObject(wrappedValue: PollPostComposerViewModel(targetId: targetId, targetType: targetType))
+    public init(targetId: String?, targetType: AmityPostTargetType, pollType: AmityPollType = .text, event: AmityEvent? = nil) {
+        self._viewModel = StateObject(wrappedValue: PollPostComposerViewModel(targetId: targetId, targetType: targetType, event: event))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .pollPostPage))
         self._editorViewModel = StateObject(wrappedValue: AmityTextEditorViewModel(mentionManager: MentionManager(withType: .post(communityId: targetType == .community ? targetId : ""))))
         self.pollType = pollType

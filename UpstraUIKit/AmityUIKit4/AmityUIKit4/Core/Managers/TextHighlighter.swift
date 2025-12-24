@@ -97,21 +97,7 @@ class TextHighlighter {
     }
     
     public static func detectLinks(in text: String) -> [String] {
-        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else {
-            return []
-        }
-        
-        let stringRange = NSRange(location: 0, length: text.count)
-        let linkMatches = detector.matches(in: text, options: [], range: stringRange)
-        
-        // Get all links
-        var links = [String]()
-        for linkMatch in linkMatches {
-            guard let swiftRange = Range(linkMatch.range, in: text) else { continue }
-            links.append(String(text[swiftRange]))
-        }
-        
-        return links
+        return AmityPreviewLinkWizard.shared.detectLinks(text: text)
     }
     
     @available(iOS 15, *)

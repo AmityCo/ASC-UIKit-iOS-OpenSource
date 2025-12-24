@@ -64,7 +64,7 @@ public class AmityInvitationSectionViewModel: ObservableObject {
         invitationCollection = invitationManager.getMyCommunityInvitations()
         invitationCancellable = invitationCollection?.$snapshots
             .sink(receiveValue: { [weak self] invitations in
-                self?.invitations = invitations.prefix(3).map { $0 }
+                self?.invitations = invitations.filter { $0.targetType == "community" }.prefix(3).map { $0 }
             })
         
         loadingStatusCancellable = invitationCollection?.$loadingStatus

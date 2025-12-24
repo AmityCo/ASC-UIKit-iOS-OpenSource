@@ -164,7 +164,7 @@ struct ExpandableTextEditorView: View {
             Text(input)
                 .font(font)
                 .padding(.horizontal, 16)
-                .padding(.vertical, 4)
+                .padding(.vertical, 2)
                 .foregroundColor(.clear)
                 .lineLimit(lineLimit)
                 .background(GeometryReader {
@@ -175,7 +175,7 @@ struct ExpandableTextEditorView: View {
                 Text(placeholder)
                     .font(font)
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 2)
                     .foregroundColor(placeholderColor)
                     .opacity(input.isEmpty ? 1 : 0)
                 
@@ -183,7 +183,7 @@ struct ExpandableTextEditorView: View {
                     .font(font)
                     .frame(height: max(40, textEditorHeight))
                     .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 2)
                     .transparentBackground()
                     .foregroundColor(textColor)
                     .offset(y: 2)

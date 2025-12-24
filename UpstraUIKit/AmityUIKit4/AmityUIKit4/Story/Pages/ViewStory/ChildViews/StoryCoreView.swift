@@ -318,17 +318,27 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     
                     Spacer(minLength: 80)
                 }
-                HStack {
+                HStack(spacing: 0) {
                     Text(story.createdAt.timeAgoString)
                         .applyTextStyle(.caption(.white))
                         .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.createdAtTextView)
+                    
                     Text("•")
                         .applyTextStyle(.caption(.white))
+                        .padding(.horizontal, 4)
+                    
                     Text("By \(story.creatorName)")
                         .applyTextStyle(.caption(.white))
                         .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.creatorDisplayNameTextView)
+                        .lineLimit(1)
+                    
+                    Image(AmityIcon.brandBadge.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
+                        .opacity(story.isCreatorBrand ? 1 : 0)
+                        .padding(.leading, 2)
                 }
-                
             }
             
             Spacer()

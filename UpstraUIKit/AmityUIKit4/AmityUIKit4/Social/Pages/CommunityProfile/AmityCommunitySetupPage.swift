@@ -320,52 +320,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
             )
             
             if case .edit(let community) = pageMode {
-                editCommunityButtonView
-                    .onTapGesture {
-                        guard isExistingDataChanged else { return }
-                        
-                        let requiredConfirmations = draft.requiresConfirmationForPrivacyChanges(with: CommunityDraft(community: community))
-                        var isConfirmationAlertShown = false
-                        
-                        // Note:
-                        // We show maximum one confirmation alert (if required) for edit operation. Incase confirmation alert is not required, we continue with editing community
-                        for confirmation in requiredConfirmations {
-                            
-                            if confirmation == .pendingJoinRequests {
-                                guard viewModel.hasPendingJoinRequests else { continue }
-                                
-                                isConfirmationAlertShown = true
-                                showConfirmationAlert(type: .pendingJoinRequests) {
-                                    // Do nothing
-                                }
-                                
-                                // Once alert is shown, we break out of the loop
-                                break
-                            }
-                            
-                            if confirmation == .globalFeaturedPosts {
-                                guard viewModel.hasGlobalPinnedPost else { continue }
-                                
-                                isConfirmationAlertShown = true
-                                showConfirmationAlert(type: .globalFeaturedPosts) {
-                                    editCommunity(community)
-                                }
-                                
-                                // Once alert is shown, we break out of the loop
-                                break
-                            }
-                        }
-                        
-                        if !isConfirmationAlertShown {
-                            editCommunity(community)
-                        }
-                    }
+                editCommunityButtonView(community: community)
             } else {
                 createCommunityButtonView
-                    .onTapGesture {
-                        guard !draft.name.isEmpty else { return }
-                        createCommunity()
-                    }
             }
         }
         .onChange(of: imagePickerViewModel) { _ in
@@ -537,73 +494,13 @@ public struct AmityCommunitySetupPage: AmityPageView {
                         switch member.type {
                             
                         case .user:
-                            VStack(spacing: 8) {
-                                ZStack(alignment: .topTrailing) {
-                                    AmityUserProfileImageView(
-                                        displayName: member.user?.displayName
-                                        ?? AmityLocalizedStringSet.General.anonymous
-                                            .localizedString,
-                                        avatarURL: URL(string: member.user?.avatarURL ?? "")
-                                    )
-                                    .frame(width: 40, height: 40)
-                                    .clipShape(Circle())
-                                    
-                                    Circle()
-                                        .fill(.black.opacity(0.3))
-                                        .frame(width: 18, height: 18)
-                                        .overlay(
-                                            Image(AmityIcon.closeIcon.getImageResource())
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 18, height: 18)
-                                        )
-                                        .offset(x: 2, y: -3)
-                                        .onTapGesture {
-                                            selectedMembers.remove(at: index)
-                                        }
-                                }
-                                
-                                Text(member.user?.displayName ?? "Unknown")
-                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
-                                    .lineLimit(1)
+                            SelectedMemberView(member: member) {
+                                selectedMembers.remove(at: index)
                             }
-                            .frame(width: 64, height: 68)
-                            
                         case .create:
-                            VStack(spacing: 8) {
-                                Circle()
-                                    .fill(Color(viewConfig.theme.baseColorShade4))
-                                    .frame(width: 40, height: 40)
-                                    .overlay(
-                                        Image(
-                                            viewConfig.getImage(
-                                                elementId: .communityAddMemberButton)
-                                        )
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 20, height: 20)
-                                        .accessibilityIdentifier(
-                                            AccessibilityID.Social.CommunitySetup
-                                                .communityAddMemberButton)
-                                    )
-                                
-                                let addMemberText =
-                                viewConfig.getText(elementId: .communityAddMemberButton) ?? ""
-                                Text(addMemberText)
-                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
-                                    .lineLimit(1)
-                            }
-                            .frame(width: 64, height: 68)
+                            AddNewMemberView(elementId: .communityAddMemberButton)
                             .onTapGesture {
-                                let selectedUsers = selectedMembers.compactMap { member in
-                                    if let user = member.user {
-                                        return user
-                                    }
-                                    
-                                    return nil
-                                }
+                                let selectedUsers = selectedMembers.compactMap { $0.user }
                                 
                                 let context = AmityCommunitySetupPageBehavior.Context(
                                     page: self, selectedUsers: selectedUsers,
@@ -650,74 +547,13 @@ public struct AmityCommunitySetupPage: AmityPageView {
                         switch member.type {
                             
                         case .user:
-                            VStack(spacing: 8) {
-                                ZStack(alignment: .topTrailing) {
-                                    AmityUserProfileImageView(
-                                        displayName: member.user?.displayName
-                                        ?? AmityLocalizedStringSet.General.anonymous
-                                            .localizedString,
-                                        avatarURL: URL(string: member.user?.avatarURL ?? "")
-                                    )
-                                    .frame(width: 40, height: 40)
-                                    .clipShape(Circle())
-                                    
-                                    Circle()
-                                        .fill(.black.opacity(0.3))
-                                        .frame(width: 18, height: 18)
-                                        .overlay(
-                                            Image(AmityIcon.closeIcon.getImageResource())
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(width: 18, height: 18)
-                                        )
-                                        .offset(x: 2, y: -3)
-                                        .onTapGesture {
-                                            selectedMembers.remove(at: index)
-                                        }
-                                }
-                                
-                                Text(member.user?.displayName ?? "Unknown")
-                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
-                                    .lineLimit(1)
+                            SelectedMemberView(member: member) {
+                                selectedMembers.remove(at: index)
                             }
-                            .frame(width: 64, height: 68)
-                            
                         case .create:
-                            VStack(spacing: 8) {
-                                Circle()
-                                    .fill(Color(viewConfig.theme.baseColorShade4))
-                                    .frame(width: 40, height: 40)
-                                    .overlay(
-                                        Image(
-                                            viewConfig.getImage(
-                                                elementId: .communityInviteMemberButton)
-                                        )
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 20, height: 20)
-                                        .accessibilityIdentifier(
-                                            AccessibilityID.Social.CommunitySetup
-                                                .communityAddMemberButton)
-                                    )
-                                
-                                let inviteMemberText =
-                                viewConfig.getText(elementId: .communityInviteMemberButton)
-                                ?? ""
-                                Text(inviteMemberText)
-                                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
-                                    .lineLimit(1)
-                            }
-                            .frame(width: 64, height: 68)
+                            AddNewMemberView(elementId: .communityInviteMemberButton)
                             .onTapGesture {
-                                let selectedUsers = selectedMembers.compactMap { member in
-                                    if let user = member.user {
-                                        return user
-                                    }
-                                    
-                                    return nil
-                                }
+                                let selectedUsers = selectedMembers.compactMap { $0.user }
                                 
                                 let context = AmityCommunitySetupPageBehavior.Context(
                                     page: self, selectedUsers: selectedUsers,
@@ -745,57 +581,85 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 1)
             
-            Rectangle()
-                .fill(.blue)
-                .frame(height: 40)
-                .cornerRadius(4)
-                .overlay(
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
-                        .isHidden(!draft.name.isEmpty)
-                )
-                .overlay(
-                    HStack(spacing: 8) {
-                        let communityCreateButtonImage = viewConfig.getImage(
-                            elementId: .communityCreateButton)
-                        Image(communityCreateButtonImage)
-                            .resizable()
-                            .renderingMode(.template)
-                            .foregroundColor(.white)
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 20.0, height: 20.0)
-                        
-                        let communityCreateButtonText =
-                        viewConfig.getText(elementId: .communityCreateButton) ?? ""
-                        Text(communityCreateButtonText)
-                            .applyTextStyle(.bodyBold(.white))
-                    }
-                )
-                .padding([.leading, .trailing], 16)
+            Button {
+                guard !draft.name.isEmpty else { return }
+                createCommunity()
+            } label: {
+                HStack(spacing: 8) {
+                    let communityCreateButtonImage = viewConfig.getImage(
+                        elementId: .communityCreateButton)
+                    Image(communityCreateButtonImage)
+                        .resizable()
+                        .renderingMode(.template)
+                        .foregroundColor(.white)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 20.0, height: 20.0)
+                    
+                    let communityCreateButtonText =
+                    viewConfig.getText(elementId: .communityCreateButton) ?? ""
+                    Text(communityCreateButtonText)
+                        .applyTextStyle(.bodyBold(.white))
+                }
+            }
+            .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig))
+            .disabled(draft.name.isEmpty)
+            .padding(.horizontal, 16)
         }
         .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityCreateButton)
     }
     
-    private var editCommunityButtonView: some View {
+    private func editCommunityButtonView(community: AmityCommunity) -> some View {
         VStack(spacing: 16) {
             Rectangle()
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 1)
             
-            Rectangle()
-                .fill(.blue)
-                .frame(height: 40)
-                .cornerRadius(4)
-                .overlay(
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
-                        .isHidden(isExistingDataChanged)
-                )
-                .overlay(
-                    Text(viewConfig.getText(elementId: .communityEditButton) ?? "Save")
-                        .applyTextStyle(.bodyBold(.white))
-                )
-                .padding([.leading, .trailing], 16)
+            Button {
+                guard isExistingDataChanged else { return }
+                
+                let requiredConfirmations = draft.requiresConfirmationForPrivacyChanges(with: CommunityDraft(community: community))
+                var isConfirmationAlertShown = false
+                
+                // Note:
+                // We show maximum one confirmation alert (if required) for edit operation. Incase confirmation alert is not required, we continue with editing community
+                for confirmation in requiredConfirmations {
+                    
+                    if confirmation == .pendingJoinRequests {
+                        guard viewModel.hasPendingJoinRequests else { continue }
+                        
+                        isConfirmationAlertShown = true
+                        showConfirmationAlert(type: .pendingJoinRequests) {
+                            // Do nothing
+                        }
+                        
+                        // Once alert is shown, we break out of the loop
+                        break
+                    }
+                    
+                    if confirmation == .globalFeaturedPosts {
+                        guard viewModel.hasGlobalPinnedPost else { continue }
+                        
+                        isConfirmationAlertShown = true
+                        showConfirmationAlert(type: .globalFeaturedPosts) {
+                            editCommunity(community)
+                        }
+                        
+                        // Once alert is shown, we break out of the loop
+                        break
+                    }
+                }
+                
+                if !isConfirmationAlertShown {
+                    editCommunity(community)
+                }
+            } label: {
+                Text(viewConfig.getText(elementId: .communityEditButton) ?? "Save")
+                    .applyTextStyle(.bodyBold(.white))
+
+            }
+            .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig))
+            .disabled(!isExistingDataChanged)
+            .padding(.horizontal, 16)
         }
         .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.communityEditButton)
     }
@@ -1014,5 +878,82 @@ public struct AmityCommunitySetupPage: AmityPageView {
             alertController.addAction(action)
         }
         host.controller?.present(alertController, animated: true)
+    }
+    
+    // View showing invited/added members in a circular avatar.
+    struct SelectedMemberView: View {
+        
+        @EnvironmentObject var viewConfig: AmityViewConfigController
+        
+        let member: AddMemberModel
+        let onRemove: () -> Void
+        
+        var body: some View {
+            VStack(spacing: 8) {
+                ZStack(alignment: .topTrailing) {
+                    AmityUserProfileImageView(displayName: member.user?.displayName
+                        ?? AmityLocalizedStringSet.General.anonymous
+                            .localizedString,
+                        avatarURL: URL(string: member.user?.avatarURL ?? "")
+                    )
+                    .frame(width: 40, height: 40)
+                    .clipShape(Circle())
+                    
+                    Circle()
+                        .fill(.black.opacity(0.3))
+                        .frame(width: 18, height: 18)
+                        .overlay(
+                            Image(AmityIcon.closeIcon.imageResource)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 18, height: 18)
+                        )
+                        .offset(x: 2, y: -3)
+                        .onTapGesture {
+                            onRemove()
+                        }
+                }
+                
+                let isBrandUser = member.user?.isBrand ?? false
+                UserDisplayNameLabel(name: member.user?.displayName ?? "Unknown", isBrand: isBrandUser, textStyle: .caption(Color(viewConfig.theme.baseColor)), spacing: 1)
+            }
+            .frame(width: 64, height: 68)
+        }
+    }
+    
+    struct AddNewMemberView: View {
+        @EnvironmentObject var viewConfig: AmityViewConfigController
+        
+        let elementId: ElementId
+        
+        var body: some View {
+            VStack(spacing: 8) {
+                Circle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(width: 40, height: 40)
+                    .overlay(
+                        Image(
+                            viewConfig.getImage(
+                                elementId: elementId)
+                        )
+                        .renderingMode(.template)
+                        .resizable()
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 20, height: 20)
+                        .accessibilityIdentifier(
+                            AccessibilityID.Social.CommunitySetup
+                                .communityAddMemberButton)
+                    )
+                
+                let title =
+                viewConfig.getText(elementId: elementId) ?? ""
+                Text(title)
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                    .lineLimit(1)
+            }
+            .frame(width: 64, height: 68)
+            .contentShape(Rectangle())
+        }
     }
 }

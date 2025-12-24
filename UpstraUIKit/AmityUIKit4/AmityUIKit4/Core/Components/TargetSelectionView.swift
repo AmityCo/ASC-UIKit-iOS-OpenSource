@@ -15,11 +15,20 @@ struct TargetSelectionView<Content: View>: View {
     private let headerView: () -> Content
     private let communityOnTapAction: ((AmityCommunityModel) -> Void)?
     
-    init(@ViewBuilder headerView: @escaping () -> Content = { EmptyView() },
-         communityOnTapAction: ((AmityCommunityModel) -> Void)? = nil, contentType: PostMenuType) {
+    init(
+        @ViewBuilder headerView: @escaping () -> Content = { EmptyView() },
+        communityOnTapAction: ((AmityCommunityModel) -> Void)? = nil,
+        contentType: PostMenuType,
+        viewModel: TargetSelectionViewModel? = nil
+    ) {
         self.headerView = headerView
         self.communityOnTapAction = communityOnTapAction
-        self._viewModel = StateObject(wrappedValue: TargetSelectionViewModel(contentType: contentType))
+        
+        if let viewModel {
+            self._viewModel = StateObject(wrappedValue: viewModel)
+        } else {
+            self._viewModel = StateObject(wrappedValue: TargetSelectionViewModel(contentType: contentType))
+        }
     }
     
     var body: some View {
@@ -46,20 +55,22 @@ struct TargetSelectionView<Content: View>: View {
                                         let lockIcon = AmityIcon.getImageResource(named: "lockBlackIcon")
                                         Image(lockIcon)
                                             .frame(width: 20, height: 20)
-                                            .offset(y: -1)
+                                            .offset(x: -2, y: -1)
                                             .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))
                                     }
                                     
                                     Text(community.displayName)
                                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                                        .lineLimit(1)
                                     
                                     if community.isOfficial {
-                                        let verifiedBadgeIcon = AmityIcon.getImageResource(named: "verifiedBadge")
+                                        let verifiedBadgeIcon = AmityIcon.verifiedBadge.imageResource
                                         Image(verifiedBadgeIcon)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(width: 12, height: 12)
+                                            .frame(width: 16, height: 16)
                                             .isHidden(viewConfig.isHidden(elementId: .communityOfficialBadge))
+                                            .padding(.leading, 4)
                                     }
                                     
                                     Spacer()

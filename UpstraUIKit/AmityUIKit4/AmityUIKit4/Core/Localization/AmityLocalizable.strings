@@ -54,6 +54,10 @@
 "unreport_comment_bottom_sheet_title" = "Unreport comment";
 "comment_reported_message" = "Comment reported";
 "comment_unreported_message" = "Comment unreported";
+"report_reply_bottom_sheet_title" = "Report reply";
+"unreport_reply_bottom_sheet_title" = "Unreport reply";
+"reply_reported_message" = "Reply reported";
+"reply_unreported_message" = "Reply unreported";
 "comment_react_button_text" = "Like";
 "comment_reacted_button_text" = "Like";
 "comment_reply_button_text" = "Reply";
@@ -144,6 +148,10 @@
 
 "livestream_player_ended_title" = "This live stream has ended.";
 "livestream_player_ended_message" = "Playback will be available for you to watch shortly.";
+
+"livestream_player_error_title" = "Replay unavailable";
+"livestream_player_error_message" = "This live stream was too short to have a playback.";
+
 "livestream_player_terminated_title" = "This stream has been terminated.";
 "livestream_player_terminated_message" = "It looks like this livestream goes against our content moderation guidelines.";
 "livestream_player_banned_title" = "You’ve been banned.";
@@ -405,6 +413,30 @@
 "live_chat_unreport_message" = "UnReport message";
 "live_chat_toast_report_message" = "Message reported.";
 "live_chat_toast_unreport_message" = "Message unreported.";
+"live_chat_promote_to_moderator" = "Promote to moderator";
+"live_chat_demote_to_member" = "Demote to member";
+"live_chat_mute_user" = "Mute user";
+"live_chat_unmute_user" = "Unmute user";
+"live_chat_promote_to_moderator_title" = "Moderator promotion";
+"live_chat_promote_to_moderator_desc" = "Are you sure you want to promote this member to moderator? They will gain access to all moderator permissions in this live stream.";
+"live_chat_demote_to_member_title" = "Moderator demotion";
+"live_chat_demote_to_member_desc" = "Are you sure you want to demote this moderator? They will lose access to all moderator permissions in this live stream.";
+"live_chat_promote_button" = "Promote";
+"live_chat_demote_button" = "Demote";
+"live_chat_promote_to_moderator_success_toast" = "User promoted.";
+"live_chat_promote_to_moderator_failed_toast" = "Failed to promote user. Please try again.";
+"live_chat_demote_to_member_success_toast" = "User demoted.";
+"live_chat_demote_to_member_failed_toast" = "Failed to demote user. Please try again.";
+"live_chat_mute_user_title" = "Confirm mute";
+"live_chat_mute_user_desc" = "Are you sure you want to mute this user? They will no longer be able to send messages.";
+"live_chat_unmute_user_title" = "Confirm unmute";
+"live_chat_unmute_user_desc" = "Are you sure you want to unmute this user? They can now send messages.";
+"live_chat_mute_button" = "Mute";
+"live_chat_unmute_button" = "Unmute";
+"live_chat_mute_user_success_toast" = "User muted.";
+"live_chat_mute_user_failed_toast" = "Failed to mute user. Please try again.";
+"live_chat_unmute_user_success_toast" = "User unmuted.";
+"live_chat_unmute_user_failed_toast" = "Failed to unmute user. Please try again.";
 
 "community_update_success_toast_message" = "Successfully updated community profile.";
 
@@ -436,3 +468,208 @@
 "community_pending_posts_empty_state_title" = "No pending posts";
 
 "error_guest_user" = "Create an account or sign in to continue.";
+
+// Explore Event Feed
+"explore_event_recommended_for_you" = "Recommended for you";
+"explore_event_view_all" = "View all";
+
+// My Event Feed
+"my_event_feed_upcoming" = "Upcoming";
+"my_event_feed_past" = "Past";
+
+// Event Detail Page Alert
+"event_detail_alert_edit_not_possible_title" = "Editing is not possible";
+"event_detail_alert_edit_not_possible_message" = "You can no longer edit this event. Changes are restricted 15 minutes before the start time.";
+"event_detail_alert_leave_without_finishing_title" = "Leave without finishing?";
+"event_detail_alert_leave_without_finishing_message" = "Your changes that you made may not be saved.";
+"event_detail_alert_delete_event_title" = "Delete this event?";
+"event_detail_alert_delete_event_message" = "This event will be permanently deleted. You and others will no longer see and find this event.";
+
+// Event Discussion Feed
+"event_discussion_feed_no_posts_yet" = "No posts yet";
+
+// Event Info Component
+"event_info_about_the_event" = "About the event";
+"event_info_see_more" = "...See more";
+"event_info_event_link" = "Event link";
+"event_info_live_stream" = "Live stream";
+"event_info_event_address" = "Event address";
+"event_info_address_copied" = "Address copied";
+"event_info_copy" = "Copy";
+"event_info_link_copied" = "Link copied.";
+"event_info_stream_status_ended" = "Ended";
+"event_info_stream_status_live" = "Live";
+"event_info_stream_status_recorded" = "Recorded";
+"event_info_stream_status_upcoming_live" = "Upcoming Live";
+
+// Event Detail Header
+"event_detail_header_unknown_user" = "Unknown user";
+"event_detail_header_starts" = "Starts";
+"event_detail_header_event_type" = "Event type";
+"event_detail_header_in_person" = "In-person";
+"event_detail_header_virtual" = "Virtual";
+"event_detail_header_hosted_by" = "Hosted by";
+"event_detail_header_status_happening_now" = "Happening now";
+"event_detail_header_status_upcoming" = "Upcoming";
+"event_detail_header_status_cancelled" = "Cancelled";
+"event_detail_header_status_ended" = "Ended";
+"event_detail_header_attendees" = "Attendees";
+"event_detail_header_event_added_to_calendar" = "Event added to your calendar.";
+"event_detail_header_no_calendar_access" = "No access to your calendar. Please enable permissions in your Settings.";
+"event_detail_header_attending_status_change_not_allowed" = "Your attending status cannot be changed once the event has started.";
+"event_detail_header_join_community_failed" = "Failed to join the community. Please try again.";
+"event_detail_header_update_attending_status_failed" = "Failed to update your attending status. Please try again.";
+"event_detail_header_add_to_calendar" = "Add to calendar";
+"event_detail_header_going" = "Going";
+"event_detail_header_not_going" = "Not going";
+"event_detail_header_update_attending_status_success" = "Successfully updated your attending status.";
+"event_detail_header_livestream_setup_info" = "You can start setting up live 15 minutes before the event starts.";
+
+// Event Attendees Page
+"event_attendees_page_title" = "Attendees";
+
+// Join Community Sheet
+"join_community_sheet_title" = "Join community to continue";
+"join_community_sheet_description" = "Become a member of %@ to participate in events and discussions.";
+"join_community_sheet_join_and_rsvp" = "Join community and RSVP";
+"join_community_sheet_join" = "Join community";
+"join_community_sheet_cancel" = "Cancel";
+
+// Add Calendar Event Sheet
+"add_calendar_sheet_title" = "You'll be notified";
+"add_calendar_sheet_description" = "You can also keep track of this event by adding it to your device's calendar.";
+"add_calendar_sheet_add_button" = "Add to calendar";
+
+// Event List Pages
+"event_list_past_events_title" = "Past events";
+"event_list_upcoming_events_title" = "Upcoming events";
+"event_list_tab_all" = "All";
+"event_list_tab_hosting" = "Hosting";
+"event_list_happening_now_title" = "Happening now";
+
+// Event Detail Page
+"event_detail_page_edit_event" = "Edit event";
+"event_detail_page_delete_event" = "Delete event";
+"event_detail_page_event_deleted" = "Event deleted.";
+"event_detail_page_delete_failed" = "Failed to delete event. Please try again.";
+"event_detail_page_setup_livestream" = "Set up live stream";
+
+// Event Setup Page
+"event_setup_event_name_title" = "Event name";
+"event_setup_event_name_placeholder" = "Name your event";
+"event_setup_event_details_title" = "Event details";
+"event_setup_event_details_placeholder" = "Share what this event is all about";
+"event_setup_create_event_title" = "Create event";
+"event_setup_edit_event_title" = "Edit event";
+"event_setup_leave_alert_title" = "Leave without finishing?";
+"event_setup_leave_alert_message" = "Your progress won't be saved and your event won't be created.";
+"event_setup_camera" = "Camera";
+"event_setup_photo" = "Photo";
+"event_setup_date_and_time" = "Date and time";
+"event_setup_timezone" = "Timezone";
+"event_setup_starts_on" = "Starts on";
+"event_setup_no_end_time_info" = "Event without specified end time will end after 12 hours.";
+"event_setup_add_end_date_time" = "Add end date and time";
+"event_setup_ends_on" = "Ends on";
+"event_setup_location" = "Location";
+"event_setup_location_placeholder" = "Select where this event will be happening";
+"event_setup_creating" = "Creating...";
+"event_setup_saving" = "Saving...";
+"event_setup_successfully_created" = "Successfully created event.";
+"event_setup_successfully_updated" = "Successfully updated event.";
+"event_setup_update_time_limit_error" = "Your event wasn't updated as it needs to start at least 15 minutes from now.";
+"event_setup_create_time_limit_error" = "Your event wasn't created as it needs to start at least 15 minutes from now.";
+"event_setup_update_time_limit_error_generic" = "Your event wasn't updated as it needs to start at least 15 minutes from now.";
+"event_setup_create_link_not_allowed_error" = "Your event wasn't created as it contains a link that's not allowed.";
+"event_setup_update_link_not_allowed_error" = "Your event wasn't updated as it contains a link that's not allowed.";
+"event_setup_create_ban_word_error" = "Your event wasn't created as it contains an inappropriate word.";
+"event_setup_update_ban_word_error" = "Your event wasn't updated as it contains an inappropriate word.";
+"event_setup_create_failed" = "Failed to create event. Please try again.";
+"event_setup_update_failed" = "Failed to update event. Please try again.";
+"event_setup_create_button" = "Create event";
+"event_setup_save_button" = "Save";
+"event_setup_upload_failed_title" = "Upload failed";
+"event_setup_upload_failed_message" = "Failed to upload image. Please try again.";
+
+// Community Event Feed
+"community_event_feed_upcoming" = "Upcoming";
+"community_event_feed_past" = "Past";
+
+// Event Target Selection
+"event_target_selection_no_communities" = "You haven't joined any communities yet.";
+
+// Event Empty State
+"event_empty_state_no_events" = "No events yet";
+
+// Live Stream Co-Host Invite
+"livestream_invite_cohost_title" = "Invite co-host";
+"livestream_cohosting_section_title" = "Co-hosting";
+"livestream_remove_cohost_button" = "Remove";
+"livestream_cancel_invitation_button" = "Cancel";
+"livestream_invitation_cancelled_toast" = "Invitation cancelled.";
+"livestream_invitation_cancel_failed_toast" = "Failed to cancel invitation.";
+"livestream_whos_watching_title" = "Who's watching";
+"livestream_invite_button" = "Invite";
+"livestream_invitation_sent_toast" = "Invitation sent.";
+"livestream_invitation_send_failed_toast" = "Failed to send invitation.";
+"livestream_confirm_invite_cohost_title" = "Confirm invite co-host";
+"livestream_confirm_invite_cohost_message" = "If they accept your invitation, they'll join as a co-host with moderator access. They can turn on their camera and mic, appear on stage, and help manage chat.";
+"livestream_no_viewers_title" = "No viewers available right now";
+"livestream_no_viewers_message" = "Viewers who join your livestream will\nappear here.";
+
+// Live Stream Co-Host Join
+"livestream_join_as_cohost_title" = "Join as co-host";
+"livestream_join_as_cohost_message" = "%@ invited you to join their livestream as a co-host. You'll enter a backstage room to set up before going live.";
+"livestream_accept_button" = "Accept";
+"livestream_decline_button" = "Decline";
+
+// Live Stream Badges
+"livestream_host_badge" = "Host";
+"livestream_cohost_badge" = "Co-host";
+"livestream_moderator_badge" = "Moderator";
+
+// Live Stream Banned Page
+"livestream_banned_page_title" = "Live stream";
+"livestream_banned_title" = "You've been banned.";
+"livestream_banned_message" = "You can no longer access this live stream.";
+"livestream_banned_ok_button" = "OK";
+
+// Live Stream Backstage
+"livestream_backstage_header_title" = "You're in the backstage";
+"livestream_backstage_setup_message" = "Set up your camera, mic, and lighting before the live stream begins.";
+"livestream_backstage_join_live_button" = "Join LIVE";
+
+// Live Stream Chat Compose Bar
+"livestream_chat_placeholder" = "Chat...";
+"livestream_chat_muted_message" = "You have been muted.";
+"livestream_chat_readonly_message" = "This live stream is now read-only.";
+"livestream_chat_send_failed_message" = "Failed to send message. Please try again.";
+
+// Live Stream Chat Feed
+"livestream_chat_deleted_message" = "This message was deleted.";
+"livestream_chat_unknown_user" = "Unknown User";
+"livestream_chat_invite_as_cohost" = "Invite as co-host";
+"livestream_chat_message_not_sent_title" = "Your message wasn't sent";
+"livestream_chat_delete_action" = "Delete";
+
+// Live Stream Player Page
+"livestream_leave_backstage_title" = "Leave backstage";
+"livestream_leave_backstage_message" = "Are you sure you want to leave backstage?You'll return to viewer mode and need a new invite to rejoin.";
+"livestream_left_stage_toast" = "You left the stage and are now watching as a viewer.";
+"livestream_invitation_no_longer_valid" = "Invitation is no longer valid.";
+"livestream_accept_invitation_failed" = "Failed to accept invitation.";
+"livestream_invitation_declined_toast" = "Invitation declined.";
+"livestream_decline_invitation_failed" = "Failed to decline invitation.";
+"livestream_left_backstage_toast" = "You have left the backstage.";
+
+// Live Stream Alerts
+"livestream_alert_cancel_cohost_invitation_title" = "Cancel co-host invitation";
+"livestream_alert_cancel_cohost_invitation_message" = "Are you sure you want to cancel this invitation? They'll no longer be invited as a co-host and will remain as a viewer.";
+"livestream_alert_cohost_leave_title" = "Leave live stream";
+"livestream_alert_cohost_leave_message" = "Are you sure you want to leave this livestream? You’ll stop broadcasting and exit the session completely.";
+"livestream_alert_leave_as_cohost_title" = "Leave as co-host";
+"livestream_alert_leave_as_cohost_message" = "Are you sure you want to stop co-hosting? You'll leave the stage and continue watching as a viewer.";
+"livestream_alert_remove_cohost_title" = "Remove co-host from live";
+"livestream_alert_remove_cohost_message" = "Are you sure you want to remove this co-host from the live stream? They'll immediately stop broadcasting and return as a viewer.";
+"livestream_alert_confirm_button" = "Confirm";
+"livestream_alert_remove_button" = "Remove";

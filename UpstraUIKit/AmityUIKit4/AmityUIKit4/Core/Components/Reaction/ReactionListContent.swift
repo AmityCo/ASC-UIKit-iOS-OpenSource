@@ -119,7 +119,8 @@ struct ReactionListRowItem: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: URL(string: user.avatarURL))
+            let displayName = user.displayName
+            AmityUserProfileImageView(displayName: displayName, avatarURL: URL(string: user.avatarURL))
                 .frame(width: 32, height: 32)
                 .redacted(reason: isPlaceholder ? .placeholder : [])
                 .shimmering(active: isPlaceholder)
@@ -127,11 +128,21 @@ struct ReactionListRowItem: View {
                 .padding(.trailing, 12)
                 .accessibilityIdentifier(AccessibilityID.Chat.ReactionList.userAvatarView)
             
-            VStack(alignment: .leading, spacing: 0) {
-                Text(user.displayName)
-                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
-                    .textShimmerEffect(cornerRadius: 10, isActive: isPlaceholder, color: viewConfig.theme.baseInverseColor)
-                    .accessibilityIdentifier(AccessibilityID.Chat.ReactionList.userDisplayName)
+            VStack(alignment: .leading, spacing: 0) {                
+                HStack(spacing: 0) {
+                    Text(user.displayName)
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                        .textShimmerEffect(cornerRadius: 10, isActive: isPlaceholder, color: viewConfig.theme.baseInverseColor)
+                        .accessibilityIdentifier(AccessibilityID.Chat.ReactionList.userDisplayName)
+                        .lineLimit(1)
+                    
+                    Image(AmityIcon.brandBadge.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
+                        .padding(.leading, 4)
+                        .opacity(user.isBrand ? 1 : 0)
+                }
                 
                 Text(AmityLocalizedStringSet.Reaction.tapToRemove.localizedString)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
@@ -270,6 +281,7 @@ struct ReactionUser {
     let reactionName: String
     let reactionImage: ImageResource
     let type: AmityReactionList.ReactionListType
+    let isBrand: Bool
     
     init(reaction: AmityReaction, type: AmityReactionList.ReactionListType) {
         self.userId = reaction.creator?.userId ?? ""
@@ -277,6 +289,7 @@ struct ReactionUser {
         self.avatarURL = reaction.creator?.getAvatarInfo()?.fileURL ?? ""
         self.reactionName = reaction.reactionName
         self.type = type
+        self.isBrand = reaction.creator?.isBrand ?? false
         if type == .post || type == .comment {
             self.reactionImage = SocialReactionConfiguration.shared.getReaction(withName: reaction.reactionName).image
         } else {
@@ -295,6 +308,7 @@ struct ReactionUser {
         self.reactionName = reactionName
         self.reactionImage = MessageReactionConfiguration.shared.getReaction(withName: reactionName).image
         self.type = .none
+        self.isBrand = false
     }
     
     // Used for skeleton loading

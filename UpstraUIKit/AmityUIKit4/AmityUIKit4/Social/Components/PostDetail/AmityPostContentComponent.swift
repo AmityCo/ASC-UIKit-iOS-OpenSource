@@ -162,23 +162,18 @@ public struct AmityPostContentComponent: AmityComponentView {
                     
                     // Moderator Badge
                     HStack(spacing: 4) {
-                        if post.isModerator && !viewConfig.isHidden(elementId: .moderatorBadge) {
-                            let moderatorIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .moderatorBadge, key: "icon", of: String.self) ?? "")
-                            let moderatorTitle = viewConfig.getConfig(elementId: .moderatorBadge, key: "text", of: String.self) ?? ""
-                            HStack(spacing: 3) {
-                                Image(moderatorIcon)
-                                    .resizable()
-                                    .frame(width: 12, height: 12)
-                                    .padding(.leading, 6)
-                                Text(moderatorTitle)
-                                    .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
-                                    .padding(.trailing, 6)
-                            }
-                            .frame(height: 20)
-                            .background(Color(viewConfig.theme.primaryColor.blend(.shade3)))
-                            .clipShape(RoundedCorner(radius: 10))
-                            .accessibilityIdentifier(AccessibilityID.Social.PostContent.moderatorBadge)
+                        let isEventPost = context?.isEventPost ?? false
+                        let isEventHost = isEventPost && post.postedUserId == context?.event?.creator?.userId
+                        let isModerator = post.isModerator && !viewConfig.isHidden(elementId: .moderatorBadge)
+                        
+                        if isEventHost || isModerator {
+                            let icon = isEventHost ? AmityIcon.eventHostBadge.imageResource : viewConfig.getImage(elementId: .moderatorBadge, placeholder: "moderatorBadgeIcon")
+                            let title = isEventHost ? "Host" : viewConfig.getText(elementId: .moderatorBadge) ?? ""
+                            let isBadgeHidden = viewConfig.isHidden(elementId: .moderatorBadge)
                             
+                            PostAuthorBadge(badgeType: isEventHost ? .host : .moderator, icon: icon, title: title)
+                                .isHidden(isModerator && isBadgeHidden)
+
                             Text("•")
                                 .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                         }
@@ -238,6 +233,12 @@ public struct AmityPostContentComponent: AmityComponentView {
                             case .reportPost:
                                 // Dismiss toggle
                                 showBottomSheet.toggle()
+                                
+                                let hasJoinedCommunity = post.targetCommunity?.isJoined ?? false
+                                if !hasJoinedCommunity {
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                                    return
+                                }
                                 
                                 AmityUserAction.perform {
                                     // Dismiss bottom sheet
@@ -315,6 +316,12 @@ public struct AmityPostContentComponent: AmityComponentView {
                 PostContentLiveStreamView(post: post)
                     .padding([.leading, .trailing, .top], -16)
                 
+            case .room:
+                roomPostContentTextView()
+                
+                PostContentLiveStreamView(post: post)
+                    .padding([.leading, .trailing, .top], -16)
+                
             case .clip:
                 postContentTextView()
                 
@@ -375,6 +382,48 @@ public struct AmityPostContentComponent: AmityComponentView {
             VStack(spacing: 0) {
                 let title = livestream.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
                 let description = livestream.streamDescription?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                
+                if !title.isEmpty {
+                    
+                    if #available(iOS 15, *) {
+                        let highlightedTitle = title.highlight(mentions: nil, highlightLink: true, highlightAttributes: [.foregroundColor: viewConfig.theme.primaryColor, .font: UIFont.systemFont(ofSize: AmityTextStyle.bodyBold(.white).getStyle().fontSize, weight: .semibold)])
+                        Text(highlightedTitle)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, description.isEmpty ? 16 : 20)
+                        
+                    } else {
+                        Text(title)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, description.isEmpty ? 16 : 20)
+                    }
+                }
+                
+                if !description.isEmpty {
+                    ExpandableText(description)
+                        .lineLimit(8)
+                        .moreButtonText("...See more")
+                        .font(AmityTextStyle.body(.clear).getFont())
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .attributedColor(viewConfig.theme.primaryColor)
+                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .expandAnimation(.easeOut(duration: 0.25))
+                        .lineSpacing(5)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 16)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func roomPostContentTextView() -> some View {
+        if let room = post.room {
+            
+            VStack(spacing: 0) {
+                let title = post.title.isEmpty ? room.title ?? "" : post.title
+                let description = post.text
                 
                 if !title.isEmpty {
                     
@@ -690,7 +739,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 UIPasteboard.general.string = shareLink
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    Toast.showToast(style: .success, message: "Link copied")
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventInfoLinkCopied.localizedString)
                 }
             }
         
@@ -774,7 +823,8 @@ extension AmityPostContentComponent {
         if #available(iOS 16.0, *) {
             AmityReactionList(post: post.object, pageId: pageId)
                             .environmentObject(host)
-                            .presentationDetents([.fraction(0.5)])
+                            .presentationDetents([.fraction(0.5), .large])
+                            .presentationDragIndicator(.hidden)
         } else {
             AmityReactionList(post: post.object, pageId: pageId)
                             .environmentObject(host)
@@ -800,6 +850,35 @@ extension AmityPostContentComponent {
     private func goToCommunityProfilePage() {
         let context = AmityPostContentComponentBehavior.Context(component: self)
         AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)
+    }
+}
+
+struct PostAuthorBadge: View {
+    
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
+    
+    enum BadgeType {
+        case moderator
+        case host
+    }
+    
+    let badgeType: BadgeType
+    let icon: ImageResource
+    let title: String
+    
+    var body: some View {
+        HStack(spacing: 3) {
+            Image(icon)
+                .resizable()
+                .frame(width: 12, height: 12)
+                .padding(.leading, 6)
+            Text(title)
+                .applyTextStyle(.captionSmall(badgeType == .moderator ? Color(viewConfig.theme.primaryColor) : Color(hex: "4B1BD0")))
+                .padding(.trailing, 6)
+        }
+        .frame(height: 20)
+        .background(badgeType == .moderator ? Color(viewConfig.theme.primaryColor.blend(.shade3)) : Color(hex: "#EAE2FF"))
+        .clipShape(RoundedCorner(radius: 10))
     }
 }
 
@@ -846,6 +925,8 @@ extension AmityPostContentComponent {
         var hideMenuButton: Bool
         var isClipPost: Bool
         var searchKeyword: String
+        var event: AmityEvent?
+        var isEventPost: Bool
         
         
         public init(shouldShowPollResults: Bool = false,
@@ -853,7 +934,8 @@ extension AmityPostContentComponent {
                     shouldHideTarget: Bool = false,
                     shouldHideMenuButton: Bool = false,
                     isClipPost: Bool = false,
-                    searchKeyword: String = ""
+                    searchKeyword: String = "",
+                    event: AmityEvent? = nil
         ) {
             self.showPollResults = shouldShowPollResults
             self.category = category
@@ -861,6 +943,8 @@ extension AmityPostContentComponent {
             self.hideMenuButton = shouldHideMenuButton
             self.isClipPost = isClipPost
             self.searchKeyword = searchKeyword
+            self.event = event
+            self.isEventPost = event != nil
         }
     }
 }

@@ -68,6 +68,12 @@ public enum PageId: String {
     case draftClipPage = "draft_clip_page"
     case clipFeedPage = "clip_feed_page"
     
+    case eventSetupPage = "event_setup_page"
+    case eventTargetSelectionPage = "select_event_target_page"
+    case eventDetailPage = "event_detail_page"
+    case upcomingEventsPage = "upcoming_events_page"
+    case pastEventsPage = "past_events_page"
+    case eventAttendeesPage = "event_attendees_page"
 }
 
 public enum ComponentId: String {
@@ -122,6 +128,9 @@ public enum ComponentId: String {
     
     case joinRequestContent = "join_request_content"
     case pendingPostListComponent = "pending_post_list"
+    
+    case myEventFeedComponent = "my_event_feed_component"
+    case exploreEventFeedComponent = "explore_event_feed_component"
 }
 
 public enum ElementId: String {

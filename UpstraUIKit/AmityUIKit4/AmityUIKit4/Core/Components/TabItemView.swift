@@ -39,6 +39,7 @@ struct TabItemView: View {
                     Color.clear.frame(height: 2)
                 }
             }
+            .contentShape(Rectangle())
             .animation(.easeInOut(duration: 0.1), value: self.currentTab)
         }
         .buttonStyle(.plain)

@@ -24,20 +24,18 @@ struct BottomSheetRadioItemView: View {
             
             Spacer()
             
-            Circle()
-                .stroke(lineWidth: 1.0)
-                .fill(.gray)
-                .overlay(
-                    Circle()
-                        .fill(Color(viewConfig.theme.primaryColor))
-                        .overlay(
-                            Circle()
-                                .fill(.white)
-                                .frame(width: 8, height: 8)
-                        )
-                        .visibleWhen(isSelected)
-                )
-                .frame(width: 18, height: 18)
+            
+            ZStack {
+                Circle()
+                    .stroke(lineWidth: 2.0)
+                    .fill(.gray)
+                    .frame(width: 16, height: 16)
+                    .opacity(isSelected ? 0 : 1)
+                
+                Image(AmityIcon.pollRadioIcon.imageResource)
+                    .frame(width: 22, height: 22)
+                    .opacity(isSelected ? 1 : 0)
+            }
         }
         .contentShape(Rectangle())
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))

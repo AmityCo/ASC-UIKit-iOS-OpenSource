@@ -71,6 +71,7 @@ struct AmityMentionUserItemView: View {
                 
                 Text(user.displayName)
                     .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                    .lineLimit(1)
                     .padding(.leading, 8)
                     .accessibilityIdentifier(AccessibilityID.Chat.MentionList.userDisplayName)
                 

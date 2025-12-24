@@ -21,7 +21,6 @@ public struct AmityCommunityProfileTabComponent: AmityComponentView {
     public init(currentTab: Binding<Int>, pageId: PageId = .communityProfilePage) {
         self.pageId = pageId
         self._currentTab = currentTab
-        
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityProfileTab))
     }
     
@@ -39,11 +38,11 @@ public struct AmityCommunityProfileTabComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .communityPinTabButton))
                 .accessibilityIdentifier(AccessibilityID.Social.CommunityProfileTab.communityPinTabButton)
             
-            let imageFeedTabIcon = AmityIcon.communityImageFeedIcon.getImageResource()
-            let imageFeedTabItem = TabItem(index: 2, image: imageFeedTabIcon)
-            TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: imageFeedTabItem)
+            let eventTabIcon = AmityIcon.createEventMenuIcon.imageResource
+            let eventTabItem = TabItem(index: 2, image: eventTabIcon)
+            TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: eventTabItem)
             
-            let videoFeedTabIcon = AmityIcon.communityVideoFeedIcon.getImageResource()
+            let videoFeedTabIcon = AmityIcon.mediaFeedIcon.imageResource
             let videoFeedTabItem = TabItem(index: 3, image: videoFeedTabIcon)
             TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: videoFeedTabItem)
         }

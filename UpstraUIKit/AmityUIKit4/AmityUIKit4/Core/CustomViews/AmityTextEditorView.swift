@@ -223,13 +223,14 @@ public struct AmityTextEditorView: View {
 public class AmityTextEditorViewModel: ObservableObject {
     let textView: UITextView = UITextView(frame: .zero)
     let mentionManager: MentionManager
+    let linkManager = AmityPreviewLinkWizard.shared
     let textStyle: AmityTextStyle?
     @Published var reachMentionLimit = false
     var existingHashtags: [AmityHashtagModel] = []
     @Published var reachHashtagLimit = false
     
     // Callback to reapply hashtag highlighting after mention processing
-    var reapplyHashtagHighlighting: (() -> Void)?
+    var didFinishMentionHighlight: (() -> Void)?
     
     // Attributes used to highlight mentions
     var highlightAttributes: [NSAttributedString.Key: Any] = [
@@ -405,7 +406,7 @@ internal struct TextEditorView: UIViewRepresentable {
             parentView.viewModel.textView.typingAttributes = parentView.viewModel.typingAttributes
             
             // Reapply hashtag highlighting if callback is set
-            parentView.viewModel.reapplyHashtagHighlighting?()
+            parentView.viewModel.didFinishMentionHighlight?()
         }
 
     }

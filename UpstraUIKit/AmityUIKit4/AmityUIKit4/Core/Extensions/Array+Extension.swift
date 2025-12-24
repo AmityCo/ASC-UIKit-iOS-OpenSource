@@ -32,3 +32,10 @@ extension Collection {
         return self[index]
     }
 }
+
+extension Collection where Element: Hashable {
+    func contains(item: Element) -> Bool {
+        let set = Set(self)
+        return set.contains(item)
+    }
+}

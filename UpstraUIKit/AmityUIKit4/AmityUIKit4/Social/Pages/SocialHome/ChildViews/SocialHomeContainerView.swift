@@ -29,6 +29,10 @@ struct SocialHomeContainerView: View {
                 AmityExplorePageContainer()
             case .myCommunities:
                 AmityMyCommunitiesComponent(pageId: pageId)
+            case .communities:
+                AmityCommunitiesPageContainer()
+            case .events:
+                AmityEventPageContainer()
             case .clips:
                 Text("Clips")
             }

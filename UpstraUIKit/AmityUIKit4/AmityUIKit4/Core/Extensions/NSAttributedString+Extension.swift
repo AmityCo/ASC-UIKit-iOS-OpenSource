@@ -8,6 +8,7 @@
 import UIKit
 
 extension NSAttributedString.Key {
-    static let hashtag = NSAttributedString.Key("hashtag")
+    static let hashtag = NSAttributedString.Key("amity.hashtag")
+    static let link = NSAttributedString.Key("amity.link")
 }
 

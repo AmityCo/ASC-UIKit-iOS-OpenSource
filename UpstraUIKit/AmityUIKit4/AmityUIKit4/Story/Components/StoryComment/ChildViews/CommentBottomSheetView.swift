@@ -36,49 +36,20 @@ struct CommentBottomSheetView: View {
     @ViewBuilder
     private func getOwnerBottomSheetView() -> some View {
         VStack {
-            HStack(spacing: 12) {
-                Image(AmityIcon.editCommentIcon.getImageResource())
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 20, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                
-                Button {
+            let isReply = viewModel.sheetState.comment?.parentId != nil
+            let editTitle = isReply ? "Edit reply" : AmityLocalizedStringSet.Comment.editCommentBottomSheetTitle.localizedString
+            BottomSheetItemView(icon: AmityIcon.editCommentIcon.imageResource, text: editTitle)
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
+                .onTapGesture {
                     editAction?(viewModel.sheetState.comment)
                     viewModel.sheetState.isShown.toggle()
-                } label: {
-                    let isReply = viewModel.sheetState.comment?.parentId != nil
-                    
-                    let editTitle = isReply ? "Edit reply" : AmityLocalizedStringSet.Comment.editCommentBottomSheetTitle.localizedString
-                    Text(editTitle)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
-                
-                Spacer()
-            }
-            .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
-            
-            HStack(spacing: 12) {
-                Image(AmityIcon.trashBinIcon.imageResource)
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 20, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.alertColor))
-                
-                Button {
+                        
+            let deleteTitle = isReply ? "Delete reply" : AmityLocalizedStringSet.Comment.deleteCommentBottomSheetTitle.localizedString
+            BottomSheetItemView(icon: AmityIcon.trashBinIcon.imageResource, text: deleteTitle, isDestructive: true)
+                .onTapGesture {
                     viewModel.isAlertShown.toggle()
-                } label: {
-                    let isReply = viewModel.sheetState.comment?.parentId != nil
-                    
-                    let deleteTitle = isReply ? "Delete reply" : AmityLocalizedStringSet.Comment.deleteCommentBottomSheetTitle.localizedString
-                    Text(deleteTitle)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.alertColor)))
                 }
-                .buttonStyle(.plain)
                 .alert(isPresented: $viewModel.isAlertShown, content: {
                     let isReply = viewModel.sheetState.comment?.parentId != nil
                     
@@ -96,10 +67,7 @@ struct CommentBottomSheetView: View {
                     }))
                 })
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.deleteCommentButton)
-                
-                Spacer()
-            }
-            .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
+
             Spacer()
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
@@ -109,15 +77,14 @@ struct CommentBottomSheetView: View {
     @ViewBuilder
     func getNonOwnerBottomSheetView() -> some View {
         VStack {
-            HStack(spacing: 12) {
-                Image(viewModel.isCommentFlaggedByMe ? AmityIcon.unflagIcon.imageResource : AmityIcon.flagIcon.imageResource)
-                    .renderingMode(.template)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 20, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                
-                Button {
+            let isReply = viewModel.sheetState.comment?.parentId != nil
+            
+            let reportTitle = isReply ? AmityLocalizedStringSet.Comment.reportReplyBottomSheetTitle.localizedString : AmityLocalizedStringSet.Comment.reportCommentBottomSheetTitle.localizedString
+            let unreportTitle = isReply ? AmityLocalizedStringSet.Comment.unReportReplyBottomSheetTitle.localizedString : AmityLocalizedStringSet.Comment.unReportCommentBottomSheetTitle.localizedString
+            
+            BottomSheetItemView(icon: viewModel.isCommentFlaggedByMe ? AmityIcon.unflagIcon.imageResource : AmityIcon.flagIcon.imageResource, text: viewModel.isCommentFlaggedByMe ? unreportTitle : reportTitle)
+                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.reportCommentButton)
+                .onTapGesture {
                     guard let comment = viewModel.sheetState.comment else {
                         viewModel.sheetState.isShown.toggle()
                         return
@@ -129,8 +96,10 @@ struct CommentBottomSheetView: View {
                                 try await viewModel.unflagComment(id: comment.id)
                                 
                                 viewModel.updateCommentFlaggedByMeState(id: comment.id)
+                                let reportMessage = isReply ? AmityLocalizedStringSet.Comment.replyReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentReportedMessage.localizedString
+                                let unReportMessage = isReply ? AmityLocalizedStringSet.Comment.replyUnReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentUnReportedMessage.localizedString
                                 
-                                Toast.showToast(style: .success, message: viewModel.isCommentFlaggedByMe ? AmityLocalizedStringSet.Comment.commentUnReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentReportedMessage.localizedString)
+                                Toast.showToast(style: .success, message: viewModel.isCommentFlaggedByMe ? unReportMessage : reportMessage)
                             } catch {
                                 Toast.showToast(style: .warning, message: error.localizedDescription)
                             }
@@ -141,22 +110,12 @@ struct CommentBottomSheetView: View {
                         // Dismiss
                         viewModel.sheetState.isShown.toggle()
                     }
-                } label: {
-                    Text(viewModel.isCommentFlaggedByMe ? AmityLocalizedStringSet.Comment.unReportCommentBottomSheetTitle.localizedString : AmityLocalizedStringSet.Comment.reportCommentBottomSheetTitle.localizedString)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 }
-                .buttonStyle(.plain)
-                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.reportCommentButton)
-                
-                Spacer()
-            }
-            .padding(EdgeInsets(top: 16, leading: 20, bottom: 0, trailing: 20))
-            
+
             Spacer()
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
     }
-    
     
 }
 

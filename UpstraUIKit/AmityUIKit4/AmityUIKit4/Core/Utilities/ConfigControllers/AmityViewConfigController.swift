@@ -57,8 +57,8 @@ class AmityViewConfigController: NSObject, ObservableObject {
         getConfig(elementId: elementId, key: "text", of: String.self)
     }
     
-    public func getImage(elementId: ElementId) -> ImageResource {
-        AmityIcon.getImageResource(named: getConfig(elementId: elementId, key: "image", of: String.self) ?? "")
+    public func getImage(elementId: ElementId, placeholder: String = "") -> ImageResource {
+        AmityIcon.getImageResource(named: getConfig(elementId: elementId, key: "image", of: String.self) ?? placeholder)
     }
     
     public func isHidden(elementId: ElementId? = nil) -> Bool {

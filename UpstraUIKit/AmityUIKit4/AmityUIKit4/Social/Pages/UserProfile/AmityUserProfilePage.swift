@@ -88,11 +88,8 @@ public struct AmityUserProfilePage: AmityPageView {
                             AmityUserFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
                                 .isHidden(currentTab != 0)
                             
-                            AmityUserImageFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
+                            AmityMediaFeedContainer(pageId: id, type: .user, imageFeedModel: viewModel.imageFeedViewModel, videoFeedModel: viewModel.videoFeedViewModel)
                                 .isHidden(currentTab != 1)
-                            
-                            AmityUserVideoFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
-                                .isHidden(currentTab != 2)
                         }
                     }
                     .background(GeometryReader { geometry in
@@ -157,7 +154,15 @@ public struct AmityUserProfilePage: AmityPageView {
     }
     
     private var navigationBarView: some View {
-        AmityNavigationBar(title: showDisplayName ? viewModel.user?.displayName ?? "" : "", leading: {
+        AmityNavigationBar {
+            
+            UserDisplayNameLabel(name: viewModel.user?.displayName ?? "",
+                                 isBrand: viewModel.user?.isBrand ?? false,
+                                 textStyle: .titleBold(Color(viewConfig.theme.baseColor)),
+                                 size: .init(width: 20, height: 20), spacing: 4)
+            .opacity(showDisplayName ? 1 : 0)
+
+        } leading: {
             let backButton = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .backButtonElement, key: "image", of: String.self) ?? "")
             Image(backButton)
                 .renderingMode(.template)
@@ -168,7 +173,7 @@ public struct AmityUserProfilePage: AmityPageView {
                 .onTapGesture {
                     host.controller?.navigationController?.popViewController()
                 }
-        }, trailing: {
+        } trailing: {
             let menuButton = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .menuButton, key: "image", of: String.self) ?? "")
             Button {
                 showBottomSheet.toggle()
@@ -180,7 +185,7 @@ public struct AmityUserProfilePage: AmityPageView {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .frame(width: 24, height: 24)
             }
-        })
+        }
     }
     
     private var tabBarView: some View {
@@ -191,14 +196,9 @@ public struct AmityUserProfilePage: AmityPageView {
                     .isHidden(viewConfig.isHidden(elementId: .userFeedTabButton))
                     .accessibilityIdentifier(AccessibilityID.Social.UserProfile.userFeedTabButton)
                 
-                let imageFeedTabItem = TabItem(index: 1, image: AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .userImageFeedTabButton, key: "image", of: String.self) ?? ""))
-                TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: imageFeedTabItem)
-                    .isHidden(viewConfig.isHidden(elementId: .userImageFeedTabButton))
-                    .accessibilityIdentifier(AccessibilityID.Social.UserProfile.userImageFeedTabButton)
-                
-                let videoFeedTabItem = TabItem(index: 2, image: AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .userVideoFeedTabButton, key: "image", of: String.self) ?? ""))
+                let videoFeedTabIcon = AmityIcon.mediaFeedIcon.getImageResource()
+                let videoFeedTabItem = TabItem(index: 1, image: videoFeedTabIcon)
                 TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: videoFeedTabItem)
-                    .isHidden(viewConfig.isHidden(elementId: .userVideoFeedTabButton))
                     .accessibilityIdentifier(AccessibilityID.Social.UserProfile.userVideoFeedTabButton)
             }
             .padding(.horizontal, 16)
@@ -497,7 +497,7 @@ public struct AmityUserProfilePage: AmityPageView {
                 UIPasteboard.general.string = profileLink
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    Toast.showToast(style: .success, message: "Link copied")
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventInfoLinkCopied.localizedString)
                 }
             }
         

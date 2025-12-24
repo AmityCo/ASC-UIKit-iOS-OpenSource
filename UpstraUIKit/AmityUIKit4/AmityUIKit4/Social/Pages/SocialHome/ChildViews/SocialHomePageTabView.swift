@@ -13,8 +13,10 @@ public enum AmitySocialHomePageTab: String, CaseIterable, Identifiable {
     }
     
     case newsFeed = "NewsFeed"
-    case explore = "Explore"
     case clips = "Clips"
+    case explore = "Explore"
+    case communities = "Communities"
+    case events = "Events"
     case myCommunities = "MyCommunities"
 }
 
@@ -33,13 +35,19 @@ struct SocialHomePageTabView: View {
         
         var items: [TabItem] = []
         if AmityUIKitManagerInternal.shared.isGuestUser {
-            items.append(TabItem(tab: .explore, selected: selectedTab.wrappedValue == .explore))
+            items.append(TabItem(tab: .communities, selected: selectedTab.wrappedValue == .communities)) // myCommunities
+            items.append(TabItem(tab: .events, selected: selectedTab.wrappedValue == .events)) // Events
 
             if clipViewAccess == .all {
                 items.append(TabItem(tab: .clips, selected: selectedTab.wrappedValue == .clips))
             }
         } else {
-            items = AmitySocialHomePageTab.allCases.map { tab in
+            items = [
+                AmitySocialHomePageTab.newsFeed,
+                AmitySocialHomePageTab.communities,
+                AmitySocialHomePageTab.events,
+                AmitySocialHomePageTab.clips
+            ].map { tab in
                 TabItem(tab: tab, selected: tab == selectedTab.wrappedValue)
             }
         }
@@ -62,7 +70,7 @@ struct SocialHomePageTabView: View {
                         .accessibilityIdentifier(getAccessibilityID(tab: item.tab))
                 }
             }
-            .padding(.leading, 20)
+            .padding(.leading, 16)
             .padding(.trailing, 2)
         }
         .onChange(of: selectedTab) { value in
@@ -102,6 +110,10 @@ struct SocialHomePageTabView: View {
             return viewConfig.forElement(.clipsButton).text ?? ""
         case .myCommunities:
             return viewConfig.forElement(.myCommunitiesButton).text ?? ""
+        case .communities:
+            return "Communities"
+        case .events:
+            return "Events"
         }
     }
     
@@ -111,6 +123,9 @@ struct SocialHomePageTabView: View {
         case .explore: AccessibilityID.Social.SocialHomePage.exploreButton
         case .myCommunities: AccessibilityID.Social.SocialHomePage.myCommunitiesButton
         case .clips: AccessibilityID.Social.SocialHomePage.clipsButton
+        case .communities: AccessibilityID.Social.SocialHomePage.communitiesButton
+        case .events:
+            "events_button"
         }
     }
     

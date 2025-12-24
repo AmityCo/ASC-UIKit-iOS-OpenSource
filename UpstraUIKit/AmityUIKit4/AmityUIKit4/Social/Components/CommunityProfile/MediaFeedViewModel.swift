@@ -84,7 +84,7 @@ class MediaFeedViewModel: ObservableObject {
     }
     
     // Used for querying videos & clip feed
-    func loadMediaFeed(feedTab: VideoFeedTab, feedSources: [AmityFeedSource]? = nil) {
+    func loadMediaFeed(feedTab: VideoFeedType, feedSources: [AmityFeedSource]? = nil) {
         if let feedSources {
             currentFeedSources = feedSources
         }

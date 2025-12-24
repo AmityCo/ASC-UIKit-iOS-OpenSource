@@ -37,7 +37,7 @@ struct CommunityMemberTabView: View {
                         }
                     } else {
                         ForEach(Array(viewModel.communityMembers.enumerated()), id: \.element.userId) { index, communityMember in
-                            CommunityMemberView(communityMember, isModerator: false, onTapAction: onTapAction, onMenuAction: onMenuAction)
+                            CommunityMemberView(communityMember, isModerator: communityMember.hasModeratorRole, onTapAction: onTapAction, onMenuAction: onMenuAction)
                                 .padding([.leading, .trailing], 16)
                                 .onAppear {
                                     if index == viewModel.communityMembers.count - 1 {

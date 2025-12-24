@@ -64,14 +64,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 }
             
             VStack(alignment: .leading, spacing: 3) {
-                HStack(spacing: 8) {
-                    Text(post.displayName)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
-                        .lineLimit(1)
-                        .onTapGesture {
-                            goToUserProfilePage(post.postedUserId)
-                        }
-                }
+                authorDisplayNameLabel
                 
                 Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
@@ -157,6 +150,12 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 
             case .liveStream:
                 livestreamPostContentTextView()
+                
+                PostContentLiveStreamView(post: post)
+                    .padding([.leading, .trailing, .top], -16)
+            
+            case .room:
+                roomPostContentTextView()
                 
                 PostContentLiveStreamView(post: post)
                     .padding([.leading, .trailing, .top], -16)
@@ -289,6 +288,48 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
         }
     }
     
+    @ViewBuilder
+    private func roomPostContentTextView() -> some View {
+        if let room = post.room {
+            
+            VStack(spacing: 0) {
+                let title = room.title?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                let description = room.description?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                
+                if !title.isEmpty {
+                    
+                    if #available(iOS 15, *) {
+                        let highlightedTitle = title.highlight(mentions: nil, highlightLink: true, highlightAttributes: [.foregroundColor: viewConfig.theme.primaryColor, .font: UIFont.systemFont(ofSize: AmityTextStyle.bodyBold(.white).getStyle().fontSize, weight: .semibold)])
+                        Text(highlightedTitle)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, description.isEmpty ? 16 : 20)
+                        
+                    } else {
+                        Text(title)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.bottom, description.isEmpty ? 16 : 20)
+                    }
+                }
+                
+                if !description.isEmpty {
+                    ExpandableText(description)
+                        .lineLimit(8)
+                        .moreButtonText("...See more")
+                        .font(AmityTextStyle.body(.clear).getFont())
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .attributedColor(viewConfig.theme.primaryColor)
+                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .expandAnimation(.easeOut(duration: 0.25))
+                        .lineSpacing(5)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 16)
+                }
+            }
+        }
+    }
+    
     private func getItemView(_ icon: ImageResource, text: String, isDestructive: Bool = false) -> some View {
         HStack(spacing: 12) {
             Image(icon)
@@ -311,40 +352,35 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
         let context = AmityPendingPostContentComponentBehavior.Context(component: self, userId: userId)
         AmityUIKitManagerInternal.shared.behavior.pendingPostContentComponentBehavior?.goToUserProfilePage(context: context)
     }
+    
+    @ViewBuilder
+    var authorDisplayNameLabel: some View {
+        HStack(spacing: 8) {
+            Text(post.displayName)
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                .lineLimit(1)
+                .onTapGesture {
+                    self.goToUserProfilePage(post.postedUserId)
+                }
+            
+            if post.isFromBrand {
+                Image(AmityIcon.brandBadge.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 18, height: 18)
+                    .padding(.leading, -4)
+                    .opacity(post.isFromBrand ? 1 : 0)
+            }
+        }
+    }
 }
 
 class AmityPendingPostContentComponentViewModel: ObservableObject {
-    @Published var previewLinkData: (url: URL?, metadata: LPLinkMetadata?, image: UIImage?, loaded: Bool) = (nil, nil, nil, false)
     private let postManager = PostManager()
     private let post: AmityPostModel
     
     init(_ post: AmityPost) {
         self.post = AmityPostModel(post: post)
-    }
-    
-    @MainActor
-    func getPreviewlinkData() async {
-        let urls = AmityPreviewLinkWizard.shared.detectLinks(input: post.text)
-        
-        guard urls.count > 0 else {
-            previewLinkData.url = nil
-            return
-        }
-        
-        previewLinkData.loaded = false
-        previewLinkData.url = urls[0]
-        previewLinkData.metadata = await AmityPreviewLinkWizard.shared.getMetadata(url: urls[0])
-        previewLinkData.loaded = true
-        
-        previewLinkData.metadata?.imageProvider?.loadObject(ofClass: UIImage.self, completionHandler: { [weak self] image, error in
-            guard let self else { return }
-            
-            DispatchQueue.main.async {
-                if let image = image as? UIImage {
-                    self.previewLinkData.image = image
-                }
-            }
-        })
     }
     
     @discardableResult

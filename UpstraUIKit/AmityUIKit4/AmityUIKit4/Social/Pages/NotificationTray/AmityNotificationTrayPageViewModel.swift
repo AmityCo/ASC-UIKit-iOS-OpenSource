@@ -19,9 +19,7 @@ class AmityNotificationTrayPageViewModel: ObservableObject {
     private var collection: AmityCollection<AmityNotificationTrayItem>?
     
     var token: AmityNotificationToken?
-    
-    private let parser = NotificationParser()
-    
+        
     init() {
         fetchNotifications()
     }
@@ -111,6 +109,10 @@ struct NotificationItem: Identifiable {
         case reactionOnPost = "reaction_on_post"
         case reactionOnReply = "reaction_on_reply"
         case respondOnJoinRequest = "respond_on_join_request"
+        case eventStarted = "event_started"
+        case eventReminder = "event_reminder"
+        case eventCreated = "event_created"
+        case inviteRoomCoHost = "room_cohost_invite"
         case none = ""
     }
     
@@ -123,11 +125,14 @@ struct NotificationItem: Identifiable {
         case reply
         case follow
         case joinRequest = "join_request"
+        case event
+        case invitation
     }
     
     enum TargetType: String {
         case user
         case community
+        case room
     }
     
     let id: String
@@ -140,6 +145,7 @@ struct NotificationItem: Identifiable {
     let lastSeenAt: Date?
     let lastOccurredAt: Date?
     let actionType: ActionType
+    let targetId: String
     let targetType: TargetType
     let trayItemCategory: ItemCategory
     let object: AmityNotificationTrayItem
@@ -148,6 +154,7 @@ struct NotificationItem: Identifiable {
     let referenceId: String
     let referenceType: String
     let parentId: String?
+    let event: AmityEvent?
 
     init(model: AmityNotificationTrayItem) {
         self.id = model.notificationId
@@ -162,6 +169,7 @@ struct NotificationItem: Identifiable {
         self.lastSeenAt = model.lastSeenAt
         self.lastOccurredAt = model.lastOccurredAt
         self.actionType = ActionType(rawValue: model.actionType) ?? .post
+        self.targetId = model.targetId
         self.targetType = TargetType(rawValue: model.targetType) ?? .user
         self.trayItemCategory = ItemCategory(rawValue: model.trayItemCategory) ?? .none
         self.actionReferenceId = model.actionReferenceId
@@ -169,6 +177,7 @@ struct NotificationItem: Identifiable {
         self.referenceType = model.referenceType
         self.parentId = model.parentId
         self.object = model
+        self.event = model.event
     }
     
     @available(iOS 15, *)
@@ -188,6 +197,8 @@ struct NotificationItem: Identifiable {
         var commentId: String?
         var parentId: String?
         var userId: String?
+        var eventId: String?
+        var roomId: String?
         
         init(item: NotificationItem) {
             switch item.actionType {
@@ -223,6 +234,12 @@ struct NotificationItem: Identifiable {
                 break
             case .follow:
                 userId = item.users.first?.userId
+            case .event:
+                eventId = item.actionReferenceId
+            case .invitation:
+                if item.targetType == .room {
+                    roomId = item.targetId
+                }
             }
             
             parentId = item.parentId

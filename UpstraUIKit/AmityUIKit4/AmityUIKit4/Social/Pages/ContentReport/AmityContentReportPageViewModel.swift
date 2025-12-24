@@ -19,7 +19,7 @@ enum ContentReportSubmissionState {
 enum ContentReportType {
     case message(id: String)
     case post(id: String)
-    case comment(id: String)
+    case comment(id: String, isReply: Bool)
     
     var description: String {
         switch self {
@@ -27,8 +27,8 @@ enum ContentReportType {
             return "message"
         case .post:
             return "post"
-        case .comment:
-            return "comment"
+        case .comment(_, let isReply):
+            return isReply ? "reply" : "comment"
         }
     }
 }
@@ -56,9 +56,10 @@ class AmityContentReportPageViewModel: ObservableObject {
             switch type {
             case .message(id: let id):
                 try await chatManager.flagMessage(messageId: id, reason: reason)
+                MessageCache.shared.setFlagStatus(messageId: id, value: true)
             case .post(let id):
                 try await postManager.flagPost(withId: id, reason: reason)
-            case .comment(let id):
+            case .comment(let id, let isReply):
                 try await commentManager.flagComment(withId: id, reason: reason)
             }
             

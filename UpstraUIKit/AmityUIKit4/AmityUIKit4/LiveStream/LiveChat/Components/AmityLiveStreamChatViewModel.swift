@@ -14,9 +14,14 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     @Published var loadingStatus: AmityLoadingStatus = .notLoading
     @Published var messageInput: String = ""
     @Published var showBottomSheet: (show: Bool, message: MessageModel?) = (false, nil)
+    @Published var showModerationBottomSheet: (show: Bool, message: MessageModel?) = (false, nil)
     @Published var showReactionBar: Bool = false
     @Published var composeBarState: ComposeBarState = .normal
     @Published var isTextEditorFocused: Bool = false
+    
+    // Channel moderation related data
+    @Published var moderators: [String] = []
+    @Published var mutedMembers: [String] = []
     
     private let channelManager = ChannelManager()
     private let chatManager = ChatManager()
@@ -32,10 +37,29 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     private(set) var isCommunityMember: Bool = true
     private var isChannelEnabled: Bool = true
     private var isUserMuted: Bool = false
+    private var isUserMutedByModerator: Bool = false
     
+    // Delegate functions being set in LiveStreamConferenceView
+    var isWaitingCoHost: (() -> (Bool, String))?
+    var inviteCoHostAction: (() -> Void)?
+    var removeCoHostAction: (() -> Void)?
+    var didFinishCoHostInvitationAction: ((AmityUserModel?) -> Void)?
     var swapCameraAction: (() -> Void)?
-    let stream: AmityStream
-    let isStreamer: Bool
+    var toggleMicAction: (() -> Void)?
+    @Published var isMicOn: Bool = true
+    
+    let room: AmityRoom
+    @Published var hostUserId: String = ""
+    @Published var coHostUserId: String = ""
+    
+    var isHost: Bool = false
+    var isCoHost: Bool = false
+    var isStreamer: Bool {
+        return isHost || isCoHost
+    }
+    private var refreshTask: Task<Void, Never>?
+    
+    let participantRole: LiveStreamParticipantRole
     let liveReactionViewModel: LiveReactionViewModel
     
     enum ComposeBarState {
@@ -67,8 +91,13 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
             return .readOnly
         }
         
-        // Priority 3: muted state (when channel is enabled but user is muted)
+        // Priority 3: muted state (when channel is enabled but user is muted by Admin in console)
         if isUserMuted {
+            return .muted
+        }
+        
+        // Priority 4: muted state (when channel is enabled but user is muted by a moderator in UIKit)
+        if isUserMutedByModerator {
             return .muted
         }
         
@@ -76,11 +105,20 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         return .normal
     }
     
-    public init(stream: AmityStream) {
-        self.stream = stream
-        self.isStreamer = stream.user?.userId ?? "" == AmityUIKitManagerInternal.shared.currentUserId
-        self.channel = stream.channel
-        self.liveReactionViewModel = LiveReactionViewModel(stream: stream)
+    public init(room: AmityRoom, participantRole: LiveStreamParticipantRole = .viewer) {
+        self.room = room
+        self.participantRole = participantRole
+        
+        let hostId = room.creatorId ?? ""
+        self.hostUserId = hostId
+        self.isHost = AmityUIKitManagerInternal.shared.currentUserId == hostId
+        
+        let coHostId = room.participants.first(where: { $0.type == "coHost" })?.userId ?? ""
+        self.coHostUserId = coHostId
+        self.isCoHost = AmityUIKitManagerInternal.shared.currentUserId == coHostId
+        
+        self.channel = room.channel
+        self.liveReactionViewModel = LiveReactionViewModel(room: room)
         
         guard let channel else { return }
         
@@ -89,10 +127,11 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         // Also the streamer has already joined the channel since channel is created by the streamer
         if isStreamer {
             subscribeChannel(channel)
+            observeChannel(channel)
             observeMessages(channel)
         } else {
             setupComposeBarState()
-            subscribeLiveStreamChatModeration(stream)
+//            subscribeLiveStreamChatModeration(stream)
             joinChannel(channel) {
                 self.observeChannelMembership(channel)
                 self.subscribeChannel(channel)
@@ -102,15 +141,9 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         }
     }
     
-    deinit {
-        guard let channel else { return }
-        unsubscribeChannel(channel)
-        unsubscribeLiveStreamChatModeration(stream)
-    }
-    
     private func setupComposeBarState() {
-        isCommunityMember = stream.community?.isJoined ?? true
-        isChannelEnabled = !(stream.channel?.isMuted ?? false)
+        isCommunityMember = room.community?.isJoined ?? true
+        isChannelEnabled = !(room.channel?.isMuted ?? false)
         updateComposeBarState()
     }
     
@@ -172,34 +205,48 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         })
     }
     
-    private func subscribeLiveStreamChatModeration(_ stream: AmityStream) {
-        stream.subscribeEvent(.chatModeration) { status, error in
-            if error != nil {
-                Log.add(event: .error, "Failed to subscribe to live stream chat moderation: \(error?.localizedDescription ?? "Unknown error")")
-            } else {
-                Log.add(event: .info, "Subscribed to live stream chat moderation for stream: \(stream.streamId)")
-            }
-        }
-    }
-    
-    private func unsubscribeLiveStreamChatModeration(_ stream: AmityStream) {
-        guard !stream.model.isInvalidated else { return }
-        
-        stream.unsubscribeEvent(.chatModeration) { status, error in
-            if error != nil {
-                Log.add(event: .error, "Failed to unsubscribe from live stream chat moderation: \(error?.localizedDescription ?? "Unknown error")")
-            } else {
-                Log.add(event: .info, "UnSubscribed from live stream chat moderation for stream: \(stream.streamId)")
-            }
-        }
-    }
+//    private func subscribeLiveStreamChatModeration(_ stream: AmityStream) {
+//        stream.subscribeEvent(.chatModeration) { status, error in
+//            if error != nil {
+//                Log.add(event: .error, "Failed to subscribe to live stream chat moderation: \(error?.localizedDescription ?? "Unknown error")")
+//            } else {
+//                Log.add(event: .info, "Subscribed to live stream chat moderation for stream: \(stream.streamId)")
+//            }
+//        }
+//    }
+//    
+//    private func unsubscribeLiveStreamChatModeration(_ stream: AmityStream) {
+//        guard !stream.model.isInvalidated else { return }
+//        
+//        stream.unsubscribeEvent(.chatModeration) { status, error in
+//            if error != nil {
+//                Log.add(event: .error, "Failed to unsubscribe from live stream chat moderation: \(error?.localizedDescription ?? "Unknown error")")
+//            } else {
+//                Log.add(event: .info, "UnSubscribed from live stream chat moderation for stream: \(stream.streamId)")
+//            }
+//        }
+//    }
     
     private func observeChannel(_ channel: AmityChannel) {
         channelToken = channelManager.getChannel(channelId: channel.channelId).observe { [weak self] object, error in
             guard let self, let channel = object.snapshot else { return }
             
-            self.isChannelEnabled = !channel.isMuted
-            self.updateComposeBarState()
+            self.channel = channel
+            
+            // Channel Moderation related data
+            if let moderators = channel.metadata?["moderators"] as? [String] {
+                self.moderators = moderators
+            }
+            
+            if let mutedMembers = channel.metadata?["mutedMembers"] as? [String] {
+                self.mutedMembers = mutedMembers
+            }
+            
+            if !isStreamer {
+                self.isChannelEnabled = !channel.isMuted
+                self.isUserMutedByModerator = isMuted(userId: AmityUIKitManagerInternal.shared.currentUserId)
+                self.updateComposeBarState()
+            }
         }
     }
     
@@ -250,6 +297,161 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     
     func unflagMessage(_ messageId: String) async throws {
         let _ = try await chatManager.unflagMessage(messageId: messageId)
+        MessageCache.shared.setFlagStatus(messageId: messageId, value: false)
+    }
+    
+    @MainActor
+    func promoteModerator(userId: String) async throws {
+        guard let channel = self.channel else { return }
+        let builder = AmityChannelUpdateBuilder(channelId: channel.channelId)
+        var metadata: [String: Any] = [:]
+        
+        if var moderators = channel.metadata?["moderators"] as? [String] {
+            moderators.append(userId)
+            metadata["moderators"] = moderators
+        } else {
+            metadata["moderators"] = [userId]
+        }
+        
+        if let mutedMembers = channel.metadata?["mutedMembers"] as? [String] {
+            metadata["mutedMembers"] = mutedMembers
+        }
+        
+        builder.setMetadata(metadata)
+        try await channelManager.addRole(channelId: channel.channelId, userId: userId, role: AmityChannelRole.channelModerator.rawValue)
+        self.channel = try await channelManager.updateChannel(builder: builder)
+    }
+    
+    @MainActor
+    func demoteModerator(userId: String) async throws {
+        guard let channel = self.channel else { return }
+        let builder = AmityChannelUpdateBuilder(channelId: channel.channelId)
+        var metadata: [String: Any] = [:]
+        
+        if var moderators = channel.metadata?["moderators"] as? [String] {
+            moderators.removeAll { $0 == userId }
+            metadata["moderators"] = moderators
+        }
+        
+        if let mutedMembers = channel.metadata?["mutedMembers"] as? [String] {
+            metadata["mutedMembers"] = mutedMembers
+        }
+        
+        builder.setMetadata(metadata)
+        
+        try await channelManager.removeRole(channelId: channel.channelId, userId: userId, role: AmityChannelRole.channelModerator.rawValue)
+        self.channel = try await channelManager.updateChannel(builder: builder)
+    }
+    
+    @MainActor
+    func muteMember(userId: String) async throws {
+        guard let channel = self.channel else { return }
+        let builder = AmityChannelUpdateBuilder(channelId: channel.channelId)
+        var metadata: [String: Any] = [:]
+        
+        if let moderators = channel.metadata?["moderators"] as? [String] {
+            metadata["moderators"] = moderators
+        }
+        
+        if var mutedMembers = channel.metadata?["mutedMembers"] as? [String] {
+            mutedMembers.append(userId)
+            metadata["mutedMembers"] = mutedMembers
+        } else {
+            metadata["mutedMembers"] = [userId]
+        }
+        
+        builder.setMetadata(metadata)
+        self.channel = try await channelManager.updateChannel(builder: builder)
+    }
+    
+    @MainActor
+    func unmuteMember(userId: String) async throws {
+        guard let channel = self.channel else { return }
+        let builder = AmityChannelUpdateBuilder(channelId: channel.channelId)
+        var metadata: [String: Any] = [:]
+        
+        if let moderators = channel.metadata?["moderators"] as? [String] {
+            metadata["moderators"] = moderators
+        }
+        
+        if var mutedMembers = channel.metadata?["mutedMembers"] as? [String] {
+            mutedMembers.removeAll { $0 == userId }
+            metadata["mutedMembers"] = mutedMembers
+        }
+        
+        builder.setMetadata(metadata)
+        self.channel = try await channelManager.updateChannel(builder: builder)
+    }
+    
+    func refreshHostAndCoHostId(room: AmityRoom) {
+        let previousTask = refreshTask
+        
+        refreshTask = Task { @MainActor [weak self] in
+            await previousTask?.value
+            
+            guard let self = self else { return }
+            
+            let newHostUserId = room.creatorId ?? ""
+            let newCoHostUserId = room.participants.first(where: { $0.type == "coHost" })?.userId ?? ""
+            
+            if participantRole == .host {
+                do {
+                    if !newCoHostUserId.isEmpty && !self.isModerator(userId: newCoHostUserId) {
+                        try await self.promoteModerator(userId: newCoHostUserId)
+                    } else if newCoHostUserId.isEmpty && !self.coHostUserId.isEmpty && self.isModerator(userId: self.coHostUserId) {
+                        Log.add(event: .info, "Demoting previous co-host (\(self.coHostUserId)) from moderator role")
+                        try await self.demoteModerator(userId: self.coHostUserId)
+                    }
+                } catch {
+                    print("Error updating moderator: \(error)")
+                }
+            }
+            
+            self.hostUserId = newHostUserId
+            self.coHostUserId = newCoHostUserId
+            self.isHost = AmityUIKitManagerInternal.shared.currentUserId == newHostUserId
+            self.isCoHost = AmityUIKitManagerInternal.shared.currentUserId == newCoHostUserId
+        }
+    }
+    func inviteAsCoHost(userId: String) async throws {
+        try await room.createInvitation(userId)
+    }
+    
+    func isModerator(userId: String) -> Bool {
+        return moderators.contains(item: userId)
+    }
+    
+    func isMuted(userId: String) -> Bool {
+        return mutedMembers.contains(item: userId)
+    }
+    
+    func cleanup() {
+        // Cancel all ongoing observations
+        collectionCancellable?.cancel()
+        collectionCancellable = nil
+        
+        loadingStatusCancellable?.cancel()
+        loadingStatusCancellable = nil
+        
+        channelMembershipCancellable?.cancel()
+        channelMembershipCancellable = nil
+        
+        // Invalidate tokens
+        streamToken?.invalidate()
+        streamToken = nil
+        
+        channelToken?.invalidate()
+        channelToken = nil
+        
+        // Clear collection
+        messageCollection = nil
+        
+        // Clear live reaction VM
+        liveReactionViewModel.cleanup()
+        
+        // Unsubscribe from channel if it exists
+        guard let channel else { return }
+        unsubscribeChannel(channel)
+//        unsubscribeLiveStreamChatModeration(stream)
     }
 }
-

@@ -30,8 +30,14 @@ struct InfoTextFieldModel {
     // If TextField need to be expandable
     var isExpandable: Bool = false
     
+    /// Number of lines supported when text field is expanded
+    var expandedLineLimit: Int = 7
+    
     // If TextField need to limit maximum character count
     var maxCharCount: Int?
+    
+    // If new lines are allowed
+    var allowNewLine: Bool = true
 }
 
 extension InfoTextField: AmityViewBuildable {
@@ -127,7 +133,7 @@ struct InfoTextField: View {
             .padding(.bottom, 5)
             
             textField
-                .lineLimit(data.isExpandable ? 7 : 1)
+                .lineLimit(data.isExpandable ? data.expandedLineLimit : 1)
                 .textFieldStyle(PlainTextFieldStyle())
                 .frame(minHeight: 34)
                 .onChange(of: text) { newText in
@@ -135,6 +141,12 @@ struct InfoTextField: View {
                     charCount = newText.count
                     if charCount >= limitedCharCount {
                         text = String(newText.prefix(limitedCharCount))
+                        ImpactFeedbackGenerator.impactFeedback(style: .light)
+                        return
+                    }
+                    
+                    if !data.allowNewLine {
+                        text = newText.replacingOccurrences(of: "\n", with: "")
                     }
                 }
                 .onAppear {

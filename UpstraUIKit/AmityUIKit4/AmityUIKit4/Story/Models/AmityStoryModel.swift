@@ -63,6 +63,7 @@ public struct AmityStoryModel: Identifiable, Equatable, Hashable {
     
     var isModerator: Bool = false
     var isCreator: Bool = false
+    var isCreatorBrand: Bool = false
     
     var isLiked: Bool {
         myReactions.contains(.like)
@@ -120,6 +121,7 @@ public struct AmityStoryModel: Identifiable, Equatable, Hashable {
         }
         
         isCreator = creatorId == AmityUIKitManagerInternal.shared.currentUserId
+        isCreatorBrand = story.creator?.isBrand ?? false
     }
     
     

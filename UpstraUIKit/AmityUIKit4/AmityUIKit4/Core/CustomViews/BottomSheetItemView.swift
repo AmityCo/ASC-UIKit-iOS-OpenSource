@@ -7,20 +7,32 @@
 
 import SwiftUI
 
+enum IconBackground {
+    case none
+    case circular
+}
+
 struct BottomSheetItemView: View {
     @EnvironmentObject var viewConfig: AmityViewConfigController
-    private let icon: ImageResource
+    private let icon: ImageResource?
     private let text: String
+    private let iconBackground: IconBackground
     private let iconSize: CGSize
     private let isDestructive: Bool
     private let tintColor: UIColor?
     
-    init(icon: ImageResource, text: String, iconSize: CGSize = CGSize(width: 20, height: 24), tintColor: UIColor? = nil, isDestructive: Bool = false) {
+    init(icon: ImageResource?,
+         text: String,
+         iconBackground: IconBackground = .none,
+         iconSize: CGSize = CGSize(width: 20, height: 24),
+         tintColor: UIColor? = nil,
+         isDestructive: Bool = false) {
         self.icon = icon
         self.text = text
         self.iconSize = iconSize
         self.isDestructive = isDestructive
         self.tintColor = tintColor
+        self.iconBackground = iconBackground
     }
     
     var body: some View {
@@ -31,14 +43,18 @@ struct BottomSheetItemView: View {
         return tintColor ?? (isDestructive ? viewConfig.theme.alertColor : viewConfig.theme.baseColor)
     }
     
-    private func getItemView(_ icon: ImageResource, text: String, isDestructive: Bool = false) -> some View {
+    private func getItemView(_ icon: ImageResource?, text: String, isDestructive: Bool = false) -> some View {
         HStack(spacing: 12) {
-            Image(icon)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .frame(width: iconSize.width, height: iconSize.height)
-                .foregroundColor(Color(foregroundTintColor))
+            if let icon {
+                Image(icon)
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: iconSize.width, height: iconSize.height)
+                    .foregroundColor(Color(foregroundTintColor))
+                    .padding(iconBackground == .circular ? 6 : 0)
+                    .background(iconBackground == .circular ? Color(viewConfig.theme.backgroundShade1Color).clipped().clipShape(Circle()) : nil)
+            }
             
             Text(text)
                 .applyTextStyle(.bodyBold(Color(foregroundTintColor)))

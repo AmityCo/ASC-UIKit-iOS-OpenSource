@@ -130,11 +130,18 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .communityJoinButton) || viewModel.pendingCommunityInvitation != nil)
                 .accessibilityIdentifier(AccessibilityID.Social.CommunityHeader.communityJoinButton)
 
-            AmityStoryTabComponent(type: .communityFeed(community.communityId))
-                .padding(.top, 8)
-                .padding(.bottom, 12)
-                .padding(.horizontal, 16)
-                .isHidden(!(!viewModel.stories.isEmpty || viewModel.hasStoryManagePermission))
+            
+            if viewModel.isStoryTabLoading {
+                SkeletonStoryTabComponent(radius: 56)
+                    .frame(height: 85)
+                    .padding(.bottom, 12)
+                    .padding(.horizontal, 12)
+            } else {
+                AmityStoryTabComponent(type: .communityFeed(community.communityId))
+                    .frame(height: 85)
+                    .padding(.bottom, 12)
+                    .isHidden(!(!viewModel.stories.isEmpty || viewModel.hasStoryManagePermission || !viewModel.roomPosts.isEmpty))
+            }
             
             // Pending Posts Banner
             pendingRequestsBanner

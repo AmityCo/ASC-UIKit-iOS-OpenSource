@@ -40,7 +40,7 @@ struct AmityStoryRingElement: AmityElementView {
         }) { config in
             
             Circle()
-                .stroke(lineWidth: 3.0)
+                .stroke(lineWidth: 2.0)
                 .fill(
                     LinearGradient(colors: getRingColor(progressColor: config.progressColor, backgroundColor: [config.backgroundColor])
                                    , startPoint: .top, endPoint: .bottom)
@@ -52,7 +52,7 @@ struct AmityStoryRingElement: AmityElementView {
                                 .trim(from: startProgress, to: stopProgress)
                                 .stroke(
                                     config.backgroundColor,
-                                    lineWidth: 3.0
+                                    lineWidth: 2.0
                                 )
                                 .rotationEffect(.degrees(-90))
                         }

@@ -29,11 +29,14 @@ public class CommunityProfileViewModel: ObservableObject {
     @Published var announcementPost: AmityPostModel?
     
     @Published var stories: [AmityStory] = []
+    @Published var roomPosts: [AmityPostModel] = []
+    @Published var isStoryTabLoading: Bool = true
+    private var cancellable: Set<AnyCancellable> = []
     @Published var pendingPostCount: Int = 0
     @Published var joinRequestCount: Int = 0
     @Published var shouldShowPendingBanner: Bool = false
     
-    @Published var startedScrollingToTop: Bool = false
+    @Published var startedScrollingToBottom: Bool = false
     @Published var showErrorState = false
 
     @Published var joinStatus: CommunityJoinState = .notJoined
@@ -48,13 +51,17 @@ public class CommunityProfileViewModel: ObservableObject {
     private var communityToken: AmityNotificationToken?
     private var pendingPostToken: AmityNotificationToken?
     private var storyToken: AmityNotificationToken?
+    private var roomPostsToken: AmityNotificationToken?
     private var pinnedPostToken: AmityNotificationToken?
     private var joinRequestsToken: AmityNotificationToken?
     
     private var collection: AmityCollection<AmityPinnedPost>?
+    private var storyCollection: AmityCollection<AmityStory>?
+    private var roomPostCollection: AmityCollection<AmityPost>?
     
     @Published var hasStoryManagePermission: Bool = false
     @Published var hasCreatePostPermission = false
+    @Published var hasCreateEventPermission = false
     
     let firstLoadTask = OneTimeTask()
 
@@ -125,6 +132,16 @@ public class CommunityProfileViewModel: ObservableObject {
             } else {
                 self.hasCreatePostPermission = community.isJoined
             }
+            
+            AmityUIKit4Manager.client.hasPermission(.createEvent, forCommunity: community.communityId) { [weak self] hasPermission in
+                guard let self else { return }
+                self.hasCreateEventPermission = hasPermission
+            }
+            
+            // If the user leave the community after approved the join request, refresh the feed.
+            if self.joinStatus == .joined && community.isJoined == false {
+                self.refreshFeed()
+            }
         }
         
         // Note:
@@ -142,10 +159,43 @@ public class CommunityProfileViewModel: ObservableObject {
     
     func loadStories() {
         storyToken = nil
-        storyToken = storyManager.getActiveStories(in: communityId).observe({ [weak self] collection, _, error in
+        storyCollection = storyManager.getActiveStories(in: communityId)
+        storyToken = storyCollection?.observe({ [weak self] collection, _, error in
             let stories = collection.snapshots
             self?.stories = stories
         })
+        
+        storyCollection?.$loadingStatus
+            .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] status in
+                self?.isStoryTabLoading = status == .loading
+            })
+            .store(in: &cancellable)
+        
+        roomPostsToken = nil
+        roomPostCollection = postManager.getCommunityLiveRoomPosts(communityId: communityId)
+        roomPostsToken = roomPostCollection?.observe { [weak self] collection, _, error in
+            let posts = collection.snapshots
+            self?.roomPosts = posts.flatMap({ post -> [AmityPostModel] in
+                // community linked object is only available in parent post
+                let targetCommunity = post.targetCommunity
+                
+                // Parent post are text posts, we need to filter children posts which are live rooms
+                return post.childrenPosts.compactMap({ post -> AmityPostModel? in
+                    guard post.dataType == "room" && post.getRoomInfo()?.status == .live else { return nil }
+                    let model = AmityPostModel(post: post)
+                    model.targetCommunity = targetCommunity
+                    return model
+                })
+                
+            })
+        }
+        
+        roomPostCollection?.$loadingStatus
+            .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] status in
+                self?.isStoryTabLoading = status == .loading
+            }).store(in: &cancellable)
     }
     
     func loadPinnedFeed() {

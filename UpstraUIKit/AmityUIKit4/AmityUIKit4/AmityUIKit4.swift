@@ -176,30 +176,34 @@ final class AmityUIKitManagerInternal: NSObject {
     
     private override init() {
         super.init()
+        AmityLog.logLevel = .all
         setupUIKitBehaviour()
     }
     
     // MARK: - Setup functions
     
     func setup(_ apiKey: String, region: AmityRegion) {
+        AmityLog.logLevel = .all
         guard let client = try? AmityClient(apiKey: apiKey, region: region) else { return }
         
         _client = client
         _client?.delegate = self
-        
+       
         verifyStoredConfigForCurrentApiKey()
     }
     
     func setup(_ apiKey: String, endpoint: AmityEndpoint) {
+        AmityLog.logLevel = .all
         guard let client = try? AmityClient(apiKey: apiKey, endpoint: endpoint) else { return }
         
         _client = client
         _client?.delegate = self
-        
+
         verifyStoredConfigForCurrentApiKey()
     }
     
     func setup(_ client: AmityClient) {
+        AmityLog.logLevel = .all
         _client = client
         _client?.delegate = self
         didUpdateClient()
@@ -375,6 +379,13 @@ final class AmityUIKitManagerInternal: NSObject {
         
         let globalBehavior = AmityGlobalBehavior()
         behavior.globalBehavior = globalBehavior
+        
+        // Event
+        behavior.eventTargetSelectionPageBehavior = AmityEventTargetSelectionPageBehavior()
+        behavior.eventDetailPageBehavior = AmityEventDetailPageBehavior()
+        behavior.exploreEventFeedComponentBehavior = AmityExploreEventFeedComponentBehavior()
+        behavior.myEventFeedComponentBehavior = AmityMyEventFeedComponentBehavior()
+        behavior.eventSetupPageBehavior = AmityEventSetupPageBehavior()
     }
     
     func registerDevice(_ userId: String,

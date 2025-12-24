@@ -70,7 +70,20 @@ public struct AmityCommunityCommentsNotificationSettingPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .frame(width: 24, height: 20)
                 .onTapGesture {
-                    host.controller?.navigationController?.popViewController()
+                    if viewModel.isSettingChanged {
+                        let alert = UIAlertController(title: "Leave without finishing?", message: "Your changes that you made may not be saved.", preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+                        let leaveAction = UIAlertAction(title: "Leave", style: .destructive) { _ in
+                            host.controller?.navigationController?.popViewController()
+                        }
+                        
+                        alert.addAction(cancelAction)
+                        alert.addAction(leaveAction)
+                        
+                        host.controller?.present(alert, animated: true)
+                    } else {
+                        host.controller?.navigationController?.popViewController()
+                    }
                 }
             
             Spacer()
@@ -157,5 +170,3 @@ class AmityCommunityCommentsNotificationSettingPageViewModel: ObservableObject {
         }
     }
 }
-
-

@@ -14,14 +14,27 @@ open class AmityNotificationTrayPageBehavior {
         public let parentCommentId: String?
         public let communityId: String?
         public let userId: String?
+        public let eventId: String?
+        public let roomId: String?
         
-        public init(page: AmityNotificationTrayPage, postId: String?, commentId: String?, parentCommentId: String?, communityId: String?, userId: String?) {
+        public init(
+            page: AmityNotificationTrayPage,
+            postId: String?,
+            commentId: String?,
+            parentCommentId: String?,
+            communityId: String?,
+            userId: String?,
+            eventId: String? = nil,
+            roomId: String? = nil
+        ) {
             self.page = page
             self.postId = postId
             self.commentId = commentId
             self.parentCommentId = parentCommentId
             self.communityId = communityId
             self.userId = userId
+            self.eventId = eventId
+            self.roomId = roomId
         }
     }
     
@@ -44,5 +57,20 @@ open class AmityNotificationTrayPageBehavior {
         let page = AmityUserProfilePage(userId: context.userId ?? "")
         let vc = AmitySwiftUIHostingController(rootView: page)
         context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    open func goToEventDetailPage(context: AmityNotificationTrayPageBehavior.Context) {
+        
+        let page = AmityEventDetailPage(eventId: context.eventId ?? "")
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    open func goToLiveStreamPage(context: AmityNotificationTrayPageBehavior.Context) {
+        let livestreamPlayerPage = AmityLivestreamPlayerPage(roomId: context.roomId ?? "", displayErrorIfEnded: true)
+        let hostController = AmitySwiftUIHostingNavigationController(rootView: livestreamPlayerPage)
+        hostController.isNavigationBarHidden = true
+        hostController.modalPresentationStyle = .overFullScreen
+        context.page.host.controller?.present(hostController, animated: true)
     }
 }

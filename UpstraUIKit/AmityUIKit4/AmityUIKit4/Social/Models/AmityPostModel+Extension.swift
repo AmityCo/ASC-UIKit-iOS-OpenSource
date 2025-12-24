@@ -17,6 +17,7 @@ extension AmityPostModel {
         case terminated
         case recorded
         case idle
+        case error
         case none
         
         var badgeTitle: String {
@@ -27,7 +28,7 @@ extension AmityPostModel {
                 return AmityLocalizedStringSet.Social.livestreamPlayerRecorded.localizedString
             case .idle:
                 return AmityLocalizedStringSet.Social.livestreamPlayerUpcomingLive.localizedString
-            case .none, .ended, .terminated:
+            case .none, .ended, .terminated, .error:
                 return ""
             }
         }
@@ -55,6 +56,7 @@ extension AmityPostModel {
         case poll
         case liveStream
         case clip
+        case room
         case unknown
     }
 }

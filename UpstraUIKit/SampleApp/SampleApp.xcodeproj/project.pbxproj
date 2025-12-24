@@ -3,73 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0D73AC9325DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73AC8B25DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.swift */; };
-		0D73AC9425DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D73AC8C25DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.xib */; };
-		0D73AC9525DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73AC8E25DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.swift */; };
-		0D73AC9625DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D73AC8F25DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.xib */; };
-		0D73AC9725DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D73AC9125DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.xib */; };
-		0D73AC9825DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73AC9225DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.swift */; };
-		0D73AC9E25DB9332000D73CA /* BirthdayPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73AC9D25DB9332000D73CA /* BirthdayPostComponent.swift */; };
-		0D73ACA425DB93A2000D73CA /* ThumbsupPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73ACA325DB93A2000D73CA /* ThumbsupPostComponent.swift */; };
-		0D73ACA825DB9423000D73CA /* NewJoinerPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73ACA725DB9423000D73CA /* NewJoinerPostComponent.swift */; };
-		0D8FFC2925DCBFD900943538 /* AmityCustomFooterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2725DCBFD900943538 /* AmityCustomFooterTableViewCell.swift */; };
-		0D8FFC2A25DCBFD900943538 /* AmityCustomFooterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2825DCBFD900943538 /* AmityCustomFooterTableViewCell.xib */; };
-		680DC0032C8ABE09006D8764 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */; };
-		680DC0042C8AC2B2006D8764 /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */; };
 		682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; };
 		682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		684097562B30607F00697E1B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 684097552B30607F00697E1B /* GoogleService-Info.plist */; };
 		68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; };
 		68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7214C9CB2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */; };
-		7214C9D72632C0AD00192BB3 /* NotificationModuleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9D62632C0AD00192BB3 /* NotificationModuleTableViewCell.swift */; };
-		7214C9DB2632C0D500192BB3 /* SwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9DA2632C0D500192BB3 /* SwitchTableViewCell.swift */; };
-		721AF3C426088849005BA15F /* CustomEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721AF3C326088849005BA15F /* CustomEventHandler.swift */; };
-		721AF3CA26088884005BA15F /* CustomFeedEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721AF3C926088884005BA15F /* CustomFeedEventHandler.swift */; };
-		724C25F4274CE38B0058B066 /* SamplePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C25F3274CE38B0058B066 /* SamplePageViewController.swift */; };
-		7288E96C2630139E004535DD /* AppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7288E96B2630139E004535DD /* AppManager.swift */; };
-		729CAF3E273CC8ED000AE162 /* Binding+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF3D273CC8ED000AE162 /* Binding+Extension.swift */; };
-		729CAF42273CC95B000AE162 /* EndpointManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF41273CC95B000AE162 /* EndpointManager.swift */; };
-		72AACE0B273931F100E59D55 /* EndpointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72AACE0A273931F100E59D55 /* EndpointsView.swift */; };
-		92DBE8A62ACA98CF007D873C /* DataListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D495077325E637C1005C033F /* DataListViewController.swift */; };
-		92DBE8A72ACA98CF007D873C /* SamplePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C25F3274CE38B0058B066 /* SamplePageViewController.swift */; };
-		92DBE8A82ACA98CF007D873C /* PostCreatorSettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */; };
-		92DBE8A92ACA98CF007D873C /* UserLevelPushNotificationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */; };
-		92DBE8AA2ACA98CF007D873C /* FeatureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA4AE24BED89000EE902B /* FeatureViewController.swift */; };
-		92DBE8AB2ACA98CF007D873C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA47824BED7D300EE902B /* AppDelegate.swift */; };
-		92DBE8AC2ACA98CF007D873C /* AmityPostBirthdayTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73AC8E25DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.swift */; };
-		92DBE8AD2ACA98CF007D873C /* AmityPostThumbsupTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73AC8B25DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.swift */; };
-		92DBE8AE2ACA98CF007D873C /* AmityPostNewJoinerTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73AC9225DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.swift */; };
-		92DBE8AF2ACA98CF007D873C /* TabbarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72861D824C573B100ECC563 /* TabbarViewController.swift */; };
-		92DBE8B02ACA98CF007D873C /* GlobalPostsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */; };
-		92DBE8B12ACA98CF007D873C /* BirthdayPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73AC9D25DB9332000D73CA /* BirthdayPostComponent.swift */; };
-		92DBE8B22ACA98CF007D873C /* PostPreviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */; };
-		92DBE8B32ACA98CF007D873C /* GlobalPostsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */; };
-		92DBE8B42ACA98CF007D873C /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74ADE5D24F3B026009C86DA /* UserDefaults.swift */; };
-		92DBE8B52ACA98CF007D873C /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B754DBED24C6F6BB005A8282 /* RegisterViewController.swift */; };
-		92DBE8B62ACA98CF007D873C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA47A24BED7D300EE902B /* SceneDelegate.swift */; };
-		92DBE8B72ACA98CF007D873C /* AmityCustomFooterTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2725DCBFD900943538 /* AmityCustomFooterTableViewCell.swift */; };
-		92DBE8B82ACA98CF007D873C /* NotificationModuleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9D62632C0AD00192BB3 /* NotificationModuleTableViewCell.swift */; };
-		92DBE8B92ACA98CF007D873C /* UserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78FC53D24CAAA2F0083CBB4 /* UserDefault.swift */; };
-		92DBE8BA2ACA98CF007D873C /* CustomChannelEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F101F426A69FBF00AD84A1 /* CustomChannelEventHandler.swift */; };
-		92DBE8BB2ACA98CF007D873C /* NewJoinerPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73ACA725DB9423000D73CA /* NewJoinerPostComponent.swift */; };
-		92DBE8BC2ACA98CF007D873C /* SwitchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9DA2632C0D500192BB3 /* SwitchTableViewCell.swift */; };
-		92DBE8BD2ACA98CF007D873C /* Binding+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF3D273CC8ED000AE162 /* Binding+Extension.swift */; };
-		92DBE8BE2ACA98CF007D873C /* CustomMessageTextIncomingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72CDA39256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift */; };
-		92DBE8BF2ACA98CF007D873C /* CommunityFeatureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA4B024BEDBC500EE902B /* CommunityFeatureViewController.swift */; };
-		92DBE8C02ACA98CF007D873C /* AppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7288E96B2630139E004535DD /* AppManager.swift */; };
-		92DBE8C12ACA98CF007D873C /* CustomFeedEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721AF3C926088884005BA15F /* CustomFeedEventHandler.swift */; };
-		92DBE8C22ACA98CF007D873C /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78FC53F24CAAA2F0083CBB4 /* Theme.swift */; };
-		92DBE8C32ACA98CF007D873C /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B754DBEB24C6F6B5005A8282 /* SettingViewController.swift */; };
-		92DBE8C42ACA98CF007D873C /* ThumbsupPostComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D73ACA325DB93A2000D73CA /* ThumbsupPostComponent.swift */; };
-		92DBE8C52ACA98CF007D873C /* EndpointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72AACE0A273931F100E59D55 /* EndpointsView.swift */; };
-		92DBE8C62ACA98CF007D873C /* EndpointManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF41273CC95B000AE162 /* EndpointManager.swift */; };
-		92DBE8C72ACA98CF007D873C /* CustomEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721AF3C326088849005BA15F /* CustomEventHandler.swift */; };
-		92DBE8C82ACA98CF007D873C /* ChatFeatureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA4B224BEDBD100EE902B /* ChatFeatureViewController.swift */; };
 		92DBE8CA2ACA98CF007D873C /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; };
 		92DBE8CB2ACA98CF007D873C /* AmitySDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D45D45B726204253008F7C2C /* AmitySDK.xcframework */; };
 		92DBE8CC2ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */; };
@@ -79,15 +20,6 @@
 		92DBE8D02ACA98CF007D873C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */; };
 		92DBE8D12ACA98CF007D873C /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D45B3A93264A840300F6FF52 /* Realm.xcframework */; };
 		92DBE8D22ACA98CF007D873C /* AmityUIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; };
-		92DBE8D42ACA98CF007D873C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B78DA48324BED7DA00EE902B /* LaunchScreen.storyboard */; };
-		92DBE8D52ACA98CF007D873C /* AmityPostThumbsupTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D73AC8C25DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.xib */; };
-		92DBE8D62ACA98CF007D873C /* AmityCustomFooterTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D8FFC2825DCBFD900943538 /* AmityCustomFooterTableViewCell.xib */; };
-		92DBE8D72ACA98CF007D873C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B78DA48124BED7DA00EE902B /* Assets.xcassets */; };
-		92DBE8D82ACA98CF007D873C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B78DA47E24BED7D300EE902B /* Main.storyboard */; };
-		92DBE8D92ACA98CF007D873C /* AmityPostBirthdayTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D73AC8F25DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.xib */; };
-		92DBE8DA2ACA98CF007D873C /* PostPreviewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D4AFF1CC25ECE8AD002C001C /* PostPreviewTableViewCell.xib */; };
-		92DBE8DB2ACA98CF007D873C /* CustomMessageTextIncomingTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B72CDA3A256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib */; };
-		92DBE8DC2ACA98CF007D873C /* AmityPostNewJoinerTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0D73AC9125DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.xib */; };
 		92DBE8DE2ACA98CF007D873C /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8DF2ACA98CF007D873C /* AmitySDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45D45B726204253008F7C2C /* AmitySDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E02ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -96,40 +28,17 @@
 		92DBE8E32ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E42ACA98CF007D873C /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45B3A93264A840300F6FF52 /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E52ACA98CF007D873C /* AmityUIKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		97F101F526A69FBF00AD84A1 /* CustomChannelEventHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F101F426A69FBF00AD84A1 /* CustomChannelEventHandler.swift */; };
-		A03190A7272169C1008A85DC /* PostCreatorSettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */; };
 		A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; };
 		A0BD0B4926DDE0E30054088B /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A9FF80E62BBD10010088A317 /* LiveChatListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF80E52BBD10010088A317 /* LiveChatListView.swift */; };
-		A9FF80ED2BBD55870088A317 /* LiveChatListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF80E52BBD10010088A317 /* LiveChatListView.swift */; };
-		B72861D924C573B100ECC563 /* TabbarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72861D824C573B100ECC563 /* TabbarViewController.swift */; };
-		B72CDA3B256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B72CDA39256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift */; };
-		B72CDA3C256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = B72CDA3A256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib */; };
-		B74ADE5E24F3B026009C86DA /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = B74ADE5D24F3B026009C86DA /* UserDefaults.swift */; };
-		B754DBEC24C6F6B5005A8282 /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B754DBEB24C6F6B5005A8282 /* SettingViewController.swift */; };
-		B754DBEE24C6F6BB005A8282 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B754DBED24C6F6BB005A8282 /* RegisterViewController.swift */; };
-		B78DA47924BED7D300EE902B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA47824BED7D300EE902B /* AppDelegate.swift */; };
-		B78DA47B24BED7D300EE902B /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA47A24BED7D300EE902B /* SceneDelegate.swift */; };
-		B78DA48024BED7D300EE902B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B78DA47E24BED7D300EE902B /* Main.storyboard */; };
-		B78DA48224BED7DA00EE902B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B78DA48124BED7DA00EE902B /* Assets.xcassets */; };
-		B78DA48524BED7DA00EE902B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B78DA48324BED7DA00EE902B /* LaunchScreen.storyboard */; };
 		B78DA49024BED7DA00EE902B /* SampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA48F24BED7DA00EE902B /* SampleAppTests.swift */; };
 		B78DA49B24BED7DA00EE902B /* SampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */; };
-		B78DA4AF24BED89000EE902B /* FeatureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA4AE24BED89000EE902B /* FeatureViewController.swift */; };
-		B78DA4B124BEDBC500EE902B /* CommunityFeatureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA4B024BEDBC500EE902B /* CommunityFeatureViewController.swift */; };
-		B78DA4B324BEDBD100EE902B /* ChatFeatureViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA4B224BEDBD100EE902B /* ChatFeatureViewController.swift */; };
-		B78FC54024CAAA2F0083CBB4 /* UserDefault.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78FC53D24CAAA2F0083CBB4 /* UserDefault.swift */; };
-		B78FC54124CAAA2F0083CBB4 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78FC53F24CAAA2F0083CBB4 /* Theme.swift */; };
 		D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; };
 		D478D16A26240A5E006EA140 /* AmityUIKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		D495077425E637C1005C033F /* DataListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D495077325E637C1005C033F /* DataListViewController.swift */; };
-		D4AFF1CE25ECE8AD002C001C /* PostPreviewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = D4AFF1CC25ECE8AD002C001C /* PostPreviewTableViewCell.xib */; };
-		D4AFF1CF25ECE8AD002C001C /* PostPreviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */; };
-		D4AFF23225ED1E7C002C001C /* GlobalPostsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */; };
-		D4AFF23625ED1F88002C001C /* GlobalPostsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */; };
-		ED2386B32EDEE97200FC819E /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED2386B22EDEE97200FC819E /* SharedFrameworks */; };
-		EDF77D6E2E841857005776DA /* GuestLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF77D6D2E841857005776DA /* GuestLoginView.swift */; };
-		EDF77D6F2E841857005776DA /* GuestLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF77D6D2E841857005776DA /* GuestLoginView.swift */; };
+		ED32E6F92EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */; };
+		ED32E6FA2EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		ED32E6FB2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; };
+		ED32E6FC2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		ED98C23F2EFC16DA0086B4A5 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED98C23E2EFC16DA0086B4A5 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -158,9 +67,11 @@
 			files = (
 				92DBE8DE2ACA98CF007D873C /* AmityUIKitLiveStream.framework in Embed Frameworks */,
 				92DBE8DF2ACA98CF007D873C /* AmitySDK.xcframework in Embed Frameworks */,
+				ED32E6FC2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Embed Frameworks */,
 				92DBE8E02ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */,
 				92DBE8E12ACA98CF007D873C /* RealmSwift.xcframework in Embed Frameworks */,
 				92DBE8E22ACA98CF007D873C /* MobileVLCKit.xcframework in Embed Frameworks */,
+				ED32E6FA2EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Embed Frameworks */,
 				682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */,
 				92DBE8E32ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Embed Frameworks */,
 				92DBE8E42ACA98CF007D873C /* Realm.xcframework in Embed Frameworks */,
@@ -185,19 +96,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0D73AC8B25DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmityPostThumbsupTableViewCell.swift; sourceTree = "<group>"; };
-		0D73AC8C25DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AmityPostThumbsupTableViewCell.xib; sourceTree = "<group>"; };
-		0D73AC8E25DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmityPostBirthdayTableViewCell.swift; sourceTree = "<group>"; };
-		0D73AC8F25DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AmityPostBirthdayTableViewCell.xib; sourceTree = "<group>"; };
-		0D73AC9125DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AmityPostNewJoinerTableViewCell.xib; sourceTree = "<group>"; };
-		0D73AC9225DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AmityPostNewJoinerTableViewCell.swift; sourceTree = "<group>"; };
-		0D73AC9D25DB9332000D73CA /* BirthdayPostComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirthdayPostComponent.swift; sourceTree = "<group>"; };
-		0D73ACA325DB93A2000D73CA /* ThumbsupPostComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbsupPostComponent.swift; sourceTree = "<group>"; };
-		0D73ACA725DB9423000D73CA /* NewJoinerPostComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewJoinerPostComponent.swift; sourceTree = "<group>"; };
-		0D8FFC2725DCBFD900943538 /* AmityCustomFooterTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityCustomFooterTableViewCell.swift; sourceTree = "<group>"; };
-		0D8FFC2825DCBFD900943538 /* AmityCustomFooterTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AmityCustomFooterTableViewCell.xib; sourceTree = "<group>"; };
-		680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
-		684097552B30607F00697E1B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		684187EE2EA621F6000D4C6A /* AmityLiveKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityLiveKit.xcframework; path = /Users/zayar/Desktop/Amity/EkoMessagingSDKUIKitIOS/UpstraUIKit/AmityUIKit4/../../../../../Downloads/AmityLiveKit.xcframework; sourceTree = "<absolute>"; };
+		684187F12EA62203000D4C6A /* LiveKitWebRTC.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LiveKitWebRTC.xcframework; path = /Users/zayar/Desktop/Amity/EkoMessagingSDKUIKitIOS/UpstraUIKit/AmityUIKit4/../../../../../Downloads/LiveKitWebRTC.xcframework; sourceTree = "<absolute>"; };
 		684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		684AE1302B0C8CB900FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -205,60 +105,46 @@
 		688F8617299E409B000FE6E7 /* SharedFrameworks */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SharedFrameworks; path = ../SharedFrameworks; sourceTree = "<group>"; };
 		68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Eko Corporation Company Limited"; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = ../Shared/RealmSwift.xcframework; sourceTree = "<group>"; };
 		68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLevelPushNotificationsTableViewController.swift; sourceTree = "<group>"; };
-		7214C9D62632C0AD00192BB3 /* NotificationModuleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationModuleTableViewCell.swift; sourceTree = "<group>"; };
-		7214C9DA2632C0D500192BB3 /* SwitchTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchTableViewCell.swift; sourceTree = "<group>"; };
-		721AF3C326088849005BA15F /* CustomEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomEventHandler.swift; sourceTree = "<group>"; };
-		721AF3C926088884005BA15F /* CustomFeedEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomFeedEventHandler.swift; sourceTree = "<group>"; };
-		72363461260877D600CEB2B5 /* SampleApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SampleApp.entitlements; sourceTree = "<group>"; };
-		724C25F3274CE38B0058B066 /* SamplePageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplePageViewController.swift; sourceTree = "<group>"; };
-		7288E96B2630139E004535DD /* AppManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppManager.swift; sourceTree = "<group>"; };
-		729CAF3D273CC8ED000AE162 /* Binding+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Extension.swift"; sourceTree = "<group>"; };
-		729CAF41273CC95B000AE162 /* EndpointManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointManager.swift; sourceTree = "<group>"; };
-		72AACE0A273931F100E59D55 /* EndpointsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndpointsView.swift; sourceTree = "<group>"; };
+		68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityLiveKit.xcframework; path = ../Shared/AmityLiveKit.xcframework; sourceTree = "<group>"; };
+		68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LiveKitWebRTC.xcframework; path = ../Shared/LiveKitWebRTC.xcframework; sourceTree = "<group>"; };
 		92DBE8E92ACA98CF007D873C /* SampleAppDistribution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleAppDistribution.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		97F101F426A69FBF00AD84A1 /* CustomChannelEventHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomChannelEventHandler.swift; sourceTree = "<group>"; };
-		A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCreatorSettingsPage.swift; sourceTree = "<group>"; };
 		A0BD0B3B26DDDFCC0054088B /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityLiveVideoBroadcastKit.xcframework; path = ../Shared/AmityLiveVideoBroadcastKit.xcframework; sourceTree = "<group>"; };
 		A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityVideoPlayerKit.xcframework; path = ../Shared/AmityVideoPlayerKit.xcframework; sourceTree = "<group>"; };
 		A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = ../Shared/MobileVLCKit.xcframework; sourceTree = "<group>"; };
 		A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A9FF80E52BBD10010088A317 /* LiveChatListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveChatListView.swift; sourceTree = "<group>"; };
-		B72861D824C573B100ECC563 /* TabbarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabbarViewController.swift; sourceTree = "<group>"; };
-		B72CDA39256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomMessageTextIncomingTableViewCell.swift; sourceTree = "<group>"; };
-		B72CDA3A256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomMessageTextIncomingTableViewCell.xib; sourceTree = "<group>"; };
-		B74ADE5D24F3B026009C86DA /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
-		B754DBEB24C6F6B5005A8282 /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
-		B754DBED24C6F6BB005A8282 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		B78DA47524BED7D300EE902B /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		B78DA47824BED7D300EE902B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B78DA47A24BED7D300EE902B /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		B78DA47F24BED7D300EE902B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		B78DA48124BED7DA00EE902B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B78DA48424BED7DA00EE902B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		B78DA48624BED7DA00EE902B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B78DA48B24BED7DA00EE902B /* SampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B78DA48F24BED7DA00EE902B /* SampleAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppTests.swift; sourceTree = "<group>"; };
 		B78DA49124BED7DA00EE902B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B78DA49624BED7DA00EE902B /* SampleAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SampleAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppUITests.swift; sourceTree = "<group>"; };
 		B78DA49C24BED7DA00EE902B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B78DA4AE24BED89000EE902B /* FeatureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureViewController.swift; sourceTree = "<group>"; };
-		B78DA4B024BEDBC500EE902B /* CommunityFeatureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunityFeatureViewController.swift; sourceTree = "<group>"; };
-		B78DA4B224BEDBD100EE902B /* ChatFeatureViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatFeatureViewController.swift; sourceTree = "<group>"; };
-		B78FC53D24CAAA2F0083CBB4 /* UserDefault.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefault.swift; sourceTree = "<group>"; };
-		B78FC53F24CAAA2F0083CBB4 /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		D45B3A93264A840300F6FF52 /* Realm.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Amity Technologies (Thailand) Co., Ltd."; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = ../Shared/Realm.xcframework; sourceTree = "<group>"; };
 		D45D45B726204253008F7C2C /* AmitySDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmitySDK.xcframework; path = ../Shared/AmitySDK.xcframework; sourceTree = "<group>"; };
 		D478D153262409E5006EA140 /* AmityUIKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D495077325E637C1005C033F /* DataListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataListViewController.swift; sourceTree = "<group>"; };
-		D4AFF1CC25ECE8AD002C001C /* PostPreviewTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PostPreviewTableViewCell.xib; sourceTree = "<group>"; };
-		D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostPreviewTableViewCell.swift; sourceTree = "<group>"; };
-		D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalPostsFeedViewController.swift; sourceTree = "<group>"; };
-		D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalPostsDataSource.swift; sourceTree = "<group>"; };
-		EDF77D6D2E841857005776DA /* GuestLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestLoginView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		ED32E6F72EE03EE600AACA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = B78DA47424BED7D300EE902B /* SampleApp */;
+		};
+		ED32E6F82EE03EE600AACA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 92DBE8A22ACA98CF007D873C /* SampleAppDistribution */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		ED32E6922EE03EE600AACA20 /* SampleApp */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (ED32E6F72EE03EE600AACA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ED32E6F82EE03EE600AACA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = SampleApp; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		92DBE8C92ACA98CF007D873C /* Frameworks */ = {
@@ -266,6 +152,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				92DBE8CA2ACA98CF007D873C /* AmityUIKitLiveStream.framework in Frameworks */,
+				ED32E6F92EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Frameworks */,
 				92DBE8CB2ACA98CF007D873C /* AmitySDK.xcframework in Frameworks */,
 				92DBE8CC2ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */,
 				92DBE8CD2ACA98CF007D873C /* RealmSwift.xcframework in Frameworks */,
@@ -275,6 +162,7 @@
 				682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */,
 				92DBE8D12ACA98CF007D873C /* Realm.xcframework in Frameworks */,
 				92DBE8D22ACA98CF007D873C /* AmityUIKit.framework in Frameworks */,
+				ED32E6FB2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,7 +170,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED2386B32EDEE97200FC819E /* SharedFrameworks in Frameworks */,
+				ED98C23F2EFC16DA0086B4A5 /* SharedFrameworks in Frameworks */,
 				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
@@ -306,72 +194,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		0D73AC8925DB8C61000D73CA /* Custom Post */ = {
-			isa = PBXGroup;
-			children = (
-				0D73AC9C25DB931F000D73CA /* Components */,
-				0D73AC9B25DB9316000D73CA /* Cells */,
-			);
-			path = "Custom Post";
-			sourceTree = "<group>";
-		};
-		0D73AC8A25DB8CB5000D73CA /* Thumbsup */ = {
-			isa = PBXGroup;
-			children = (
-				0D73AC8B25DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.swift */,
-				0D73AC8C25DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.xib */,
-			);
-			path = Thumbsup;
-			sourceTree = "<group>";
-		};
-		0D73AC8D25DB8CB5000D73CA /* Birthday */ = {
-			isa = PBXGroup;
-			children = (
-				0D73AC8E25DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.swift */,
-				0D73AC8F25DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.xib */,
-			);
-			path = Birthday;
-			sourceTree = "<group>";
-		};
-		0D73AC9025DB8CB5000D73CA /* New Joiner */ = {
-			isa = PBXGroup;
-			children = (
-				0D73AC9225DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.swift */,
-				0D73AC9125DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.xib */,
-			);
-			path = "New Joiner";
-			sourceTree = "<group>";
-		};
-		0D73AC9B25DB9316000D73CA /* Cells */ = {
-			isa = PBXGroup;
-			children = (
-				0D8FFC2F25DCC00800943538 /* Footer */,
-				0D73AC8D25DB8CB5000D73CA /* Birthday */,
-				0D73AC9025DB8CB5000D73CA /* New Joiner */,
-				0D73AC8A25DB8CB5000D73CA /* Thumbsup */,
-			);
-			path = Cells;
-			sourceTree = "<group>";
-		};
-		0D73AC9C25DB931F000D73CA /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				0D73AC9D25DB9332000D73CA /* BirthdayPostComponent.swift */,
-				0D73ACA325DB93A2000D73CA /* ThumbsupPostComponent.swift */,
-				0D73ACA725DB9423000D73CA /* NewJoinerPostComponent.swift */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		0D8FFC2F25DCC00800943538 /* Footer */ = {
-			isa = PBXGroup;
-			children = (
-				0D8FFC2725DCBFD900943538 /* AmityCustomFooterTableViewCell.swift */,
-				0D8FFC2825DCBFD900943538 /* AmityCustomFooterTableViewCell.xib */,
-			);
-			path = Footer;
-			sourceTree = "<group>";
-		};
 		688F8616299E409B000FE6E7 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
@@ -380,75 +202,11 @@
 			name = Packages;
 			sourceTree = "<group>";
 		};
-		7214C9D32632C05600192BB3 /* User Level Notifications */ = {
-			isa = PBXGroup;
-			children = (
-				7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */,
-				7214C9D62632C0AD00192BB3 /* NotificationModuleTableViewCell.swift */,
-				7214C9DA2632C0D500192BB3 /* SwitchTableViewCell.swift */,
-			);
-			path = "User Level Notifications";
-			sourceTree = "<group>";
-		};
-		721AF3C226088830005BA15F /* EventHandler */ = {
-			isa = PBXGroup;
-			children = (
-				721AF3C326088849005BA15F /* CustomEventHandler.swift */,
-				721AF3C926088884005BA15F /* CustomFeedEventHandler.swift */,
-				97F101F426A69FBF00AD84A1 /* CustomChannelEventHandler.swift */,
-			);
-			path = EventHandler;
-			sourceTree = "<group>";
-		};
-		724C25F2274CE3770058B066 /* Intregrated Page */ = {
-			isa = PBXGroup;
-			children = (
-				724C25F3274CE38B0058B066 /* SamplePageViewController.swift */,
-			);
-			path = "Intregrated Page";
-			sourceTree = "<group>";
-		};
-		729CAF3F273CC913000AE162 /* Endpoint Settings */ = {
-			isa = PBXGroup;
-			children = (
-				72AACE0A273931F100E59D55 /* EndpointsView.swift */,
-			);
-			path = "Endpoint Settings";
-			sourceTree = "<group>";
-		};
-		729CAF40273CC93D000AE162 /* Manager */ = {
-			isa = PBXGroup;
-			children = (
-				7288E96B2630139E004535DD /* AppManager.swift */,
-				729CAF41273CC95B000AE162 /* EndpointManager.swift */,
-			);
-			path = Manager;
-			sourceTree = "<group>";
-		};
-		A03190A527216946008A85DC /* Post Creator Settings */ = {
-			isa = PBXGroup;
-			children = (
-				A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */,
-			);
-			path = "Post Creator Settings";
-			sourceTree = "<group>";
-		};
-		B72CDA38256B9BC100F7CAC3 /* Custom Cell */ = {
-			isa = PBXGroup;
-			children = (
-				D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */,
-				D4AFF1CC25ECE8AD002C001C /* PostPreviewTableViewCell.xib */,
-				B72CDA39256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift */,
-				B72CDA3A256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib */,
-			);
-			path = "Custom Cell";
-			sourceTree = "<group>";
-		};
 		B78DA46C24BED7D300EE902B = {
 			isa = PBXGroup;
 			children = (
 				688F8616299E409B000FE6E7 /* Packages */,
-				B78DA47724BED7D300EE902B /* SampleApp */,
+				ED32E6922EE03EE600AACA20 /* SampleApp */,
 				B78DA48E24BED7DA00EE902B /* SampleAppTests */,
 				B78DA49924BED7DA00EE902B /* SampleAppUITests */,
 				B78DA47624BED7D300EE902B /* Products */,
@@ -465,25 +223,6 @@
 				92DBE8E92ACA98CF007D873C /* SampleAppDistribution.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		B78DA47724BED7D300EE902B /* SampleApp */ = {
-			isa = PBXGroup;
-			children = (
-				684097552B30607F00697E1B /* GoogleService-Info.plist */,
-				72363461260877D600CEB2B5 /* SampleApp.entitlements */,
-				721AF3C226088830005BA15F /* EventHandler */,
-				B78FC53C24CAAA2F0083CBB4 /* Extension */,
-				B78FC53E24CAAA2F0083CBB4 /* Utils */,
-				B78DA4AD24BED88000EE902B /* Feature */,
-				729CAF40273CC93D000AE162 /* Manager */,
-				B78DA47824BED7D300EE902B /* AppDelegate.swift */,
-				B78DA47A24BED7D300EE902B /* SceneDelegate.swift */,
-				B78DA48124BED7DA00EE902B /* Assets.xcassets */,
-				B78DA48324BED7DA00EE902B /* LaunchScreen.storyboard */,
-				B78DA48624BED7DA00EE902B /* Info.plist */,
-			);
-			path = SampleApp;
 			sourceTree = "<group>";
 		};
 		B78DA48E24BED7DA00EE902B /* SampleAppTests */ = {
@@ -507,6 +246,10 @@
 		B78DA4A824BED83100EE902B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				684187F12EA62203000D4C6A /* LiveKitWebRTC.xcframework */,
+				684187EE2EA621F6000D4C6A /* AmityLiveKit.xcframework */,
+				68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */,
+				68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */,
 				68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */,
 				684AE1402B0C9B4E00FD7270 /* AmityUIKit4.framework */,
 				684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */,
@@ -523,50 +266,6 @@
 				D45D45B726204253008F7C2C /* AmitySDK.xcframework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		B78DA4AD24BED88000EE902B /* Feature */ = {
-			isa = PBXGroup;
-			children = (
-				724C25F2274CE3770058B066 /* Intregrated Page */,
-				A03190A527216946008A85DC /* Post Creator Settings */,
-				7214C9D32632C05600192BB3 /* User Level Notifications */,
-				0D73AC8925DB8C61000D73CA /* Custom Post */,
-				B72CDA38256B9BC100F7CAC3 /* Custom Cell */,
-				729CAF3F273CC913000AE162 /* Endpoint Settings */,
-				B78DA47E24BED7D300EE902B /* Main.storyboard */,
-				B72861D824C573B100ECC563 /* TabbarViewController.swift */,
-				B78DA4AE24BED89000EE902B /* FeatureViewController.swift */,
-				B78DA4B024BEDBC500EE902B /* CommunityFeatureViewController.swift */,
-				B78DA4B224BEDBD100EE902B /* ChatFeatureViewController.swift */,
-				B754DBEB24C6F6B5005A8282 /* SettingViewController.swift */,
-				B754DBED24C6F6BB005A8282 /* RegisterViewController.swift */,
-				D495077325E637C1005C033F /* DataListViewController.swift */,
-				D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */,
-				D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */,
-				A9FF80E52BBD10010088A317 /* LiveChatListView.swift */,
-				EDF77D6D2E841857005776DA /* GuestLoginView.swift */,
-			);
-			path = Feature;
-			sourceTree = "<group>";
-		};
-		B78FC53C24CAAA2F0083CBB4 /* Extension */ = {
-			isa = PBXGroup;
-			children = (
-				B78FC53D24CAAA2F0083CBB4 /* UserDefault.swift */,
-				729CAF3D273CC8ED000AE162 /* Binding+Extension.swift */,
-				680DC0022C8ABE09006D8764 /* UIDevice+Extension.swift */,
-			);
-			path = Extension;
-			sourceTree = "<group>";
-		};
-		B78FC53E24CAAA2F0083CBB4 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				B78FC53F24CAAA2F0083CBB4 /* Theme.swift */,
-				B74ADE5D24F3B026009C86DA /* UserDefaults.swift */,
-			);
-			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -586,6 +285,9 @@
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				ED32E6922EE03EE600AACA20 /* SampleApp */,
+			);
 			name = SampleAppDistribution;
 			packageProductDependencies = (
 				92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */,
@@ -602,14 +304,18 @@
 				B78DA47224BED7D300EE902B /* Frameworks */,
 				B78DA47324BED7D300EE902B /* Resources */,
 				A052EAF42577A6B700FF9312 /* Embed Frameworks */,
+				ED2392EF2EDEF13400FC819E /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
+			fileSystemSynchronizedGroups = (
+				ED32E6922EE03EE600AACA20 /* SampleApp */,
+			);
 			name = SampleApp;
 			packageProductDependencies = (
-				ED2386B22EDEE97200FC819E /* SharedFrameworks */,
+				ED98C23E2EFC16DA0086B4A5 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -703,16 +409,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92DBE8D42ACA98CF007D873C /* LaunchScreen.storyboard in Resources */,
-				92DBE8D52ACA98CF007D873C /* AmityPostThumbsupTableViewCell.xib in Resources */,
-				92DBE8D62ACA98CF007D873C /* AmityCustomFooterTableViewCell.xib in Resources */,
-				92DBE8D72ACA98CF007D873C /* Assets.xcassets in Resources */,
-				92DBE8D82ACA98CF007D873C /* Main.storyboard in Resources */,
-				92DBE8D92ACA98CF007D873C /* AmityPostBirthdayTableViewCell.xib in Resources */,
-				92DBE8DA2ACA98CF007D873C /* PostPreviewTableViewCell.xib in Resources */,
-				684097562B30607F00697E1B /* GoogleService-Info.plist in Resources */,
-				92DBE8DB2ACA98CF007D873C /* CustomMessageTextIncomingTableViewCell.xib in Resources */,
-				92DBE8DC2ACA98CF007D873C /* AmityPostNewJoinerTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -720,15 +416,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B78DA48524BED7DA00EE902B /* LaunchScreen.storyboard in Resources */,
-				0D73AC9425DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.xib in Resources */,
-				0D8FFC2A25DCBFD900943538 /* AmityCustomFooterTableViewCell.xib in Resources */,
-				B78DA48224BED7DA00EE902B /* Assets.xcassets in Resources */,
-				B78DA48024BED7D300EE902B /* Main.storyboard in Resources */,
-				0D73AC9625DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.xib in Resources */,
-				D4AFF1CE25ECE8AD002C001C /* PostPreviewTableViewCell.xib in Resources */,
-				B72CDA3C256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.xib in Resources */,
-				0D73AC9725DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -771,6 +458,23 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${BUILD_DIR%/Build/*}/SourcePackages/checkouts/firebase-ios-sdk/Crashlytics/run\"\n";
 		};
+		ED2392EF2EDEF13400FC819E /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/bash\nGIT_HASH=$(git rev-parse --short HEAD)\n\n# Write directly to a generated file\ncat > \"${SRCROOT}/SampleApp/BuildInfo.swift\" << EOF\n// You can safely ignore the content of this file. All content is generated automatically from run script.\nenum BuildInfo {\n    static let gitHash = \"${GIT_HASH}\"\n}\nEOF\n";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -778,44 +482,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				680DC0042C8AC2B2006D8764 /* UIDevice+Extension.swift in Sources */,
-				92DBE8A62ACA98CF007D873C /* DataListViewController.swift in Sources */,
-				92DBE8A72ACA98CF007D873C /* SamplePageViewController.swift in Sources */,
-				92DBE8A82ACA98CF007D873C /* PostCreatorSettingsPage.swift in Sources */,
-				92DBE8A92ACA98CF007D873C /* UserLevelPushNotificationsTableViewController.swift in Sources */,
-				92DBE8AA2ACA98CF007D873C /* FeatureViewController.swift in Sources */,
-				92DBE8AB2ACA98CF007D873C /* AppDelegate.swift in Sources */,
-				92DBE8AC2ACA98CF007D873C /* AmityPostBirthdayTableViewCell.swift in Sources */,
-				92DBE8AD2ACA98CF007D873C /* AmityPostThumbsupTableViewCell.swift in Sources */,
-				92DBE8AE2ACA98CF007D873C /* AmityPostNewJoinerTableViewCell.swift in Sources */,
-				92DBE8AF2ACA98CF007D873C /* TabbarViewController.swift in Sources */,
-				92DBE8B02ACA98CF007D873C /* GlobalPostsFeedViewController.swift in Sources */,
-				92DBE8B12ACA98CF007D873C /* BirthdayPostComponent.swift in Sources */,
-				92DBE8B22ACA98CF007D873C /* PostPreviewTableViewCell.swift in Sources */,
-				92DBE8B32ACA98CF007D873C /* GlobalPostsDataSource.swift in Sources */,
-				92DBE8B42ACA98CF007D873C /* UserDefaults.swift in Sources */,
-				92DBE8B52ACA98CF007D873C /* RegisterViewController.swift in Sources */,
-				A9FF80ED2BBD55870088A317 /* LiveChatListView.swift in Sources */,
-				92DBE8B62ACA98CF007D873C /* SceneDelegate.swift in Sources */,
-				92DBE8B72ACA98CF007D873C /* AmityCustomFooterTableViewCell.swift in Sources */,
-				92DBE8B82ACA98CF007D873C /* NotificationModuleTableViewCell.swift in Sources */,
-				92DBE8B92ACA98CF007D873C /* UserDefault.swift in Sources */,
-				92DBE8BA2ACA98CF007D873C /* CustomChannelEventHandler.swift in Sources */,
-				92DBE8BB2ACA98CF007D873C /* NewJoinerPostComponent.swift in Sources */,
-				92DBE8BC2ACA98CF007D873C /* SwitchTableViewCell.swift in Sources */,
-				92DBE8BD2ACA98CF007D873C /* Binding+Extension.swift in Sources */,
-				92DBE8BE2ACA98CF007D873C /* CustomMessageTextIncomingTableViewCell.swift in Sources */,
-				92DBE8BF2ACA98CF007D873C /* CommunityFeatureViewController.swift in Sources */,
-				92DBE8C02ACA98CF007D873C /* AppManager.swift in Sources */,
-				92DBE8C12ACA98CF007D873C /* CustomFeedEventHandler.swift in Sources */,
-				92DBE8C22ACA98CF007D873C /* Theme.swift in Sources */,
-				EDF77D6F2E841857005776DA /* GuestLoginView.swift in Sources */,
-				92DBE8C32ACA98CF007D873C /* SettingViewController.swift in Sources */,
-				92DBE8C42ACA98CF007D873C /* ThumbsupPostComponent.swift in Sources */,
-				92DBE8C52ACA98CF007D873C /* EndpointsView.swift in Sources */,
-				92DBE8C62ACA98CF007D873C /* EndpointManager.swift in Sources */,
-				92DBE8C72ACA98CF007D873C /* CustomEventHandler.swift in Sources */,
-				92DBE8C82ACA98CF007D873C /* ChatFeatureViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -823,44 +489,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D495077425E637C1005C033F /* DataListViewController.swift in Sources */,
-				724C25F4274CE38B0058B066 /* SamplePageViewController.swift in Sources */,
-				A03190A7272169C1008A85DC /* PostCreatorSettingsPage.swift in Sources */,
-				7214C9CB2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift in Sources */,
-				B78DA4AF24BED89000EE902B /* FeatureViewController.swift in Sources */,
-				B78DA47924BED7D300EE902B /* AppDelegate.swift in Sources */,
-				680DC0032C8ABE09006D8764 /* UIDevice+Extension.swift in Sources */,
-				0D73AC9525DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.swift in Sources */,
-				0D73AC9325DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.swift in Sources */,
-				0D73AC9825DB8CB5000D73CA /* AmityPostNewJoinerTableViewCell.swift in Sources */,
-				B72861D924C573B100ECC563 /* TabbarViewController.swift in Sources */,
-				D4AFF23225ED1E7C002C001C /* GlobalPostsFeedViewController.swift in Sources */,
-				0D73AC9E25DB9332000D73CA /* BirthdayPostComponent.swift in Sources */,
-				D4AFF1CF25ECE8AD002C001C /* PostPreviewTableViewCell.swift in Sources */,
-				D4AFF23625ED1F88002C001C /* GlobalPostsDataSource.swift in Sources */,
-				B74ADE5E24F3B026009C86DA /* UserDefaults.swift in Sources */,
-				B754DBEE24C6F6BB005A8282 /* RegisterViewController.swift in Sources */,
-				A9FF80E62BBD10010088A317 /* LiveChatListView.swift in Sources */,
-				B78DA47B24BED7D300EE902B /* SceneDelegate.swift in Sources */,
-				0D8FFC2925DCBFD900943538 /* AmityCustomFooterTableViewCell.swift in Sources */,
-				7214C9D72632C0AD00192BB3 /* NotificationModuleTableViewCell.swift in Sources */,
-				B78FC54024CAAA2F0083CBB4 /* UserDefault.swift in Sources */,
-				97F101F526A69FBF00AD84A1 /* CustomChannelEventHandler.swift in Sources */,
-				0D73ACA825DB9423000D73CA /* NewJoinerPostComponent.swift in Sources */,
-				7214C9DB2632C0D500192BB3 /* SwitchTableViewCell.swift in Sources */,
-				729CAF3E273CC8ED000AE162 /* Binding+Extension.swift in Sources */,
-				B72CDA3B256B9BEB00F7CAC3 /* CustomMessageTextIncomingTableViewCell.swift in Sources */,
-				B78DA4B124BEDBC500EE902B /* CommunityFeatureViewController.swift in Sources */,
-				7288E96C2630139E004535DD /* AppManager.swift in Sources */,
-				721AF3CA26088884005BA15F /* CustomFeedEventHandler.swift in Sources */,
-				B78FC54124CAAA2F0083CBB4 /* Theme.swift in Sources */,
-				EDF77D6E2E841857005776DA /* GuestLoginView.swift in Sources */,
-				B754DBEC24C6F6B5005A8282 /* SettingViewController.swift in Sources */,
-				0D73ACA425DB93A2000D73CA /* ThumbsupPostComponent.swift in Sources */,
-				72AACE0B273931F100E59D55 /* EndpointsView.swift in Sources */,
-				729CAF42273CC95B000AE162 /* EndpointManager.swift in Sources */,
-				721AF3C426088849005BA15F /* CustomEventHandler.swift in Sources */,
-				B78DA4B324BEDBD100EE902B /* ChatFeatureViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -894,25 +522,6 @@
 			targetProxy = B78DA49724BED7DA00EE902B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		B78DA47E24BED7D300EE902B /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B78DA47F24BED7D300EE902B /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		B78DA48324BED7DA00EE902B /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				B78DA48424BED7DA00EE902B /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		92DBE8E72ACA98CF007D873C /* Debug */ = {
@@ -1147,7 +756,6 @@
 		B78DA4A324BED7DA00EE902B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = SampleAppTests/Info.plist;
@@ -1168,7 +776,6 @@
 		B78DA4A424BED7DA00EE902B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = SampleAppTests/Info.plist;
@@ -1189,7 +796,6 @@
 		B78DA4A624BED7DA00EE902B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = SampleAppUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1208,7 +814,6 @@
 		B78DA4A724BED7DA00EE902B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = SampleAppUITests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1299,7 +904,7 @@
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
 		};
-		ED2386B22EDEE97200FC819E /* SharedFrameworks */ = {
+		ED98C23E2EFC16DA0086B4A5 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

@@ -98,6 +98,7 @@ class AppManager {
                 UIApplication.shared.windows.first?.rootViewController = TabbarViewController()
                 UIApplication.shared.windows.first?.makeKeyAndVisible()
             } catch {
+                print("Could not register user \(error.localizedDescription)")
                 AmityHUD.show(.error(message: "Could not register user: \(error.localizedDescription)"))
             }
         }
@@ -193,7 +194,7 @@ class CustomV4LivestreamBehavior: AmityLivestreamBehavior {
     
     override func createLivestreamPlayer(stream: AmityStream, client: AmityClient, isPlaying: Bool) -> any View {
         #if canImport(AmityUIKitLiveStream)
-        return AmityUIKit4.LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
+        return EmptyView()
         #else
         print("AmityUIKit4 supports watching live stream from the same framework")
         return AmityUIKit4.LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)

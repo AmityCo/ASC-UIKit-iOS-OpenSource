@@ -12,6 +12,7 @@ class PollPostComposerViewModel: ObservableObject {
     
     let targetId: String?
     let targetType: AmityPostTargetType
+    let event: AmityEvent?
     
     let pollManager = PollManager()
     let postManager = PostManager()
@@ -24,15 +25,21 @@ class PollPostComposerViewModel: ObservableObject {
     
     let fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
     
-    init(targetId: String?, targetType: AmityPostTargetType) {
+    init(targetId: String?, targetType: AmityPostTargetType, event: AmityEvent?) {
         self.targetId = targetId
         self.targetType = targetType
+        self.event = event
         self.setupTarget(targetType: targetType, targetId: targetId)
     }
     
     func setupTarget(targetType: AmityPostTargetType, targetId: String?) {
         switch targetType {
         case .community:
+            if let event {
+                self.pollTarget = event.title
+                return
+            }
+            
             if let targetId, let community = communityManager.getCommunity(withId: targetId).snapshot {
                 self.pollTarget = community.displayName
             }

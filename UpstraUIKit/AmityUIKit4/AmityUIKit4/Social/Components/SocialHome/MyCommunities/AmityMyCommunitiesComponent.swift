@@ -29,6 +29,28 @@ public struct AmityMyCommunitiesComponent: AmityComponentView {
     public var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
+                HStack(spacing: 16) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color(viewConfig.theme.baseColorShade4))
+                        .frame(size: CGSize(width: 80, height: 80))
+                        .clipped()
+                        .overlay(
+                            Image(AmityIcon.plusIcon.imageResource)
+                        )
+                    
+                    Text("Create community")
+                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                        .lineLimit(1)
+                    
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(Color(viewConfig.theme.backgroundColor))
+                .onTapGesture {
+                    AmityUIKitManagerInternal.shared.behavior.myCommunitiesComponentBehavior?.goToCommunitySetupPage(context: .init(component: self))
+                }
+                
                 if viewModel.loadingStatus == .loading && viewModel.communities.isEmpty {
                     ForEach(0..<8, id: \.self) { _ in
                         CommunityCellSkeletonView()
@@ -55,8 +77,10 @@ public struct AmityMyCommunitiesComponent: AmityComponentView {
             .background(Color(viewConfig.theme.backgroundColor))
         }
         .updateTheme(with: viewConfig)
+        .onAppear{
+            viewModel.loadCommunities()
+        }
     }
-    
 }
 
 class AmityMyCommunitiesComponentViewModel: ObservableObject {
@@ -69,6 +93,9 @@ class AmityMyCommunitiesComponentViewModel: ObservableObject {
     
     init() {
         communityCollection = communityManager.getCommunities(filter: .userIsMember)
+    }
+    
+    func loadCommunities() {
         loadingCancellable = communityCollection.$loadingStatus
             .sink(receiveValue: { [weak self] status in
                 self?.loadingStatus = status
@@ -79,7 +106,6 @@ class AmityMyCommunitiesComponentViewModel: ObservableObject {
                 self?.communities = communities
             }
     }
-    
     
     func loadMore() {
         if communityCollection.hasNext {

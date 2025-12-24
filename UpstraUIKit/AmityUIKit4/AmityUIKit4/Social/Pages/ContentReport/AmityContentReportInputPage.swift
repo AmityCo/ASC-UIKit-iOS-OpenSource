@@ -55,9 +55,10 @@ struct AmityContentReportInputPage: View {
                             .dividerColor(viewConfig.theme.baseColorShade4)
                             .titleTextColor(viewConfig.theme.baseColor)
                             .infoTextColor(viewConfig.theme.baseColorShade2)
-                            .textFieldTextColor(viewConfig.theme.baseColorShade2)
+                            .textFieldTextColor(viewConfig.theme.baseColor)
                             .padding(.top, 24)
                             .padding([.horizontal, .bottom], 16)
+                            .focused()
                         
                         Spacer()
                         
@@ -75,7 +76,7 @@ struct AmityContentReportInputPage: View {
                                 }
                             }
                         }
-                        .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig))
+                        .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig, backgroundColor: viewConfig.theme.primaryColor))
                         .disabled(viewModel.submissionState == .submitting)
                         .padding(16)
                     }

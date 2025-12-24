@@ -10,24 +10,13 @@ import SwiftUI
 public struct AmityCommunityVideoFeedComponent: AmityComponentView {
     public var pageId: PageId?
     @StateObject private var viewModel: MediaFeedViewModel
-    @StateObject private var viewConfig: AmityViewConfigController
-    
-    @State private var currentTab: VideoFeedTab = .videos
-    
+        
     public var id: ComponentId {
         .communityVideoFeed
     }
     
-    private var gridLayout: [GridItem] {
-        [
-            GridItem(.flexible(), spacing: 8),
-            GridItem(.flexible(), spacing: 8)
-        ]
-    }
-    
     public init(communityId: String, communityProfileViewModel: CommunityProfileViewModel? = nil, pageId: PageId? = nil) {
         self.pageId = pageId
-        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .communityVideoFeed))
         
         if let communityProfileViewModel {
             self._viewModel = StateObject(wrappedValue: communityProfileViewModel.videoFeedViewModel)
@@ -37,7 +26,6 @@ public struct AmityCommunityVideoFeedComponent: AmityComponentView {
     }
     
     public var body: some View {
-        VideoFeedComponent(mediaFeedViewModel: viewModel)
-            .updateTheme(with: viewConfig)
+        VideoFeedComponent(mediaFeedViewModel: viewModel, type: .videos, pageId: pageId, componentId: .communityVideoFeed)
     }
 }

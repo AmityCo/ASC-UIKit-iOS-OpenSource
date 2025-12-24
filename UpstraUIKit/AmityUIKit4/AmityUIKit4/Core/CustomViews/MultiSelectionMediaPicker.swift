@@ -131,7 +131,6 @@ struct MultiSelectionMediaPicker: UIViewControllerRepresentable {
     }
 }
 
-
 class LoadingOverlayView: UIView {
     private let containerView: UIView
     private let activityIndicator: UIActivityIndicatorView

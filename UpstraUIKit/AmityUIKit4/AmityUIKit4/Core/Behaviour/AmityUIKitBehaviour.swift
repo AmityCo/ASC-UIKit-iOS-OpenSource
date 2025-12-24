@@ -58,6 +58,12 @@ open class AmityUIKitBehaviour {
     public var draftClipPageBehavior: AmityDraftClipPageBehavior = AmityDraftClipPageBehavior()
     
     public var globalBehavior: AmityGlobalBehavior? = AmityGlobalBehavior()
+    
+    public var eventTargetSelectionPageBehavior: AmityEventTargetSelectionPageBehavior?
+    public var eventDetailPageBehavior: AmityEventDetailPageBehavior?
+    public var exploreEventFeedComponentBehavior: AmityExploreEventFeedComponentBehavior?
+    public var myEventFeedComponentBehavior: AmityMyEventFeedComponentBehavior?
+    public var eventSetupPageBehavior: AmityEventSetupPageBehavior?
 }
 
 open class AmitySwipeToBackGestureBehavior {

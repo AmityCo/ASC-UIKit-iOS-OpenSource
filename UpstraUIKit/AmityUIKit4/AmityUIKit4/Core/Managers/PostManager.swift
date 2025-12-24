@@ -74,11 +74,16 @@ class PostManager {
     }
     
     @discardableResult
-    func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?, hashtags: AmitySDK.AmityHashtagBuilder?) async throws -> AmityPost {
-        try await postRepository.editPost(withId: withId, builder: builder, metadata: metadata, mentionees: mentionees, hashtags: hashtags)
+    func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?, hashtags: AmitySDK.AmityHashtagBuilder?, links: [AmityLink]?) async throws -> AmityPost {
+        
+        return try await postRepository.editPost(withId: withId, builder: builder, metadata: metadata, mentionees: mentionees, hashtags: hashtags, links: links)
     }
     
     func createStreamPost(builder: AmityLiveStreamPostBuilder, targetId: String?, targetType: AmityPostTargetType, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
+        return try await postRepository.createLiveStreamPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+    }
+    
+    func createLiveStreamRoomPost(builder: AmityRoomPostBuilder, targetId: String?, targetType: AmityPostTargetType, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
         return try await postRepository.createLiveStreamPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
     }
     
@@ -90,5 +95,13 @@ class PostManager {
     func searchPosts(hashtags: [String]) -> AmityCollection<AmityPost> {
         let searchOptions = AmityPostHashtagSearchOptions(hashtags: hashtags)
         return postRepository.searchPostsByHashtag(options: searchOptions)
+    }
+    
+    func getCommunityLiveRoomPosts(communityId: String) -> AmityCollection<AmityPost> {
+        postRepository.getCommunityLiveRoomPosts(withIds: [communityId])
+    }
+    
+    func getGlobalLiveRoomPosts() -> AmityCollection<AmityPost> {
+        postRepository.getLiveRoomPosts()
     }
 }

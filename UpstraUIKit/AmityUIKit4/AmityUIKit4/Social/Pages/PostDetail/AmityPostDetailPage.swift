@@ -121,8 +121,14 @@ public struct AmityPostDetailPage: AmityPageView {
                                 // Dismiss bottom sheet
                                 host.controller?.dismiss(animated: false)
                                 
+                                let hasMembership = viewModel.post?.targetCommunity?.isJoined ?? false
+                                if !hasMembership {
+                                    AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+                                    return
+                                }
+                                
                                 AmityUserAction.perform(host: host) {
-                                    let page = AmityContentReportPage(type: .comment(id: commentId))
+                                    let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil))
                                         .updateTheme(with: viewConfig)
                                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                     vc.isNavigationBarHidden = true
@@ -200,6 +206,12 @@ public struct AmityPostDetailPage: AmityPageView {
                         case .reportPost:
                             // Dismiss toggle
                             showBottomSheet.toggle()
+                            
+                            let hasJoinedCommunity = viewModel.post?.targetCommunity?.isJoined ?? false
+                            if !hasJoinedCommunity {
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                                return
+                            }
                             
                             AmityUserAction.perform {
                                 // Dismiss bottom sheet

@@ -45,9 +45,22 @@ class RegisterViewController: UIViewController {
         
         let dictionary = Bundle.main.infoDictionary!
         let version = dictionary["CFBundleShortVersionString"] as! String
-        let build = dictionary["CFBundleVersion"] as! String
         
-        versionLabel.text = "\(version) build \(build)"
+        /* Note:
+         1. Create file called BuildInfo.swift inside SampleApp project / target. UpstraUIKit/SampleApp/SampleApp/BuildInfo.swift
+         2. Copy code below to that file
+         
+         enum BuildInfo {
+             static let gitHash = "git-hash"
+         }
+         */
+        
+        versionLabel.text = "v\(version)\nBuild: \(BuildInfo.gitHash)"
+        versionLabel.numberOfLines = 2
+        versionLabel.textAlignment = .center
+        versionLabel.font = UIFont.systemFont(ofSize: 15, weight: .regular)
+        versionLabel.isUserInteractionEnabled = true
+        versionLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onVersionLabelTap)))
         
         tableView.keyboardDismissMode = .onDrag
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
@@ -55,6 +68,12 @@ class RegisterViewController: UIViewController {
         tableView.dataSource = self
         
         loginAsGuestButton.addTarget(self, action: #selector(onLoginAsGuestButtonTap), for: .touchUpInside)
+    }
+    
+    @objc func onVersionLabelTap() {
+        UIPasteboard.general.string = "Build: \(BuildInfo.gitHash)"
+        
+        Toast.showToast(style: .success, message: "Build hash copied!")
     }
     
     @objc func onLoginAsGuestButtonTap() {

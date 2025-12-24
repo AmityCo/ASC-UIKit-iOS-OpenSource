@@ -214,4 +214,28 @@ class Formatters {
         formatter.maximumFractionDigits = 2
         return formatter
     }()
-}
+    
+    static var eventDurationFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.dateFormat = "d MMM yyyy' at 'H:mm" // 24 Sep at 9:41 AM
+        return dateFormatter
+    }()
+    
+    static var eventTimeFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.dateFormat = "HH:mm" // 24 Sep at 9:41 AM
+        return dateFormatter
+    }()
+    
+    static var eventDateAndTimeFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.dateFormat = "d MMM yyyy, HH:mm" // 24 Sep at 9:41 AM
+        return dateFormatter
+    }()
+ }

@@ -43,7 +43,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
         ZStack(alignment: .top) {
             // Header #1
             headerView
-                .opacity(viewModel.startedScrollingToTop ? 0 : 1)
+                .opacity(!viewModel.startedScrollingToBottom ? 0 : 1)
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
@@ -57,12 +57,12 @@ public struct AmityCommunityProfilePage: AmityPageView {
                     //
                     // Header #2
                     headerView
-                        .opacity(!viewModel.startedScrollingToTop ? 0.01 : 1)
+                        .opacity(viewModel.startedScrollingToBottom ? 0 : 1)
                     
                     if isRefreshing {
-                        ProgressView()
-                            .frame(width: 20, height: 20)
-                            .padding(.vertical, 10)
+                        Color(viewConfig.theme.backgroundColor)
+                            .frame(height: 40)
+                            .overlay(ProgressView().frame(width: 20, height: 20))
                     }
                     
                     AmityCommunityFeedComponent(communityId: communityId, pageId: .communityProfilePage, communityProfileViewModel: viewModel, onTapAction: { post, componentContext in
@@ -78,12 +78,11 @@ public struct AmityCommunityProfilePage: AmityPageView {
                     })
                     .isHidden(viewModel.currentTab != 1)
                     
-                    AmityCommunityImageFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
-                    .isHidden(viewModel.currentTab != 2)
+                    AmityCommunityEventFeedComponent(communityId: communityId)
+                        .isHidden(viewModel.currentTab != 2)
                     
-                    AmityCommunityVideoFeedComponent(communityId: communityId, communityProfileViewModel: viewModel, pageId: .communityProfilePage)
-                    .isHidden(viewModel.currentTab != 3)
-                    
+                    AmityMediaFeedContainer(pageId: .communityProfilePage, type: .community, imageFeedModel: viewModel.imageFeedViewModel, videoFeedModel: viewModel.videoFeedViewModel)
+                        .isHidden(viewModel.currentTab != 3)
                 }
                 .background(GeometryReader { geometry in
                     Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
@@ -93,8 +92,8 @@ public struct AmityCommunityProfilePage: AmityPageView {
             .onPreferenceChange(ScrollOffsetKey.self) { offsetY in
                 guard headerComponentHeight != 0.0 else { return }
                 
-                if viewModel.startedScrollingToTop != (offsetY < 0) {
-                    viewModel.startedScrollingToTop.toggle()
+                if viewModel.startedScrollingToBottom != (offsetY > 0) {
+                    viewModel.startedScrollingToBottom.toggle()
                 }
                                 
                 // Profile Tab Height: 46
@@ -156,7 +155,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                                 UIPasteboard.general.string = profileLink
                                 
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                    Toast.showToast(style: .success, message: "Link copied")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventInfoLinkCopied.localizedString)
                                 }
                             }
                         
@@ -224,6 +223,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                 }
                 
                 AmityCommunityProfileTabComponent(currentTab: $viewModel.currentTab, pageId: .communityProfilePage)
+                
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
                     .frame(height: 1)
@@ -282,32 +282,6 @@ public struct AmityCommunityProfilePage: AmityPageView {
             Spacer()
         }
     }
-
-    
-    private struct VisualEffectView: UIViewRepresentable {
-        var effect: UIVisualEffect?
-        var alpha: CGFloat
-        func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView { UIVisualEffectView() }
-        func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) {
-            uiView.effect = effect
-            uiView.alpha = alpha
-        }
-    }
-    
-    func calculateBottomSheetHeight() -> CGFloat {
-        
-        let baseBottomSheetHeight: CGFloat = 68
-        let itemHeight: CGFloat = 48
-        let additionalItems = [
-            true,
-            viewModel.hasStoryManagePermission
-        ].filter { $0 }
-        
-        let additionalHeight = CGFloat(additionalItems.count) * itemHeight
-        
-        return baseBottomSheetHeight + additionalHeight
-    }
-    
 }
 
 extension AmityCommunityProfilePage {
@@ -382,6 +356,16 @@ extension AmityCommunityProfilePage {
                         let context = AmityCommunityProfilePageBehavior.Context(page: self)
                         AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToClipComposerPage(context: context, community: viewModel.community)
                     }
+                
+                if viewModel.hasCreateEventPermission {
+                    BottomSheetItemView(icon: AmityIcon.createEventMenuIcon.imageResource, text: "Event", iconSize: CGSize(width: 20, height: 20))
+                        .onTapGesture {
+                            showCreateBottomSheet.toggle()
+                            host.controller?.dismiss(animated: false)
+                            let context = AmityCommunityProfilePageBehavior.Context(page: self, community: viewModel.community?.object)
+                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToEventSetupPage(context: context)
+                        }
+                }
             }
             .padding(.bottom, 32)
         }
@@ -565,5 +549,14 @@ extension AmityCommunityProfilePage {
     func canViewCommunitySettings() -> Bool {
         return viewModel.community?.isJoined ?? false
     }
-    
+}
+
+struct VisualEffectView: UIViewRepresentable {
+    var effect: UIVisualEffect?
+    var alpha: CGFloat
+    func makeUIView(context: UIViewRepresentableContext<Self>) -> UIVisualEffectView { UIVisualEffectView() }
+    func updateUIView(_ uiView: UIVisualEffectView, context: UIViewRepresentableContext<Self>) {
+        uiView.effect = effect
+        uiView.alpha = alpha
+    }
 }

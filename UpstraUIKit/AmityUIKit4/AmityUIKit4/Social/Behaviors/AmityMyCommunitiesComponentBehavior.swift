@@ -31,4 +31,11 @@ open class AmityMyCommunitiesComponentBehavior {
         
         context.component.host.controller?.navigationController?.pushViewController(controller, animated: true)
     }
+    
+    open func goToCommunitySetupPage(context: AmityMyCommunitiesComponentBehavior.Context) {
+        
+        let page = AmityCommunitySetupPage(mode: .create)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        context.component.host.controller?.navigationController?.pushViewController(vc, animation: .presentation)
+    }
 }

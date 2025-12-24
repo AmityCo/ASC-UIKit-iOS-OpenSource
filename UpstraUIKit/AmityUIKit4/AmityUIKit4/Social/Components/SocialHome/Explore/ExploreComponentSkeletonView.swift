@@ -32,18 +32,25 @@ struct SkeletonRectangle: View {
     let width: CGFloat
     let cornerRadius: CGFloat
     let color: UIColor?
+    let isExpanded: Bool
     
-    init(height: CGFloat = 12, width: CGFloat = 200, cornerRadius: CGFloat = 12, color: UIColor? = nil) {
+    init(height: CGFloat = 12,
+         width: CGFloat = 200,
+         cornerRadius: CGFloat = 12,
+         color: UIColor? = nil,
+         isExpanded: Bool = false
+    ) {
         self.height = height
         self.width = width
         self.cornerRadius = cornerRadius
         self.color = color
+        self.isExpanded = isExpanded
     }
     
     var body: some View {
         Rectangle()
             .fill(Color(color ?? viewConfig.theme.baseColorShade4))
-            .frame(width: width, height: height)
+            .frame(width: isExpanded ? nil : width, height: height)
             .cornerRadius(cornerRadius, corners: .allCorners)
     }
 }

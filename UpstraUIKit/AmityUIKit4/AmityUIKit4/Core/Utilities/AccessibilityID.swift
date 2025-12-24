@@ -203,6 +203,7 @@ struct AccessibilityID {
             static let exploreButton = "explore_button"
             static let clipsButton = "clips_button"
             static let myCommunitiesButton = "my_communities_button"
+            static let communitiesButton = "communities_button"
             static let notificationTrayButton = "notification_tray_button"
         }
         

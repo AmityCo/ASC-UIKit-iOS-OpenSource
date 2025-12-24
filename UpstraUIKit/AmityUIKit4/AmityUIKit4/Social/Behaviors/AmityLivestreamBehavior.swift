@@ -17,7 +17,7 @@ open class AmityLivestreamBehavior {
     }
     
     open func createLivestreamPlayer(stream: AmityStream, client: AmityClient, isPlaying: Bool) -> any View {
-        return LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
+        return EmptyView()
     }
     
 }

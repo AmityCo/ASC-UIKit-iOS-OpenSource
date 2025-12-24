@@ -108,7 +108,7 @@ struct PostBottomSheetView: View {
     @ViewBuilder
     private var moderatorView: some View {
         editSheetButton
-            .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream) // We cannot edit poll post & live stream post
+            .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream || post.dataTypeInternal == .room) // We cannot edit poll post & live stream post
         
         if let poll = post.poll, !poll.isClosed {
             closePollButton
@@ -127,7 +127,7 @@ struct PostBottomSheetView: View {
     @ViewBuilder
     private var memberView: some View {
         editSheetButton
-            .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream)
+            .isHidden(!post.isOwner || post.dataTypeInternal == .poll || post.dataTypeInternal == .liveStream || post.dataTypeInternal == .room)
         
         if let poll = post.poll, !poll.isClosed {
             closePollButton
@@ -223,7 +223,7 @@ struct PostBottomSheetView: View {
                 UIPasteboard.general.string = shareLink
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    Toast.showToast(style: .success, message: "Link copied")
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventInfoLinkCopied.localizedString)
                 }
             }
         

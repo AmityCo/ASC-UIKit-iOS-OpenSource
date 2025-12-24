@@ -18,7 +18,9 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
     @ObservedObject private var viewModel: AmityLiveStreamChatViewModel
     @StateObject private var viewConfig: AmityViewConfigController
     
-    private let placeholder: String = "Chat..."
+    private var placeholder: String {
+        AmityLocalizedStringSet.Social.livestreamChatPlaceholder.localizedString
+    }
     private let maxCharCount: Int = 200
     
     public init(viewModel: AmityLiveStreamChatViewModel, pageId: PageId? = nil) {
@@ -27,7 +29,7 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
     }
     
     public var body: some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .bottom, spacing: 10) {
             switch viewModel.composeBarState {
             case .normal, .disabled:
                 inputView
@@ -35,12 +37,12 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                 rightButton
 
             case .muted:
-                getInfoView(icon: AmityIcon.LiveStream.disabledChatIcon.imageResource, text: "You have been muted.")
+                getInfoView(icon: AmityIcon.LiveStream.disabledChatIcon.imageResource, text: AmityLocalizedStringSet.Social.livestreamChatMutedMessage.localizedString)
                 Spacer()
                 rightButton
                 
             case .readOnly:
-                getInfoView(icon: AmityIcon.LiveStream.disabledChatIcon.imageResource, text: "This live stream is now read-only.")
+                getInfoView(icon: AmityIcon.LiveStream.disabledChatIcon.imageResource, text: AmityLocalizedStringSet.Social.livestreamChatReadonlyMessage.localizedString)
                 Spacer()
                 rightButton
             }
@@ -59,7 +61,7 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                     do {
                         try await viewModel.sendMessage()
                     } catch {
-                        Toast.showToast(style: .warning, message: "Failed to send message. Please try again.")
+                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamChatSendFailedMessage.localizedString, bottomPadding: 60)
                     }
                     
                     viewModel.messageInput.removeAll()
@@ -70,23 +72,50 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 32, height: 32)
+                    .padding(.bottom, 8)
             }
-        } else if viewModel.isStreamer {
+        } else if viewModel.isStreamer && viewModel.participantRole != .viewer {
+            // Only host can invite co-host
+            if viewModel.participantRole == .host {
+                Button {
+                    viewModel.inviteCoHostAction?()
+                } label: {
+                    Image(AmityIcon.inviteUserIcon.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .circularBackground(radius: 40, color: Color(viewConfig.defaultDarkTheme.baseColorShade4))
+                }
+            }
+            
+            Button {
+                viewModel.isMicOn.toggle() // Update UI state immediately
+                viewModel.toggleMicAction?()
+            } label: {
+                Image(viewModel.isMicOn ? AmityIcon.LiveStream.mic.imageResource : AmityIcon.LiveStream.unmuteMic.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .circularBackground(radius: 40, color: Color(viewConfig.defaultDarkTheme.baseColorShade4))
+            }
+            
             Button {
                 viewModel.swapCameraAction?()
             } label: {
-                Image(AmityIcon.flipCameraIcon.imageResource)
+                Image(AmityIcon.LiveStream.switchCamera.imageResource)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 32, height: 32)
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .circularBackground(radius: 40, color: Color(viewConfig.defaultDarkTheme.baseColorShade4))
             }
         } else {
             Image(AmityIcon.Reaction.like.imageResource)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: 32, height: 32)
+                .frame(width: 30, height: 30)
+                .padding(.bottom, 8)
                 .onTapGesture {
-                    let like = AmityLiveReactionModel(reactionName: "like", referenceId: viewModel.stream.post?.postId ?? "", streamId: viewModel.stream.streamId)
+                    let like = AmityLiveReactionModel(reactionName: "like", referenceId: viewModel.room.post?.postId ?? "", streamId: viewModel.room.roomId)
                     viewModel.liveReactionViewModel.addReaction(like)
                 }
                 .onLongPressGesture {
@@ -106,11 +135,20 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                 .font(AmityTextStyle.body(.white).getFont())
                 .maxCharCount(maxCharCount)
                 .lineLimit(1)
+                .disableNewlines(true)
+                .onChange(of: viewModel.messageInput) { newValue in
+                    // this logic is intentionally added here not to change the behavior of text editor
+                    if newValue.contains("\n") {
+                        hideKeyboard()
+                    }
+                }
         } else {
             ExpandableTextEditorView(isTextEditorFocused: .constant(true), input: $viewModel.messageInput)
                 .placeholder(placeholder)
                 .font(AmityTextStyle.body(.white).getFont())
                 .maxCharCount(maxCharCount)
+                .lineLimit(1)
+                .disableNewlines(true)
         }
     }
     
@@ -128,5 +166,6 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
             Text(text)
                 .applyTextStyle(.body(Color(viewConfig.theme.secondaryColor.blend(.shade2))))
         }
+        .padding(.bottom, 12)
     }
 }

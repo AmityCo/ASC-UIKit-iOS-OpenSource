@@ -56,8 +56,7 @@ struct AmityVideoPlayerView: View {
         ZStack(alignment: .topTrailing) {
             AVPlayerView(
                 url: url,
-                autoPlay: autoPlay,
-                post: post
+                autoPlay: autoPlay
             )
             .cornerRadius(cornerRadius)
             .overlay(

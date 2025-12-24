@@ -97,6 +97,11 @@ public struct AmityNotificationTrayPage: AmityPageView {
             AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToCommunityProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId, userId: nil))
         case .follow:
             AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToUserProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: nil, userId: idInfo.userId))
+        case .event:
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToEventDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId, userId: idInfo.userId, eventId: idInfo.eventId))
+        case .invitation:
+            guard item.targetType == .room else { return }
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToLiveStreamPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: nil, parentCommentId: nil, communityId: nil, userId: nil, roomId: idInfo.roomId))
         }
     }
     

@@ -51,9 +51,6 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
                     .isHidden(viewConfig.isHidden(elementId: .searchIcon), remove: true)
                     .accessibilityIdentifier(AccessibilityID.Social.TopSearchBar.searchIcon)
                 
-                let placeholderText =
-                viewModel.searchType == .myCommunities
-                ? "Search my communities" : "Search community and user"
                 TextField("", text: $viewModel.searchKeyword)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     .placeholder(when: viewModel.searchKeyword.isEmpty, placeholder: {
@@ -87,6 +84,16 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
         }
         .updateTheme(with: viewConfig)
         .padding(.horizontal, 16)
-        
+    }
+    
+    var placeholderText: String {
+        switch viewModel.searchType {
+        case .posts:
+            "Search"
+        case .community, .user:
+            "Search community and user"
+        case .myCommunities:
+            "Search my communities"
+        }
     }
 }

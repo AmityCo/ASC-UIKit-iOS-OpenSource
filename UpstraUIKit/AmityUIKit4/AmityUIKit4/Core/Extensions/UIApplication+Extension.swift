@@ -22,4 +22,25 @@ extension UIApplication {
         }
         return base
     }
+    
+    // This function will rewind the view controller stack to the specified view controller type
+    // It will dismiss or pop view controllers until it finds the desired one
+    class func rewind(to: UIViewController.Type, completion: ((UIViewController?) -> Void)? = nil) {
+        guard let topVC = UIApplication.topViewController() else {
+            completion?(nil)
+            return
+        }
+        
+        if topVC.isKind(of: to) {
+            completion?(topVC)
+            return
+        }
+        
+        // Dismiss or pop, then recursively call again
+        topVC.dismissOrPop(animated: false) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                rewind(to: to, completion: completion)
+            }
+        }
+    }
 }

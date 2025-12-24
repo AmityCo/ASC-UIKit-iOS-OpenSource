@@ -21,7 +21,6 @@ public struct AmityNewsFeedComponent: AmityComponentView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var postFeedViewModel = PostFeedViewModel(feedType: .globalFeed)
     @StateObject private var viewModel = AmityNewsFeedComponentViewModel()
-    @State private var hideStoryTab: Bool = true
     @State private var pullToRefreshShowing: Bool = false
     
     public init(pageId: PageId? = nil) {
@@ -40,9 +39,6 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                 .opacity(postFeedViewModel.postItems.isEmpty && postFeedViewModel.feedLoadingStatus == .loaded ? 1 : 0)
         }
         .updateTheme(with: viewConfig)
-        .onReceive(viewModel.$shouldHideStoryComponent, perform: { value in
-            hideStoryTab = value
-        })
     }
     
     @ViewBuilder
@@ -52,6 +48,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                 .refreshable {
                     // just to show/hide story view
                     viewModel.loadStoryTargets()
+                    viewModel.loadRoomPosts()
                     // refresh global feed
                     // swiftUI cannot update properly if we use nested Observable Object
                     // that is the reason why postFeedViewModel is not moved into viewModel
@@ -65,10 +62,23 @@ public struct AmityNewsFeedComponent: AmityComponentView {
     @ViewBuilder
     func getPostListView() -> some View {
         List {
-            if !hideStoryTab {
+            if (!viewModel.storyTargets.isEmpty || !viewModel.roomPosts.isEmpty) {
                 VStack(spacing: 0) {
                     AmityStoryTabComponent(type: .globalFeed, pageId: pageId)
                         .frame(height: 118)
+                    
+                    Rectangle()
+                        .fill(Color(viewConfig.theme.baseColorShade4))
+                        .frame(height: 8)
+                }
+                .listRowInsets(EdgeInsets())
+                .modifier(HiddenListSeparator())
+            } else if viewModel.isStoryTabLoading {
+                VStack(spacing: 0) {
+                    SkeletonStoryTabComponent(radius: 64)
+                        .frame(height: 118)
+                        .padding(.leading, 18)
+                        .background(Color(viewConfig.theme.backgroundColor))
                     
                     Rectangle()
                         .fill(Color(viewConfig.theme.baseColorShade4))
@@ -161,21 +171,64 @@ public struct AmityNewsFeedComponent: AmityComponentView {
 }
 
 class AmityNewsFeedComponentViewModel: ObservableObject {
-    @Published var shouldHideStoryComponent: Bool = true
+    @Published var storyTargets: [AmityStoryTarget] = []
+    @Published var isStoryTabLoading: Bool = true
+    
+    @Published var roomPosts: [AmityPostModel] = []
     private var storyTargetCollection: AmityCollection<AmityStoryTarget>?
-    private var cancellable: AnyCancellable?
+    private var storyTargetCancellable: AnyCancellable?
+    private var storyTargetLoadingCancellable: AnyCancellable?
+    
     private let storyManager = StoryManager()
+    private let postManager = PostManager()
+    private var roomPostCollection: AmityCollection<AmityPost>?
+    private var roomPostCancellable: AnyCancellable?
+    private var roomPostLoadingCancellable: AnyCancellable?
     
     init() {
         loadStoryTargets()
+        loadRoomPosts()
     }
     
     func loadStoryTargets() {
         storyTargetCollection = storyManager.getGlobaFeedStoryTargets(options: .smart)
-        cancellable = storyTargetCollection?.$snapshots
+        storyTargetCancellable = storyTargetCollection?.$snapshots
             .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
             .sink { [weak self] targets in
-                self?.shouldHideStoryComponent = targets.count == 0
+                self?.storyTargets = targets
             }
+        
+        storyTargetLoadingCancellable = storyTargetCollection?.$loadingStatus
+            .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] status in
+                self?.isStoryTabLoading = status == .loading
+            })
+    }
+    
+    func loadRoomPosts() {
+        roomPostCollection = postManager.getGlobalLiveRoomPosts()
+        roomPostCancellable = roomPostCollection?.$snapshots
+            .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
+            .sink { [weak self] posts in
+                self?.roomPosts = posts.flatMap({ post -> [AmityPostModel] in
+                    // community linked object is only available in parent post
+                    let targetCommunity = post.targetCommunity
+                    
+                    // Parent post are text posts, we need to filter children posts which are live rooms
+                    return post.childrenPosts.compactMap({ post -> AmityPostModel? in
+                        guard post.dataType == "room" && post.getRoomInfo()?.status == .live else { return nil }
+                        let model = AmityPostModel(post: post)
+                        model.targetCommunity = targetCommunity
+                        return model
+                    })
+                    
+                })
+            }
+        
+        roomPostLoadingCancellable = roomPostCollection?.$loadingStatus
+            .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] status in
+                self?.isStoryTabLoading = status == .loading
+            })
     }
 }

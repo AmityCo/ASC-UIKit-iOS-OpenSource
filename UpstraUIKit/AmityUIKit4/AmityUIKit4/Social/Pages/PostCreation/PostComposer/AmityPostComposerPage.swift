@@ -23,10 +23,13 @@ public enum AmityPostComposerMode {
 }
 
 public enum AmityPostComposerOptions {
-    case editOptions(mode: AmityPostComposerMode = .edit, post: AmityPostModel)
-    case createOptions(
-        mode: AmityPostComposerMode = .create, targetId: String?, targetType: AmityPostTargetType,
-        community: AmityCommunityModel?)
+    case editOptions(mode: AmityPostComposerMode = .edit,
+                     post: AmityPostModel)
+    case createOptions(mode: AmityPostComposerMode = .create,
+                       targetId: String?,
+                       targetType: AmityPostTargetType,
+                       community: AmityCommunityModel?,
+                       event: AmityEvent? = nil)
 }
 
 public struct AmityPostComposerPage: AmityPageView {
@@ -111,10 +114,10 @@ public struct AmityPostComposerPage: AmityPageView {
                 return nil
             })
             
-        case .createOptions(let mode, let targetId, let targetType, let community):
+        case .createOptions(let mode, let targetId, let targetType, let community, let event):
             self._viewModel = StateObject(
                 wrappedValue: AmityPostComposerViewModel(
-                    targetId: targetId, targetType: targetType, community: community, mode: mode))
+                    targetId: targetId, targetType: targetType, community: community, mode: mode, event: event))
             self._textEditorViewModel = StateObject(
                 wrappedValue: AmityTextEditorViewModel(
                     mentionManager: MentionManager(withType: .post(communityId: targetId))))
@@ -134,26 +137,7 @@ public struct AmityPostComposerPage: AmityPageView {
                 
                 ScrollView {
                     
-                    if viewModel.isInClipComposerMode, let clipURL {
-                        ZStack {
-                            VideoPlayer(url: clipURL, play: $playClipVideo)
-                                .mute(true)
-                                .contentMode(.scaleAspectFill)
-                                .onAppear {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        playClipVideo = false
-                                    }
-                                }
-                                .frame(width: 80, height: 142)
-                                .background(Color(viewConfig.defaultLightTheme.secondaryColor))
-                                .cornerRadius(4, corners: .allCorners)
-                            
-                            Image(AmityIcon.videoControlIcon.getImageResource())
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
-                        }
-                    }
+                    clipPreview
                     
                     ExpandableTextEditorView(isTextEditorFocused: .constant(false), input: $viewModel.postTitle)
                         .placeholder("Title (Optional)")
@@ -170,11 +154,13 @@ public struct AmityPostComposerPage: AmityPageView {
                         text: $viewModel.postText,
                         mentionData: $viewModel.mentionData,
                         mentionedUsers: $viewModel.mentionedUsers,
+                        links: $viewModel.links,
                         textViewHeight: getTextEditorHeight(for: viewModel.postText)
                     )
                     .placeholder(viewModel.postText.isEmpty ? placeholderText : "")
                     .maxExpandableHeight(99999)
                     .enableHashtagHighlighting(true)
+                    .enableLinkHighlight(true)
                     .maxHashtagCount(30)
                     .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                     .onChange(of: textEditorViewModel.reachHashtagLimit) { reached in
@@ -186,11 +172,45 @@ public struct AmityPostComposerPage: AmityPageView {
                         }
                     }
                     
+                    if let link = viewModel.previewedLink, !viewModel.didRemoveLinkPreview, mediaAttatchmentViewModel.medias.isEmpty {
+                        PreviewLinkView(viewModel: self.viewModel.previewLinkViewModel)
+                            .overlay(
+                                VStack {
+                                    HStack {
+                                        Spacer()
+                                        Button(action: {
+                                            viewModel.previewedLink = nil
+                                            viewModel.didRemoveLinkPreview = true
+                                        }) {
+                                            Image(AmityIcon.closeIcon.imageResource)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 24, height: 24)
+                                                .padding(4)
+                                                .background(Color.black.opacity(0.5))
+                                                .clipShape(Circle())
+                                        }
+                                        .offset(x: 10, y: -10)
+                                    }
+                                    
+                                    Spacer()
+                                }
+                            )
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 16)
+                    }
+
                     if !viewModel.isInClipComposerMode {
                         PostCreationMediaAttachmentPreviewView(viewModel: mediaAttatchmentViewModel)
                             .contentShape(Rectangle())
                             .padding(.bottom, 60)
                     }                    
+                }
+                .onChange(of: mediaAttatchmentViewModel.medias) { medias in
+                    if !medias.isEmpty && !viewModel.didRemoveLinkPreview {
+                        viewModel.didRemoveLinkPreview = true
+                        viewModel.previewedLink = nil
+                    }
                 }
                 
                 Spacer()
@@ -294,19 +314,26 @@ public struct AmityPostComposerPage: AmityPageView {
         .updateTheme(with: viewConfig)
     }
     
-    func dismissComposer() {
-        switch viewModel.mode {
-        case .create, .edit, .editClip:
-            if isPostDraftEmpty() {
-                host.controller?.navigationController?.dismiss(animated: true)
-            } else {
-                showDismissAlert = true
-            }
-        case .createClip:
-            if isPostDraftEmpty() {
-                host.controller?.navigationController?.popViewController(animated: true)
-            } else {
-                showDismissAlert = true
+    @ViewBuilder
+    var clipPreview: some View {
+        if viewModel.isInClipComposerMode, let clipURL {
+            ZStack {
+                VideoPlayer(url: clipURL, play: $playClipVideo)
+                    .mute(true)
+                    .contentMode(.scaleAspectFill)
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            playClipVideo = false
+                        }
+                    }
+                    .frame(width: 80, height: 142)
+                    .background(Color(viewConfig.defaultLightTheme.secondaryColor))
+                    .cornerRadius(4, corners: .allCorners)
+                
+                Image(AmityIcon.videoControlIcon.getImageResource())
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 24, height: 24)
             }
         }
     }
@@ -363,6 +390,23 @@ public struct AmityPostComposerPage: AmityPageView {
                     host.controller?.navigationController?.dismiss(animated: true)
                 }
             }))
+        }
+    }
+    
+    func dismissComposer() {
+        switch viewModel.mode {
+        case .create, .edit, .editClip:
+            if isPostDraftEmpty() {
+                host.controller?.navigationController?.dismiss(animated: true)
+            } else {
+                showDismissAlert = true
+            }
+        case .createClip:
+            if isPostDraftEmpty() {
+                host.controller?.navigationController?.popViewController(animated: true)
+            } else {
+                showDismissAlert = true
+            }
         }
     }
     
@@ -444,6 +488,11 @@ public struct AmityPostComposerPage: AmityPageView {
     }
     
     private func processPost() {
+        if let links = viewModel.links, links.count >= 100 {
+            showAlertForLinkLimit()
+            return
+        }
+        
         isLoading = true
         
         Task { @MainActor in
@@ -454,9 +503,9 @@ public struct AmityPostComposerPage: AmityPageView {
                 // Create or edit post
                 let post: AmityPost?
                 if isInCreateMode {
-                    post = try await viewModel.createPost(medias: mediaAttatchmentViewModel.medias, files: [], hashtags: textEditorViewModel.existingHashtags)
+                    post = try await viewModel.createPost(medias: mediaAttatchmentViewModel.medias, files: [], hashtags: textEditorViewModel.existingHashtags, links: viewModel.getEmbeddedLinks())
                 } else {
-                    post = try await viewModel.editPost(medias: mediaAttatchmentViewModel.medias, files: [], hashtags: textEditorViewModel.existingHashtags)
+                    post = try await viewModel.editPost(medias: mediaAttatchmentViewModel.medias, files: [], hashtags: textEditorViewModel.existingHashtags, links: viewModel.getEmbeddedLinks())
                     
                     // Determine which media files were deleted (including all media types)
                     let currentMediaFileIds = mediaAttatchmentViewModel.medias.compactMap { media -> String? in
@@ -520,5 +569,13 @@ public struct AmityPostComposerPage: AmityPageView {
         withAnimation(.easeInOut(duration: 0.5).delay(3.0)) {
             failedToastAlphaValue = 0.0
         }
+    }
+    
+    private func showAlertForLinkLimit() {
+        let alert = UIAlertController(title: "Link limit reached", message: "You can only add up to 100 links per post.", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .cancel)
+        alert.addAction(action)
+        
+        UIApplication.topViewController()?.present(alert, animated: true)
     }
 }

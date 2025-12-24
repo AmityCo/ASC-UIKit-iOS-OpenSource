@@ -8,7 +8,7 @@
 import SwiftUI
 import AmitySDK
 
-// This page acts as a container & is not public by default.
+// This page acts as a internal container
 struct AmityExplorePageContainer: View {
     
     @EnvironmentObject private var viewConfig: AmityViewConfigController
@@ -113,10 +113,3 @@ struct AmityExplorePageContainer: View {
         try? await Task.sleep(nanoseconds: minRefreshSeconds)
     }
 }
-
-#if DEBUG
-#Preview {
-    AmityExplorePageContainer()
-        .environmentObject(AmityViewConfigController(pageId: .socialHomePage))
-}
-#endif

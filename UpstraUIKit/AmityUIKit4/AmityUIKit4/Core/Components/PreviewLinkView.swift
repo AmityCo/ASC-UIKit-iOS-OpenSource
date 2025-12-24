@@ -8,28 +8,35 @@
 import SwiftUI
 import AmitySDK
 import LinkPresentation
+import UniformTypeIdentifiers
 
 struct PreviewLinkView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: PreviewLinkViewModel
     
+    init(viewModel: PreviewLinkViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
+    
     init(post: AmityPostModel) {
         self._viewModel = StateObject(wrappedValue: PreviewLinkViewModel(post: post))
     }
-    
+        
     var body: some View {
         if let url = viewModel.previewLinkData.url {
             VStack(alignment: .leading, spacing: 0) {
-                let fallbackImage = viewModel.previewLinkData.metadata == nil ? AmityIcon.triangleErrorIcon : AmityIcon.previewLinkDefaultIcon
-                Rectangle()
-                    .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(height: 210)
-                    .overlay(
-                        previewLinkImageView(viewModel.previewLinkData.image, fallback: fallbackImage.getImage() ?? UIImage())
-                            .isHidden(!viewModel.previewLinkData.loaded)
-                    )
-                    .clipped()
-                    .shimmering(active: !viewModel.previewLinkData.loaded)
+                
+                if viewModel.previewLinkData.imageUrl != nil {
+                    Rectangle()
+                        .fill(Color(viewConfig.theme.baseColorShade4))
+                        .frame(height: 170)
+                        .overlay(
+                            previewLinkImageView(viewModel.previewLinkData.imageUrl)
+                                .isHidden(!viewModel.previewLinkData.loaded)
+                        )
+                        .clipped()
+                        .shimmering(active: !viewModel.previewLinkData.loaded)
+                }
                 
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
@@ -49,86 +56,112 @@ struct PreviewLinkView: View {
                             .clipShape(RoundedCorner())
                             .shimmering()
                     } else {
-                        let urlText = viewModel.previewLinkData.metadata?.url?.host ?? "Preview not available"
-                        let titleText = viewModel.previewLinkData.metadata?.title ?? "Please make sure the URL is correct and try again."
-                        let urlTextColor = viewModel.previewLinkData.metadata?.url?.host == nil ? Color(viewConfig.theme.baseColor) : Color(viewConfig.theme.baseColorShade1)
-                        let urlTextStyle: AmityTextStyle = viewModel.previewLinkData.metadata?.url?.host == nil ? .bodyBold(urlTextColor) : .caption(urlTextColor)
-                        let titleTextColor = viewModel.previewLinkData.metadata?.url?.host == nil ? Color(viewConfig.theme.baseColorShade1) : Color(viewConfig.theme.baseColor)
-                        let titleTextStyle: AmityTextStyle = viewModel.previewLinkData.metadata?.url?.host == nil ? .body(titleTextColor) : .bodyBold(titleTextColor)
-                        
-                        Text(urlText)
-                            .applyTextStyle(urlTextStyle)
-                            .lineLimit(1)
+                        let defaultHost = viewModel.previewLinkData.defaultHost
+                        let titleText = viewModel.previewLinkData.title ?? defaultHost
+                        let urlText = viewModel.previewLinkData.domain ?? defaultHost
                         
                         Text(titleText)
-                            .applyTextStyle(titleTextStyle)
+                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                             .lineLimit(2)
+                        
+                        Text(urlText)
+                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                            .lineLimit(1)
                     }
                 }
-                .padding([.leading, .trailing], 12)
-                .padding([.bottom, .top], 14)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 14)
             }
             .cornerRadius(8.0)
             .contentShape(Rectangle())
             .onTapGesture {
+                guard UIApplication.shared.canOpenURL(url) else { return }
+                
                 UIApplication.shared.open(url)
             }
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 0.4)
+                    .stroke(Color(viewConfig.theme.baseColorShade4), lineWidth: 1)
             )
         }
     }
     
     @ViewBuilder
-    private func previewLinkImageView(_ image: UIImage?, fallback: UIImage) -> some View {
-        if let image {
-            Image(uiImage: image)
-                .resizable()
+    private func previewLinkImageView(_ imageURL: URL?) -> some View {
+        if let imageURL {
+            AsyncImage(placeholder: AmityIcon.previewLinkDefaultIcon.imageResource, url: imageURL)
+                .frame(height: 170)
                 .scaledToFill()
-        } else {
-            Image(uiImage: fallback)
-                .frame(width: 50, height: 50)
-                .scaledToFit()
         }
     }
 }
 
 class PreviewLinkViewModel: ObservableObject {
-    let post: AmityPostModel
-    @Published var previewLinkData: (url: URL?, metadata: LPLinkMetadata?, image: UIImage?, loaded: Bool) = (nil, nil, nil, false)
     
-    init(post: AmityPostModel) {
-        self.post = post
+    struct PreviewData {
+        var title: String?
+        var domain: String?
+        var imageUrl: URL?
+        var url: URL?
+        var loaded: Bool
+        
+        var defaultHost: String {
+            let defaultValue = url?.absoluteString ?? "-"
+            
+            if let url, !url.absoluteString.hasPrefix("http") {
+                let newURL = "https://\(url.absoluteString)"
+                return URL(string: newURL)?.host ?? defaultValue
+            }
+            
+            return defaultValue
+        }
+    }
+    
+    var text: String
+    
+    @Published var previewLinkData: PreviewData = PreviewData(loaded: false)
+    
+    init(text: String) {
+        self.text = text
         
         Task { @MainActor in
             await getPreviewlinkData()
         }
     }
     
-    @MainActor
-    private func getPreviewlinkData() async {
-        let urls = AmityPreviewLinkWizard.shared.detectLinks(input: post.text)
-        
-        guard urls.count > 0 else {
-            previewLinkData.url = nil
+    convenience init(post: AmityPostModel) {
+        // For old posts which has link in their text content, but do not contain dedicated [AmityLink] payload, we will extract & highlight it again.
+        guard !post.links.isEmpty else {
+            self.init(text: post.text)
             return
         }
         
-        previewLinkData.loaded = false
-        previewLinkData.url = urls[0]
-        previewLinkData.metadata = await AmityPreviewLinkWizard.shared.getMetadata(url: urls[0])
-        previewLinkData.loaded = true
+        // If post has links, highlight only if renderPreview is true
+        if let firstLink = post.links.first, firstLink.renderPreview {
+            self.init(text: firstLink.url)
+        } else {
+            // No need to show preview in this case.
+            self.init(text: "")
+        }
+    }
+    
+    @MainActor
+    func getPreviewlinkData() async {
+        guard !text.isEmpty else { return }
         
-        previewLinkData.metadata?.imageProvider?.loadObject(ofClass: UIImage.self, completionHandler: { [weak self] image, error in
-            guard let self else { return }
-            
-            DispatchQueue.main.async {
-                if let image = image as? UIImage {
-                    self.previewLinkData.image = image
-                }
-            }
-        })
+        let urls = AmityPreviewLinkWizard.shared.detectLinks(text: text)
+        
+        guard urls.count > 0, let linkUrl = URL(string: urls[0]) else {
+            previewLinkData.url = nil
+            return
+        }
+                
+        previewLinkData.loaded = false
+        previewLinkData.url = linkUrl
+        
+        let metadata = await AmityPreviewLinkWizard.shared.fetchLinkMetadata(url: urls[0])
+        
+        let finalData = PreviewData(title: metadata?.title, domain: metadata?.domain, imageUrl: URL(string: metadata?.imageUrl ?? ""), url: linkUrl, loaded: true)
+        previewLinkData = finalData
     }
 }
-

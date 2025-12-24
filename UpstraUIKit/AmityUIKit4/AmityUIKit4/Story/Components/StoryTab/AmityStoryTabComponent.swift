@@ -49,82 +49,13 @@ public struct AmityStoryTabComponent: AmityComponentView {
                 StoryGlobalFeedView(id: id, viewModel: viewModel, storyTabComponent: self)
                 
             case .communityFeed(_):
-                if let storyTarget = viewModel.communityFeedStoryTarget {
-                    HStack {
-                        StoryTargetView(componentId: id, storyTarget: storyTarget, storyTargetName: "Story", hideLockIcon: true, cornerImage: {
-                            viewModel.hasManagePermission ? AmityCreateNewStoryButtonElement(componentId: id)
-                                .frame(width: 20.0, height: 20.0)
-                                .offset(x: 22, y: 22) : nil
-                            
-                        })
-                        .frame(width: 64, height: 64)
-                        .padding(EdgeInsets(top: 13, leading: 2, bottom: 13, trailing: 0))
-                        .onTapGesture {
-                            if storyTarget.itemCount == 0 && viewModel.hasManagePermission {
-                                let context = AmityStoryTabComponentBehaviour.Context(component: self, 
-                                                                                      storyFeedType: .communityFeed(storyTarget.targetId),
-                                                                                      targetId: storyTarget.targetId,
-                                                                                      targetType: .community)
-                                AmityUIKitManagerInternal.shared.behavior.storyTabComponentBehaviour?.goToCreateStoryPage(context: context)
-                            } else {
-                                let context = AmityStoryTabComponentBehaviour.Context(component: self, 
-                                                                                      storyFeedType: .communityFeed(storyTarget.targetId),
-                                                                                      targetId: storyTarget.targetId,
-                                                                                      targetType: .community)
-                                AmityUIKitManagerInternal.shared.behavior.storyTabComponentBehaviour?.goToViewStoryPage(context: context)
-                            }
-                        }
-                        .onAppear {
-                            viewModel.communityFeedStoryTarget?.fetchStory()
-                        }
-                        Spacer()
-                    }
-                }
+                StoryCommunityFeedView(id: id, viewModel: viewModel, storyTabComponent: self)
             }
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)
     }
 }
-
-struct StoryGlobalFeedView: View {
-    let id: ComponentId
-    @ObservedObject var viewModel: AmityStoryTabComponentViewModel
-    let storyTabComponent: AmityStoryTabComponent
-    
-    var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: 16) {
-                ForEach(Array(viewModel.globalFeedStoryTargets.enumerated()), id: \.element.targetId)  { index, storyTarget in
-                    
-                    StoryTargetView(componentId: id, storyTarget: storyTarget, hideLockIcon: storyTarget.isPublicTarget, cornerImage: {
-                        storyTarget.isVerifiedTarget ? Image(AmityIcon.verifiedBadgeWithBorder.imageResource)
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .offset(x: 22, y: 20) : nil
-                    })
-                    .frame(width: 64, height: 64)
-                    .padding(.leading, 2)
-                    .onTapGesture {
-                        Log.add(event: .info, "Tapped StoryTargetIndex: \(index)")
-                        let context = AmityStoryTabComponentBehaviour.Context(component: storyTabComponent,
-                                                                         storyFeedType: .globalFeed,
-                                                                         targetId: storyTarget.targetId,
-                                                                         targetType: .community)
-                        AmityUIKitManagerInternal.shared.behavior.storyTabComponentBehaviour?.goToViewStoryPage(context: context)
-                    }
-                    .onAppear {
-                        viewModel.loadMoreGlobalFeedTargetIfHas(index)
-                    }
-                    .tag(index)
-                }
-            }
-            .padding([.top, .bottom], 30)
-            .padding([.leading, .trailing], 18)
-        }
-    }
-}
-
 
 class AmityStoryTabComponentViewModel: ObservableObject {
     @Published var globalFeedStoryTargets: [AmityStoryTargetModel] = []
@@ -137,7 +68,13 @@ class AmityStoryTabComponentViewModel: ObservableObject {
     
     private var storyFeedType: AmityStoryTabComponentType
     private let storyManager = StoryManager()
+    private let postManager = PostManager()
     private var cancellable: AnyCancellable?
+    
+    // Live Stream Room posts
+    @Published var liveStreamPosts: [AmityPostModel] = []
+    private var liveStreamPostCollection: AmityCollection<AmityPost>?
+    private var liveStreamPostCancellable: AnyCancellable?
     
     public init(type: AmityStoryTabComponentType) {
         self.storyFeedType = type
@@ -145,9 +82,11 @@ class AmityStoryTabComponentViewModel: ObservableObject {
         switch storyFeedType {
         case .globalFeed:
             loadGlobalFeedStoryTargets()
+            loadGlobalLiveStreamPosts()
             
         case .communityFeed(let communityId):
             loadCommunityStoryTarget(communityId)
+            loadCommunityLiveStreamPosts(communityId)
         }
     }
     
@@ -194,6 +133,42 @@ class AmityStoryTabComponentViewModel: ObservableObject {
     
     func loadMoreGlobalFeedTargetIfHas(_ index: Int) {
         guard let collection = globalFeedCollection else { return }
+        if index == collection.snapshots.count - 1 && collection.hasNext {
+            collection.nextPage()
+        }
+    }
+    
+    private func loadGlobalLiveStreamPosts() {
+        liveStreamPostCollection = postManager.getGlobalLiveRoomPosts()
+        observeRoomPosts(liveStreamPostCollection)
+    }
+    
+    private func loadCommunityLiveStreamPosts(_ communityId: String) {
+        liveStreamPostCollection = postManager.getCommunityLiveRoomPosts(communityId: communityId)
+        observeRoomPosts(liveStreamPostCollection)
+    }
+    
+    private func observeRoomPosts(_ collection: AmityCollection<AmityPost>?) {
+        liveStreamPostCancellable = collection?.$snapshots
+            .sink { [weak self] posts in
+                self?.liveStreamPosts = posts.flatMap({ post -> [AmityPostModel] in
+                    // community linked object is only available in parent post
+                    let targetCommunity = post.targetCommunity
+                    
+                    // Parent post are text posts, we need to filter children posts which are live rooms
+                    return post.childrenPosts.compactMap({ post -> AmityPostModel? in
+                        guard post.dataType == "room" && post.getRoomInfo()?.status == .live else { return nil }
+                        let model = AmityPostModel(post: post)
+                        model.targetCommunity = targetCommunity
+                        return model
+                    })
+                    
+                })
+            }
+    }
+    
+    func loadMoreLiveStreamPostsIfHas(_ index: Int) {
+        guard let collection = liveStreamPostCollection else { return }
         if index == collection.snapshots.count - 1 && collection.hasNext {
             collection.nextPage()
         }

@@ -11,7 +11,6 @@ import Combine
 
 public struct AmityStoryTargetSelectionPage: AmityPageIdentifiable, View {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
-    @Environment(\.colorScheme) private var colorScheme
     
     public var id: PageId {
         .storyTargetSelectionPage

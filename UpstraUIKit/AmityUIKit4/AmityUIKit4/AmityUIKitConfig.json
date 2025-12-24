@@ -30,13 +30,11 @@
             "highlight_color": "#1054DE"
         }
     },
-    "excludes": [
-        
-    ],
+    "excludes": [],
     "feature_flags": {
         "post": {
             "clip": {
-                "can_create":  "all",
+                "can_create": "all",
                 "can_view_tab": "all"
             }
         }
@@ -86,11 +84,26 @@
         }
     ],
     "reactions": [
-        { "name": "like", "image": "messageReactionLike"},
-        { "name": "heart", "image": "messageReactionHeart"},
-        { "name": "fire", "image": "messageReactionFire"},
-        { "name": "grinning", "image": "messageReactionGrinning"},
-        { "name": "sad", "image": "messageReactionSad"}
+        {
+            "name": "like",
+            "image": "messageReactionLike"
+        },
+        {
+            "name": "heart",
+            "image": "messageReactionHeart"
+        },
+        {
+            "name": "fire",
+            "image": "messageReactionFire"
+        },
+        {
+            "name": "grinning",
+            "image": "messageReactionGrinning"
+        },
+        {
+            "name": "sad",
+            "image": "messageReactionSad"
+        }
     ],
     "customizations": {
         "camera_page/*/*": {
@@ -441,7 +454,7 @@
             "text": "Public"
         },
         "community_setup_page/*/community_privacy_public_description": {
-            "text": "Community is discoverable by anyone. Content is visible to anyone.",
+            "text": "Community is discoverable by anyone. Content is visible to anyone."
         },
         "community_setup_page/*/community_add_member_title": {
             "text": "Member"
@@ -592,7 +605,7 @@
             "text": "Share To"
         },
         "poll_post_composer_page/*/post_title": {
-            "text": "Post title",
+            "text": "Post title"
         },
         "post_composer_page/*/*": {},
         "post_composer_page/*/close_button": {
@@ -947,7 +960,7 @@
             "image": "createClipMenuIcon"
         },
         "social_home_page/*/clipsfeed_button": {
-            "text": "Clips",
+            "text": "Clips"
         },
         "clip_feed_page/*/*": {
             "theme": {}
@@ -1052,7 +1065,6 @@
             "image": "copyLinkIcon",
             "text": "Copy live stream link"
         },
-
         "clip_feed_page/*/share_link": {
             "image": "shareToIcon",
             "text": "Share to"
@@ -1092,8 +1104,52 @@
         "community_profile_page/*/copy_link": {
             "image": "copyLinkIcon",
             "text": "Copy profile link"
-        }
-        
-        
+        },
+        "social_home_page/*/communities_button": {
+            "text": "Communities"
+        },
+        "social_home_page/*/events_button": {
+            "text": "Events"
+        },
+        "social_home_page/create_post_menu/create_event_button": {
+            "text": "Event",
+            "image": ""
+        },
+        "select_event_target_page/*/*": {},
+        "select_event_target_page/*/close_button": {
+            "image": "closeIcon"
+        },
+        "select_event_target_page/*/title": {
+            "text": "Create event in"
+        },
+        "event_setup_page/*/*": {},
+        "event_setup_page/*/title": {
+            "text": "Create event"
+        },
+        "event_setup_page/*/camera_button": {
+            "text": "Camera",
+            "image": ""
+        },
+        "event_setup_page/*/image_button": {
+            "text": "Photo",
+            "image": ""
+        },
+        "event_setup_page/*/event_name_title": {
+            "text": "Event name"
+        },
+        "event_setup_page/*/event_details_title": {
+            "text": "Event details"
+        },
+        "event_setup_page/*/event_date_time_title": {
+            "text": "Date and time"
+        },
+        "event_setup_page/*/event_location_title": {
+            "text": "Location"
+        },
+        "event_detail_page/*/*": {},
+        "social_home_page/my_event_feed_component/*": {},
+        "social_home_page/explore_event_feed_component/*": {},
+        "upcoming_events_page/*/*": {},
+        "past_events_page/*/*": {}
     }
 }

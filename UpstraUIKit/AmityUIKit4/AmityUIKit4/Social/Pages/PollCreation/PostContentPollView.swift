@@ -60,7 +60,7 @@ struct PostContentPollView: View {
                     .isHidden(showResultsForOwner || poll.isVoted, remove: true)
                 
                 // Show only 4 options in feed and show all options in post detail page.
-                if poll.isVoted || poll.isClosed || showResultsForOwner {
+                if poll.isVoted || poll.isClosed || showResultsForOwner || viewModel.isPollClosedOnServer {
                     // Results
                     let sortedAnswers = poll.answers.sorted { $0.voteCount > $1.voteCount }
                     let prefixLimit = isPollOptionExpanded ? maximumVisibleAnswersCount : minimumVisibleAnswersCount
@@ -128,7 +128,7 @@ struct PostContentPollView: View {
                         Spacer()
                         
                         // showResultsForOwner
-                        Text(poll.isVoted || poll.isClosed || (showResultsForOwner && !isPollOptionExpanded) ? AmityLocalizedStringSet.Social.pollSeeFullResultsLabel.localizedString : AmityLocalizedStringSet.Social.pollSeeMoreOptionsLabel.localized(arguments: poll.answers.count - minimumVisibleAnswersCount))
+                        Text(poll.isVoted || poll.isClosed || viewModel.isPollClosedOnServer || (showResultsForOwner && !isPollOptionExpanded) ? AmityLocalizedStringSet.Social.pollSeeFullResultsLabel.localizedString : AmityLocalizedStringSet.Social.pollSeeMoreOptionsLabel.localized(arguments: poll.answers.count - minimumVisibleAnswersCount))
                             .applyTextStyle(.bodyBold(Color(viewConfig.theme.secondaryColor)))
                         
                         Spacer()
@@ -170,7 +170,7 @@ struct PostContentPollView: View {
                     .cornerRadius(8, corners: .allCorners)
                 })
                 .buttonStyle(.plain)
-                .isHidden(poll.isClosed || poll.isVoted || showResultsForOwner, remove: true)
+                .isHidden(poll.isClosed || viewModel.isPollClosedOnServer || poll.isVoted || showResultsForOwner, remove: true)
                 
                 HStack {
                     Group {
@@ -184,7 +184,8 @@ struct PostContentPollView: View {
                         
                         // Days Remaining or Ended
                         let pollStatus = PollStatus(poll: poll, isInPendingFeed: isInPendingFeed)
-                        Text(pollStatus.statusInfo)
+                        let statusInfo = viewModel.isPollClosedOnServer ? AmityLocalizedStringSet.Social.pollStatusEnded.localizedString : pollStatus.statusInfo
+                        Text(statusInfo)
                             .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))
                     }
                     
@@ -216,7 +217,7 @@ struct PostContentPollView: View {
                     .disabled(!isResultsButtonVisible)
                     .isHidden(!isResultsButtonVisible, remove: false)
                     
-                    let isUnvoteButtonVisible = poll.isVoted && !poll.isClosed && !isInPendingFeed
+                    let isUnvoteButtonVisible = poll.isVoted && !poll.isClosed && !viewModel.isPollClosedOnServer && !isInPendingFeed
                     Button {
                         selectedAnswers.removeAll()
                         viewModel.unVote(poll: poll)
@@ -294,6 +295,11 @@ class PostContentPollViewModel: ObservableObject {
     
     let pollManager = PollManager()
     
+    // When user tries to vote or unvote and the poll has already ended,
+    // we receive 400000 error code. This property tracks poll status
+    // upon receiving the error.
+    @Published var isPollClosedOnServer = false
+    
     @MainActor
     func vote(poll: AmityPostModel.PollModel, answers: [String]) {
         Task {
@@ -306,6 +312,7 @@ class PostContentPollViewModel: ObservableObject {
                 }
             } catch let error {
                 if error.isErrorCode(400000) {
+                    self.isPollClosedOnServer = true
                     Toast.showToast(style: .warning, message: "Poll ended.")
                 } else if error.isErrorCode(400400) {
                     Toast.showToast(style: .warning, message: "This post is no longer available.")
@@ -331,6 +338,7 @@ class PostContentPollViewModel: ObservableObject {
                 }
             } catch let error {
                 if error.isErrorCode(400000) {
+                    self?.isPollClosedOnServer = true
                     Toast.showToast(style: .warning, message: "Poll ended.")
                 } else if error.isErrorCode(400400) {
                     Toast.showToast(style: .warning, message: "This post is no longer available.")

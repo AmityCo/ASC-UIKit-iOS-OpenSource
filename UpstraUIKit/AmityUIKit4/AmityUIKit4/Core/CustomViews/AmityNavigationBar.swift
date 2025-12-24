@@ -15,6 +15,7 @@ struct AmityNavigationBar: View {
     
     let title: String
     let isBackButtonEnabled: Bool
+    let titleView: AnyView?
     let trailingView: AnyView?
     let leadingView: AnyView?
     let showDivider: Bool
@@ -30,6 +31,7 @@ struct AmityNavigationBar: View {
         self.showDivider = false
         self.isTransparent = false
         self.tintColor = nil
+        self.titleView = nil
     }
     
     /// Navigation Bar with back button & divider customization
@@ -41,6 +43,7 @@ struct AmityNavigationBar: View {
         self.showDivider = showDivider
         self.isTransparent = isTransparent
         self.tintColor = tintColor
+        self.titleView = nil
     }
     
     /// Navigation Bar with title, leading view & empty trailing view customization
@@ -52,6 +55,7 @@ struct AmityNavigationBar: View {
         self.trailingView = nil
         self.isTransparent = isTransparent
         self.tintColor = tintColor
+        self.titleView = nil
     }
     
     /// Navigation Bar with title, back button, divider & trailing view customization
@@ -63,6 +67,7 @@ struct AmityNavigationBar: View {
         self.trailingView = AnyView(trailing())
         self.isTransparent = isTransparent
         self.tintColor = nil
+        self.titleView = nil
     }
     
     /// Navigation Bar with title, divider, leading & trailing view customization
@@ -74,7 +79,27 @@ struct AmityNavigationBar: View {
         self.isBackButtonEnabled = false
         self.isTransparent = isTransparent
         self.tintColor = nil
+        self.titleView = nil
     }
+    
+    /// Navigation Bar with title, divider, leading & trailing view customization
+    init<TitleView: View, LeadingView: View, TrailingView: View>(
+        @ViewBuilder titleView: () -> TitleView,
+        @ViewBuilder leading: () -> LeadingView,
+        @ViewBuilder trailing: () -> TrailingView,
+        showDivider: Bool = false,
+        isTransparent: Bool = false
+    ) {
+        self.title = ""
+        self.showDivider = showDivider
+        self.leadingView = AnyView(leading())
+        self.trailingView = AnyView(trailing())
+        self.isBackButtonEnabled = false
+        self.isTransparent = isTransparent
+        self.tintColor = nil
+        self.titleView = AnyView(titleView())
+    }
+    
     
     var body: some View {
         VStack(spacing: 0) {
@@ -93,11 +118,18 @@ struct AmityNavigationBar: View {
                 .layoutPriority(1)
                 .frame(maxWidth: .infinity)
 
-                Text(title)
-                    .applyTextStyle(.titleBold(Color(tintColor ?? viewConfig.theme.baseColor)))
-                    .padding(.horizontal, 8)
-                    .lineLimit(1)
-                    .layoutPriority(2)
+                if let titleView {
+                    titleView
+                        .padding(.horizontal, 8)
+                        .lineLimit(1)
+                        .layoutPriority(2)
+                } else {
+                    Text(title)
+                        .applyTextStyle(.titleBold(Color(tintColor ?? viewConfig.theme.baseColor)))
+                        .padding(.horizontal, 8)
+                        .lineLimit(1)
+                        .layoutPriority(2)
+                }
 
                 HStack {
                     Spacer()

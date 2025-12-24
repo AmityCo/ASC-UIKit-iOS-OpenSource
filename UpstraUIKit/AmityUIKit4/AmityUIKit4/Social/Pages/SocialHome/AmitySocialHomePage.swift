@@ -16,6 +16,7 @@ public struct AmitySocialHomePage: AmityPageView {
     }
     
     @StateObject private var viewModel: AmitySocialHomePageViewModel = AmitySocialHomePageViewModel()
+    @ObservedObject private var globalBannedViewModel =  AmityGlobalBannedViewModel.shared
     @StateObject private var viewConfig: AmityViewConfigController
     
     let showBackButton: Bool
@@ -32,7 +33,7 @@ public struct AmitySocialHomePage: AmityPageView {
             }
             
             AmitySocialHomeTopNavigationComponent(pageId: id, selectedTab: viewModel.selectedTab, searchButtonAction: {
-                if viewModel.selectedTab == .newsFeed || viewModel.selectedTab == .explore {
+                if viewModel.selectedTab == .newsFeed || viewModel.selectedTab == .explore || viewModel.selectedTab == .communities || viewModel.selectedTab == .events {
                     let context = AmitySocialHomePageBehavior.Context(page: self)
                     AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToGlobalSearchPage(context: context)
                 } else if viewModel.selectedTab == .myCommunities {
@@ -72,7 +73,7 @@ public struct AmitySocialHomePage: AmityPageView {
             .frame(height: 62)
             
             Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewModel.selectedTab == .communities || viewModel.selectedTab == .events ? viewConfig.theme.backgroundColor : viewConfig.theme.baseColorShade4))
                 .frame(height: 8)
             
             SocialHomeContainerView($viewModel.selectedTab, pageId: id)
@@ -92,7 +93,7 @@ class AmitySocialHomePageViewModel: ObservableObject {
     
     init() {
         if AmityUIKitManagerInternal.shared.isGuestUser {
-            selectedTab = .explore
+            selectedTab = .communities
         }
         /// Observe didPostCreated event sent from AmityPostCreationPage
         /// We need to explicitly change the tab to Newsfeed.

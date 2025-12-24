@@ -31,4 +31,19 @@ class ChannelManager {
     func unmuteChannel(channelId: String) async throws {
         try await repository.unmuteChannel(channelId: channelId)
     }
+    
+    @discardableResult
+    func updateChannel(builder: AmityChannelUpdateBuilder) async throws -> AmityChannel {
+        try await repository.editChannel(with: builder)
+    }
+    
+    func addRole(channelId: String, userId: String, role: String) async throws {
+        let moderation = AmityChannelModeration(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        let _ = try await moderation.addRole(role, userIds: [userId])
+    }
+    
+    func removeRole(channelId: String, userId: String, role: String) async throws {
+        let moderation = AmityChannelModeration(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        let _ = try await moderation.removeRole(role, userIds: [userId])
+    }
 }

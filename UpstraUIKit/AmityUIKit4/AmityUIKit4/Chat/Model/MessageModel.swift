@@ -20,6 +20,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     public let hasReaction: Bool
     public let avatarURL: URL?
     public let createdAt: Date
+    public let user: AmityUser?
     public let userId: String
     public let isDeleted: Bool
     public let metadata: [String: Any]?
@@ -47,6 +48,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         self.avatarURL = URL(string: message.user?.getAvatarInfo()?.fileURL ?? "")
         self.isEdited = message.isEdited
         self.createdAt = message.createdAt
+        self.user = message.user
         self.userId = message.userId
         self.isDeleted = message.isDeleted
         self.metadata = message.metadata
@@ -108,6 +110,7 @@ extension MessageModel {
         self.avatarURL = nil
         self.isEdited = false
         self.createdAt = Date()
+        self.user = nil
         self.userId = ""
         self.isDeleted = false
         self.metadata = [:]

@@ -109,6 +109,15 @@ extension View {
     func captureViewFrameInWindow(onFrame: @escaping (CGRect) -> Void) -> some View {
         self.modifier(CaptureWindowFrameModifier(onFrame: onFrame))
     }
+    
+    func circularBackground(radius: CGFloat, color: Color) -> some View {
+        Circle()
+            .fill(color)
+            .frame(width: radius, height: radius)
+            .overlay(
+                self
+            )
+    }
 }
 
 // MARK: Button

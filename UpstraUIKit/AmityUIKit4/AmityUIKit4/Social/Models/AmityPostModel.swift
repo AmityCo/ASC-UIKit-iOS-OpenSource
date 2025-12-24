@@ -33,7 +33,7 @@ public class AmityPostModel: Identifiable {
     public var medias: [AmityMedia] = []
     
     /// The post target community
-    public let targetCommunity: AmityCommunity?
+    public var targetCommunity: AmityCommunity?
     
     /// The post metadata
     public let metadata: [String: Any]?
@@ -93,6 +93,8 @@ public class AmityPostModel: Identifiable {
     
     public let impression: Int
     
+    public var links: [AmityLink] = []
+    
     var commentExpandedIds: Set<String> = []
     
     // MARK: - Internal variables
@@ -107,6 +109,10 @@ public class AmityPostModel: Identifiable {
     private(set) var title: String = ""
     private(set) var liveStream: AmityStream?
     private(set) var livestreamState: LivestreamState = .none
+    
+    var room: AmityRoom?
+    var event: AmityEvent?
+    
     let object: AmityPost
     private let childrenPosts: [AmityPost]
     
@@ -170,6 +176,7 @@ public class AmityPostModel: Identifiable {
         postedUserId = post.postedUserId
         sharedCount = Int(post.sharedCount)
         allCommentCount = Int(post.commentsCount)
+        links = post.links
         
         // reactions are ordered by the count. if the count is equal, order by alphabet
         // if the count is 1 and the reaction is the same as current user's first reaction, remove it from the list
@@ -336,6 +343,30 @@ public class AmityPostModel: Identifiable {
                     livestreamState = .idle
                 }
             }
+            
+        case "room":
+            if let roomData = post.getRoomInfo() {
+                room = roomData
+                dataTypeInternal = .room
+                
+                if !(roomData.moderation?.terminateLabels.isEmpty ?? true) {
+                    livestreamState = .terminated
+                } else if roomData.status == AmityRoomStatus.ended {
+                    livestreamState = .ended
+                } else if roomData.status == AmityRoomStatus.live || roomData.status == AmityRoomStatus.waitingReconnect {
+                    livestreamState = .live
+                } else if roomData.status == AmityRoomStatus.recorded {
+                    livestreamState = .recorded
+                } else {
+                    livestreamState = .idle
+                }
+                
+                // If stream is deleted but post is still there (due to be bug), show this stream is currently unavailable text.
+                if roomData.isDeleted {
+                    livestreamState = .idle
+                }
+            }
+            
         case "clip":
             
             let isMuted = post.data?["isMuted"] as? Bool ?? false
