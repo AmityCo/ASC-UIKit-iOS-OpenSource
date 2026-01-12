@@ -23,18 +23,18 @@ let package = Package(
             dependencies: []),
         .binaryTarget(
             name: "AmitySDK",
-            url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.17.0-beta01/AmitySDK.xcframework.zip",
-            checksum: "1d3a50d924fa51959fe1cb8cbf800295f3230027ee239d8868d4d76a5da73f58"
+            url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.17.0-beta01-xcode26.2/AmitySDK.xcframework.zip",
+            checksum: "0d1b764fb04c36346dbab2a4f1900762091b8d707a4245b07d1b053008310f26"
         ),
         .binaryTarget(
             name: "Realm",
-            url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.17.0-beta01/Realm.xcframework.zip",
-            checksum: "32d3e5999b1e13db5570e05b9a9caab74dca79cca854a6c23167d2b2bc30e13d"
+            url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.17.0-beta01-xcode26.2/Realm.xcframework.zip",
+            checksum: "5151b1a35b17d015f972470f6598310f928044ae402529b2a931461096903dc9"
         ),
         .binaryTarget(
             name: "RealmSwift",
-            url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.17.0-beta01/RealmSwift.xcframework.zip",
-            checksum: "65e4b8a93a6204622f77a6c12f9c058c7433557b17980f40d379e96308e910f8"
+            url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.17.0-beta01-xcode26.2/RealmSwift.xcframework.zip",
+            checksum: "0f06d1e1ec7b4cc249ab06132a81a48d97bcabb3c327268dbbe23a3215fd958e"
         ),
         .binaryTarget(
             name: "AmityLiveVideoBroadcastKit",

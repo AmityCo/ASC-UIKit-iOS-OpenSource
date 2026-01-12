@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9211B03A2F150204000D5568 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9211B0392F150204000D5568 /* SharedFrameworks */; };
 		92952FDF2CC0E78E0012B2B9 /* LivestreamPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92952FDE2CC0E78E0012B2B9 /* LivestreamPlayerView.swift */; };
 		92952FE52CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92952FE42CC5B1F90012B2B9 /* RecordedStreamPlayerView.swift */; };
 		A0B68B3026E07278007D7B5B /* LiveStreamViewController+GoLive.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0B68B2F26E07278007D7B5B /* LiveStreamViewController+GoLive.swift */; };
@@ -32,7 +33,6 @@
 		A0BD0B6226DF3A3F0054088B /* LiveStreamBroadcast+UIContainerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0BD0B6126DF3A3F0054088B /* LiveStreamBroadcast+UIContainerState.swift */; };
 		ED84C29E2D71BFAD006FD1DA /* LiveStreamBroadcastViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED84C29D2D71BFAD006FD1DA /* LiveStreamBroadcastViewController.swift */; };
 		ED84C2A32D71D630006FD1DA /* Framework.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED84C2A22D71D630006FD1DA /* Framework.swift */; };
-		ED98C23D2EFC16C10086B4A5 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED98C23C2EFC16C10086B4A5 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,7 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED98C23D2EFC16C10086B4A5 /* SharedFrameworks in Frameworks */,
+				9211B03A2F150204000D5568 /* SharedFrameworks in Frameworks */,
 				A0BD0B3426DDD9820054088B /* AmityUIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -254,7 +254,7 @@
 			);
 			name = AmityUIKitLiveStream;
 			packageProductDependencies = (
-				ED98C23C2EFC16C10086B4A5 /* SharedFrameworks */,
+				9211B0392F150204000D5568 /* SharedFrameworks */,
 			);
 			productName = AmityUIKitLiveStream;
 			productReference = A0BD0B1526DCE4F50054088B /* AmityUIKitLiveStream.framework */;
@@ -541,7 +541,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		ED98C23C2EFC16C10086B4A5 /* SharedFrameworks */ = {
+		9211B0392F150204000D5568 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
