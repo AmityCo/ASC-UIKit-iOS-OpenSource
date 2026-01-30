@@ -31,8 +31,8 @@ class AmityPostDetailPageViewModel: ObservableObject {
         isLoading = true
         observePost(postId: postId)
         
-        // Add observer
-        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePoll(_:)), name: .didVotePoll, object: nil)
+        // Add observer for poll updated notification
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePoll(_:)), name: .didPollUpdated, object: nil)
     }
     
     init(post: AmityPost) {
@@ -41,8 +41,8 @@ class AmityPostDetailPageViewModel: ObservableObject {
                 
         observePost(postId: post.postId)
         
-        // Add observer
-        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePoll(_:)), name: .didVotePoll, object: nil)
+        // Add observer for poll updated notification
+        NotificationCenter.default.addObserver(self, selector: #selector(didUpdatePoll(_:)), name: .didPollUpdated, object: nil)
     }
     
     @objc private func didUpdatePoll(_ notification: Notification) {

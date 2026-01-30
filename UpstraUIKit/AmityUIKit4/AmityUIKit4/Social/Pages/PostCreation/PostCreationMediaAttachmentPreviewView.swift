@@ -261,11 +261,10 @@ struct MediaAttachmentView: View {
         let allowedFormats: Set<String> = ["jpg","jpeg","png"]
         let imageExtension = media.localUrl?.pathExtension.lowercased() ?? ""
         let needsConversion = !allowedFormats.contains(imageExtension)
-        
-        if needsConversion {
-            // Change state outside of dispatch queue
-            media.state = .uploading(progress: 0)
-        }
+
+        // Set uploading state immediately before starting async upload
+        media.state = .uploading(progress: 0)
+        mediaViewModel.updateMediaState(media)
 
         DispatchQueue.global(qos: .background).async {
             if needsConversion {
@@ -307,14 +306,18 @@ struct MediaAttachmentView: View {
     
     // Note: No need for conversion as png image is extracted from UIImage internally in SDK
     private func uploadImage(image: UIImage) {
+        // Set uploading state immediately before starting async upload
+        media.state = .uploading(progress: 0)
+        mediaViewModel.updateMediaState(media)
+
         Task { @MainActor in
             do {
                 let imageData = try await fileRepositoryManager.fileRepository.uploadImage(image) { progress in
-                    
+
                     DispatchQueue.main.async {
                         Log.add(event: .info, "Image Upload progress: \(progress)")
                         media.state = .uploading(progress: progress)
-                        
+
                         // Update view model state
                         self.mediaViewModel.updateMediaState(media)
                     }
@@ -336,10 +339,9 @@ struct MediaAttachmentView: View {
     
     private func generatedThumbnailAndUploadVideo() {
         let originalURL = media.localUrl ?? URL(fileURLWithPath: "")
+        media.state = .uploading(progress: 0.1)
         
         generateThumbnail(videoURL: originalURL)
-        
-        media.state = .uploading(progress: 0.1)
         
         let asset = AVAsset(url: originalURL)
         if VideoConverter.shouldConvertVideo(asset: asset) {

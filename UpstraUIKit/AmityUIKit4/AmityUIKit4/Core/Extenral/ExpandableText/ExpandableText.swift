@@ -111,18 +111,15 @@ public struct ExpandableText: View {
             }
             .modifier(OverlayAdapter(alignment: .trailingLastTextBaseline, view: {
                 if shouldShowMoreButton {
-                    Button {
-                        if let defaultAction {
-                            defaultAction()
-                        } else {
-                            // we expand without expand animation as it looks ugly
-                            isExpanded.toggle()
-                        }
-                    } label: {
-                        Text(moreButtonText)
-                            .font(moreButtonFont ?? font)
-                            .foregroundColor(moreButtonColor)
-                    }
+                    Text(moreButtonText)
+                        .font(moreButtonFont ?? font)
+                        .foregroundColor(moreButtonColor)
+                        .contentShape(Rectangle())
+                        .highPriorityGesture(
+                            TapGesture().onEnded {
+                                isExpanded.toggle()
+                            }
+                        )
                 }
             }))
     }

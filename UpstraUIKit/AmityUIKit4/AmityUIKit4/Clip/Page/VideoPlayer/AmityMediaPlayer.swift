@@ -32,7 +32,7 @@ struct AmityMediaPlayer: UIViewRepresentable {
     
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
-        
+
         let headers = [
             "Authorization": "Bearer \(AmityUIKitManagerInternal.shared.client.accessToken ?? "")"
         ]
@@ -160,6 +160,9 @@ struct AmityCustomMediaPlayer: View {
         }
         .onAppear {
             playerController.autoReplay = false
+        }
+        .onDisappear {
+            playerController.pause()
         }
         .onChange(of: playerController.isPlaying) { playing in
             if playing && !hideOverlay {
