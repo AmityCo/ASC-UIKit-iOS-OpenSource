@@ -17,7 +17,11 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
         case streamingAsCoHost
     }
     
-    @Published var currentState: PageState = .viewer
+    @Published var currentState: PageState = .viewer {
+        didSet {
+            handleStateTransition(from: oldValue, to: currentState)
+        }
+    }
     @Published var showInvitedAsCoHostSheet: Bool = false
     
     private var roomManager = RoomManager()
@@ -26,6 +30,9 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
     @Published var post: AmityPostModel?
     @Published var room: AmityRoom?
     private var cancellable: AnyCancellable?
+    
+    // Watch minute tracking for role transitions
+    private let watchMinuteTracker = WatchMinuteTracker()
     
     // ViewModels
     @Published var broadcasterViewModel: LiveStreamBroadcasterViewModel?
@@ -100,7 +107,7 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
         
         self.broadcasterViewModel = broadcasterViewModel
         self.conferenceViewModel = LiveStreamConferenceViewModel(targetId: postModel.targetId, targetType: postModel.postTargetType, participantRole: .coHost, broadcasterViewModel: broadcasterViewModel)
-        self.livestreamViewerViewModel = LiveStreamViewerViewModel(post: postModel)
+        self.livestreamViewerViewModel = LiveStreamViewerViewModel(post: postModel, tracker: watchMinuteTracker)
     }
     
     private func observeCoHostEvents(room: AmityRoom) {
@@ -167,6 +174,27 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
             } catch {
                 Log.add(event: .error, "Error when levaing the room: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    // MARK: - Watch Minute Tracking State Transitions
+    
+    /// Handle watch minute tracking when user transitions between viewer and co-host roles
+    private func handleStateTransition(from oldState: PageState, to newState: PageState) {
+        guard let room = room else { return }
+        
+        // User became co-host (accepted invitation)
+        if oldState == .viewer && (newState == .inBackstage || newState == .streamingAsCoHost) {
+            // Stop tracking when user becomes co-host
+            watchMinuteTracker.stopTracking()
+            Log.add(event: .info, "Watch tracking stopped: User became co-host")
+        }
+        
+        // User returned to viewer (left co-host role)
+        if (oldState == .inBackstage || oldState == .streamingAsCoHost) && newState == .viewer {
+            // Start new tracking session when user returns to viewer
+            watchMinuteTracker.startTracking(for: room)
+            Log.add(event: .info, "Watch tracking started: User returned to viewer")
         }
     }
 }

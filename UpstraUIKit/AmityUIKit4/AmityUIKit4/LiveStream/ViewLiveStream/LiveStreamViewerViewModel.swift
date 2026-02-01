@@ -22,6 +22,9 @@ class LiveStreamViewerViewModel: ObservableObject {
     private var presenceTimer: Timer?
     @Published var watchingCount: Int = 0
     
+    // Watch minute tracking
+    let watchMinuteTracker: WatchMinuteTracker
+    
     let post: AmityPostModel
     
     @Published var isLoaded = false
@@ -35,8 +38,9 @@ class LiveStreamViewerViewModel: ObservableObject {
         }
     }
     
-    init(post: AmityPostModel) {
+    init(post: AmityPostModel, tracker: WatchMinuteTracker = WatchMinuteTracker()) {
         self.post = post
+        self.watchMinuteTracker = tracker
         subscribeRoomEventAndObserve(roomId: post.room?.roomId ?? "")
         subscribePostEventAndObserve(postId: post.postId)
         
@@ -45,6 +49,11 @@ class LiveStreamViewerViewModel: ObservableObject {
         self.room = room
         self.presenceRepository = AmityRoomPresenceRepository(client: AmityUIKitManagerInternal.shared.client, roomId: room.roomId)
         observeWatchingCount()
+        
+        // Start watch minute tracking for viewers in LIVE rooms
+        if room.status == .live {
+            watchMinuteTracker.startTracking(for: room)
+        }
         
         Task.runOnMainActor {
             do {
@@ -164,6 +173,9 @@ class LiveStreamViewerViewModel: ObservableObject {
         // Cancel any ongoing cleanup operations first
         chatViewModelCancellable?.cancel()
         chatViewModelCancellable = nil
+        
+        // Stop watch minute tracking
+        watchMinuteTracker.stopTracking()
         
         // Clean up chat view model
         liveStreamChatViewModel?.cleanup()

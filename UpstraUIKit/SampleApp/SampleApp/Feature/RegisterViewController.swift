@@ -55,7 +55,7 @@ class RegisterViewController: UIViewController {
          }
          */
         
-        versionLabel.text = "v\(version)\nBuild: \(BuildInfo.gitHash)"
+//        versionLabel.text = "v\(version)\nBuild: \(BuildInfo.gitHash)"
         versionLabel.numberOfLines = 2
         versionLabel.textAlignment = .center
         versionLabel.font = UIFont.systemFont(ofSize: 15, weight: .regular)
@@ -71,7 +71,7 @@ class RegisterViewController: UIViewController {
     }
     
     @objc func onVersionLabelTap() {
-        UIPasteboard.general.string = "Build: \(BuildInfo.gitHash)"
+//        UIPasteboard.general.string = "Build: \(BuildInfo.gitHash)"
         
         Toast.showToast(style: .success, message: "Build hash copied!")
     }

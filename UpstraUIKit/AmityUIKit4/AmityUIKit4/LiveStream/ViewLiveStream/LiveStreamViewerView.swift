@@ -13,7 +13,7 @@ struct LiveStreamViewerView: View {
     @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: .livestreamPlayerPage)
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @State private var showOverlay = false
-    @State private var opacity = 0.0
+    @State private var playPauseOpacity = 0.0
     @State private var isPlaying = true
     @StateObject var networkMonitor = NetworkMonitor()
     @State var degreesRotating = 0.0
@@ -74,6 +74,9 @@ struct LiveStreamViewerView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .clipped()
                             .dismissKeyboardOnDrag()
+                            .onTapGesture {
+                                playPauseButtonAction()
+                            }
                         
                         HStack {
                             // Live badge overlay in original position (top-leading)
@@ -124,6 +127,8 @@ struct LiveStreamViewerView: View {
                                 }
                         }
                         .padding(.top, 20)
+                        
+                        playPauseButton
                     }
                     .ignoresSafeArea(.keyboard, edges: .all)
                 }
@@ -352,9 +357,6 @@ struct LiveStreamViewerView: View {
                 }
             }
         }
-        .onTapGesture {
-            displayOverlay()
-        }
         .onChange(of: viewModel.isStreamTerminated) { isTerminated in
             guard isTerminated else { return }
             
@@ -527,11 +529,44 @@ struct LiveStreamViewerView: View {
         }
     }
     
-    func displayOverlay() {
-        opacity = 1.0
+    private var playPauseButton: some View {
+        VStack {
+            Spacer()
+            
+            HStack {
+                Spacer()
+                
+                Image(isPlaying ? AmityIcon.LiveStream.pauseIcon.imageResource : AmityIcon.LiveStream.playIcon.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
+                   
+                Spacer()
+            }
+            
+            Spacer()
+        }
+        .animation(.easeInOut(duration: 0.3), value: playPauseOpacity)
+        .opacity(playPauseOpacity)
+        .allowsHitTesting(false)
+    }
+    
+    func playPauseButtonAction() {
+        if playPauseOpacity == 1.0 {
+            isPlaying.toggle()
+            
+            // Pause/Resume watch time tracking accordingly
+            if isPlaying {
+                viewModel.watchMinuteTracker.resumeTracking()
+            } else {
+                viewModel.watchMinuteTracker.pauseTracking()
+            }
+        }
+        
+        playPauseOpacity = 1.0
         
         debouncer.run {
-            opacity = 0.0
+            playPauseOpacity = 0.0
         }
     }
 }

@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; };
 		682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		68BB9C2D2F17A09F002E4F31 /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; };
+		68BB9C2E2F17A09F002E4F31 /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		68E6F91A2F2F6C0600EA04B3 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 68E6F9192F2F6C0600EA04B3 /* SharedFrameworks */; };
 		68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; };
 		68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8CA2ACA98CF007D873C /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; };
@@ -20,7 +23,6 @@
 		92DBE8D02ACA98CF007D873C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */; };
 		92DBE8D12ACA98CF007D873C /* Realm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D45B3A93264A840300F6FF52 /* Realm.xcframework */; };
 		92DBE8D22ACA98CF007D873C /* AmityUIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; };
-		92DBE8DE2ACA98CF007D873C /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8DF2ACA98CF007D873C /* AmitySDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45D45B726204253008F7C2C /* AmitySDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E02ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E12ACA98CF007D873C /* RealmSwift.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -28,7 +30,6 @@
 		92DBE8E32ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E42ACA98CF007D873C /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45B3A93264A840300F6FF52 /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E52ACA98CF007D873C /* AmityUIKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; };
 		A0BD0B4926DDE0E30054088B /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B78DA49024BED7DA00EE902B /* SampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA48F24BED7DA00EE902B /* SampleAppTests.swift */; };
 		B78DA49B24BED7DA00EE902B /* SampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */; };
@@ -38,7 +39,6 @@
 		ED32E6FA2EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		ED32E6FB2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; };
 		ED32E6FC2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		ED98C23F2EFC16DA0086B4A5 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED98C23E2EFC16DA0086B4A5 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,7 +65,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				92DBE8DE2ACA98CF007D873C /* AmityUIKitLiveStream.framework in Embed Frameworks */,
+				A0BD0B4926DDE0E30054088B /* AmityUIKitLiveStream.framework in Embed Frameworks */,
 				92DBE8DF2ACA98CF007D873C /* AmitySDK.xcframework in Embed Frameworks */,
 				ED32E6FC2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Embed Frameworks */,
 				92DBE8E02ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */,
@@ -86,7 +86,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A0BD0B4926DDE0E30054088B /* AmityUIKitLiveStream.framework in Embed Frameworks */,
+				68BB9C2E2F17A09F002E4F31 /* AmityUIKitLiveStream.framework in Embed Frameworks */,
 				68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */,
 				D478D16A26240A5E006EA140 /* AmityUIKit.framework in Embed Frameworks */,
 			);
@@ -170,8 +170,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED98C23F2EFC16DA0086B4A5 /* SharedFrameworks in Frameworks */,
-				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
+				68E6F91A2F2F6C0600EA04B3 /* SharedFrameworks in Frameworks */,
+				68BB9C2D2F17A09F002E4F31 /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
 			);
@@ -315,7 +315,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				ED98C23E2EFC16DA0086B4A5 /* SharedFrameworks */,
+				68E6F9192F2F6C0600EA04B3 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -899,14 +899,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		68E6F9192F2F6C0600EA04B3 /* SharedFrameworks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SharedFrameworks;
+		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
-		};
-		ED98C23E2EFC16DA0086B4A5 /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

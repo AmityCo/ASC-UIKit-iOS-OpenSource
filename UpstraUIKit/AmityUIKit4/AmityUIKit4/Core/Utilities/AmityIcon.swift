@@ -256,6 +256,8 @@ enum AmityIcon: String, ImageResourceProvider {
         case menu = "livestreamMenuIcon"
         case hostIcon = "streamHostIcon"
         case leaveIcon = "leaveIcon"
+        case playIcon = "ic_play"
+        case pauseIcon = "ic_pause"
     }
     
     enum Reaction: String, ImageResourceProvider {
