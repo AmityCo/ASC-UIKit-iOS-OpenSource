@@ -13,26 +13,27 @@ class AmityUIKitConfigController {
     private(set) var config: [String: Any] = [:]
     private var excludedList: Set<String> = []
     private(set) var featureFlag: AmityFeatureFlag?
-    
+    private var configFilePath: String?
+
     private init() {
         loadConfig()
     }
-    
+
     private func loadConfig() {
-        let wrappedConfig = RemoteConfig.shared.getMergedConfig()
-        
-        if let configDict = wrappedConfig["config"] as? [String: Any], !configDict.isEmpty {
-            config = configDict
-        } else {
-            config = loadConfigFile(fileName: "AmityUIKitConfig")
-        }
-        
+        let configFilePath = configFilePath ?? AmityUIKit4Manager.bundle.path(forResource: "AmityUIKitConfig", ofType: "json")
+        let localConfig = configFilePath.flatMap { loadConfigFile(filePath: $0) } ?? [:]
+        let wrappedConfig = RemoteConfig.shared.mergeWithLocalConfig(localConfig)
+
+        config = (wrappedConfig["config"] as? [String: Any]) ?? localConfig
         excludedList = Set(config["excludes"] as? [String] ?? [])
-        
-        let featureConfig = config["feature_flags"] as? [String: Any] ?? [:]
-        self.featureFlag = try? AmityFeatureFlag.decode(from: featureConfig)
+        featureFlag = try? AmityFeatureFlag.decode(from: config["feature_flags"] as? [String: Any] ?? [:])
     }
-    
+
+    func setConfigFile(_ filePath: String) {
+        configFilePath = filePath
+        refreshConfig()
+    }
+
     func refreshConfig() {
         loadConfig()
         NotificationCenter.default.post(name: .configDidUpdate, object: nil)
@@ -143,19 +144,14 @@ class AmityUIKitConfigController {
         )
     }
     
-    private func loadConfigFile(fileName: String) -> [String: Any] {
-        if let path = AmityUIKit4Manager.bundle.path(forResource: fileName, ofType: "json") {
-            do {
-                let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
-                let jsonResult = try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
-                if let jsonResult = jsonResult as? Dictionary<String, AnyObject> {
-                    return jsonResult
-                }
-            } catch {
-                return [:]
-            }
+    private func loadConfigFile(filePath: String) -> [String: Any]? {
+        do {
+            let data = try Data(contentsOf: URL(fileURLWithPath: filePath), options: .mappedIfSafe)
+            return try JSONSerialization.jsonObject(with: data, options: .mutableLeaves) as? [String: Any]
+        } catch {
+            Log.warn("Error loading config file at path: \(filePath), error: \(error)")
+            return nil
         }
-        return [:]
     }
     
     public func getCurrentThemeStyle() -> AmityThemeStyle {
