@@ -195,9 +195,7 @@ public struct AmityTextEditorView: View {
                 Text(placeholder)
                     .applyTextStyle(.body(Color(UIColor(hex: "#898E9E"))))
                     .padding(.leading, 5)
-                    .onTapGesture {
-                        viewModel.textView.becomeFirstResponder()
-                    }
+                    .allowsHitTesting(false)
                     .isHidden(hidePlaceholder)
             }
         }

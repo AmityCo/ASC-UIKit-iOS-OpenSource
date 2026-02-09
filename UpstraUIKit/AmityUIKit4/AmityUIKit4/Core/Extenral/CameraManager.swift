@@ -1532,7 +1532,7 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
         embeddingView = view
         attachZoom(view)
         attachFocus(view)
-        attachExposure(view)
+//        attachExposure(view)
         
         DispatchQueue.main.async { () -> Void in
             guard let previewLayer = self.previewLayer else { return }

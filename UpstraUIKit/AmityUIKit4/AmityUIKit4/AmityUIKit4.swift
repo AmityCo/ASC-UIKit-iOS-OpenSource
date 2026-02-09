@@ -139,6 +139,22 @@ public final class AmityUIKit4Manager {
         return Bundle(for: self)
     }
     
+    /// Sets a custom configuration JSON file to override the default bundled config.
+    ///
+    /// Use this method to provide a custom configuration JSON file from your app's bundle.
+    ///
+    /// Example:
+    /// ```swift
+    /// if let path = Bundle.main.path(forResource: "CustomUIKitConfig", ofType: "json") {
+    ///     AmityUIKit4Manager.setCustomConfigFile(path)
+    /// }
+    /// ```
+    ///
+    /// - Parameter filePath: The absolute file path to the configuration JSON file.
+    public static func setConfigFile(_ filePath: String) {
+        AmityUIKitConfigController.shared.setConfigFile(filePath)
+    }
+
     public static func syncNetworkConfig() async throws {
         try await AmityUIKitManagerInternal.shared.syncNetworkConfig()
     }

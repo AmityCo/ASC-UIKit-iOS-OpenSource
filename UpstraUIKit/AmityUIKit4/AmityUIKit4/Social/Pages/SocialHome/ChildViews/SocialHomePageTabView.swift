@@ -85,6 +85,10 @@ struct SocialHomePageTabView: View {
                     return nil
                 }
                 
+                if viewConfig.isHidden(elementId: .clipsButton) && item.tab == .clips {
+                    return nil
+                }
+                
                 return item
             })
             
