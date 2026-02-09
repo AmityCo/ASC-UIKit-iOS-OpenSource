@@ -203,7 +203,7 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
      Property to determine if manager should enable pan to change exposure/brightness.
      - note: Default value is **true**
      */
-    open var shouldEnableExposure = true {
+    open var shouldEnableExposure = false {
         didSet {
             exposureGesture.isEnabled = shouldEnableExposure
         }
@@ -1532,7 +1532,7 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
         embeddingView = view
         attachZoom(view)
         attachFocus(view)
-        attachExposure(view)
+//        attachExposure(view)
         
         DispatchQueue.main.async { () -> Void in
             guard let previewLayer = self.previewLayer else { return }
