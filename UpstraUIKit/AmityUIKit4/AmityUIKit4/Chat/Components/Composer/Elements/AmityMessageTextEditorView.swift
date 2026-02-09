@@ -168,9 +168,7 @@ public struct AmityMessageTextEditorView: View {
                 Text(placeholder)
                     .applyTextStyle(viewModel.textStyle?.withColor(Color(viewConfig.theme.baseColorShade3)) ?? .body(Color(viewConfig.theme.baseColorShade3)))
                     .padding(.leading, placeholderPadding)
-                    .onTapGesture {
-                        viewModel.textView.becomeFirstResponder()
-                    }
+                    .allowsHitTesting(false)
                     .isHidden(hidePlaceholder)
             }
         }
