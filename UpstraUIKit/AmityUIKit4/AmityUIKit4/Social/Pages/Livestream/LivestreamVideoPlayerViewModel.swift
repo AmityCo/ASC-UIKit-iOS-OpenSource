@@ -39,8 +39,8 @@ class LivestreamVideoPlayerViewModel: ObservableObject {
         guard let stream = post.liveStream else { return }
         Task.runOnMainActor {
             do {
-                guard let _ = try await stream.getLiveChat() else { return }
-                self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(stream: stream)
+                guard let _ = try await stream.getLiveChat(), let updatedStream = StreamManager().getStream(id: stream.streamId).snapshot else { return }
+                self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(stream: updatedStream)
             } catch {
                 Log.add(event: .error, "Failed to get live chat channel: \(error.localizedDescription)")
             }

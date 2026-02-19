@@ -26,7 +26,15 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
     func configure(playerLayer: AVPlayerLayer) {
         self.player = playerLayer.player
         self.playerLayer = playerLayer
-        
+
+        // Force audio output even when the device is in silent mode.
+        // This must happen before playback starts to ensure audio works on all devices.
+        try? AVAudioSession.sharedInstance().setCategory(.playback)
+
+        // Explicitly sync player audio state to avoid silent playback on some devices
+        player?.isMuted = isMuted
+        player?.volume = 1.0
+
         configureObservers()
         configurePlayerItem()
     }

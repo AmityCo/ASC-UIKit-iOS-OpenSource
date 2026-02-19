@@ -198,9 +198,9 @@ struct ExpandableTextEditorView: View {
             }
             
             // Handle character limit
-            if processedValue.count > maxCharCount {
+            if processedValue.utf16Count > maxCharCount {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
-                processedValue = String(processedValue.prefix(maxCharCount))
+                processedValue = processedValue.utf16Prefix(maxCharCount)
             }
             
             // Update input if it was modified

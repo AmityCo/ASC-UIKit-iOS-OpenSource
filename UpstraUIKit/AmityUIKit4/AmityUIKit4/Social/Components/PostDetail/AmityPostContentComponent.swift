@@ -346,7 +346,9 @@ public struct AmityPostContentComponent: AmityComponentView {
                 
                 // Post text content
                 if !post.text.isEmpty {
-                    ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, highlightedText: context?.searchKeyword, onTapMentionee: { userId in
+                    let tapActionContext = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
+                
+                    ExpandableText(post.text, defaultAction: { onTapAction?(tapActionContext) }, metadata: post.metadata, mentionees: post.mentionees, highlightedText: context?.searchKeyword, onTapMentionee: { userId in
                         goToUserProfilePage(userId)
                     }, onTapHashtag: { hashtag in
                         // \u{200E} make the hashtag text left to right in all languages

@@ -49,6 +49,7 @@ class PostFeedViewModel: ObservableObject {
         NotificationCenter.default.removeObserver(self, name: .didPostCreated, object: nil)
         NotificationCenter.default.removeObserver(self, name: .didPostDeleted, object: nil)
         NotificationCenter.default.removeObserver(self, name: .didPostReacted, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .didPollUpdated, object: nil)
         NotificationCenter.default.removeObserver(self, name: .didLivestreamStatusUpdated, object: nil)
     }
     
@@ -113,6 +114,10 @@ class PostFeedViewModel: ObservableObject {
         /// If the post is the modded one that is not from liveCollection, we need to update directly to the dataSource to be reactive.
         NotificationCenter.default.addObserver(self, selector: #selector(didPostReacted(_:)), name: .didPostReacted, object: nil)
         
+        /// Observe didPollUpdated events sent from PostContentPollView(vote/unvote) and PostBottomSheetView(close poll)
+        /// If the post is the modded one that is not from liveCollection, we need to update directly to the dataSource to be reactive.
+        NotificationCenter.default.addObserver(self, selector: #selector(didPollUpdated(_:)), name: .didPollUpdated, object: nil)
+        
         
         NotificationCenter.default.addObserver(self, selector: #selector(didLivestreamStatusUpdated(_:)), name: .didLivestreamStatusUpdated, object: nil)
     }
@@ -168,6 +173,14 @@ class PostFeedViewModel: ObservableObject {
     @objc private func didPostReacted(_ notification: Notification) {
         if let object = notification.object as? AmityPost, feedType == .globalFeed {
             /// Check recentlyCreatedPosts is reacted
+            if recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
+                self.objectWillChange.send()
+            }
+        }
+    }
+    
+    @objc private func didPollUpdated(_ notification: Notification) {
+        if let object = notification.object as? AmityPost, feedType == .globalFeed {
             if recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
                 self.objectWillChange.send()
             }

@@ -43,4 +43,14 @@ extension String {
     func capitalizeFirstLetter() -> String {
         return prefix(1).capitalized + dropFirst()
     }
+
+    var utf16Count: Int {
+        self.utf16.count
+    }
+
+    func utf16Prefix(_ maxLength: Int) -> String {
+        guard self.utf16.count > maxLength else { return self }
+        let index = String.Index(utf16Offset: maxLength, in: self)
+        return String(self[..<index])
+    }
 }

@@ -61,6 +61,11 @@ class AppManager {
                 
         AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
         
+        // load config file from sample app side
+        if let filePath = Bundle.main.path(forResource: "AmityUIKitConfig", ofType: "json") {
+            AmityUIKit4Manager.setConfigFile(filePath)
+        }
+        
         let livestreamBehavior = CustomV4LivestreamBehavior()
         AmityUIKit4Manager.behaviour.livestreamBehavior = livestreamBehavior
         #endif

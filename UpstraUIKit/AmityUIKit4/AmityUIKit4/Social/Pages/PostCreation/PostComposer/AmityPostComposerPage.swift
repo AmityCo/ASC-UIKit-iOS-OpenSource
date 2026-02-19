@@ -47,6 +47,7 @@ public struct AmityPostComposerPage: AmityPageView {
     @State private var showDismissAlert: Bool = false
     @State private var isLoading: Bool = false
     @State private var areAttachmentsReady: Bool = true
+    @State private var keyboardHeight: CGFloat = 0
     private let options: AmityPostComposerOptions
     // Track original media file IDs for comparison when post is updated
     @State private var originalMediaFileIds: [String] = []
@@ -78,7 +79,7 @@ public struct AmityPostComposerPage: AmityPageView {
         case .createClip:
             return "What's going on? (optional)"
         default:
-            return "What's going on..."
+            return "What's on your mind?"
         }
     }
     
@@ -132,65 +133,81 @@ public struct AmityPostComposerPage: AmityPageView {
             VStack {
                 navigationBarView
                 
-                ScrollView {
-                    
-                    if viewModel.isInClipComposerMode, let clipURL {
-                        ZStack {
-                            VideoPlayer(url: clipURL, play: $playClipVideo)
-                                .mute(true)
-                                .contentMode(.scaleAspectFill)
-                                .onAppear {
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        playClipVideo = false
+                ScrollViewReader { scrollProxy in
+                    ScrollView {
+                        
+                        if viewModel.isInClipComposerMode, let clipURL {
+                            ZStack {
+                                VideoPlayer(url: clipURL, play: $playClipVideo)
+                                    .mute(true)
+                                    .contentMode(.scaleAspectFill)
+                                    .onAppear {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                            playClipVideo = false
+                                        }
                                     }
-                                }
-                                .frame(width: 80, height: 142)
-                                .background(Color(viewConfig.defaultLightTheme.secondaryColor))
-                                .cornerRadius(4, corners: .allCorners)
-                            
-                            Image(AmityIcon.videoControlIcon.getImageResource())
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 24, height: 24)
+                                    .frame(width: 80, height: 142)
+                                    .background(Color(viewConfig.defaultLightTheme.secondaryColor))
+                                    .cornerRadius(4, corners: .allCorners)
+                                
+                                Image(AmityIcon.videoControlIcon.getImageResource())
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(width: 24, height: 24)
+                            }
+                        }
+                        
+                        ExpandableTextEditorView(isTextEditorFocused: .constant(false), input: $viewModel.postTitle)
+                            .placeholder("Title (Optional)")
+                            .font(AmityTextStyle.titleBold(.clear).getFont())
+                            .placeholderColor(Color(viewConfig.theme.baseColorShade2))
+                            .textColor(Color(viewConfig.theme.baseColor))
+                            .lineLimit(10)
+                            .maxCharCount(viewModel.postTitleMaxCount)
+                            .disableNewlines(true)
+                            .padding(.horizontal, 4)
+                        
+                        AmityMessageTextEditorView(
+                            textEditorViewModel,
+                            text: $viewModel.postText,
+                            mentionData: $viewModel.mentionData,
+                            mentionedUsers: $viewModel.mentionedUsers,
+                            textViewHeight: getTextEditorHeight(for: viewModel.postText)
+                        )
+                        .placeholder(viewModel.postText.isEmpty ? placeholderText : "")
+                        .maxExpandableHeight(99999)
+                        .scrollEnabled(false)
+                        .enableHashtagHighlighting(true)
+                        .maxHashtagCount(30)
+                        .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+                        .onChange(of: viewModel.postText) { _ in
+                            guard textEditorViewModel.textView.isFirstResponder,
+                                  keyboardHeight > 0 else { return }
+                            scrollToCursorIfNeeded(scrollProxy: scrollProxy, kbHeight: keyboardHeight)
+                        }
+                        .onChange(of: textEditorViewModel.reachHashtagLimit) { reached in
+                            if reached {
+                                let alert = UIAlertController(title: "Hashtag limit reached", message: "You can only add hashtag up to 30 hashtags per post.", preferredStyle: .alert)
+                                let action = UIAlertAction(title: "OK", style: .cancel)
+                                alert.addAction(action)
+                                host.controller?.present(alert, animated: true)
+                            }
+                        }
+                        .ignoresSafeArea(.keyboard)
+                        
+                        Color.clear.id("TextEditorBottom")
+
+                        if !viewModel.isInClipComposerMode {
+                            PostCreationMediaAttachmentPreviewView(viewModel: mediaAttatchmentViewModel)
+                                .contentShape(Rectangle())
+                                .padding(.bottom, 60)
+                        }
+                    }.onReceive(keyboardPublisher) { keyboardEvent in
+                        keyboardHeight = keyboardEvent.height
+                        if keyboardEvent.isAppeared && textEditorViewModel.textView.isFirstResponder {
+                            scrollToCursorIfNeeded(scrollProxy: scrollProxy, kbHeight: keyboardEvent.height)
                         }
                     }
-                    
-                    ExpandableTextEditorView(isTextEditorFocused: .constant(false), input: $viewModel.postTitle)
-                        .placeholder("Title (Optional)")
-                        .font(AmityTextStyle.titleBold(.clear).getFont())
-                        .placeholderColor(Color(viewConfig.theme.baseColorShade2))
-                        .textColor(Color(viewConfig.theme.baseColor))
-                        .lineLimit(10)
-                        .maxCharCount(viewModel.postTitleMaxCount)
-                        .disableNewlines(true)
-                        .padding(.horizontal, 4)
-                    
-                    AmityMessageTextEditorView(
-                        textEditorViewModel,
-                        text: $viewModel.postText,
-                        mentionData: $viewModel.mentionData,
-                        mentionedUsers: $viewModel.mentionedUsers,
-                        textViewHeight: getTextEditorHeight(for: viewModel.postText)
-                    )
-                    .placeholder(viewModel.postText.isEmpty ? placeholderText : "")
-                    .maxExpandableHeight(99999)
-                    .enableHashtagHighlighting(true)
-                    .maxHashtagCount(30)
-                    .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
-                    .onChange(of: textEditorViewModel.reachHashtagLimit) { reached in
-                        if reached {
-                            let alert = UIAlertController(title: "Hashtag limit reached", message: "You can only add hashtag up to 30 hashtags per post.", preferredStyle: .alert)
-                            let action = UIAlertAction(title: "OK", style: .cancel)
-                            alert.addAction(action)
-                            host.controller?.present(alert, animated: true)
-                        }
-                    }
-                    
-                    if !viewModel.isInClipComposerMode {
-                        PostCreationMediaAttachmentPreviewView(viewModel: mediaAttatchmentViewModel)
-                            .contentShape(Rectangle())
-                            .padding(.bottom, 60)
-                    }                    
                 }
                 
                 Spacer()
@@ -381,7 +398,7 @@ public struct AmityPostComposerPage: AmityPageView {
         ? AmityLocalizedStringSet.Social.postCreateError.localizedString
         : AmityLocalizedStringSet.Social.postEditError.localizedString
         
-        if viewModel.postText.count > maxCharLimit {
+        if viewModel.postText.utf16Count > maxCharLimit {
             message = "Your post wasn't posted because it exceeds the 50,000 characters limit."
         } else if error.isAmityErrorCode(.banWordFound) {
             message = "Your post wasn't posted because it contains a blocked word."
@@ -520,5 +537,43 @@ public struct AmityPostComposerPage: AmityPageView {
         withAnimation(.easeInOut(duration: 0.5).delay(3.0)) {
             failedToastAlphaValue = 0.0
         }
+    }
+    
+    private func scrollToCursorIfNeeded(scrollProxy: ScrollViewProxy, kbHeight: CGFloat) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let textView = textEditorViewModel.textView
+            guard let selectedRange = textView.selectedTextRange else { return }
+            guard let scrollView = findParentScrollView(of: textView) else { return }
+
+            // Cursor position on screen
+            let caretRect = textView.caretRect(for: selectedRange.end)
+            let caretInWindow = textView.convert(caretRect, to: nil)
+
+            // Top of keyboard + overlay area on screen
+            let screenHeight = UIScreen.main.bounds.height
+            let overlayHeight: CGFloat = 100
+            let keyboardTop = screenHeight - kbHeight - overlayHeight
+
+            // Only scroll if cursor is behind the keyboard
+            guard caretInWindow.maxY > keyboardTop else { return }
+
+            // Scroll down by exactly the overlap amount
+            let overlap = caretInWindow.maxY - keyboardTop
+            var offset = scrollView.contentOffset
+            offset.y += overlap
+            scrollView.setContentOffset(offset, animated: true)
+        }
+    }
+
+    private func findParentScrollView(of view: UIView) -> UIScrollView? {
+        var current = view.superview
+        
+        while let sv = current {
+            if let scrollView = sv as? UIScrollView {
+                return scrollView
+            }
+            current = sv.superview
+        }
+        return nil
     }
 }

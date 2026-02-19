@@ -195,9 +195,7 @@ public struct AmityTextEditorView: View {
                 Text(placeholder)
                     .applyTextStyle(.body(Color(UIColor(hex: "#898E9E"))))
                     .padding(.leading, 5)
-                    .onTapGesture {
-                        viewModel.textView.becomeFirstResponder()
-                    }
+                    .allowsHitTesting(false)
                     .isHidden(hidePlaceholder)
             }
         }
@@ -227,6 +225,7 @@ public class AmityTextEditorViewModel: ObservableObject {
     @Published var reachMentionLimit = false
     var existingHashtags: [AmityHashtagModel] = []
     @Published var reachHashtagLimit = false
+    var isScrollEnabled: Bool = true
     
     // Callback to reapply hashtag highlighting after mention processing
     var reapplyHashtagHighlighting: (() -> Void)?
@@ -348,6 +347,8 @@ internal struct TextEditorView: UIViewRepresentable {
         textView.delegate = context.coordinator
         textView.font = .systemFont(ofSize: 15)
         textView.backgroundColor = .clear
+        textView.isScrollEnabled = viewModel.isScrollEnabled
+        textView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         textView.textColor =  viewModel.typingAttributes[.foregroundColor] as? UIColor
         textView.typingAttributes = context.coordinator.parentView.viewModel.typingAttributes
         return textView

@@ -32,6 +32,10 @@ extension AmityMessageTextEditorView: AmityViewBuildable {
     public func maxHashtagCount(_ value: Int) -> Self {
         mutating(keyPath: \.maxHashtagCount, value: value)
     }
+
+    public func scrollEnabled(_ value: Bool) -> Self {
+        mutating(keyPath: \.scrollEnabled, value: value)
+    }
 }
 
 public struct AmityMessageTextEditorView: View {
@@ -54,6 +58,7 @@ public struct AmityMessageTextEditorView: View {
     private var placeholderPadding: CGFloat = 5
     private var enableHashtagHighlighting: Bool = false
     private var maxHashtagCount: Int = 5
+    private var scrollEnabled: Bool = true
     
     public init(_ viewModel: AmityTextEditorViewModel, text: Binding<String>, mentionData: Binding<MentionData>, mentionedUsers: Binding<[AmityMentionUserModel]>, textViewHeight: CGFloat, textEditorMaxHeight: CGFloat = 106) {
         self._text = text
@@ -89,10 +94,12 @@ public struct AmityMessageTextEditorView: View {
             ZStack(alignment: .leading) {
                 TextEditorView(viewModel, $text, $mentionedUsers)
                     .onAppear {
+                        viewModel.isScrollEnabled = scrollEnabled
+
                         if autoFocusTextEditor {
                             viewModel.textView.becomeFirstResponder()
                         }
-                        
+
                         if let metadata = mentionData.metadata {
                             viewModel.mentionManager.setMentions(metadata: metadata, inText: text)
                         }
@@ -113,20 +120,15 @@ public struct AmityMessageTextEditorView: View {
                     .onChange(of: text) { value in
                         hidePlaceholder = !text.isEmpty
                         
-                        if characterLimit > 0, value.count > characterLimit {
-                            self.text = String(value.prefix(characterLimit))
+                        if characterLimit > 0, value.utf16Count > characterLimit {
+                            self.text = value.utf16Prefix(characterLimit)
                             self.viewModel.textView.text = text
                         }
                         
-                        let textHeight = viewModel.textView.text.height(withConstrainedWidth: geometry.size.width, font: .systemFont(ofSize: 15))
-                        
-                        let defaultInset = viewModel.textView.textContainerInset
-                        
-                        // Note:
-                        // Max 5 lines = 90 (18px per line) | Top + Bottom Inset: 16 | ~ Max height: 106
-                        
-                        let paddedHeight = textHeight + defaultInset.top + defaultInset.bottom
-                        textEditorHeight = min(paddedHeight, textEditorMaxHeight)
+                        // Use UITextView's own size calculation which accounts for
+                        // textContainerInset and lineFragmentPadding correctly
+                        let fittingSize = viewModel.textView.sizeThatFits(CGSize(width: geometry.size.width, height: .greatestFiniteMagnitude))
+                        textEditorHeight = min(fittingSize.height, textEditorMaxHeight)
                     }
                     .onReceive(viewModel.textView.textPublisher, perform: { text in
                         self.text = text
@@ -143,9 +145,7 @@ public struct AmityMessageTextEditorView: View {
                 Text(placeholder)
                     .applyTextStyle(viewModel.textStyle?.withColor(Color(viewConfig.theme.baseColorShade3)) ?? .body(Color(viewConfig.theme.baseColorShade3)))
                     .padding(.leading, placeholderPadding)
-                    .onTapGesture {
-                        viewModel.textView.becomeFirstResponder()
-                    }
+                    .allowsHitTesting(false)
                     .isHidden(hidePlaceholder)
             }
         }

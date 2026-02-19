@@ -23,6 +23,8 @@
 		682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; };
 		682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		684097562B30607F00697E1B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 684097552B30607F00697E1B /* GoogleService-Info.plist */; };
+		68D870FA2F35D4380071D3E3 /* AmityUIKitConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = 68D870F92F35D4380071D3E3 /* AmityUIKitConfig.json */; };
+		68D870FB2F35D4380071D3E3 /* AmityUIKitConfig.json in Resources */ = {isa = PBXBuildFile; fileRef = 68D870F92F35D4380071D3E3 /* AmityUIKitConfig.json */; };
 		68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; };
 		68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7214C9CB2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */; };
@@ -35,6 +37,7 @@
 		729CAF3E273CC8ED000AE162 /* Binding+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF3D273CC8ED000AE162 /* Binding+Extension.swift */; };
 		729CAF42273CC95B000AE162 /* EndpointManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF41273CC95B000AE162 /* EndpointManager.swift */; };
 		72AACE0B273931F100E59D55 /* EndpointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72AACE0A273931F100E59D55 /* EndpointsView.swift */; };
+		926A57262F4742DE00B72702 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 926A57252F4742DE00B72702 /* SharedFrameworks */; };
 		92DBE8A62ACA98CF007D873C /* DataListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D495077325E637C1005C033F /* DataListViewController.swift */; };
 		92DBE8A72ACA98CF007D873C /* SamplePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C25F3274CE38B0058B066 /* SamplePageViewController.swift */; };
 		92DBE8A82ACA98CF007D873C /* PostCreatorSettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */; };
@@ -127,7 +130,6 @@
 		D4AFF1CF25ECE8AD002C001C /* PostPreviewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF1CD25ECE8AD002C001C /* PostPreviewTableViewCell.swift */; };
 		D4AFF23225ED1E7C002C001C /* GlobalPostsFeedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23125ED1E7C002C001C /* GlobalPostsFeedViewController.swift */; };
 		D4AFF23625ED1F88002C001C /* GlobalPostsDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AFF23525ED1F88002C001C /* GlobalPostsDataSource.swift */; };
-		ED2386B32EDEE97200FC819E /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED2386B22EDEE97200FC819E /* SharedFrameworks */; };
 		EDF77D6E2E841857005776DA /* GuestLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF77D6D2E841857005776DA /* GuestLoginView.swift */; };
 		EDF77D6F2E841857005776DA /* GuestLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDF77D6D2E841857005776DA /* GuestLoginView.swift */; };
 /* End PBXBuildFile section */
@@ -203,6 +205,7 @@
 		684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		684AE1402B0C9B4E00FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		688F8617299E409B000FE6E7 /* SharedFrameworks */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SharedFrameworks; path = ../SharedFrameworks; sourceTree = "<group>"; };
+		68D870F92F35D4380071D3E3 /* AmityUIKitConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AmityUIKitConfig.json; sourceTree = "<group>"; };
 		68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Eko Corporation Company Limited"; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = ../Shared/RealmSwift.xcframework; sourceTree = "<group>"; };
 		68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7214C9CA2632BE5500192BB3 /* UserLevelPushNotificationsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLevelPushNotificationsTableViewController.swift; sourceTree = "<group>"; };
@@ -282,7 +285,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				ED2386B32EDEE97200FC819E /* SharedFrameworks in Frameworks */,
+				926A57262F4742DE00B72702 /* SharedFrameworks in Frameworks */,
 				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
@@ -447,6 +450,7 @@
 		B78DA46C24BED7D300EE902B = {
 			isa = PBXGroup;
 			children = (
+				68D870F92F35D4380071D3E3 /* AmityUIKitConfig.json */,
 				688F8616299E409B000FE6E7 /* Packages */,
 				B78DA47724BED7D300EE902B /* SampleApp */,
 				B78DA48E24BED7DA00EE902B /* SampleAppTests */,
@@ -609,7 +613,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				ED2386B22EDEE97200FC819E /* SharedFrameworks */,
+				926A57252F4742DE00B72702 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -703,6 +707,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68D870FB2F35D4380071D3E3 /* AmityUIKitConfig.json in Resources */,
 				92DBE8D42ACA98CF007D873C /* LaunchScreen.storyboard in Resources */,
 				92DBE8D52ACA98CF007D873C /* AmityPostThumbsupTableViewCell.xib in Resources */,
 				92DBE8D62ACA98CF007D873C /* AmityCustomFooterTableViewCell.xib in Resources */,
@@ -723,6 +728,7 @@
 				B78DA48524BED7DA00EE902B /* LaunchScreen.storyboard in Resources */,
 				0D73AC9425DB8CB5000D73CA /* AmityPostThumbsupTableViewCell.xib in Resources */,
 				0D8FFC2A25DCBFD900943538 /* AmityCustomFooterTableViewCell.xib in Resources */,
+				68D870FA2F35D4380071D3E3 /* AmityUIKitConfig.json in Resources */,
 				B78DA48224BED7DA00EE902B /* Assets.xcassets in Resources */,
 				B78DA48024BED7D300EE902B /* Main.storyboard in Resources */,
 				0D73AC9625DB8CB5000D73CA /* AmityPostBirthdayTableViewCell.xib in Resources */,
@@ -1294,14 +1300,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		926A57252F4742DE00B72702 /* SharedFrameworks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SharedFrameworks;
+		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
-		};
-		ED2386B22EDEE97200FC819E /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

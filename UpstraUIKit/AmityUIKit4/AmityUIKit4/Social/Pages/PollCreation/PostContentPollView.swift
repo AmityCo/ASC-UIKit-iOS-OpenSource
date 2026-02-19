@@ -152,7 +152,7 @@ struct PostContentPollView: View {
                             return
                         }
 
-                        viewModel.vote(poll: poll, answers: Array(selectedAnswers))
+                        viewModel.vote(poll: poll, answers: Array(selectedAnswers), post: post)
                     }
                 }, label: {
                     HStack {
@@ -219,7 +219,7 @@ struct PostContentPollView: View {
                     let isUnvoteButtonVisible = poll.isVoted && !poll.isClosed && !isInPendingFeed
                     Button {
                         selectedAnswers.removeAll()
-                        viewModel.unVote(poll: poll)
+                        viewModel.unVote(poll: poll, post: post)
                     } label: {
                         Text(AmityLocalizedStringSet.Social.pollUnvoteButton.localizedString)
                             .applyTextStyle(.captionBold(Color(viewConfig.theme.primaryColor)))
@@ -295,14 +295,15 @@ class PostContentPollViewModel: ObservableObject {
     let pollManager = PollManager()
     
     @MainActor
-    func vote(poll: AmityPostModel.PollModel, answers: [String]) {
+    func vote(poll: AmityPostModel.PollModel, answers: [String], post: AmityPostModel) {
         Task {
             do {
                 let _ = try await pollManager.votePoll(pollId: poll.id, answerIds: answers)
                 
-                // Post notification
+                /// Send didPollUpdated event to update global feed data source
+                /// This event is observed in PostFeedViewModel and AmityPostDetailPageViewModel
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    NotificationCenter.default.post(name: .didVotePoll, object: nil)
+                    NotificationCenter.default.post(name: .didPollUpdated, object: post.object)
                 }
             } catch let error {
                 if error.isErrorCode(400000) {
@@ -319,15 +320,16 @@ class PostContentPollViewModel: ObservableObject {
     }
     
     
-    func unVote(poll: AmityPostModel.PollModel) {
+    func unVote(poll: AmityPostModel.PollModel, post: AmityPostModel) {
         Task.runOnMainActor { [weak self] in
             do {
                 let _ = try await self?.pollManager.unvotePoll(pollId: poll.id)
                 Toast.showToast(style: .success, message: "Vote removed.")
                 
-                // Post notification
+                /// Send didPollUpdated event to update global feed data source
+                /// This event is observed in PostFeedViewModel and AmityPostDetailPageViewModel
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    NotificationCenter.default.post(name: .didVotePoll, object: nil)
+                    NotificationCenter.default.post(name: .didPollUpdated, object: post.object)
                 }
             } catch let error {
                 if error.isErrorCode(400000) {

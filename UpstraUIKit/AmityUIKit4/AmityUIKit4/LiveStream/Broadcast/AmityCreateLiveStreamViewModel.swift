@@ -222,12 +222,13 @@ class AmityCreateLiveStreamViewModel: ObservableObject, AmityVideoBroadcasterDel
                 Log.add(event: .info, "Post Created: \(post.postId)")
                 
                 // #5 Create Live Stream Channel
-                if let channel = try await stream.getLiveChat() {
+                if let channel = try await stream.getLiveChat(), let updatedStream = streamManager.getStream(id: streamId).snapshot {
                     // If live chat is enabled, we will mute the channel since the beginning of live stream
                     if isLiveChatDisabled {
                         try await channelManager.muteChannel(channelId: channel.channelId)
                     }
-                    self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(stream: stream)
+                    self.createdStream = updatedStream
+                    self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(stream: updatedStream)
                 }
 
                 // #6 Start publishing
