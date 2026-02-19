@@ -37,7 +37,7 @@
 		729CAF3E273CC8ED000AE162 /* Binding+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF3D273CC8ED000AE162 /* Binding+Extension.swift */; };
 		729CAF42273CC95B000AE162 /* EndpointManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 729CAF41273CC95B000AE162 /* EndpointManager.swift */; };
 		72AACE0B273931F100E59D55 /* EndpointsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72AACE0A273931F100E59D55 /* EndpointsView.swift */; };
-		926A57262F4742DE00B72702 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 926A57252F4742DE00B72702 /* SharedFrameworks */; };
+		92400B782F4752BE00D3F4C9 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92400B772F4752BE00D3F4C9 /* SharedFrameworks */; };
 		92DBE8A62ACA98CF007D873C /* DataListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D495077325E637C1005C033F /* DataListViewController.swift */; };
 		92DBE8A72ACA98CF007D873C /* SamplePageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724C25F3274CE38B0058B066 /* SamplePageViewController.swift */; };
 		92DBE8A82ACA98CF007D873C /* PostCreatorSettingsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03190A6272169C1008A85DC /* PostCreatorSettingsPage.swift */; };
@@ -285,7 +285,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				926A57262F4742DE00B72702 /* SharedFrameworks in Frameworks */,
+				92400B782F4752BE00D3F4C9 /* SharedFrameworks in Frameworks */,
 				A0BD0B4826DDE0E30054088B /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
@@ -613,7 +613,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				926A57252F4742DE00B72702 /* SharedFrameworks */,
+				92400B772F4752BE00D3F4C9 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -1300,7 +1300,7 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		926A57252F4742DE00B72702 /* SharedFrameworks */ = {
+		92400B772F4752BE00D3F4C9 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
