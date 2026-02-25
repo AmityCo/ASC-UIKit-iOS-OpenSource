@@ -11,7 +11,7 @@
 		684AE1012B0C5B0200FD7270 /* AmityUIKit4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1002B0C5B0200FD7270 /* AmityUIKit4Tests.swift */; };
 		685F16C22BFCABAD0016685F /* AmityReactionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C12BFCABAD0016685F /* AmityReactionList.swift */; };
 		685F16C62BFCABB50016685F /* ReactionTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C52BFCABB50016685F /* ReactionTabBarView.swift */; };
-		926A57202F4742C000B72702 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 926A571F2F4742C000B72702 /* SharedFrameworks */; };
+		92AF7E232F4F98C1003360E4 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92AF7E222F4F98C1003360E4 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -654,7 +654,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				926A57202F4742C000B72702 /* SharedFrameworks in Frameworks */,
+				92AF7E232F4F98C1003360E4 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1127,7 +1127,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		926A571F2F4742C000B72702 /* SharedFrameworks */ = {
+		92AF7E222F4F98C1003360E4 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};
