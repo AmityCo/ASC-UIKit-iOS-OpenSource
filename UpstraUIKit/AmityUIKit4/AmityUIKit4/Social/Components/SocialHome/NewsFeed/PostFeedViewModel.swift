@@ -171,24 +171,28 @@ class PostFeedViewModel: ObservableObject {
     }
     
     @objc private func didPostReacted(_ notification: Notification) {
-        if let object = notification.object as? AmityPost, feedType == .globalFeed {
-            /// Check recentlyCreatedPosts is reacted
-            if recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
-                self.objectWillChange.send()
-            }
-        }
+        refreshRecentlyCreatedPost(notification.object)
     }
     
     @objc private func didPollUpdated(_ notification: Notification) {
-        if let object = notification.object as? AmityPost, feedType == .globalFeed {
-            if recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
-                self.objectWillChange.send()
-            }
-        }
+        refreshRecentlyCreatedPost(notification.object)
     }
     
     @objc private func didLivestreamStatusUpdated(_ notification: Notification) {
-        self.objectWillChange.send()
+        refreshRecentlyCreatedPost(notification.object)
+    }
+    
+    private func refreshRecentlyCreatedPost(_ object: Any?) {
+        if let post = object as? AmityPost, feedType == .globalFeed {
+            if recentlyCreatedPosts.contains(where: { $0.postId == post.postId }) {
+                if let postModel = postManager.getPost(withId: post.postId).snapshot {
+                    if let index = recentlyCreatedPosts.firstIndex(where: { $0.postId == post.postId }) {
+                        recentlyCreatedPosts[index] = postModel
+                        self.renderFeed()
+                    }
+                }
+            }
+        }
     }
 }
 

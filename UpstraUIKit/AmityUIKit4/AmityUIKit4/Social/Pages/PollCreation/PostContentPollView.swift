@@ -138,6 +138,7 @@ struct PostContentPollView: View {
                     .contentShape(Rectangle())
                     .border(radius: 8, borderColor: Color(viewConfig.theme.baseColorShade3), borderWidth: 1)
                 })
+                .buttonStyle(.plain)
                 .isHidden(style == .detail || poll.answers.count <= minimumVisibleAnswersCount || isInPendingFeed || isPollOptionExpanded, remove: true)
                 
                 // Vote Poll
