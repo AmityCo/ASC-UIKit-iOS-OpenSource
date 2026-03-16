@@ -109,6 +109,8 @@ struct CommentListView<Content>: View where Content: View {
                     AmityCommentAdComponent(ad: ad, selctedAdInfoAction: { ad in
                         commentCoreViewModel.adSeetState = (true, ad)
                     })
+                case .bannerAd:
+                    EmptyView()
                 case .content(let comment):
                     Section {
                         if !comment.isDeleted {
