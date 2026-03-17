@@ -35,6 +35,11 @@ class PostFeedViewModel: ObservableObject {
     private var globalPinnedPostsIds: Set<String> = []
     private var feedPosts: [PaginatedItem<AmityPost>] = []
     
+    /// Cached banner-ad slots keyed by their position index (0, 1, 2 …).
+    /// Reusing the same instances keeps their `id` stable so SwiftUI does
+    /// not recreate (and therefore "blink") the ad views on every re-render.
+    private var cachedBannerAds: [Int: PaginatedItem<AmityPostModel>] = [:]
+    
     public enum FeedType: Equatable {
         case community(communityId: String)
         case globalFeed
@@ -229,6 +234,9 @@ extension PostFeedViewModel {
         let feedPosts = prepareFeedPosts()
         listItems.append(contentsOf: feedPosts)
         
+        // Inject external banner ads (e.g. Google Ads) into the feed
+        listItems = injectBannerAds(into: listItems)
+        
         self.postItems = listItems
     }
     
@@ -258,6 +266,8 @@ extension PostFeedViewModel {
                 if canRenderPost(post: post) && !globalPinnedPostsIds.contains(post.postId) {
                     finalItems.append(PaginatedItem(id: $0.id, type: .content(AmityPostModel(post: post))))
                 }
+            case .bannerAd:
+                break // banner ads are injected later in renderFeed()
             }
         }
         
@@ -268,6 +278,45 @@ extension PostFeedViewModel {
         let filterCondition = !post.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" }
         return filterCondition
     }
+    
+    // MARK: - External Banner Ad Injection
+    
+    /// Inserts `BannerAdPlacement` items into the list at a fixed frequency
+    /// controlled by `BannerAdFeedConfig`.
+    /// Placements are cached so their IDs stay stable across re-renders,
+    /// preventing SwiftUI from recreating (blinking) the ad views.
+    private func injectBannerAds(into items: [PaginatedItem<AmityPostModel>]) -> [PaginatedItem<AmityPostModel>] {
+        let config = BannerAdFeedConfig.shared
+        guard config.isEnabled, config.frequency > 0, config.adViewBuilder != nil else {
+            return items
+        }
+        
+        var result = [PaginatedItem<AmityPostModel>]()
+        var adsInserted = 0
+        var contentCount = 0
+        
+        for item in items {
+            result.append(item)
+            
+            if case .content = item.type {
+                contentCount += 1
+            }
+            
+            if contentCount > 0,
+               contentCount % config.frequency == 0,
+               adsInserted < config.maxAdsCount {
+                
+                // Reuse the cached item for this slot index, or create once
+                let slotIndex = adsInserted
+                if cachedBannerAds[slotIndex] == nil {
+                    let placement = BannerAdPlacement(adUnitID: config.adUnitID)
+                    cachedBannerAds[slotIndex] = PaginatedItem(id: placement.id, type: .bannerAd(placement))
+                }
+                result.append(cachedBannerAds[slotIndex]!)
+                adsInserted += 1
+            }
+        }
+        
+        return result
+    }
 }
-
-

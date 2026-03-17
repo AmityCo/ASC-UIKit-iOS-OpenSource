@@ -140,6 +140,8 @@ class CommentCoreViewModel: ObservableObject {
                 return PaginatedItem(id: $0.id, type: .content(AmityCommentModel(comment: comment)))
             case .ad(let ad):
                 return PaginatedItem(id: $0.id, type: .ad(ad))
+            case .bannerAd(let placement):
+                return PaginatedItem(id: $0.id, type: .bannerAd(placement))
             }
         }
         items.append(contentsOf: mappedLoadedItems)
