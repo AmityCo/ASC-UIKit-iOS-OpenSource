@@ -121,14 +121,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
     }
     
     private var backgroundOverlay: some View {
-        LinearGradient(
-            colors: [Color.black.opacity(0),
-                     Color.black.opacity(0.7),
-                     Color.black.opacity(0.8),
-                     Color.black],
-            startPoint: .top,
-            endPoint: .bottom
-        )
+        Color.clear
     }
     
     private func getMessageBubble(_ message: MessageModel, isModerator: Bool, isMuted: Bool, isHost: Bool, isCoHost: Bool) -> some View {

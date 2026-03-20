@@ -44,6 +44,7 @@ public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
     var clip: AmityClipData?
     
     @Published var altText: String?
+    @Published var produtTags: [AmityProductTagModel] = []
     
     /// This property carry over when the state change from .localAsset to .uploadedVideo.
     var localAsset: PHAsset?
@@ -200,6 +201,15 @@ public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
         }
     }
     
+    public func isUploaded() -> Bool {
+        switch state {
+        case .uploadedImage(_), .uploadedVideo(_), .downloadableImage(_, _), .downloadableVideo(_, _):
+            return true
+        default:
+            return false
+        }
+    }
+    
     public func getAltText(hasDefault: Bool = true) -> String? {
         let fallback = "No description available"
         
@@ -214,6 +224,17 @@ public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
             }
             return altText
             
+        default: return nil
+        }
+    }
+    
+    public func getFileId() -> String? {
+        switch self.state {
+
+        case .uploadedImage(let data), .downloadableImage(let data, _): return data.fileId
+
+        case .uploadedVideo(let data), .downloadableVideo(let data, _): return data.fileId
+
         default: return nil
         }
     }

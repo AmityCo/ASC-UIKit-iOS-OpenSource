@@ -9,6 +9,5 @@ import UIKit
 
 extension NSAttributedString.Key {
     static let hashtag = NSAttributedString.Key("amity.hashtag")
-    static let link = NSAttributedString.Key("amity.link")
+    static let previewLink = NSAttributedString.Key("amity.previewlink")
 }
-

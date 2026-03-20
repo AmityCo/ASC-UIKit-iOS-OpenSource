@@ -355,6 +355,20 @@ extension View {
             self
         }
     }
+
+    /// Applies half-sheet presentation style with drag indicator hidden.
+    /// On iOS 16+, sets detents to half (.fraction(0.5)) and full (.large).
+    /// On earlier versions, uses default sheet presentation.
+    @ViewBuilder
+    func halfSheetPresentation() -> some View {
+        if #available(iOS 16.0, *) {
+            self
+                .presentationDetents([.fraction(0.5), .large])
+                .presentationDragIndicator(.hidden)
+        } else {
+            self
+        }
+    }
 }
 
 class WindowFrameCaptureUIView: UIView {

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import PhotosUI
+import UniformTypeIdentifiers
 
 struct MultiSelectionMediaPicker: UIViewControllerRepresentable {
     
@@ -63,37 +64,35 @@ struct MultiSelectionMediaPicker: UIViewControllerRepresentable {
             }
             
             for result in results {
-                
+                let itemProvider = result.itemProvider
+
                 // load image from item provider
-                if result.itemProvider.canLoadObject(ofClass: UIImage.self) {
+                if itemProvider.canLoadObject(ofClass: UIImage.self) {
                     dispatchGroup.enter()
-                    result.itemProvider.loadObject(ofClass: UIImage.self) { newImage, error in
+                    itemProvider.loadObject(ofClass: UIImage.self) { newImage, error in
                         defer { dispatchGroup.leave() }
                         guard error == nil, let image = newImage as? UIImage else { return }
                         images.append(image)
                     }
-                } else {
-                    guard let assetId = result.assetIdentifier else { continue }
-                    
-                    let fetchResult = PHAsset.fetchAssets(withLocalIdentifiers: [assetId], options: nil)
-                    guard let asset = fetchResult.firstObject else { continue }
-                    
-                    // load video as avasset
-                    if asset.mediaType == .video {
-                        let options = PHVideoRequestOptions()
-                        options.version = .original
-                        options.isNetworkAccessAllowed = true
-                        
-                        dispatchGroup.enter()
-                        PHImageManager.default().requestAVAsset(forVideo: asset, options: options) { avAsset, audioMix, info in
-                            defer { dispatchGroup.leave() }
-                            if let urlAsset = avAsset as? AVURLAsset {
-                                videos.append(urlAsset.url)
-                            }
+                } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
+                    // Load video directly from item provider (works with limited photo access)
+                    dispatchGroup.enter()
+                    itemProvider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { url, error in
+                        defer { dispatchGroup.leave() }
+                        guard error == nil, let url = url else { return }
+
+                        // Copy to temporary location since the provided URL is temporary
+                        let tempURL = FileManager.default.temporaryDirectory
+                            .appendingPathComponent(UUID().uuidString)
+                            .appendingPathExtension(url.pathExtension)
+                        do {
+                            try FileManager.default.copyItem(at: url, to: tempURL)
+                            videos.append(tempURL)
+                        } catch {
+                            Log.add(event: .error, "Failed to copy video: \(error)")
                         }
                     }
                 }
-                
             }
             
             dispatchGroup.notify(queue: .main) {

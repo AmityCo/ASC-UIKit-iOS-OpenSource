@@ -8,6 +8,7 @@
 import SwiftUI
 import LinkPresentation
 import AmitySDK
+import SafariServices
 
 public struct AmityPendingPostContentComponent: AmityComponentView {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
@@ -35,7 +36,8 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             
             VStack(spacing: 12) {
                 postContentView(post)
-                
+                postProductCarouselView(post)
+            
                 if viewModel.hasModeratorRole() {
                     VStack(spacing: 16) {
                         Rectangle()
@@ -47,7 +49,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 }
             }
         }
-        .padding(EdgeInsets(top: 8, leading: 16, bottom: 12, trailing: 16))
+        .padding(EdgeInsets(top: 8, leading: 0, bottom: 12, trailing: 0))
         .background(Color(viewConfig.theme.backgroundColor))
         .updateTheme(with: viewConfig)
     }
@@ -103,6 +105,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 }
             }
         }
+        .padding(EdgeInsets(top: 8, leading: 12, bottom: 0, trailing: 12))
     }
     
     
@@ -164,6 +167,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 EmptyView()
             }
         }
+        .padding(.horizontal, 16)
     }
     
     
@@ -180,8 +184,10 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 
                 // Post text content
                 if !post.text.isEmpty {
-                    ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
+                    ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, productTags: post.textProductTags, onTapMentionee: { userId in
                         goToUserProfilePage(userId)
+                    }, onTapProductTag: { productId in
+                        openProductWebView(productId: productId)
                     })
                     .lineLimit(8)
                     .moreButtonText("...See more")
@@ -198,6 +204,14 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
         }
     }
     
+    @ViewBuilder
+    private func postProductCarouselView(_ post: AmityPostModel) -> some View {
+        if !post.allProductTags.isEmpty {
+            AmityProductCarouselView(allProductTags: post.allProductTags, postId: post.postId)
+                .environmentObject(viewConfig)
+                .environmentObject(host)
+        }
+    }
     
     @ViewBuilder
     private func postReviewActionView(_ post: AmityPostModel) -> some View {
@@ -244,6 +258,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 .accessibilityIdentifier(AccessibilityID.Social.PendingPost.postDeclineButton)
         }
         .frame(height: 40)
+        .padding(.horizontal, 16)
     }
     
     @ViewBuilder
@@ -348,6 +363,14 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
         .padding(EdgeInsets(top: 16, leading: 20, bottom: 16, trailing: 20))
     }
     
+    private func openProductWebView(productId: String) {
+        guard let productTag = post.textProductTags?.first(where: { $0.productId == productId }),
+              let url = URL(string: productTag.object.productUrl) else { return }
+        let browserVC = SFSafariViewController(url: url)
+        browserVC.modalPresentationStyle = .pageSheet
+        UIApplication.topViewController()?.present(browserVC, animated: true)
+    }
+
     private func goToUserProfilePage(_ userId: String) {
         let context = AmityPendingPostContentComponentBehavior.Context(component: self, userId: userId)
         AmityUIKitManagerInternal.shared.behavior.pendingPostContentComponentBehavior?.goToUserProfilePage(context: context)

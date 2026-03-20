@@ -236,6 +236,9 @@ enum AmityIcon: String, ImageResourceProvider {
     case communityPeopleIcon = "communityPeopleIcon"
     case eventAttendeeIcon = "eventAttendeeIcon"
     case eventRSVPBellIcon = "eventRSVPBellIcon"
+    case tagIcon = "tagIcon"
+    case livestreamPostPlayerActionButton = "livestream_post_player_action_button"
+    case postPlayerActionButton = "post_player_action_button"
     
     // Livestream icons
     enum LiveStream: String, ImageResourceProvider {
@@ -256,6 +259,12 @@ enum AmityIcon: String, ImageResourceProvider {
         case menu = "livestreamMenuIcon"
         case hostIcon = "streamHostIcon"
         case leaveIcon = "leaveIcon"
+        case productTaggingIcon = "livestreamProductTaggingIcon"
+        case emptyProductTaggingIcon = "emptyProductTaggingIcon"
+        case productTagImagePlaceholderIcon = "productTagImagePlaceholderIcon"
+        case livestreamPinProductIcon = "livestreamPinProductIcon"
+        case livestreamFilledPinProductIcon = "livestreamFilledPinProductIcon"
+        case livestreamAddThumbnailButtonIcon = "livestreamAddThumbnailButtonIcon"
         case playIcon = "ic_play"
         case pauseIcon = "ic_pause"
     }

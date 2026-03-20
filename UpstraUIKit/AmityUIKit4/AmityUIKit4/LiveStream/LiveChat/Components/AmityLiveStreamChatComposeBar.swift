@@ -32,6 +32,26 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
         HStack(alignment: .bottom, spacing: 10) {
             switch viewModel.composeBarState {
             case .normal, .disabled:
+                    // Show product tagging button for host always, co-host with permission always,
+                    // co-host without permission or viewer only if there are products
+                    ProductTaggingButtonElement(productCount: viewModel.productCount) {
+                        Task {
+                            // Re-fetch network setting before opening product tag sheet
+                            await viewModel.checkProductCatalogueSettings()
+                            guard viewModel.isProductTagEnabled else {
+                                if viewModel.isStreamer {
+                                    LiveStreamAlert.shared.show(for: .productTaggingUnavailableWhileStreaming(action: {
+                                        LiveStreamAlert.shared.hide()
+                                    }))
+                                }
+                                return
+                            }
+                            await viewModel.refreshProductTagsAction?()
+                            viewModel.showProductTagAction?()
+                        }
+                    }
+                    .isHidden(!viewModel.isProductTagEnabled || (viewModel.participantRole != .host && !(viewModel.participantRole == .coHost && viewModel.canCoHostManageProduct) && viewModel.productCount == 0))
+                
                 inputView
                     .allowsHitTesting(!AmityUIKitManagerInternal.shared.isGuestUser)
                 rightButton

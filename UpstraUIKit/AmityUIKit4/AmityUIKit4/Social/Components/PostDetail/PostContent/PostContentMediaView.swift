@@ -8,8 +8,10 @@
 import Foundation
 import SwiftUI
 import AmitySDK
+import SafariServices
 
 struct PostContentMediaView: View {
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @StateObject private var viewModel: PostContentMediaViewModel = PostContentMediaViewModel()
     @ObservedObject var viewConfig: AmityViewConfigController
     let post: AmityPostModel
@@ -24,51 +26,62 @@ struct PostContentMediaView: View {
         if !post.medias.isEmpty {
             getGridView(data: post.medias) { index, media in
                 
-                ZStack {
-                    // Handle different media states
-                    Group {
-                        if let url = media.getImageURL() {
-                            Color.clear
-                                .overlay(Color(viewConfig.theme.baseColorShade4))
-                                .overlay(
-                                    URLImage(url, content: { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                    })
-                                    .environment(\.urlImageOptions, URLImageOptions.amityOptions)
-                                )
-                                .contentShape(Rectangle())
-                                .applyIf(media.getAltText() != nil) {
-                                    $0.accessibility(children: .ignore, labelKey: "Photo \(index + 1) of \(post.medias.count): \(media.getAltText()!)")
-                                }
-                                            
-                        } else {
-                            Color(viewConfig.theme.baseColorShade4)
+                ZStack(alignment: .bottomTrailing) {
+                    ZStack {
+                        // Handle different media states
+                        Group {
+                            if let url = media.getImageURL() {
+                                Color.clear
+                                    .overlay(Color(viewConfig.theme.baseColorShade4))
+                                    .overlay(
+                                        URLImage(url, content: { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                        })
+                                        .environment(\.urlImageOptions, URLImageOptions.amityOptions)
+                                    )
+                                    .contentShape(Rectangle())
+                                    .applyIf(media.getAltText() != nil) {
+                                        $0.accessibility(children: .ignore, labelKey: "Photo \(index + 1) of \(post.medias.count): \(media.getAltText()!)")
+                                    }
+
+                            } else {
+                                Color(viewConfig.theme.baseColorShade4)
+                            }
+                        }
+
+                        // Display play button if the media is video
+                        if media.type == .video {
+                            Image(AmityIcon.videoControlIcon.imageResource)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 40, height: 40)
+                        }
+
+                        // +X ovelay view if the post has more than 4 medias
+                        if index == 3 && post.medias.count > 4 {
+                            ZStack {
+                                Rectangle()
+                                    .fill(Color.black.opacity(0.25))
+
+                                Text("+\(post.medias.count - 3)")
+                                    .applyTextStyle(.headline(.white))
+                            }
+                            .allowsHitTesting(false)
+                            .applyIf(media.getAltText() != nil) {
+                                $0.accessibility(children: .combine, labelKey: "Activate to view \(post.medias.count - 3) more photos")
+                            }
                         }
                     }
-                    
-                    // Display play button if the media is video
-                    if media.type == .video {
-                        Image(AmityIcon.videoControlIcon.imageResource)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 40, height: 40)
-                    }
-                    
-                    // +X ovelay view if the post has more than 4 medias
-                    if index == 3 && post.medias.count > 4 {
-                        ZStack {
-                            Rectangle()
-                                .fill(Color.black.opacity(0.25))
-                            
-                            Text("+\(post.medias.count - 3)")
-                                .applyTextStyle(.headline(.white))
-                        }
-                        .allowsHitTesting(false)
-                        .applyIf(media.getAltText() != nil) {
-                            $0.accessibility(children: .combine, labelKey: "Activate to view \(post.medias.count - 3) more photos")
-                        }
+
+                    if !media.produtTags.isEmpty {
+                        AmityProductTagBadgeView(count: media.produtTags.count)
+                            .padding(8)
+                            .onTapGesture {
+                                viewModel.selectedProductTagMedia = media
+                                viewModel.showProductTagSheet = true
+                            }
                     }
                 }
                 .compositingGroup()
@@ -83,21 +96,44 @@ struct PostContentMediaView: View {
             }
             .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
                 MediaViewer(
-                    medias: post.medias, 
-                    startIndex: viewModel.selectedMediaIndex, 
+                    medias: post.medias,
+                    startIndex: viewModel.selectedMediaIndex,
                     viewConfig: viewConfig,
                     closeAction: { viewModel.showMediaViewer.toggle() },
                     showEditAction: post.isOwner,
                     post: post,
                     showViewParentPost: false
                 )
-                
+
+            }
+            .sheet(isPresented: $viewModel.showProductTagSheet) {
+                productTagListSheet
             }
         } else {
             EmptyView()
         }
     }
     
+    @ViewBuilder
+    private var productTagListSheet: some View {
+        if let media = viewModel.selectedProductTagMedia {
+            let renderMode: ProductTagListRenderMode = media.type == .video ? .video : .image
+            let component = AmityProductTagListComponent(
+                productTags: media.produtTags,
+                renderMode: renderMode,
+                sourceId: post.postId, onProductClick: { productTag in
+                    if let url = URL(string: productTag.object.productUrl) {
+                        let browserVC = SFSafariViewController(url: url)
+                        browserVC.modalPresentationStyle = .pageSheet
+                        UIApplication.topViewController()?.present(browserVC, animated: true)
+                    }
+                })
+            component
+                .environmentObject(host)
+                .halfSheetPresentation()
+        }
+    }
+
     @ViewBuilder
     private func getGridView<Content: View, Data: RandomAccessCollection>(data: Data, @ViewBuilder content: @escaping (Data.Index, Data.Element) -> Content) -> some View where Data.Element: Identifiable {
         GeometryReader { geometry in
@@ -136,4 +172,6 @@ struct PostContentMediaView: View {
 class PostContentMediaViewModel: ObservableObject {
     @Published var showMediaViewer: Bool = false
     @Published var selectedMediaIndex: Int = 0
+    @Published var showProductTagSheet: Bool = false
+    @Published var selectedProductTagMedia: AmityMedia?
 }

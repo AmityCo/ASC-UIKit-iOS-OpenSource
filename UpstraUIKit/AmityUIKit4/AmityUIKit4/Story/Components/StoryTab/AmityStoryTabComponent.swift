@@ -156,9 +156,10 @@ class AmityStoryTabComponentViewModel: ObservableObject {
                     let targetCommunity = post.targetCommunity
                     
                     // Parent post are text posts, we need to filter children posts which are live rooms
-                    return post.childrenPosts.compactMap({ post -> AmityPostModel? in
-                        guard post.dataType == "room" && post.getRoomInfo()?.status == .live else { return nil }
-                        let model = AmityPostModel(post: post)
+                    return post.childrenPosts.compactMap({ childPost -> AmityPostModel? in
+
+                        guard childPost.dataType == "room" && childPost.getRoomInfo()?.status == .live && post.getFeedType() == .published else { return nil }
+                        let model = AmityPostModel(post: childPost)
                         model.targetCommunity = targetCommunity
                         return model
                     })

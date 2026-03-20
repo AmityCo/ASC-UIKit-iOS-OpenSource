@@ -138,11 +138,9 @@ struct InfoTextField: View {
                 .frame(minHeight: 34)
                 .onChange(of: text) { newText in
                     guard let limitedCharCount = data.maxCharCount else { return }
-                    charCount = newText.count
+                    charCount = newText.utf16Count
                     if charCount >= limitedCharCount {
-                        text = String(newText.prefix(limitedCharCount))
-                        ImpactFeedbackGenerator.impactFeedback(style: .light)
-                        return
+                        text = newText.utf16Prefix(limitedCharCount)
                     }
                     
                     if !data.allowNewLine {
@@ -151,9 +149,9 @@ struct InfoTextField: View {
                 }
                 .onAppear {
                     guard let limitedCharCount = data.maxCharCount else { return }
-                    charCount = text.count
+                    charCount = text.utf16Count
                     if charCount >= limitedCharCount {
-                        text = String(text.prefix(limitedCharCount))
+                        text = text.utf16Prefix(limitedCharCount)
                     }
                 }
                 .padding(.vertical, 10)

@@ -8,6 +8,7 @@
 
 import SwiftUI
 import AmitySDK
+import SafariServices
 
 public struct AmityLivestreamPlayerPage: AmityPageView {
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
@@ -47,6 +48,11 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
             // Error View
             PostDetailEmptyStateView(action: { host.controller?.dismiss(animated: true) })
                 .visibleWhen(!viewModel.isLoading && (viewModel.room?.status == .ended || viewModel.room?.status == .recorded || viewModel.room?.status == .terminated) && displayErrorIfEnded)
+        }
+        .onAppear {
+            Task {
+                await viewModel.checkProductCatalogueSettings()
+            }
         }
         .bottomSheet(isShowing: $viewModel.showInvitedAsCoHostSheet, height: .contentSize, backgroundColor: Color(viewConfig.defaultDarkTheme.backgroundColor), sheetContent: {
             LiveStreamCoHostJoinSheet(
@@ -104,9 +110,162 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
     
     @ViewBuilder
     private var playbackPlayerView: some View {
-        if let room = viewModel.post?.room {
-            LiveStreamPlaybackPlayerView(room: room)
+        if let room = viewModel.post?.room, let post = viewModel.post {
+            let isHost = post.postedUserId == AmityUIKitManagerInternal.shared.client.currentUserId
+            let childPost = viewModel.updatedChildPost ?? post.childrenPosts.first
+            let productTagsBinding = Binding<[AmityProductTagModel]>(
+                get: {
+                    (viewModel.updatedChildPost ?? post.childrenPosts.first)?.getMediaProductTags().compactMap { tag -> AmityProductTagModel? in
+                        guard let product = tag.product else { return nil }
+                        return AmityProductTagModel(object: product, range: NSRange(), contentType: .media)
+                    } ?? []
+                },
+                set: { _ in }
+            )
+            ZStack(alignment: .bottomLeading) {
+                AmityPostMediaVideoPlayer(
+                    pageId: id,
+                    post: post,
+                    playerType: .livestream(room),
+                    hideActionMenu: !isHost,
+                    onClose: {
+                        host.controller?.dismissOrPop()
+                    },
+                    onTagProducts: isHost ? {
+                        if let childPost = childPost {
+                            showPlaybackProductList(childPost: childPost)
+                        }
+                    } : nil,
+                    liveProductTags: productTagsBinding
+                )
                 .ignoresSafeArea(.all)
+            }
+        }
+    }
+    
+    private func showPlaybackProductList(childPost: AmityPost) {
+        Task {
+            // Re-fetch network setting before showing any product tag UI
+            await viewModel.checkProductCatalogueSettings()
+            guard viewModel.isProductTagEnabled else { return }
+            _showPlaybackProductList(childPost: childPost)
+        }
+    }
+    
+    private func _showPlaybackProductList(childPost: AmityPost) {
+        // Check if current user is the post owner (host)
+        let isHost = childPost.postedUserId == AmityUIKitManagerInternal.shared.client.currentUserId
+        
+        if isHost {
+            // Seed viewModel state from the child post
+            viewModel.taggedProducts = childPost.getMediaProductTags().compactMap { $0.product }
+            viewModel.pinnedProductId = childPost.pinnedProductId
+            viewModel.previousProductCount = viewModel.taggedProducts.count
+            
+            let manageVM = ManageProductTagViewModel()
+            manageVM.taggedProducts = viewModel.taggedProducts
+            manageVM.pinnedProductId = viewModel.pinnedProductId
+            
+            let manageComponent = ManageProductTagListComponent(
+                viewModel: manageVM,
+                renderMode: .playback,
+                onClose: { products in
+                    viewModel.taggedProducts = products
+                },
+                onAddProducts: {
+                    viewModel.previousProductCount = manageVM.taggedProducts.count
+                    let productSelectionComponent = AmityProductTagSelectionComponent(
+                        pageId: .livestreamPlayerPage,
+                        mode: .livestream,
+                        initialSelection: [],
+                        existingProducts: manageVM.taggedProducts.map { $0.productId },
+                        onClose: {
+                            UIApplication.topViewController()?.dismiss(animated: true)
+                        },
+                        onDone: {
+                            if manageVM.taggedProducts.count > viewModel.previousProductCount {
+                                // Sync to parent before API call
+                                viewModel.taggedProducts = manageVM.taggedProducts
+                                UIApplication.topViewController()?.dismiss(animated: true) {
+                                    Task {
+                                        await viewModel.updateProductTagsAPI(childPost: childPost)
+                                    }
+                                }
+                            } else {
+                                UIApplication.topViewController()?.dismiss(animated: true)
+                            }
+                        },
+                        onTagChanges: { newlySelectedProducts in
+                            let existingIds = Set(manageVM.taggedProducts.map { $0.productId })
+                            let newProducts = newlySelectedProducts.filter { !existingIds.contains($0.productId) }
+                            manageVM.taggedProducts = manageVM.taggedProducts + newProducts
+                        }
+                    )
+                        .environmentObject(viewConfig)
+                        .ignoresSafeArea(edges: .bottom)
+                    let hostController = AmitySwiftUIHostingController(rootView: productSelectionComponent)
+                    hostController.modalPresentationStyle = UIModalPresentationStyle.pageSheet
+                    UIApplication.topViewController()?.present(hostController, animated: true)
+                },
+                onPinToggle: { productId, isPinned in
+                    // Pin/unpin disabled for recorded livestream
+                    print("Cannot pin/unpin products in recorded livestream")
+                },
+                onProductRemove: { productId in
+                    Task {
+                        // Filter out the removed product for API call without local update to manageVM
+                        viewModel.taggedProducts = manageVM.taggedProducts.filter { $0.productId != productId }
+                        if viewModel.pinnedProductId == productId {
+                            viewModel.pinnedProductId = nil
+                        }
+                        await viewModel.updateProductTagsAPI(childPost: childPost)
+                        // Sync BE response back to manageVM
+                        manageVM.taggedProducts = viewModel.taggedProducts
+                        manageVM.pinnedProductId = viewModel.pinnedProductId
+                    }
+                }
+            )
+            .environmentObject(AmityViewConfigController(pageId: .livestreamPlayerPage, componentId: .productTagListBottomsheet))
+            
+            let vc = AmitySwiftUIHostingController(rootView: manageComponent)
+            vc.modalPresentationStyle = UIModalPresentationStyle.pageSheet
+            host.controller?.present(vc, animated: true)
+        } else {
+            // Show view-only product list for viewer
+            let productTags = childPost.getMediaProductTags().compactMap { mediaTag -> AmityProductTagModel? in
+                guard let product = mediaTag.product else { return nil }
+                return AmityProductTagModel(object: product, range: NSRange(location: 0, length: 0), contentType: .media)
+            }
+            
+            let component = AmityProductTagListComponent(
+                pageId: .livestreamPlayerPage,
+                productTags: productTags,
+                renderMode: .livestream,
+                sourceId: childPost.getRoomInfo()?.roomId ?? "",
+                onClose: {
+                    self.host.controller?.dismiss(animated: true)
+                },
+                onProductClick: { productTag in
+                    if let url = URL(string: productTag.object.productUrl) {
+                        let browserVC = SFSafariViewController(url: url)
+                        browserVC.modalPresentationStyle = UIModalPresentationStyle.pageSheet
+                        UIApplication.topViewController()?.present(browserVC, animated: true)
+                    }
+                }
+            )
+            
+            let vc = AmitySwiftUIHostingController(rootView: component
+                .ignoresSafeArea(edges: .bottom))
+            vc.modalPresentationStyle = UIModalPresentationStyle.pageSheet
+            if #available(iOS 15.0, *) {
+                if let sheet = vc.sheetPresentationController {
+                    sheet.detents = [.medium(), .large()]
+                    sheet.selectedDetentIdentifier = .medium
+                }
+            } else {
+                // Fallback on earlier versions
+            }
+            host.controller?.present(vc, animated: true)
         }
     }
     

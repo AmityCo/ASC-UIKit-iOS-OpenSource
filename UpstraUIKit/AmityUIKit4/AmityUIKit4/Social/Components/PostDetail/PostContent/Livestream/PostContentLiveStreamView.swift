@@ -8,15 +8,22 @@
 import SwiftUI
 import AmitySDK
 import AVKit
+import SafariServices
 
 struct PostContentLiveStreamView: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     
     @State var showVideoPlayer: Bool = false
+    @State private var taggedProducts: [AmityProduct] = []
+    @State private var previousProductCount: Int = 0
+    @State private var showProductTagSheet: Bool = false
+    
     let post: AmityPostModel
     let room: AmityRoom?
     let isStreamDeleted: Bool
     let isStreamBanned: Bool
+    
+    private var postManager = PostManager()
     
     init(post: AmityPostModel) {
         self.post = post
@@ -24,6 +31,12 @@ struct PostContentLiveStreamView: View {
         self.isStreamDeleted = room?.isDeleted ?? false
         self.isStreamBanned = false
 //        self.isStreamBanned = room?.isBanned ?? false
+        
+        // Initialize tagged products from child post
+        if let childPost = post.childrenPosts.first {
+            let mediaProductTags = childPost.getMediaProductTags()
+            self._taggedProducts = State(initialValue: mediaProductTags.compactMap { $0.product })
+        }
     }
     
     var body: some View {
@@ -64,6 +77,9 @@ struct PostContentLiveStreamView: View {
                     
                     VStack(alignment: .leading) {
                         HStack {
+                            Spacer()
+                            
+                            // "RECORDED" badge moved to top-right
                             Text(post.livestreamState.badgeTitle)
                                 .applyTextStyle(.captionBold(.white))
                                 .padding(.vertical, 4)
@@ -72,11 +88,25 @@ struct PostContentLiveStreamView: View {
                                 .blurBackground(style: .regular)
                                 .cornerRadius(4, corners: .allCorners)
                                 .padding(12)
-                            
-                            Spacer()
                         }
                         
                         Spacer()
+                        
+                        // Tag badge on bottom-right - tappable to open product tag list
+                        let childPost = post.childrenPosts.first
+                        let productCount = childPost?.getMediaProductTags().count ?? 0
+                        
+                        if productCount > 0 {
+                            HStack {
+                                Spacer()
+                                
+                                AmityProductTagBadgeView(count: productCount)
+                                    .padding(12)
+                                    .onTapGesture {
+                                        showProductTagSheet = true
+                                    }
+                            }
+                        }
                     }
                     
                     Image(AmityIcon.videoControlIcon.imageResource)
@@ -148,7 +178,38 @@ struct PostContentLiveStreamView: View {
             default:
                 break
             }
-            
+        }
+        .sheet(isPresented: $showProductTagSheet) {
+            productTagListSheet
+        }
+    }
+    
+    @ViewBuilder
+    private var productTagListSheet: some View {
+        if let childPost = post.childrenPosts.first {
+            let productTags = childPost.getMediaProductTags().compactMap { mediaTag -> AmityProductTagModel? in
+                guard let product = mediaTag.product else { return nil }
+                return AmityProductTagModel(object: product, range: NSRange(location: 0, length: 0), contentType: .media)
+            }
+            if !productTags.isEmpty {
+                AmityProductTagListComponent(
+                    productTags: productTags,
+                    renderMode: .livestream,
+                    sourceId: post.room?.roomId ?? "",
+                    onClose: {
+                        self.host.controller?.dismiss(animated: true)
+                    },
+                    onProductClick: { productTag in
+                        if let url = URL(string: productTag.object.productUrl) {
+                            let browserVC = SFSafariViewController(url: url)
+                            browserVC.modalPresentationStyle = .pageSheet
+                            UIApplication.topViewController()?.present(browserVC, animated: true)
+                        }
+                    }
+                )
+                .environmentObject(host)
+                .halfSheetPresentation()
+            }
         }
     }
 }

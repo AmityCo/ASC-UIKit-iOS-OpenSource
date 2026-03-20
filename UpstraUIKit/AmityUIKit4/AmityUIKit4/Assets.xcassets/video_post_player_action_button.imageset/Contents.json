@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "video_post_player_action_button.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

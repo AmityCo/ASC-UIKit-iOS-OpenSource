@@ -74,17 +74,17 @@ class PostManager {
     }
     
     @discardableResult
-    func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?, hashtags: AmitySDK.AmityHashtagBuilder?, links: [AmityLink]?) async throws -> AmityPost {
-        
-        return try await postRepository.editPost(withId: withId, builder: builder, metadata: metadata, mentionees: mentionees, hashtags: hashtags, links: links)
+    func editPost(withId: String, builder: any AmitySDK.AmityPostBuilder, metadata: [String : Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?, hashtags: AmitySDK.AmityHashtagBuilder?, links: [AmityLink]?, productTags: [AmityTextProductTag]? = nil, attachmentProductTags: AmityAttachmentProductTags? = nil) async throws -> AmityPost {
+
+        return try await postRepository.editPost(withId: withId, builder: builder, metadata: metadata, mentionees: mentionees, hashtags: hashtags, links: links, productTags: productTags, attachmentProductTags: attachmentProductTags)
     }
     
     func createStreamPost(builder: AmityLiveStreamPostBuilder, targetId: String?, targetType: AmityPostTargetType, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
         return try await postRepository.createLiveStreamPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
     }
     
-    func createLiveStreamRoomPost(builder: AmityRoomPostBuilder, targetId: String?, targetType: AmityPostTargetType, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?) async throws -> AmityPost {
-        return try await postRepository.createLiveStreamPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees)
+    func createLiveStreamRoomPost(builder: AmityRoomPostBuilder, targetId: String?, targetType: AmityPostTargetType, metadata: [String: Any]?, mentionees: AmitySDK.AmityMentioneesBuilder?, productTags: [AmityProductTag]? = nil, pinnedProductId: String? = nil) async throws -> AmityPost {
+        return try await postRepository.createRoomPost(builder, targetId: targetId, targetType: targetType, metadata: metadata, mentionees: mentionees, hashtags: nil, links: nil, productTags: productTags, pinnedProductId: pinnedProductId)
     }
     
     func searchPosts(keyword: String) -> AmityCollection<AmityPost> {
@@ -103,5 +103,19 @@ class PostManager {
     
     func getGlobalLiveRoomPosts() -> AmityCollection<AmityPost> {
         postRepository.getLiveRoomPosts()
+    }
+    
+    // MARK: - Product Tag Operations
+    
+    func updateProductTags(postId: String, productTags: [AmityMediaProductTag]) async throws -> AmityPost {
+        return try await postRepository.updateProductTags(postId: postId, productTags: productTags)
+    }
+    
+    func pinProductTag(postId: String, productId: String) async throws -> AmityPost {
+        return try await postRepository.pinProduct(postId: postId, productId: productId)
+    }
+    
+    func unpinProductTag(postId: String) async throws -> AmityPost {
+        return try await postRepository.unpinProduct(postId: postId)
     }
 }

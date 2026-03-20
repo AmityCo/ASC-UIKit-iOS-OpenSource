@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import AmitySDK
 import AVKit
+import SafariServices
 
 struct MediaViewer: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
@@ -22,8 +23,6 @@ struct MediaViewer: View {
     // use for showing image index at top
     @State private var pageIndex: Int
     
-    @State private var showVideoPlayer: Bool = false
-    @State private var hideOverlay: Bool = false
     @StateObject private var viewModel: MediaViewerViewModel
     @ObservedObject var viewConfig: AmityViewConfigController
     @State private var showScaleEffect: Bool = false
@@ -31,6 +30,7 @@ struct MediaViewer: View {
     @State private var showBottomSheet: Bool = false
     @State private var showAltTextComponent: Bool = false
     @State private var hasNavigatedToPostDetail: Bool = false
+    @State private var selectedProductTagMedia: AmityMedia?
     
     private let medias: [AmityMedia]
     private let closeAction: (() -> Void)?
@@ -97,6 +97,8 @@ struct MediaViewer: View {
                     .isHidden(!showScaleEffect)
                 
                 Pager(page: page, data: medias, id: \.id) { media in
+                    let showProductBadge = !media.produtTags.isEmpty && !viewModel.isPostDeleted && !viewModel.isMediaDeleted(media)
+
                     ZoomableScrollView(isZooming: $isZooming, isZoomable: media.type == .image) {
                         ZStack {
                             // Create a properly centered placeholder with maximum height using solid theme color
@@ -109,23 +111,18 @@ struct MediaViewer: View {
                             
                             
                             if media.type == .video {
-                                if let urlStr = media.video?.getVideo(resolution: .original) {
-                                    if let url = URL(string: urlStr) {
-                                        AmityCustomMediaPlayer(url: url, onBackgroundTap: { isHiding in
-                                            withAnimation {
-                                                hideOverlay = isHiding
+                                if let post = post {
+                                    AmityPostMediaVideoPlayer(
+                                        post: post,
+                                        playerType: .video(media),
+                                        hideActionMenu: !showViewParentPost,
+                                        onClose: {
+                                            withoutAnimation {
+                                                closeAction?()
                                             }
-                                        })
-                                    }
-                                } else {
-                                    if let url = URL(string: media.video?.fileURL ?? "") {
-                                        AmityCustomMediaPlayer(url: url, onBackgroundTap: { isHiding in
-                                            hideOverlay = isHiding
-                                            withAnimation {
-                                                hideOverlay = isHiding
-                                            }
-                                        })
-                                    }
+                                        }
+                                    )
+                                    .environmentObject(host)
                                 }
                             } else {
                                 
@@ -150,6 +147,18 @@ struct MediaViewer: View {
                                             image
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
+                                                .overlay(
+                                                    Group {
+                                                        if showProductBadge {
+                                                            AmityProductTagBadgeView(count: media.produtTags.count)
+                                                                .padding(.all, 12)
+                                                                .onTapGesture {
+                                                                    selectedProductTagMedia = media
+                                                                }
+                                                        }
+                                                    },
+                                                    alignment: .bottomTrailing
+                                                )
                                         })
                                         .environment(\.urlImageOptions, URLImageOptions.amityOptions)
                                         .adaptiveVerticalPadding(top: 35, bottom: 35)
@@ -308,8 +317,7 @@ struct MediaViewer: View {
                 .padding(.bottom, 15)
                 .background(Color.black.opacity(0.5))
                 .transition(.opacity.combined(with: .scale))
-                .isHidden(!showScaleEffect)
-                .opacity(hideOverlay ? 0 : 1) // Hide it when video player is shown
+                .isHidden(!showScaleEffect || medias[page.index].type == .video) // Hide overlay for video media
                 .opacity(backgroundOpacity == 1 ? 1 : 0) // Hide it when dragging
             }
         }
@@ -328,11 +336,22 @@ struct MediaViewer: View {
                 })
             }
         }
-        .fullScreenCover(isPresented: $showVideoPlayer) {
-            if let videoURL = viewModel.videoURL {
-                AVPlayerView(url: videoURL)
-                    .ignoresSafeArea(.all)
+        .sheet(item: $selectedProductTagMedia) { media in
+            let renderMode: ProductTagListRenderMode = media.type == .video ? .video : .image
+            let component = AmityProductTagListComponent(
+                productTags: media.produtTags,
+                renderMode: renderMode,
+                sourceId: post?.postId ?? ""
+            ) { productTag in
+                if let url = URL(string: productTag.object.productUrl) {
+                    let browserVC = SFSafariViewController(url: url)
+                    browserVC.modalPresentationStyle = .pageSheet
+                    UIApplication.topViewController()?.present(browserVC, animated: true)
+                }
             }
+            component
+                .environmentObject(host)
+                .halfSheetPresentation()
         }
     }
     
@@ -340,10 +359,9 @@ struct MediaViewer: View {
             VStack(spacing: 0) {
                 // Get current media being displayed
                 let currentMedia = page.index < medias.count ? medias[page.index] : nil
-                let isCurrentMediaDeleted = currentMedia != nil && viewModel.isMediaDeleted(currentMedia!)
                 
                 if showViewParentPost {
-                    BottomSheetItemView(icon: AmityIcon.viewPostIcon.getImageResource(), text: "View original post")
+                    BottomSheetItemView(icon: AmityIcon.viewPostIcon.getImageResource(), text: "View post")
                         .onTapGesture {
                             showBottomSheet.toggle()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {

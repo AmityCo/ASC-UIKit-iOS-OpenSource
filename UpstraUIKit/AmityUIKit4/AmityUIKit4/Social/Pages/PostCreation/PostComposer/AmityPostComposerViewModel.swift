@@ -24,6 +24,23 @@ class AmityPostComposerViewModel: ObservableObject {
     
     @Published var displayName: String
     
+    /// Product tags from text editor
+    var textProductTags: [AmityProductTagModel] = []
+    /// Product tags from media
+    var attachmentProductTags: AmityAttachmentProductTags = AmityAttachmentProductTags()
+
+    /// Combined product tags (text first, then media by index)
+    @Published private(set) var productTags: [AmityProductTagModel] = []
+    @Published private(set) var isProductCatalogueEnabled: Bool = false
+
+    /// Maximum allowed product tags
+    let productTagLimit: Int = 20
+    
+    /// Returns true if more product tags can be added
+    var canAddMoreProductTags: Bool {
+        productTags.count < productTagLimit
+    }
+        
     let postTitleMaxCount: Int = 150
     var postTitleCount: Int = 0
     @Published var postTitle: String = ""
@@ -34,6 +51,8 @@ class AmityPostComposerViewModel: ObservableObject {
     private let originalPostTitle: String
     private let originalMedias: [AmityMedia]
     private var originalLinkPreview: LinkDetail?
+    private let originalTextProductTagIds: [String]
+    private let originalMediaProductTagIds: [String: [String]]
     
     @Published var didRemoveLinkPreview = false
     @Published var previewedLink: LinkDetail? // The link being previewed in composer
@@ -76,12 +95,15 @@ class AmityPostComposerViewModel: ObservableObject {
         self.originalPostTitle = ""
         self.event = event
         self.originalLinkPreview = nil
+        self.originalTextProductTagIds = []
+        self.originalMediaProductTagIds = [:]
         
         if let communityId = targetId , targetType == .community {
             self.loadTargetCommunity(id: communityId)
         }
         
         self.observeLinkChanges()
+        self.getProductCatalogueFeatureSetting()
     }
     
     // Edit mode
@@ -98,6 +120,15 @@ class AmityPostComposerViewModel: ObservableObject {
         self.originalPostTitle = post.title
         self.originalMedias = post.medias
         self.event = nil
+        
+        self.originalTextProductTagIds = (post.textProductTags ?? []).map { $0.productId }
+        var mediaTagMap: [String: [String]] = [:]
+        for media in post.medias {
+            if let fileId = media.getFileId() {
+                mediaTagMap[fileId] = media.produtTags.map { $0.productId }
+            }
+        }
+        self.originalMediaProductTagIds = mediaTagMap
         self.mentionData.metadata = post.metadata
         
         post.links.forEach { link in
@@ -109,9 +140,20 @@ class AmityPostComposerViewModel: ObservableObject {
             }
         }
         
+        // Initialize product tags from existing post medias
+        for media in post.medias {
+            if let fileId = media.getFileId() {
+                let mediaProductTags = media.produtTags.map { AmityMediaProductTag(productId: $0.productId, product: $0.object) }
+                attachmentProductTags.set(fileId: fileId, tags: mediaProductTags)
+            }
+        }
+        self.textProductTags = post.textProductTags ?? []
+        self.productTags = getCombinedTags(medias: post.medias)
+
         self.observeLinkChanges()
+        self.getProductCatalogueFeatureSetting()
     }
-    
+
     func observeLinkChanges() {
         linkCancellable = $links
             .debounce(for: 2, scheduler: DispatchQueue.main)
@@ -175,17 +217,30 @@ class AmityPostComposerViewModel: ObservableObject {
         let trimmedOriginalText = originalPostText.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedCurrentText = currentText.trimmingCharacters(in: .whitespacesAndNewlines)
         let hasTextChanges = trimmedOriginalText != trimmedCurrentText
-        
+
         let trimmedOriginalTitle = originalPostTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedCurrentTitle = currentTitle.trimmingCharacters(in: .whitespacesAndNewlines)
         let hasTitleChanges = trimmedOriginalTitle != trimmedCurrentTitle
-        
+
         // Check for media changes (count, content)
         let hasMediaChanges = !areMediasEqual(originalMedias, currentMedias)
-        
+
         let hasLinkChanges = originalLinkPreview != previewedLink || didRemoveLinkPreview
-        
-        return hasTextChanges || hasMediaChanges || hasTitleChanges || hasLinkChanges
+
+        // Check for text product tag changes (order-sensitive)
+        let currentTextProductTagIds = textProductTags.map { $0.productId }
+        let hasTextProductTagChanges = currentTextProductTagIds != originalTextProductTagIds
+
+        // Check for media product tag changes (order-sensitive)
+        var currentMediaProductTagIds: [String: [String]] = [:]
+        for media in currentMedias {
+            if let fileId = media.getFileId() {
+                currentMediaProductTagIds[fileId] = media.produtTags.map { $0.productId }
+            }
+        }
+        let hasMediaProductTagChanges = currentMediaProductTagIds != originalMediaProductTagIds
+
+        return hasTextChanges || hasMediaChanges || hasTitleChanges || hasLinkChanges || hasTextProductTagChanges || hasMediaProductTagChanges
     }
     
     // Helper function to compare two media arrays
@@ -217,7 +272,34 @@ class AmityPostComposerViewModel: ObservableObject {
         
         return fileIds1 == fileIds2
     }
+
+    // MARK: - Product Tag Management
+
+    /// Updates the combined product tags list.
+    /// Order: text product tags first, then media product tags by media index.
+    func updateProductTags(medias: [AmityMedia]) {
+        productTags = getCombinedTags(medias: medias)
+    }
     
+    /// Order: text product tags first, then media product tags by media index.
+    func getCombinedTags(medias: [AmityMedia]) -> [AmityProductTagModel] {
+        var combinedTags: [AmityProductTagModel] = []
+
+        // Add text product tags first
+        for tag in textProductTags {
+            combinedTags.append(tag)
+        }
+
+        // Add media product tags in order of media index
+        for media in medias {
+            for tag in media.produtTags {
+                combinedTags.append(tag)
+            }
+        }
+        
+        return combinedTags
+    }
+
     @discardableResult
     func createPost(medias: [AmityMedia], files: [AmityFile], hashtags: [AmityHashtagModel], links: [AmityLink]) async throws -> AmityPost {
         guard networkMonitor.isConnected else {
@@ -233,7 +315,7 @@ class AmityPostComposerViewModel: ObservableObject {
         let mentions = AmityMetadataMapper.mentions(fromMetadata: mentionData.metadata ?? [:])
         let hashtags = hashtags.map { AmityHashtag(text: $0.text, index: $0.range.location, length: $0.range.length)}
         let metadata = AmityMetadataMapper.metadata(mentions: mentions, hashtags: hashtags)
-        
+        let textProductTags = textProductTags.map { AmityTextProductTag(productId: $0.productId, index: $0.range.location, length: $0.range.length)}
         
         if !imagesData.isEmpty {
             // Image Post
@@ -247,7 +329,7 @@ class AmityPostComposerViewModel: ObservableObject {
             
             return try await postManager.postRepository.createImagePost(
                 imagePostBuilder, targetId: targetId, targetType: targetType,
-                metadata: metadata, mentionees: mentionData.mentionee, links: links)
+                metadata: metadata, mentionees: mentionData.mentionee, links: links, productTags: textProductTags, attachmentProductTags: attachmentProductTags)
             
         } else if !videosData.isEmpty {
             // Video Post
@@ -261,7 +343,7 @@ class AmityPostComposerViewModel: ObservableObject {
             
             return try await postManager.postRepository.createVideoPost(
                 videoPostBuilder, targetId: targetId, targetType: targetType,
-                metadata: metadata, mentionees: mentionData.mentionee, links: links)
+                metadata: metadata, mentionees: mentionData.mentionee, links: links, productTags: textProductTags, attachmentProductTags: attachmentProductTags)
         } else if !filesData.isEmpty {
             // File Post
             Log.add(event: .info, "Creating file post with \(filesData.count) files")
@@ -274,7 +356,7 @@ class AmityPostComposerViewModel: ObservableObject {
             
             return try await postManager.postRepository.createFilePost(
                 fileBuilder, targetId: targetId, targetType: targetType,
-                metadata: metadata, mentionees: mentionData.mentionee, links: links)
+                metadata: metadata, mentionees: mentionData.mentionee, links: links, productTags: textProductTags, attachmentProductTags: attachmentProductTags)
         } else if isInClipComposerMode {
             if case .createClip(_, let draft) = mode {
                 let clipBuilder = AmityClipPostBuilder()
@@ -286,7 +368,7 @@ class AmityPostComposerViewModel: ObservableObject {
                 
                 return try await postManager.postRepository.createClipPost(
                     clipBuilder, targetId: targetId, targetType: targetType,
-                    metadata: metadata, mentionees: mentionData.mentionee, links: links)
+                    metadata: metadata, mentionees: mentionData.mentionee, links: links, productTags: textProductTags, attachmentProductTags: attachmentProductTags)
             } else {
                 fatalError("Clip post information is not available")
             }
@@ -302,7 +384,7 @@ class AmityPostComposerViewModel: ObservableObject {
             
             return try await postManager.postRepository.createTextPost(
                 textPostBuilder, targetId: targetId, targetType: targetType,
-                metadata: metadata, mentionees: mentionData.mentionee, hashtags: hashtagBuilder, links: links)
+                metadata: metadata, mentionees: mentionData.mentionee, hashtags: hashtagBuilder, links: links, productTags: textProductTags)
         }
     }
     
@@ -405,10 +487,13 @@ class AmityPostComposerViewModel: ObservableObject {
         let hashtagBuilder = AmityHashtagBuilder()
         hashtagBuilder.hashtags(hashtags: hashtags.map { $0.text })
         
+        let textProductTags = textProductTags.map { AmityTextProductTag(productId: $0.productId, index: $0.range.location, length: $0.range.length)}
+
         if let postId = post?.postId {
             return try await postManager.editPost(
                 withId: postId, builder: postBuilder, metadata: metadata,
-                mentionees: mentionData.mentionee, hashtags: hashtagBuilder, links: links)
+                mentionees: mentionData.mentionee, hashtags: hashtagBuilder, links: links,
+                productTags: textProductTags, attachmentProductTags: attachmentProductTags)
         }
         return nil
     }
@@ -476,6 +561,20 @@ class AmityPostComposerViewModel: ObservableObject {
                 AmityLink(url: $0.url, index: $0.index, length: $0.length, renderPreview: false, domain: nil, title: nil, imageUrl: nil)
             }
             return mappedLinks
+        }
+    }
+    
+    func updateProductCatalogueEnabled(_ enabled: Bool) {
+        isProductCatalogueEnabled = enabled
+    }
+
+    func getProductCatalogueFeatureSetting() {
+        Task.runOnMainActor {
+            do {
+                self.isProductCatalogueEnabled = try await AmityUIKit4Manager.client.getProductCatalogueSetting().enabled
+            } catch {
+                self.isProductCatalogueEnabled = false
+            }
         }
     }
 }

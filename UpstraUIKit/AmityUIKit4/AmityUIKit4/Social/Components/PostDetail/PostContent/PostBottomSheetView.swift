@@ -91,6 +91,12 @@ struct PostBottomSheetView: View {
                         if let pollId = post.poll?.id {
                             do {
                                 let _ = try await viewModel.closePoll(id: pollId)
+                                
+                                /// Send didPollUpdated event to update global feed data source
+                                /// This event is observed in PostFeedViewModel and AmityPostDetailPageViewModel
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    NotificationCenter.default.post(name: .didPollUpdated, object: post.object)
+                                }
                             } catch let error {
                                 /// Delay showing toast as deleting post will effect post data source
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

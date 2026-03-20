@@ -24,6 +24,9 @@ class LiveStreamAlert: ObservableObject {
         case removeCoHost(action: AlertAction)
         case streamEndedDueToMaxDuration(action: AlertAction)
         case streamDiscard(action: AlertAction)
+        case disableCoHostProductTag(action: AlertAction)
+        case productTaggingDisabled(action: AlertAction)
+        case productTaggingUnavailableWhileStreaming(action: AlertAction)
         case streamError
         case thumbnailError(_ isInappropriate: Bool)
         
@@ -43,6 +46,12 @@ class LiveStreamAlert: ObservableObject {
                 AmityLocalizedStringSet.Social.liveStreamAlertEndAtMaxDurationTitle.localizedString
             case .streamDiscard:
                 AmityLocalizedStringSet.Social.liveStreamAlertDiscardStreamTitle.localizedString
+            case .disableCoHostProductTag:
+                AmityLocalizedStringSet.Social.productTagDisableCoHostTitle.localizedString
+            case .productTaggingDisabled:
+                AmityLocalizedStringSet.Social.productTagUnavailableTitle.localizedString
+            case .productTaggingUnavailableWhileStreaming:
+                AmityLocalizedStringSet.Social.productTagUnavailableTitle.localizedString
             case .streamError:
                 AmityLocalizedStringSet.Social.liveStreamAlertStreamErrorTitle.localizedString
             case .thumbnailError(let isInappropriate):
@@ -66,6 +75,12 @@ class LiveStreamAlert: ObservableObject {
                 AmityLocalizedStringSet.Social.liveStreamAlertEndAtMaxDurationMessage.localizedString
             case .streamDiscard:
                 AmityLocalizedStringSet.Social.liveStreamAlertDiscardStreamMessage.localizedString
+            case .disableCoHostProductTag:
+                AmityLocalizedStringSet.Social.productTagDisableCoHostMessage.localizedString
+            case .productTaggingDisabled:
+                AmityLocalizedStringSet.Social.productTagUnavailableWhileStreamingMessage.localizedString
+            case .productTaggingUnavailableWhileStreaming:
+                AmityLocalizedStringSet.Social.productTagUnavailableWhileStreamingMessage.localizedString
             case .streamError:
                 AmityLocalizedStringSet.Social.liveStreamAlertStreamErrorMessage.localizedString
             case .thumbnailError(let isInappropriate):
@@ -80,6 +95,8 @@ class LiveStreamAlert: ObservableObject {
                 return .cancel()
             case .streamDiscard:
                 return .cancel()
+            case .productTaggingDisabled:
+                return .cancel(Text(AmityLocalizedStringSet.Social.productTagEditLive.localizedString))
             default:
                 return .cancel()
                 
@@ -99,6 +116,10 @@ class LiveStreamAlert: ObservableObject {
                 return .destructive(Text(AmityLocalizedStringSet.Social.livestreamAlertRemoveButton.localizedString), action: action)
             case .streamDiscard(let action):
                 return .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: action)
+            case .disableCoHostProductTag(let action):
+                return .destructive(Text(AmityLocalizedStringSet.Social.productTagDisableButton.localizedString), action: action)
+            case .productTaggingDisabled(let action):
+                return .default(Text(AmityLocalizedStringSet.Social.productTagGoLive.localizedString), action: action)
             default:
                 return .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString))
             }
@@ -109,6 +130,8 @@ class LiveStreamAlert: ObservableObject {
             case .streamError, .thumbnailError:
                 return .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString))
             case .streamEndedDueToMaxDuration(let action):
+                return .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString), action: action)
+            case .productTaggingUnavailableWhileStreaming(let action):
                 return .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString), action: action)
             default:
                 return nil

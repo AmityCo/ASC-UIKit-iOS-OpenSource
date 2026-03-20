@@ -790,6 +790,70 @@
         "livestream_player_page/*/*": {
             "theme": {}
         },
+        "livestream_player_page/product_tag_list_bottomsheet/*": {
+            "theme": {
+                "light": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                },
+                "dark": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                }
+            }
+        },
+        "livestream_player_page/product_tag_selection_bottomsheet/*": {
+            "theme": {
+                "light": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                },
+                "dark": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                }
+            }
+        },
         "livestream_post_target_selection_page/*/*": {
             "theme": {}
         },
@@ -839,6 +903,70 @@
         },
         "create_livestream_page/*/start_livestream_button": {
             "image": "value"
+        },
+        "create_livestream_page/product_tag_list_bottomsheet/*": {
+            "theme": {
+                "light": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                },
+                "dark": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                }
+            }
+        },
+        "create_livestream_page/product_tag_selection_bottomsheet/*": {
+            "theme": {
+                "light": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                },
+                "dark": {
+                    "primary_color": "#1054DE",
+                    "secondary_color": "#292B32",
+                    "base_color": "#EBECEF",
+                    "base_shade1_color": "#A5A9B5",
+                    "base_shade2_color": "#6E7487",
+                    "base_shade3_color": "#40434E",
+                    "base_shade4_color": "#292B32",
+                    "alert_color": "#FA4D30",
+                    "background_color": "#191919",
+                    "base_inverse_color": "#FFFFFF",
+                    "background_shade1_color": "#40434E",
+                    "highlight_color": "#1054DE"
+                }
+            }
         },
         "create_livestream_page/create_livestream_bottom_bar/*": {
             "theme": {}

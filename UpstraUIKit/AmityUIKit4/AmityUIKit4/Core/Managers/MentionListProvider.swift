@@ -77,7 +77,11 @@ class MentionListProvider {
             }
             
             // Search for users
-            searchUsers(with: text)
+            // Don't search if the text count is 1 or 2, as sdk doesn't return any result for that query.
+            // Maintain the existing searched user list in that case.
+            if !(1...2 ~= text.count) {
+                searchUsers(with: text)
+            }
         case .message:
             searchChannelMembers(with: text)
         }

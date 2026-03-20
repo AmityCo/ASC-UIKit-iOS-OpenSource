@@ -80,9 +80,9 @@ class MentionTextEditor {
                             // Remove mentions from array too
                             removeMentionWithinRange(range: range)
                             
-                            let deleteLength = range.length + 1
+                            let deleteLength = range.length
                             for (index, mention) in self.mentions.enumerated() where range.location <= mention.index {
-                                mentions[index].index -= deleteLength // There is a space after every mention, range.length + 1 to count total length included the space
+                                mentions[index].index -= deleteLength
                             }
                         } else {
                             // We don't allow deleting individual character of mention, so we highlight the whole mention text if user
@@ -96,9 +96,8 @@ class MentionTextEditor {
                         }
                     } else {
                         // Didn't find any mention. Update mention ranges if necessary
-                        var deleteLength = range.length
-                        deleteLength = deleteLength > 1 ? deleteLength + 1 : deleteLength // Selecting word seems to delete space too.
-                        
+                        let deleteLength = range.length
+
                         for (index, mention) in self.mentions.enumerated() where range.location <= mention.index {
                             mentions[index].index -= deleteLength
                         }
@@ -223,9 +222,9 @@ class MentionTextEditor {
         
         Log.add(event: .info, "Adding mention \(member.displayName) to index: \(mentionRange.location), length: \(mentionRange.length)")
         
-        // Append mention display name to current text
+        // Append mention display name to current text (with trailing space that is not part of the mention)
         let searchInput = mentionSearchKey.isEmpty ? "@" : "@\(mentionSearchKey)" // Actual search input in UITextView with "@"
-        var finalText = currentText.replacingOccurrences(of: searchInput, with: "@\(member.displayName)", options: .caseInsensitive, range: Range(mentionRange, in: currentText))
+        var finalText = currentText.replacingOccurrences(of: searchInput, with: "@\(member.displayName) ", options: .caseInsensitive, range: Range(mentionRange, in: currentText))
         
         // Note: Remove this logic if we support sending whitespaces + newlines at the beginning of the message text.
         // Remove whitespace occurrence in beginning of the text & adjusts mention range.
@@ -233,7 +232,8 @@ class MentionTextEditor {
             char.isWhitespace
         }
         mentionRange.location -= whitespaces.count
-        finalText = finalText.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Only trim leading whitespace to preserve the trailing space after the mention
+        finalText = String(finalText.drop(while: { $0.isWhitespace }))
         
         // Append mention array
         let mention = AmityMention(type: member.type, index: mentionRange.location, length: member.displayName.count, userId: member.userId)
@@ -241,7 +241,7 @@ class MentionTextEditor {
         
         // Determine index to be shifted for existing mentions
         let mentionSearchKeyLength = mentionSearchKey.utf8.count // Length of search key already used
-        let mentionOffset = member.displayName.count - mentionSearchKeyLength // Amount of search text to be replaced.
+        let mentionOffset = member.displayName.count - mentionSearchKeyLength + 1 // Amount of search text to be replaced (+1 for trailing space).
         Log.add(event: .info, "Mention Offset: \(mentionOffset)")
                 
         // Update the length of previous mention
@@ -271,36 +271,82 @@ class MentionTextEditor {
         if existingText.isEmpty {
             return true
         } else {
-            // Determine text on left & right side of the @ character
+            // Only check the left side of @ — it must have whitespace or newline before it
+            // (or be at the start). The right side doesn't matter because the user is typing
+            // new characters after @, and there may already be text to the right when inserting
+            // in the middle of existing text.
             let triggerLeftRange = NSRange(location: rangeIndex - 1, length: 1)
-            let triggerRightRange = NSRange(location: rangeIndex + 1, length: 1)
-            
-            var isMentionAllowed = true
-            
+
             // If left character range is valid
             if NSLocationInRange(triggerLeftRange.location, NSRange(location: 0, length: currentText.utf16.count)) {
                 let beforeCharacter = (currentText as NSString).substring(with: triggerLeftRange).trimmingCharacters(in: .whitespacesAndNewlines)
                 if !beforeCharacter.isEmpty {
-                    isMentionAllowed = false
+                    return false
                 }
             }
-            
-            // If Right character is valid.
-            if NSLocationInRange(triggerRightRange.location, NSRange(location: 0, length: currentText.utf16.count)) {
-                let afterCharacter = (currentText as NSString).substring(with: triggerLeftRange).trimmingCharacters(in: .whitespacesAndNewlines)
-                if !afterCharacter.isEmpty {
-                    isMentionAllowed = false
-                }
-            }
-            
-            return isMentionAllowed
+
+            return true
         }
     }
     
+    /// Adjusts existing mention indices when the text content changes externally
+    /// (e.g., a product tag is added/removed, shifting text around mentions).
+    /// Computes the diff between old and new text and updates indices accordingly.
+    func adjustIndicesForTextChange(oldText: String, newText: String) {
+        let oldNS = oldText as NSString
+        let newNS = newText as NSString
+
+        // Find common prefix length
+        var prefixLen = 0
+        let minLen = min(oldNS.length, newNS.length)
+        while prefixLen < minLen && oldNS.character(at: prefixLen) == newNS.character(at: prefixLen) {
+            prefixLen += 1
+        }
+
+        // Find common suffix length
+        var suffixLen = 0
+        while suffixLen < minLen - prefixLen
+                && oldNS.character(at: oldNS.length - 1 - suffixLen) == newNS.character(at: newNS.length - 1 - suffixLen) {
+            suffixLen += 1
+        }
+
+        let changeLocation = prefixLen
+        let oldChangeLength = oldNS.length - prefixLen - suffixLen
+        let newChangeLength = newNS.length - prefixLen - suffixLen
+        let lengthDifference = newChangeLength - oldChangeLength
+
+        var indicesToRemove: [Int] = []
+
+        for i in 0..<mentions.count {
+            let mentionStart = mentions[i].index
+
+            // Mention is within the changed region → remove it
+            if mentionStart >= changeLocation && mentionStart < changeLocation + oldChangeLength {
+                indicesToRemove.append(i)
+            }
+            // Mention is after the changed region → shift
+            else if mentionStart >= changeLocation + oldChangeLength {
+                mentions[i].index += lengthDifference
+            }
+        }
+
+        for index in indicesToRemove.reversed() {
+            mentions.remove(at: index)
+        }
+    }
+
     func reset() {
         mentions = []
         mentionSearchKey = ""
         mentionState = .idle
+        mentionRange = .init()
+    }
+
+    /// Reset only the current search state without clearing existing mentions
+    func resetSearchState() {
+        mentionSearchKey = ""
+        mentionState = .idle
+        mentionRange = .init()
     }
 }
 

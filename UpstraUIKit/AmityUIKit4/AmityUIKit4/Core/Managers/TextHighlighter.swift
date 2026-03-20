@@ -15,6 +15,7 @@ import SwiftUI
 class TextHighlighter {
     public static let mentionURL: String = "https://www.amity.co/mentionuser/"
     public static let hashtagURL: String = "https://www.amity.co/hashtag/"
+    public static let productTagURL: String = "https://www.amity.co/producttag/"
     
     // Helper Method
     public static func getAttributedText(from message: MessageModel, highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemBlue, .font: UIFont.systemFont(ofSize: 15)]) -> AttributedString {
@@ -55,6 +56,31 @@ class TextHighlighter {
         // Create attributed string
         let highlightedText = getMentionHighlightedAttributedText(in: text, mentions: mentions, mentionees: mentionees, highlightAttributes: highlightAttributes)
         return highlightedText
+    }
+    
+    // Returns attributed text where product tags are highlighted.
+    @discardableResult
+    static func highlightProductTags(_ attributedString: NSMutableAttributedString, productTags: [AmityProductTagModel], highlightAttributes: [NSAttributedString.Key: Any]) -> NSMutableAttributedString {
+        
+        for productTag in productTags {
+            // Skip highlighting for deleted or archived products
+            if productTag.object.isDeleted || productTag.object.status == .archived {
+                continue
+            }
+
+            let range = productTag.range
+
+            if range.location != NSNotFound && (range.location + range.length) <= attributedString.string.utf8.count {
+                var updatedAttributes = highlightAttributes
+                if let encodedId = productTag.productId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) {
+                    updatedAttributes[.link] = URL(string: "\(TextHighlighter.productTagURL)\(encodedId)")
+                }
+
+                attributedString.addAttributes(updatedAttributes, range: range)
+            }
+        }
+        
+        return attributedString
     }
     
     /// Highlights hashtags in NSMutableAttributedString based on hashtag models

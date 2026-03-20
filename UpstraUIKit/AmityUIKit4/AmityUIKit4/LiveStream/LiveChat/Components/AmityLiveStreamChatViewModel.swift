@@ -46,11 +46,17 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     var didFinishCoHostInvitationAction: ((AmityUserModel?) -> Void)?
     var swapCameraAction: (() -> Void)?
     var toggleMicAction: (() -> Void)?
+    var showProductTagAction: (() -> Void)?
+    var refreshProductTagsAction: (() async -> Void)?
     @Published var isMicOn: Bool = true
+    @Published var productCount: Int = 0
+    @Published var isProductTagEnabled: Bool = false
     
     let room: AmityRoom
     @Published var hostUserId: String = ""
     @Published var coHostUserId: String = ""
+    
+    var canCoHostManageProduct = false
     
     var isHost: Bool = false
     var isCoHost: Bool = false
@@ -392,7 +398,10 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
             guard let self = self else { return }
             
             let newHostUserId = room.creatorId ?? ""
-            let newCoHostUserId = room.participants.first(where: { $0.type == "coHost" })?.userId ?? ""
+            let newCoHost = room.participants.first(where: { $0.type == "coHost" })
+            let newCoHostUserId = newCoHost?.userId ?? ""
+
+            canCoHostManageProduct = newCoHost?.canManageProductTags ?? false
             
             if participantRole == .host {
                 do {
@@ -452,6 +461,20 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         // Unsubscribe from channel if it exists
         guard let channel else { return }
         unsubscribeChannel(channel)
-//        unsubscribeLiveStreamChatModeration(stream)
+    }
+    
+    /// Checks if product catalogue/tag is enabled from network settings
+    func checkProductCatalogueSettings() async {
+        do {
+            let productSettings = try await AmityUIKitManagerInternal.shared.client.getProductCatalogueSetting()
+            await MainActor.run {
+                self.isProductTagEnabled = productSettings.enabled
+            }
+        } catch {
+            // Default to false if error or not available
+            await MainActor.run {
+                self.isProductTagEnabled = false
+            }
+        }
     }
 }

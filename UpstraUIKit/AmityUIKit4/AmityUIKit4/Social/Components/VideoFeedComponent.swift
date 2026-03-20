@@ -7,14 +7,16 @@
 
 import SwiftUI
 import AmitySDK
+import SafariServices
 
 /// Shared View for VideoFeedComponent in UserProfile & CommunityProfilePage
 struct VideoFeedComponent: View {
-    
+
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
-    
+
     @State private var selectedType: VideoFeedType = .videos
-    
+    @State private var selectedProductTagMedia: AmityMedia?
+
     @StateObject private var viewModel: MediaFeedViewModel
     @StateObject private var viewConfig: AmityViewConfigController
     
@@ -84,10 +86,27 @@ struct VideoFeedComponent: View {
         }
         .onAppear {
             if viewModel.hasNavigatedToPostDetail {
-                viewModel.hasNavigatedToPostDetail = false                
+                viewModel.hasNavigatedToPostDetail = false
             } else {
                 viewModel.loadMediaFeed(feedTab: selectedType)
             }
+        }
+        .sheet(item: $selectedProductTagMedia) { media in
+            let renderMode: ProductTagListRenderMode = media.type == .video ? .video : .image
+            let component = AmityProductTagListComponent(
+                productTags: media.produtTags,
+                renderMode: renderMode,
+                sourceId: media.parentPostId ?? "",
+                onProductClick: { productTag in
+                    if let url = URL(string: productTag.object.productUrl) {
+                        let browserVC = SFSafariViewController(url: url)
+                        browserVC.modalPresentationStyle = .pageSheet
+                        UIApplication.topViewController()?.present(browserVC, animated: true)
+                    }
+                })
+            component
+                .environmentObject(host)
+                .halfSheetPresentation()
         }
     }
     
@@ -109,42 +128,15 @@ struct VideoFeedComponent: View {
                            let meta = attributes["metadata"] as? [String: Any],
                            let videoMeta = meta["video"] as? [String: Any],
                            let duration = videoMeta["duration"] as? TimeInterval {
-                            getVideoView(url, duration)
+                            getVideoView(url, duration, media)
                                 .frame(maxWidth: .infinity)
                                 .aspectRatio(1, contentMode: .fit)
                                 .background(Color.gray)
                                 .cornerRadius(10)
                                 .onTapGesture {
-                                    viewModel.hasNavigatedToPostDetail = true
-                                    
-                                    viewModel.videoURL = URL(string: media.video?.getVideo(resolution: .original) ?? "")
-                                    
-                                    let selectedMedia = viewModel.getVideoContent(at: index)
-                                    // Get the parent post from cache if available
-                                    
-                                    var parentPostModel: AmityPostModel?
-                                    if let parentPost = selectedMedia?.parentPostId.flatMap({ viewModel.postsCache[$0] }) {
-                                        parentPostModel = AmityPostModel(post: parentPost)
-                                    }
-                                                                        
-                                    if let videoURL = viewModel.videoURL {
-                                        
-                                        let nav = UINavigationController()
-                                        nav.navigationBar.isHidden = true
-                                        
-                                        
-                                        let playerView = AmityVideoPlayerView(url: videoURL, post: parentPostModel, closeAction: {
-                                            nav.dismiss(animated: true) {
-                                                viewModel.showMediaViewer = false
-                                            }
-                                        })
-                                            .ignoresSafeArea(.all)
-                                            .environmentObject(viewConfig)
-                                        
-                                        let controller = AmitySwiftUIHostingController(rootView: playerView)
-                                        nav.viewControllers = [controller]
-                                        nav.modalPresentationStyle = .fullScreen
-                                        host.controller?.present(nav, animated: true)
+                                    viewModel.selectedMediaIndex = index
+                                    withoutAnimation {
+                                        viewModel.showMediaViewer.toggle()
                                     }
                                 }
                                 .onAppear {
@@ -157,18 +149,47 @@ struct VideoFeedComponent: View {
                 }
             }
             .padding(.horizontal, 16)
-            .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
-                if let videoURL = viewModel.videoURL {
-                    AVPlayerView(url: videoURL)
-                        .ignoresSafeArea(.all)
+            .onChange(of: viewModel.showMediaViewer) { _ in
+                if viewModel.showMediaViewer {
+                    // Get the selected media
+                    let selectedMedia = viewModel.medias[viewModel.selectedMediaIndex]
+                    // Get the parent post from cache if available
+                    
+                    var parentPostModel: AmityPostModel?
+                    if let parentPost = selectedMedia.parentPostId.flatMap({ viewModel.postsCache[$0] }) {
+                        parentPostModel = AmityPostModel(post: parentPost)
+                    }
+                    
+                    let nav = UINavigationController()
+                    nav.navigationBar.isHidden = true
+                    
+                    let view = MediaViewer(
+                        medias: [viewModel.medias[viewModel.selectedMediaIndex]],
+                        startIndex: viewModel.selectedMediaIndex,
+                        viewConfig: viewConfig,
+                        closeAction: {
+                            nav.dismiss(animated: true) {
+                                viewModel.showMediaViewer = false
+                            }
+                        },
+                        post: parentPostModel
+                    )
+                        .environmentObject(viewConfig)
+                    
+                    let controller = AmitySwiftUIHostingController(rootView: view)
+                    nav.viewControllers = [controller]
+                    nav.modalPresentationStyle = .overFullScreen
+                    nav.view.backgroundColor = .clear
+                    host.controller?.present(nav, animated: false)
                 }
             }
-            
+                           
+
             Color.clear
                 .frame(height: 16)
         }
     }
-    
+
     @ViewBuilder
     private var clipsFeedView: some View {
         VStack(spacing: 0) {
@@ -192,7 +213,7 @@ struct VideoFeedComponent: View {
                            let meta = attributes["metadata"] as? [String: Any],
                            let videoMeta = meta["video"] as? [String: Any],
                            let duration = videoMeta["duration"] as? TimeInterval {
-                            getClipView(url, duration, displayMode)
+                            getClipView(url, duration, displayMode, media)
                                 .frame(maxWidth: .infinity)
                                 .background(Color.gray)
                                 .cornerRadius(10)
@@ -231,24 +252,18 @@ struct VideoFeedComponent: View {
                 }
             }
             .padding(.horizontal, 16)
-            .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
-                if let videoURL = viewModel.videoURL {
-                    AVPlayerView(url: videoURL)
-                        .ignoresSafeArea(.all)
-                }
-            }
-            
+
             Color.clear
                 .frame(height: 16)
         }
     }
-    
+
     @ViewBuilder
-    private func getClipView(_ url: URL, _ duration: TimeInterval,_ contentMode: ContentMode) -> some View {
+    private func getClipView(_ url: URL, _ duration: TimeInterval, _ contentMode: ContentMode, _ media: AmityMedia) -> some View {
         let emptyView = Color(viewConfig.theme.baseColorShade4)
         let clipViewHeight = ((UIScreen.main.bounds.width - 32 - 8) / 2) * 1.66
-        
-        ZStack(alignment: .bottomLeading) {
+
+        ZStack {
             Color.black
                 .overlay(
                     URLImage(url, empty: {
@@ -268,21 +283,35 @@ struct VideoFeedComponent: View {
                 .clipped()
                 .contentShape(Rectangle())
                 .frame(height: clipViewHeight)
-            
-            Text("\(duration.formattedDurationString ?? "0:00")")
-                .applyTextStyle(.caption(.white))
-                .padding(.all, 4)
-                .background(Color.black.opacity(0.7))
-                .cornerRadius(4)
-                .padding([.leading, .bottom], 8)
+
+            VStack {
+                Spacer()
+                HStack(alignment: .bottom) {
+                    Text("\(duration.formattedDurationString ?? "0:00")")
+                        .applyTextStyle(.caption(.white))
+                        .padding(.all, 4)
+                        .background(Color.black.opacity(0.7))
+                        .cornerRadius(4)
+
+                    Spacer()
+
+                    if !media.produtTags.isEmpty {
+                        AmityProductTagBadgeView(count: media.produtTags.count)
+                            .onTapGesture {
+                                selectedProductTagMedia = media
+                            }
+                    }
+                }
+                .padding(8)
+            }
         }
-        
+
     }
-    
+
     @ViewBuilder
-    private func getVideoView(_ url: URL, _ duration: TimeInterval) -> some View {
+    private func getVideoView(_ url: URL, _ duration: TimeInterval, _ media: AmityMedia) -> some View {
         let emptyView = Color(viewConfig.theme.baseColorShade4)
-        ZStack(alignment: .bottomLeading) {
+        ZStack {
             Color.clear
                 .overlay(
                     URLImage(url, empty: {
@@ -301,15 +330,29 @@ struct VideoFeedComponent: View {
                 .compositingGroup()
                 .clipped()
                 .contentShape(Rectangle())
-            
-            Text("\(duration.formattedDurationString ?? "0:00")")
-                .applyTextStyle(.caption(.white))
-                .padding(.all, 4)
-                .background(Color.black.opacity(0.7))
-                .cornerRadius(4)
-                .padding([.leading, .bottom], 8)
+
+            VStack {
+                Spacer()
+                HStack(alignment: .bottom) {
+                    Text("\(duration.formattedDurationString ?? "0:00")")
+                        .applyTextStyle(.caption(.white))
+                        .padding(.all, 4)
+                        .background(Color.black.opacity(0.7))
+                        .cornerRadius(4)
+
+                    Spacer()
+
+                    if !media.produtTags.isEmpty {
+                        AmityProductTagBadgeView(count: media.produtTags.count)
+                            .onTapGesture {
+                                selectedProductTagMedia = media
+                            }
+                    }
+                }
+                .padding(8)
+            }
         }
-        
+
     }
     
     @ViewBuilder
@@ -332,4 +375,5 @@ struct VideoFeedComponent: View {
             .cornerRadius(10)
             .shimmering(gradient: shimmerGradient)
     }
+
 }

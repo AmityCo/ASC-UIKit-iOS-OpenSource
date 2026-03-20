@@ -199,9 +199,22 @@ final public class MentionManager: MentionTextEditorDelegate {
         return mentionees
     }
 
+    /// Adjusts existing mention indices when the text content changes externally
+    /// (e.g., a product tag is added/removed, shifting text around mentions).
+    /// Computes the diff between old and new text and updates indices accordingly.
+    func adjustIndicesForTextChange(oldText: String, newText: String) {
+        mentionEditor.adjustIndicesForTextChange(oldText: oldText, newText: newText)
+    }
+
     // Reset everything to state before mention.
     func resetState() {
         mentionEditor.reset()
         mentionProvider.reset()
+    }
+
+    /// Reset only the current search state without clearing existing mentions
+    func resetSearchState() {
+        mentionEditor.resetSearchState()
+        mentionProvider.mentionList = []
     }
 }

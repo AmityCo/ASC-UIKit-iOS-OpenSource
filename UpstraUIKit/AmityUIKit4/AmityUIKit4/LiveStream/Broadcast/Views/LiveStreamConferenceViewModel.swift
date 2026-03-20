@@ -81,6 +81,8 @@ class LiveStreamConferenceViewModel: ObservableObject {
     
     private var targetObjectToken: AmityNotificationToken?
     private var livePostToken: AmityNotificationToken?
+    private var parentPostToken: AmityNotificationToken?
+    private var postObserveOnceToken: AmityNotificationToken?
     private var liveRoomToken: AmityNotificationToken?
     
     // Target
@@ -124,6 +126,15 @@ class LiveStreamConferenceViewModel: ObservableObject {
     
     // Settings
     @Published var isLiveChatDisabled: Bool = false
+    
+    // Product Catalogue Settings
+    @Published var isProductTagEnabled: Bool = false
+    
+    // Product tagging
+    @Published var taggedProducts: [AmityProduct] = []
+    @Published var pinnedProductId: String? = nil
+    
+    @Published var isCoHostManageProductTagEnable: Bool = false
     
     // ViewModels
     @Published var liveStreamChatViewModel: AmityLiveStreamChatViewModel?
@@ -191,10 +202,57 @@ class LiveStreamConferenceViewModel: ObservableObject {
     
     private func setup() {
         self.fetchTargetInfo(targetId: targetId, targetType: targetType)
+        Task {
+            await self.checkProductCatalogueSettings()
+        }
         
         // Observe app life cycle notfications
 //        NotificationCenter.default.addObserver(self, selector: #selector(suspendLiveStream), name: UIApplication.didEnterBackgroundNotification, object: nil)
 //        NotificationCenter.default.addObserver(self, selector: #selector(resumeLiveStream), name: UIApplication.willEnterForegroundNotification, object: nil)
+    }
+    
+    /// Checks if product catalogue/tag is enabled from network settings
+    func checkProductCatalogueSettings() async {
+        do {
+            let productSettings = try await AmityUIKitManagerInternal.shared.client.getProductCatalogueSetting()
+            await MainActor.run {
+                self.isProductTagEnabled = productSettings.enabled
+            }
+        } catch {
+            // Default to false if error or not available
+            await MainActor.run {
+                self.isProductTagEnabled = false
+            }
+        }
+    }
+    
+    /// Refreshes the latest product tags and pinned product from the livestream child post
+    func getPost() async {
+        guard let createdPost else { return }
+        let livestreamPost: AmityPost
+        if let childPost = createdPost.childrenPosts.first {
+            livestreamPost = childPost
+        } else {
+            livestreamPost = createdPost
+        }
+        postObserveOnceToken?.invalidate()
+        postObserveOnceToken = nil
+        await withCheckedContinuation { continuation in
+            postObserveOnceToken = postManager.getPost(withId: livestreamPost.postId).observeOnce { [weak self] liveObject, _ in
+                guard let self, let snapshot = liveObject.snapshot else { return }
+                // Sync product tags from post updates
+                if let livestreamPost = snapshot.childrenPosts.first {
+                    Task { @MainActor in
+                        await self.syncProductTagsFromPost(livestreamPost)
+                    }
+                } else {
+                    Task { @MainActor in
+                        await self.syncProductTagsFromPost(snapshot)
+                    }
+                }
+                continuation.resume()
+            }
+        }
     }
     
     private func observeBroadcasterState() {
@@ -239,6 +297,11 @@ class LiveStreamConferenceViewModel: ObservableObject {
     func startStream(title: String, description: String) {
         guard currentState != .streaming else { return }
         
+        // #0. Check product catalogue settings from network config
+        Task {
+            await checkProductCatalogueSettings()
+        }
+        
         // #1. Validate inputs
         let sanitizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let sanitizedDescription = description.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -281,9 +344,30 @@ class LiveStreamConferenceViewModel: ObservableObject {
                     let roomPostBuilder = AmityRoomPostBuilder(roomId: roomId, text: sanitizedDescription)
                     roomPostBuilder.setTitle(sanitizedTitle)
                     
-                    let post = try await postManager.createLiveStreamRoomPost(builder: roomPostBuilder, targetId: self.targetId, targetType: self.targetType, metadata: nil, mentionees: nil)
+                    // Convert AmityProduct to AmityProductTag
+                    let productTagsArray = taggedProducts.map { product in
+                        AmityMediaProductTag(productId: product.productId, product: product)
+                    }
+                    
+                    let post = try await postManager.createLiveStreamRoomPost(
+                        builder: roomPostBuilder,
+                        targetId: self.targetId,
+                        targetType: self.targetType,
+                        metadata: nil,
+                        mentionees: nil,
+                        productTags: productTagsArray.isEmpty ? nil : productTagsArray,
+                        pinnedProductId: pinnedProductId
+                    )
                     self.internalCreatedPost = post
                     Log.add(event: .info, "Post Created: \(post.postId)")
+                    
+                    // Show warning if some tagged products are no longer available
+                    if !productTagsArray.isEmpty {
+                        let returnedTagCount = post.childrenPosts.first?.getMediaProductTags().count ?? 0
+                        if returnedTagCount != productTagsArray.count {
+                            Toast.showToast(style: .warning, message: "Some products that you've tagged are no longer available.", bottomPadding: 60)
+                        }
+                    }
                 }
                 
                 guard let room = createdRoom else {
@@ -294,17 +378,15 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 }
                 
                 // #5 Create Live Stream Channel
-                if let channel = try await room.getLiveChat() {
+                if let channel = try await room.getLiveChat(), let updatedRoom = roomManager.getRoom(roomId: room.roomId).snapshot {
                     Log.add(event: .info, "Retrieved live chat channel: \(channel.channelId)")
                     // If live chat is enabled, we will mute the channel since the beginning of live stream
                     if isLiveChatDisabled {
                         try await channelManager.muteChannel(channelId: channel.channelId)
                     }
                     
-                    // Get attached room for chat view model
-                    if let attachedToRoom = channel.attachedToRoom {
-                        self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(room: attachedToRoom, participantRole: .host)
-                    }
+                    self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(room: updatedRoom, participantRole: .host)
+                    self.internalCreatedRoom = updatedRoom
                 }
                 
                 // #6 Generate room token & URL
@@ -341,8 +423,17 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 Log.add(event: .info, "Obversing watching count from room")
                 
             } catch let error {
-                // Show alert
-                LiveStreamAlert.shared.show(for: .streamError)
+                if !taggedProducts.isEmpty {
+                    // Creation failed while products were tagged — clear tags and let user retry without them
+                    pinnedProductId = nil
+                    LiveStreamAlert.shared.show(for: .productTaggingDisabled(action: { [weak self] in                        
+                        guard let self else { return }
+                        self.taggedProducts.removeAll()
+                        self.startStream(title: sanitizedTitle, description: sanitizedDescription)
+                    }))
+                } else {
+                    LiveStreamAlert.shared.show(for: .streamError)
+                }
                 // Update ui state
                 currentState = .setup
                 
@@ -361,13 +452,22 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 self.internalCreatedRoom = room
                 Log.add(event: .info, "Post Created: \(post.postId)")
                 
+                // Initialize product tags from child post (livestream post)
+                if let childPost = post.childrenPosts.first {
+                    let productTags = childPost.getMediaProductTags()
+                    self.taggedProducts = productTags.compactMap { $0.product }
+                    self.pinnedProductId = childPost.pinnedProductId
+                    Log.add(event: .info, "Initialized product tags from child post: \(taggedProducts.count)")
+                }
+                
                 // #1 Create Live Stream Channel
-                if let channel = try await room.getLiveChat() {
+                if let channel = try await room.getLiveChat(), let updatedRoom = roomManager.getRoom(roomId: room.roomId).snapshot  {
                     // If live chat is enabled, we will mute the channel since the beginning of live stream
                     if isLiveChatDisabled {
                         try await channelManager.muteChannel(channelId: channel.channelId)
                     }
-                    self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(room: room, participantRole: .coHost)
+                    self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(room: updatedRoom, participantRole: .coHost)
+                    self.liveStreamChatViewModel?.productCount = self.taggedProducts.count
                 }
                 
                 // #2 Generate room token & URL
@@ -551,14 +651,24 @@ class LiveStreamConferenceViewModel: ObservableObject {
         }
     }
     
+    func updateCohostProductTag(cohostId: String, canManageProductTag: Bool) {
+        Task { @MainActor in
+            await roomManager.manageCohostProductTag(roomId: createdRoom?.roomId ?? "", cohostId: cohostId, canManageProductTags: canManageProductTag)
+        }
+    }
+    
     func cleanup(_ reason: LiveStreamEndReason) {
         targetObjectToken?.invalidate()
         liveRoomToken?.invalidate()
         livePostToken?.invalidate()
+        parentPostToken?.invalidate()
+        postObserveOnceToken?.invalidate()
         
         targetObjectToken = nil
         liveRoomToken = nil
         livePostToken = nil
+        parentPostToken = nil
+        postObserveOnceToken = nil
         
         // Cleanup states
         isReconnecting = false
@@ -583,8 +693,8 @@ class LiveStreamConferenceViewModel: ObservableObject {
         // If co-host left or being removed, UI state will change to LiveStreamViewerView which still needs to observe room and post events...
         // So we only unsubscribe events when the participant is host
         if participantRole == .host {
-            if createdPost?.isInvalidated == false {
-                createdPost?.unsubscribeEvent(.post, withCompletion: { success, error in
+            if createdPost?.isInvalidated == false, let livestreamPost = createdPost?.childrenPosts.first, !livestreamPost.isInvalidated {
+                livestreamPost.unsubscribeEvent(.post, withCompletion: { success, error in
                     Log.add(event: .info, "Unsubscribing post event status: \(success) Error: \(String(describing: error))")
                 })
             }
@@ -598,17 +708,53 @@ class LiveStreamConferenceViewModel: ObservableObject {
     }
     
     func subscribePostEventAndObserve(subscribeEvent: Bool) {
-        guard let postId = createdPost?.postId else { return }
-        
+        guard let createdPost else { return }
+        let livestreamPost: AmityPost
+        if let childPost = createdPost.childrenPosts.first {
+            livestreamPost = childPost
+            
+            parentPostToken = postManager.getPost(withId: createdPost.postId).observe{ [weak self] liveObject, error in
+                guard let self, let snapshot = liveObject.snapshot else { return }
+                            
+                if snapshot.getFeedType() == .declined {
+                    self.endLiveStream(reason: .notApproved)
+                }
+                
+                if snapshot.isDeleted {
+                    livePostToken?.invalidate()
+                    livePostToken = nil
+                    
+                    self.endLiveStream(reason: .terminated)
+                }
+                internalCreatedPost = snapshot
+            }
+        } else {
+            livestreamPost = createdPost
+        }
         if subscribeEvent {
-            createdPost?.subscribeEvent(.post, withCompletion: { success, error in
+            livestreamPost.subscribeEvent(.post, withCompletion: { success, error in
+                Log.add(event: .info, "Subscribing post event status: \(success) Error: \(String(describing: error))")
+            })
+            
+            createdPost.subscribeEvent(.post, withCompletion: { success, error in
                 Log.add(event: .info, "Subscribing post event status: \(success) Error: \(String(describing: error))")
             })
         }
         
-        livePostToken = postManager.getPost(withId: postId).observe{ [weak self] liveObject, error in
+        
+        livePostToken = postManager.getPost(withId: livestreamPost.postId).observe{ [weak self] liveObject, error in
             guard let self, let snapshot = liveObject.snapshot else { return }
-            
+                        
+            // Sync product tags from post updates
+            if let livestreamPost = snapshot.childrenPosts.first {
+                Task { @MainActor in
+                    await self.syncProductTagsFromPost(livestreamPost)
+                }
+            } else {
+                Task { @MainActor in
+                    await self.syncProductTagsFromPost(snapshot)
+                }
+            }
             if snapshot.getFeedType() == .declined {
                 self.endLiveStream(reason: .notApproved)
             }
@@ -640,6 +786,10 @@ class LiveStreamConferenceViewModel: ObservableObject {
             if participantRole == .coHost && snapshot.status == .ended {
                 endLiveStream(reason: .manual)
             }
+            
+            let newCoHost = snapshot.participants.first(where: { $0.type == "coHost" })
+                        
+            isCoHostManageProductTagEnable = newCoHost?.canManageProductTags ?? false
             
             if snapshot.isDeleted {
                 liveRoomToken?.invalidate()
@@ -765,6 +915,68 @@ extension LiveStreamConferenceViewModel {
         }
         
         self.isUploadingThumbnail = false
+    }
+    
+    // MARK: - Product Tag API Methods
+    
+    @MainActor
+    func updateProductTagsAPI(postId: String) async {
+        do {
+            let productTagsArray: [AmityMediaProductTag] = taggedProducts.map { product in
+                let productTag = AmityMediaProductTag(productId: product.productId)
+                return productTag
+            }
+            let sentCount = productTagsArray.count
+            
+            let updatedPost = try await postManager.updateProductTags(postId: postId, productTags: productTagsArray)
+            
+            // Sync local state with backend response
+            await syncProductTagsFromPost(updatedPost)
+            
+            // Show warning if some tagged products are no longer available
+            if sentCount > 0 && taggedProducts.count != sentCount {
+                Toast.showToast(style: .warning, message: "Some products that you've tagged are no longer available.", bottomPadding: 60)
+            }
+        } catch {
+        }
+    }
+    
+    @MainActor
+    func pinProductTagAPI(postId: String, productId: String) async throws {
+        let updatedPost = try await postManager.pinProductTag(postId: postId, productId: productId)
+        
+        // Sync local state with backend response
+        await syncProductTagsFromPost(updatedPost)
+    }
+    
+    @MainActor
+    func unpinProductTagAPI(postId: String) async throws {
+        let updatedPost = try await postManager.unpinProductTag(postId: postId)
+        
+        // Sync local state with backend response
+        await syncProductTagsFromPost(updatedPost)
+    }
+    
+    // MARK: - Sync Product Tags from Post
+    
+    @MainActor
+    private func syncProductTagsFromPost(_ post: AmityPost) async {
+        // Update tagged products from post
+        let productTags = post.getMediaProductTags()
+        
+        // Convert AmityProductTag to AmityProduct
+        var updatedProducts: [AmityProduct] = []
+        for tag in productTags {
+            if let product = tag.product {
+                updatedProducts.append(product)
+            }
+        }
+                
+        taggedProducts = updatedProducts
+        
+        // Update pinned product ID from post
+        pinnedProductId = post.pinnedProductId
+        
     }
 }
 

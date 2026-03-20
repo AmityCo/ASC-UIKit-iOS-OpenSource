@@ -2,11 +2,12 @@
 //  LivestreamVideoPlayerView.swift
 //  AmityUIKit4
 //
-//  Created by Manuchet Rungraksa on 7/10/2567 BE.
+//  Created by Manuchet Rungraksa on 7/10/2567 BE.  
 //
 
 import SwiftUI
 import AVKit
+import SafariServices
 
 struct LiveStreamViewerView: View {
     
@@ -20,6 +21,7 @@ struct LiveStreamViewerView: View {
     
     @State private var showBottomSheet = false
     @State private var showShareSheet = false
+    @State private var isPinnedProductDismissed = false
     
     private let debouncer = Debouncer(delay: 2)
     @ObservedObject var viewModel: LiveStreamViewerViewModel
@@ -165,6 +167,41 @@ struct LiveStreamViewerView: View {
                     liveChatFeedView
                         .isHidden(viewModel.post.targetUser != nil)
                     
+                    
+                    // Pinned Product Element (above compose bar) - Shows for viewers during live
+                    if let room = viewModel.room,
+                       room.status == .live,
+                       viewModel.liveStreamChatViewModel?.isProductTagEnabled == true,
+                       let pinnedId = viewModel.pinnedProductId,
+                       let pinnedProduct = viewModel.productTags.first(where: { $0.productId == pinnedId }),
+                       !isPinnedProductDismissed {
+                        LivestreamPinnedProductElement(
+                            pageId: .livestreamPlayerPage,
+                            product: pinnedProduct,
+                            canManageProduct: false,
+                            onProductTap: { product, productUrl in
+                                // Open product URL in Safari
+                                if let url = URL(string: productUrl) {
+                                    let browserVC = SFSafariViewController(url: url)
+                                    browserVC.modalPresentationStyle = .pageSheet
+                                    UIApplication.topViewController()?.present(browserVC, animated: true)
+                                }
+                            },
+                            onUnpin: { _ in
+                            },
+                            onDismiss: { product in
+                                // Viewer dismisses for themselves only
+                                isPinnedProductDismissed = true
+                            },
+                            onDelete: { _ in
+                            },
+                            roomId: viewModel.room?.roomId
+                        )
+                        .environmentObject(viewConfig)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
+                    }
+                    
                     if viewModel.post.feedType == .reviewing {
                         inPostReviewComposeBar
                     } else if viewModel.post.targetCommunity?.isJoined == false {
@@ -174,6 +211,20 @@ struct LiveStreamViewerView: View {
                             .isHidden(viewModel.post.targetUser != nil)
                     }
                 }
+                .background(
+                    GeometryReader { geometry in
+                        LinearGradient(
+                            colors: [Color.black.opacity(0),
+                                     Color.black.opacity(0.8)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: UIScreen.main.bounds.height / 3)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                        .allowsHitTesting(false)
+                    }
+                    .allowsHitTesting(false)
+                )
                 
                 // Reaction bar overlay
                 if let liveChatViewModel = viewModel.liveStreamChatViewModel {
@@ -357,6 +408,13 @@ struct LiveStreamViewerView: View {
                 }
             }
         }
+        .onChange(of: networkMonitor.isConnected) { isConnected in
+            if !isConnected {
+                Toast.showToast(style: .loading, message: "Waiting for network...", bottomPadding: 60, autoHide: false)
+            } else {
+                Toast.hideToastIfPresented(immediately: true)
+            }
+        }
         .onChange(of: viewModel.isStreamTerminated) { isTerminated in
             guard isTerminated else { return }
             
@@ -416,7 +474,7 @@ struct LiveStreamViewerView: View {
             if let liveChatViewModel = viewModel.liveStreamChatViewModel {
                 Color.black
                     .frame(height: 50)
-                
+                                
                 AmityLiveStreamChatComposeBar(viewModel: liveChatViewModel)
                     .frame(height: 35)
                     .padding(.leading, 16)
@@ -431,8 +489,64 @@ struct LiveStreamViewerView: View {
                             }
                         }
                     }
+                    .onAppear {
+                        liveChatViewModel.productCount = viewModel.productTags.count
+                        liveChatViewModel.showProductTagAction = {
+                            showProductList()
+                        }
+                        liveChatViewModel.refreshProductTagsAction = {
+                            if Date().timeIntervalSince(viewModel.post.object.updatedAt) > 60 {
+                                await viewModel.getPost()
+                            }
+                        }
+                        Task {
+                            await liveChatViewModel.checkProductCatalogueSettings()
+                        }
+                    }
+                    .onChange(of: viewModel.productTags.count) { newCount in
+                        liveChatViewModel.productCount = newCount
+                    }
+                    .onChange(of: viewModel.pinnedProductId) { _ in
+                        isPinnedProductDismissed = false
+                    }
             }
         }
+    }
+    
+    private func showProductList() {
+        // Viewers always see view-only product list
+        let productTags = viewModel.productTags.map { product in
+            AmityProductTagModel(object: product, range: NSRange(location: 0, length: 0), contentType: .media)
+        }
+        
+        let component = AmityProductTagListComponent(
+            pageId: .livestreamPlayerPage,
+            productTags: productTags,
+            renderMode: .livestream,
+            sourceId: viewModel.room?.roomId ?? "",
+            onClose: {
+                UIApplication.topViewController()?.dismiss(animated: true)
+            }
+        ) { productTag in
+            if let url = URL(string: productTag.object.productUrl) {
+                let browserVC = SFSafariViewController(url: url)
+                browserVC.modalPresentationStyle = .pageSheet
+                UIApplication.topViewController()?.present(browserVC, animated: true)
+            }
+        }
+        
+        let vc = AmitySwiftUIHostingController(rootView: component
+            .ignoresSafeArea(edges: .bottom))
+        vc.modalPresentationStyle = .pageSheet
+        if #available(iOS 15.0, *) {
+            if let sheet = vc.sheetPresentationController {
+                sheet.detents = [.medium(), .large()]
+                sheet.selectedDetentIdentifier = .medium
+            }
+        } else {
+            // Fallback on earlier versions
+        }
+        host.controller?.present(vc, animated: true)
     }
     
     @ViewBuilder

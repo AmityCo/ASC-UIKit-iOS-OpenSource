@@ -48,6 +48,11 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
     
     @Published var coHostInvitation: AmityInvitation?
     @Published var isJoinSheetDismissedOnAction: Bool = false
+    @Published var isProductTagEnabled: Bool = false
+    @Published var updatedChildPost: AmityPost? = nil
+    @Published var taggedProducts: [AmityProduct] = []
+    @Published var pinnedProductId: String? = nil
+    var previousProductCount: Int = 0
     
     
     public init(post: AmityPostModel) {
@@ -107,7 +112,13 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
         
         self.broadcasterViewModel = broadcasterViewModel
         self.conferenceViewModel = LiveStreamConferenceViewModel(targetId: postModel.targetId, targetType: postModel.postTargetType, participantRole: .coHost, broadcasterViewModel: broadcasterViewModel)
-        self.livestreamViewerViewModel = LiveStreamViewerViewModel(post: postModel, tracker: watchMinuteTracker)
+        let livestreamPostModel: AmityPostModel
+        if let childPost = postModel.childrenPosts.first {
+            livestreamPostModel = AmityPostModel(post: childPost)
+        } else {
+            livestreamPostModel = postModel
+        }
+        self.livestreamViewerViewModel = LiveStreamViewerViewModel(post: livestreamPostModel, tracker: watchMinuteTracker)
     }
     
     private func observeCoHostEvents(room: AmityRoom) {
@@ -120,6 +131,11 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                 if event.type == .coHostRemoved && self?.currentState == .inBackstage {
                     self?.currentState = .viewer
                     Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamLeftStageToast.localizedString, bottomPadding: 60)
+                }
+                
+                // Display co-host left toast if the user is a viewer when co-host left
+                if event.type == .coHostLeft && self?.currentState == .viewer {
+                    Toast.showToast(style: .success, message: "Co-host left the live stream.", bottomPadding: 60)
                 }
                 
                 // Ensure the invitation is for the current user since BE is sending events to all users in the room
@@ -195,6 +211,45 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
             // Start new tracking session when user returns to viewer
             watchMinuteTracker.startTracking(for: room)
             Log.add(event: .info, "Watch tracking started: User returned to viewer")
+        }
+    }
+    
+    @MainActor
+    func updateProductTagsAPI(childPost: AmityPost) async {
+        do {
+            let productTagsArray: [AmityMediaProductTag] = taggedProducts.map { product in
+                let productTag = AmityMediaProductTag(productId: product.productId)
+                return productTag
+            }
+            
+            let updatedPost = try await postManager.updateProductTags(postId: childPost.postId, productTags: productTagsArray)
+            self.updatedChildPost = updatedPost
+            
+            // Sync local state with BE response
+            let productTags = updatedPost.getMediaProductTags()
+            taggedProducts = productTags.compactMap { $0.product }
+            pinnedProductId = updatedPost.pinnedProductId
+            
+            print("[Playback] Successfully updated product tags for post: \(childPost.postId)")
+        } catch {
+            print("[Playback] Failed to update product tags: \(error.localizedDescription)")
+        }
+    }
+    
+    /// Checks if product catalogue/tag is enabled from network settings
+    func checkProductCatalogueSettings() async {
+        do {
+            let productSettings = try await AmityUIKitManagerInternal.shared.client.getProductCatalogueSetting()
+            await MainActor.run {
+                self.isProductTagEnabled = productSettings.enabled
+                print("Product Catalogue enabled from client: \(self.isProductTagEnabled)")
+            }
+        } catch {
+            // Default to false if error or not available
+            await MainActor.run {
+                self.isProductTagEnabled = false
+                print("Product Catalogue setting not available: \(error.localizedDescription)")
+            }
         }
     }
 }

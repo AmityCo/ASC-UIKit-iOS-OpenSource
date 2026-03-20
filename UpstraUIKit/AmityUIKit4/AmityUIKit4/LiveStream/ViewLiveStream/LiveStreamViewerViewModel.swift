@@ -15,6 +15,7 @@ class LiveStreamViewerViewModel: ObservableObject {
     
     var roomToken: AmityNotificationToken?
     var postToken: AmityNotificationToken?
+    var postObserveOnceToken: AmityNotificationToken?
     private var chatViewModelCancellable: AnyCancellable?
     
     // Room Presense state
@@ -35,12 +36,28 @@ class LiveStreamViewerViewModel: ObservableObject {
     @Published var liveStreamChatViewModel: AmityLiveStreamChatViewModel? {
         didSet {
             setupChatViewModelObservation()
+            updateProductCount()
         }
     }
+    
+    // Product tagging
+    @Published var productTags: [AmityProduct] = [] {
+        didSet {
+            updateProductCount()
+        }
+    }
+    @Published var pinnedProductId: String?
     
     init(post: AmityPostModel, tracker: WatchMinuteTracker = WatchMinuteTracker()) {
         self.post = post
         self.watchMinuteTracker = tracker
+        
+        // Initialize product tags from post
+        let productTags = post.object.getMediaProductTags()
+        self.productTags = productTags.compactMap { $0.product }
+        self.pinnedProductId = post.pinnedProductId
+
+        
         subscribeRoomEventAndObserve(roomId: post.room?.roomId ?? "")
         subscribePostEventAndObserve(postId: post.postId)
         
@@ -80,6 +97,25 @@ class LiveStreamViewerViewModel: ObservableObject {
         self.presenceRepository?.stopHeartbeat()
     }
     
+    /// Manually refreshes product tags from the post snapshot (linked objects don't notify observers)
+    func getPost() async {
+        postObserveOnceToken?.invalidate()
+        postObserveOnceToken = nil
+        await withCheckedContinuation { continuation in
+            postObserveOnceToken = postManager.getPost(withId: post.postId).observeOnce { [weak self] liveObject, _ in
+                guard let self, let post = liveObject.snapshot else { return }
+                            
+                // Update product tags when post changes
+                Task { @MainActor in
+                    let productTags = post.getMediaProductTags()
+                    self.productTags = productTags.compactMap { $0.product }
+                    self.pinnedProductId = post.pinnedProductId
+                }
+                continuation.resume()
+            }
+        }
+    }
+    
     func observeWatchingCount() {
         self.presenceTimer?.invalidate()
         self.presenceTimer = nil
@@ -100,7 +136,7 @@ class LiveStreamViewerViewModel: ObservableObject {
         postToken = nil
         
         post.object.subscribeEvent(.post) { success, error in
-            Log.add(event: .info, "Subscribing post event status: \(success) Error: \(String(describing: error))")
+            Log.add(event: .info, "Subscribing post \(postId) event status: \(success) Error: \(String(describing: error))")
         }
         
         postToken = postManager.getPost(withId: postId).observe { [weak self] data, error in
@@ -109,7 +145,16 @@ class LiveStreamViewerViewModel: ObservableObject {
             if post.isDeleted {
                 isPostDeleted = true
                 cleanup()
+                return
             }
+            
+            // Update product tags when post changes
+            Task { @MainActor in
+                let productTags = post.getMediaProductTags()
+                self.productTags = productTags.compactMap { $0.product }
+                self.pinnedProductId = post.pinnedProductId
+            }
+
         }
     }
     
@@ -119,11 +164,12 @@ class LiveStreamViewerViewModel: ObservableObject {
         isLoaded = false
         
         post.room?.subscribeEvent() { success, error in
-            Log.add(event: .info, "Subscribing room event status: \(success) Error: \(String(describing: error))")
+            Log.add(event: .info, "Subscribing room \(roomId) event status: \(success) Error: \(String(describing: error))")
         }
         
         roomToken = roomManager.getRoom(roomId: roomId).observe { [weak self] data, error in
             guard let self, let room = data.snapshot else { return }
+            print("ReceiveRoomData \(room)")
             
             self.liveStreamChatViewModel?.refreshHostAndCoHostId(room: room)
             
@@ -200,6 +246,55 @@ class LiveStreamViewerViewModel: ObservableObject {
             room.unsubscribeEvent() { success, error in
                 Log.add(event: .info, "Unsubscribing room event status: \(success) Error: \(String(describing: error))")
             }
+        }
+    }
+    
+    // MARK: - Product Tag API Methods
+    
+    func updateProductTags(postId: String) async {
+        do {
+            let productTagsArray: [AmityMediaProductTag] = productTags.map { product in
+                let productTag = AmityMediaProductTag(productId: product.productId)
+                return productTag
+            }
+            
+            let updatedPost = try await postManager.updateProductTags(postId: postId, productTags: productTagsArray)
+            syncProductTagsFromPost(updatedPost)
+        } catch {
+            print("[LiveStreamViewer] Failed to update product tags: \(error.localizedDescription)")
+        }
+    }
+    
+    func pinProductTag(postId: String, productId: String) async {
+        do {
+            let updatedPost = try await postManager.pinProductTag(postId: postId, productId: productId)
+            syncProductTagsFromPost(updatedPost)
+        } catch {
+            print("[LiveStreamViewer] Failed to pin product tag: \(error.localizedDescription)")
+        }
+    }
+    
+    func unpinProductTag(postId: String) async {
+        do {
+            let updatedPost = try await postManager.unpinProductTag(postId: postId)
+            syncProductTagsFromPost(updatedPost)
+        } catch {
+            print("[LiveStreamViewer] Failed to unpin product tag: \(error.localizedDescription)")
+        }
+    }
+    
+    private func syncProductTagsFromPost(_ post: AmityPost?) {
+        guard let post = post else { return }
+        Task.runOnMainActor {
+            let productTags = post.getMediaProductTags()
+            self.productTags = productTags.compactMap { $0.product }
+            self.pinnedProductId = post.pinnedProductId
+        }
+    }
+    
+    private func updateProductCount() {
+        Task.runOnMainActor {
+            self.liveStreamChatViewModel?.productCount = self.productTags.count
         }
     }
 }

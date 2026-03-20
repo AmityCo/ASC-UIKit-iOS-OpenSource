@@ -131,6 +131,12 @@ public enum ComponentId: String {
     
     case myEventFeedComponent = "my_event_feed_component"
     case exploreEventFeedComponent = "explore_event_feed_component"
+    
+    case productTagListBottomsheet = "product_tag_list_bottomsheet"
+    case productTagSelectionBottomsheet = "product_tag_selection_bottomsheet"
+    
+    case manageProductTagList = "manage_product_tag_list"
+
 }
 
 public enum ElementId: String {
@@ -340,4 +346,19 @@ public enum ElementId: String {
     
     case copyLink = "copy_link"
     case shareLink = "share_link"
+
+    // ProductTagSelection
+    case productTaggingButton = "product_tagging_button"
+    case manageProductTagItem = "manage_product_tag_item"
+    case productTagSelectionHeader = "product_tag_selection_header"
+    case productTagSelectionSearchBar = "product_tag_selection_search_bar"
+    case productTagSelectionItem = "product_tag_selection_item"
+    case productTagEmpty = "product_tag_empty"
+    case productTagNoResult = "product_tag_no_result"
+
+    // ProductTagList
+    case productTagListHeader = "product_tag_list_header"
+    case productTagListItem = "product_tag_list_item"
+    // Livestream Pinned Product
+    case livestreamPinnedProduct = "livestream_pinned_product"
 }

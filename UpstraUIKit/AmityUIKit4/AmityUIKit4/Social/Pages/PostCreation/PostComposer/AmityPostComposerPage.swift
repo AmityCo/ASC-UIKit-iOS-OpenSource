@@ -8,6 +8,7 @@
 import AmitySDK
 import Combine
 import SwiftUI
+import SafariServices
 
 public struct AmityClipDraft {
     let clipData: AmityClipData
@@ -50,6 +51,7 @@ public struct AmityPostComposerPage: AmityPageView {
     @State private var showDismissAlert: Bool = false
     @State private var isLoading: Bool = false
     @State private var areAttachmentsReady: Bool = true
+    @State private var keyboardHeight: CGFloat = .zero
     private let options: AmityPostComposerOptions
     // Track original media file IDs for comparison when post is updated
     @State private var originalMediaFileIds: [String] = []
@@ -93,9 +95,10 @@ public struct AmityPostComposerPage: AmityPageView {
                 wrappedValue: AmityPostComposerViewModel(
                     targetId: post.targetId, targetType: AmityPostTargetType.community, post: post, mode: mode))
             
-            self._textEditorViewModel = StateObject(
-                wrappedValue: AmityTextEditorViewModel(
-                    mentionManager: MentionManager(withType: .post(communityId: post.targetId))))
+            let textEditorVM = AmityTextEditorViewModel(
+                mentionManager: MentionManager(withType: .post(communityId: post.targetId)))
+            textEditorVM.productTagManager.productTags = post.textProductTags ?? []
+            self._textEditorViewModel = StateObject(wrappedValue: textEditorVM)
             self._mediaAttatchmentViewModel = StateObject(
                 wrappedValue: AmityMediaAttachmentViewModel(medias: post.medias, isPostEditing: true))
             self._viewConfig = StateObject(
@@ -161,8 +164,33 @@ public struct AmityPostComposerPage: AmityPageView {
                     .maxExpandableHeight(99999)
                     .enableHashtagHighlighting(true)
                     .enableLinkHighlight(true)
+                    .scrollEnabled(false)
                     .maxHashtagCount(30)
+                    .enableProductMention(viewModel.isProductCatalogueEnabled)
                     .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
+                    .onChange(of: viewModel.postText) { _ in
+                        guard textEditorViewModel.textView.isFirstResponder,
+                              keyboardHeight > 0 else { return }
+                        scrollToCursorIfNeeded(kbHeight: keyboardHeight)
+                    }
+                    .onReceive(keyboardPublisher) { keyboardEvent in
+                        keyboardHeight = keyboardEvent.height
+                        if keyboardEvent.isAppeared && textEditorViewModel.textView.isFirstResponder {
+                            scrollToCursorIfNeeded(kbHeight: keyboardEvent.height)
+                        }
+                    }
+                    .onChange(of: textEditorViewModel.reachProductTagLimit) { reached in
+                        if reached {
+                            let alert = UIAlertController(
+                                title: AmityLocalizedStringSet.Social.productTagLimitTitle.localizedString,
+                                message: AmityLocalizedStringSet.Social.productTagLimitMessage.localizedString,
+                                preferredStyle: .alert
+                            )
+                            alert.addAction(UIAlertAction(title: AmityLocalizedStringSet.General.okay.localizedString, style: .cancel))
+                            host.controller?.present(alert, animated: true)
+                            textEditorViewModel.reachProductTagLimit = false
+                        }
+                    }
                     .onChange(of: textEditorViewModel.reachHashtagLimit) { reached in
                         if reached {
                             let alert = UIAlertController(title: "Hashtag limit reached", message: "You can only add hashtag up to 30 hashtags per post.", preferredStyle: .alert)
@@ -201,18 +229,34 @@ public struct AmityPostComposerPage: AmityPageView {
                     }
 
                     if !viewModel.isInClipComposerMode {
-                        PostCreationMediaAttachmentPreviewView(viewModel: mediaAttatchmentViewModel)
+                        PostCreationMediaAttachmentPreviewView(postComposerViewModel: viewModel, viewModel: mediaAttatchmentViewModel)
                             .contentShape(Rectangle())
                             .padding(.bottom, 60)
-                    }                    
+                    }
                 }
                 .onChange(of: mediaAttatchmentViewModel.medias) { medias in
                     if !medias.isEmpty && !viewModel.didRemoveLinkPreview {
                         viewModel.didRemoveLinkPreview = true
                         viewModel.previewedLink = nil
                     }
+                    viewModel.updateProductTags(medias: medias)
                 }
-                
+                .onChange(of: textEditorViewModel.productTags) { productTags in
+                    viewModel.textProductTags = productTags
+                    viewModel.updateProductTags(medias: mediaAttatchmentViewModel.medias)
+                }
+                .onChange(of: viewModel.productTags) { productTags in
+                    textEditorViewModel.suggestionViewModel.taggedProductIds = Set(productTags.map { $0.productId })
+                }
+                .onAppear {
+                    // Set up product tag limit check closure
+                    textEditorViewModel.canAddProductTag = { [weak viewModel] in
+                        viewModel?.canAddMoreProductTags ?? false
+                    }
+                    // Initialize tagged product IDs for suggestion view
+                    textEditorViewModel.suggestionViewModel.taggedProductIds = Set(viewModel.productTags.map { $0.productId })
+                }
+
                 Spacer()
             }
             
@@ -229,33 +273,42 @@ public struct AmityPostComposerPage: AmityPageView {
                     .isHidden(failedToastAlphaValue == 0)
                 
                 // Mention List View
-                AmityMentionUserListView(
-                    mentionedUsers: $viewModel.mentionedUsers,
-                    selection: { selectedMention in
-                        // Ask view model to handle this selection
-                        textEditorViewModel.selectMentionUser(user: selectedMention)
-                        
-                        // Update attributed Input
-                        viewModel.postText = textEditorViewModel.textView.text
-                        
-                        viewModel.mentionData.mentionee = textEditorViewModel.mentionManager
-                            .getMentionees()
-                        viewModel.mentionData.metadata = textEditorViewModel.mentionManager
-                            .getMetadata()
-                        
-                    },
-                    paginate: {
-                        textEditorViewModel.loadMoreMentions()
-                    }
-                )
-                .background(Color(viewConfig.theme.backgroundColor))
-                .isHidden(viewModel.mentionedUsers.count == 0, remove: true)
+//                AmityMentionUserListView(
+//                    mentionedUsers: $viewModel.mentionedUsers,
+//                    selection: { selectedMention in
+//                        // Ask view model to handle this selection
+//                        textEditorViewModel.selectMentionUser(user: selectedMention)
+//                        
+//                        // Update attributed Input
+//                        viewModel.postText = textEditorViewModel.textView.text
+//                        
+//                        viewModel.mentionData.mentionee = textEditorViewModel.mentionManager
+//                            .getMentionees()
+//                        viewModel.mentionData.metadata = textEditorViewModel.mentionManager
+//                            .getMetadata()
+//                        
+//                    },
+//                    paginate: {
+//                        textEditorViewModel.loadMoreMentions()
+//                    }
+//                )
+//                .background(Color(viewConfig.theme.backgroundColor))
+//                .isHidden(viewModel.mentionedUsers.count == 0, remove: true)
                 
+                // Product Tag Button
+                HStack {
+                    Spacer()
+                    productTagButton
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 12)
+                }
+                .isHidden(viewModel.isInClipComposerMode)
+
                 // Media Attatchment View
                 VStack(spacing: 5) {
                     BottomSheetDragIndicator()
                         .foregroundColor(Color(viewConfig.theme.baseColorShade3))
-                    
+
                     if showSmallComponent {
                         AmityMediaAttachmentComponent(
                             viewModel: mediaAttatchmentViewModel, pageId: id)
@@ -329,11 +382,57 @@ public struct AmityPostComposerPage: AmityPageView {
                     .frame(width: 80, height: 142)
                     .background(Color(viewConfig.defaultLightTheme.secondaryColor))
                     .cornerRadius(4, corners: .allCorners)
-                
+
                 Image(AmityIcon.videoControlIcon.getImageResource())
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 24, height: 24)
+            }
+        }
+    }
+
+    @ViewBuilder
+    var productTagButton: some View {
+        let productTagCount = viewModel.productTags.count
+        if productTagCount > 0 {
+            Button {
+                let component = AmityProductTagListComponent(pageId: .postComposerPage,
+                                                             productTags: viewModel.productTags,
+                                                             sourceId: "", // No postId yet during composition
+                                                             onClose: nil) { productTag in
+                    if let url = URL(string: productTag.object.productUrl) {
+                        let browserVC = SFSafariViewController(url: url)
+                        browserVC.modalPresentationStyle = .pageSheet
+                        UIApplication.topViewController()?.present(browserVC, animated: true)
+                    }
+                }
+
+                let vc = AmitySwiftUIHostingController(rootView: component)
+                host.controller?.present(vc, animated: true)
+            } label: {
+                ZStack(alignment: .topTrailing) {
+                    // Tag icon button
+                    Circle()
+                        .fill(Color(viewConfig.theme.baseColorShade4))
+                        .frame(width: 40, height: 40)
+                        .shadow(color: Color.black.opacity(0.18), radius: 4, x: 0, y: 4)
+                        .overlay(
+                            Image(AmityIcon.tagIcon.imageResource)
+                                .renderingMode(.template)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(Color(viewConfig.theme.baseColor))
+                        )
+
+                    // Badge with count
+                    Text("\(productTagCount)")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.white)
+                        .frame(minWidth: 16, minHeight: 16)
+                        .circularBackground(radius: 20, color: Color(viewConfig.theme.baseColor))
+                        .offset(x: 4, y: -4)
+                }
             }
         }
     }
@@ -425,7 +524,7 @@ public struct AmityPostComposerPage: AmityPageView {
         ? AmityLocalizedStringSet.Social.postCreateError.localizedString
         : AmityLocalizedStringSet.Social.postEditError.localizedString
         
-        if viewModel.postText.count > maxCharLimit {
+        if viewModel.postText.utf16Count > maxCharLimit {
             message = "Your post wasn't posted because it exceeds the 50,000 characters limit."
         } else if error.isAmityErrorCode(.banWordFound) {
             message = "Your post wasn't posted because it contains a blocked word."
@@ -492,13 +591,81 @@ public struct AmityPostComposerPage: AmityPageView {
             showAlertForLinkLimit()
             return
         }
-        
+
+        // Check if there are product tags and if product catalogue is still enabled
+        let hasProductTags = !viewModel.productTags.isEmpty || !textEditorViewModel.productTags.isEmpty
+        if hasProductTags {
+            Task { @MainActor in
+                do {
+                    let isEnabled = try await AmityUIKit4Manager.client.getProductCatalogueSetting().enabled
+                    if !isEnabled {
+                        viewModel.updateProductCatalogueEnabled(false)
+                        showProductTagUnavailableAlert()
+                        return
+                    }
+                    executePostCreation()
+                } catch {
+                    // If we can't check the setting, proceed with post creation
+                    executePostCreation()
+                }
+            }
+        } else {
+            executePostCreation()
+        }
+    }
+
+    private func showProductTagUnavailableAlert() {
+        let alert = UIAlertController(
+            title: AmityLocalizedStringSet.Social.productTagUnavailableTitle.localizedString,
+            message: AmityLocalizedStringSet.Social.productTagUnavailableMessage.localizedString,
+            preferredStyle: .alert
+        )
+
+        alert.addAction(UIAlertAction(
+            title: AmityLocalizedStringSet.Social.productTagReviewPost.localizedString,
+            style: .default
+        ){ _ in
+            // Clear product tags
+            self.clearProductTagsAndPublish(publish: false)
+        })
+
+        alert.addAction(UIAlertAction(
+            title: AmityLocalizedStringSet.Social.productTagPublish.localizedString,
+            style: .default
+        ) { _ in
+            // Clear product tags and proceed with post creation
+            self.clearProductTagsAndPublish(publish: true)
+        })
+
+        host.controller?.present(alert, animated: true)
+    }
+
+    private func clearProductTagsAndPublish(publish: Bool) {
+        // Clear text product tags
+        viewModel.textProductTags = []
+        textEditorViewModel.productTagManager.reset()
+
+        // Clear media product tags
+        for media in mediaAttatchmentViewModel.medias {
+            media.produtTags = []
+        }
+        viewModel.attachmentProductTags = AmityAttachmentProductTags()
+        viewModel.updateProductTags(medias: mediaAttatchmentViewModel.medias)
+
+        // Proceed with post creation
+        if publish {
+            executePostCreation()
+        }
+    }
+
+    private func executePostCreation() {
         isLoading = true
-        
+
         Task { @MainActor in
-            
+
             let isInCreateMode = viewModel.isInCreateMode
-            
+            let sentProductTagCount = viewModel.productTags.count
+
             do {
                 // Create or edit post
                 let post: AmityPost?
@@ -532,9 +699,24 @@ public struct AmityPostComposerPage: AmityPageView {
                     )
                 }
                 
+                // Compare sent product tag count with response to detect deleted products,
+                // or check if any product tag in the response has archived status
+                let showProductTagWarning: Bool
+                if let post, sentProductTagCount > 0 {
+                    let responseModel = AmityPostModel(post: post)
+                    let hasArchivedProduct = responseModel.allProductTags.contains { $0.object.status == .archived }
+                    let hasDeletedProductIncluded = responseModel.allProductTags.count < sentProductTagCount
+                    showProductTagWarning = hasDeletedProductIncluded || hasArchivedProduct
+                } else {
+                    showProductTagWarning = false
+                }
+
                 isLoading = false
-                
+
                 host.controller?.navigationController?.dismiss(animated: true, completion: {
+                    if showProductTagWarning {
+                        Toast.showToast(style: .warning, message: "Some products that you've tagged are no longer available.")
+                    }
                     if post?.getFeedType() == .reviewing {
                         let title = isInCreateMode ? "Posts sent for review" : "Post updates sent for review"
                         let message = isInCreateMode ? "Your post has been submitted to the pending list. It will be published once approved by the community moderator" : "Your post update has been submitted to the pending list. It will be published once approved by the community moderator"
@@ -548,10 +730,12 @@ public struct AmityPostComposerPage: AmityPageView {
                     }
                 })
                 
+                /// Send didPostCreated event to mod global feed listing
+                /// This event is observed in PostFeedViewModel
                 if isInCreateMode {
-                    /// Send didPostCreated event to mod global feed listing
-                    /// This event is observed in PostFeedViewModel
                     NotificationCenter.default.post(name: .didPostCreated, object: post)
+                } else {
+                    NotificationCenter.default.post(name: .didPostEdited, object: post)
                 }
             } catch {
                 processError(error: error)
@@ -577,5 +761,43 @@ public struct AmityPostComposerPage: AmityPageView {
         alert.addAction(action)
         
         UIApplication.topViewController()?.present(alert, animated: true)
+    }
+    
+    private func scrollToCursorIfNeeded(kbHeight: CGFloat) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let textView = textEditorViewModel.textView
+            guard let selectedRange = textView.selectedTextRange else { return }
+            guard let scrollView = findParentScrollView(of: textView) else { return }
+            
+            // Cursor position on screen
+            let caretRect = textView.caretRect(for: selectedRange.end)
+            let caretInWindow = textView.convert(caretRect, to: nil)
+            
+            // Top of keyboard + overlay area on screen
+            let screenHeight = UIScreen.main.bounds.height
+            let overlayHeight: CGFloat = 100
+            let keyboardTop = screenHeight - kbHeight - overlayHeight
+            
+            // Only scroll if cursor is behind the keyboard
+            guard caretInWindow.maxY > keyboardTop else { return }
+            
+            // Scroll down by exactly the overlap amount
+            let overlap = caretInWindow.maxY - keyboardTop
+            var offset = scrollView.contentOffset
+            offset.y += overlap
+            scrollView.setContentOffset(offset, animated: true)
+        }
+    }
+    
+    private func findParentScrollView(of view: UIView) -> UIScrollView? {
+        var current = view.superview
+        
+        while let sv = current {
+            if let scrollView = sv as? UIScrollView {
+                return scrollView
+            }
+            current = sv.superview
+        }
+        return nil
     }
 }

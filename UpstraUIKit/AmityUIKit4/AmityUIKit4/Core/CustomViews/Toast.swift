@@ -175,12 +175,13 @@ public class Toast: UIViewController {
         }
     }
     
-    public static func hideToastIfPresented() {
+    public static func hideToastIfPresented(immediately: Bool = false) {
         let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
         guard let window = keyWindow else { return }
         
         if let toastView = window.subviews.first(where: { $0.tag == ToastView.toastViewTag }) {
-            UIView.animate(withDuration: 0.5, delay: 3.0, options: .curveEaseInOut, animations: {
+            let delay: TimeInterval = immediately ? 0.0 : 3.0
+            UIView.animate(withDuration: 0.5, delay: delay, options: .curveEaseInOut, animations: {
                 toastView.alpha = 0.0
             }, completion: { _ in
                 toastView.removeFromSuperview()

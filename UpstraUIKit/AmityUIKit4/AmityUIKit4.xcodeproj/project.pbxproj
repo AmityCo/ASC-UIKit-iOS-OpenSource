@@ -11,7 +11,7 @@
 		684AE1012B0C5B0200FD7270 /* AmityUIKit4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1002B0C5B0200FD7270 /* AmityUIKit4Tests.swift */; };
 		685F16C22BFCABAD0016685F /* AmityReactionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C12BFCABAD0016685F /* AmityReactionList.swift */; };
 		685F16C62BFCABB50016685F /* ReactionTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C52BFCABB50016685F /* ReactionTabBarView.swift */; };
-		68E6F9102F2F6BD700EA04B3 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 68E6F90F2F2F6BD700EA04B3 /* SharedFrameworks */; };
+		92EAD78D2F6D782E0084BA8C /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92EAD78C2F6D782E0084BA8C /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -152,9 +152,7 @@
 				Core/CustomViews/AmityButtonStyle.swift,
 				Core/CustomViews/AmityNavigationBar.swift,
 				Core/CustomViews/AmityTextEditorView.swift,
-				Core/CustomViews/AmityVideoPlayerView.swift,
 				Core/CustomViews/AsyncImage.swift,
-				Core/CustomViews/AVPlayerView.swift,
 				Core/CustomViews/BottomSheetDragIndicator.swift,
 				Core/CustomViews/BottomSheetItemView.swift,
 				Core/CustomViews/BottomSheetRadioItemView.swift,
@@ -169,6 +167,7 @@
 				Core/CustomViews/MultiSelectionMediaPicker.swift,
 				Core/CustomViews/SegmentedPickerView.swift,
 				Core/CustomViews/ShareActivitySheetView.swift,
+				Core/CustomViews/TextEditorSuggestionView.swift,
 				Core/CustomViews/Toast.swift,
 				Core/CustomViews/Toast.xib,
 				Core/Extenral/BottomSheet/BottomSheet.swift,
@@ -373,6 +372,7 @@
 				"Core/Extensions/Int+Extension.swift",
 				"Core/Extensions/Notification+Extension.swift",
 				"Core/Extensions/NSAttributedString+Extension.swift",
+				Core/Extensions/PresentationDismissHandler.swift,
 				"Core/Extensions/String+Extension.swift",
 				"Core/Extensions/Task+Extension.swift",
 				"Core/Extensions/TimeInterval+Extension.swift",
@@ -396,6 +396,8 @@
 				Core/Managers/NotificationTrayManager.swift,
 				Core/Managers/PollManager.swift,
 				Core/Managers/PostManager.swift,
+				Core/Managers/ProductManager.swift,
+				Core/Managers/ProductTagManager.swift,
 				Core/Managers/ReactionManager.swift,
 				Core/Managers/RoomManager.swift,
 				Core/Managers/StoryManager.swift,
@@ -491,6 +493,10 @@
 				LiveStream/LiveChat/Components/AmityLiveStreamChatFeed.swift,
 				LiveStream/LiveChat/Components/AmityLiveStreamChatViewModel.swift,
 				LiveStream/LiveStreamAlert.swift,
+				LiveStream/Shared/Component/ManageProductTagListComponent.swift,
+				LiveStream/Shared/Element/LivestreamPinnedProductElement.swift,
+				LiveStream/Shared/Element/ManageProductTagElement.swift,
+				LiveStream/Shared/Element/ProductTaggingButtonElement.swift,
 				LiveStream/ViewLiveStream/AmityLivestreamPlayerPage.swift,
 				LiveStream/ViewLiveStream/AmityLiveStreamPlayerPageViewModel.swift,
 				LiveStream/ViewLiveStream/LiveStreamViewerView.swift,
@@ -550,11 +556,23 @@
 				Social/Components/PostCreation/AmityMediaAttachmentViewModel.swift,
 				Social/Components/PostCreation/AmityMediaAttatchmentComponent.swift,
 				Social/Components/PostDetail/AmityPostContentComponent.swift,
+				Social/Components/PostDetail/PostContent/AmityPostMediaVideoPlayer.swift,
+				Social/Components/PostDetail/PostContent/AmityProductCarouselView.swift,
+				Social/Components/PostDetail/PostContent/AmityProductTagBadgeView.swift,
 				Social/Components/PostDetail/PostContent/Livestream/PostContentLiveStreamView.swift,
 				Social/Components/PostDetail/PostContent/MediaViewer.swift,
 				Social/Components/PostDetail/PostContent/PostBottomSheetView.swift,
 				Social/Components/PostDetail/PostContent/PostContentMediaView.swift,
 				Social/Components/PostDetail/PostContentSkeletonView.swift,
+				Social/Components/Products/ProductTagList/Components/AmityProductTagListComponent.swift,
+				Social/Components/Products/ProductTagList/Elements/AmityProductTagElement.swift,
+				Social/Components/Products/ProductTagList/Elements/AmityProductTagListHeaderElement.swift,
+				Social/Components/Products/ProductTagSelection/Components/AmityProductTagSelectionComponent.swift,
+				Social/Components/Products/ProductTagSelection/Elements/AmityProductTagEmptyElement.swift,
+				Social/Components/Products/ProductTagSelection/Elements/AmityProductTagNoResultElement.swift,
+				Social/Components/Products/ProductTagSelection/Elements/AmityProductTagSelectionHeaderElement.swift,
+				Social/Components/Products/ProductTagSelection/Elements/AmityProductTagSelectionItemElement.swift,
+				Social/Components/Products/ProductTagSelection/Elements/AmityProductTagSelectionSearchBarElement.swift,
 				Social/Components/Search/AmityCommunitySearchResultComponent.swift,
 				Social/Components/Search/AmityPostSearchResultComponent.swift,
 				Social/Components/Search/AmityTopSearchBarComponent.swift,
@@ -744,7 +762,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68E6F9102F2F6BD700EA04B3 /* SharedFrameworks in Frameworks */,
+				92EAD78D2F6D782E0084BA8C /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1221,7 +1239,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		68E6F90F2F2F6BD700EA04B3 /* SharedFrameworks */ = {
+		92EAD78C2F6D782E0084BA8C /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

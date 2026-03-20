@@ -52,8 +52,10 @@ public struct ExpandableText: View {
     internal var trimMultipleNewlinesWhenTruncated: Bool = false
     internal var metadata: [String: Any]?
     internal var mentionees: [AmityMentionees]?
+    internal var productTags: [AmityProductTagModel]?
     internal var onTapMentionee: ((String) -> Void)?
     internal var onTapHashtag: ((String) -> Void)?
+    internal var onTapProductTag: ((String) -> Void)?
     internal var defaultAction: (() -> Void)?
     internal var highlights: String?
     
@@ -62,13 +64,15 @@ public struct ExpandableText: View {
      - Parameter text: The initial text string to display in the `ExpandableText` view.
      - Returns: A new `ExpandableText` instance with the specified text string and trimming applied.
      */
-    public init(_ text: String, defaultAction: (() -> Void)? = nil, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, highlightedText: String? = nil, onTapMentionee: ((String) -> Void)? = nil, onTapHashtag: ((String) -> Void)? = nil) {
+    public init(_ text: String, defaultAction: (() -> Void)? = nil, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, productTags: [AmityProductTagModel]? = [], highlightedText: String? = nil, onTapMentionee: ((String) -> Void)? = nil, onTapHashtag: ((String) -> Void)? = nil, onTapProductTag: ((String) -> Void)? = nil) {
         self.text = text.trimmingCharacters(in: .newlines)
         self.defaultAction = defaultAction
         self.metadata = metadata
         self.mentionees = mentionees
+        self.productTags = productTags
         self.onTapMentionee = onTapMentionee
         self.onTapHashtag = onTapHashtag
+        self.onTapProductTag = onTapProductTag
         self.highlights = highlightedText
     }
     
@@ -111,18 +115,15 @@ public struct ExpandableText: View {
             }
             .modifier(OverlayAdapter(alignment: .trailingLastTextBaseline, view: {
                 if shouldShowMoreButton {
-                    Button {
-                        if let defaultAction {
-                            defaultAction()
-                        } else {
-                            // we expand without expand animation as it looks ugly
-                            isExpanded.toggle()
-                        }
-                    } label: {
-                        Text(moreButtonText)
-                            .font(moreButtonFont ?? font)
-                            .foregroundColor(moreButtonColor)
-                    }
+                    Text(moreButtonText)
+                        .font(moreButtonFont ?? font)
+                        .foregroundColor(moreButtonColor)
+                        .contentShape(Rectangle())
+                        .highPriorityGesture(
+                            TapGesture().onEnded {
+                                isExpanded.toggle()
+                            }
+                        )
                 }
             }))
     }
@@ -130,8 +131,8 @@ public struct ExpandableText: View {
     @ViewBuilder
     private var content: some View {
         if #available(iOS 15, *) {
-            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color)
-            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color)
+            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], productTags: productTags ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color)
+            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], productTags: productTags ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color)
             
             Text(trimMultipleNewlinesWhenTruncated
                  ? (shouldShowMoreButton ? trimmedText : text)
@@ -146,13 +147,19 @@ public struct ExpandableText: View {
                     onTapMentionee?(userId)
                     return .discarded
                 }
-                
+
                 if url.deletingLastPathComponent().absoluteString == TextHighlighter.hashtagURL {
                     let hashtag = url.lastPathComponent
                     onTapHashtag?(hashtag)
                     return .discarded
                 }
-                
+
+                if url.deletingLastPathComponent().absoluteString == TextHighlighter.productTagURL {
+                    let productId = url.lastPathComponent
+                    onTapProductTag?(productId)
+                    return .discarded
+                }
+
                 return .systemAction
             })
         } else {
@@ -180,7 +187,7 @@ public struct ExpandableText: View {
 
 extension ExpandableText {
     @available(iOS 15, *)
-    private func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], font: UIFont, attributedColor: UIColor, hashtagColor: UIColor, highlights: String?, color: Color) -> AttributedString {
+    private func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], productTags: [AmityProductTagModel], font: UIFont, attributedColor: UIColor, hashtagColor: UIColor, highlights: String?, color: Color) -> AttributedString {
         
         let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: AmityTextStyle.bodyBold(.clear).getFont()]
         
@@ -189,6 +196,9 @@ extension ExpandableText {
         
         // If mention is present, highlight mentions first.
         let attributedString = TextHighlighter.highlightMentions(for: contentText, metadata: metadata, mentionees: mentionees, highlightAttributes: highlightAttributes)
+        
+        // If product tags is present, highlight product tags
+        TextHighlighter.highlightProductTags(attributedString, productTags: productTags, highlightAttributes: highlightAttributes)
         
         // If hashtags is present, highlight hashtags
         let hashtagAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: hashtagColor, .font: AmityTextStyle.bodyBold(.clear).getFont()]

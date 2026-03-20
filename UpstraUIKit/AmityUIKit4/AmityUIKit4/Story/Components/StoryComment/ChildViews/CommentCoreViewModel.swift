@@ -16,10 +16,10 @@ class CommentCoreViewModel: ObservableObject {
     @Published var hasScrolledToTop: Bool = true
     
     var loadedItems: [PaginatedItem<AmityComment>] = []
-    
-    private var commentCollection: AmityCollection<AmityComment>
+
+    private var commentCollection: AmityCollection<AmityComment>?
     private let commentManager = CommentManager()
-    var paginator: UIKitPaginator<AmityComment>
+    var paginator: UIKitPaginator<AmityComment>?
     
     let referenceId: String
     let referenceType: AmityCommentReferenceType
@@ -53,7 +53,8 @@ class CommentCoreViewModel: ObservableObject {
          communityId: String? = nil,
          targetCommentId: String? = nil,
          targetCommentParentId: String? = nil,
-         preloadRepliesOfComment: Bool = false
+         preloadRepliesOfComment: Bool = false,
+         loadComments: Bool = true
     ) {
         self.referenceId = referenceId
         self.referenceType = referenceType
@@ -62,7 +63,7 @@ class CommentCoreViewModel: ObservableObject {
         self.targetCommentId = targetCommentId
         self.targetCommentParentId = targetCommentParentId
         self.preloadRepliesOfComment = preloadRepliesOfComment
-        
+
         // Fetch target post
         if referenceType == .post {
             if let localPost = postManager.getPost(withId: referenceId).snapshot {
@@ -75,7 +76,10 @@ class CommentCoreViewModel: ObservableObject {
                 self.targetMembershipStatus = PostTargetMembershipStatus.determineStatus(isJoined: story?.community?.isJoined)
             }
         }
-        
+
+        // Skip expensive comment loading when not needed (e.g. feed inline comment)
+        guard loadComments else { return }
+
         let queryOptions = AmityCommentQueryOptions(referenceId: referenceId,
                                                     referenceType: referenceType,
                                                     filterByParentId: true,
@@ -87,14 +91,14 @@ class CommentCoreViewModel: ObservableObject {
         paginator = UIKitPaginator(liveCollection: collection, adPlacement: .comment, communityId: communityId, excludedId: idToExclude, modelIdentifier: { model in
             return model.commentId
         })
-        paginator.load()
-        
-        paginatorCancellable = paginator.$snapshots.sink { [weak self] items in
+        paginator?.load()
+
+        paginatorCancellable = paginator?.$snapshots.sink { [weak self] items in
             guard let self else { return }
-            
-            self.loadingStatus = self.commentCollection.loadingStatus
+
+            self.loadingStatus = self.commentCollection?.loadingStatus ?? .notLoading
             self.loadedItems = items
-            
+
             // If there is no target, we render feed immediately
             if targetCommentId == nil {
                 self.renderCommentFeed()
@@ -102,23 +106,23 @@ class CommentCoreViewModel: ObservableObject {
                 self.renderCommentFeed()
             }
         }
-        
+
         if let targetCommentId {
-            
+
             // If there is target comment, we fetch those comment first
             self.targetCommentFetcher.fetchTargetComment(id: targetCommentId) { parent, reply in
                 self.isTargetCommentFetched = true
-                                
+
                 if let parent {
                     let parentComment = PaginatedItem(id: parent.commentId, type: .content(AmityCommentModel(comment: parent)))
                     self.targetComment = parentComment
                 }
-                
+
                 if let reply {
                     let replyComment = PaginatedItem(id: reply.commentId, type: .content(AmityCommentModel(comment: reply)))
                     self.targetCommentReply = replyComment
                 }
-                
+
                 self.renderCommentFeed()
             }
         }

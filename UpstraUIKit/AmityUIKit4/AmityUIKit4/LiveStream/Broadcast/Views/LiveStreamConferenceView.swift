@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AmitySDK
+import SafariServices
 
 struct LiveStreamConferenceView: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
@@ -16,6 +17,7 @@ struct LiveStreamConferenceView: View {
     @StateObject private var permissionChecker = LiveStreamPermissionChecker()
     @StateObject private var pickerViewModel = ImageVideoPickerViewModel()
     @StateObject private var liveStreamAlert = LiveStreamAlert.shared
+    @StateObject private var networkMonitor = NetworkMonitor()
             
     @State private var showThumbnailEditSheet = false
     @State private var showMediaPicker = false
@@ -23,6 +25,10 @@ struct LiveStreamConferenceView: View {
     @State private var showShareSheet = false
     @State private var showCoHostInviteSheet = false
     @State private var showCoHostMenuActionSheet = false
+    @State private var showProductTagSheet = false
+    @State private var showProductSelectionSheet = false
+    @State private var previousProductCount = 0
+    @State private var isPinnedProductDismissed = false
     
     @ObservedObject var broadcasterViewModel: LiveStreamBroadcasterViewModel
     
@@ -82,11 +88,191 @@ struct LiveStreamConferenceView: View {
                 Color.black
                     .edgesIgnoringSafeArea(.bottom)
                     .frame(height: 50)
-                    .bottomSheet(isShowing: $showSettingSheet, height: .fixed(400), backgroundColor: Color(viewConfig.defaultDarkTheme.backgroundColor)) {
+                    .bottomSheet(isShowing: $showSettingSheet, height: .fixed(300), backgroundColor: Color(viewConfig.defaultDarkTheme.backgroundColor)) {
                         settingBottomSheetView
                     }
                     .bottomSheet(isShowing: $showCoHostMenuActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.defaultDarkTheme.backgroundColor)) {
                         coHostMenuActionSheet
+                    }
+                    .onChange(of: showProductTagSheet) { isShowing in
+                        if isShowing {
+                            Task {
+                                // Re-fetch network setting before showing any product tag UI
+                                await viewModel.checkProductCatalogueSettings()
+                                guard viewModel.isProductTagEnabled else {
+                                    showProductTagSheet = false
+                                    if viewModel.currentState.isStreaming {
+                                        liveStreamAlert.show(for: .productTaggingUnavailableWhileStreaming(action: {
+                                            LiveStreamAlert.shared.hide()
+                                        }))
+                                    }
+                                    return
+                                }
+                                
+                                if let updatedAt = viewModel.createdPost?.updatedAt,
+                                   Date().timeIntervalSince(updatedAt) > 60 {
+                                    await viewModel.getPost()
+                                }
+                                
+                                // Check if user can manage products (host or co-host with permission)
+                                let canManageProducts = viewModel.participantRole == .host ||
+                                (viewModel.participantRole == .coHost && viewModel.isCoHostManageProductTagEnable)
+                                
+                                if canManageProducts {
+                                    // Show manage component for host or co-host with permission
+                                    let manageVM = ManageProductTagViewModel()
+                                    manageVM.taggedProducts = viewModel.taggedProducts
+                                    manageVM.pinnedProductId = viewModel.pinnedProductId
+                                    
+                                    let manageComponent = ManageProductTagListComponent(
+                                    viewModel: manageVM,
+                                    onClose: { products in
+                                        viewModel.taggedProducts = products
+                                        showProductTagSheet = false
+                                    },
+                                    onAddProducts: {
+                                        previousProductCount = manageVM.taggedProducts.count
+                                        let productSelectionComponent = AmityProductTagSelectionComponent(
+                                            pageId: .createLivestreamPage,
+                                            mode: .livestream,
+                                            initialSelection: [],
+                                            existingProducts: manageVM.taggedProducts.map { $0.productId },
+                                            onClose: {
+                                                UIApplication.topViewController()?.dismiss(animated: true)
+                                            },
+                                            onDone: {
+                                                if viewModel.currentState.isStreaming, manageVM.taggedProducts.count > previousProductCount {
+                                                    // Sync to parent before API call
+                                                    viewModel.taggedProducts = manageVM.taggedProducts
+                                                    let livestreamPostId = viewModel.createdPost?.childrenPosts.first?.postId ?? viewModel.createdPost?.postId
+                                                    if let postId = livestreamPostId {
+                                                        Task {
+                                                            await viewModel.updateProductTagsAPI(postId: postId)
+                                                            // Sync API response back to manageVM
+                                                            manageVM.taggedProducts = viewModel.taggedProducts
+                                                            manageVM.pinnedProductId = viewModel.pinnedProductId
+                                                        }
+                                                    }
+                                                    UIApplication.topViewController()?.dismiss(animated: true) {
+                                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastAdded.localizedString, bottomPadding: 60)
+                                                        }
+                                                    }
+                                                } else {
+                                                    UIApplication.topViewController()?.dismiss(animated: true)
+                                                }
+                                            },
+                                            onTagChanges: { newlySelectedProducts in
+                                                let existingIds = Set(manageVM.taggedProducts.map { $0.productId })
+                                                let newProducts = newlySelectedProducts.filter { !existingIds.contains($0.productId) }
+                                                manageVM.taggedProducts = manageVM.taggedProducts + newProducts
+                                            }
+                                        )
+                                        let hostController = AmitySwiftUIHostingController(rootView: productSelectionComponent
+                                            .environmentObject(viewConfig)
+                                            .ignoresSafeArea(edges: .bottom))
+                                        UIApplication.topViewController()?.present(hostController, animated: true)
+                                    },
+                                    onPinToggle: { productId, isPinned in
+                                        let livestreamPostId = viewModel.createdPost?.childrenPosts.first?.postId ?? viewModel.createdPost?.postId
+                                        if viewModel.currentState.isStreaming, let postId = livestreamPostId {
+                                            Task {
+                                                do {
+                                                    if isPinned {
+                                                        try await viewModel.pinProductTagAPI(postId: postId, productId: productId)
+                                                    } else {
+                                                        try await viewModel.unpinProductTagAPI(postId: postId)
+                                                    }
+                                                    // Sync API response back to manageVM
+                                                    manageVM.taggedProducts = viewModel.taggedProducts
+                                                    manageVM.pinnedProductId = viewModel.pinnedProductId
+                                                    Toast.showToast(style: .success, message: isPinned ? AmityLocalizedStringSet.Social.productTagToastPinned.localizedString : AmityLocalizedStringSet.Social.productTagToastUnpinned.localizedString, bottomPadding: 60)
+                                                } catch {
+                                                    Toast.showToast(style: .warning, message: isPinned ? AmityLocalizedStringSet.Social.productTagToastPinFailed.localizedString : AmityLocalizedStringSet.Social.productTagToastUnpinFailed.localizedString, bottomPadding: 60)
+                                                }
+                                            }
+                                        } else {
+                                            // Setup phase: update locally
+                                            manageVM.togglePin(productId)
+                                            viewModel.pinnedProductId = isPinned ? productId : nil
+                                        }
+                                    },
+                                    onProductRemove: { productId in
+                                        let livestreamPostId = viewModel.createdPost?.childrenPosts.first?.postId ?? viewModel.createdPost?.postId
+                                        if viewModel.currentState.isStreaming, let postId = livestreamPostId {
+                                            Task {
+                                                // Filter out the removed product for API call without local update to manageVM
+                                                viewModel.taggedProducts = manageVM.taggedProducts.filter { $0.productId != productId }
+                                                if viewModel.pinnedProductId == productId {
+                                                    viewModel.pinnedProductId = nil
+                                                }
+                                                await viewModel.updateProductTagsAPI(postId: postId)
+                                                // Sync BE response back to manageVM
+                                                manageVM.taggedProducts = viewModel.taggedProducts
+                                                manageVM.pinnedProductId = viewModel.pinnedProductId
+                                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastRemoved.localizedString, bottomPadding: 60)
+                                            }
+                                        } else {
+                                            // Setup phase: update locally
+                                            manageVM.deleteProduct(productId)
+                                            viewModel.taggedProducts = manageVM.taggedProducts
+                                            viewModel.pinnedProductId = manageVM.pinnedProductId
+                                        }
+                                    }
+                                )
+                                
+                                let hostController = AmitySwiftUIHostingController(rootView: manageComponent
+                                    .environmentObject(viewConfig)
+                                    .ignoresSafeArea(edges: .bottom))
+                                hostController.modalPresentationStyle = .pageSheet
+                                
+                                let dismissHandler = PresentationDismissHandler()
+                                dismissHandler.onDismiss = {
+                                    showProductTagSheet = false
+                                }
+                                hostController.presentationController?.delegate = dismissHandler
+                                objc_setAssociatedObject(hostController, "dismissHandler", dismissHandler, .OBJC_ASSOCIATION_RETAIN)
+                                
+                                UIApplication.topViewController()?.present(hostController, animated: true)
+                            } else {
+                                // Show view-only component for co-host without permission
+                                let productTags = viewModel.taggedProducts.map { product in
+                                    AmityProductTagModel(object: product, range: NSRange(location: 0, length: 0), contentType: .media)
+                                }
+                                
+                                let viewOnlyComponent = AmityProductTagListComponent(
+                                    pageId: .createLivestreamPage,
+                                    productTags: productTags,
+                                    renderMode: .livestream,
+                                    pinnedProductId: viewModel.pinnedProductId,
+                                    sourceId: viewModel.createdRoom?.roomId ?? "",
+                                    onClose: {
+                                        UIApplication.topViewController()?.dismiss(animated: true)
+                                        showProductTagSheet = false
+                                    }
+                                ) { productTag in
+                                    if let url = URL(string: productTag.object.productUrl) {
+                                        let browserVC = SFSafariViewController(url: url)
+                                        browserVC.modalPresentationStyle = .pageSheet
+                                        UIApplication.topViewController()?.present(browserVC, animated: true)
+                                    }
+                                }
+                                
+                                let hostController = AmitySwiftUIHostingController(rootView: viewOnlyComponent
+                                    .ignoresSafeArea(edges: .bottom))
+                                hostController.modalPresentationStyle = .pageSheet
+                                
+                                let dismissHandler = PresentationDismissHandler()
+                                dismissHandler.onDismiss = {
+                                    showProductTagSheet = false
+                                }
+                                hostController.presentationController?.delegate = dismissHandler
+                                objc_setAssociatedObject(hostController, "dismissHandler", dismissHandler, .OBJC_ASSOCIATION_RETAIN)
+                                
+                                UIApplication.topViewController()?.present(hostController, animated: true)
+                            }
+                            } // end Task
+                        }
                     }
                     .sheet(isPresented: $showCoHostInviteSheet, content: {
                         coHostInviteSheetDetentView
@@ -94,6 +280,31 @@ struct LiveStreamConferenceView: View {
                     })
                     .onChange(of: viewModel.isLiveChatDisabled) { isDisabled in
                         viewModel.editLiveStream(chatDisabled: isDisabled)
+                    }
+                    .onChange(of: viewModel.isCoHostManageProductTagEnable) { isEnabled in
+                        // Co-host: notify when permission is granted
+                        if viewModel.participantRole == .coHost {
+                            if isEnabled {
+                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastCoHostManageEnabled.localizedString, bottomPadding: 60)
+                            }
+                            return
+                        }
+                        
+                        // Only host should handle toggle changes with alert
+                        guard viewModel.participantRole == .host else { return }
+                        
+                        if !isEnabled {
+                            // Close the settings sheet first, then show alert after delay
+                            showCoHostMenuActionSheet = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                liveStreamAlert.show(for: .disableCoHostProductTag(action: {
+                                    viewModel.updateCohostProductTag(cohostId: viewModel.invitedCoHost.user?.userId ?? "", canManageProductTag: false)
+                                }))
+                            }
+                        } else {
+                            // Enable without alert
+                            viewModel.updateCohostProductTag(cohostId: viewModel.invitedCoHost.user?.userId ?? "", canManageProductTag: true)
+                        }
                     }
                 
                 // Stack #2
@@ -107,7 +318,21 @@ struct LiveStreamConferenceView: View {
                     
                     liveChatFeedView
                 }
-                .padding(.bottom, 80) // Padding to avoid overlapping with footer view
+                .padding(.bottom, viewModel.pinnedProductId != nil && !isPinnedProductDismissed ? 160 : 80) // Extra padding when product is pinned
+                .background(
+                    GeometryReader { geometry in
+                        LinearGradient(
+                            colors: [Color.black.opacity(0),
+                                     Color.black.opacity(0.8)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: UIScreen.main.bounds.height / 3)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                        .allowsHitTesting(false)
+                    }
+                    .allowsHitTesting(false)
+                )
                 
                 
                 // Stack #3
@@ -134,7 +359,7 @@ struct LiveStreamConferenceView: View {
                         }
                         
                         pendingPostReviewView
-                            .visibleWhen(viewModel.createdPost?.getFeedType() == .reviewing)
+                            .visibleWhen(viewModel.createdPost?.getFeedType() == .reviewing && viewModel.currentState != .started)
                         
                         liveStreamStartingState
                             .visibleWhen(viewModel.currentState == .started)
@@ -149,6 +374,66 @@ struct LiveStreamConferenceView: View {
                         liveStreamEndingCountdownState
                             .visibleWhen(viewModel.isLiveStreamEndCountdownStarted)
                         
+                    }
+                    
+                    Spacer()
+                        .allowsHitTesting(false)
+                    
+                    // Pinned Product Element (above compose bar) - Only shows during live streaming
+                    if viewModel.currentState.isStreaming,
+                       viewModel.liveStreamChatViewModel?.isProductTagEnabled == true,
+                       let pinnedId = viewModel.pinnedProductId,
+                       let pinnedProduct = viewModel.taggedProducts.first(where: { $0.productId == pinnedId }),
+                       !isPinnedProductDismissed {
+                        let canManageProducts = viewModel.participantRole == .host ||
+                        (viewModel.participantRole == .coHost && viewModel.isCoHostManageProductTagEnable)
+                        
+                        LivestreamPinnedProductElement(
+                            pageId: .createLivestreamPage,
+                            product: pinnedProduct,
+                            canManageProduct: canManageProducts,
+                            onProductTap: { product, productUrl in
+                                // Open product URL in Safari
+                                if let url = URL(string: productUrl) {
+                                    let browserVC = SFSafariViewController(url: url)
+                                    browserVC.modalPresentationStyle = .pageSheet
+                                    UIApplication.topViewController()?.present(browserVC, animated: true)
+                                }
+                            },
+                            onUnpin: { product in
+                                // Call API to unpin during live stream
+                                let livestreamPostId = viewModel.createdPost?.childrenPosts.first?.postId ?? viewModel.createdPost?.postId
+                                if let postId = livestreamPostId {
+                                    Task {
+                                        do {
+                                            try await viewModel.unpinProductTagAPI(postId: postId)
+                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastUnpinned.localizedString, bottomPadding: 60)
+                                        } catch {
+                                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.productTagToastUnpinFailed.localizedString, bottomPadding: 60)
+                                        }
+                                    }
+                                }
+                            },
+                            onDismiss: { _ in },
+                            onDelete: { product in
+                                let livestreamPostId = viewModel.createdPost?.childrenPosts.first?.postId ?? viewModel.createdPost?.postId
+                                if viewModel.currentState.isStreaming, let postId = livestreamPostId {
+                                    Task {
+                                        // Filter out the removed product for API call, wait for BE response
+                                        viewModel.taggedProducts = viewModel.taggedProducts.filter { $0.productId != product.productId }
+                                        if viewModel.pinnedProductId == product.productId {
+                                            viewModel.pinnedProductId = nil
+                                        }
+                                        await viewModel.updateProductTagsAPI(postId: postId)
+                                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastRemoved.localizedString, bottomPadding: 60)
+                                    }
+                                }
+                            },
+                            roomId: viewModel.createdRoom?.roomId
+                        )
+                        .environmentObject(viewConfig)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
                     }
                     
                     footerView
@@ -185,6 +470,11 @@ struct LiveStreamConferenceView: View {
             // Update permission status
             permissionChecker.checkCameraAndMicrophonePermissionStatus()
             
+            // Check product catalogue settings
+            Task {
+                await viewModel.checkProductCatalogueSettings()
+            }
+            
             // Handle Permission Stuffs
             Task {
                 if permissionChecker.shouldAskForCameraPermission() {
@@ -203,6 +493,13 @@ struct LiveStreamConferenceView: View {
                 Alert(title: Text(liveStreamAlert.alertState.title), message: Text(liveStreamAlert.alertState.message), primaryButton: liveStreamAlert.alertState.primaryButton, secondaryButton: liveStreamAlert.alertState.secondaryButton)
             }
         })
+        .onChange(of: networkMonitor.isConnected) { isConnected in
+            if !isConnected {
+                Toast.showToast(style: .loading, message: "Waiting for network...", bottomPadding: 60, autoHide: false)
+            } else {
+                Toast.hideToastIfPresented(immediately: true)
+            }
+        }
         .onChange(of: viewModel.currentState) { newValue in
             switch newValue {
             case .ending(reason: .maxDuration):
@@ -312,7 +609,7 @@ struct LiveStreamConferenceView: View {
             LiveStreamCircularProgressBar(progress: .constant(40), config: LiveStreamCircularProgressBar.Config(strokeWidth: 2))
                 .frame(width: 40, height: 40)
             
-            Text("Ending live stream")
+            Text(AmityLocalizedStringSet.Social.liveStreamEndingStreamTitle.localizedString)
                 .applyTextStyle(.titleBold(Color.white))
                 .padding(.top, 12)
             
@@ -359,6 +656,7 @@ struct LiveStreamConferenceView: View {
                             }
                         } else {
                             if viewModel.participantRole == .host {
+
                                 liveStreamAlert.show(for: .streamEndedManually(action: {
                                     viewModel.endLiveStream(reason: .manual)
                                 }))
@@ -372,8 +670,9 @@ struct LiveStreamConferenceView: View {
                         Image(AmityIcon.LiveStream.close.imageResource)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 32, height: 32)
+                            .frame(width: viewModel.createdEvent == nil ? 24 : 32, height: viewModel.createdEvent == nil ? 24 : 32)
                             .foregroundColor(Color.white)
+                            .circularBackground(radius: 32, color: viewModel.createdEvent == nil ? .black.opacity(0.5) : .clear)
                             .padding(.bottom, 4)
                     }
                     
@@ -397,19 +696,25 @@ struct LiveStreamConferenceView: View {
                             .frame(width: 40, height: 40)
                             .clipShape(Circle())
                             
-                            // Event Creator info
-                            if let creator = event.creator {
-                                HStack(spacing: 0) {
-                                    Text("By \(creator.displayName ?? "")")
-                                        .applyTextStyle(.caption(Color.white))
-                                        .lineLimit(1)
-                                    
-                                    Image(AmityIcon.brandBadge.imageResource)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 18, height: 18)
-                                        .padding(.leading, 4)
-                                        .opacity(creator.isBrand ? 1 : 0)
+                            VStack(alignment: .leading, spacing: 2) {
+                                // Event title
+                                Text(event.title)
+                                    .applyTextStyle(.bodyBold(Color.white))
+                                    .lineLimit(1)
+                                
+                                // Event Creator info
+                                if let creator = event.creator {
+                                    HStack(spacing: 4) {
+                                        Text("By \(creator.displayName ?? "")")
+                                            .applyTextStyle(.caption(Color.white))
+                                            .lineLimit(1)
+                                        
+                                        Image(AmityIcon.brandBadge.imageResource)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 18, height: 18)
+                                            .opacity(creator.isBrand ? 1 : 0)
+                                    }
                                 }
                             }
                             
@@ -420,8 +725,10 @@ struct LiveStreamConferenceView: View {
                             let context = AmityLivestreamPostTargetSelectionPage.Context(onSelection: { selectedTarget in
                                 if let selectedTarget {
                                     viewModel.targetDisplayName = selectedTarget.displayName
+                                    viewModel.targetType = .community
                                 } else {
                                     viewModel.targetDisplayName = AmityLocalizedStringSet.Social.liveStreamMyTimelineLabel.localizedString
+                                    viewModel.targetType = .user
                                 }
                             }, isOpenedFromLiveStreamPage: true)
                             let view = AmityLivestreamPostTargetSelectionPage(context: context)
@@ -506,6 +813,7 @@ struct LiveStreamConferenceView: View {
                     Spacer(minLength: 160)
                 }
                 .padding(.leading, 36)
+                .allowsHitTesting(false)
             }
         }
     }
@@ -648,6 +956,22 @@ struct LiveStreamConferenceView: View {
                         liveChatViewModel.toggleMicAction = { [weak viewModel] in
                             viewModel?.toggleMicrophone()
                         }
+                        
+                        liveChatViewModel.productCount = viewModel.taggedProducts.count
+                        liveChatViewModel.isProductTagEnabled = viewModel.isProductTagEnabled
+                            liveChatViewModel.showProductTagAction = {
+                                showProductTagSheet = true
+                            }
+                    }
+                    .onChange(of: viewModel.taggedProducts.count) { newCount in
+                        liveChatViewModel.productCount = newCount
+                    }
+                    .onChange(of: viewModel.isProductTagEnabled) { isEnabled in
+                        liveChatViewModel.isProductTagEnabled = isEnabled
+                    }
+                    .onChange(of: viewModel.pinnedProductId) { newPinnedId in
+                        // Reset dismissal when pinned product changes
+                        isPinnedProductDismissed = false
                     }
             } else {
                 defaultComposeBar
@@ -684,18 +1008,17 @@ struct LiveStreamConferenceView: View {
             Button {
                 showMediaPicker.toggle()
             } label: {
-                HStack {
-                    Image(AmityIcon.LiveStream.thumbnail.imageResource)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                    
-                    Text(AmityLocalizedStringSet.Social.liveStreamAddThumbnailLabel.localizedString)
-                        .foregroundColor(Color.white)
-                        .font(.system(size: 13, weight: .semibold))
-                }
-                .contentShape(Rectangle())
-                .padding(.vertical, 4)
+                Image(AmityIcon.LiveStream.livestreamAddThumbnailButtonIcon.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
+                    .frame(width: 70, height: 40)
+                    .continuousCornerRadius(4)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(Color(viewConfig.defaultDarkTheme.baseColorShade3), lineWidth: 1)
+                    )
+                    .background(Color(viewConfig.defaultDarkTheme.baseColorShade4).opacity(0.5))
             }
         }
     }
@@ -794,6 +1117,12 @@ struct LiveStreamConferenceView: View {
             
             Spacer()
             
+            // Product Tagging Button - only show if enabled from network settings and not on user feed
+            ProductTaggingButtonElement(productCount: viewModel.taggedProducts.count) {
+                showProductTagSheet = true
+            }
+            .isHidden(viewModel.targetType == .user || !viewModel.isProductTagEnabled)
+            
             Button {
                 showSettingSheet.toggle()
             } label: {
@@ -847,16 +1176,20 @@ struct LiveStreamConferenceView: View {
                 }
             }
             
-            if viewModel.createdPost?.getFeedType() != .reviewing {
-                Button {
-                    viewModel.toggleMicrophone()
-                } label: {
-                    Image(broadcasterViewModel.enableMicrophone ? AmityIcon.LiveStream.mic.imageResource : AmityIcon.LiveStream.unmuteMic.imageResource)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 30, height: 30)
-                        .circularBackground(radius: 40, color: Color(viewConfig.defaultDarkTheme.baseColorShade4))
-                }
+            // Product Tagging Button - only show if enabled from network settings and not on user feed
+            ProductTaggingButtonElement(productCount: viewModel.taggedProducts.count) {
+                showProductTagSheet = true
+            }
+            .isHidden(viewModel.targetType == .user || !viewModel.isProductTagEnabled)
+            
+            Button {
+                viewModel.toggleMicrophone()
+            } label: {
+                Image(broadcasterViewModel.enableMicrophone ? AmityIcon.LiveStream.mic.imageResource : AmityIcon.LiveStream.unmuteMic.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 30, height: 30)
+                    .circularBackground(radius: 40, color: Color(viewConfig.defaultDarkTheme.baseColorShade4))
             }
             
             Button {
@@ -930,14 +1263,14 @@ struct LiveStreamConferenceView: View {
                 .foregroundColor(.white)
             
             // Title
-            Text("Waiting for approval")
+            Text(AmityLocalizedStringSet.Social.liveStreamWaitingForApprovalTitle.localizedString)
                 .applyTextStyle(.titleBold(.white))
                 .foregroundColor(.white)
                 .multilineTextAlignment(.center)
                 .padding(.top, 8)
             
             // Description
-            Text("This live stream has started. However, it will have limited visibility until your post has been approved.")
+            Text(AmityLocalizedStringSet.Social.liveStreamWaitingForApprovalMessage.localizedString)
                 .applyTextStyle(.caption(.white))
                 .foregroundColor(.white.opacity(0.8))
                 .multilineTextAlignment(.center)
@@ -959,7 +1292,7 @@ struct LiveStreamConferenceView: View {
                     .frame(width: 64, height: 64)
                     .clipShape(Circle())
                 
-                Text("Waiting for co-host to get ready...")
+                Text(AmityLocalizedStringSet.Social.liveStreamWaitingForCoHost.localizedString)
                     .applyTextStyle(.custom(17, .regular, .white))
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
@@ -1063,6 +1396,14 @@ struct LiveStreamConferenceView: View {
                         .frame(height: 1)
                         .padding(.top, 12)
                     
+                    SettingToggleButtonView(isEnabled: $viewModel.isCoHostManageProductTagEnable,
+                                            title: "Allow co-host to manage product tags",
+                                            description: "When enabled, co-host can add or remove tagged products and pin or unpin a product during the live stream.")
+                        .contentShape(Rectangle())
+                        .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
+                        .isHidden(!viewModel.isProductTagEnabled)
+                    
+                    
                     BottomSheetItemView(icon: AmityIcon.unfollowingUserIcon.imageResource, text: "Remove from live", isDestructive: true)
                         .onTapGesture {
                             // Remove co-host action
@@ -1095,13 +1436,8 @@ struct LiveStreamConferenceView: View {
     
     @ViewBuilder
     private var coHostInviteSheetDetentView: some View {
-        if #available(iOS 16.0, *) {
-            coHostInviteSheetView
-                .presentationDetents([.fraction(0.5), .large])
-                .presentationDragIndicator(.hidden)
-        } else {
-            coHostInviteSheetView
-        }
+        coHostInviteSheetView
+            .halfSheetPresentation()
     }
     
     @ViewBuilder
@@ -1140,13 +1476,37 @@ struct LiveStreamSetupView: View {
             .opacity((isPermissionGranted && viewModel.currentState == .setup && viewModel.createdEvent == nil) ? 1 : 0)
             
             Button {
-                guard networkMonitor.isConnected else {
-                    LiveStreamAlert.shared.show(for: .streamError)
-                    return
+                // Check product catalogue settings before starting stream
+                Task {
+                    await viewModel.checkProductCatalogueSettings()
+                    
+                    // Check if product tagging is disabled but products are tagged
+                    if !viewModel.isProductTagEnabled && !viewModel.taggedProducts.isEmpty {
+                        // Show specific alert for disabled product tagging with option to go live
+                        viewModel.taggedProducts.removeAll()
+                        viewModel.pinnedProductId = nil
+                        LiveStreamAlert.shared.show(for: .productTaggingDisabled(action: {
+                            // User chose to go live - remove products and start stream
+                            hideKeyboard()
+                            viewModel.startStream(
+                                title: viewModel.streamTitle,
+                                description: viewModel.streamDescription
+                            )
+                        }))
+                        return
+                    }
+                    
+                    guard networkMonitor.isConnected else {
+                        LiveStreamAlert.shared.show(for: .streamError)
+                        return
+                    }
+                    
+                    hideKeyboard()
+                    viewModel.startStream(
+                        title: viewModel.streamTitle,
+                        description: viewModel.streamDescription
+                    )
                 }
-                
-                hideKeyboard()
-                viewModel.startStream(title: viewModel.streamTitle, description: viewModel.streamDescription)
             } label: {
                 let isShutterButtonDisabled = viewModel.streamTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isUploadingThumbnail
                 Image(isShutterButtonDisabled ? AmityIcon.LiveStream.shutterButtonDisabled.imageResource : AmityIcon.LiveStream.shutterButtonEnabled.imageResource)
@@ -1200,3 +1560,5 @@ struct LiveStreamSetupView: View {
         }
     }
 }
+
+

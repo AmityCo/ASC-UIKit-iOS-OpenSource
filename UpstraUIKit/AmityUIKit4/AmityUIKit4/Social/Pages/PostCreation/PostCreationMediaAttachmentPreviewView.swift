@@ -7,12 +7,15 @@
 
 import SwiftUI
 import AVKit
+import AmitySDK
 
 struct PostCreationMediaAttachmentPreviewView: View {
     
+    @ObservedObject private var postComposerViewModel: AmityPostComposerViewModel
     @ObservedObject private var mediaAttachmentViewModel: AmityMediaAttachmentViewModel
     
-    init(viewModel: AmityMediaAttachmentViewModel) {
+    init(postComposerViewModel: AmityPostComposerViewModel, viewModel: AmityMediaAttachmentViewModel) {
+        self.postComposerViewModel = postComposerViewModel
         self.mediaAttachmentViewModel = viewModel
     }
     
@@ -21,25 +24,24 @@ struct PostCreationMediaAttachmentPreviewView: View {
             getGridView()
         }
         .padding([.leading, .trailing], 16)
+        .environmentObject(postComposerViewModel)
+        .environmentObject(mediaAttachmentViewModel)
     }
     
     
     @ViewBuilder
     private func getGridView() -> some View {
-        let columns = (0..<getColumnCount()).map { _ in GridItem(.flexible()) }
-        
-        LazyVGrid(columns: columns, spacing: 5) {
-            ForEach(Array(mediaAttachmentViewModel.medias.enumerated()), id: \.element.id) { index, media in
-                let _ = print("media check \(media.state)")
+        let columns = (0..<getColumnCount()).map { _ in GridItem(.flexible(), spacing: 8) }
 
+        LazyVGrid(columns: columns, spacing: 8) {
+            ForEach(Array(mediaAttachmentViewModel.medias.enumerated()), id: \.element.id) { index, media in
                 MediaAttachmentView(
-                    media: media, 
-                    mediaViewModel: mediaAttachmentViewModel,
+                    media: media,
                     removeAction: {
                         mediaAttachmentViewModel.medias.remove(at: index)
                     }
                 )
-                .frame(height: mediaAttachmentViewModel.medias.count < 3 ? 300 : 140)
+                .aspectRatio(1, contentMode: .fill)
             }
         }
     }
@@ -47,8 +49,7 @@ struct PostCreationMediaAttachmentPreviewView: View {
     private func getColumnCount() -> Int {
         switch mediaAttachmentViewModel.medias.count {
         case 1: return 1
-        case 2: return 2
-        default: return 3
+        default: return 2
         }
     }
 }
@@ -56,17 +57,18 @@ struct PostCreationMediaAttachmentPreviewView: View {
 
 struct MediaAttachmentView: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    @EnvironmentObject private var mediaViewModel: AmityMediaAttachmentViewModel
+    @EnvironmentObject private var postComposerViewModel: AmityPostComposerViewModel
     
     @StateObject private var media: AmityMedia
     private let removeAction: () -> Void
     private let fileRepositoryManager = FileRepositoryManager()
     @StateObject private var networkMonitor = NetworkMonitor()
-    @ObservedObject private var mediaViewModel: AmityMediaAttachmentViewModel
+    
     @State private var showAltTextConfig: Bool = false
     
-    init(media: AmityMedia, mediaViewModel: AmityMediaAttachmentViewModel, removeAction: @escaping () -> Void) {
+    init(media: AmityMedia, removeAction: @escaping () -> Void) {
         self._media = StateObject(wrappedValue: media)
-        self.mediaViewModel = mediaViewModel
         self.removeAction = removeAction
     }
     
@@ -174,47 +176,93 @@ struct MediaAttachmentView: View {
                 Rectangle()
                     .fill(Color.clear)
                 
-                // Display alt text button only if the media is an image and from the local device
-                if media.isLocal() && media.type == .image {
-                    Button(action: {
-                        guard let imageData = media.image else { return }
-                        
-                        let configMode: AltTextConfigMode
-                        
-                        if let altText = media.altText, !altText.isEmpty {
-                            configMode = .edit(altText, .image(imageData))
-                        } else {
-                            configMode = .create(.image(imageData))
-                        }
-                        
-                        let component = AmityAltTextConfigComponent(mode: configMode) { altText in
-                            media.altText = altText
-                        }
-                        let vc = AmitySwiftUIHostingController(rootView: component)
-                        
-                        host.controller?.present(vc, animated: true)
-                       }) {
-                           HStack(spacing: 4) {
-                               Text(AmityLocalizedStringSet.Social.altTextButtonTitle.localizedString)
-                                   .applyTextStyle(AmityTextStyle.captionBold(.white))
-                               
-                               if let altText = media.altText ?? media.getAltText(hasDefault: false), !altText.isEmpty {
-                                   Image(AmityIcon.checkMarkIcon.getImageResource())
-                                       .resizable()
-                                       .scaledToFill()
-                                       .frame(width: 16, height: 12)
+                HStack {
+                    // Display alt text button only if the media is an image and from the local device
+                    if media.isLocal() && media.type == .image {
+                        Button(action: {
+                            guard let imageData = media.image else { return }
+                            
+                            let configMode: AltTextConfigMode
+                            
+                            if let altText = media.altText, !altText.isEmpty {
+                                configMode = .edit(altText, .image(imageData))
+                            } else {
+                                configMode = .create(.image(imageData))
+                            }
+                            
+                            let component = AmityAltTextConfigComponent(mode: configMode) { altText in
+                                media.altText = altText
+                            }
+                            let vc = AmitySwiftUIHostingController(rootView: component)
+                            
+                            host.controller?.present(vc, animated: true)
+                           }) {
+                               HStack(spacing: 4) {
+                                   Text(AmityLocalizedStringSet.Social.altTextButtonTitle.localizedString)
+                                       .applyTextStyle(AmityTextStyle.captionBold(.white))
+                                   
+                                   if let altText = media.altText ?? media.getAltText(hasDefault: false), !altText.isEmpty {
+                                       Image(AmityIcon.checkMarkIcon.getImageResource())
+                                           .resizable()
+                                           .scaledToFill()
+                                           .frame(width: 16, height: 12)
+                                   }
                                }
+                               .padding(.horizontal, 8)
+                               .padding(.vertical, 4)
+                               .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.black.opacity(0.5))
+                               )
                            }
-                           .padding(.horizontal, 8)
-                           .padding(.vertical, 4)
-                           .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.black.opacity(0.5))
-                           )
-                       }
-                       .padding(8)
+                           
+                    }
+                    
+                    Spacer()
+                    
+                    AmityProductTagBadgeView(count: media.produtTags.count)
+                    .isHidden(!postComposerViewModel.isProductCatalogueEnabled || (media.produtTags.isEmpty && postComposerViewModel.productTags.count == postComposerViewModel.productTagLimit))
+                    .onTapGesture {
+                        let initialSelection = media.produtTags.map { $0.object }
+                        let mode: AmityProductTagSelectionMode = media.produtTags.isEmpty ? .create : .edit
+                        var selectedProductTags: [AmityProductTagModel] = media.produtTags
+                        var vc: AmitySwiftUIHostingController<AmityProductTagSelectionComponent>?
+                        
+                        let existingProducts = postComposerViewModel.productTags.map { $0.productId }
+
+                        let component = AmityProductTagSelectionComponent(
+                            mode: mode,
+                            initialSelection: initialSelection,
+                            existingProducts: existingProducts,
+                            onClose: { vc?.dismiss(animated: true) },
+                            onDone: {
+                                media.produtTags = selectedProductTags
+
+                                if let mediaFileId = media.getFileId() {
+                                    let mediaProductTags = selectedProductTags.map { AmityMediaProductTag(productId: $0.productId, product: $0.object) }
+                                    postComposerViewModel.attachmentProductTags.set(fileId: mediaFileId, tags: mediaProductTags)
+                                    postComposerViewModel.updateProductTags(medias: mediaViewModel.medias)
+                                }
+
+                                let message = initialSelection.isEmpty
+                                    ? AmityLocalizedStringSet.Social.productTagsAdded.localizedString
+                                    : AmityLocalizedStringSet.Social.productTagsUpdated.localizedString
+                                Toast.showToast(style: .success, message: message)
+
+                                vc?.dismiss(animated: true)
+                            },
+                            onTagChanges: { products in
+                                selectedProductTags = products.map { AmityProductTagModel(object: $0, range: NSRange(), contentType: .media) }
+                            }
+                        )
+
+                        vc = AmitySwiftUIHostingController(rootView: component)
+                        host.controller?.present(vc!, animated: true)
+                    }
                 }
+                .padding(8)
             }
+            .visibleWhen(media.isUploaded())
         }
         .cornerRadius(6)
         .contentShape(Rectangle())
@@ -261,11 +309,10 @@ struct MediaAttachmentView: View {
         let allowedFormats: Set<String> = ["jpg","jpeg","png"]
         let imageExtension = media.localUrl?.pathExtension.lowercased() ?? ""
         let needsConversion = !allowedFormats.contains(imageExtension)
-        
-        if needsConversion {
-            // Change state outside of dispatch queue
-            media.state = .uploading(progress: 0)
-        }
+
+        // Set uploading state immediately before starting async upload
+        media.state = .uploading(progress: 0)
+        mediaViewModel.updateMediaState(media)
 
         DispatchQueue.global(qos: .background).async {
             if needsConversion {
@@ -307,14 +354,18 @@ struct MediaAttachmentView: View {
     
     // Note: No need for conversion as png image is extracted from UIImage internally in SDK
     private func uploadImage(image: UIImage) {
+        // Set uploading state immediately before starting async upload
+        media.state = .uploading(progress: 0)
+        mediaViewModel.updateMediaState(media)
+
         Task { @MainActor in
             do {
                 let imageData = try await fileRepositoryManager.fileRepository.uploadImage(image) { progress in
-                    
+
                     DispatchQueue.main.async {
                         Log.add(event: .info, "Image Upload progress: \(progress)")
                         media.state = .uploading(progress: progress)
-                        
+
                         // Update view model state
                         self.mediaViewModel.updateMediaState(media)
                     }
@@ -336,10 +387,9 @@ struct MediaAttachmentView: View {
     
     private func generatedThumbnailAndUploadVideo() {
         let originalURL = media.localUrl ?? URL(fileURLWithPath: "")
+        media.state = .uploading(progress: 0.1)
         
         generateThumbnail(videoURL: originalURL)
-        
-        media.state = .uploading(progress: 0.1)
         
         let asset = AVAsset(url: originalURL)
         if VideoConverter.shouldConvertVideo(asset: asset) {

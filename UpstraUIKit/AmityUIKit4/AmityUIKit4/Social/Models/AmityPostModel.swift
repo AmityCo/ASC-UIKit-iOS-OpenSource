@@ -41,6 +41,9 @@ public class AmityPostModel: Identifiable {
     /// The post mentionees
     public let mentionees: [AmityMentionees]?
     
+    /// Text product tags
+    public let textProductTags: [AmityProductTagModel]?
+    
     /// The post target type
     public var postTargetType: AmityPostTargetType {
         return targetCommunity == nil ? .user : .community
@@ -95,6 +98,8 @@ public class AmityPostModel: Identifiable {
     
     public var links: [AmityLink] = []
     
+    public let pinnedProductId: String?
+    
     var commentExpandedIds: Set<String> = []
     
     // MARK: - Internal variables
@@ -114,7 +119,7 @@ public class AmityPostModel: Identifiable {
     var event: AmityEvent?
     
     let object: AmityPost
-    private let childrenPosts: [AmityPost]
+    let childrenPosts: [AmityPost]
     
     // Maps fileId to PostId for child post
     private var fileMap = [String: String]()
@@ -134,6 +139,21 @@ public class AmityPostModel: Identifiable {
     // Used only in clip & text post as the moment
     var content: PostContent = .text(value: "")
     
+    /// All product tags (text mentions + media tags), deduplicated by productId, text mentions first
+    var allProductTags: [AmityProductTagModel] {
+        var seen = Set<String>()
+        var result: [AmityProductTagModel] = []
+        for tag in (textProductTags ?? []) {
+            if seen.insert(tag.productId).inserted { result.append(tag) }
+        }
+        for media in medias {
+            for tag in media.produtTags {
+                if seen.insert(tag.productId).inserted { result.append(tag) }
+            }
+        }
+        return result
+    }
+
     // Computed property to get the latest comment that is not flagged or deleted
     var inlineComment: AmityCommentModel? {
         return latestComments.last { comment in
@@ -177,6 +197,7 @@ public class AmityPostModel: Identifiable {
         sharedCount = Int(post.sharedCount)
         allCommentCount = Int(post.commentsCount)
         links = post.links
+        pinnedProductId = post.pinnedProductId
         
         // reactions are ordered by the count. if the count is equal, order by alphabet
         // if the count is 1 and the reaction is the same as current user's first reaction, remove it from the list
@@ -210,6 +231,10 @@ public class AmityPostModel: Identifiable {
         data = post.data ?? [:]
         metadata = post.metadata
         mentionees = post.mentionees
+        textProductTags = post.getTextProductTags().compactMap {
+            guard let product = $0.product else { return nil }
+            return AmityProductTagModel(object: product, range: NSRange(location: $0.index, length: $0.length))
+        }
         isEdited = post.isEdited
         analytic = post.analytics
         impression = post.impression
@@ -267,6 +292,12 @@ public class AmityPostModel: Identifiable {
             // Create a media object regardless of whether imageData can be retrieved
             let imageData = post.getImageInfo()
             
+            let mediaProductTags = post.getMediaProductTags()
+            let productTagModels = mediaProductTags.compactMap { tag -> AmityProductTagModel? in
+                guard let product = tag.product else { return nil }
+                return AmityProductTagModel(object: product, range: NSRange(), contentType: .media)
+            }
+
             // If we have image data, use it
             if let imageData = imageData {
                 let state = AmityMediaState.downloadableImage(
@@ -276,6 +307,7 @@ public class AmityPostModel: Identifiable {
                 let media = AmityMedia(state: state, type: .image)
                 media.image = imageData
                 media.parentPostId = post.parentPostId
+                media.produtTags = productTagModels
                 medias.append(media)
                 fileMap[imageData.fileId] = post.postId
             } else {
@@ -283,6 +315,7 @@ public class AmityPostModel: Identifiable {
                 // This ensures the UI can show something (gray placeholder) for the missing image
                 let media = AmityMedia(state: .none, type: .image)
                 media.parentPostId = post.parentPostId
+                media.produtTags = productTagModels
                 medias.append(media)
             }
             
@@ -292,7 +325,13 @@ public class AmityPostModel: Identifiable {
             // Similar approach for video - create media even if data is missing
             let videoData = post.getVideoInfo()
             let thumbnail = post.getVideoThumbnailInfo()
-            
+
+            let videoMediaProductTags = post.getMediaProductTags()
+            let videoProductTagModels = videoMediaProductTags.compactMap { tag -> AmityProductTagModel? in
+                guard let product = tag.product else { return nil }
+                return AmityProductTagModel(object: product, range: NSRange(), contentType: .media)
+            }
+
             if let videoData = videoData {
                 let state = AmityMediaState.downloadableVideo(
                     videoData: videoData,
@@ -301,12 +340,14 @@ public class AmityPostModel: Identifiable {
                 let media = AmityMedia(state: state, type: .video)
                 media.video = videoData
                 media.parentPostId = post.parentPostId
+                media.produtTags = videoProductTagModels
                 medias.append(media)
                 fileMap[videoData.fileId] = post.postId
             } else {
                 // Create placeholder for missing video
                 let media = AmityMedia(state: .none, type: .video)
                 media.parentPostId = post.parentPostId
+                media.produtTags = videoProductTagModels
                 medias.append(media)
             }
             

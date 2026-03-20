@@ -41,7 +41,6 @@ class MediaFeedViewModel: ObservableObject {
     
     @Published var showMediaViewer: Bool = false
     var selectedMediaIndex: Int = 0
-    var videoURL: URL? = nil
     
     // Parent Post Id : Post
     var postsCache: [String: AmityPost] = [:]
@@ -166,25 +165,21 @@ class MediaFeedViewModel: ObservableObject {
                 self.debouner.run {
                     self.emptyFeedState = nil
                     
-                    if isClipFeed {
-                        let idsToFetch: [String] = snapshots.compactMap { post in
-                            let parentId = post.parentPostId ?? ""
-                            if let _ = self.postsCache[parentId] {
-                                return nil
-                            } else {
-                                return parentId
-                            }
-                        }
-                        
-                        if idsToFetch.isEmpty {
-                            self.processMedias(posts: snapshots)
+                    let idsToFetch: [String] = snapshots.compactMap { post in
+                        let parentId = post.parentPostId ?? ""
+                        if let _ = self.postsCache[parentId] {
+                            return nil
                         } else {
-                            self.fetchParentPosts(ids: idsToFetch) {
-                                self.processMedias(posts: snapshots)
-                            }
+                            return parentId
                         }
-                    } else {
+                    }
+                    
+                    if idsToFetch.isEmpty {
                         self.processMedias(posts: snapshots)
+                    } else {
+                        self.fetchParentPosts(ids: idsToFetch) {
+                            self.processMedias(posts: snapshots)
+                        }
                     }
                 }
             }

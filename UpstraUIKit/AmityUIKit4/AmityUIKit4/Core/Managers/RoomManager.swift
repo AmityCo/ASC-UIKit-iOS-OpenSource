@@ -47,4 +47,12 @@ class RoomManager {
     func getCoHostEvent(roomId: String) -> AnyPublisher<AmityCoHostEvent, Never> {
         return repository.getCoHostEvent(roomId: roomId)
     }
+    
+    func manageCohostProductTag(roomId: String, cohostId: String, canManageProductTags: Bool) async {
+        do {
+            try await repository.updateCohostPermissions(roomId: roomId, cohostId: cohostId, canManageProductTags: canManageProductTags)
+        } catch {
+            print("Error")
+        }
+    }
 }

@@ -119,7 +119,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
                                 
                                 Spacer()
                                 
-                                Text("\(title.count)/\(Constants.titleMaxCharLimit)")
+                                Text("\(title.utf16Count)/\(Constants.titleMaxCharLimit)")
                                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                                     .accessibilityIdentifier("titleCharCountTextAccessibilityId")
                             }
@@ -154,7 +154,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
                                 
                                 Spacer()
                                 
-                                Text("\(question.count)/\(Constants.questionMaxCharLimit)")
+                                Text("\(question.utf16Count)/\(Constants.questionMaxCharLimit)")
                                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                                     .accessibilityIdentifier("charCountTextAccessibilityId")
                             }
@@ -270,7 +270,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
         // guard !sanitizedTitle.isEmpty else { return false }
         
         // Question character count should be less than 500
-        guard sanitizedTitle.count <= Constants.titleMaxCharLimit else { return false }
+        guard sanitizedTitle.utf16Count <= Constants.titleMaxCharLimit else { return false }
         
         return true
     }
@@ -282,7 +282,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
         guard !sanitizedQuestion.isEmpty else { return false }
         
         // Question character count should be less than 500
-        guard sanitizedQuestion.count <= Constants.questionMaxCharLimit else { return false }
+        guard sanitizedQuestion.utf16Count <= Constants.questionMaxCharLimit else { return false }
         
         return true
     }
@@ -298,7 +298,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
         
         var isAllOptionsValid = true
         for option in sanitizedOptions {
-            if option.count > Constants.answerMaxCharLimit {
+            if option.utf16Count > Constants.answerMaxCharLimit {
                 isAllOptionsValid = false
                 break
             }

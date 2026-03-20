@@ -36,6 +36,14 @@ extension AmityMessageTextEditorView: AmityViewBuildable {
     public func maxHashtagCount(_ value: Int) -> Self {
         mutating(keyPath: \.maxHashtagCount, value: value)
     }
+    
+    public func enableProductMention(_ value: Bool) -> Self {
+        mutating(keyPath: \.enableProductMention, value: value)
+    }
+
+    public func scrollEnabled(_ value: Bool) -> Self {
+        mutating(keyPath: \.scrollEnabled, value: value)
+    }
 }
 
 public struct AmityMessageTextEditorView: View {
@@ -60,6 +68,8 @@ public struct AmityMessageTextEditorView: View {
     private var enableHashtagHighlighting: Bool = false
     private var enableLinkHighlight: Bool = false
     private var maxHashtagCount: Int = 5
+    private var enableProductMention: Bool = false
+    private var scrollEnabled: Bool = true
     
     public init(_ viewModel: AmityTextEditorViewModel, text: Binding<String>, mentionData: Binding<MentionData>, mentionedUsers: Binding<[AmityMentionUserModel]>, links: Binding<[LinkDetail]?>? = nil, textViewHeight: CGFloat, textEditorMaxHeight: CGFloat = 106, placeholderPadding: CGFloat = 5) {
         self._text = text
@@ -100,10 +110,12 @@ public struct AmityMessageTextEditorView: View {
             ZStack(alignment: .leading) {
                 TextEditorView(viewModel, $text, $mentionedUsers)
                     .onAppear {
+                        viewModel.isScrollEnabled = scrollEnabled
+
                         if autoFocusTextEditor {
                             viewModel.textView.becomeFirstResponder()
                         }
-                        
+
                         if let metadata = mentionData.metadata {
                             viewModel.mentionManager.setMentions(metadata: metadata, inText: text)
                         }
@@ -117,7 +129,12 @@ public struct AmityMessageTextEditorView: View {
                         if enableLinkHighlight {
                             applyLinkHighlight(to: viewModel.textView)
                         }
-                        
+
+                        // Restore product tag highlighting (e.g. when editing a post)
+                        if !viewModel.productTagManager.productTags.isEmpty {
+                            viewModel.productTagManager.reapplyHighlighting()
+                        }
+
                         // Reapply hashtag highlighting when mentionee are highlighted
                         viewModel.didFinishMentionHighlight = {
                             DispatchQueue.main.async {
@@ -134,20 +151,15 @@ public struct AmityMessageTextEditorView: View {
                     .onChange(of: text) { value in
                         hidePlaceholder = !text.isEmpty
                         
-                        if characterLimit > 0, value.count > characterLimit {
-                            self.text = String(value.prefix(characterLimit))
+                        if characterLimit > 0, value.utf16Count > characterLimit {
+                            self.text = value.utf16Prefix(characterLimit)
                             self.viewModel.textView.text = text
                         }
                         
-                        let textHeight = viewModel.textView.text.height(withConstrainedWidth: geometry.size.width, font: .systemFont(ofSize: 15))
-                        
-                        let defaultInset = viewModel.textView.textContainerInset
-                        
-                        // Note:
-                        // Max 5 lines = 90 (18px per line) | Top + Bottom Inset: 16 | ~ Max height: 106
-                        
-                        let paddedHeight = textHeight + defaultInset.top + defaultInset.bottom
-                        textEditorHeight = min(paddedHeight, textEditorMaxHeight)
+                        // Use UITextView's own size calculation which accounts for
+                        // textContainerInset and lineFragmentPadding correctly
+                        let fittingSize = viewModel.textView.sizeThatFits(CGSize(width: geometry.size.width, height: .greatestFiniteMagnitude))
+                        textEditorHeight = min(fittingSize.height, textEditorMaxHeight)
                     }
                     .onReceive(viewModel.textView.textPublisher, perform: { text in
                         self.text = text
@@ -171,6 +183,21 @@ public struct AmityMessageTextEditorView: View {
                     .allowsHitTesting(false)
                     .isHidden(hidePlaceholder)
             }
+        }
+        .onChange(of: viewModel.showSuggestionView) { show in
+            if show {
+                showSuggestionOverlay()
+            } else {
+                SuggestionOverlayWindow.dismiss()
+            }
+        }
+        .onChange(of: viewModel.suggestionViewCursorRect) { newRect in
+            if viewModel.showSuggestionView {
+                SuggestionOverlayWindow.updatePosition(at: newRect)
+            }
+        }
+        .onDisappear {
+            SuggestionOverlayWindow.dismiss()
         }
         .onReceive(viewConfig.$theme, perform: { value in
             viewModel.updateAttributes(hightlightColor: value.primaryColor, textColor: value.baseColor)
@@ -285,22 +312,70 @@ public struct AmityMessageTextEditorView: View {
         
         // Remove all link attributes from existing attributed text
         attributedText.enumerateAttributes(in: fullRange) { attribute, range, _ in
-            if attribute[.link] as? Bool == true {
+            if attribute[.previewLink] as? Bool == true {
                 attributedText.removeAttribute(.foregroundColor, range: range)
-                attributedText.removeAttribute(.link, range: range)
+                attributedText.removeAttribute(.previewLink, range: range)
             }
         }
 
         // Apply link highlights
         for link in extractedLinks {
             attributedText.addAttribute(.foregroundColor, value: viewModel.highlightAttributes[.foregroundColor] ?? UIColor(), range: link.range)
-            attributedText.addAttribute(.link, value: true, range: link.range)
+            attributedText.addAttribute(.previewLink, value: true, range: link.range)
         }
         
         textView.attributedText = attributedText
         textView.selectedRange = selectedRange
         textView.typingAttributes = viewModel.typingAttributes
     }
+    
+    
+    private func showSuggestionOverlay() {
+        let suggestionVM = viewModel.suggestionViewModel
+        suggestionVM.onClose = {
+            viewModel.hideSuggestionView()
+        }
+        suggestionVM.onUserSelected = { user in
+            // Handle mentioned user selection
+            viewModel.selectMentionUser(user: user)
+
+            // Set the updated text to the binding text property
+            text = viewModel.textView.text
+
+            mentionData.mentionee = viewModel.mentionManager
+                .getMentionees()
+            mentionData.metadata = viewModel.mentionManager
+                .getMetadata()
+
+            viewModel.hideSuggestionView()
+        }
+        suggestionVM.onProductSelected = { product in
+            // Handle product selection
+            viewModel.selectProduct(product: product)
+
+            // Set the updated text to the binding text property
+            text = viewModel.textView.text
+
+            // Update mention data after product selection shifted mention indices
+            mentionData.mentionee = viewModel.mentionManager
+                .getMentionees()
+            mentionData.metadata = viewModel.mentionManager
+                .getMetadata()
+
+            viewModel.hideSuggestionView()
+        }
+
+        suggestionVM.selectedTab = .user
+        suggestionVM.isProductMentionEnabled = enableProductMention
+        let suggestionView = TextEditorSuggestionView(viewModel: suggestionVM)
+
+        SuggestionOverlayWindow.show(
+            at: viewModel.suggestionViewCursorRect,
+            content: suggestionView,
+            viewConfig: viewConfig
+        )
+    }
+
 }
 
 struct AmityHashtagModel {

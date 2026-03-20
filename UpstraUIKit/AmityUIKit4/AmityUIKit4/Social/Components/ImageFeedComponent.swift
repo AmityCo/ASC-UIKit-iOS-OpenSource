@@ -6,13 +6,16 @@
 //
 
 import SwiftUI
+import SafariServices
 
 struct ImageFeedComponent: View {
-    
+
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
-    
+
     @StateObject var viewModel: MediaFeedViewModel
     @StateObject var viewConfig: AmityViewConfigController
+
+    @State private var selectedProductTagMedia: AmityMedia?
 
     private var gridLayout: [GridItem] {
         [
@@ -51,7 +54,7 @@ struct ImageFeedComponent: View {
     @ViewBuilder
     private var imageFeedView: some View {
         VStack(spacing: 0) {
-            if viewModel.emptyFeedState == .private {
+            if viewModel.emptyFeedState == .private, case .community = viewModel.feedType {
                 PrivateCommunityFeedView()
             } else {
                 Color.clear
@@ -65,22 +68,32 @@ struct ImageFeedComponent: View {
                     } else {
                         ForEach(Array(viewModel.medias.enumerated()), id: \.element.id) { index, media in
                             if let url = media.getImageURL() {
-                                getImageView(url)
-                                    .frame(maxWidth: .infinity)
-                                    .aspectRatio(1, contentMode: .fit)
-                                    .background(Color.gray)
-                                    .cornerRadius(10)
-                                    .onTapGesture {
-                                        viewModel.selectedMediaIndex = index
-                                        withoutAnimation {
-                                            viewModel.showMediaViewer.toggle()
-                                        }
+                                ZStack(alignment: .bottomTrailing) {
+                                    getImageView(url)
+
+                                    if !media.produtTags.isEmpty {
+                                        AmityProductTagBadgeView(count: media.produtTags.count)
+                                            .padding(8)
+                                            .onTapGesture {
+                                                selectedProductTagMedia = media
+                                            }
                                     }
-                                    .onAppear {
-                                        if index == viewModel.medias.count - 1 {
-                                            viewModel.loadMore()
-                                        }
+                                }
+                                .frame(maxWidth: .infinity)
+                                .aspectRatio(1, contentMode: .fit)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .onTapGesture {
+                                    viewModel.selectedMediaIndex = index
+                                    withoutAnimation {
+                                        viewModel.showMediaViewer.toggle()
                                     }
+                                }
+                                .onAppear {
+                                    if index == viewModel.medias.count - 1 {
+                                        viewModel.loadMore()
+                                    }
+                                }
                             }
                         }
                     }
@@ -115,8 +128,9 @@ struct ImageFeedComponent: View {
                         
                         let controller = AmitySwiftUIHostingController(rootView: view)
                         nav.viewControllers = [controller]
-                        nav.modalPresentationStyle = .fullScreen
-                        host.controller?.present(nav, animated: true)
+                        nav.modalPresentationStyle = .overFullScreen
+                        nav.view.backgroundColor = .clear
+                        host.controller?.present(nav, animated: false)
                     }
                 }
                 
@@ -124,8 +138,24 @@ struct ImageFeedComponent: View {
                     .frame(height: 16)
             }
         }
+        .sheet(item: $selectedProductTagMedia) { media in
+            let component = AmityProductTagListComponent(
+                productTags: media.produtTags,
+                renderMode: .image,
+                sourceId: media.parentPostId ?? "",
+                onProductClick: { productTag in
+                    if let url = URL(string: productTag.object.productUrl) {
+                        let browserVC = SFSafariViewController(url: url)
+                        browserVC.modalPresentationStyle = .pageSheet
+                        UIApplication.topViewController()?.present(browserVC, animated: true)
+                    }
+                })
+            component
+                .environmentObject(host)
+                .halfSheetPresentation()
+        }
     }
-    
+
     @ViewBuilder
     private func getImageView(_ url: URL) -> some View {
         let emptyView = Color(viewConfig.theme.baseColorShade4)

@@ -49,6 +49,7 @@ class PostFeedViewModel: ObservableObject {
         NotificationCenter.default.removeObserver(self, name: .didPostCreated, object: nil)
         NotificationCenter.default.removeObserver(self, name: .didPostDeleted, object: nil)
         NotificationCenter.default.removeObserver(self, name: .didPostReacted, object: nil)
+        NotificationCenter.default.removeObserver(self, name: .didPollUpdated, object: nil)
         NotificationCenter.default.removeObserver(self, name: .didLivestreamStatusUpdated, object: nil)
     }
     
@@ -105,6 +106,10 @@ class PostFeedViewModel: ObservableObject {
         /// We need to add the newly created post at the top of global feed.
         NotificationCenter.default.addObserver(self, selector: #selector(didPostCreated(_:)), name: .didPostCreated, object: nil)
         
+        /// Observe didPostEdited event sent from AmityPostCreationPage
+        /// If the post is the modded one that is not from liveCollection, we need to update directly to the dataSource to be reactive.
+        NotificationCenter.default.addObserver(self, selector: #selector(didPostEdited(_:)), name: .didPostEdited, object: nil)
+        
         /// Observe didPostDeleted event sent from AmityPostContentComponent and AmityPostDetailPage
         /// If the post is the modded one that is not from liveCollection, we need to update directly to the dataSource to be reactive.
         NotificationCenter.default.addObserver(self, selector: #selector(didPostDeleted(_:)), name: .didPostDeleted, object: nil)
@@ -112,6 +117,10 @@ class PostFeedViewModel: ObservableObject {
         /// Observe didPostReacted event sent from AmityPostContentComponent
         /// If the post is the modded one that is not from liveCollection, we need to update directly to the dataSource to be reactive.
         NotificationCenter.default.addObserver(self, selector: #selector(didPostReacted(_:)), name: .didPostReacted, object: nil)
+        
+        /// Observe didPollUpdated events sent from PostContentPollView(vote/unvote) and PostBottomSheetView(close poll)
+        /// If the post is the modded one that is not from liveCollection, we need to update directly to the dataSource to be reactive.
+        NotificationCenter.default.addObserver(self, selector: #selector(didPollUpdated(_:)), name: .didPollUpdated, object: nil)
         
         
         NotificationCenter.default.addObserver(self, selector: #selector(didLivestreamStatusUpdated(_:)), name: .didLivestreamStatusUpdated, object: nil)
@@ -160,22 +169,37 @@ class PostFeedViewModel: ObservableObject {
                         return true
                     } else { return false }
                 }
-                
             }
         }
+    }
+    
+    @objc private func didPostEdited(_ notification: Notification) {
+        refreshRecentlyCreatedPost(notification.object)
     }
     
     @objc private func didPostReacted(_ notification: Notification) {
-        if let object = notification.object as? AmityPost, feedType == .globalFeed {
-            /// Check recentlyCreatedPosts is reacted
-            if recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
-                self.objectWillChange.send()
-            }
-        }
+        refreshRecentlyCreatedPost(notification.object)
+    }
+    
+    @objc private func didPollUpdated(_ notification: Notification) {
+        refreshRecentlyCreatedPost(notification.object)
     }
     
     @objc private func didLivestreamStatusUpdated(_ notification: Notification) {
-        self.objectWillChange.send()
+        refreshRecentlyCreatedPost(notification.object)
+    }
+    
+    private func refreshRecentlyCreatedPost(_ object: Any?) {
+        if let post = object as? AmityPost, feedType == .globalFeed {
+            if recentlyCreatedPosts.contains(where: { $0.postId == post.postId }) {
+                if let postModel = postManager.getPost(withId: post.postId).snapshot {
+                    if let index = recentlyCreatedPosts.firstIndex(where: { $0.postId == post.postId }) {
+                        recentlyCreatedPosts[index] = postModel
+                        self.renderFeed()
+                    }
+                }
+            }
+        }
     }
 }
 

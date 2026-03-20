@@ -56,6 +56,7 @@ struct VisibleModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .opacity(condition ? 1 : 0)
+            .allowsHitTesting(condition)
     }
 }
 

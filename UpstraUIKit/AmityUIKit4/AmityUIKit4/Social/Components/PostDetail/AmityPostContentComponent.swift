@@ -8,6 +8,7 @@
 import SwiftUI
 import AmitySDK
 import LinkPresentation
+import SafariServices
 
 public enum AmityPostContentComponentStyle {
     case feed
@@ -60,10 +61,10 @@ public struct AmityPostContentComponent: AmityComponentView {
         self.pageId = pageId
         self.category = category
         self.context = nil
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, loadComments: false))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
-    
+
     // Convenience Initializer. You can pass context to this component so that it can render the correct state. One usage of context is to show poll results when user taps on
     // see results button from Feed and we open post detail page with poll post results.
     public init(post: AmityPost, style: AmityPostContentComponentStyle = .feed, context: AmityPostContentComponent.Context, onTapAction: ((AmityPostContentComponent.Context?) -> Void)? = nil, pageId: PageId? = nil) {
@@ -75,7 +76,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         self.pageId = pageId
         self.category = context.category
         self.context = context
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, loadComments: false))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
     
@@ -84,6 +85,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             postHeaderView(post)
             postContentView(post)
                 .isHidden(viewConfig.isHidden(elementId: .postContent), remove: true)
+            postProductCarouselView(post)
             postEngagementView(post)
             postEngagementActionView(post)
                 .contentShape(Rectangle())
@@ -353,11 +355,14 @@ public struct AmityPostContentComponent: AmityComponentView {
                 
                 // Post text content
                 if !post.text.isEmpty {
-                    ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, highlightedText: context?.searchKeyword, onTapMentionee: { userId in
+                    let tapActionContext = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
+                    ExpandableText(post.text, defaultAction: {onTapAction?(tapActionContext)}, metadata: post.metadata, mentionees: post.mentionees, productTags: post.textProductTags, highlightedText: context?.searchKeyword, onTapMentionee: { userId in
                         goToUserProfilePage(userId)
                     }, onTapHashtag: { hashtag in
                         // \u{200E} make the hashtag text left to right in all languages
                         goToSearchPage("#\(hashtag)")
+                    }, onTapProductTag: { productId in
+                        openProductWebView(productId: productId)
                     })
                     .lineLimit(style == .detail ? 1000 : 8)
                     .moreButtonText("...See more")
@@ -456,6 +461,15 @@ public struct AmityPostContentComponent: AmityComponentView {
                         .padding(.bottom, 16)
                 }
             }
+        }
+    }
+    
+    @ViewBuilder
+    private func postProductCarouselView(_ post: AmityPostModel) -> some View {
+        if !post.allProductTags.isEmpty {
+            AmityProductCarouselView(allProductTags: post.allProductTags, postId: post.postId)
+                .environmentObject(viewConfig)
+                .environmentObject(host)
         }
     }
     
@@ -820,15 +834,9 @@ extension AmityPostContentComponent {
     
     @ViewBuilder
     private var reactionListSheet: some View {
-        if #available(iOS 16.0, *) {
-            AmityReactionList(post: post.object, pageId: pageId)
-                            .environmentObject(host)
-                            .presentationDetents([.fraction(0.5), .large])
-                            .presentationDragIndicator(.hidden)
-        } else {
-            AmityReactionList(post: post.object, pageId: pageId)
-                            .environmentObject(host)
-        }
+        AmityReactionList(post: post.object, pageId: pageId)
+            .environmentObject(host)
+            .halfSheetPresentation()
     }
     
     private func goToUserProfilePage(_ userId: String) {
@@ -846,7 +854,15 @@ extension AmityPostContentComponent {
         let context = AmityPostContentComponentBehavior.Context(component: self, searchKeyword: keyword)
         AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToSocialGlobalSearchPage(context: context)
     }
-    
+
+    private func openProductWebView(productId: String) {
+        guard let productTag = post.textProductTags?.first(where: { $0.productId == productId }),
+              let url = URL(string: productTag.object.productUrl) else { return }
+        let browserVC = SFSafariViewController(url: url)
+        browserVC.modalPresentationStyle = .pageSheet
+        UIApplication.topViewController()?.present(browserVC, animated: true)
+    }
+
     private func goToCommunityProfilePage() {
         let context = AmityPostContentComponentBehavior.Context(component: self)
         AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToCommunityProfilePage(context: context)

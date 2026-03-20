@@ -150,8 +150,8 @@ struct CommentListView<Content>: View where Content: View {
             .onAppear {
                 // Parent comment list will load previous page on scrolling.
                 // Reply comment list will load on View More Reply button action.
-                if index == commentCoreViewModel.commentItems.count - 1 && commentCoreViewModel.paginator.hasPreviousPage() {
-                    commentCoreViewModel.paginator.previousPage()
+                if index == commentCoreViewModel.commentItems.count - 1 && (commentCoreViewModel.paginator?.hasPreviousPage() ?? false) {
+                    commentCoreViewModel.paginator?.previousPage()
                     
                 }
             }

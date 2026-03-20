@@ -66,12 +66,19 @@ class AmityUIKitConfigController {
         
         let customizationConfig = config["customizations"] as? [String: Any]
         let id = configId.components(separatedBy: "/")
-        guard id.count == 3 else { return getThemeColor(theme: globalTheme, fallbackTheme: fallbackTheme) }
+        guard id.count == 3 else {
+            return getThemeColor(theme: globalTheme, fallbackTheme: fallbackTheme)
+        }
         
+        let pageComponentTheme = customizationConfig?[keyPath: "\(id[0])/\(id[1])/*.theme.\(style.rawValue)"] as? [String: Any]
         let pageTheme = customizationConfig?[keyPath: "\(id[0])/*/*.theme.\(style.rawValue)"] as? [String: Any]
         let componentTheme = customizationConfig?[keyPath: "*/\(id[1])/*.theme.\(style.rawValue)"] as? [String: Any]
         
         do {
+            if let pageComponentTheme {
+                return try getThemeColor(theme: pageComponentTheme.decode(AmityTheme.self), fallbackTheme: fallbackTheme)
+            }
+            
             if let componentTheme {
                 return try getThemeColor(theme: componentTheme.decode(AmityTheme.self), fallbackTheme: fallbackTheme)
             }
