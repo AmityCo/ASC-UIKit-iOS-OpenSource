@@ -13,6 +13,7 @@
 		68BB9C2E2F17A09F002E4F31 /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; };
 		68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		926F9EE52F6D90B400C9AE72 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 926F9EE42F6D90B400C9AE72 /* SharedFrameworks */; };
 		92DBE8CA2ACA98CF007D873C /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; };
 		92DBE8CB2ACA98CF007D873C /* AmitySDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D45D45B726204253008F7C2C /* AmitySDK.xcframework */; };
 		92DBE8CC2ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */; };
@@ -29,7 +30,6 @@
 		92DBE8E32ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E42ACA98CF007D873C /* Realm.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45B3A93264A840300F6FF52 /* Realm.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8E52ACA98CF007D873C /* AmityUIKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92EAD7932F6D784C0084BA8C /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92EAD7922F6D784C0084BA8C /* SharedFrameworks */; };
 		A0BD0B4926DDE0E30054088B /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B78DA49024BED7DA00EE902B /* SampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA48F24BED7DA00EE902B /* SampleAppTests.swift */; };
 		B78DA49B24BED7DA00EE902B /* SampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */; };
@@ -171,7 +171,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92EAD7932F6D784C0084BA8C /* SharedFrameworks in Frameworks */,
+				926F9EE52F6D90B400C9AE72 /* SharedFrameworks in Frameworks */,
 				68BB9C2D2F17A09F002E4F31 /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
@@ -317,7 +317,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				92EAD7922F6D784C0084BA8C /* SharedFrameworks */,
+				926F9EE42F6D90B400C9AE72 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -901,14 +901,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		926F9EE42F6D90B400C9AE72 /* SharedFrameworks */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SharedFrameworks;
+		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
-		};
-		92EAD7922F6D784C0084BA8C /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
