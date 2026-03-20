@@ -78,6 +78,7 @@ public struct AmityCommunityNotificationSettingPage: AmityPageView {
                     let context = AmityCommunityNotificationSettingPageBehavior.Context(page: self, community: community)
                     AmityUIKitManagerInternal.shared.behavior.communityNotificationSettingPageBehavior?.goToStoriesNotificationSettingPage(context)
                 }
+                .isHidden(viewConfig.isHidden(elementId: .storyNotificationSetting))
         }
     }
     

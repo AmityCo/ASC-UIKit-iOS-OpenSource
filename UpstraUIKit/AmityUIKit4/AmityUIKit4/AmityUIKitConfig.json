@@ -31,7 +31,11 @@
         }
     },
     "excludes": [
-        
+        "user_profile_page/user_profile_header/user_profile_action",
+        "user_profile_page/*/user_profile_content",
+        "user_profile_page/*/create_post_button",
+        "community_setting_page/*/story_setting",
+        "community_notification_page/*/story_notification_setting"
     ],
     "feature_flags": {
         "post": {

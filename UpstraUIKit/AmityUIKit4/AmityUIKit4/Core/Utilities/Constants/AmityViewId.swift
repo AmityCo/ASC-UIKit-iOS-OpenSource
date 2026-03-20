@@ -304,6 +304,9 @@ public enum ElementId: String {
     case userDescription = "user_description"
     case userFollowing = "user_following"
     case userFollower = "user_follower"
+    case userProfileAction = "user_profile_action"
+    case userProfileContent = "user_profile_content"
+    case storyNotificationSetting = "story_notification_setting"
     
     // User Feed, Image Feed, Video Feed
     case emptyUserFeed = "empty_user_feed"

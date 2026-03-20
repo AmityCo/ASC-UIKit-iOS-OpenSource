@@ -60,20 +60,20 @@ public struct AmityUserProfilePage: AmityPageView {
             ZStack(alignment: .bottomTrailing) {
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
+                        ProgressView()
+                            .frame(width: 20, height: 20)
+                            .padding(.vertical, 10)
+                            .isHidden(!isRefreshing)
+                        
+                        if let user = viewModel.user {
+                            AmityUserProfileHeaderComponent(user: user.object, userProfilePageViewModel: viewModel, pageId: id)
+                                .padding(.horizontal, 16)
+                                .readSize { headerComponentHeight = $0.height }
+                        } else {
+                            UserProfileHeaderSkeletonView()
+                        }
+                        
                         VStack(spacing: 0) {
-                            ProgressView()
-                                .frame(width: 20, height: 20)
-                                .padding(.vertical, 10)
-                                .isHidden(!isRefreshing)
-                            
-                            if let user = viewModel.user {
-                                AmityUserProfileHeaderComponent(user: user.object, userProfilePageViewModel: viewModel, pageId: id)
-                                    .padding(.horizontal, 16)
-                                    .readSize { headerComponentHeight = $0.height }
-                            } else {
-                                UserProfileHeaderSkeletonView()
-                            }
-                            
                             VStack(spacing: 0) {
                                 tabBarView
                                     .padding(.top, 22)
@@ -82,18 +82,19 @@ public struct AmityUserProfilePage: AmityPageView {
                                     .isHidden(viewModel.feedState == .blocked || viewModel.feedState == .private)
                             }
                             .isHidden(showStickyHeader)
-                        }
-                        
-                        if let user = viewModel.user {
-                            AmityUserFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
-                                .isHidden(currentTab != 0)
                             
-                            AmityUserImageFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
-                                .isHidden(currentTab != 1)
-                            
-                            AmityUserVideoFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
-                                .isHidden(currentTab != 2)
+                            if let user = viewModel.user {
+                                AmityUserFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
+                                    .isHidden(currentTab != 0)
+                                
+                                AmityUserImageFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
+                                    .isHidden(currentTab != 1)
+                                
+                                AmityUserVideoFeedComponent(userId: user.userId, userProfilePageViewModel: viewModel, pageId: id)
+                                    .isHidden(currentTab != 2)
+                            }
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .userProfileContent))
                     }
                     .background(GeometryReader { geometry in
                         Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
@@ -103,6 +104,7 @@ public struct AmityUserProfilePage: AmityPageView {
                 if let user = viewModel.user {
                     createPostView
                         .isHidden(!user.isCurrentUser)
+                        .isHidden(viewConfig.isHidden(elementId: .createPostButton))
                 }
             }
             .coordinateSpace(name: "scroll")

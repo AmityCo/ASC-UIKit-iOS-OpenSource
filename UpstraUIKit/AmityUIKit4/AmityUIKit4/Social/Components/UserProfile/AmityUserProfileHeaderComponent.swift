@@ -53,32 +53,35 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .userDescription) || user.about.isEmpty)
                 .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userDescription)
             
-            userRelationshipView
-                .frame(height: 20)
-                .padding(.top, 6)
-            
-            if let followInfo = viewModel.followInfo, let status = followInfo.status, !isOwnProfile {
-                Group {
-                    switch status {
-                    case .none:
-                        followButton
-                    case .pending:
-                        pendingRequestButton
-                    case .accepted:
-                        followingButton
-                    case .blocked:
-                        unblockButton
-                    default:
-                        EmptyView()
+            VStack(spacing: 8) {
+                userRelationshipView
+                    .frame(height: 20)
+                    .padding(.top, 6)
+                
+                if let followInfo = viewModel.followInfo, let status = followInfo.status, !isOwnProfile {
+                    Group {
+                        switch status {
+                        case .none:
+                            followButton
+                        case .pending:
+                            pendingRequestButton
+                        case .accepted:
+                            followingButton
+                        case .blocked:
+                            unblockButton
+                        default:
+                            EmptyView()
+                        }
                     }
+                    .padding(.top, 8)
                 }
-                .padding(.top, 8)
+                
+                if viewModel.followRequestCount != 0, isOwnProfile {
+                    pendingFollowRequestView
+                        .padding(.vertical, 8)
+                }
             }
-            
-            if viewModel.followRequestCount != 0, isOwnProfile {
-                pendingFollowRequestView
-                    .padding(.vertical, 8)
-            }
+            .isHidden(viewConfig.isHidden(elementId: .userProfileAction))
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .fullScreenCover(isPresented: $showMediaViewer) {
