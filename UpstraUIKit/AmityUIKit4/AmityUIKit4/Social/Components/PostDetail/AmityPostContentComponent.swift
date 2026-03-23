@@ -297,7 +297,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             case .image, .video:
                 postContentTextView()
                 
-                PostContentMediaView(post: post, viewConfig: viewConfig)
+                PostContentMediaView(post: post, viewConfig: viewConfig, pageId: pageId)
                     .frame(height: 328)
                     .clipShape(RoundedCorner(radius: 8))
                 
@@ -315,13 +315,13 @@ public struct AmityPostContentComponent: AmityComponentView {
             case .liveStream:
                 livestreamPostContentTextView()
                 
-                PostContentLiveStreamView(post: post)
+                PostContentLiveStreamView(post: post, pageId: pageId)
                     .padding([.leading, .trailing, .top], -16)
                 
             case .room:
                 roomPostContentTextView()
                 
-                PostContentLiveStreamView(post: post)
+                PostContentLiveStreamView(post: post, pageId: pageId)
                     .padding([.leading, .trailing, .top], -16)
                 
             case .clip:
@@ -467,7 +467,7 @@ public struct AmityPostContentComponent: AmityComponentView {
     @ViewBuilder
     private func postProductCarouselView(_ post: AmityPostModel) -> some View {
         if !post.allProductTags.isEmpty {
-            AmityProductCarouselView(allProductTags: post.allProductTags, postId: post.postId)
+            AmityProductCarouselView(allProductTags: post.allProductTags, postId: post.postId, pageId: pageId)
                 .environmentObject(viewConfig)
                 .environmentObject(host)
         }

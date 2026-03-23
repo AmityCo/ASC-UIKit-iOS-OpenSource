@@ -15,10 +15,12 @@ struct PostContentMediaView: View {
     @StateObject private var viewModel: PostContentMediaViewModel = PostContentMediaViewModel()
     @ObservedObject var viewConfig: AmityViewConfigController
     let post: AmityPostModel
+    var pageId: PageId? = nil
     
-    init(post: AmityPostModel, viewConfig: AmityViewConfigController) {
+    init(post: AmityPostModel, viewConfig: AmityViewConfigController, pageId: PageId? = nil) {
         self.post = post
         self.viewConfig = viewConfig
+        self.pageId = pageId
     }
     
     var body: some View {
@@ -119,6 +121,7 @@ struct PostContentMediaView: View {
         if let media = viewModel.selectedProductTagMedia {
             let renderMode: ProductTagListRenderMode = media.type == .video ? .video : .image
             let component = AmityProductTagListComponent(
+                pageId: pageId,
                 productTags: media.produtTags,
                 renderMode: renderMode,
                 sourceId: post.postId, onProductClick: { productTag in

@@ -301,7 +301,12 @@ class AmityPostComposerViewModel: ObservableObject {
     }
 
     @discardableResult
-    func createPost(medias: [AmityMedia], files: [AmityFile], hashtags: [AmityHashtagModel], links: [AmityLink]) async throws -> AmityPost {
+    func createPost(medias: [AmityMedia],
+                    files: [AmityFile],
+                    hashtags: [AmityHashtagModel],
+                    links: [AmityLink],
+                    textProductTags: [AmityProductTagModel]? = nil,
+                    attachmentProductTags: AmityAttachmentProductTags? = nil) async throws -> AmityPost {
         guard networkMonitor.isConnected else {
             throw NSError(domain: "Internet is not connected.", code: 500)
         }
@@ -315,7 +320,7 @@ class AmityPostComposerViewModel: ObservableObject {
         let mentions = AmityMetadataMapper.mentions(fromMetadata: mentionData.metadata ?? [:])
         let hashtags = hashtags.map { AmityHashtag(text: $0.text, index: $0.range.location, length: $0.range.length)}
         let metadata = AmityMetadataMapper.metadata(mentions: mentions, hashtags: hashtags)
-        let textProductTags = textProductTags.map { AmityTextProductTag(productId: $0.productId, index: $0.range.location, length: $0.range.length)}
+        let textProductTags = textProductTags?.map { AmityTextProductTag(productId: $0.productId, index: $0.range.location, length: $0.range.length)}
         
         if !imagesData.isEmpty {
             // Image Post
@@ -388,7 +393,12 @@ class AmityPostComposerViewModel: ObservableObject {
         }
     }
     
-    func editPost(medias: [AmityMedia], files: [AmityFile], hashtags: [AmityHashtagModel], links: [AmityLink]) async throws -> AmityPost? {
+    func editPost(medias: [AmityMedia],
+                  files: [AmityFile],
+                  hashtags: [AmityHashtagModel],
+                  links: [AmityLink],
+                  textProductTags: [AmityProductTagModel]? = nil,
+                  attachmentProductTags: AmityAttachmentProductTags? = nil) async throws -> AmityPost? {
         var postBuilder: AmityPostBuilder
         
         // If all media have been removed, use the appropriate empty builder based on original media type
@@ -487,7 +497,7 @@ class AmityPostComposerViewModel: ObservableObject {
         let hashtagBuilder = AmityHashtagBuilder()
         hashtagBuilder.hashtags(hashtags: hashtags.map { $0.text })
         
-        let textProductTags = textProductTags.map { AmityTextProductTag(productId: $0.productId, index: $0.range.location, length: $0.range.length)}
+        let textProductTags = textProductTags?.map { AmityTextProductTag(productId: $0.productId, index: $0.range.location, length: $0.range.length)}
 
         if let postId = post?.postId {
             return try await postManager.editPost(
