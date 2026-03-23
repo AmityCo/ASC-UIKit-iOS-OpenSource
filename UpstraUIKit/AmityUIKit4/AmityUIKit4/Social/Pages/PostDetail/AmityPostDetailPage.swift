@@ -89,7 +89,7 @@ public struct AmityPostDetailPage: AmityPageView {
                         CommentCoreView(headerView: {
                             VStack(spacing: 4) {
                                 if let postModel = viewModel.post {
-                                    AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext()) { tapContext in
+                                    AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext(), onTapAction: { tapContext in
                                         
                                         if postModel.dataTypeInternal == .clip {
                                             if let media = postModel.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
@@ -101,7 +101,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                                 self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
                                             }
                                         }
-                                    }
+                                    }, pageId: id)
                                     Rectangle()
                                         .fill(Color(viewConfig.theme.baseColorShade4))
                                         .frame(height: 1)

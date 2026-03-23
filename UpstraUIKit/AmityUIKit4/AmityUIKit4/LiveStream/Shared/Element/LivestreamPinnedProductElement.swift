@@ -49,7 +49,7 @@ struct LivestreamPinnedProductElement: AmityElementView {
     var roomId: String? = nil
     
     // Static set for session-level view deduplication
-    private static var viewedProductIds = Set<String>()
+    static var viewedProductIds = Set<String>()
     
     @EnvironmentObject var viewConfig: AmityViewConfigController
     
@@ -69,14 +69,13 @@ struct LivestreamPinnedProductElement: AmityElementView {
     
     /// Track product view analytics when element becomes visible
     private func trackProductView() {
-        guard !Self.viewedProductIds.contains(product.productId) else {
+        guard !LivestreamPinnedProductElement.viewedProductIds.contains(product.productId) else {
             return
         }
-        Self.viewedProductIds.insert(product.productId)
-        
         let component = componentId?.rawValue ?? "*"
-        let location = "\(pageId?.rawValue ?? "")/\(component)/\(id.rawValue)"
+        let location = "\(pageId?.rawValue ?? "*")/\(component)/\(id.rawValue)"
         let resolvedRoomId = roomId ?? ""
+        LivestreamPinnedProductElement.viewedProductIds.insert(product.productId)
         
         product.analytics.markAsViewed(
             location: location,
@@ -88,7 +87,7 @@ struct LivestreamPinnedProductElement: AmityElementView {
     /// Track product click analytics when user taps card
     private func trackProductClick() {
         let component = componentId?.rawValue ?? "*"
-        let location = "\(pageId?.rawValue ?? "")/\(component)/\(id.rawValue)"
+        let location = "\(pageId?.rawValue ?? "*")/\(component)/\(id.rawValue)"
         let resolvedRoomId = roomId ?? ""
         
         product.analytics.markAsClicked(
@@ -104,7 +103,7 @@ struct LivestreamPinnedProductElement: AmityElementView {
         let visibleHeight = min(screenHeight, frame.maxY) - max(0, frame.minY)
         let visiblePercentage = (visibleHeight / frame.height) * 100
         
-        if visiblePercentage > 60 && !Self.viewedProductIds.contains(product.productId) {
+        if visiblePercentage > 60/* && !Self.viewedProductIds.contains(product.productId)*/ {
             trackProductView()
         }
     }
@@ -225,6 +224,9 @@ struct LivestreamPinnedProductElement: AmityElementView {
             }
             .background(GeometryReader { geometry in
                 Color.clear
+                    .onAppear {
+                        checkVisibilityAndTrackView(frame: geometry.frame(in: .global))
+                    }
                     .onChange(of: geometry.frame(in: .global)) { frame in
                         checkVisibilityAndTrackView(frame: frame)
                     }

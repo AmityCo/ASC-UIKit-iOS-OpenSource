@@ -8,18 +8,11 @@
 import SwiftUI
 import AmitySDK
 
-/// ProductTagElement v2
+/// ProductTagElement
 /// Displays a single product tag with context-aware behavior and pin status.
 /// Used within ProductTagListComponent to render individual product tags.
 ///
 /// Element ID: `product_tag_list_item`
-///
-/// ## Key Features (v2)
-/// - Render mode support (post vs livestream contexts)
-/// - Pin status display with banner overlay
-/// - Click interaction on entire card
-/// - Context-aware action button (View for livestream viewers)
-/// - Analytics tracking for view and click events
 struct AmityProductTagElement: AmityElementView {
 
     var pageId: PageId?
@@ -33,19 +26,14 @@ struct AmityProductTagElement: AmityElementView {
 
     /// The product tag data to display
     let productTag: AmityProductTagModel
-    /// Context mode for rendering (v2) - affects button display
+    /// Context mode for rendering
     let renderMode: ProductTagListRenderMode
-    /// Whether this product is currently pinned (v2) - shows banner (REQ-001)
     var isPinned: Bool = false
-    /// Called when user clicks anywhere on the product card (REQ-004)
     let onClick: () -> Void
     /// Source ID for analytics (postId or roomId)
     let sourceId: String
     /// Source type for analytics (room or post)
     let sourceType: AmityAnalyticsSourceType
-    
-    // Static set for session-level view deduplication
-    private static var viewedProductIds = Set<String>()
     
     /// Whether the product is unavailable (inactive)
     private var isInactive: Bool {
@@ -56,13 +44,14 @@ struct AmityProductTagElement: AmityElementView {
     
     /// Track product view analytics when element becomes visible
     private func trackProductView() {
-        guard !Self.viewedProductIds.contains(productTag.productId) else {
+        guard !AmityProductTagListComponent.viewedProductIds.contains(productTag.productId) else {
             return
         }
-        Self.viewedProductIds.insert(productTag.productId)
+        AmityProductTagListComponent.viewedProductIds.insert(productTag.productId)
         
+        let page = pageId?.rawValue ?? "*"
         let component = componentId?.rawValue ?? "*"
-        let location = "\(pageId?.rawValue ?? "")/\(component)/\(id.rawValue)"
+        let location = "\(page)/\(component)/\(id.rawValue)"
         
         productTag.object.analytics.markAsViewed(
             location: location,
@@ -73,8 +62,9 @@ struct AmityProductTagElement: AmityElementView {
     
     /// Track product click analytics when user taps card
     private func trackProductClick() {
+        let page = pageId?.rawValue ?? "*"
         let component = componentId?.rawValue ?? "*"
-        let location = "\(pageId?.rawValue ?? "")/\(component)/\(id.rawValue)"
+        let location = "\(page)/\(component)/\(id.rawValue)"
         
         productTag.object.analytics.markAsClicked(
             location: location,
@@ -89,14 +79,13 @@ struct AmityProductTagElement: AmityElementView {
         let visibleHeight = min(screenHeight, frame.maxY) - max(0, frame.minY)
         let visiblePercentage = (visibleHeight / frame.height) * 100
         
-        if visiblePercentage > 60 && !Self.viewedProductIds.contains(productTag.productId) {
+        if visiblePercentage > 60 /*&& !Self.viewedProductIds.contains(productTag.productId) */{
             trackProductView()
         }
     }
 
     var body: some View {
         HStack(spacing: 12) {
-            // Product Thumbnail with Pin Status Banner (REQ-001, REQ-002, REQ-003)
             ZStack(alignment: .bottom) {
                 AsyncImage(
                     placeholderView: {
@@ -200,16 +189,16 @@ struct AmityProductTagElement: AmityElementView {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .contentShape(Rectangle())
-        // REQ-004, REQ-005: Entire card is clickable (including button)
         .onTapGesture {
             guard !isInactive else { return }
-            // REQ-007: Track click before opening URL
             trackProductClick()
             onClick()
         }
-        // REQ-006: Track view when element is 60% visible
         .background(GeometryReader { geometry in
             Color.clear
+                .onAppear {
+                    checkVisibilityAndTrackView(frame: geometry.frame(in: .global))
+                }
                 .onChange(of: geometry.frame(in: .global)) { frame in
                     checkVisibilityAndTrackView(frame: frame)
                 }

@@ -22,11 +22,13 @@ struct PostContentLiveStreamView: View {
     let room: AmityRoom?
     let isStreamDeleted: Bool
     let isStreamBanned: Bool
+    var pageId: PageId? = nil
     
     private var postManager = PostManager()
     
-    init(post: AmityPostModel) {
+    init(post: AmityPostModel, pageId: PageId? = nil) {
         self.post = post
+        self.pageId = pageId
         self.room = post.room
         self.isStreamDeleted = room?.isDeleted ?? false
         self.isStreamBanned = false
@@ -193,6 +195,7 @@ struct PostContentLiveStreamView: View {
             }
             if !productTags.isEmpty {
                 AmityProductTagListComponent(
+                    pageId: pageId,
                     productTags: productTags,
                     renderMode: .livestream,
                     sourceId: post.room?.roomId ?? "",
