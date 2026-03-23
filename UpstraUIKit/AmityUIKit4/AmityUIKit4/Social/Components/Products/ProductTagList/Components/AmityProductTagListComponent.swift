@@ -56,6 +56,8 @@ public struct AmityProductTagListComponent: AmityComponentView {
         .productTagListBottomsheet
     }
 
+    static var viewedProductIds = Set<String>()
+
     // MARK: - Properties
 
     /// Array of product tags to display
