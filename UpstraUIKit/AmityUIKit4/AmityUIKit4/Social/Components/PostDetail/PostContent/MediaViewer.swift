@@ -39,6 +39,7 @@ struct MediaViewer: View {
     private let fileRepositoryManager = FileRepositoryManager()
     private let post: AmityPostModel?
     private let showViewParentPost: Bool
+    private let pageId: PageId?
     
     private var canEditAltText: Bool {
         guard let post else { return false }
@@ -63,7 +64,7 @@ struct MediaViewer: View {
         return canEditAltText || showViewParentPost
     }
     
-    init(medias: [AmityMedia], startIndex: Int, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, showEditAction: Bool = false, post: AmityPostModel? = nil, showViewParentPost: Bool = true) {
+    init(medias: [AmityMedia], startIndex: Int, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, showEditAction: Bool = false, post: AmityPostModel? = nil, showViewParentPost: Bool = true, pageId: PageId? = nil) {
         self._page = State(initialValue: Page.withIndex(startIndex))
         self._pageIndex = State(initialValue: startIndex + 1)
         self.medias = medias
@@ -72,10 +73,11 @@ struct MediaViewer: View {
         self.showEditAction = showEditAction
         self.post = post
         self.showViewParentPost = showViewParentPost
+        self.pageId = pageId
         self._viewModel = StateObject(wrappedValue: MediaViewerViewModel(post: post))
     }
     
-    init(url: URL?, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?) {
+    init(url: URL?, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, pageId: PageId? = nil) {
         self._page = State(initialValue: Page.withIndex(0))
         self._pageIndex = State(initialValue: 1)
         let imageData = AmityImageData()
@@ -85,6 +87,7 @@ struct MediaViewer: View {
         self.viewConfig = viewConfig
         self.post = nil
         self.showViewParentPost = true
+        self.pageId = pageId
         self._viewModel = StateObject(wrappedValue: MediaViewerViewModel(post: nil))
     }
     
@@ -113,6 +116,7 @@ struct MediaViewer: View {
                             if media.type == .video {
                                 if let post = post {
                                     AmityPostMediaVideoPlayer(
+                                        pageId: pageId,
                                         post: post,
                                         playerType: .video(media),
                                         hideActionMenu: !showViewParentPost,

@@ -11,7 +11,7 @@
 		684AE1012B0C5B0200FD7270 /* AmityUIKit4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1002B0C5B0200FD7270 /* AmityUIKit4Tests.swift */; };
 		685F16C22BFCABAD0016685F /* AmityReactionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C12BFCABAD0016685F /* AmityReactionList.swift */; };
 		685F16C62BFCABB50016685F /* ReactionTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C52BFCABB50016685F /* ReactionTabBarView.swift */; };
-		92EAD78D2F6D782E0084BA8C /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92EAD78C2F6D782E0084BA8C /* SharedFrameworks */; };
+		9232191D2F76BFE3007A66D1 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 9232191C2F76BFE3007A66D1 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -573,6 +573,7 @@
 				Social/Components/Products/ProductTagSelection/Elements/AmityProductTagSelectionHeaderElement.swift,
 				Social/Components/Products/ProductTagSelection/Elements/AmityProductTagSelectionItemElement.swift,
 				Social/Components/Products/ProductTagSelection/Elements/AmityProductTagSelectionSearchBarElement.swift,
+				Social/Components/Products/ViewedProductTracker.swift,
 				Social/Components/Search/AmityCommunitySearchResultComponent.swift,
 				Social/Components/Search/AmityPostSearchResultComponent.swift,
 				Social/Components/Search/AmityTopSearchBarComponent.swift,
@@ -762,7 +763,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92EAD78D2F6D782E0084BA8C /* SharedFrameworks in Frameworks */,
+				9232191D2F76BFE3007A66D1 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1239,7 +1240,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		92EAD78C2F6D782E0084BA8C /* SharedFrameworks */ = {
+		9232191C2F76BFE3007A66D1 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

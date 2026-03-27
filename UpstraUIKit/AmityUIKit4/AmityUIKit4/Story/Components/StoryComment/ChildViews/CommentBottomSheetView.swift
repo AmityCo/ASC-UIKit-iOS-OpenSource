@@ -21,23 +21,53 @@ struct CommentBottomSheetView: View {
     }
 
     var body: some View {
-        if let comment = viewModel.sheetState.comment, comment.isOwner {
-            getOwnerBottomSheetView()
-        } else {
-            getNonOwnerBottomSheetView()
-                .onAppear {
-                    if let comment = viewModel.sheetState.comment {
+        if let comment = viewModel.sheetState.comment {
+            if comment.isOwner {
+                getOwnerBottomSheetView()
+            } else {
+                getNonOwnerBottomSheetView()
+                    .onAppear {
                         viewModel.updateCommentFlaggedByMeState(id: comment.id)
                     }
-                }
+            }
         }
+    }
+    
+    // MARK: - Shared Delete Button
+    
+    @ViewBuilder
+    private func deleteCommentButton(isReply: Bool) -> some View {
+        let deleteTitle = isReply ? AmityLocalizedStringSet.Comment.deleteReplyBottomSheetTitle.localizedString : AmityLocalizedStringSet.Comment.deleteCommentBottomSheetTitle.localizedString
+        BottomSheetItemView(icon: AmityIcon.trashBinIcon.imageResource, text: deleteTitle, isDestructive: true)
+            .onTapGesture {
+                viewModel.isAlertShown.toggle()
+            }
+            .alert(isPresented: $viewModel.isAlertShown, content: {
+                let alertTitle = isReply ? AmityLocalizedStringSet.Comment.deleteReplyTitle.localizedString : AmityLocalizedStringSet.Comment.deleteCommentTitle.localizedString
+                let alertMessage = isReply ? AmityLocalizedStringSet.Comment.deleteReplyMessage.localizedString : AmityLocalizedStringSet.Comment.deleteCommentMessage.localizedString
+
+                return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
+                    Task { @MainActor in
+                        viewModel.sheetState.isShown.toggle()
+                        if let comment = viewModel.sheetState.comment {
+                            do {
+                                try await viewModel.deleteComment(id: comment.commentId)
+                                viewModel.sheetState.comment = nil
+                            } catch {
+                                Toast.showToast(style: .warning, message: error.localizedDescription)
+                            }
+                        }
+                    }
+                }))
+            })
+            .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.deleteCommentButton)
     }
     
     @ViewBuilder
     private func getOwnerBottomSheetView() -> some View {
         VStack {
             let isReply = viewModel.sheetState.comment?.parentId != nil
-            let editTitle = isReply ? "Edit reply" : AmityLocalizedStringSet.Comment.editCommentBottomSheetTitle.localizedString
+            let editTitle = isReply ? AmityLocalizedStringSet.Comment.editReplyBottomSheetTitle.localizedString : AmityLocalizedStringSet.Comment.editCommentBottomSheetTitle.localizedString
             BottomSheetItemView(icon: AmityIcon.editCommentIcon.imageResource, text: editTitle)
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.editCommentButton)
                 .onTapGesture {
@@ -45,35 +75,14 @@ struct CommentBottomSheetView: View {
                     viewModel.sheetState.isShown.toggle()
                 }
                         
-            let deleteTitle = isReply ? "Delete reply" : AmityLocalizedStringSet.Comment.deleteCommentBottomSheetTitle.localizedString
-            BottomSheetItemView(icon: AmityIcon.trashBinIcon.imageResource, text: deleteTitle, isDestructive: true)
-                .onTapGesture {
-                    viewModel.isAlertShown.toggle()
-                }
-                .alert(isPresented: $viewModel.isAlertShown, content: {
-                    let isReply = viewModel.sheetState.comment?.parentId != nil
-                    
-                    let alertTitle = isReply ? "Delete reply" : AmityLocalizedStringSet.Comment.deleteCommentTitle.localizedString
-                    let alertMessage = isReply ? "This reply will be permanently deleted." : AmityLocalizedStringSet.Comment.deleteCommentMessage.localizedString
-
-                    return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
-                        Task {
-                            viewModel.sheetState.isShown.toggle()
-                            if let comment = viewModel.sheetState.comment {
-                                try await viewModel.deleteComment(id: comment.commentId)
-                            }
-                            viewModel.sheetState.comment = nil
-                        }
-                    }))
-                })
-                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.BottomSheet.deleteCommentButton)
+            deleteCommentButton(isReply: isReply)
 
             Spacer()
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
     }
     
-    
+
     @ViewBuilder
     func getNonOwnerBottomSheetView() -> some View {
         VStack {
@@ -112,6 +121,10 @@ struct CommentBottomSheetView: View {
                     }
                 }
 
+            if viewModel.hasDeletePermission {
+                deleteCommentButton(isReply: isReply)
+            }
+
             Spacer()
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
@@ -124,8 +137,16 @@ class CommentBottomSheetViewModel: ObservableObject {
     @Published var sheetState: (isShown: Bool, comment: AmityCommentModel?) = (false, nil)
     @Published var isAlertShown: Bool = false
     @Published var isCommentFlaggedByMe: Bool = false
+    @Published var hasDeletePermission: Bool = false
     
     private let commentManager = CommentManager()
+    
+    func checkDeletePermission(communityId: String?) {
+        guard let communityId = communityId else { return }
+        Task { @MainActor in
+            hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityCommentPermission(communityId: communityId)
+        }
+    }
     
     @MainActor
     func deleteComment(id: String) async throws {

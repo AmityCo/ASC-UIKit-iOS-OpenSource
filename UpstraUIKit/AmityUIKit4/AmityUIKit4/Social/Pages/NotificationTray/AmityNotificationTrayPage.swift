@@ -92,7 +92,7 @@ public struct AmityNotificationTrayPage: AmityPageView {
                 AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: nil, parentCommentId: nil, communityId: nil, userId: nil))
             }
         case .comment, .reply, .reaction, .mention:
-            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: idInfo.commentId, parentCommentId: idInfo.parentId, communityId: nil, userId: nil))
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: idInfo.latestCommentId ?? idInfo.commentId, parentCommentId: idInfo.parentId, rootCommentId: idInfo.rootCommentId, communityId: nil, userId: nil))
         case .joinRequest:
             AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToCommunityProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId, userId: nil))
         case .follow:
@@ -102,6 +102,8 @@ public struct AmityNotificationTrayPage: AmityPageView {
         case .invitation:
             guard item.targetType == .room else { return }
             AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToLiveStreamPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: nil, parentCommentId: nil, communityId: nil, userId: nil, roomId: idInfo.roomId))
+        case .user:
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToEditProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: nil, userId: nil))
         }
     }
     

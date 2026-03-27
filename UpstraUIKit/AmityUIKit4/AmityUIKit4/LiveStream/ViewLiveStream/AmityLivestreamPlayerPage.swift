@@ -133,7 +133,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                     },
                     onTagProducts: isHost ? {
                         if let childPost = childPost {
-                            showPlaybackProductList(childPost: childPost)
+                            showPlaybackProductList(childPost: childPost, isHost: isHost)
                         }
                     } : nil,
                     liveProductTags: productTagsBinding
@@ -143,11 +143,12 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
         }
     }
     
-    private func showPlaybackProductList(childPost: AmityPost) {
+    private func showPlaybackProductList(childPost: AmityPost, isHost: Bool = false) {
         Task {
             // Re-fetch network setting before showing any product tag UI
             await viewModel.checkProductCatalogueSettings()
-            guard viewModel.isProductTagEnabled else { return }
+            // Host can always manage products regardless of catalogue setting
+            guard viewModel.isProductTagEnabled || isHost else { return }
             _showPlaybackProductList(childPost: childPost)
         }
     }
@@ -166,7 +167,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
             manageVM.taggedProducts = viewModel.taggedProducts
             manageVM.pinnedProductId = viewModel.pinnedProductId
             
-            let manageComponent = ManageProductTagListComponent(
+            var manageComponent = ManageProductTagListComponent(
                 viewModel: manageVM,
                 renderMode: .playback,
                 onClose: { products in
@@ -225,9 +226,10 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                     }
                 }
             )
-            .environmentObject(AmityViewConfigController(pageId: .livestreamPlayerPage, componentId: .productTagListBottomsheet))
+            manageComponent.canAddProducts = viewModel.isProductTagEnabled
             
-            let vc = AmitySwiftUIHostingController(rootView: manageComponent)
+            let vc = AmitySwiftUIHostingController(rootView: manageComponent
+                .environmentObject(AmityViewConfigController(pageId: .livestreamPlayerPage, componentId: .productTagListBottomsheet)))
             vc.modalPresentationStyle = UIModalPresentationStyle.pageSheet
             host.controller?.present(vc, animated: true)
         } else {

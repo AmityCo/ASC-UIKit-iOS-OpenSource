@@ -425,7 +425,7 @@ extension ClipFeedItemOverlayView {
     private var postExpandableContent: some View {
         ExpandableText(post.text, defaultAction: {
             togglePostContentExpantion()
-        }, metadata: post.metadata, mentionees: post.mentionees, onTapMentionee: { userId in
+        }, metadata: post.metadata, mentionees: post.mentionees, links: post.links, onTapMentionee: { userId in
             // We do not support expanding text in this view, so we redirect to post detail page
             onTapAction?(.userProfile(userId: userId))
         })

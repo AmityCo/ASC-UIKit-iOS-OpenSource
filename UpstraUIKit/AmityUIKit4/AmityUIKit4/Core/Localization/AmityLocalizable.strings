@@ -62,10 +62,19 @@
 "comment_reacted_button_text" = "Like";
 "comment_reply_button_text" = "Reply";
 "comment_edited_text" = "(edited)";
-"view_more_reply_text" = "View more reply";
+"view_more_reply_text" = "View more replies";
+"reply_unavailable_toast_message" = "This reply is no longer available";
 "disable_create_comment_text" = "Comments are disabled for this story";
 "comment_with_banned_words_error_message" = "Your comment contains inappropriate word. Please review and delete it.";
 "comment_with_not_allowed_link_error" = "Your comment contains a link that's not allowed. Please review and delete it.";
+"edit_reply_bottom_sheet_title" = "Edit reply";
+"delete_reply_bottom_sheet_title" = "Delete reply";
+"delete_reply_title" = "Delete reply";
+"delete_reply_message" = "This reply will be permanently deleted.";
+"comment_unavailable_toast_message" = "This comment is no longer available.";
+"post_unavailable_toast_message" = "This post is no longer available.";
+"clip_unavailable_toast_message" = "This clip is no longer available.";
+"comment_edit_error" = "Failed to edit comment. Please try again.";
 
 // Toast
 "chat_toast_loading" = "Loading chat...";
@@ -149,7 +158,7 @@
 "livestream_player_ended_title" = "This live stream has ended.";
 "livestream_player_ended_message" = "Playback will be available for you to watch shortly.";
 
-"livestream_player_error_title" = "Replay unavailable";
+"livestream_player_error_title" = "Playback unavailable.";
 "livestream_player_error_message" = "This live stream was too short to have a playback.";
 
 "livestream_player_terminated_title" = "This stream has been terminated.";
@@ -236,6 +245,9 @@
 
 "user_profile_edit_alert_title" = "Unsaved changes";
 "user_profile_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+"user_profile_edit_success" = "Successfully updated your profile!";
+"user_profile_edit_banned_word" = "Your profile wasn't updated as it contains an inappropriate word.";
+"user_profile_edit_failed" = "Failed to save your profile. Please try again.";
 "user_profile_follow_request_title" = "New follow requests";
 
 // Polls

@@ -22,11 +22,62 @@ struct PostContentLiveStreamView: View {
     let room: AmityRoom?
     let isStreamDeleted: Bool
     let isStreamBanned: Bool
+    var pageId: PageId? = nil
     
     private var postManager = PostManager()
-    
-    init(post: AmityPostModel) {
+
+    /// Resolves the thumbnail URL using priority: creator-uploaded → live thumbnail → placeholder
+    private var resolvedThumbnailURL: String? {
+        // 1. Creator-uploaded thumbnail (thumbnailFileId)
+        if let creatorThumbnail = room?.getThumbnail()?.mediumFileURL, !creatorThumbnail.isEmpty {
+            return creatorThumbnail
+        }
+        // 2. Live thumbnail (Mux auto-generated)
+        if let liveThumbnail = room?.liveThumbnailUrl, !liveThumbnail.isEmpty {
+            return liveThumbnail
+        }
+        // 3. No thumbnail available → placeholder
+        return nil
+    }
+
+    private var contentHeight: CGFloat {
+        let height16x9: CGFloat = 208
+        let height4x5: CGFloat = 480
+        
+        // Idle state always uses 16:9 aspect ratio with placeholder thumbnail
+        if post.livestreamState == .idle {
+            return height16x9
+        }
+        
+        // Creator-uploaded thumbnail uses platform default (16:9 for iOS)
+        if let creatorThumbnail = room?.getThumbnail()?.mediumFileURL, !creatorThumbnail.isEmpty {
+            return height16x9
+        }
+
+        // Live/recorded thumbnails use resolution data to determine aspect ratio
+        let resolution: AmityRoomResolution? = {
+            switch post.livestreamState {
+            case .live:
+                return room?.liveResolution
+            case .recorded:
+                return room?.recordedResolution
+            default:
+                return room?.liveResolution ?? room?.recordedResolution
+            }
+        }()
+
+        if let width = resolution?.width, let height = resolution?.height, width > 0, height > 0 {
+            // Portrait or square → 4:5, Landscape → 16:9
+            return height >= width ? height4x5 : height16x9
+        }
+
+        // iOS default: 16:9
+        return height16x9
+    }
+
+    init(post: AmityPostModel, pageId: PageId? = nil) {
         self.post = post
+        self.pageId = pageId
         self.room = post.room
         self.isStreamDeleted = room?.isDeleted ?? false
         self.isStreamBanned = false
@@ -72,8 +123,7 @@ struct PostContentLiveStreamView: View {
                 switch post.livestreamState {
                 case .idle, .live, .recorded:
                     
-                    let thumbnailImageUrl = room?.getThumbnail()?.mediumFileURL ?? ""
-                    AsyncImage(placeholder: AmityIcon.livestreamPlaceholderGray.imageResource, url: URL(string: thumbnailImageUrl), contentMode: .fill)
+                    AsyncImage(placeholder: AmityIcon.livestreamPlaceholderGray.imageResource, url: URL(string: resolvedThumbnailURL ?? ""), contentMode: .fill)
                     
                     VStack(alignment: .leading) {
                         HStack {
@@ -164,7 +214,7 @@ struct PostContentLiveStreamView: View {
                 }
             }
         }
-        .frame(height: 208)
+        .frame(height: contentHeight)
         .onTapGesture {
             guard !isStreamBanned else { return }
             
@@ -193,6 +243,7 @@ struct PostContentLiveStreamView: View {
             }
             if !productTags.isEmpty {
                 AmityProductTagListComponent(
+                    pageId: pageId,
                     productTags: productTags,
                     renderMode: .livestream,
                     sourceId: post.room?.roomId ?? "",

@@ -242,7 +242,8 @@ struct PostContentPollView: View {
                     },
                     showEditAction: post.isOwner,
                     post: post,
-                    showViewParentPost: false
+                    showViewParentPost: false,
+                    pageId: viewConfig.pageId
                 )
             }
             

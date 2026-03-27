@@ -202,10 +202,15 @@ public struct AmityEditUserProfilePage: AmityPageView {
                     Task { @MainActor in
                         do {
                             try await viewModel.updateUser(UserModel(displayName: displayNameText, about: aboutText, avatar: imagePickerViewModel.selectedImage))
-                            Toast.showToast(style: .success, message: "Successfully updated your profile!")
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userProfileEditSuccess.localizedString)
                             host.controller?.navigationController?.popViewController()
                         } catch {
-                            Toast.showToast(style: .warning, message: "Failed to save your profile. Please try again.")
+                            if let error = AmityError(error: error), error == .bannedWord {
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userProfileEditBannedWord.localizedString)
+                                return
+                            }
+                            
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userProfileEditFailed.localizedString)
                         }
                     }
                 }

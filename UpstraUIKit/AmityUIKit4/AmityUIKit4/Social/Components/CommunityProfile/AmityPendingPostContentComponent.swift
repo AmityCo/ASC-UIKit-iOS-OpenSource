@@ -184,7 +184,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 
                 // Post text content
                 if !post.text.isEmpty {
-                    ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, productTags: post.textProductTags, onTapMentionee: { userId in
+                    ExpandableText(post.text, metadata: post.metadata, mentionees: post.mentionees, productTags: post.textProductTags, links: post.links, onTapMentionee: { userId in
                         goToUserProfilePage(userId)
                     }, onTapProductTag: { productId in
                         openProductWebView(productId: productId)

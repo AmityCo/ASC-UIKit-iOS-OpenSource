@@ -15,8 +15,9 @@ public struct AmityPostDetailPage: AmityPageView {
     
     @StateObject private var commentCoreViewModel: CommentCoreViewModel
     @StateObject private var commentComposerViewModel: CommentComposerViewModel
-    @StateObject private var commentBottomSheetViewModel = CommentBottomSheetViewModel()
+    @StateObject private var commentBottomSheetViewModel: CommentBottomSheetViewModel
     @StateObject private var viewConfig: AmityViewConfigController
+    @StateObject private var networkMonitor = NetworkMonitor()
     @State private var showBottomSheet: Bool = false
     
     private var context: AmityPostContentComponent.Context?
@@ -27,15 +28,19 @@ public struct AmityPostDetailPage: AmityPageView {
         .postDetailPage
     }
     
-    public init(id: String, commentId: String? = nil, parentId: String? = nil, showReplyToComment: Bool = false, preloadRepliesOfComment: Bool = false) {
+    public init(id: String, commentId: String? = nil, parentId: String? = nil, rootCommentId: String? = nil, showReplyToComment: Bool = false, preloadRepliesOfComment: Bool = false) {
         let postDetailViewModel = AmityPostDetailPageViewModel(id: id)
         self.commentId = commentId
         self.showReplyToComment = showReplyToComment
         self.context = AmityPostContentComponent.Context()
         self._viewModel = StateObject(wrappedValue: postDetailViewModel)
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId, targetCommentId: commentId, targetCommentParentId: parentId, preloadRepliesOfComment: preloadRepliesOfComment))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId, targetCommentId: commentId, targetCommentParentId: parentId, rootCommentId: rootCommentId, preloadRepliesOfComment: preloadRepliesOfComment))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: id, referenceType: .post, community: postDetailViewModel.post?.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
+        
+        let bottomSheetVM = CommentBottomSheetViewModel()
+        bottomSheetVM.checkDeletePermission(communityId: postDetailViewModel.post?.targetCommunity?.communityId)
+        self._commentBottomSheetViewModel = StateObject(wrappedValue: bottomSheetVM)
     }
     
     // Post with context
@@ -45,6 +50,10 @@ public struct AmityPostDetailPage: AmityPageView {
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: post.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
+        
+        let bottomSheetVM = CommentBottomSheetViewModel()
+        bottomSheetVM.checkDeletePermission(communityId: post.targetCommunity?.communityId)
+        self._commentBottomSheetViewModel = StateObject(wrappedValue: bottomSheetVM)
     }
     
     public var body: some View {
@@ -89,7 +98,7 @@ public struct AmityPostDetailPage: AmityPageView {
                         CommentCoreView(headerView: {
                             VStack(spacing: 4) {
                                 if let postModel = viewModel.post {
-                                    AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext()) { tapContext in
+                                    AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext(), onTapAction: { tapContext in
                                         
                                         if postModel.dataTypeInternal == .clip {
                                             if let media = postModel.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
@@ -101,7 +110,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                                 self.host.controller?.navigationController?.pushViewController(hostingView, animated: true)
                                             }
                                         }
-                                    }
+                                    }, pageId: id)
                                     Rectangle()
                                         .fill(Color(viewConfig.theme.baseColorShade4))
                                         .frame(height: 1)
@@ -111,7 +120,7 @@ public struct AmityPostDetailPage: AmityPageView {
                             }
                         },viewModel: commentCoreViewModel, commentButtonAction: self.commentButtonAction(_:))
                         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
-                                     height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? .fixed(204) : .fixed(148),
+                                     height: (commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false || commentBottomSheetViewModel.hasDeletePermission) ? .fixed(204) : .fixed(148),
                                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                             CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
                                 commentCoreViewModel.editingComment = comment
@@ -138,7 +147,11 @@ public struct AmityPostDetailPage: AmityPageView {
                         }
                         
                         let isComposerHidden = !(viewModel.post?.targetCommunity?.isJoined ?? true) || AmityUIKitManagerInternal.shared.isGuestUser
-                        CommentComposerView(viewModel: commentComposerViewModel)
+                        CommentComposerView(viewModel: commentComposerViewModel, onL2ReplyCreated: { comment, l1ParentId in
+                                commentCoreViewModel.registerOptimisticL2Reply(comment: comment, l1ParentId: l1ParentId)
+                            }, onReplyCreated: { replyTargetCommentId in
+                                commentCoreViewModel.expandRepliesForCommentId = replyTargetCommentId
+                            })
                             .isHidden(isComposerHidden)
                     }
                     .opacity(viewModel.isPostDeleted ? 0 : 1)
@@ -152,12 +165,18 @@ public struct AmityPostDetailPage: AmityPageView {
         })
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
+        .onChange(of: networkMonitor.isConnected) { isConnected in
+            if !isConnected {
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.General.noInternetConnection.localizedString)
+            }
+        }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 if showReplyToComment,
                     let item = commentCoreViewModel.targetComment,
                     case .content(let comment) = item.type {
-                    commentComposerViewModel.replyState = (true, comment)
+                    // comment is always L0 in this path; resolved parent is its own commentId
+                    commentComposerViewModel.replyState = (true, comment, comment.commentId)
                 }
             }
             
@@ -242,8 +261,8 @@ public struct AmityPostDetailPage: AmityPageView {
         switch type {
         case .react(_): break
             // Do nothing since it has rendering orchestration issue.
-        case .reply(let comment):
-            commentComposerViewModel.replyState = (true, comment)
+        case .reply(let comment, let resolvedParentId):
+            commentComposerViewModel.handleReplyAction(comment: comment, resolvedParentId: resolvedParentId)
         case .meatball(let comment):
             hideKeyboard()
             

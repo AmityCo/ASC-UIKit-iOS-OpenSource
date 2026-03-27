@@ -14,6 +14,7 @@ class CommentCoreViewModel: ObservableObject {
     @Published var adSeetState: (isShown: Bool, ad: AmityAd?) = (false, nil)
     @Published var loadingStatus: AmityLoadingStatus = .notLoading
     @Published var hasScrolledToTop: Bool = true
+    @Published var scrollToEditingAnchorId: String?
     
     var loadedItems: [PaginatedItem<AmityComment>] = []
 
@@ -28,15 +29,27 @@ class CommentCoreViewModel: ObservableObject {
     
     private var paginatorCancellable: AnyCancellable?
     
-    // We use this target when navigating from notification tray page.
     let targetCommentId: String?
     let targetCommentParentId: String?
     
+    let rootCommentId: String?
+    
+    var isL2Target: Bool {
+        guard let parentId = targetCommentParentId, let rootId = rootCommentId else { return false }
+        return parentId != rootId
+    }
+    
+    var highlightTargetCommentId: String? {
+        guard isL2Target else { return nil }
+        return targetCommentId
+    }
+    
     var targetCommentReply: PaginatedItem<AmityCommentModel>?
     var targetComment: PaginatedItem<AmityCommentModel>?
+    @Published var targetL2Comment: PaginatedItem<AmityCommentModel>?
     
     let targetCommentFetcher = TargetCommentFetcher()
-    var isTargetCommentFetched = false
+    @Published var isTargetCommentFetched = false
     let preloadRepliesOfComment: Bool
     
     private let postManager = PostManager()
@@ -53,6 +66,7 @@ class CommentCoreViewModel: ObservableObject {
          communityId: String? = nil,
          targetCommentId: String? = nil,
          targetCommentParentId: String? = nil,
+         rootCommentId: String? = nil,
          preloadRepliesOfComment: Bool = false,
          loadComments: Bool = true
     ) {
@@ -62,9 +76,9 @@ class CommentCoreViewModel: ObservableObject {
         self.hideCommentButtons = hideCommentButtons
         self.targetCommentId = targetCommentId
         self.targetCommentParentId = targetCommentParentId
+        self.rootCommentId = rootCommentId
         self.preloadRepliesOfComment = preloadRepliesOfComment
 
-        // Fetch target post
         if referenceType == .post {
             if let localPost = postManager.getPost(withId: referenceId).snapshot {
                 self.post = AmityPostModel(post: localPost)
@@ -77,7 +91,6 @@ class CommentCoreViewModel: ObservableObject {
             }
         }
 
-        // Skip expensive comment loading when not needed (e.g. feed inline comment)
         guard loadComments else { return }
 
         let queryOptions = AmityCommentQueryOptions(referenceId: referenceId,
@@ -87,7 +100,13 @@ class CommentCoreViewModel: ObservableObject {
                                                     includeDeleted: true)
         let collection = commentManager.getComments(queryOptions: queryOptions)
         commentCollection = collection
-        let idToExclude = targetCommentParentId ?? targetCommentId
+        let idToExclude: String?
+        let isL2 = targetCommentParentId != nil && rootCommentId != nil && targetCommentParentId != rootCommentId
+        if isL2, let rootId = rootCommentId {
+            idToExclude = rootId
+        } else {
+            idToExclude = targetCommentParentId ?? targetCommentId
+        }
         paginator = UIKitPaginator(liveCollection: collection, adPlacement: .comment, communityId: communityId, excludedId: idToExclude, modelIdentifier: { model in
             return model.commentId
         })
@@ -99,7 +118,6 @@ class CommentCoreViewModel: ObservableObject {
             self.loadingStatus = self.commentCollection?.loadingStatus ?? .notLoading
             self.loadedItems = items
 
-            // If there is no target, we render feed immediately
             if targetCommentId == nil {
                 self.renderCommentFeed()
             } else if self.isTargetCommentFetched {
@@ -108,22 +126,68 @@ class CommentCoreViewModel: ObservableObject {
         }
 
         if let targetCommentId {
-
-            // If there is target comment, we fetch those comment first
-            self.targetCommentFetcher.fetchTargetComment(id: targetCommentId) { parent, reply in
-                self.isTargetCommentFetched = true
-
-                if let parent {
-                    let parentComment = PaginatedItem(id: parent.commentId, type: .content(AmityCommentModel(comment: parent)))
-                    self.targetComment = parentComment
+            if isL2Target, let rootId = rootCommentId {
+                self.targetCommentFetcher.fetchComment(id: rootId) { [weak self] rootComment in
+                    guard let self else { return }
+                    
+                    self.isTargetCommentFetched = true
+                    
+                    if let rootComment, !rootComment.isDeleted {
+                        let root = PaginatedItem(id: rootComment.commentId, type: .content(AmityCommentModel(comment: rootComment)))
+                        self.targetComment = root
+                    } else {
+                        DispatchQueue.main.async {
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Comment.replyUnavailableToastMessage.localizedString)
+                        }
+                    }
+                    
+                    if let parentId = self.targetCommentParentId {
+                        self.targetCommentFetcher.fetchComment(id: parentId) { [weak self] l1Comment in
+                            guard let self else { return }
+                            if let l1Comment, !l1Comment.isDeleted {
+                                let reply = PaginatedItem(id: l1Comment.commentId, type: .content(AmityCommentModel(comment: l1Comment)))
+                                self.targetCommentReply = reply
+                            } else {
+                                DispatchQueue.main.async {
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Comment.replyUnavailableToastMessage.localizedString)
+                                }
+                            }
+                            self.targetCommentFetcher.fetchComment(id: targetCommentId) { l2Comment in
+                                if let l2Comment, !l2Comment.isDeleted {
+                                    let l2 = PaginatedItem(id: l2Comment.commentId, type: .content(AmityCommentModel(comment: l2Comment)))
+                                    self.targetL2Comment = l2
+                                } else {
+                                    DispatchQueue.main.async {
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Comment.replyUnavailableToastMessage.localizedString)
+                                    }
+                                }
+                                self.renderCommentFeed()
+                            }
+                        }
+                    } else {
+                        self.renderCommentFeed()
+                    }
                 }
-
-                if let reply {
-                    let replyComment = PaginatedItem(id: reply.commentId, type: .content(AmityCommentModel(comment: reply)))
-                    self.targetCommentReply = replyComment
+            } else {
+                self.targetCommentFetcher.fetchTargetComment(id: targetCommentId) { parent, reply in
+                    self.isTargetCommentFetched = true
+                                    
+                    if let parent, !parent.isDeleted {
+                        let parentComment = PaginatedItem(id: parent.commentId, type: .content(AmityCommentModel(comment: parent)))
+                        self.targetComment = parentComment
+                    } else {
+                        DispatchQueue.main.async {
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Comment.replyUnavailableToastMessage.localizedString)
+                        }
+                    }
+                    
+                    if let reply {
+                        let replyComment = PaginatedItem(id: reply.commentId, type: .content(AmityCommentModel(comment: reply)))
+                        self.targetCommentReply = replyComment
+                    }
+                    
+                    self.renderCommentFeed()
                 }
-
-                self.renderCommentFeed()
             }
         }
     }
@@ -131,13 +195,10 @@ class CommentCoreViewModel: ObservableObject {
     func renderCommentFeed() {
         var items = [PaginatedItem<AmityCommentModel>]()
         
-        // Add target parent comment to the top
-        // We handle targetReply in ReplyCommentView
         if let targetComment {
             items.insert(targetComment, at: 0)
         }
         
-        // Add remaining comment
         let mappedLoadedItems = loadedItems.map {
             switch $0.type {
             case .content(let comment):
@@ -147,27 +208,60 @@ class CommentCoreViewModel: ObservableObject {
             }
         }
         items.append(contentsOf: mappedLoadedItems)
-        
-        // Finally render the comment list
         self.commentItems = items
     }
     
-    func getChildComments(parentId: String) -> AmityCollection<AmityComment> {
+    func getChildComments(parentId: String, isL2Thread: Bool = false) -> AmityCollection<AmityComment> {
         let queryOptions = AmityCommentQueryOptions(referenceId: referenceId,
                                                     referenceType: referenceType,
                                                     filterByParentId: true,
                                                     parentId: parentId,
-                                                    orderBy: .descending,
-                                                    includeDeleted: true)
+                                                    orderBy: isL2Thread ? .ascending : .descending,
+                                                    includeDeleted: false,
+                                                    pageSize: 5)
         return commentManager.getComments(queryOptions: queryOptions)
     }
     
     @MainActor
     func editComment(comment: AmityCommentModel) async throws {
-        let updateOptions = AmityCommentUpdateOptions(text: comment.text, metadata: comment.metadata, mentioneesBuilder: comment.mentioneeBuilder)
+        let links = AmityPreviewLinkWizard.shared.buildLinks(from: comment.text)
+        let metadata = comment.metadata ?? ["mentioned": []]
+        let updateOptions = AmityCommentUpdateOptions(text: comment.text, metadata: metadata, mentioneesBuilder: comment.mentioneeBuilder, links: links.isEmpty ? [] : links)
         try await commentManager.editComment(withId: comment.id, options: updateOptions)
+        refreshOptimisticL2Comment(commentId: comment.id)
     }
     
+    func refreshOptimisticL2Comment(commentId: String) {
+        let liveObject = commentManager.getComment(commentId: commentId)
+        guard let snapshot = liveObject.snapshot, let parentId = snapshot.parentId else { return }
+        if var comments = optimisticL2InsertComments[parentId] {
+            if let idx = comments.firstIndex(where: { $0.commentId == commentId }) {
+                comments[idx] = snapshot
+                optimisticL2InsertComments[parentId] = comments
+            }
+        }
+    }
+    
+    @Published var optimisticL2InsertIds: [String: [String]] = [:]
+    @Published var optimisticL2InsertComments: [String: [AmityComment]] = [:]
+
+    @Published var expandRepliesForCommentId: String? = nil
+
+    func registerOptimisticL2Reply(comment: AmityComment, l1ParentId: String) {
+        let commentId = comment.commentId
+        var ids = optimisticL2InsertIds[l1ParentId] ?? []
+        if !ids.contains(commentId) {
+            ids.insert(commentId, at: 0) // prepend newest
+        }
+        optimisticL2InsertIds[l1ParentId] = ids
+
+        var comments = optimisticL2InsertComments[l1ParentId] ?? []
+        if !comments.contains(where: { $0.commentId == commentId }) {
+            comments.insert(comment, at: 0) // prepend newest
+        }
+        optimisticL2InsertComments[l1ParentId] = comments
+    }
+
     func hasTargetReply(comment: AmityCommentModel) -> Bool {
         if case .content(let replyComment) = targetCommentReply?.type, replyComment.parentId == comment.commentId {
             return true
@@ -181,6 +275,13 @@ class CommentCoreViewModel: ObservableObject {
         } else {
             return nil
         }
+    }
+
+    func getTargetL2Comment() -> AmityCommentModel? {
+        if case .content(let l2Comment) = targetL2Comment?.type {
+            return l2Comment
+        }
+        return nil
     }
 }
 
@@ -198,31 +299,30 @@ class TargetCommentFetcher {
                 return
             }
             
-            // If this comment has parent, its a reply comment
             if let parentCommentId = comment?.parentId {
                 replyComment = comment
-                // Fetch its parent
                 fetchComment(id: parentCommentId) { parentComment in
                     completion(parentComment, replyComment)
                 }
             } else {
-                // This comment does not have parent
                 completion(comment, nil)
             }
         }
     }
     
-    private func fetchComment(id: String, completion: @escaping (_ comment: AmityComment?) -> Void) {
+    func fetchComment(id: String, completion: @escaping (_ comment: AmityComment?) -> Void) {
         token = commentManager.getComment(commentId: id).observe({ [weak self] liveComment, error in
             if let error {
                 Log.warn(">> Error while fetching target comment \(id): \(error.localizedDescription)")
+                completion(nil)
+                return
             }
             
             guard let self else {
                 completion(nil)
                 return
             }
-                        
+            
             completion(liveComment.snapshot)
         })
     }

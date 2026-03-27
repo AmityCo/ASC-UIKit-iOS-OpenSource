@@ -67,12 +67,20 @@ struct AmityProductTagSelectionItemElement: AmityElementView {
                     .frame(width: 16, height: 16)
                     .isHidden(isSelected)
 
-                Image(AmityIcon.checkboxIcon.getImageResource())
-                    .renderingMode(.template)
-                    .foregroundColor(Color(isAlreadyTagged ? viewConfig.theme.primaryColor.blend(.shade2) : viewConfig.theme.primaryColor))
-                    .frame(width: 22, height: 22)
-                    .isHidden(!isSelected)
-                    .offset(x: 3)
+                if isLivestream {
+                    Image(isAlreadyTagged ? AmityIcon.checkboxIcon.getImageResource() :  AmityIcon.pollCheckboxIcon.getImageResource())
+                        .opacity(!isDisabled ? 1 : 0.3)
+                        .frame(width: 22, height: 22)
+                        .isHidden(!isSelected)
+                        .offset(x: 3)
+                } else {
+                    Image(AmityIcon.checkboxIcon.getImageResource())
+                        .renderingMode(.template)
+                        .foregroundColor(Color(isAlreadyTagged ? viewConfig.theme.primaryColor.blend(.shade2) : viewConfig.theme.primaryColor))
+                        .frame(width: 22, height: 22)
+                        .isHidden(!isSelected)
+                        .offset(x: 3)
+                }
             }
             .padding(.trailing, 16)
         }

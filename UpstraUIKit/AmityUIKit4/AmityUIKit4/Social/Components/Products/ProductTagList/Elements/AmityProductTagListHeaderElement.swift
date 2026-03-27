@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-/// Header element for the ProductTagListComponent (v2).
+/// Header element for the ProductTagListComponent.
 /// Displays context-aware title based on render mode.
 ///
 /// Element ID: `product_tag_list_header`
@@ -20,7 +20,6 @@ struct AmityProductTagListHeaderElement: AmityElementView {
         return .productTagListHeader
     }
 
-    /// Context mode for determining header text (v2)
     let renderMode: ProductTagListRenderMode
 
     /// Optional close action for livestream mode
@@ -55,7 +54,6 @@ struct AmityProductTagListHeaderElement: AmityElementView {
         }
     }
 
-    /// Returns context-aware header text based on renderMode (REQ-001)
     private var headerText: String {
         // Check for custom text from config first
         let customKey: String

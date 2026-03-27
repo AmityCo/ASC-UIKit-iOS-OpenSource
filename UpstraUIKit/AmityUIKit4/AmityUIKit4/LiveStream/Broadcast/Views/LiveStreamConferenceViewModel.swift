@@ -575,15 +575,14 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 } else if event.type == .invitationAccepted {
                     self?.invitedCoHost.invitationAccepted = true
                     Toast.showToast(style: .success, message: "Co-host accepted the invitation.", bottomPadding: 60)
-                } else if event.type == .coHostLeft {
-                    self?.invitedCoHost = (false, nil, false)
-                                        
-                    if let hostParticipant = room.participants.first(where: { $0.type == "host" }), let actorInternalId = event.actorInternalId, actorInternalId == hostParticipant.userInternalId {
-                        return
-                    } else {
+                } else if event.type == .coHostStageLeft {
+                    if self?.invitedCoHost.invitationAccepted == true {
                         Toast.showToast(style: .success, message: "Co-host left the stage.", bottomPadding: 60)
                     }
-                    
+                    self?.invitedCoHost = (false, nil, false)
+                } else if event.type == .coHostLeft {
+                    self?.invitedCoHost = (false, nil, false)
+                    Toast.showToast(style: .success, message: "Co-host left the live stream.", bottomPadding: 60)
                 } else if event.type == .coHostRemoved {
                     if self?.participantRole == .host {
                         self?.invitedCoHost = (false, nil, false)

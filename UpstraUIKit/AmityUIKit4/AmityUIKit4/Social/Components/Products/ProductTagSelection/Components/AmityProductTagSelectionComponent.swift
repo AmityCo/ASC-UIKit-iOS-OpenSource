@@ -172,7 +172,7 @@ public struct AmityProductTagSelectionComponent: AmityComponentView {
                                 pageId: pageId,
                                 componentId: id
                             )
-                            .padding(.top, keyboardHeight > 0 ? 76 : 150)
+                            .padding(.top, 150)
                         } else if viewModel.loadingStatus == .loading && viewModel.products.isEmpty {
                             // Loading state
                             ForEach(0..<5, id: \.self) { _ in
@@ -238,16 +238,23 @@ public struct AmityProductTagSelectionComponent: AmityComponentView {
                         .opacity(disableButton ? 0.3 : 1.0)
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
-                        .padding(.bottom, 24)
+                        .padding(.bottom, keyboardHeight > 0 ? 12 : 24)
                         .background(Color(viewConfig.theme.backgroundColor))
                     }
-//                    .offset(y: keyboardHeight > 0 ? -keyboardHeight : 0)
+                    .offset(y: keyboardHeight > 0 ? -keyboardHeight : 0)
                 }
             }
         }
         .ignoresSafeArea(.keyboard)
-        .onReceive(keyboardPublisher) { event in
-            keyboardHeight = event.height
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { notification in
+            if let frame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    keyboardHeight = frame.height
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            keyboardHeight = 0
         }
         .background(Color(viewConfig.theme.backgroundColor))
         .background(

@@ -34,6 +34,17 @@ struct LiveStreamConferenceView: View {
     
     let liveChatFeedHeight = (UIScreen.main.bounds.height - 50) / 5
     
+    private var isPinnedProductVisible: Bool {
+        viewModel.currentState.isStreaming &&
+        (viewModel.liveStreamChatViewModel?.isProductTagEnabled ?? viewModel.isProductTagEnabled) &&
+        viewModel.pinnedProductId != nil &&
+        !isPinnedProductDismissed
+    }
+    
+    private var isProductTagFeatureEnabled: Bool {
+        viewModel.liveStreamChatViewModel?.isProductTagEnabled ?? viewModel.isProductTagEnabled
+    }
+    
     public init(viewModel: LiveStreamConferenceViewModel, broadcasterViewModel: LiveStreamBroadcasterViewModel) {
         self.viewModel = viewModel
         self.broadcasterViewModel = broadcasterViewModel
@@ -124,7 +135,7 @@ struct LiveStreamConferenceView: View {
                                     manageVM.taggedProducts = viewModel.taggedProducts
                                     manageVM.pinnedProductId = viewModel.pinnedProductId
                                     
-                                    let manageComponent = ManageProductTagListComponent(
+                                    var manageComponent = ManageProductTagListComponent(
                                     viewModel: manageVM,
                                     onClose: { products in
                                         viewModel.taggedProducts = products
@@ -220,6 +231,7 @@ struct LiveStreamConferenceView: View {
                                         }
                                     }
                                 )
+                                manageComponent.canAddProducts = viewModel.isProductTagEnabled
                                 
                                 let hostController = AmitySwiftUIHostingController(rootView: manageComponent
                                     .environmentObject(viewConfig)
@@ -318,7 +330,7 @@ struct LiveStreamConferenceView: View {
                     
                     liveChatFeedView
                 }
-                .padding(.bottom, viewModel.pinnedProductId != nil && !isPinnedProductDismissed ? 160 : 80) // Extra padding when product is pinned
+                .padding(.bottom, isPinnedProductVisible ? 162 : 80)
                 .background(
                     GeometryReader { geometry in
                         LinearGradient(
@@ -376,15 +388,10 @@ struct LiveStreamConferenceView: View {
                         
                     }
                     
-                    Spacer()
-                        .allowsHitTesting(false)
-                    
                     // Pinned Product Element (above compose bar) - Only shows during live streaming
-                    if viewModel.currentState.isStreaming,
-                       viewModel.liveStreamChatViewModel?.isProductTagEnabled == true,
+                    if isPinnedProductVisible,
                        let pinnedId = viewModel.pinnedProductId,
-                       let pinnedProduct = viewModel.taggedProducts.first(where: { $0.productId == pinnedId }),
-                       !isPinnedProductDismissed {
+                       let pinnedProduct = viewModel.taggedProducts.first(where: { $0.productId == pinnedId }) {
                         let canManageProducts = viewModel.participantRole == .host ||
                         (viewModel.participantRole == .coHost && viewModel.isCoHostManageProductTagEnable)
                         
@@ -435,6 +442,9 @@ struct LiveStreamConferenceView: View {
                         .padding(.horizontal, 16)
                         .padding(.bottom, 8)
                     }
+                    
+                    Spacer()
+                        .allowsHitTesting(false)
                     
                     footerView
                         .padding(.leading, 16)

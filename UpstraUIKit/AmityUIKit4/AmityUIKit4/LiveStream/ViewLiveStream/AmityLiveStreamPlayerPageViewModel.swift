@@ -134,7 +134,7 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                 }
                 
                 // Display co-host left toast if the user is a viewer when co-host left
-                if event.type == .coHostLeft && self?.currentState == .viewer {
+                if event.type == .coHostLeft && self?.currentState == .viewer && event.room.status == .live {
                     Toast.showToast(style: .success, message: "Co-host left the live stream.", bottomPadding: 60)
                 }
                 

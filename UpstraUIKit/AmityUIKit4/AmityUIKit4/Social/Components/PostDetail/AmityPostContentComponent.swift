@@ -297,7 +297,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             case .image, .video:
                 postContentTextView()
                 
-                PostContentMediaView(post: post, viewConfig: viewConfig)
+                PostContentMediaView(post: post, viewConfig: viewConfig, pageId: pageId)
                     .frame(height: 328)
                     .clipShape(RoundedCorner(radius: 8))
                 
@@ -315,13 +315,13 @@ public struct AmityPostContentComponent: AmityComponentView {
             case .liveStream:
                 livestreamPostContentTextView()
                 
-                PostContentLiveStreamView(post: post)
+                PostContentLiveStreamView(post: post, pageId: pageId)
                     .padding([.leading, .trailing, .top], -16)
                 
             case .room:
                 roomPostContentTextView()
                 
-                PostContentLiveStreamView(post: post)
+                PostContentLiveStreamView(post: post, pageId: pageId)
                     .padding([.leading, .trailing, .top], -16)
                 
             case .clip:
@@ -356,7 +356,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 // Post text content
                 if !post.text.isEmpty {
                     let tapActionContext = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
-                    ExpandableText(post.text, defaultAction: {onTapAction?(tapActionContext)}, metadata: post.metadata, mentionees: post.mentionees, productTags: post.textProductTags, highlightedText: context?.searchKeyword, onTapMentionee: { userId in
+                    ExpandableText(post.text, defaultAction: {onTapAction?(tapActionContext)}, metadata: post.metadata, mentionees: post.mentionees, productTags: post.textProductTags, highlightedText: context?.searchKeyword, links: post.links, onTapMentionee: { userId in
                         goToUserProfilePage(userId)
                     }, onTapHashtag: { hashtag in
                         // \u{200E} make the hashtag text left to right in all languages
@@ -467,7 +467,7 @@ public struct AmityPostContentComponent: AmityComponentView {
     @ViewBuilder
     private func postProductCarouselView(_ post: AmityPostModel) -> some View {
         if !post.allProductTags.isEmpty {
-            AmityProductCarouselView(allProductTags: post.allProductTags, postId: post.postId)
+            AmityProductCarouselView(allProductTags: post.allProductTags, postId: post.postId, pageId: pageId)
                 .environmentObject(viewConfig)
                 .environmentObject(host)
         }
@@ -661,21 +661,16 @@ public struct AmityPostContentComponent: AmityComponentView {
                             HStack(spacing: 4) {
                                 Image(AmityIcon.replyArrowIcon.getImageResource())
                                     .resizable()
-                                    .frame(width: 16, height: 16)
-                                    .padding(.leading, 8)
+                                    .frame(width: 20, height: 20)
                                 
                                 let repliesCount = comment.childrenNumber
                                 let word = WordsGrammar(count: repliesCount, set: .reply)
                                 let finalText = "View \(repliesCount) \(word.value)"
                                 Text(finalText)
                                     .applyTextStyle(.captionBold(Color(viewConfig.theme.secondaryColorShade1)))
-                                    .padding(.trailing, 8)
                             }
+                            .padding(.horizontal, 4)
                             .frame(height: 28, alignment: .leading)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 4)
-                                    .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 0.4)
-                            )
                             
                             Spacer()
                         }
@@ -693,7 +688,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         switch actionType {
         case .react(_):
             break
-        case .reply(let comment):
+        case .reply(let comment, _):
             goToComment(comment.id, showReplyToComment: true)
         case .meatball(_):
             break

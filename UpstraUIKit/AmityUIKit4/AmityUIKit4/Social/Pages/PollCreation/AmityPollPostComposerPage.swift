@@ -125,9 +125,10 @@ public struct AmityPollPostComposerPage: AmityPageView {
                             }
                             .padding(.bottom, 20)
                             
-                            AmityMessageTextEditorView(titleEitorViewModel, text: $title, mentionData: $mentionData, mentionedUsers: $mentionedUsers, initialEditorHeight: 34, maxNumberOfLines: 12, placeholderPadding: 4)
+                            AmityMessageTextEditorView(titleEitorViewModel, text: $title, mentionData: .constant(MentionData()), mentionedUsers: .constant([]), initialEditorHeight: 34, maxNumberOfLines: 12, placeholderPadding: 4)
                                 .placeholder(AmityLocalizedStringSet.Social.pollPostTitleTextfieldPlaceholder.localizedString)
                                 .characterLimit(Constants.titleMaxCharLimit)
+                                .displayInlineSuggestionView(false)
                                 .onChange(of: title) { newValue in
                                     validateInputs()
                                 }
@@ -166,6 +167,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
                                 .characterLimit(Constants.questionMaxCharLimit)
                                 .enableHashtagHighlighting(true)
                                 .maxHashtagCount(30)
+                                .displayInlineSuggestionView(false)
                                 .onChange(of: question) { newValue in
                                     validateInputs()
                                 }

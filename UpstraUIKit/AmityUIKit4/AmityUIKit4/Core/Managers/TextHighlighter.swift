@@ -126,19 +126,16 @@ class TextHighlighter {
         return AmityPreviewLinkWizard.shared.detectLinks(text: text)
     }
     
-    @available(iOS 15, *)
-    public static func highlightLinks(links: [String], in string: AttributedString, attributes: [NSAttributedString.Key: Any] = [.underlineStyle: Text.LineStyle(pattern: .solid), .foregroundColor : UIColor.systemBlue]) -> AttributedString {
+    public static func highlightLinks(links: [String], in string: AttributedString, attributes: [NSAttributedString.Key: Any] = [.underlineStyle: Text.LineStyle(pattern: .solid), .foregroundColor : UIColor.systemBlue], linkURLMap: [String: String] = [:]) -> AttributedString {
         var finalStr = string
         
         for link in links {
             let linkRange = finalStr.range(of: link) // Get attributed link here.
             
-            // Note:
-            // Link without scheme does not get opened when tapping on it.
-            // So we modify the scheme when tapping upon link.
-            var finalLink = link
-            if !link.hasPrefix("http") && !link.hasPrefix("https://") {
-                finalLink = "https://" + link
+            // Use URL from linkURLMap if available, otherwise use the link text itself
+            var finalLink = linkURLMap[link] ?? link
+            if !finalLink.hasPrefix("http") && !finalLink.hasPrefix("https://") {
+                finalLink = "https://" + finalLink
             }
             
             if let linkRange {
@@ -152,7 +149,6 @@ class TextHighlighter {
         return finalStr
     }
     
-    @available(iOS 15, *)
     public static func highlightKeyword(keyword: String, in string: AttributedString, attributes: [NSAttributedString.Key: Any]) -> AttributedString {
         
         var finalStr = string

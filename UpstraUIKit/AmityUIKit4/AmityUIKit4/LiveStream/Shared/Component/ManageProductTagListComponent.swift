@@ -30,6 +30,7 @@ struct ManageProductTagListComponent: AmityComponentView {
     @ObservedObject private var viewModel: ManageProductTagViewModel
     
     private let renderMode: ManageProductTagRenderMode
+    var canAddProducts: Bool = true
     private let onClose: ([AmityProduct]) -> Void
     private let onAddProducts: () -> Void
     private let onPinToggle: (String, Bool) -> Void
@@ -119,17 +120,19 @@ struct ManageProductTagListComponent: AmityComponentView {
                     }
                     .padding(.bottom, 16)
                     
-                    Button(action: {
-                        onAddProducts()
-                    }) {
-                        Text(AmityLocalizedStringSet.Social.productTagAddProducts.localizedString)
-                            .applyTextStyle(.bodyBold(.white))
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.white, lineWidth: 1)
-                            )
+                    if canAddProducts {
+                        Button(action: {
+                            onAddProducts()
+                        }) {
+                            Text(AmityLocalizedStringSet.Social.productTagAddProducts.localizedString)
+                                .applyTextStyle(.bodyBold(.white))
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 10)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.white, lineWidth: 1)
+                                )
+                        }
                     }
                     
                     Spacer()
@@ -218,30 +221,32 @@ struct ManageProductTagListComponent: AmityComponentView {
                 }
                 
                 // Bottom Button
-                VStack(spacing: 0) {
-                    Rectangle()
-                        .fill(Color(viewConfig.defaultDarkTheme.baseColorShade4))
-                        .frame(height: 1)
-                    
-                    Button(action: {
-                        onAddProducts()
-                    }) {
-                        Text(AmityLocalizedStringSet.Social.productTagAddProducts.localizedString)
-                            .applyTextStyle(.bodyBold(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.baseColor) : Color(hex: "#40434E")))
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(Color(viewConfig.defaultDarkTheme.backgroundColor))
-                            .cornerRadius(8)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .stroke(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.secondaryColor.blend(.shade3)) : Color(hex: "#292B32"), lineWidth: 1)
-                            )
+                if canAddProducts {
+                    VStack(spacing: 0) {
+                        Rectangle()
+                            .fill(Color(viewConfig.defaultDarkTheme.baseColorShade4))
+                            .frame(height: 1)
+                        
+                        Button(action: {
+                            onAddProducts()
+                        }) {
+                            Text(AmityLocalizedStringSet.Social.productTagAddProducts.localizedString)
+                                .applyTextStyle(.bodyBold(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.baseColor) : Color(hex: "#40434E")))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(Color(viewConfig.defaultDarkTheme.backgroundColor))
+                                .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.secondaryColor.blend(.shade3)) : Color(hex: "#292B32"), lineWidth: 1)
+                                )
+                        }
+                        .disabled(!viewModel.canAddMore())
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                        .padding(.bottom, 24)
+                        .background(Color(viewConfig.defaultDarkTheme.backgroundColor))
                     }
-                    .disabled(!viewModel.canAddMore())
-                    .padding(.horizontal, 16)
-                    .padding(.top, 12)
-                    .padding(.bottom, 24)
-                    .background(Color(viewConfig.defaultDarkTheme.backgroundColor))
                 }
             }
         }

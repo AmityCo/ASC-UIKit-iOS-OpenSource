@@ -15,10 +15,11 @@ struct AmityProductCarouselView: View {
 
     let allProductTags: [AmityProductTagModel]
     let postId: String
+    var pageId: PageId? = nil
 
     @State private var showProductList: Bool = false
 
-    static var viewedProductIds = Set<String>()
+    @StateObject private var viewedProductTracker = ViewedProductTracker()
 
     private let maxDisplayCount = 5
 
@@ -36,7 +37,9 @@ struct AmityProductCarouselView: View {
                     ProductCarouselCardView(
                         productTag: productTag,
                         postId: postId,
-                        viewConfig: viewConfig
+                        pageId: pageId,
+                        viewConfig: viewConfig,
+                        viewedProductTracker: viewedProductTracker
                     )
                 }
 
@@ -72,6 +75,7 @@ struct AmityProductCarouselView: View {
     @ViewBuilder
     private var productTagListSheet: some View {
         let component = AmityProductTagListComponent(
+            pageId: pageId,
             productTags: allProductTags,
             renderMode: .post,
             sourceId: postId,
@@ -150,7 +154,9 @@ struct ProductCarouselSkeletonView: View {
 private struct ProductCarouselCardView: View {
     let productTag: AmityProductTagModel
     let postId: String
+    let pageId: PageId?
     let viewConfig: AmityViewConfigController
+    let viewedProductTracker: ViewedProductTracker
 
     private var isUnavailable: Bool {
         return productTag.object.isDeleted || productTag.object.status == .archived
@@ -238,10 +244,12 @@ private struct ProductCarouselCardView: View {
     // MARK: - Analytics
 
     private func trackProductView() {
-        guard !AmityProductCarouselView.viewedProductIds.contains(productTag.productId) else { return }
-        AmityProductCarouselView.viewedProductIds.insert(productTag.productId)
-
-        let location = "*/post_content_component/*"
+        let page = pageId?.rawValue ?? "*"
+        let location = "\(page)/post_content/product_tag"
+        
+        guard !viewedProductTracker.hasViewed(productTag.productId) else { return }
+        viewedProductTracker.markViewed(productTag.productId)
+        
         productTag.object.analytics.markAsViewed(
             location: location,
             sourceType: .post,
@@ -250,7 +258,8 @@ private struct ProductCarouselCardView: View {
     }
 
     private func trackProductClick() {
-        let location = "*/post_content_component/*"
+        let page = pageId?.rawValue ?? "*"
+        let location = "\(page)/post_content/product_tag"
         productTag.object.analytics.markAsClicked(
             location: location,
             sourceType: .post,
@@ -263,7 +272,7 @@ private struct ProductCarouselCardView: View {
         let visibleHeight = min(screenHeight, frame.maxY) - max(0, frame.minY)
         let visiblePercentage = (visibleHeight / frame.height) * 100
 
-        if visiblePercentage > 60 && !AmityProductCarouselView.viewedProductIds.contains(productTag.productId) {
+        if visiblePercentage > 60 {
             trackProductView()
         }
     }
