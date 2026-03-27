@@ -64,6 +64,7 @@ public class CommunityProfileViewModel: ObservableObject {
     @Published var hasCreateEventPermission = false
     
     let firstLoadTask = OneTimeTask()
+    let refreshFeedAfterUserJoinedCommunityTask = OneTimeTask()
 
     var postFeedViewModel: PostFeedViewModel
     var imageFeedViewModel: MediaFeedViewModel
@@ -140,7 +141,9 @@ public class CommunityProfileViewModel: ObservableObject {
             
             // If the user leave the community after approved the join request, refresh the feed.
             if self.joinStatus == .joined && community.isJoined == false {
-                self.refreshFeed()
+                self.refreshFeedAfterUserJoinedCommunityTask.perform {
+                    self.refreshFeed()
+                }
             }
         }
         

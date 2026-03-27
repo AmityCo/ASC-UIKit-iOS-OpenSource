@@ -132,7 +132,7 @@ public enum ComponentId: String {
     case myEventFeedComponent = "my_event_feed_component"
     case exploreEventFeedComponent = "explore_event_feed_component"
     
-    case productTagListBottomsheet = "product_tag_list_bottomsheet"
+    case productTagListBottomsheet = "product_tag_list"
     case productTagSelectionBottomsheet = "product_tag_selection_bottomsheet"
     
     case manageProductTagList = "manage_product_tag_list"
@@ -358,7 +358,7 @@ public enum ElementId: String {
 
     // ProductTagList
     case productTagListHeader = "product_tag_list_header"
-    case productTagListItem = "product_tag_list_item"
+    case productTagListItem = "product_tag"
     // Livestream Pinned Product
     case livestreamPinnedProduct = "livestream_pinned_product"
 }

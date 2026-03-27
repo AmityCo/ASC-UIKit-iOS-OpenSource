@@ -169,7 +169,6 @@ class LiveStreamViewerViewModel: ObservableObject {
         
         roomToken = roomManager.getRoom(roomId: roomId).observe { [weak self] data, error in
             guard let self, let room = data.snapshot else { return }
-            print("ReceiveRoomData \(room)")
             
             self.liveStreamChatViewModel?.refreshHostAndCoHostId(room: room)
             
@@ -261,7 +260,6 @@ class LiveStreamViewerViewModel: ObservableObject {
             let updatedPost = try await postManager.updateProductTags(postId: postId, productTags: productTagsArray)
             syncProductTagsFromPost(updatedPost)
         } catch {
-            print("[LiveStreamViewer] Failed to update product tags: \(error.localizedDescription)")
         }
     }
     
@@ -270,7 +268,6 @@ class LiveStreamViewerViewModel: ObservableObject {
             let updatedPost = try await postManager.pinProductTag(postId: postId, productId: productId)
             syncProductTagsFromPost(updatedPost)
         } catch {
-            print("[LiveStreamViewer] Failed to pin product tag: \(error.localizedDescription)")
         }
     }
     
@@ -279,7 +276,6 @@ class LiveStreamViewerViewModel: ObservableObject {
             let updatedPost = try await postManager.unpinProductTag(postId: postId)
             syncProductTagsFromPost(updatedPost)
         } catch {
-            print("[LiveStreamViewer] Failed to unpin product tag: \(error.localizedDescription)")
         }
     }
     

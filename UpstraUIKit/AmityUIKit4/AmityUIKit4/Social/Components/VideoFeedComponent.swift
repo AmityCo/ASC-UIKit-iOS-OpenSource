@@ -172,7 +172,8 @@ struct VideoFeedComponent: View {
                                 viewModel.showMediaViewer = false
                             }
                         },
-                        post: parentPostModel
+                        post: parentPostModel,
+                        pageId: viewConfig.pageId
                     )
                         .environmentObject(viewConfig)
                     

@@ -12,6 +12,9 @@ open class AmityNotificationTrayPageBehavior {
         public let postId: String?
         public let commentId: String?
         public let parentCommentId: String?
+        /// NEW in v4 — L0 root comment ID for L2 reply notifications.
+        /// Null for L0/L1 notification targets.
+        public let rootCommentId: String?
         public let communityId: String?
         public let userId: String?
         public let eventId: String?
@@ -22,6 +25,7 @@ open class AmityNotificationTrayPageBehavior {
             postId: String?,
             commentId: String?,
             parentCommentId: String?,
+            rootCommentId: String? = nil,
             communityId: String?,
             userId: String?,
             eventId: String? = nil,
@@ -31,6 +35,7 @@ open class AmityNotificationTrayPageBehavior {
             self.postId = postId
             self.commentId = commentId
             self.parentCommentId = parentCommentId
+            self.rootCommentId = rootCommentId
             self.communityId = communityId
             self.userId = userId
             self.eventId = eventId
@@ -41,7 +46,15 @@ open class AmityNotificationTrayPageBehavior {
     public init() { }
     
     open func goToPostDetailPage(context: AmityNotificationTrayPageBehavior.Context) {
-        let page = AmityPostDetailPage(id: context.postId ?? "", commentId: context.commentId, parentId: context.parentCommentId)
+        // Preload the reply thread when the notification target is a reply (parentCommentId is set),
+        // so the thread is auto-expanded and the target bubble is visible without manual interaction.
+        let page = AmityPostDetailPage(
+            id: context.postId ?? "",
+            commentId: context.commentId,
+            parentId: context.parentCommentId,
+            rootCommentId: context.rootCommentId,
+            preloadRepliesOfComment: context.parentCommentId != nil
+        )
         let vc = AmitySwiftUIHostingController(rootView: page)
         context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
     }
@@ -62,6 +75,12 @@ open class AmityNotificationTrayPageBehavior {
     open func goToEventDetailPage(context: AmityNotificationTrayPageBehavior.Context) {
         
         let page = AmityEventDetailPage(eventId: context.eventId ?? "")
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    open func goToEditProfilePage(context: AmityNotificationTrayPageBehavior.Context) {
+        let page = AmityEditUserProfilePage()
         let vc = AmitySwiftUIHostingController(rootView: page)
         context.page.host.controller?.navigationController?.pushViewController(vc, animated: true)
     }

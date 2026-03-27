@@ -35,6 +35,17 @@ struct NotificationTrayItemView: View {
                 AsyncImage(placeholder: AmityIcon.eventImagePlaceholder.imageResource, url: URL(string: eventUrl), contentMode: .fill)
                     .frame(width: 32, height: 32)
                     .clipShape(RoundedRectangle(cornerRadius: 6))
+            case .userProfileReset:
+                ZStack {
+                    Circle()
+                        .fill(Color(viewConfig.theme.primaryColor.blend(.shade2)))
+                        .frame(width: 32, height: 32)
+                    Image(AmityIcon.avatarPlaceholder.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.white)
+                        .frame(width: 12, height: 12)
+                }
             default:
                 AmityUserProfileImageView(
                     displayName: item.users.first?.displayName ?? "",
@@ -66,7 +77,7 @@ struct NotificationTrayItemView: View {
             Color(
                 item.isSeen
                 ? viewConfig.theme.backgroundColor
-                : viewConfig.theme.primaryColor.blend(.shade3)))
+                : viewConfig.theme.primaryColor.blend(.shade4)))
     }
 }
 

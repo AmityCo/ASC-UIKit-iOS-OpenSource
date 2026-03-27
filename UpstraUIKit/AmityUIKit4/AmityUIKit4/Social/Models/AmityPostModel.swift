@@ -398,6 +398,8 @@ public class AmityPostModel: Identifiable {
                     livestreamState = .live
                 } else if roomData.status == AmityRoomStatus.recorded {
                     livestreamState = .recorded
+                } else if roomData.status == AmityRoomStatus.error {
+                    livestreamState = .error
                 } else {
                     livestreamState = .idle
                 }

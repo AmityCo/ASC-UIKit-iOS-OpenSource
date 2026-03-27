@@ -40,6 +40,7 @@ public struct AmityCommentModel: Identifiable, Equatable  {
     let syncState: AmitySyncState
     var communityId: String?
     let flagCount: Int
+    public var links: [AmityLink] = []
     
     // Due to AmityChat 4.0.0 requires comment object for editing and deleting
     // So, this is a workaroud for passing the original object.
@@ -91,6 +92,7 @@ public struct AmityCommentModel: Identifiable, Equatable  {
         
         syncState = comment.syncState
         flagCount = comment.flagCount
+        links = comment.links
         
         // reactions are ordered by the count. if the count is equal, order by alphabet
         // if the count is 1 and the reaction is the same as current user's first reaction, remove it from the list

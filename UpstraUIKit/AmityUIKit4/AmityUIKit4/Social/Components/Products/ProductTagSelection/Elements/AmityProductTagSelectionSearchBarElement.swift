@@ -57,7 +57,7 @@ struct AmityProductTagSelectionSearchBarElement: AmityElementView {
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                            .foregroundColor(Color(viewConfig.theme.baseColorShade3))
                             .frame(width: 17, height: 17)
                     }
                 }

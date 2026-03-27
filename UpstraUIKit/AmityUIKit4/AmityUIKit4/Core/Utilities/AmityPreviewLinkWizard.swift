@@ -46,6 +46,19 @@ public class AmityPreviewLinkWizard {
         return links
     }
     
+    /// Detects URLs in `text` via regex and converts them into `[AmityLink]` objects
+    /// with accurate `index`/`length` positions. `renderPreview` is always `false`;
+    /// no preview metadata is fetched here.
+    func buildLinks(from text: String) -> [AmityLink] {
+        let detectedURLs = detectLinks(text: text)
+        return detectedURLs.compactMap { urlString in
+            guard let range = text.range(of: urlString) else { return nil }
+            let index = text.distance(from: text.startIndex, to: range.lowerBound)
+            let length = text.distance(from: range.lowerBound, to: range.upperBound)
+            return AmityLink(url: urlString, index: index, length: length, renderPreview: false)
+        }
+    }
+    
     func detectLinks(text: String) -> [String] {
         if let cachedLinks = linkCache[text] {
             return cachedLinks

@@ -25,7 +25,12 @@ enum PostTargetMembershipStatus {
 
 public enum AmityCommentButtonActionType {
     case react(AmityCommentModel)
-    case reply(AmityCommentModel)
+    /// - Parameters:
+    ///   - comment: The comment the user tapped Reply on.
+    ///   - resolvedParentId: The `parentId` to use when creating the new comment.
+    ///     For L0/L1 targets this is `comment.commentId`.
+    ///     For L2 targets this is `comment.parentId` (L1 ancestor — flat model).
+    case reply(AmityCommentModel, resolvedParentId: String?)
     case meatball(AmityCommentModel)
     case userProfile(String)
 }
@@ -43,6 +48,16 @@ public struct AmityCommentView: View {
     let hideButtonView: Bool
     let seeMoreLineLimit: Int
     let commentButtonAction: AmityCommentButtonAction
+    /// Pre-resolved `parentId` to use when creating a reply to this comment.
+    /// Nil means fall back to `comment.commentId` (correct for L0 and L1 targets).
+    /// Set to `comment.parentId` for L2 targets so all nested replies are
+    /// flattened under the L1 ancestor.
+    private let replyParentId: String?
+    /// When `true`, a vertical line is drawn beneath the avatar to indicate
+    /// this L1 comment has child replies below it (matches Figma "Nested line" design).
+    private let showChildLine: Bool
+    /// Optional override for the bubble background color (e.g. highlight on navigation from mention_in_reply).
+    private let highlightColor: Color?
     @State var showSheet: Bool = false
     @State var showReactionSheet: Bool = false
     
@@ -55,6 +70,9 @@ public struct AmityCommentView: View {
                 hideMeatballButton: Bool = false,
                 hideButtonView: Bool = false,
                 seeMoreLineLimit: Int = 8,
+                replyParentId: String? = nil,
+                showChildLine: Bool = false,
+                highlightColor: Color? = nil,
                 commentButtonAction: @escaping AmityCommentButtonAction) {
         self.comment = comment
         self.hideReplyButton = hideReplyButton
@@ -62,18 +80,31 @@ public struct AmityCommentView: View {
         self.hideButtonView = hideButtonView
         self.commentButtonAction = commentButtonAction
         self.seeMoreLineLimit = seeMoreLineLimit
+        self.replyParentId = replyParentId
+        self.showChildLine = showChildLine
+        self.highlightColor = highlightColor
     }
     
     public var body: some View {
         HStack(alignment: .top, spacing: 0) {
-            AmityUserProfileImageView(displayName: comment.displayName, avatarURL: URL(string: comment.avatarURL))
-                .frame(width: 32, height: 32)
-                .clipShape(.circle)
-                .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))
-                .onTapGesture {
-                    commentButtonAction(.userProfile(comment.userId))
+            VStack(spacing: 0) {
+                AmityUserProfileImageView(displayName: comment.displayName, avatarURL: URL(string: comment.avatarURL))
+                    .frame(width: 32, height: 32)
+                    .clipShape(.circle)
+                    .onTapGesture {
+                        commentButtonAction(.userProfile(comment.userId))
+                    }
+                    .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.avatarImageView)
+
+                if showChildLine {
+                    Capsule()
+                        .fill(Color(viewConfig.theme.baseColorShade4))
+                        .frame(width: 2)
+                        .frame(maxHeight: .infinity)
+                        .padding(.top, 8)
                 }
-                .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.avatarImageView)
+            }
+            .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))
             
             VStack(alignment: .leading, spacing: 0) {
                 ZStack(alignment: .bottomLeading) {
@@ -102,7 +133,7 @@ public struct AmityCommentView: View {
                                 .isHidden(!comment.isModerator)
                                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.badgeImageView)
                             
-                            ExpandableText(comment.text, metadata: comment.metadata, mentionees: comment.mentionees, onTapMentionee: { userId in
+                            ExpandableText(comment.text, metadata: comment.metadata, mentionees: comment.mentionees, links: comment.links, onTapMentionee: { userId in
                                 commentButtonAction(.userProfile(userId))
                             })
                             .lineLimit(seeMoreLineLimit)
@@ -119,7 +150,7 @@ public struct AmityCommentView: View {
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentTextView)
                             .id(comment.text)
                         }
-                        .background(Color(viewConfig.theme.baseColorShade4))
+                        .background(highlightColor ?? Color(viewConfig.theme.baseColorShade4))
                         .clipShape(RoundedCorner(radius: 12, corners: [.topRight, .bottomLeft, .bottomRight]))
                         
                         Button {
@@ -227,9 +258,9 @@ public struct AmityCommentView: View {
                                             if error.isAmityErrorCode(.itemNotFound) {
                                                 let message: String
                                                 if let post = commentCoreViewModel.post, post.dataTypeInternal == .clip {
-                                                    message = "This clip is no longer available."
+                                                    message = AmityLocalizedStringSet.Comment.clipUnavailableToastMessage.localizedString
                                                 } else {
-                                                    message = "This post is no longer available."
+                                                    message = AmityLocalizedStringSet.Comment.postUnavailableToastMessage.localizedString
                                                 }
                                                 
                                                 Toast.showToast(style: .warning, message: message)
@@ -266,7 +297,7 @@ public struct AmityCommentView: View {
                                     return
                                 }
                                 
-                                commentButtonAction(.reply(comment))
+                                commentButtonAction(.reply(comment, resolvedParentId: replyParentId))
                             }
                         } label: {
                             Text(AmityLocalizedStringSet.Comment.replyButtonText.localizedString)
@@ -297,7 +328,8 @@ public struct AmityCommentView: View {
             
             Spacer(minLength: 16)
         }
-        .padding(.vertical, 4)
+        .padding(.top, 4)
+        .padding(.bottom, showChildLine ? 0 : 4)
         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentItem)
     }
     

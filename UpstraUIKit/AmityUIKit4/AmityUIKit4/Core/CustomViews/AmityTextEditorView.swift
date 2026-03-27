@@ -52,6 +52,10 @@ extension AmityTextEditorView: AmityViewBuildable {
     public func hightlightColor(_ value: UIColor) -> Self {
         mutating(keyPath: \.hightlightColor, value: value)
     }
+    
+    public func enableLinkHighlight(_ value: Bool) -> Self {
+        mutating(keyPath: \.enableLinkHighlight, value: value)
+    }
 }
 
 
@@ -90,12 +94,16 @@ public struct AmityTextEditorView: View {
     private var backgroundColor: UIColor = .white
 
     private var hightlightColor: UIColor = .blue
+    private var enableLinkHighlight: Bool = false
 
     public init(_ mentionManagerType: MentionManagerType, text: Binding<String>, mentionData: Binding<MentionData>, textViewHeight: CGFloat) {
         self._text = text
         self._mentionData = mentionData
         self._textEditorHeight = State(initialValue: textViewHeight)
         self.textEditorMinHeight = textViewHeight
+        // Hide the placeholder immediately when the view is created with pre-existing text
+        // (e.g. after a mention prefill triggers a .id()-based view recreation).
+        self._hidePlaceholder = State(initialValue: !text.wrappedValue.isEmpty)
         
         let mentionManger = MentionManager(withType: mentionManagerType)
 
@@ -109,12 +117,28 @@ public struct AmityTextEditorView: View {
                     .onAppear {
                         textEditorInitialHeight = geometry.size.height
                         
-                        if autoFocusTextEditor {
-                            viewModel.textView.becomeFirstResponder()
-                        }
-                        
                         if let metadata = mentionData.metadata {
                             viewModel.mentionManager.setMentions(metadata: metadata, inText: text)
+                        }
+                        
+                        if enableLinkHighlight {
+                            applyLinkHighlight(to: viewModel.textView)
+                        }
+                        
+                        if autoFocusTextEditor {
+                            DispatchQueue.main.async {
+                                viewModel.textView.becomeFirstResponder()
+                                let endPosition = viewModel.textView.endOfDocument
+                                viewModel.textView.selectedTextRange = viewModel.textView.textRange(from: endPosition, to: endPosition)
+                            }
+                        }
+                        
+                        viewModel.didFinishMentionHighlight = {
+                            DispatchQueue.main.async {
+                                if enableLinkHighlight {
+                                    self.applyLinkHighlight(to: self.viewModel.textView)
+                                }
+                            }
                         }
                     }
                     .onChange(of: text) { value in
@@ -128,11 +152,19 @@ public struct AmityTextEditorView: View {
                         
                         let paddedHeight = textHeight + defaultInset.top + defaultInset.bottom
                         textEditorHeight = max(textEditorMinHeight, min(paddedHeight, textEditorMaxHeight))
+                        
+                        if enableLinkHighlight {
+                            applyLinkHighlight(to: viewModel.textView)
+                        }
                     }
                     .onReceive(viewModel.textView.textPublisher, perform: { text in
                         self.mentionData.metadata = viewModel.mentionManager.getMetadata()
                         self.mentionData.mentionee = viewModel.mentionManager.getMentionees()
                         self.text = text
+                        
+                        if enableLinkHighlight {
+                            applyLinkHighlight(to: viewModel.textView)
+                        }
                     })
                     .onChange(of: mentionedUsers.count) { count in
                         let listHeight = mentionedUsers.count < 5 ? CGFloat(mentionedUsers.count) * 50.0 : 250.0
@@ -202,6 +234,10 @@ public struct AmityTextEditorView: View {
         }
         .onReceive(viewConfig.$theme) { value in
             viewModel.updateAttributes(hightlightColor: value.primaryColor, textColor: value.baseColor)
+            
+            if enableLinkHighlight {
+                applyLinkHighlight(to: viewModel.textView)
+            }
         }
         .frame(height: textEditorHeight)
     }
@@ -216,6 +252,33 @@ public struct AmityTextEditorView: View {
         case .none:
             0.0
         }
+    }
+    
+    private func applyLinkHighlight(to textView: UITextView) {
+        guard let attributedText = textView.attributedText?.mutableCopy() as? NSMutableAttributedString else { return }
+        
+        let selectedRange = textView.selectedRange
+        let text = attributedText.string
+        let fullRange = NSRange(location: 0, length: text.utf16.count)
+        let extractedLinks = viewModel.linkManager.extractLinks(from: text)
+        
+        // Remove existing link highlights
+        attributedText.enumerateAttributes(in: fullRange) { attribute, range, _ in
+            if attribute[.link] as? Bool == true {
+                attributedText.removeAttribute(.foregroundColor, range: range)
+                attributedText.removeAttribute(.link, range: range)
+            }
+        }
+        
+        // Apply new link highlights
+        for link in extractedLinks {
+            attributedText.addAttribute(.foregroundColor, value: viewModel.highlightAttributes[.foregroundColor] ?? UIColor(), range: link.range)
+            attributedText.addAttribute(.link, value: true, range: link.range)
+        }
+        
+        textView.attributedText = attributedText
+        textView.selectedRange = selectedRange
+        textView.typingAttributes = viewModel.typingAttributes
     }
 }
 

@@ -14,14 +14,18 @@ public struct AmityEditCommentView: View {
     private let comment: AmityCommentModel
     private let cancelAction: () -> Void
     private let saveAction: (AmityCommentModel) -> Void
+    private let showChildLine: Bool
     @State private var bottomPadding: CGFloat = 0.0
     
     @EnvironmentObject var viewConfig: AmityViewConfigController
+    @EnvironmentObject var commentCoreViewModel: CommentCoreViewModel
     
-    public init(comment: AmityCommentModel, cancelAction: @escaping () -> Void, saveAction: @escaping (AmityCommentModel) -> Void) {
+    public init(comment: AmityCommentModel, showChildLine: Bool = false, cancelAction: @escaping () -> Void, saveAction: @escaping (AmityCommentModel) -> Void) {
         self.comment = comment
+        self.showChildLine = showChildLine
         self.cancelAction = cancelAction
         self.saveAction = saveAction
+        self._text = State(initialValue: comment.text)
     }
     
     public var body: some View {
@@ -37,11 +41,17 @@ public struct AmityEditCommentView: View {
                     .maxExpandableHeight(120)
                     .mentionListPosition(.bottom(20.0))
                     .autoFocus(true)
+                    .enableLinkHighlight(true)
                     .textColor(viewConfig.theme.baseColor)
                     .backgroundColor(viewConfig.theme.backgroundColor)
                     .hightlightColor(viewConfig.theme.primaryColor)
                     .willShowMentionList { listHeight in
                         bottomPadding = listHeight
+                        if listHeight > 0 {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                commentCoreViewModel.scrollToEditingAnchorId = "edit-bottom-\(comment.commentId)"
+                            }
+                        }
                     }
                     .padding(12)
                     .background(
@@ -68,6 +78,7 @@ public struct AmityEditCommentView: View {
                         editedComment.metadata = mentionData.metadata
                         editedComment.mentioneeBuilder = mentionData.mentionee
                         
+                        hideKeyboard()
                         saveAction(editedComment)
                     } label: {
                         Text(AmityLocalizedStringSet.General.save.localizedString)
@@ -85,8 +96,27 @@ public struct AmityEditCommentView: View {
             }
             Spacer(minLength: 16)
         }
+        .padding([.top, .bottom], 3)
+        .overlay(
+            Color.clear
+                .frame(height: 1)
+                .id("edit-bottom-\(comment.commentId)")
+            , alignment: .bottom
+        )
+        .background(
+            Group {
+                if showChildLine {
+                    Capsule()
+                        .fill(Color(viewConfig.theme.baseColorShade4))
+                        .frame(width: 2)
+                        .frame(maxHeight: .infinity)
+                        .padding(.top, 43) // 3 (top padding) + 32 (avatar) + 8 (gap)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.leading, 27) // 12 (avatar leading padding) + 16 (half avatar width) - 1 (half capsule width)
+        )
         .onAppear {
-            text = comment.text
             mentionData.metadata = comment.metadata
         }
         .onDisappear {

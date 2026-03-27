@@ -11,6 +11,7 @@ import Combine
 
 public class AmityLiveStreamChatViewModel: ObservableObject {
     @Published var messages: [MessageModel] = []
+    private(set) var deletedMessageIds: [String: Bool] = [:]
     @Published var loadingStatus: AmityLoadingStatus = .notLoading
     @Published var messageInput: String = ""
     @Published var showBottomSheet: (show: Bool, message: MessageModel?) = (false, nil)
@@ -277,7 +278,15 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         messageCollection = chatManager.queryMessages(options: queryOptions)
         
         collectionCancellable = messageCollection?.$snapshots.sink(receiveValue: { [weak self] messages in
-            self?.messages = messages.map { MessageModel(message: $0) }
+            self?.messages = messages.map {
+                
+                // Store deleted message ids to prevent the stale cache from BE
+                if self?.deletedMessageIds[$0.uniqueId] == nil && $0.isDeleted {
+                    self?.deletedMessageIds[$0.uniqueId] = true
+                }
+                
+                return MessageModel(message: $0)
+            }
         })
         
         loadingStatusCancellable = messageCollection?.$loadingStatus.sink(receiveValue: { [weak self] status in
