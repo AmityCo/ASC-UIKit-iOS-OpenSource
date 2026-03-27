@@ -56,6 +56,8 @@ public struct AmityProductTagListComponent: AmityComponentView {
         .productTagListBottomsheet
     }
 
+    @StateObject private var viewedProductTracker = ViewedProductTracker()
+
     // MARK: - Properties
 
     /// Array of product tags to display
@@ -116,7 +118,6 @@ public struct AmityProductTagListComponent: AmityComponentView {
     // MARK: - Body
 
     public var body: some View {
-        // Hide component when no products tagged (REQ-003)
         if productTags.isEmpty {
             EmptyView()
         } else {
@@ -136,7 +137,6 @@ public struct AmityProductTagListComponent: AmityComponentView {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade3))
                 .padding(.top, 8)
 
-            // Header with context-aware label (REQ-001, v2)
             AmityProductTagListHeaderElement(
                 pageId: pageId,
                 componentId: id,
@@ -155,7 +155,6 @@ public struct AmityProductTagListComponent: AmityComponentView {
                     .padding(.bottom, 16)
             }
 
-            // Vertical list of product tags (REQ-002)
             ScrollView {
                 productListView
             }
@@ -164,7 +163,6 @@ public struct AmityProductTagListComponent: AmityComponentView {
         .accessibilityLabel("Products tagged in this post")
     }
 
-    /// Vertical list of product tag elements (REQ-002, REQ-006)
     private var productListView: some View {
         LazyVStack(alignment: .leading, spacing: 12) {
             ForEach(productTags, id: \.productId) { productTag in
@@ -179,7 +177,8 @@ public struct AmityProductTagListComponent: AmityComponentView {
                         onProductClick?(productTag)
                     },
                     sourceId: sourceId,
-                    sourceType: sourceType
+                    sourceType: sourceType,
+                    viewedProductTracker: viewedProductTracker
                 )
                 .environmentObject(viewConfig)
             }

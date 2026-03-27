@@ -18,6 +18,72 @@ struct AmityEventInfoComponent: View {
     
     @StateObject private var viewConfig: AmityViewConfigController = .init(pageId: .socialHomePage)
     
+    /// Resolves the thumbnail URL using priority: Event cover image -> creator-uploaded → live thumbnail → placeholder
+    private var resolvedThumbnailURL: String {
+        let room = viewModel.event?.room
+        
+        // 1. Event cover image (if available) - this takes precedence over room thumbnails
+        if let eventCoverImageUrl = viewModel.event?.coverImage?.mediumFileURL {
+            return eventCoverImageUrl
+        }
+        
+        // 2. Creator-uploaded thumbnail (thumbnailFileId)
+        if let creatorThumbnail = room?.getThumbnail()?.mediumFileURL, !creatorThumbnail.isEmpty {
+            return creatorThumbnail
+        }
+        
+        // 3. Live thumbnail (Mux auto-generated)
+        if let liveThumbnail = room?.liveThumbnailUrl, !liveThumbnail.isEmpty {
+            return liveThumbnail
+        }
+        
+        // 4. No thumbnail available → placeholder
+        return ""
+    }
+
+    private var contentHeight: CGFloat {
+        let height16x9: CGFloat = 208
+        let height4x5: CGFloat = 480
+        
+        let room = viewModel.event?.room
+        let streamStatus = room?.status ?? .idle
+        
+        // Idle state always uses 16:9 aspect ratio with placeholder thumbnail
+        if streamStatus == .idle {
+            return height16x9
+        }
+        
+        // Event cover image (if available)
+        if let eventCoverImageUrl = viewModel.event?.coverImage?.mediumFileURL {
+            return height16x9
+        }
+        
+        // Creator-uploaded thumbnail uses platform default (16:9 for iOS)
+        if let creatorThumbnail = room?.getThumbnail()?.mediumFileURL, !creatorThumbnail.isEmpty {
+            return height16x9
+        }
+
+        // Live/recorded thumbnails use resolution data to determine aspect ratio
+        let resolution: AmityRoomResolution? = {
+            switch streamStatus {
+            case .live:
+                return room?.liveResolution
+            case .recorded:
+                return room?.recordedResolution
+            default:
+                return room?.liveResolution ?? room?.recordedResolution
+            }
+        }()
+
+        if let width = resolution?.width, let height = resolution?.height, width > 0, height > 0 {
+            // Portrait or square → 4:5, Landscape → 16:9
+            return height >= width ? height4x5 : height16x9
+        }
+
+        // iOS default: 16:9
+        return height16x9
+    }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
@@ -82,11 +148,8 @@ struct AmityEventInfoComponent: View {
                     }
                     
                     ZStack(alignment: .center) {
-                        let eventCoverImageUrl = viewModel.event?.coverImage?.mediumFileURL ?? ""
-                        let streamThumbnailUrl = stream?.getThumbnail()?.mediumFileURL
-                        let livestreamThumbnailUrl = streamThumbnailUrl ?? eventCoverImageUrl
-                        AsyncImage(placeholder: AmityIcon.livestreamPlaceholderGray.imageResource, url: URL(string: livestreamThumbnailUrl), contentMode: .fill)
-                            .frame(height: 192)
+                        AsyncImage(placeholder: AmityIcon.livestreamPlaceholderGray.imageResource, url: URL(string: resolvedThumbnailURL), contentMode: .fill)
+                            .frame(height: contentHeight)
                             .cornerRadius(8)
                         
                         VStack(alignment: .leading) {

@@ -67,9 +67,18 @@ public struct AmityLocalizedStringSet {
         static let replyButtonText = "comment_reply_button_text"
         static let editedText = "comment_edited_text"
         static let viewMoreReplyText = "view_more_reply_text"
+        static let replyUnavailableToastMessage = "reply_unavailable_toast_message"
         static let disableCreateCommentText = "disable_create_comment_text"
         static let commentWithBannedWordsErrorMessage = "comment_with_banned_words_error_message"
         static let commentWithNotAllowedLink = "comment_with_not_allowed_link_error"
+        static let editReplyBottomSheetTitle = "edit_reply_bottom_sheet_title"
+        static let deleteReplyBottomSheetTitle = "delete_reply_bottom_sheet_title"
+        static let deleteReplyTitle = "delete_reply_title"
+        static let deleteReplyMessage = "delete_reply_message"
+        static let commentUnavailableToastMessage = "comment_unavailable_toast_message"
+        static let postUnavailableToastMessage = "post_unavailable_toast_message"
+        static let clipUnavailableToastMessage = "clip_unavailable_toast_message"
+        static let commentEditError = "comment_edit_error"
     }
     
     public struct Chat {
@@ -284,6 +293,9 @@ public struct AmityLocalizedStringSet {
         
         static let userProfileEditAlertTitle = "user_profile_edit_alert_title"
         static let userProfileEditAlertMessage = "user_profile_edit_alert_message"
+        static let userProfileEditSuccess = "user_profile_edit_success"
+        static let userProfileEditBannedWord = "user_profile_edit_banned_word"
+        static let userProfileEditFailed = "user_profile_edit_failed"
         static let userProfileFollowRequestTitle = "user_profile_follow_request_title"
         
         

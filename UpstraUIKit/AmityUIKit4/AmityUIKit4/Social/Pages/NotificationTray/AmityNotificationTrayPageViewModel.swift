@@ -113,6 +113,7 @@ struct NotificationItem: Identifiable {
         case eventReminder = "event_reminder"
         case eventCreated = "event_created"
         case inviteRoomCoHost = "room_cohost_invite"
+        case userProfileReset = "user_profile_reset"
         case none = ""
     }
     
@@ -127,6 +128,7 @@ struct NotificationItem: Identifiable {
         case joinRequest = "join_request"
         case event
         case invitation
+        case user
     }
     
     enum TargetType: String {
@@ -154,6 +156,8 @@ struct NotificationItem: Identifiable {
     let referenceId: String
     let referenceType: String
     let parentId: String?
+    let rootId: String?
+    let latestCommentId: String?
     let event: AmityEvent?
 
     init(model: AmityNotificationTrayItem) {
@@ -176,13 +180,23 @@ struct NotificationItem: Identifiable {
         self.referenceId = model.referenceId
         self.referenceType = model.referenceType
         self.parentId = model.parentId
+        self.rootId = model.rootId
+        self.latestCommentId = model.latestCommentId
         self.object = model
         self.event = model.event
     }
     
     @available(iOS 15, *)
     func getHighlightedText() -> AttributedString {
-        let highlightValues = data.map { ($0.text, $0.range)}
+        var highlightValues = data.map { ($0.text, $0.range)}
+        
+        if trayItemCategory == .userProfileReset {
+            let textToHighlight = "Your profile information was reset"
+            if let range = text.range(of: textToHighlight) {
+                highlightValues.append((textToHighlight, NSRange(range, in: text)))
+            }
+        }
+        
         return TextHighlighter.highlightTexts(texts: highlightValues, in: AttributedString(text), attributes: [.font: UIFont.systemFont(ofSize: 15, weight: .semibold)])
     }
     
@@ -196,6 +210,8 @@ struct NotificationItem: Identifiable {
         var postId: String?
         var commentId: String?
         var parentId: String?
+        var rootCommentId: String?
+        var latestCommentId: String?
         var userId: String?
         var eventId: String?
         var roomId: String?
@@ -240,9 +256,17 @@ struct NotificationItem: Identifiable {
                 if item.targetType == .room {
                     roomId = item.targetId
                 }
+            case .user:
+                break
             }
             
             parentId = item.parentId
+            
+            // NEW v4: Forward rootId and latestCommentId for L2 scoped render & highlight.
+            // rootCommentId = L0 root comment ID; latestCommentId = highlight target bubble.
+            rootCommentId = item.rootId
+            latestCommentId = item.latestCommentId
+            
             communityId = item.targetType == .community ? item.object.targetId : nil
         }
     }
@@ -267,6 +291,7 @@ extension AmityNotificationTrayItem {
           Reference Type: \(referenceType)
           Action Reference Id: \(actionReferenceId)
           Parent Id: \(parentId)
+          Root Id: \(rootId)
           Text: \(text)
           Template: \(templatedText)
           """

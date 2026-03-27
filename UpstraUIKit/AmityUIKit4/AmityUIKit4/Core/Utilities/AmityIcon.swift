@@ -122,6 +122,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case videoAttatchmentIcon = "videoAttatchmentIcon"
     case attatchmentIcon = "attatchmentIcon"
     case downArrowIcon = "downArrowIcon"
+    case viewMoreReplyArrowIcon = "viewMoreReplyArrowIcon"
     case noSearchableIcon = "noSearchableIcon"
     case defaultSearchIcon = "defaultSearchIcon"
     case mediaUploadErrorIcon = "mediaUploadErrorIcon"

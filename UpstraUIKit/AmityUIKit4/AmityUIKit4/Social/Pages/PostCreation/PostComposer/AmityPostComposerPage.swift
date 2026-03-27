@@ -665,14 +665,32 @@ public struct AmityPostComposerPage: AmityPageView {
 
             let isInCreateMode = viewModel.isInCreateMode
             let sentProductTagCount = viewModel.productTags.count
+            
+            // Prepare product tags for text and attachments if catalogue is enabled
+            var textProductTags: [AmityProductTagModel]? = nil
+            var attachmentProductTags: AmityAttachmentProductTags? = nil
+            if viewModel.isProductCatalogueEnabled {
+                textProductTags = viewModel.textProductTags
+                attachmentProductTags = viewModel.attachmentProductTags
+            }
 
             do {
                 // Create or edit post
                 let post: AmityPost?
                 if isInCreateMode {
-                    post = try await viewModel.createPost(medias: mediaAttatchmentViewModel.medias, files: [], hashtags: textEditorViewModel.existingHashtags, links: viewModel.getEmbeddedLinks())
+                    post = try await viewModel.createPost(medias: mediaAttatchmentViewModel.medias,
+                                                          files: [],
+                                                          hashtags: textEditorViewModel.existingHashtags,
+                                                          links: viewModel.getEmbeddedLinks(),
+                                                          textProductTags: textProductTags,
+                                                          attachmentProductTags: attachmentProductTags)
                 } else {
-                    post = try await viewModel.editPost(medias: mediaAttatchmentViewModel.medias, files: [], hashtags: textEditorViewModel.existingHashtags, links: viewModel.getEmbeddedLinks())
+                    post = try await viewModel.editPost(medias: mediaAttatchmentViewModel.medias,
+                                                        files: [],
+                                                        hashtags: textEditorViewModel.existingHashtags,
+                                                        links: viewModel.getEmbeddedLinks(),
+                                                        textProductTags: textProductTags,
+                                                        attachmentProductTags: attachmentProductTags)
                     
                     // Determine which media files were deleted (including all media types)
                     let currentMediaFileIds = mediaAttatchmentViewModel.medias.compactMap { media -> String? in

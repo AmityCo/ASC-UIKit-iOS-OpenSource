@@ -46,10 +46,6 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                 ForEach(0..<5, id: \.self) { index in
                     VStack(spacing: 0) {
                         PostContentSkeletonView()
-                        
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(height: 8)
                     }
                     .listRowInsets(EdgeInsets())
                     .modifier(HiddenListSeparator())

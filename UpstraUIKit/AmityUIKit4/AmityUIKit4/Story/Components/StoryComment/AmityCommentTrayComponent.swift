@@ -19,7 +19,7 @@ public struct AmityCommentTrayComponent: AmityComponentView {
     
     @StateObject private var commentCoreViewModel: CommentCoreViewModel
     @StateObject private var commentComposerViewModel: CommentComposerViewModel
-    @StateObject private var commentBottomSheetViewModel = CommentBottomSheetViewModel()
+    @StateObject private var commentBottomSheetViewModel: CommentBottomSheetViewModel
     
     private let avatarURL: URL? = URL(string: AmityUIKitManagerInternal.shared.client.user?.snapshot?.getAvatarInfo()?.fileURL ?? "")
     @StateObject private var viewConfig: AmityViewConfigController
@@ -37,6 +37,9 @@ public struct AmityCommentTrayComponent: AmityComponentView {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .commentTrayComponent))
         self.pageId = pageId
         
+        let bottomSheetVM = CommentBottomSheetViewModel()
+        bottomSheetVM.checkDeletePermission(communityId: community?.communityId)
+        self._commentBottomSheetViewModel = StateObject(wrappedValue: bottomSheetVM)
     }
     
     public var body: some View {
@@ -60,12 +63,16 @@ public struct AmityCommentTrayComponent: AmityComponentView {
                     .frame(height: 1)
                     .foregroundColor(Color(viewConfig.theme.baseColorShade4))
         
-                CommentComposerView(viewModel: commentComposerViewModel)
+                CommentComposerView(viewModel: commentComposerViewModel, onL2ReplyCreated: { comment, l1ParentId in
+                        commentCoreViewModel.registerOptimisticL2Reply(comment: comment, l1ParentId: l1ParentId)
+                    }, onReplyCreated: { replyTargetCommentId in
+                        commentCoreViewModel.expandRepliesForCommentId = replyTargetCommentId
+                    })
                     .isHidden(commentCoreViewModel.hideCommentButtons, remove: true)
             }
         }
         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
-                     height: commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false ? .fixed(204) : .fixed(148),
+                     height: (commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false || commentBottomSheetViewModel.hasDeletePermission) ? .fixed(204) : .fixed(148),
                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
                 commentCoreViewModel.editingComment = comment
@@ -98,8 +105,8 @@ public struct AmityCommentTrayComponent: AmityComponentView {
         switch type {
         case .react(_): break
             // Do nothing since it has rendering orchestration issue.
-        case .reply(let comment):
-            commentComposerViewModel.replyState = (true, comment)
+        case .reply(let comment, let resolvedParentId):
+            commentComposerViewModel.handleReplyAction(comment: comment, resolvedParentId: resolvedParentId)
         case .meatball(let comment):
             hideKeyboard() 
             

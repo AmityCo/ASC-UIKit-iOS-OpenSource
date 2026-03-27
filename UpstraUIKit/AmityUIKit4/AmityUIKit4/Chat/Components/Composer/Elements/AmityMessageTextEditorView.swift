@@ -44,6 +44,10 @@ extension AmityMessageTextEditorView: AmityViewBuildable {
     public func scrollEnabled(_ value: Bool) -> Self {
         mutating(keyPath: \.scrollEnabled, value: value)
     }
+    
+    public func displayInlineSuggestionView(_ value: Bool) -> Self {
+        mutating(keyPath: \.displayInlineSuggestionView, value: value)
+    }
 }
 
 public struct AmityMessageTextEditorView: View {
@@ -70,6 +74,7 @@ public struct AmityMessageTextEditorView: View {
     private var maxHashtagCount: Int = 5
     private var enableProductMention: Bool = false
     private var scrollEnabled: Bool = true
+    private var displayInlineSuggestionView: Bool = true
     
     public init(_ viewModel: AmityTextEditorViewModel, text: Binding<String>, mentionData: Binding<MentionData>, mentionedUsers: Binding<[AmityMentionUserModel]>, links: Binding<[LinkDetail]?>? = nil, textViewHeight: CGFloat, textEditorMaxHeight: CGFloat = 106, placeholderPadding: CGFloat = 5) {
         self._text = text
@@ -185,14 +190,16 @@ public struct AmityMessageTextEditorView: View {
             }
         }
         .onChange(of: viewModel.showSuggestionView) { show in
-            if show {
-                showSuggestionOverlay()
-            } else {
-                SuggestionOverlayWindow.dismiss()
+            if displayInlineSuggestionView {
+                if show {
+                    showSuggestionOverlay()
+                } else {
+                    SuggestionOverlayWindow.dismiss()
+                }
             }
         }
         .onChange(of: viewModel.suggestionViewCursorRect) { newRect in
-            if viewModel.showSuggestionView {
+            if viewModel.showSuggestionView && displayInlineSuggestionView {
                 SuggestionOverlayWindow.updatePosition(at: newRect)
             }
         }

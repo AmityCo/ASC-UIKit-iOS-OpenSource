@@ -181,7 +181,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                 }
                 
                 // Message content
-                if message.isDeleted {
+                if viewModel.deletedMessageIds[message.uniqueId] == true {
                     HStack(spacing: 6) {
                         Image(AmityIcon.trashBinIcon.getImageResource())
                             .resizable()
@@ -214,7 +214,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 24, height: 20)
                 }
-            } else if !message.isDeleted {
+            } else if viewModel.deletedMessageIds[message.uniqueId] != true {
                 Button {
                     viewModel.showBottomSheet.message = message
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

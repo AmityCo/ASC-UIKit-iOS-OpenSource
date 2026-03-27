@@ -41,8 +41,6 @@ struct CommentListView<Content>: View where Content: View {
                         Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
                     })
                 } else {
-                    // To support scroll to particular comment & bounce animation when navigating to comment through notification tray page
-                    // We cannot do that in LazyVStack as the comment isn't rendered.
                     VStack(spacing: 0) {
                         getContent(proxy: proxy)
                     }
@@ -56,6 +54,13 @@ struct CommentListView<Content>: View where Content: View {
                 if commentCoreViewModel.hasScrolledToTop != (offsetY < -1) {
                     commentCoreViewModel.hasScrolledToTop.toggle()
                 }
+            }
+            .onChange(of: commentCoreViewModel.scrollToEditingAnchorId) { anchorId in
+                guard let anchorId else { return }
+                withAnimation {
+                    proxy.scrollTo(anchorId, anchor: .bottom)
+                }
+                commentCoreViewModel.scrollToEditingAnchorId = nil
             }
         }
     }
@@ -77,9 +82,11 @@ struct CommentListView<Content>: View where Content: View {
                             }
                         }
                         
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            withAnimation {
-                                self.selectedCommentId = commentCoreViewModel.targetCommentReply?.id ?? commentId
+                        if !commentCoreViewModel.isL2Target {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                withAnimation {
+                                    self.selectedCommentId = commentCoreViewModel.targetCommentId
+                                }
                             }
                         }
                     }
@@ -119,14 +126,21 @@ struct CommentListView<Content>: View where Content: View {
                                     Task {
                                         do {
                                             try await commentCoreViewModel.editComment(comment: editedComment)
+                                            commentCoreViewModel.editingComment = nil
                                         } catch {
-                                            Toast.showToast(style: .warning, message: "Failed to edit post")
+                                            let message: String
+                                            if error.isAmityErrorCode(.banWordFound) {
+                                                message = AmityLocalizedStringSet.Comment.commentWithBannedWordsErrorMessage.localizedString
+                                            } else if error.isAmityErrorCode(.linkNotAllowed) {
+                                                message = AmityLocalizedStringSet.Comment.commentWithNotAllowedLink.localizedString
+                                            } else {
+                                                message = AmityLocalizedStringSet.Comment.commentEditError.localizedString
+                                                commentCoreViewModel.editingComment = nil
+                                            }
+                                            Toast.showToast(style: .warning, message: message)
                                         }
-                                        
-                                        commentCoreViewModel.editingComment = nil
                                     }
                                 })
-                                .padding([.top, .bottom], 3)
                             } else {
                                 AmityCommentView(comment: comment, hideReplyButton: false, hideButtonView: hideCommentButtons, commentButtonAction: commentButtonAction)
                                     .id(comment.id)
@@ -139,7 +153,10 @@ struct CommentListView<Content>: View where Content: View {
                         }
                         
                         if comment.childrenNumber != 0 {
-                            let preloadReplyComments = comment.commentId == commentCoreViewModel.targetCommentId && commentCoreViewModel.preloadRepliesOfComment
+                            let isFromNotification = commentCoreViewModel.targetCommentParentId != nil
+                            let preloadReplyComments = !isFromNotification
+                                && comment.commentId == commentCoreViewModel.targetComment?.id
+                                && commentCoreViewModel.preloadRepliesOfComment
                             let viewModel = ReplyCommentViewModel(comment, preloadReplyComments: preloadReplyComments)
                             ReplyCommentView(viewModel, hideCommentButtons: hideCommentButtons, commentButtonAction: commentButtonAction)
                                 .padding(.top, comment.reactionsCount == 0 ? 8 : 4)
@@ -148,8 +165,6 @@ struct CommentListView<Content>: View where Content: View {
                 }
             }
             .onAppear {
-                // Parent comment list will load previous page on scrolling.
-                // Reply comment list will load on View More Reply button action.
                 if index == commentCoreViewModel.commentItems.count - 1 && (commentCoreViewModel.paginator?.hasPreviousPage() ?? false) {
                     commentCoreViewModel.paginator?.previousPage()
                     
@@ -167,30 +182,22 @@ struct CommentListView<Content>: View where Content: View {
         @EnvironmentObject var viewConfig: AmityViewConfigController
         
         var body: some View {
-            VStack(spacing: 10) {
-                Rectangle()
-                    .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(height: 1)
+            HStack(spacing: 16) {
+                Image(AmityIcon.deletedMessageIcon.imageResource)
+                    .resizable()
+                    .renderingMode(.template)
+                    .frame(width: 16, height: 16)
+                    .padding(.leading, 18)
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 
-                HStack(spacing: 16) {
-                    Image(AmityIcon.deletedMessageIcon.imageResource)
-                        .resizable()
-                        .renderingMode(.template)
-                        .frame(width: 16, height: 16)
-                        .padding(.leading, 18)
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                    
-                    Text(AmityLocalizedStringSet.Comment.deletedCommentMessage.localizedString)
-                        .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
-                        .padding(.trailing, 16)
-                    
-                    Spacer()
-                }
+                Text(AmityLocalizedStringSet.Comment.deletedCommentMessage.localizedString)
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
+                    .padding(.trailing, 16)
                 
-                Rectangle()
-                    .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(height: 1)
+                Spacer()
             }
+            .padding(.vertical, 12)
+            
             
             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.deletedComment)
         }

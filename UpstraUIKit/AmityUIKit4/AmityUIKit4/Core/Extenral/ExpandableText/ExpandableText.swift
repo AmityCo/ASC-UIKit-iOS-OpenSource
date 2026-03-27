@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SafariServices
 import AmitySDK
 
 /**
@@ -58,13 +59,14 @@ public struct ExpandableText: View {
     internal var onTapProductTag: ((String) -> Void)?
     internal var defaultAction: (() -> Void)?
     internal var highlights: String?
+    internal var links: [AmityLink] = []
     
     /**
      Initializes a new `ExpandableText` instance with the specified text string, trimmed of any leading or trailing whitespace and newline characters.
      - Parameter text: The initial text string to display in the `ExpandableText` view.
      - Returns: A new `ExpandableText` instance with the specified text string and trimming applied.
      */
-    public init(_ text: String, defaultAction: (() -> Void)? = nil, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, productTags: [AmityProductTagModel]? = [], highlightedText: String? = nil, onTapMentionee: ((String) -> Void)? = nil, onTapHashtag: ((String) -> Void)? = nil, onTapProductTag: ((String) -> Void)? = nil) {
+    public init(_ text: String, defaultAction: (() -> Void)? = nil, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, productTags: [AmityProductTagModel]? = [], highlightedText: String? = nil, links: [AmityLink] = [], onTapMentionee: ((String) -> Void)? = nil, onTapHashtag: ((String) -> Void)? = nil, onTapProductTag: ((String) -> Void)? = nil) {
         self.text = text.trimmingCharacters(in: .newlines)
         self.defaultAction = defaultAction
         self.metadata = metadata
@@ -74,6 +76,7 @@ public struct ExpandableText: View {
         self.onTapHashtag = onTapHashtag
         self.onTapProductTag = onTapProductTag
         self.highlights = highlightedText
+        self.links = links
     }
     
     public var body: some View {
@@ -131,8 +134,8 @@ public struct ExpandableText: View {
     @ViewBuilder
     private var content: some View {
         if #available(iOS 15, *) {
-            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], productTags: productTags ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color)
-            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], productTags: productTags ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color)
+            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], productTags: productTags ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color, links: links)
+            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], productTags: productTags ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color, links: links)
             
             Text(trimMultipleNewlinesWhenTruncated
                  ? (shouldShowMoreButton ? trimmedText : text)
@@ -160,7 +163,11 @@ public struct ExpandableText: View {
                     return .discarded
                 }
 
-                return .systemAction
+                // Open link in in-app browser
+                let browserVC = SFSafariViewController(url: url)
+                browserVC.modalPresentationStyle = .pageSheet
+                UIApplication.topViewController()?.present(browserVC, animated: true)
+                return .discarded
             })
         } else {
             Text(.init(
@@ -187,7 +194,7 @@ public struct ExpandableText: View {
 
 extension ExpandableText {
     @available(iOS 15, *)
-    private func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], productTags: [AmityProductTagModel], font: UIFont, attributedColor: UIColor, hashtagColor: UIColor, highlights: String?, color: Color) -> AttributedString {
+    private func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], productTags: [AmityProductTagModel], font: UIFont, attributedColor: UIColor, hashtagColor: UIColor, highlights: String?, color: Color, links: [AmityLink] = []) -> AttributedString {
         
         let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: AmityTextStyle.bodyBold(.clear).getFont()]
         
@@ -207,9 +214,27 @@ extension ExpandableText {
         highlightedText = AttributedString(attributedString)
         
         // If links is present, highlight links
-        let links = TextHighlighter.detectLinks(in: contentText)
-        if !links.isEmpty {
-            highlightedText = TextHighlighter.highlightLinks(links: links, in: highlightedText, attributes: highlightAttributes)
+        var detectedLinks = TextHighlighter.detectLinks(in: contentText)
+        
+        // Build a mapping from displayed link text -> actual URL from post.links
+        var linkURLMap: [String: String] = [:]
+        let nsText = contentText as NSString
+        for link in links {
+            if let index = link.index, let length = link.length,
+               index >= 0, length > 0,
+               index + length <= nsText.length {
+                let linkText = nsText.substring(with: NSRange(location: index, length: length))
+                linkURLMap[linkText] = link.url
+                if !detectedLinks.contains(linkText) {
+                    detectedLinks.append(linkText)
+                }
+            } else if !detectedLinks.contains(link.url) {
+                detectedLinks.append(link.url)
+            }
+        }
+        
+        if !detectedLinks.isEmpty {
+            highlightedText = TextHighlighter.highlightLinks(links: detectedLinks, in: highlightedText, attributes: highlightAttributes, linkURLMap: linkURLMap)
         }
         
         // If the text need to highlight is a hashtag search keyword
