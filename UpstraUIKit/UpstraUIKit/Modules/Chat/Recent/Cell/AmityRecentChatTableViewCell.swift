@@ -78,7 +78,6 @@ final class AmityRecentChatTableViewCell: UITableViewCell, Nibbable {
             avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultGroupChat)
             memberLabel.text = "(\(channel.memberCount))"
         case .conversation:
-            avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultAvatar)
             memberLabel.text = nil
             titleLabel.text = channel.displayName
             
@@ -87,7 +86,10 @@ final class AmityRecentChatTableViewCell: UITableViewCell, Nibbable {
                 token = repository?.getUser(channel.getOtherUserId()).observeOnce { [weak self] user, error in
                     guard let userObject = user.snapshot else { return }
                     self?.titleLabel.text = userObject.displayName
+                    self?.avatarView.setImage(withImageURL: userObject.getAvatarInfo()?.fileURL ?? "", placeholder: AmityIconSet.defaultAvatar)
                 }
+            } else {
+                avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultAvatar)
             }
         case .community:
             avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultGroupChat)

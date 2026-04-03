@@ -15,23 +15,35 @@ class MessageReactionConfiguration {
     public var allReactions = [AmityReactionType]()
     
     private init() {
+        loadReactions()
+    }
+    
+    private func loadReactions() {
         let reactionsDict = AmityUIKitConfigController.shared.config["message_reactions"] as? [[String: String]] ?? [[:]]
         
         var reactionList = [AmityReactionType]()
+        var reactionsMap = [String: AmityReactionType]()
+        
         reactionsDict.forEach { item in
             let name = item["name"] ?? ""
-            let image = ImageResource(name: item["image"] ?? "", bundle: AmityUIKit4Manager.bundle)
+            let imageName = item["image"] ?? ""
+            let image = AmityIcon.loadImageResource(name: imageName)
             
-            let item = AmityReactionType(name: name, image: image, accessibilityId: item["image"] ?? "")
-            reactionList.append(item)
-            availableReactions[name] = item
+            let reactionType = AmityReactionType(name: name, image: image, accessibilityId: imageName)
+            reactionList.append(reactionType)
+            reactionsMap[name] = reactionType
         }
         
         allReactions = reactionList
+        availableReactions = reactionsMap
     }
     
     func getReaction(withName name: String) -> AmityReactionType {
         return availableReactions[name] ?? AmityReactionType(name: name, image: AmityIcon.Chat.unknownReaction.imageResource, accessibilityId: "unknown")
+    }
+    
+    func reload() {
+        loadReactions()
     }
 }
 

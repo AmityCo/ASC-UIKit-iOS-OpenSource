@@ -20,6 +20,9 @@ final class AmityMessageListHeaderView: AmityView {
     private var repository: AmityUserRepository?
     private var token: AmityNotificationToken?
     
+    // Tracks the avatar URL currently displayed to avoid redundant reloads.
+    private var displayedAvatarURL: String = ""
+    
     // MARK: - Properties
     private var screenViewModel: AmityMessageListScreenViewModelType?
 
@@ -61,20 +64,35 @@ extension AmityMessageListHeaderView {
         displayNameLabel.text = channel.displayName
         switch channel.channelType {
         case .standard:
-            avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultGroupChat)
+            if channel.avatarURL != displayedAvatarURL {
+                displayedAvatarURL = channel.avatarURL
+                avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultGroupChat)
+            }
         case .conversation:
-            avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultAvatar)
             if !channel.getOtherUserId().isEmpty {
                 token?.invalidate()
                 token = repository?.getUser(channel.getOtherUserId()).observeOnce { [weak self] user, error in
                     guard let weakSelf = self else { return }
                     if let userObject = user.snapshot {
                         weakSelf.displayNameLabel.text = userObject.displayName
+                        let userAvatarURL = userObject.getAvatarInfo()?.fileURL ?? ""
+                        if userAvatarURL != weakSelf.displayedAvatarURL {
+                            weakSelf.displayedAvatarURL = userAvatarURL
+                            weakSelf.avatarView.setImage(withImageURL: userAvatarURL, placeholder: AmityIconSet.defaultAvatar)
+                        }
                     }
+                }
+            } else {
+                if channel.avatarURL != displayedAvatarURL {
+                    displayedAvatarURL = channel.avatarURL
+                    avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultAvatar)
                 }
             }
         case .community:
-            avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultGroupChat)
+            if channel.avatarURL != displayedAvatarURL {
+                displayedAvatarURL = channel.avatarURL
+                avatarView.setImage(withImageURL: channel.avatarURL, placeholder: AmityIconSet.defaultGroupChat)
+            }
         default:
             break
         }

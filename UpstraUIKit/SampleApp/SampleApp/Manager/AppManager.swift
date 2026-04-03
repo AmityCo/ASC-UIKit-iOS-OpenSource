@@ -66,6 +66,8 @@ class AppManager {
             AmityUIKit4Manager.setConfigFile(filePath)
         }
         
+        AmityUIKit4Manager.setCustomAssetBundle(bundle: .main)
+        
         let livestreamBehavior = CustomV4LivestreamBehavior()
         AmityUIKit4Manager.behaviour.livestreamBehavior = livestreamBehavior
         #endif

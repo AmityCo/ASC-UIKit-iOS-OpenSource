@@ -155,7 +155,8 @@ class LiveReactionViewModel {
         
         reactionsDict.forEach { item in
             let name = item["name"] ?? ""
-            let icon = ImageResource(name: item["image"] ?? "", bundle: AmityUIKit4Manager.bundle)
+            let imageName = item["image"] ?? ""
+            let icon = AmityIcon.loadImageResource(name: imageName)
             
             let item = (name: name, icon: icon)
             reactionsFromConfig.append(item)

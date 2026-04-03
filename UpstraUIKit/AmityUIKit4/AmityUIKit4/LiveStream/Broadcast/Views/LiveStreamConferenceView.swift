@@ -262,13 +262,7 @@ struct LiveStreamConferenceView: View {
                                         UIApplication.topViewController()?.dismiss(animated: true)
                                         showProductTagSheet = false
                                     }
-                                ) { productTag in
-                                    if let url = URL(string: productTag.object.productUrl) {
-                                        let browserVC = SFSafariViewController(url: url)
-                                        browserVC.modalPresentationStyle = .pageSheet
-                                        UIApplication.topViewController()?.present(browserVC, animated: true)
-                                    }
-                                }
+                                )
                                 
                                 let hostController = AmitySwiftUIHostingController(rootView: viewOnlyComponent
                                     .ignoresSafeArea(edges: .bottom))
@@ -400,12 +394,8 @@ struct LiveStreamConferenceView: View {
                             product: pinnedProduct,
                             canManageProduct: canManageProducts,
                             onProductTap: { product, productUrl in
-                                // Open product URL in Safari
-                                if let url = URL(string: productUrl) {
-                                    let browserVC = SFSafariViewController(url: url)
-                                    browserVC.modalPresentationStyle = .pageSheet
-                                    UIApplication.topViewController()?.present(browserVC, animated: true)
-                                }
+                                let context = AmityGlobalBehavior.Context(host: nil, product: product)
+                                AmityUIKit4Manager.behaviour.globalBehavior?.onLivestreamProductTagClick(context: context)
                             },
                             onUnpin: { product in
                                 // Call API to unpin during live stream

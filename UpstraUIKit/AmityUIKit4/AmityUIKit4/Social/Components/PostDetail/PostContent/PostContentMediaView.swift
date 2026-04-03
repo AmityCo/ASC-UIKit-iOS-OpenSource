@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 import AmitySDK
-import SafariServices
 
 struct PostContentMediaView: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
@@ -125,13 +124,7 @@ struct PostContentMediaView: View {
                 pageId: pageId,
                 productTags: media.produtTags,
                 renderMode: renderMode,
-                sourceId: post.postId, onProductClick: { productTag in
-                    if let url = URL(string: productTag.object.productUrl) {
-                        let browserVC = SFSafariViewController(url: url)
-                        browserVC.modalPresentationStyle = .pageSheet
-                        UIApplication.topViewController()?.present(browserVC, animated: true)
-                    }
-                })
+                sourceId: post.postId)
             component
                 .environmentObject(host)
                 .halfSheetPresentation()

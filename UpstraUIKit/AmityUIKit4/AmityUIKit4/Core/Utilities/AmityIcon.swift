@@ -284,19 +284,54 @@ enum AmityIcon: String, ImageResourceProvider {
     }
     
     func getImage() -> UIImage? {
-        return UIImage(named: self.rawValue, in: AmityUIKit4Manager.bundle, compatibleWith: nil)
+        return AmityIcon.loadImage(name: self.rawValue)
     }
     
     func getImageResource() -> ImageResource {
-        return ImageResource(name: self.rawValue, bundle: AmityUIKit4Manager.bundle)
+        return AmityIcon.loadImageResource(name: self.rawValue)
     }
     
     static func getImage(named: String) -> UIImage? {
-        return UIImage(named: named, in: AmityUIKit4Manager.bundle, compatibleWith: nil)
+        return AmityIcon.loadImage(name: named)
     }
     
     static func getImageResource(named: String) -> ImageResource {
-        return ImageResource(name: named, bundle: AmityUIKit4Manager.bundle)
+        return AmityIcon.loadImageResource(name: named)
+    }
+    
+    // MARK: - Centralized Image Loading Helpers
+    
+    /// Loads an image from UIKit4 bundle first, falls back to custom asset bundle
+    /// - Parameter named: The image name
+    /// - Returns: UIImage if found, nil otherwise
+    static func loadImage(name: String) -> UIImage? {
+        // First try UIKit4 bundle
+        if let image = UIImage(named: name, in: AmityUIKit4Manager.bundle, compatibleWith: nil) {
+            return image
+        }
+        // Fallback to custom asset bundle if available
+        if let customBundle = AmityUIKit4Manager.customAssetBundle {
+            return UIImage(named: name, in: customBundle, compatibleWith: nil)
+        }
+        
+        return UIImage(named: name, in: AmityUIKit4Manager.bundle, compatibleWith: nil)
+    }
+    
+    /// Loads an ImageResource from UIKit4 bundle first, falls back to custom asset bundle
+    /// - Parameter named: The image name
+    /// - Returns: ImageResource from the appropriate bundle
+    static func loadImageResource(name: String) -> ImageResource {
+        // First try UIKit4 bundle
+        if UIImage(named: name, in: AmityUIKit4Manager.bundle, compatibleWith: nil) != nil {
+            return ImageResource(name: name, bundle: AmityUIKit4Manager.bundle)
+        }
+        // Fallback to custom asset bundle if available
+        if let customBundle = AmityUIKit4Manager.customAssetBundle,
+           UIImage(named: name, in: customBundle, compatibleWith: nil) != nil {
+            return ImageResource(name: name, bundle: customBundle)
+        }
+        // If not found anywhere, still return UIKit4 bundle (will show placeholder/missing image)
+        return ImageResource(name: name, bundle: AmityUIKit4Manager.bundle)
     }
     
 }
@@ -309,10 +344,10 @@ protocol ImageResourceProvider: RawRepresentable {
 extension ImageResourceProvider where Self.RawValue == String {
     
     var imageResource: ImageResource {
-        ImageResource(name: self.rawValue, bundle: AmityUIKit4Manager.bundle)
+        AmityIcon.loadImageResource(name: self.rawValue)
     }
     
     var image: UIImage? {
-        UIImage(named: self.rawValue, in: AmityUIKit4Manager.bundle, compatibleWith: nil)
+        AmityIcon.loadImage(name: self.rawValue)
     }
 }

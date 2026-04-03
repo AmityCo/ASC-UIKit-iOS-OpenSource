@@ -173,6 +173,7 @@ private extension AmityMessageListViewController {
         setupMessageContainer()
         setupComposeBarContainer()
         setupAudioRecordingView()
+        dismissKeyboardFromVC()
     }
     
     func setupCustomNavigationBar() {

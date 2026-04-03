@@ -180,6 +180,7 @@ final class AmityUIKitManagerInternal: NSObject {
         
         _client = client
         _client?.delegate = self
+        didUpdateClient()
     }
     
     func setup(_ apiKey: String, endpoint: AmityEndpoint) {
@@ -187,6 +188,7 @@ final class AmityUIKitManagerInternal: NSObject {
         
         _client = client
         _client?.delegate = self
+        didUpdateClient()
     }
     
     func registerDevice(_ userId: String,

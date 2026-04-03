@@ -851,11 +851,9 @@ extension AmityPostContentComponent {
     }
 
     private func openProductWebView(productId: String) {
-        guard let productTag = post.textProductTags?.first(where: { $0.productId == productId }),
-              let url = URL(string: productTag.object.productUrl) else { return }
-        let browserVC = SFSafariViewController(url: url)
-        browserVC.modalPresentationStyle = .pageSheet
-        UIApplication.topViewController()?.present(browserVC, animated: true)
+        guard let productTag = post.textProductTags?.first(where: { $0.productId == productId }) else { return }
+        let context = AmityGlobalBehavior.Context(host: nil, product: productTag.object)
+        AmityUIKit4Manager.behaviour.globalBehavior?.onPostProductTagClick(context: context)
     }
 
     private func goToCommunityProfilePage() {

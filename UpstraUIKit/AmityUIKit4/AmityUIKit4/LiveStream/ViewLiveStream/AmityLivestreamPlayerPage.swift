@@ -8,7 +8,6 @@
 
 import SwiftUI
 import AmitySDK
-import SafariServices
 
 public struct AmityLivestreamPlayerPage: AmityPageView {
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
@@ -246,13 +245,6 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                 sourceId: childPost.getRoomInfo()?.roomId ?? "",
                 onClose: {
                     self.host.controller?.dismiss(animated: true)
-                },
-                onProductClick: { productTag in
-                    if let url = URL(string: productTag.object.productUrl) {
-                        let browserVC = SFSafariViewController(url: url)
-                        browserVC.modalPresentationStyle = UIModalPresentationStyle.pageSheet
-                        UIApplication.topViewController()?.present(browserVC, animated: true)
-                    }
                 }
             )
             

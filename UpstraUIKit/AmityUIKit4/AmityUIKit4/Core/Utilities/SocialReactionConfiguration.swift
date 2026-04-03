@@ -16,28 +16,40 @@ class SocialReactionConfiguration {
     private(set) var availableReactions = [String: AmityReactionType]()
     
     public var allReactions = [AmityReactionType]()
-    
+
     private init() {
+        loadReactions()
+    }
+    
+    private func loadReactions() {
         let reactionsDict = AmityUIKitConfigController.shared.config["social_reactions"] as? [[String: String]] ?? [[:]]
         
         var reactionList = [AmityReactionType]()
+        var reactionsMap = [String: AmityReactionType]()
+
         reactionsDict.forEach { item in
             let name = item["name"] ?? ""
-            let image: ImageResource? = {
-                guard let imageName = item["image"], !imageName.isEmpty else { return nil }
-                guard let _ = UIImage(named: imageName, in: AmityUIKit4Manager.bundle, compatibleWith: nil) else { return nil }
-                return ImageResource(name: imageName, bundle: AmityUIKit4Manager.bundle)
+            let image: ImageResource = {
+                guard let imageName = item["image"], !imageName.isEmpty else {
+                    return AmityIcon.Chat.unknownReaction.imageResource
+                }
+                return AmityIcon.loadImageResource(name: imageName)
             }()
             
-            let item = AmityReactionType(name: name, image: image ?? AmityIcon.Chat.unknownReaction.imageResource, accessibilityId: item["image"] ?? "")
-            reactionList.append(item)
-            availableReactions[name] = item
+            let reactionType = AmityReactionType(name: name, image: image, accessibilityId: item["image"] ?? "")
+            reactionList.append(reactionType)
+            reactionsMap[name] = reactionType
         }
         
         allReactions = reactionList
+        availableReactions = reactionsMap
     }
     
     func getReaction(withName name: String) -> AmityReactionType {
         return availableReactions[name] ?? AmityReactionType(name: name, image: AmityIcon.Chat.unknownReaction.imageResource, accessibilityId: "unknown")
+    }
+    
+    func reload() {
+        loadReactions()
     }
 }
