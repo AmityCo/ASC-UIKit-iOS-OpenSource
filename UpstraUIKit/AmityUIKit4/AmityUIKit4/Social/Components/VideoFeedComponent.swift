@@ -7,7 +7,6 @@
 
 import SwiftUI
 import AmitySDK
-import SafariServices
 
 /// Shared View for VideoFeedComponent in UserProfile & CommunityProfilePage
 struct VideoFeedComponent: View {
@@ -96,14 +95,7 @@ struct VideoFeedComponent: View {
             let component = AmityProductTagListComponent(
                 productTags: media.produtTags,
                 renderMode: renderMode,
-                sourceId: media.parentPostId ?? "",
-                onProductClick: { productTag in
-                    if let url = URL(string: productTag.object.productUrl) {
-                        let browserVC = SFSafariViewController(url: url)
-                        browserVC.modalPresentationStyle = .pageSheet
-                        UIApplication.topViewController()?.present(browserVC, animated: true)
-                    }
-                })
+                sourceId: media.parentPostId ?? "")
             component
                 .environmentObject(host)
                 .halfSheetPresentation()

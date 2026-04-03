@@ -80,6 +80,7 @@ class AmityGroupChatEditScreenViewModel: AmityGroupChatEditorScreenViewModelType
         Task { @MainActor in
             do {
                 let uploadedData = try await fileRepository.uploadImage(avatar, progress: nil)
+                channelUpdateBuilder.setAvatar(uploadedData)
                 let updateResult = try await channelRepository.editChannel(with: channelUpdateBuilder)
                 completion(true)
             } catch let error {

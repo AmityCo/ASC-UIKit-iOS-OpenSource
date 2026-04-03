@@ -7,7 +7,6 @@
 
 import SwiftUI
 import AVFoundation
-import SafariServices
 import AmitySDK
 
 enum VideoPlayerType {
@@ -380,13 +379,6 @@ struct AmityPostMediaVideoPlayer: View {
                 sourceId: post.postId,
                 onClose: {
                     UIApplication.topViewController()?.dismiss(animated: true)
-                },
-                onProductClick:  { productTag in
-                    if let url = URL(string: productTag.object.productUrl) {
-                        let browserVC = SFSafariViewController(url: url)
-                        browserVC.modalPresentationStyle = .pageSheet
-                        UIApplication.topViewController()?.present(browserVC, animated: true)
-                    }
                 })
             component
                 .environmentObject(host)

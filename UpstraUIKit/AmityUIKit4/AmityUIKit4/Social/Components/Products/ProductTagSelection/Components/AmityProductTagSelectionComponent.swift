@@ -172,7 +172,7 @@ public struct AmityProductTagSelectionComponent: AmityComponentView {
                                 pageId: pageId,
                                 componentId: id
                             )
-                            .padding(.top, 150)
+                            .padding(.top, keyboardHeight > 0 ? max(16, 150 - keyboardHeight) : 150)
                         } else if viewModel.loadingStatus == .loading && viewModel.products.isEmpty {
                             // Loading state
                             ForEach(0..<5, id: \.self) { _ in

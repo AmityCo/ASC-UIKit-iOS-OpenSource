@@ -44,7 +44,7 @@ extension AmityMessageListTableViewController {
     func setupView() {
         tableView.separatorInset.left = UIScreen.main.bounds.width
         tableView.tableFooterView = UIView()
-        tableView.keyboardDismissMode = .onDrag
+        tableView.keyboardDismissMode = .interactive
         tableView.estimatedRowHeight = 0
         tableView.backgroundColor = AmityColorSet.backgroundColor
         screenViewModel.dataSource.allCellNibs.forEach {

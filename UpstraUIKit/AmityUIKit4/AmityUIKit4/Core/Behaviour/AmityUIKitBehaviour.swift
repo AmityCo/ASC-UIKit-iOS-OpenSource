@@ -7,6 +7,8 @@
 
 import Foundation
 import UIKit
+import SafariServices
+import AmitySDK
 
 open class AmityUIKitBehaviour {
     // MARK: - Story
@@ -87,9 +89,11 @@ open class AmityGlobalBehavior {
     open class Context {
         
         let host: AmitySwiftUIHostWrapper?
+        let product: AmityProduct?
         
-        public init(host: AmitySwiftUIHostWrapper?) {
+        public init(host: AmitySwiftUIHostWrapper? = nil, product: AmityProduct? = nil) {
             self.host = host
+            self.product = product
         }
     }
     
@@ -105,5 +109,19 @@ open class AmityGlobalBehavior {
     
     open func handleNonFollowerAction(context: Context?) {
         Toast.showToast(style: .warning, message: "Follow user to interact.")
+    }
+    
+    open func onPostProductTagClick(context: AmityGlobalBehavior.Context) {
+        guard let url = URL(string: context.product?.productUrl ?? "") else { return }
+        let browserVC = SFSafariViewController(url: url)
+        browserVC.modalPresentationStyle = .pageSheet
+        UIApplication.topViewController()?.present(browserVC, animated: true)
+    }
+    
+    open func onLivestreamProductTagClick(context: AmityGlobalBehavior.Context) {
+        guard let url = URL(string: context.product?.productUrl ?? "") else { return }
+        let browserVC = SFSafariViewController(url: url)
+        browserVC.modalPresentationStyle = .pageSheet
+        UIApplication.topViewController()?.present(browserVC, animated: true)
     }
 }

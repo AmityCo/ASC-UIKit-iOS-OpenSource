@@ -39,7 +39,8 @@ public struct AmityReactionBar: AmityComponentView {
         var reactionsFromConfig: [AmityLiveReactionModel] = []
         reactionsDict.forEach { item in
             let name = item["name"] ?? ""
-            let icon = ImageResource(name: item["image"] ?? "", bundle: AmityUIKit4Manager.bundle)
+            let imageName = item["image"] ?? ""
+            let icon = AmityIcon.loadImageResource(name: imageName)
             
             let item = AmityLiveReactionModel(reactionName: name, referenceId: targetId, referenceType: targetType, streamId: streamId, icon: icon)
             reactionsFromConfig.append(item)

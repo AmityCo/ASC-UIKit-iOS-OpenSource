@@ -29,13 +29,24 @@ class AmityGroupChatEditViewController: AmityViewController {
     // use this variable to store a new image
     private var uploadingAvatarImage: UIImage?
     
-    private var isValueChanged: Bool {
+    // Tracks the avatar URL currently displayed so we avoid redundant reloads.
+    private var displayedAvatarURL: String = ""
+    
+    // Set to true after a successful save so screenViewModelDidUpdate
+    // can complete the navigation once the server-confirmed avatar URL arrives.
+    private var pendingCompletion: Bool = false
+    
+    private var isNameChanged: Bool {
         guard let channel = screenViewModel?.dataSource.channel else {
             return false
         }
-        let isValueChanged = (nameTextField.text != channel.displayName) || (uploadingAvatarImage != nil)
-        let isValueExisted = !nameTextField.text!.isEmpty
-        return (isValueChanged && isValueExisted)
+        let isChanged = nameTextField.text != channel.displayName
+        let isExisted = !(nameTextField.text?.isEmpty ?? true)
+        return isChanged && isExisted
+    }
+    
+    private var isValueChanged: Bool {
+        return isNameChanged || (uploadingAvatarImage != nil)
     }
     
     override func viewDidLoad() {
@@ -73,6 +84,7 @@ class AmityGroupChatEditViewController: AmityViewController {
         title = AmityLocalizedStringSet.editUserProfileTitle.localizedString
         screenViewModel = AmityGroupChatEditScreenViewModel(channelId: channelId)
         screenViewModel?.delegate = self
+        updateView()
         avatarView.placeholder = AmityIconSet.defaultGroupChat
         cameraImageView.backgroundColor = AmityColorSet.secondary.blend(.shade4)
         cameraImageView.layer.borderColor = AmityColorSet.backgroundColor.cgColor
@@ -154,25 +166,26 @@ class AmityGroupChatEditViewController: AmityViewController {
     
     @objc private func saveButtonTap() {
         AmityHUD.show(.loading)
-        // Update user avatar
         if let avatar = uploadingAvatarImage {
             avatarView.state = .loading
-            screenViewModel?.action.update(avatar: avatar, completion: {[weak self] result in
+            screenViewModel?.action.update(avatar: avatar, completion: { [weak self] result in
                 guard let weakSelf = self else { return }
                 weakSelf.avatarView.state = .idle
                 if result {
                     weakSelf.uploadingAvatarImage = nil
-                    if weakSelf.isValueChanged {
+                    if weakSelf.isNameChanged {
+                        // Also update the display name; navigation happens via screenViewModelDidUpdateSuccess.
                         weakSelf.screenViewModel?.action.update(displayName: weakSelf.nameTextField.text ?? "")
                     } else {
-                        AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.successfullyUpdated.localizedString))
-                        AmityChannelEventHandler.shared.channelGroupChatUpdateDidComplete(from: weakSelf)
+                        // Avatar-only update: wait for the live channel object to confirm
+                        // the new avatar URL before showing success and navigating away.
+                        weakSelf.pendingCompletion = true
                     }
                 } else {
                     AmityHUD.show(.error(message: AmityLocalizedStringSet.HUD.somethingWentWrong.localizedString))
                 }
             })
-        } else if isValueChanged {
+        } else if isNameChanged {
             screenViewModel?.action.update(displayName: nameTextField.text ?? "")
         }
     }
@@ -212,15 +225,28 @@ extension AmityGroupChatEditViewController: AmityGroupChatEditorScreenViewModelD
     
     func screenViewModelDidUpdate(_ viewModel: AmityGroupChatEditorScreenViewModelType) {
         guard let channel = viewModel.dataSource.channel else { return }
-        setupNavigationBar()
         nameTextField.text = channel.displayName
-        if let image = uploadingAvatarImage {
-            // While uploading avatar, view model will get call once with an old image.
-            // To prevent image view showing an old image, checking if it nil here.
+        let serverAvatarURL = channel.getAvatarInfo()?.fileURL ?? ""
+        if !serverAvatarURL.isEmpty {
+            // Server has confirmed the new avatar URL — show it and clear the local image.
+            uploadingAvatarImage = nil
+            // Only reload the image if the URL actually changed to avoid flicker.
+            if serverAvatarURL != displayedAvatarURL {
+                displayedAvatarURL = serverAvatarURL
+                avatarView.setImage(withImageURL: serverAvatarURL,
+                                    placeholder: AmityIconSet.defaultGroupChat)
+            }
+            // If we were waiting for the server to confirm the avatar update, complete now.
+            if pendingCompletion {
+                pendingCompletion = false
+                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.successfullyUpdated.localizedString))
+                AmityChannelEventHandler.shared.channelGroupChatUpdateDidComplete(from: self)
+            }
+        } else if let image = uploadingAvatarImage {
+            // Server avatar URL not yet available — keep showing the locally-selected image.
             avatarView.image = image
         } else {
-            // MKL : FIX
-            avatarView.setImage(withImageURL: channel.getAvatarInfo()?.fileURL ?? "",
+            avatarView.setImage(withImageURL: serverAvatarURL,
                                 placeholder: AmityIconSet.defaultGroupChat)
         }
         updateViewState()

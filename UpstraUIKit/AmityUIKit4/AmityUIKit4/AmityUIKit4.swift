@@ -139,6 +139,22 @@ public final class AmityUIKit4Manager {
         return Bundle(for: self)
     }
     
+    /// Custom asset bundle provided by the user to override UIKit4 images
+    static var customAssetBundle: Bundle?
+    
+    /// Sets a custom asset bundle for overriding UIKit4 images.
+    ///
+    /// Use this to provide your own assets in place of UIKit4's defaults.
+    /// Your custom image will only be loaded if the image name does not exist in the UIKit4 bundle.
+    ///
+    /// - Note: If you provide an image with the same name as a UIKit4 default asset,
+    ///   the UIKit4 version will take priority and your custom image will not be used.
+    ///
+    /// - Parameter bundle: The bundle containing your custom assets
+    public static func setCustomAssetBundle(bundle: Bundle) {
+        customAssetBundle = bundle
+    }
+
     /// Sets a custom configuration JSON file to override the default bundled config.
     ///
     /// Use this method to provide a custom configuration JSON file from your app's bundle.

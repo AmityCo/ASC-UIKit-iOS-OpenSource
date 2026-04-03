@@ -20,7 +20,7 @@ public struct AmityEmptyStateView: View {
     public var body: some View {
         VStack(spacing: 0) {
             if let icon = configuration.image {
-                Image(ImageResource(name: icon, bundle: AmityUIKit4Manager.bundle))
+                Image(AmityIcon.loadImageResource(name: icon))
                     .renderingMode(configuration.renderingMode)
                     .resizable()
                     .scaledToFit()

@@ -8,7 +8,6 @@
 import AmitySDK
 import Combine
 import SwiftUI
-import SafariServices
 
 public struct AmityClipDraft {
     let clipData: AmityClipData
@@ -398,14 +397,7 @@ public struct AmityPostComposerPage: AmityPageView {
             Button {
                 let component = AmityProductTagListComponent(pageId: .postComposerPage,
                                                              productTags: viewModel.productTags,
-                                                             sourceId: "", // No postId yet during composition
-                                                             onClose: nil) { productTag in
-                    if let url = URL(string: productTag.object.productUrl) {
-                        let browserVC = SFSafariViewController(url: url)
-                        browserVC.modalPresentationStyle = .pageSheet
-                        UIApplication.topViewController()?.present(browserVC, animated: true)
-                    }
-                }
+                                                             sourceId: "") // No postId yet during composition
 
                 let vc = AmitySwiftUIHostingController(rootView: component)
                 host.controller?.present(vc, animated: true)

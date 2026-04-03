@@ -78,14 +78,7 @@ struct AmityProductCarouselView: View {
             pageId: pageId,
             productTags: allProductTags,
             renderMode: .post,
-            sourceId: postId,
-            onProductClick: { productTag in
-                if let url = URL(string: productTag.object.productUrl) {
-                    let browserVC = SFSafariViewController(url: url)
-                    browserVC.modalPresentationStyle = .pageSheet
-                    UIApplication.topViewController()?.present(browserVC, animated: true)
-                }
-            })
+            sourceId: postId)
         component
             .environmentObject(host)
             .halfSheetPresentation()
@@ -227,11 +220,8 @@ private struct ProductCarouselCardView: View {
         .onTapGesture {
             guard !isUnavailable else { return }
             trackProductClick()
-            if let url = URL(string: productTag.object.productUrl) {
-                let browserVC = SFSafariViewController(url: url)
-                browserVC.modalPresentationStyle = .pageSheet
-                UIApplication.topViewController()?.present(browserVC, animated: true)
-            }
+            let context = AmityGlobalBehavior.Context(host: nil, product: productTag.object)
+            AmityUIKit4Manager.behaviour.globalBehavior?.onPostProductTagClick(context: context)
         }
         .background(GeometryReader { geometry in
             Color.clear

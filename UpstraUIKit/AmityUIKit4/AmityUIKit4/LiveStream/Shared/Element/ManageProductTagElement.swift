@@ -32,10 +32,11 @@ struct ManageProductTagElement: AmityElementView {
     }
     
     private func handleProductClick() {
-        if let url = URL(string: product.productUrl) {
-            let browserVC = SFSafariViewController(url: url)
-            browserVC.modalPresentationStyle = .pageSheet
-            UIApplication.topViewController()?.present(browserVC, animated: true)
+        let context = AmityGlobalBehavior.Context(host: nil, product: product)
+        if renderMode == .livestream {
+            AmityUIKit4Manager.behaviour.globalBehavior?.onLivestreamProductTagClick(context: context)
+        } else {
+            AmityUIKit4Manager.behaviour.globalBehavior?.onPostProductTagClick(context: context)
         }
     }
     

@@ -180,12 +180,8 @@ struct LiveStreamViewerView: View {
                             product: pinnedProduct,
                             canManageProduct: false,
                             onProductTap: { product, productUrl in
-                                // Open product URL in Safari
-                                if let url = URL(string: productUrl) {
-                                    let browserVC = SFSafariViewController(url: url)
-                                    browserVC.modalPresentationStyle = .pageSheet
-                                    UIApplication.topViewController()?.present(browserVC, animated: true)
-                                }
+                                let context = AmityGlobalBehavior.Context(host: nil, product: product)
+                                AmityUIKit4Manager.behaviour.globalBehavior?.onLivestreamProductTagClick(context: context)
                             },
                             onUnpin: { _ in
                             },
@@ -527,13 +523,7 @@ struct LiveStreamViewerView: View {
             onClose: {
                 UIApplication.topViewController()?.dismiss(animated: true)
             }
-        ) { productTag in
-            if let url = URL(string: productTag.object.productUrl) {
-                let browserVC = SFSafariViewController(url: url)
-                browserVC.modalPresentationStyle = .pageSheet
-                UIApplication.topViewController()?.present(browserVC, animated: true)
-            }
-        }
+        )
         
         let vc = AmitySwiftUIHostingController(rootView: component
             .ignoresSafeArea(edges: .bottom))

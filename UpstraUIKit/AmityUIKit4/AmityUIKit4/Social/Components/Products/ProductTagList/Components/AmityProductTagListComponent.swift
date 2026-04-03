@@ -174,7 +174,12 @@ public struct AmityProductTagListComponent: AmityComponentView {
                     renderMode: renderMode,
                     isPinned: productTag.productId == pinnedProductId,
                     onClick: {
-                        onProductClick?(productTag)
+                        let context = AmityGlobalBehavior.Context(host: nil, product: productTag.object)
+                        if renderMode == .livestream {
+                            AmityUIKit4Manager.behaviour.globalBehavior?.onLivestreamProductTagClick(context: context)
+                        } else {
+                            AmityUIKit4Manager.behaviour.globalBehavior?.onPostProductTagClick(context: context)
+                        }
                     },
                     sourceId: sourceId,
                     sourceType: sourceType,
