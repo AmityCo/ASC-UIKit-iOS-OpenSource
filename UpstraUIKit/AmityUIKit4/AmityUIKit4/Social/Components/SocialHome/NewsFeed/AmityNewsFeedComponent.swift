@@ -110,6 +110,29 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                                     .frame(height: 8)
                             }
                             
+                        case .bannerAd(let placement):
+                            if let adView = BannerAdFeedConfig.shared.adViewBuilder?(placement) {
+                                VStack(spacing: 0) {
+                                    // "Sponsored" header
+                                    HStack {
+                                        AdSponsorLabel()
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color(viewConfig.theme.backgroundColor))
+                                    
+                                    // The actual ad view supplied by the host app
+                                    adView
+                                        .frame(height: BannerAdFeedConfig.shared.adHeight)
+                                        .frame(maxWidth: .infinity)
+                                    
+                                    Rectangle()
+                                        .fill(Color(viewConfig.theme.baseColorShade4))
+                                        .frame(height: 8)
+                                }
+                            }
+                            
                         case .content(let post):
                             
                             VStack(spacing: 0){

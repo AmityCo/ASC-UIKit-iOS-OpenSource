@@ -140,6 +140,8 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
                     videoURLs.append(videoURL)
                 }
                 return PaginatedItem<AmityStoryModel>(id: story.storyId, type: .content(AmityStoryModel(story: story)))
+            case .bannerAd(let placement):
+                return PaginatedItem<AmityStoryModel>(id: placement.id, type: .bannerAd(placement))
             }
         }
         
