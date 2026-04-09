@@ -82,9 +82,12 @@ final class AmityMessageListScreenViewModel: AmityMessageListScreenViewModelType
     private var lastNotOnline: Date?
     private var lastEnterBackground: Date?
     
-    init(channelId: String, subChannelId: String) {
+    private let initialChannel: AmityChannelModel?
+
+    init(channelId: String, subChannelId: String, channel: AmityChannelModel? = nil) {
         self.channelId = channelId
         self.subChannelId = subChannelId
+        self.initialChannel = channel
         membershipParticipation = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
         channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
         messageRepository = AmityMessageRepository(client: AmityUIKitManagerInternal.shared.client)
@@ -215,6 +218,10 @@ extension AmityMessageListScreenViewModel {
     }
     
     func getChannel(){
+        if let initialChannel {
+            delegate?.screenViewModelDidGetChannel(channel: initialChannel)
+        }
+
         channelNotificationToken?.invalidate()
         channelNotificationToken = channelRepository.getChannel(channelId).observe { [weak self] (channel, error) in
             guard let object = channel.snapshot else { return }

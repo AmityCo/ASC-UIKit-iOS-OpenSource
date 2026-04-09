@@ -196,7 +196,7 @@ public enum ElementId: String {
     case illustration = "illustration"
     case title = "title"
     case description = "description"
-    case exploreCommunittiesButton = "explore_communitties_button"
+    case exploreCommunitiesButton = "explore_communities_button"
     case createCommunityButton = "create_community_button"
     
     // MyCommunities

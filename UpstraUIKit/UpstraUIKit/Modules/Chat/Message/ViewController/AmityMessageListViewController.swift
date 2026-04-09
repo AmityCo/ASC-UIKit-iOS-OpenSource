@@ -111,9 +111,10 @@ public final class AmityMessageListViewController: AmityViewController {
     public static func make(
         channelId: String,
         subChannelId: String,
+        channel: AmityChannelModel? = nil,
         settings: AmityMessageListViewController.Settings = .init()
     ) -> AmityMessageListViewController {
-        let viewModel = AmityMessageListScreenViewModel(channelId: channelId, subChannelId: subChannelId)
+        let viewModel = AmityMessageListScreenViewModel(channelId: channelId, subChannelId: subChannelId, channel: channel)
         let vc = AmityMessageListViewController(nibName: AmityMessageListViewController.identifier, bundle: AmityUIKitManager.bundle)
         vc.screenViewModel = viewModel
         vc.settings = settings

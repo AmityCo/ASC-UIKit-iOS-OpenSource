@@ -154,8 +154,8 @@ extension AmityRecentChatViewController: AmityRecentChatScreenViewModelDelegate 
     
     func screenViewModelRoute(for route: AmityRecentChatScreenViewModel.Route) {
         switch route {
-        case .messageView(let channelId, let subChannelId):
-            AmityChannelEventHandler.shared.channelDidTap(from: self, channelId: channelId, subChannelId: subChannelId)
+        case .messageView(let channelId, let subChannelId, let channel):
+            AmityChannelEventHandler.shared.channelDidTap(from: self, channelId: channelId, subChannelId: subChannelId, channel: channel)
         }
     }
     

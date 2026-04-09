@@ -216,7 +216,7 @@ struct AccessibilityID {
             static let illustration = "illustration"
             static let title = "title"
             static let description = "description"
-            static let exploreCommunittiesButton = "explore_communitties_button"
+            static let exploreCommunitiesButton = "explore_communities_button"
             static let createCommunityButton = "create_community_button"
         }
         

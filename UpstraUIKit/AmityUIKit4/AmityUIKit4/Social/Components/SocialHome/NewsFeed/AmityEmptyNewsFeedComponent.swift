@@ -44,8 +44,8 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .description))
                 .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.description)
             
-            let exploreCommunityButtonIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .exploreCommunittiesButton, key: "icon", of: String.self) ?? "")
-            let exploreCommunityButtonText = viewConfig.getConfig(elementId: .exploreCommunittiesButton, key: "text", of: String.self) ?? ""
+            let exploreCommunityButtonIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .exploreCommunitiesButton, key: "icon", of: String.self) ?? "")
+            let exploreCommunityButtonText = viewConfig.getConfig(elementId: .exploreCommunitiesButton, key: "text", of: String.self) ?? ""
             HStack(alignment: .center, spacing: 8) {
                 Image(exploreCommunityButtonIcon)
                     .resizable()
@@ -63,8 +63,8 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
             .onTapGesture {
                 Log.add(event: .info, "Explore Community")
             }
-            .isHidden(viewConfig.isHidden(elementId: .exploreCommunittiesButton))
-            .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.exploreCommunittiesButton)
+            .isHidden(viewConfig.isHidden(elementId: .exploreCommunitiesButton))
+            .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.exploreCommunitiesButton)
             
             let createCommunityButtonText = viewConfig.getConfig(elementId: .createCommunityButton, key: "text", of: String.self) ?? ""
             Text(createCommunityButtonText)
