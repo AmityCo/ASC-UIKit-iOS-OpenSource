@@ -21,7 +21,9 @@ public struct AmityNewsFeedComponent: AmityComponentView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var postFeedViewModel = PostFeedViewModel(feedType: .globalFeed)
     @StateObject private var viewModel = AmityNewsFeedComponentViewModel()
+    @EnvironmentObject private var tabState: SocialHomeTabState
     @State private var pullToRefreshShowing: Bool = false
+    @State private var isCurrentFeedEmpty: Bool = false
     
     public init(pageId: PageId? = nil) {
         self.pageId = pageId
@@ -33,12 +35,28 @@ public struct AmityNewsFeedComponent: AmityComponentView {
     public var body: some View {
         ZStack(alignment: .top) {
             getContentView()
-                .opacity(postFeedViewModel.postItems.isEmpty && postFeedViewModel.feedLoadingStatus == .loaded ? 0 : 1)
-            
+                .opacity(isCurrentFeedEmpty ? 0 : 1)
+
             AmityEmptyNewsFeedComponent(pageId: pageId)
-                .opacity(postFeedViewModel.postItems.isEmpty && postFeedViewModel.feedLoadingStatus == .loaded ? 1 : 0)
+                .opacity(isCurrentFeedEmpty ? 1 : 0)
         }
         .updateTheme(with: viewConfig)
+        .onReceive(postFeedViewModel.$postItems.combineLatest(postFeedViewModel.$feedLoadingStatus)) { items, status in
+            if status == .loaded && items.isEmpty {
+                isCurrentFeedEmpty = true
+            } else if !items.isEmpty {
+                isCurrentFeedEmpty = false
+            }
+        }
+        .onReceive(tabState.$selectedTab) { tab in
+            guard tab == .newsFeed,
+                  postFeedViewModel.postItems.isEmpty,
+                  postFeedViewModel.feedLoadingStatus == .loaded,
+                  isCurrentFeedEmpty else { return }
+            viewModel.loadStoryTargets()
+            viewModel.loadRoomPosts()
+            postFeedViewModel.loadFeed(feedType: .globalFeed)
+        }
     }
     
     @ViewBuilder
@@ -46,6 +64,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
         if #available(iOS 15.0, *) {
             getPostListView()
                 .refreshable {
+                    isCurrentFeedEmpty = false
                     // just to show/hide story view
                     viewModel.loadStoryTargets()
                     viewModel.loadRoomPosts()

@@ -17,7 +17,6 @@ protocol AmityRecentChatScreenViewModelDelegate: AnyObject {
     func screenViewModelDidCreateCommunity(channelId: String, subChannelId: String)
     func screenViewModelDidFailedCreateCommunity(error: String)
 }
-
 protocol AmityRecentChatScreenViewModelDataSource {
     
     func channel(at indexPath: IndexPath) -> AmityChannelModel

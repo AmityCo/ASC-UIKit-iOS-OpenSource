@@ -20,6 +20,7 @@ public struct AmityChannelModel {
     let avatarFileId: String?
     //let participation: AmityChannelParticipation
     let metadata: [String:Any]
+    let defaultSubChannelId: String
     let object: AmityChannel
     
     init(object: AmityChannel) {
@@ -33,6 +34,7 @@ public struct AmityChannelModel {
         self.channelType = object.channelType
         self.avatarFileId = object.getAvatarInfo()?.fileURL
         self.metadata = object.metadata ?? [:]
+        self.defaultSubChannelId = object.defaultSubChannelId
         self.object = object
     }
     
@@ -57,7 +59,7 @@ final class AmityRecentChatScreenViewModel: AmityRecentChatScreenViewModelType {
     
     
     enum Route {
-        case messageView(channelId: String, subChannelId: String)
+        case messageView(channelId: String, subChannelId: String, channel: AmityChannelModel)
     }
     
     // MARK: - Repository
@@ -212,9 +214,9 @@ extension AmityRecentChatScreenViewModel {
     }
     
     func join(at indexPath: IndexPath) {
-        let channel = channel(at: indexPath).object
-        AmityAsyncAwaitTransformer.toCompletionHandler(asyncFunction: channelRepository.joinChannel, parameters: channel.channelId)
-        delegate?.screenViewModelRoute(for: .messageView(channelId: channel.channelId, subChannelId: channel.defaultSubChannelId))
+        let channelModel = channel(at: indexPath)
+        AmityAsyncAwaitTransformer.toCompletionHandler(asyncFunction: channelRepository.joinChannel, parameters: channelModel.channelId)
+        delegate?.screenViewModelRoute(for: .messageView(channelId: channelModel.channelId, subChannelId: channelModel.defaultSubChannelId, channel: channelModel))
     }
 
 }

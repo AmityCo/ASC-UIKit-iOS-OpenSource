@@ -69,7 +69,7 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
         let isModerator = community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
         self.shouldShowEditProfile = hasEditCommunityPermission || isModerator
         self.shouldShowPendingInvitations = isModerator
-        self.shouldShowNotifications = isSocialUserNotificationEnabled && isSocialNetworkEnabled
+        self.shouldShowNotifications = isSocialUserNotificationEnabled && isNotificationEnabled && isSocialNetworkEnabled
         self.shouldShowPostPermissions = hasEditCommunityPermission || isModerator
         self.shouldShowStoryComments = hasEditCommunityPermission || isModerator
         self.shouldShowCloseCommunity = hasDeleteCommunityPermission || isModerator
@@ -107,6 +107,7 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
             if let settings {
                 self?.isSocialNetworkEnabled = settings.isSocialNetworkEnabled
                 self?.isNotificationEnabled = settings.isEnabled
+                print("Setting Social \(settings.isSocialNetworkEnabled) Noti\(settings.isEnabled)")
                 completion?()
                 return
             }
