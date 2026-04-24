@@ -555,7 +555,9 @@ extension AmityFeedViewController: AmityPostPreviewCommentDelegate {
                 
                 // if it is in community feed, check permission before options
                 if case .communityFeed(let communityId) = self?.screenViewModel.dataSource.getFeedType() {
-                    AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: communityId) { [weak self] (hasPermission) in
+                    Task { @MainActor in
+                        let hasPermission = await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: communityId)
+                        
                         if hasPermission {
                             items.insert(deleteOption, at: 0)
                         }

@@ -78,7 +78,7 @@ public struct AmityLiveChatMessageReactionPicker: AmityElementView {
 class AmityLiveChatMessageReactionPickerViewModel: ObservableObject {
     @Published var message: MessageModel
     
-    private let reactionRepo = AmityReactionRepository(client: AmityUIKit4Manager.client)
+    private let reactionRepo = AmityReactionRepository()
     
     init(message: MessageModel) {
         self.message = message

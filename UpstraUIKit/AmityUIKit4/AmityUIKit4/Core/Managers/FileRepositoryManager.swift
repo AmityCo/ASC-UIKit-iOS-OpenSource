@@ -9,5 +9,5 @@ import Foundation
 import AmitySDK
 
 class FileRepositoryManager {
-    let fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    let fileRepository = AmityFileRepository()
 }

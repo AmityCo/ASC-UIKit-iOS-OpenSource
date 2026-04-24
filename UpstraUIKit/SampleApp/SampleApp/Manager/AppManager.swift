@@ -13,9 +13,6 @@ import AmityUIKit4
 #endif
 import SwiftUI
 import UIKit
-#if canImport(AmityUIKitLiveStream)
-import AmityUIKitLiveStream
-#endif
 
 class AppManager {
     
@@ -78,7 +75,7 @@ class AppManager {
     
     func register(withUserId userId: String) {
         AmityUIKit4Manager.registerDevice(withUserId: userId, displayName: nil, sessionHandler: SampleSessionHandler()) { [weak self] success, error in
-            print("[Sample App] register device with userId '\(userId)' \(success ? "successfully" : "failed")")
+            print("[Sample App] register device with userId '\(userId)' \(success ? "successfully" : "failed") \(error)")
             if let error = error {
                 AmityHUD.show(.error(message: "Could not register user: \(error.localizedDescription)"))
                 return

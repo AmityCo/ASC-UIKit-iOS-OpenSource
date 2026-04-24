@@ -59,10 +59,9 @@ class GlobalFeedClipService: ClipService {
         Log.add(event: .info, "Fetching clip posts for global feed")
         
         clipFeedCollection = feedManager.getGlobalFeedPosts(dataTypes: ["clip", "video"])
-        token = clipFeedCollection?.observe{ [weak self] liveCollection, _, error in
+        token = clipFeedCollection?.observe{ [weak self] liveCollection, error in
             guard let self, liveCollection.dataStatus == .fresh, !isEndlessLoopingActive else { return }
             
-            Log.add(event: .info, "Clip Posts fetched, \(liveCollection.count())")
             isPaginationInProgress = false
             
             // Handle error

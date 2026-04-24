@@ -11,13 +11,13 @@ import AmitySDK
 
 class UserRelationshipManager {
     
-    let userRelationship = AmityUserRelationship(client: AmityUIKitManagerInternal.shared.client)
+    let userRelationship = AmityUserRelationship()
     
     func followUser(userId: String, completion: @escaping (Bool, AmityFollowResponse?, Error?) -> Void) {
         Task { @MainActor in
             do {
                 let response = try await userRelationship.follow(withUserId: userId)
-                completion(response.0, response.1, nil)
+                completion(true, response, nil)
             } catch let error {
                 completion(false, nil, error)
             }
@@ -28,7 +28,7 @@ class UserRelationshipManager {
         Task { @MainActor in
             do {
                 let response = try await userRelationship.unfollow(withUserId: userId)
-                completion(response.0, response.1, nil)
+                completion(true, response, nil)
             } catch let error {
                 completion(false, nil, error)
             }
@@ -39,7 +39,7 @@ class UserRelationshipManager {
         Task { @MainActor in
             do {
                 let response = try await userRelationship.declineMyFollower(withUserId: userId)
-                completion(response.0, response.1, nil)
+                completion(true, response, nil)
             } catch let error {
                 completion(false, nil, error)
             }
@@ -49,13 +49,13 @@ class UserRelationshipManager {
 
 class UserModerationManager {
     
-    let repository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+    let repository = AmityUserRepository()
     
     func flagUser(userId: String, completion: @escaping (Bool, Error?) -> Void) {
         Task { @MainActor in
             do {
-                let result = try await repository.flagUser(withId: userId)
-                completion(result, nil)
+                try await repository.flagUser(withId: userId)
+                completion(true, nil)
             } catch let error {
                 completion(false, error)
             }
@@ -65,8 +65,8 @@ class UserModerationManager {
     func unflagUser(userId: String, completion: @escaping (Bool, Error?) -> Void) {
         Task { @MainActor in
             do {
-                let result = try await repository.unflagUser(withId: userId)
-                completion(result, nil)
+                try await repository.unflagUser(withId: userId)
+                completion(true, nil)
             } catch let error {
                 completion(false, error)
             }

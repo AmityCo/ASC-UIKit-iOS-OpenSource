@@ -20,20 +20,20 @@ final class AmityChannelUserRolesController: AmityChannelUserRolesControllerProt
     private var token: AmityNotificationToken?
     
     init(channelId: String) {
-        membersRepo = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membersRepo = AmityChannelMembership(channelId: channelId)
     }
     
     func getUserRoles(withUserId userId: String, role: AmityChannelRole, completionHandler: @escaping (Bool) -> ()) {
         token?.invalidate()
         completionHandler(false)
-        token = membersRepo?.getMembers(filter: .all, sortBy: .lastCreated, roles: [], includeDeleted: false).observe({ [weak self] collection, change, error in
+        token = membersRepo?.getMembers(filter: .all, sortBy: .lastCreated, roles: [], includeDeleted: false).observe({ [weak self] collection, error in
             guard let weakSelf = self else { return }
             if error != nil {
                 completionHandler(false)
             } else {
                 var result = false
-                for index in 0..<collection.count() {
-                    guard let member = collection.object(at: index) else { continue }
+                for index in 0..<collection.snapshots.count {
+                    let member = collection.snapshots[index]
                     if member.userId == userId {
                         result = member.roles.contains(role.rawValue)
                         break

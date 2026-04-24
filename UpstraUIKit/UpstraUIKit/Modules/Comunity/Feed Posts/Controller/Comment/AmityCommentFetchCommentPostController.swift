@@ -19,7 +19,7 @@ protocol AmityCommentFetchCommentPostControllerProtocol {
 
 class AmityCommentFetchCommentPostController: AmityCommentFetchCommentPostControllerProtocol {
     
-    private let repository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityCommentRepository()
     private var token: AmityNotificationToken?
     private var collection: AmityCollection<AmityComment>?
     
@@ -33,7 +33,7 @@ class AmityCommentFetchCommentPostController: AmityCommentFetchCommentPostContro
         let queryOptions = AmityCommentQueryOptions(referenceId: postId, referenceType: referenceType, filterByParentId: isParent, parentId: parentId, orderBy: orderBy, includeDeleted: includeDeleted)
         collection = repository.getComments(with: queryOptions)
         
-        token = collection?.observe { [weak self] (commentCollection, _, error) in
+        token = collection?.observe { [weak self] (commentcollection, error) in
             guard let strongSelf = self else { return }
             if let error = AmityError(error: error) {
                 completion?(.failure(error))
@@ -56,8 +56,8 @@ class AmityCommentFetchCommentPostController: AmityCommentFetchCommentPostContro
     private func prepareData() -> [AmityCommentModel] {
         guard let collection = collection else { return [] }
         var models = [AmityCommentModel]()
-        for i in 0..<collection.count() {
-            guard let comment = collection.object(at: i) else { continue }
+        for i in 0..<collection.snapshots.count {
+            let comment = collection.snapshots[i]
             let model = AmityCommentModel(comment: comment)
             models.append(model)
         }

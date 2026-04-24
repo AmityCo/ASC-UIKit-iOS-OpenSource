@@ -19,10 +19,10 @@ public class MentionListProvider {
     private var canMentionAll = false // Mention all members in a channel
     
     // Repositories
-    private var userRepository: AmityUserRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+    private var userRepository: AmityUserRepository = AmityUserRepository()
     private var channelMembersRepo: AmityChannelMembership?
     private var communityMembersRepo: AmityCommunityMembership?
-    private var communityRepository: AmityCommunityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private var communityRepository: AmityCommunityRepository = AmityCommunityRepository()
     
     // Collection
     private var channelMembersCollection: AmityCollection<AmityChannelMember>? // Channel Members
@@ -53,7 +53,7 @@ public class MentionListProvider {
             }
         case .message(let subChannelId):
             if let channelId = subChannelId {
-                channelMembersRepo = AmityChannelMembership(client: client, andChannel: channelId)
+                channelMembersRepo = AmityChannelMembership(channelId: channelId)
             }
         }
         
@@ -119,7 +119,7 @@ public class MentionListProvider {
     }
     
     private func setupCommunity(withId communityId: String) {
-        communityMembersRepo = AmityCommunityMembership(client: AmityUIKitManager.client, andCommunityId: communityId)
+        communityMembersRepo = AmityCommunityMembership(communityId: communityId)
         communityToken = communityRepository.getCommunity(withId: communityId).observe { [weak self] liveObject, error in
             if liveObject.dataStatus == .fresh {
                 self?.communityToken?.invalidate()
@@ -140,7 +140,7 @@ public class MentionListProvider {
         mentionListToken?.invalidate()
         
         channelMembersCollection = channelMembersRepo?.searchMembers(displayName: displayName, filterBuilder: builder, roles: [], includeDeleted: false)
-        mentionListToken = channelMembersCollection?.observe({ [weak self] liveCollection, _, error in
+        mentionListToken = channelMembersCollection?.observe({ [weak self] liveCollection, error in
             self?.handleSearchResponse(with: liveCollection)
         })
     }
@@ -150,7 +150,7 @@ public class MentionListProvider {
         mentionListToken?.invalidate()
         
         usersCollection = userRepository.searchUsers(displayName, sortBy: .displayName)
-        mentionListToken = usersCollection?.observe { [weak self] liveCollection, _, error in
+        mentionListToken = usersCollection?.observe { [weak self] liveCollection, error in
             self?.handleSearchResponse(with: liveCollection)
         }
     }
@@ -160,7 +160,7 @@ public class MentionListProvider {
         mentionListToken?.invalidate()
         
         communityMembersCollection = communityMembersRepo?.searchMembers(keyword: displayName, filter: [.member], roles: [], sortBy: .lastCreated, includeDeleted: false)
-        mentionListToken = communityMembersCollection?.observe { [weak self] liveCollection, _, error in
+        mentionListToken = communityMembersCollection?.observe { [weak self] liveCollection, error in
             self?.handleSearchResponse(with: liveCollection)
         }
     }
@@ -170,8 +170,8 @@ public class MentionListProvider {
         case .fresh:
             var updatedList = [AmityMentionUserModel]()
             
-            for i in 0..<collection.count() {
-                guard let object = collection.object(at: i) else { continue }
+            for i in 0..<collection.snapshots.count {
+                let object = collection.snapshots[i]
                 
                 if T.self == AmityCommunityMember.self {
                     guard let member = object as? AmityCommunityMember, let user = member.user else { continue }

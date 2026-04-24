@@ -9,7 +9,7 @@ import AmitySDK
 import Combine
 
 class RoomManager {
-    private let repository = AmityRoomRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityRoomRepository()
     
     func createRoom(options: AmityRoomCreateOptions) async throws -> AmityRoom {
         return try await repository.createRoom(with: options)

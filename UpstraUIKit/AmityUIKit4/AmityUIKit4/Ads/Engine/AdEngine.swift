@@ -8,8 +8,8 @@
 import Foundation
 import AmitySDK
 import Combine
-import RealmSwift
 import OSLog
+import CoreData
 
 class AdEngine {
     
@@ -24,13 +24,15 @@ class AdEngine {
     var cancellable: AnyCancellable?
         
     // Persistent cache for ad assets & seen recency
-    let dataStore = RealmStore.shared
+    //let dataStore = RealmStore.shared
+    let dataStore: CoreDataStore
     let assetEngine = AssetSyncEngine()
     
     var isEngineSyncStarted = false
         
     private init() {
-        adRepo = AmityAdRepository(client: AmityUIKitManagerInternal.shared.client)
+        dataStore =  CoreDataStore()
+        adRepo = AmityAdRepository()
                                 
         let client = AmityUIKitManagerInternal.shared.client
         cancellable = client.$sessionState.sink { [weak self] state in
@@ -55,13 +57,13 @@ class AdEngine {
     }
     
     // Clears out ad settings & ads
-    func clear() {
+    private func clear() {
         adSettings = nil
         ads = []
         isEngineSyncStarted = false
         
         // Clear assets metadata
-        dataStore.clear()
+        dataStore.database?.deleteAllData()
         timeWindowTracker.clear()
         
         // Cancel downloads & remove cached ad images
@@ -91,30 +93,29 @@ class AdEngine {
     // Note:
     // This method combines removeObsoleteAssets and assignNewAds present in tech spec into single method to perform
     // efficient database manipulation.
-    func prepareAds(newAds: [AmityAd]) {
+    private func prepareAds(newAds: [AmityAd]) {
         // We query all existing ads from realm to avoid multiple trip
-        guard let realm = dataStore.database else { return }
+        guard let context = dataStore.database?.mainContext else { return }
         
-        let obsoleteAds = getObsoleteAds(newAds: newAds, store: realm)
+        let obsoleteAds = getObsoleteAds(newAds: newAds, context: context)
         
         Log.ads.debug("Ads Received: \(newAds.count), Obsolete ads found: \(obsoleteAds.count)")
         
         // We remove obsolete ads in single realm write operation
-        realm.perform {
-            
+        context.writeAsync {
             // Delete those obsolete ads
             if !obsoleteAds.isEmpty {
-                realm.delete(obsoleteAds)
+                context.deleteAll(objects: obsoleteAds)
             }
             
             // Upsert new ads
             newAds.forEach {
-                AdAsset.upsert(ad: $0, in: realm)
+                AdAsset.upsert(ad: $0, in: context)
             }
         }
     }
     
-    func getObsoleteAds(newAds: [AmityAd], store: Realm) -> [AdAsset] {
+    private func getObsoleteAds(newAds: [AmityAd], context: NSManagedObjectContext) -> [AdAsset] {
         var newAssetIds = Set<String>()  // Keeping track of all adId as set to compare it with existing assets efficiently.
         newAds.forEach {
             if let fileId1 = $0.image1_1?.fileId {
@@ -126,11 +127,11 @@ class AdEngine {
             }
         }
         
-        let allAssets = store.objects(AdAsset.self)
+        let allAssets = AdAsset.fetchAll(in: context)
 
         // Keep track of all obsolete assets
         var obsoleteAds = [AdAsset]()
-        allAssets.forEach { item in
+        allAssets?.forEach { item in
             // Since new ad list does not contain this ad, we mark it as obsolete.
             if !newAssetIds.contains(item.fileId) {
                 obsoleteAds.append(item)
@@ -140,7 +141,7 @@ class AdEngine {
         return obsoleteAds
     }
     
-    func prefetchAssets(newAds: [AmityAd]) {
+    private func prefetchAssets(newAds: [AmityAd]) {
         // 1. Check if the ad asset is already prefetched
         for ad in newAds {
                         
@@ -190,9 +191,9 @@ class AdEngine {
         }
     }
     
-    func isAssetDownloaded(assetId: String) -> Bool {
-        guard let realm = dataStore.database else { return false }
-        let asset = realm.object(ofType: AdAsset.self, forPrimaryKey: assetId)
+    private func isAssetDownloaded(assetId: String) -> Bool {
+        guard let context = dataStore.database?.mainContext else { return false }
+        let asset = AdAsset.fetch(predicate: NSPredicate(format: "fileId == %@", assetId), in: context)
         
         if let asset {
             // Log.adAssets.debug("Is Asset Downloaded: \(assetId) \(asset.isDownloaded)")
@@ -204,12 +205,12 @@ class AdEngine {
     }
     
     private func markAssetsAsReady(assetIds: [String]) {
-        guard let realm = dataStore.database else { return }
+        guard let context = dataStore.database?.mainContext else { return }
         
-        realm.perform {
+        context.writeAsync {
             assetIds.forEach { id in
                 
-                if let asset = realm.object(ofType: AdAsset.self, forPrimaryKey: id) {
+                if let asset = AdAsset.fetch(predicate: NSPredicate(format: "fileId == %@", id), in: context) {
                     asset.isDownloaded = true
                     // Log.adAssets.debug("Asset is ready: \(id)")
                 } else {
@@ -251,18 +252,18 @@ extension AdEngine {
     }
     
     func getLastSeen(adId: String) -> Date? {
-        guard let database = dataStore.database else { return nil }
+        guard let context = dataStore.database?.mainContext else { return nil }
         
-        let cachedData = database.object(ofType: AdSeenEvent.self, forPrimaryKey: adId)
+        let cachedData = AdSeenEvent.object(in: context, forPrimaryKey: adId)
         return cachedData?.lastSeen
     }
     
     private func updateSeenRecencyCache(ad: AmityAd, placement: AmityAdPlacement) {
-        guard let database = dataStore.database else { return }
+        guard let context = dataStore.database?.mainContext else { return }
         
         // Update cache
-        database.perform {
-            AdSeenEvent.upsert(adId: ad.adId, lastSeen: Date(), in: database)
+        context.writeAsync {
+            AdSeenEvent.upsert(adId: ad.adId, lastSeen: Date(), in: context)
         }
         
         // Update time window tracker

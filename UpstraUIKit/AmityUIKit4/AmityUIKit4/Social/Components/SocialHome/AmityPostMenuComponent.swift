@@ -25,10 +25,8 @@ class AmityCreatePostMenuViewModel: ObservableObject {
     
     init() {
         // Event Permission
-        AmityUIKit4Manager.client.hasPermission(.createEvent) { [weak self] hasPermission in
-            guard let self else { return }
-            
-            self.hasCreateEventPermission = hasPermission
+        Task { @MainActor in
+            self.hasCreateEventPermission = await AmityUIKit4Manager.client.hasPermission(.createEvent) 
         }
     }
 }

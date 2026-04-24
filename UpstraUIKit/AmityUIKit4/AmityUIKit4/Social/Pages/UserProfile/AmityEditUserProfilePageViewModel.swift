@@ -32,8 +32,7 @@ class AmityEditUserProfilePageViewModel: ObservableObject {
         }
     }
     
-    @discardableResult
-    func updateUser(_ user: UserModel) async throws -> Bool {
+    func updateUser(_ user: UserModel) async throws {
         try await userManager.editUser(user: user)
     }
 }

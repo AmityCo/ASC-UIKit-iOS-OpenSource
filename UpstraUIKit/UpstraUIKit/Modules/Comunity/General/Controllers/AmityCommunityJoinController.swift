@@ -20,7 +20,7 @@ final class AmityCommunityJoinController: AmityCommunityJoinControllerProtocol {
     
     init(withCommunityId _communityId: String) {
         communityId = _communityId
-        repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityCommunityRepository()
     }
     
     func join(_ completion: @escaping (AmityError?) -> Void) {

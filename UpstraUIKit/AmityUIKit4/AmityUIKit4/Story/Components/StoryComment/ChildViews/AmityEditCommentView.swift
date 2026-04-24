@@ -119,8 +119,5 @@ public struct AmityEditCommentView: View {
         .onAppear {
             mentionData.metadata = comment.metadata
         }
-        .onDisappear {
-            text = ""
-        }
     }
 }

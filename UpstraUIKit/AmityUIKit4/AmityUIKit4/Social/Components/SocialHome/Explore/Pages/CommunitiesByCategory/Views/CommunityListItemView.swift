@@ -275,9 +275,9 @@ struct CommunityJoinButton: View {
 
 class CommunityInfoViewModel: ObservableObject {
     
-    let repository = AmityCommunityRepository(client: AmityUIKit4Manager.client)
+    let repository = AmityCommunityRepository()
     
-    func leaveCommunity(communityId: String) async throws -> Bool {
+    func leaveCommunity(communityId: String) async throws {
         try await repository.leaveCommunity(withId: communityId)
     }
 }

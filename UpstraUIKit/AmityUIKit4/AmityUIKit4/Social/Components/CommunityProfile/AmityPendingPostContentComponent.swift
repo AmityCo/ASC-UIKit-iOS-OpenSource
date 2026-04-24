@@ -405,21 +405,19 @@ class AmityPendingPostContentComponentViewModel: ObservableObject {
         self.post = AmityPostModel(post: post)
     }
     
-    @discardableResult
-    func approvePost() async throws -> Bool {
+    func approvePost() async throws {
         try await postManager.approvePost(postId: post.postId)
     }
     
-    @discardableResult
-    func declinePost() async throws -> Bool {
+    func declinePost() async throws {
         try await postManager.declinePost(postId: post.postId)
     }
     
-    @discardableResult
-    func deletePost() async throws -> Bool {
+    func deletePost() async throws {
         try await postManager.deletePost(withId: post.postId)
     }
     
+    @MainActor
     func hasModeratorRole() -> Bool {
         if let communityMember = post.targetCommunity?.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
             return communityMember.hasModeratorRole

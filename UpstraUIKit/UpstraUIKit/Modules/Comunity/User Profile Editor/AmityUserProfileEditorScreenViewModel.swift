@@ -11,12 +11,12 @@ import AmitySDK
 
 class AmityUserProfileEditorScreenViewModel: AmityUserProfileEditorScreenViewModelType {
     
-    private let userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let userRepository = AmityUserRepository()
     private var userObject: AmityObject<AmityUser>?
     private var userCollectionToken: AmityNotificationToken?
     private let dispatchGroup = DispatchGroupWraper()
-    private let amityUserUpdateBuilder = AmityUserUpdateBuilder()
-    private let fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let amityUserUpdateBuilder = AmityUserUpdateOptions()
+    private let fileRepository = AmityFileRepository()
     
     weak var delegate: AmityUserProfileEditorScreenViewModelDelegate?
     var user: AmityUserModel?
@@ -34,7 +34,7 @@ class AmityUserProfileEditorScreenViewModel: AmityUserProfileEditorScreenViewMod
     
     func updateUser(displayName: String, aboutDescription: String, avatar: UIImage?, completion: @escaping (Bool) -> Void) {
         
-        let amityUserUpdateBuilder = AmityUserUpdateBuilder()
+        let amityUserUpdateBuilder = AmityUserUpdateOptions()
         amityUserUpdateBuilder.setDisplayName(displayName)
         amityUserUpdateBuilder.setUserDescription(aboutDescription)
         
@@ -51,7 +51,7 @@ class AmityUserProfileEditorScreenViewModel: AmityUserProfileEditorScreenViewMod
             }
             
             do {
-                let user = try await AmityUIKitManagerInternal.shared.client.editUser(amityUserUpdateBuilder)
+                try await AmityUIKitManagerInternal.shared.client.editUser(amityUserUpdateBuilder)
                 completion(true)
             } catch let error {
                 completion(false)

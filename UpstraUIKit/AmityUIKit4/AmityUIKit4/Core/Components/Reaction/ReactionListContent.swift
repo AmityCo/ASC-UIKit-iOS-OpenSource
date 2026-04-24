@@ -22,7 +22,7 @@ struct ReactionListContent: View {
         ZStack {
             ScrollView {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(viewModel.reactedUsers.enumerated()), id: \.element.userId) { index, user in
+                    ForEach(Array(viewModel.reactedUsers.enumerated()), id: \.element.uniqueId) { index, user in
                         Section {
                             ReactionListRowItem(user: user)
                                 .padding(.horizontal, 12)
@@ -204,7 +204,7 @@ class ReactionLoader: ObservableObject {
         resetState()
         
         reactionCollection = reactionManger.getReactions(reactionType, referenceId: referenceId, referenceType: referenceType)
-        reactionCollectionToken = reactionCollection?.observe({ [weak self] liveCollection, _, error in
+        reactionCollectionToken = reactionCollection?.observe({ [weak self] liveCollection, error in
             guard let self else { return }
             
             if let error {
@@ -227,7 +227,7 @@ class ReactionLoader: ObservableObject {
             }
             
             // Map reactions
-            let reactions = liveCollection.allObjects()
+            let reactions = liveCollection.snapshots
             self.reactedUsers = reactions.map { ReactionUser(reaction: $0, type: self.type) }
             
             // Reacted Users
@@ -275,6 +275,7 @@ class ReactionLoader: ObservableObject {
 }
 
 struct ReactionUser {
+    let uniqueId: String
     let userId: String
     let displayName: String
     let avatarURL: String
@@ -285,8 +286,9 @@ struct ReactionUser {
     
     init(reaction: AmityReaction, type: AmityReactionList.ReactionListType) {
         self.userId = reaction.creator?.userId ?? ""
+        self.uniqueId = userId + reaction.reactionId
         self.displayName = reaction.creator?.displayName ?? ""
-        self.avatarURL = reaction.creator?.getAvatarInfo()?.fileURL ?? ""
+        self.avatarURL = reaction.creator?.avatar?.fileURL ?? ""
         self.reactionName = reaction.reactionName
         self.type = type
         self.isBrand = reaction.creator?.isBrand ?? false
@@ -308,6 +310,7 @@ struct ReactionUser {
         self.reactionName = reactionName
         self.reactionImage = MessageReactionConfiguration.shared.getReaction(withName: reactionName).image
         self.type = .none
+        self.uniqueId = ""
         self.isBrand = false
     }
     

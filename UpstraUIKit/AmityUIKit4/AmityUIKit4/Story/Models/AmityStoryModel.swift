@@ -79,7 +79,7 @@ public struct AmityStoryModel: Identifiable, Equatable, Hashable {
         data = story.data
         items = story.items
         expiresAt = story.expiresAt
-        createdAt = story.createdAt
+        createdAt = story.createdAt ?? Date()
         metadata = story.metadata
         isDeleted = story.isDeleted
         syncState = story.syncState
@@ -87,7 +87,7 @@ public struct AmityStoryModel: Identifiable, Equatable, Hashable {
         videoResolution = story.availableResolution()
         
         creatorName = story.creator?.displayName ?? ""
-        creatorAvatarURLStr = story.creator?.getAvatarInfo()?.fileURL ?? ""
+        creatorAvatarURLStr = story.creator?.avatar?.fileURL ?? ""
         if let url = story.getImageInfo()?.fileURL {
             if syncState == .syncing || syncState == .error {
                 imageURL = URL(string: url)

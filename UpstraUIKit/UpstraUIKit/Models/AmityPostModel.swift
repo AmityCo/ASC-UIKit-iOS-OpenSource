@@ -35,7 +35,7 @@ extension AmityPostModel {
             self.closedIn = UInt64(poll.closedIn)
             self.voteCount = Int(poll.voteCount)
             self.answers = poll.answers.map { Answer(answer: $0) }
-            self.createdAt = poll.createdAt
+            self.createdAt = poll.createdAt ?? Date()
         }
         
         public class Answer {
@@ -303,7 +303,7 @@ public class AmityPostModel {
         postedUser = Author(
             avatarURL: post.postedUser?.getAvatarInfo()?.fileURL,
             displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, isGlobalBan: post.postedUser?.isGlobalBanned ?? false)
-        subtitle = post.isEdited ? String.localizedStringWithFormat(AmityLocalizedStringSet.PostDetail.postDetailCommentEdit.localizedString, post.createdAt.relativeTime) : post.createdAt.relativeTime
+        subtitle = post.isEdited ? String.localizedStringWithFormat(AmityLocalizedStringSet.PostDetail.postDetailCommentEdit.localizedString, post.createdAt?.relativeTime ?? Date().relativeTime) : post.createdAt?.relativeTime ?? Date().relativeTime
         postedUserId = post.postedUserId
         sharedCount = Int(post.sharedCount)
         reactionsCount = Int(post.reactionsCount)

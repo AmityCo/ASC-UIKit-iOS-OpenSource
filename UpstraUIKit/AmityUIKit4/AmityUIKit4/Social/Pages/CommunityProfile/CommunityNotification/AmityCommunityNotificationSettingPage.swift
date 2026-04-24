@@ -131,7 +131,7 @@ public struct AmityCommunityNotificationSettingPage: AmityPageView {
     
 }
 
-
+@MainActor
 class AmityCommunityNotificationSettingPageViewModel: ObservableObject {
     @Published var isNotificationEnabled: Bool = false
     @Published var isPostNetworkNotificationEnabled: Bool = false
@@ -143,37 +143,36 @@ class AmityCommunityNotificationSettingPageViewModel: ObservableObject {
     
     init(_ community: AmityCommunity) {
         self.community = community
-        isSocialNetworkEnabled()
+        Task {
+            try await isSocialNetworkEnabled()
+        }
     }
     
     func updateSetting() {
-        if isNotificationEnabled {
-            notificationManger.enableNotificaitonSetting(withId: community.communityId, events: nil) { [weak self] status, error in
-                self?.isSocialNetworkEnabled()
+        Task {
+            if isNotificationEnabled {
+                try? await notificationManger.enableNotificationSetting(withId: community.communityId, events: [])
+            } else {
+                try? await notificationManger.disableNotificationSetting(withId: community.communityId)
             }
-        } else {
-            notificationManger.disableNotificaitonSetting(withId: community.communityId) { [weak self] status, error in
-                self?.isSocialNetworkEnabled()
-            }
+            
+            try await self.isSocialNetworkEnabled()
         }
     }
     
-    private func isSocialNetworkEnabled(_ completion: (() -> Void)? = nil) {
-        notificationManger.getCommunityNotificationSetting(withId: community.communityId) { [weak self] settings, error in
-            if let settings {
-                self?.isNotificationEnabled = settings.isEnabled
-                self?.isPostNetworkNotificationEnabled = settings.isPostNetworkEnabled
-                self?.isCommentNetworkNotificationEnabled = settings.isCommentNetworkEnabled
-                self?.isStoryNetworkNotificaitonEnabled = settings.isStoryNetworkEnabled
-                completion?()
-                return
-            }
-            
-            self?.isNotificationEnabled = false
-            self?.isPostNetworkNotificationEnabled = false
-            self?.isCommentNetworkNotificationEnabled = false
-            self?.isStoryNetworkNotificaitonEnabled = false
-            completion?()
+    private func isSocialNetworkEnabled() async throws {
+        do {
+            let settings = try await notificationManger.getCommunityNotificationSetting(withId: community.communityId)
+            updateState(settings: settings)
+        } catch {
+            updateState(settings: nil)
         }
+    }
+    
+    func updateState(settings: AmityCommunityNotificationSettings?) {
+        self.isNotificationEnabled = settings?.isEnabled ?? false
+        self.isPostNetworkNotificationEnabled = settings?.isPostNetworkEnabled ?? false
+        self.isCommentNetworkNotificationEnabled = settings?.isCommentNetworkEnabled ?? false
+        self.isStoryNetworkNotificaitonEnabled = settings?.isStoryNetworkEnabled ?? false
     }
 }

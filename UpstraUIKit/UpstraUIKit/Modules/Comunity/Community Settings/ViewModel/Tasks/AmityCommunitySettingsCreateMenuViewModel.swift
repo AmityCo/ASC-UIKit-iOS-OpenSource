@@ -137,16 +137,18 @@ final class AmityCommunitySettingsCreateMenuViewModel: AmityCommunitySettingsCre
 
     // Retrieve edit community permission
     private func retrieveEditCommunityPermission(_ completion: (() -> Void)?) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: community.communityId) { [weak self] (status) in
-            self?.shouldShowEditProfileItem = status
+        Task { @MainActor in
+            let status = await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: community.communityId)
+            self.shouldShowEditProfileItem = status
             completion?()
         }
     }
 
     // Retrieve delete community permission
     private func retrieveDeleteCommunityPermission(_ completion: (() -> Void)?) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunity, forCommunity: community.communityId) { [weak self] (status) in
-            self?.shouldShowCloseItem = status
+        Task { @MainActor in
+            let status = await AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunity, forCommunity: community.communityId)
+            self.shouldShowCloseItem = status
             completion?()
         }
     }

@@ -102,13 +102,11 @@ public class AmityUserProfilePageViewModel: ObservableObject {
         try await userManager.unblockUser(withId: userId)
     }
     
-    @discardableResult
-    func flag() async throws -> Bool {
+    func flag() async throws {
         try await userManager.flagUser(withId: userId)
     }
     
-    @discardableResult
-    func unflag() async throws -> Bool {
+    func unflag() async throws {
         try await userManager.unflagUser(withId: userId)
     }
 

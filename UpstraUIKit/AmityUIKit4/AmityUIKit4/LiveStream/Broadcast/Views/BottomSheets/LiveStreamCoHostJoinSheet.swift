@@ -28,7 +28,7 @@ struct LiveStreamCoHostJoinSheet: View {
             // Profile images section
             HStack(spacing: -5) {
                 // Host profile image
-                AmityUserProfileImageView(displayName: viewModel.coHostInvitation?.inviterUser?.displayName ?? "Host", avatarURL: URL(string: viewModel.coHostInvitation?.inviterUser?.getAvatarInfo()?.fileURL ?? ""))
+                AmityUserProfileImageView(displayName: viewModel.coHostInvitation?.inviterUser?.displayName ?? "Host", avatarURL: URL(string: viewModel.coHostInvitation?.inviterUser?.avatar?.fileURL ?? ""))
                     .frame(width: 80, height: 80)
                     .clipShape(Circle())
                     .overlay(
@@ -43,7 +43,7 @@ struct LiveStreamCoHostJoinSheet: View {
                             ), alignment: .bottom)
 
                 // Co-host profile image
-                AmityUserProfileImageView(displayName: viewModel.coHostInvitation?.invitedUser?.displayName ?? AmityUIKitManagerInternal.shared.client.user?.snapshot?.displayName ?? "CoHost", avatarURL: URL(string: viewModel.coHostInvitation?.invitedUser?.getAvatarInfo()?.fileURL ?? ""))
+                AmityUserProfileImageView(displayName: viewModel.coHostInvitation?.invitedUser?.displayName ?? AmityUIKitManagerInternal.shared.client.user?.snapshot?.displayName ?? "CoHost", avatarURL: URL(string: viewModel.coHostInvitation?.invitedUser?.avatar?.fileURL ?? ""))
                     .frame(width: 80, height: 80)
                     .clipShape(Circle())
                     .overlay(

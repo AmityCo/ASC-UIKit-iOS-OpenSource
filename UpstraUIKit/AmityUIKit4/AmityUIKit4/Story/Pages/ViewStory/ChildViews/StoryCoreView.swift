@@ -550,7 +550,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                             case .image:
                                 if let storyTarget = storyModel.storyTarget, let url = storyModel.imageURL {
                                     let targetType: AmityStoryTargetType = AmityStoryTargetType(rawValue: storyTarget.targetType) ?? .community
-                                    let createOptions = AmityImageStoryCreateOptions(targetType: targetType, tartgetId: storyTarget.targetId, imageFileURL: url, items: storyModel.storyItems)
+                                    let createOptions = AmityImageStoryCreateOptions(targetType: targetType, targetId: storyTarget.targetId, imageFileURL: url, items: storyModel.storyItems)
                                     
                                     try await viewModel.storyManager.createImageStory(in: storyTarget.targetId, createOption: createOptions)
                                 }
@@ -558,7 +558,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                             case .video:
                                 if let storyTarget = storyModel.storyTarget, let url = storyModel.videoURL {
                                     let targetType: AmityStoryTargetType = AmityStoryTargetType(rawValue: storyTarget.targetType) ?? .community
-                                    let createOptions = AmityVideoStoryCreateOptions(targetType: targetType, tartgetId: storyTarget.targetId, videoFileURL: url, items: storyModel.storyItems)
+                                    let createOptions = AmityVideoStoryCreateOptions(targetType: targetType, targetId: storyTarget.targetId, videoFileURL: url, items: storyModel.storyItems)
                                     
                                     try await viewModel.storyManager.createVideoStory(in: storyTarget.targetId, createOption: createOptions)
                                 }

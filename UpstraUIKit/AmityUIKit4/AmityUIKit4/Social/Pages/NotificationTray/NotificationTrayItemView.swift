@@ -93,7 +93,7 @@ struct NotificationTrayInvitationItemView: View {
             let inviter = invitation.inviterUser
             AmityUserProfileImageView(
                 displayName: inviter?.displayName ?? "",
-                avatarURL: URL(string: inviter?.getAvatarInfo()?.mediumFileURL ?? "")
+                avatarURL: URL(string: inviter?.avatar?.mediumFileURL ?? "")
             )
             .frame(width: 32, height: 32)
             .clipShape(Circle())
@@ -113,7 +113,7 @@ struct NotificationTrayInvitationItemView: View {
                     
                     Spacer(minLength: 12)
                     
-                    Text(invitation.createdAt.relativeTime)
+                    Text(invitation.createdAt?.relativeTime ?? Date().relativeTime)
                         .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                 }
                 

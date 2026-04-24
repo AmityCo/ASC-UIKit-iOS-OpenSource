@@ -22,7 +22,7 @@ final class AmityCommunityInfoController: AmityCommunityInfoControllerProtocol {
     
     init(communityId: String) {
         self.communityId = communityId
-        repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityCommunityRepository()
     }
     
     func getCommunity(_ completion: @escaping (Result<AmityCommunityModel, AmityError>) -> Void) {

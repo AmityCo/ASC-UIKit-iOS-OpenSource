@@ -103,7 +103,7 @@ class AmityEventDetailPageViewModel: ObservableObject {
         // For event based on livestream, a livestream post is auto-created. So we skip this post from discussion feed.
         let skippedPostId = event.postId ?? ""
         feedCollection = feedManager.getCommunityFeedPosts(communityId: event.discussionCommunityId)
-        feedToken = feedCollection?.observe({ [weak self] liveCollection, _, error in
+        feedToken = feedCollection?.observe({ [weak self] liveCollection, error in
             guard let self else { return }
             
             if let _ = error {
@@ -141,16 +141,12 @@ class AmityEventDetailPageViewModel: ObservableObject {
     func setupEventPermission() {
         isEventHost = event?.creator?.userId == AmityUIKit4Manager.client.currentUserId
         
-        AmityUIKit4Manager.client.hasPermission(.createEvent) { hasPermission in
-            self.hasCreatePermission = hasPermission
-        }
-        
-        AmityUIKit4Manager.client.hasPermission(.updateEvent) { hasPermission in
-            self.hasUpdatePermission = hasPermission
-        }
-        
-        AmityUIKit4Manager.client.hasPermission(.deleteEvent) { hasPermission in
-            self.hasDeletePermission = hasPermission
+        Task { @MainActor in
+            self.hasCreatePermission = await AmityUIKit4Manager.client.hasPermission(.createEvent)
+            
+            self.hasUpdatePermission = await AmityUIKit4Manager.client.hasPermission(.updateEvent)
+            
+            self.hasDeletePermission = await AmityUIKit4Manager.client.hasPermission(.deleteEvent)
         }
     }
     

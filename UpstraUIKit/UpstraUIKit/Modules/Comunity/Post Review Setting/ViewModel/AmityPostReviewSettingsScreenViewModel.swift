@@ -22,7 +22,7 @@ final class AmityPostReviewSettingsScreenViewModel: AmityPostReviewSettingsScree
     
     init(communityId: String) {
         self.communityId = communityId
-        communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+        communityRepository = AmityCommunityRepository()
         communityViewModel = AmityPostReviewSettingsCommunityViewModel(communityId: communityId, communityRepository: communityRepository)
     }
 }

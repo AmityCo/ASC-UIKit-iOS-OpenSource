@@ -11,7 +11,7 @@ import AmitySDK
 struct CommentComposerView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
-    private let avatarURL: URL? = URL(string: AmityUIKitManagerInternal.shared.client.user?.snapshot?.getAvatarInfo()?.fileURL ?? "")
+    private let avatarURL: URL? = URL(string: AmityUIKitManagerInternal.shared.client.user?.snapshot?.avatar?.fileURL ?? "")
     private let displayName: String = AmityUIKitManagerInternal.shared.client.user?.snapshot?.displayName ?? ""
     @ObservedObject private var viewModel: CommentComposerViewModel
     private let onL2ReplyCreated: ((_ comment: AmityComment, _ l1ParentId: String) -> Void)?

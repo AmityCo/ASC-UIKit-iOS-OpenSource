@@ -70,7 +70,7 @@ struct LiveChatListView: View {
 #endif
 
 class TestLiveChatListViewModel: ObservableObject {
-    let channelRepo = AmityChannelRepository(client: AmityUIKit4Manager.client)
+    let channelRepo = AmityChannelRepository()
 
     @Published var channels = [TestChannelModel]()
     private var channelCollection: AmityCollection<AmityChannel>?
@@ -78,13 +78,10 @@ class TestLiveChatListViewModel: ObservableObject {
     var token: AmityNotificationToken?
 
     func queryChannel() {
-        let query = AmityChannelQuery()
-        query.types = [AmityChannelQueryType.live]
-        query.filter = .userIsMember
-        query.includeDeleted = false
+        let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.live], filter: .userIsMember, includeDeleted: false)
         channelCollection = channelRepo.getChannels(with: query)
         
-        token = channelCollection?.observe({ [weak self] collection, _, error in
+        token = channelCollection?.observe({ [weak self] collection, error in
             let channels = collection.snapshots
             if collection.dataStatus == .fresh {
 

@@ -15,7 +15,7 @@ protocol AmityCommunityRecommendedControllerProtocol {
 
 final class AmityCommunityRecommendedController: AmityCommunityRecommendedControllerProtocol {
     
-    private let repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityCommunityRepository()
     private var collection: AmityCollection<AmityCommunity>?
     private var token: AmityNotificationToken?
     private let maxRecommended: Int = 4
@@ -26,7 +26,7 @@ final class AmityCommunityRecommendedController: AmityCommunityRecommendedContro
         token = nil
         
         collection = repository.getRecommendedCommunities()
-        token = collection?.observe { [weak self] (collection, change, error) in
+        token = collection?.observe { [weak self] (collection, error) in
             guard let self else { return }
             
             if let error {

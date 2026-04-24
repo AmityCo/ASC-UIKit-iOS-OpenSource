@@ -117,12 +117,14 @@ final class AmityPostHeaderProtocolHandler: AmityPostHeaderDelegate {
             // if it is in community feed, check permission before options
             if let communityId = post.targetCommunity?.communityId {
                 var items: [TextItemOption] = isReported ? [unreportOption] : [reportOption]
-                AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: communityId) { [weak self] (hasPermission) in
+                Task { @MainActor in
+                    let hasPermission = await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: communityId)
                     if hasPermission {
                         items.insert(deleteOption, at: 0)
                     }
                     contentView.configure(items: items, selectedItem: nil)
-                    self?.viewController?.present(bottomSheet, animated: false, completion: nil)
+                    
+                    self.viewController?.present(bottomSheet, animated: false, completion: nil)
                 }
             } else {
                 let items: [TextItemOption] = isReported ? [unreportOption] : [reportOption]

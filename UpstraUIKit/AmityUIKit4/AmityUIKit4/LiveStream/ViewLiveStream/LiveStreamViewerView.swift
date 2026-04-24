@@ -359,7 +359,7 @@ struct LiveStreamViewerView: View {
                                     } else if room.targetType == "user", let user = room.creator {
                                         AmityUserProfileImageView(
                                             displayName: user.displayName ?? "",
-                                            avatarURL: URL(string: user.getAvatarInfo()?.mediumFileURL ?? "")
+                                            avatarURL: URL(string: user.avatar?.mediumFileURL ?? "")
                                         )
                                         .frame(width: 32, height: 32)
                                         .clipShape(Circle())
@@ -491,7 +491,8 @@ struct LiveStreamViewerView: View {
                             showProductList()
                         }
                         liveChatViewModel.refreshProductTagsAction = {
-                            if Date().timeIntervalSince(viewModel.post.object.updatedAt) > 60 {
+                            let updatedAtTimestamp = viewModel.post.object.updatedAt ?? Date()
+                            if Date().timeIntervalSince(updatedAtTimestamp) > 60 {
                                 await viewModel.getPost()
                             }
                         }

@@ -20,7 +20,7 @@ class LiveStreamCoHostInviteViewModel: ObservableObject {
     init(conferenceViewModel: LiveStreamConferenceViewModel) {
         self.room = conferenceViewModel.createdRoom
         self.conferenceViewModel = conferenceViewModel
-        self.presenceRepository = AmityRoomPresenceRepository(client: AmityUIKitManagerInternal.shared.client, roomId: room?.roomId ?? "")
+        self.presenceRepository = AmityRoomPresenceRepository(roomId: room?.roomId ?? "")
     }
     
     func loadViewers() {

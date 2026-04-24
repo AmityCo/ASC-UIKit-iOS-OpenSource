@@ -10,7 +10,7 @@ import AmitySDK
 import Combine
 
 class InvitationManager {
-    let repository = AmityInvitationRepository(client: AmityUIKitManagerInternal.shared.client)
+    let repository = AmityInvitationRepository()
     
     func getMyCommunityInvitations() -> AmityCollection<AmityInvitation> {
         return repository.getMyCommunityInvitations()

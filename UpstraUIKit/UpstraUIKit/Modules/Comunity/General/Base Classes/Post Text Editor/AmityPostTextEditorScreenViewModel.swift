@@ -10,7 +10,7 @@ import AmitySDK
 
 class AmityPostTextEditorScreenViewModel: AmityPostTextEditorScreenViewModelType {
     
-    private let postRepository: AmityPostRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let postRepository: AmityPostRepository = AmityPostRepository()
     private var postObjectToken: AmityNotificationToken?
     
     public weak var delegate: AmityPostTextEditorScreenViewModelDelegate?

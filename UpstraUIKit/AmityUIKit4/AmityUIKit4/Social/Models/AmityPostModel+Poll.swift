@@ -36,7 +36,7 @@ extension AmityPostModel {
             self.closedIn = UInt64(poll.closedIn)
             self.voteCount = Int(poll.voteCount)
             self.answers = poll.answers.map { Answer(answer: $0) }
-            self.createdAt = poll.createdAt
+            self.createdAt = poll.createdAt ?? Date()
             self.isOpen = !poll.isClosed || !poll.isVoted
             self.isImagePoll = poll.answers.first?.dataType == "image"
         }

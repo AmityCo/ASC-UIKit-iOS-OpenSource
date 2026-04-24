@@ -8,7 +8,7 @@
 import AmitySDK
 
 class ProductManager {
-    let repository = AmityProductRepository(client: AmityUIKitManagerInternal.shared.client)
+    let repository = AmityProductRepository()
     
     func searchProducts(_ queryOptions: AmityProductQueryOptions) -> AmityCollection<AmityProduct> {
         return repository.searchProducts(options: queryOptions)

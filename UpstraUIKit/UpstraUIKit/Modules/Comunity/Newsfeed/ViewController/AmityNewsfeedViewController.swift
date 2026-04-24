@@ -24,7 +24,7 @@ public class AmityNewsfeedViewController: AmityViewController, IndicatorInfoProv
     private let createPostButton: AmityFloatingButton = AmityFloatingButton()
     private let feedViewController = AmityFeedViewController.make(feedType: .globalFeed)
     
-    private let storyRepository = AmityStoryRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let storyRepository = AmityStoryRepository()
     private var storyGlobalFeedCollection: AmityCollection<AmityStoryTarget>?
     private var cancellable: AnyCancellable?
     

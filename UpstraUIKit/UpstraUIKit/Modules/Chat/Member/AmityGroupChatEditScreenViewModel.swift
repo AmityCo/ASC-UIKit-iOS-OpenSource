@@ -40,9 +40,9 @@ extension AmityGroupChatEditorScreenViewModelType {
 class AmityGroupChatEditScreenViewModel: AmityGroupChatEditorScreenViewModelType {
     
     private var channelNotificationToken: AmityNotificationToken?
-    private let channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
-    private var channelUpdateBuilder: AmityChannelUpdateBuilder!
-    private let fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let channelRepository = AmityChannelRepository()
+    private var channelUpdateBuilder: AmityChannelUpdateOptions!
+    private let fileRepository = AmityFileRepository()
 
     var channel: AmityChannel?
     weak var delegate: AmityGroupChatEditorScreenViewModelDelegate?
@@ -51,7 +51,7 @@ class AmityGroupChatEditScreenViewModel: AmityGroupChatEditorScreenViewModelType
     
     init(channelId: String) {
         self.channelId = channelId
-        channelUpdateBuilder = AmityChannelUpdateBuilder(channelId: channelId)
+        channelUpdateBuilder = AmityChannelUpdateOptions(channelId: channelId)
         channelNotificationToken = channelRepository.getChannel(channelId)
             .observe({ [weak self] channel, error in
                 guard let weakself = self,
@@ -90,8 +90,9 @@ class AmityGroupChatEditScreenViewModel: AmityGroupChatEditorScreenViewModelType
     }
     
     func getChannelEditUserPermission(_ completion: ((Bool) -> Void)?) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.editChannel, forChannel: channelId, completion: { hasPermission in
+        Task { @MainActor in
+            let hasPermission = await AmityUIKitManagerInternal.shared.client.hasPermission(.editChannel, forChannel: channelId)
             completion?(hasPermission)
-        })
+        }
     }
 }

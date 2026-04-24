@@ -12,7 +12,7 @@ class AmityCategoryListScreenViewModel: AmityCategoryListScreenViewModelType {
     
     weak var delegate: AmityCategoryListScreenViewModelDelegate?
     
-    private let categoryRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let categoryRepository = AmityCommunityRepository()
     private var categoryCollection: AmityCollection<AmityCommunityCategory>?
     private var categoryToken: AmityNotificationToken?
     
@@ -22,7 +22,7 @@ class AmityCategoryListScreenViewModel: AmityCategoryListScreenViewModelType {
     
     private func setupCollection() {
         categoryCollection = categoryRepository.getCategories(sortBy: .displayName, includeDeleted: false)
-        categoryToken = categoryCollection?.observe { [weak self] collection, _, error in
+        categoryToken = categoryCollection?.observe { [weak self] collection, error in
             guard let strongSelf = self else { return }
             strongSelf.delegate?.screenViewModelDidUpdateData(strongSelf)
         }
@@ -31,11 +31,11 @@ class AmityCategoryListScreenViewModel: AmityCategoryListScreenViewModelType {
     // MARK: - Data Source
     
     func numberOfItems() -> Int {
-        return Int(categoryCollection?.count() ?? 0)
+        return Int(categoryCollection?.snapshots.count ?? 0)
     }
     
     func item(at indexPath: IndexPath) -> AmityCommunityCategory? {
-        return categoryCollection?.object(at: indexPath.row)
+        return categoryCollection?.snapshots[indexPath.row]
     }
     
     func loadNext() {

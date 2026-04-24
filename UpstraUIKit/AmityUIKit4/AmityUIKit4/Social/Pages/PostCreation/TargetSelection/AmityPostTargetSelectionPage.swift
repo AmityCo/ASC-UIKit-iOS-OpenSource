@@ -67,7 +67,7 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
         
         let onSelection: DefaultTapAction
         
-        private let mytimelineAvatarURL: URL? = URL(string: AmityUIKitManagerInternal.shared.client.user?.snapshot?.getAvatarInfo()?.fileURL ?? "")
+        private let mytimelineAvatarURL: URL? = URL(string: AmityUIKitManagerInternal.shared.client.user?.snapshot?.avatar?.fileURL ?? "")
 
         var body: some View {
             VStack(spacing: 10) {

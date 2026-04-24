@@ -28,8 +28,8 @@ final class AmityFollowersListScreenViewModel: AmityFollowersListScreenViewModel
     
     // MARK: - Initializer
     init(userId: String, type: AmityFollowerViewType) {
-        userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
-        followManager = userRepository.userRelationship
+        userRepository = AmityUserRepository()
+        followManager = AmityUserRelationship()
         self.userId = userId
         self.isCurrentUser = userId == AmityUIKitManagerInternal.shared.client.currentUserId
         self.type = type
@@ -57,7 +57,7 @@ extension AmityFollowersListScreenViewModel {
             followersCollection = type == .followers ? followManager.getFollowers(withUserId: userId) : followManager.getFollowings(withUserId: userId)
         }
         
-        followToken = followersCollection?.observe { [weak self] collection, _, error in
+        followToken = followersCollection?.observe { [weak self] collection, error in
             self?.prepareDataSource(collection: collection, error: error)
         }
     }
@@ -138,8 +138,8 @@ private extension AmityFollowersListScreenViewModel {
         switch collection.dataStatus {
         case .fresh:
             var followers: [AmityFollowRelationship] = []
-            for i in 0..<collection.count() {
-                guard let follow = collection.object(at: i) else { continue }
+            for i in 0..<collection.snapshots.count {
+                let follow = collection.snapshots[i]
                 followers.append(follow)
             }
             

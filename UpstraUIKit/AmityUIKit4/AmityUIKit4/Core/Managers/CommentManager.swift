@@ -9,7 +9,7 @@ import Foundation
 import AmitySDK
 
 class CommentManager {
-    private let commentRepository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let commentRepository = AmityCommentRepository()
     
 
     func getComments(queryOptions: AmityCommentQueryOptions) -> AmityCollection<AmityComment> {
@@ -27,8 +27,7 @@ class CommentManager {
     }
     
     @MainActor
-    @discardableResult
-    func deleteComment(withId commentId: String) async throws -> Bool {
+    func deleteComment(withId commentId: String) async throws {
         try await commentRepository.softDeleteComment(withId: commentId)
     }
     
@@ -49,8 +48,7 @@ class CommentManager {
     }
     
     @MainActor
-    @discardableResult
-    func unflagComment(withId commentId: String) async throws -> Bool {
+    func unflagComment(withId commentId: String) async throws {
         try await commentRepository.unflagComment(withId: commentId)
     }
     

@@ -139,10 +139,7 @@ class PostFeedViewModel: ObservableObject {
             if let community = object.targetCommunity, community.isPostReviewEnabled {
                 return
             }
-            
-            /// Rest assured all post object models are not invalidated at this point
-            guard recentlyCreatedPosts.allSatisfy({ post in !post.isInvalidated }) else { return }
-            
+                        
             /// Ensure recentlyCreatedPosts is not having the post to prevent duplication in data source
             if !recentlyCreatedPosts.contains(where: { $0.postId == object.postId }) {
                 
@@ -155,10 +152,7 @@ class PostFeedViewModel: ObservableObject {
     
     @objc private func didPostDeleted(_ notification: Notification) {
         if let info = notification.userInfo, let postId = info["postId"] as? String, feedType == .globalFeed {
-            
-            /// Rest assured all post object models are not invalidated at this point
-            guard recentlyCreatedPosts.allSatisfy({ post in !post.isInvalidated }) else { return }
-            
+                        
             /// Check recentlyCreatedPosts is deleted
             if recentlyCreatedPosts.contains(where: { $0.postId == postId }) {
                 
@@ -289,6 +283,7 @@ extension PostFeedViewModel {
     }
     
     private func canRenderPost(post: AmityPost) -> Bool {
+        guard !post.isDeleted else { return false }
         let filterCondition = !post.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" }
         return filterCondition
     }

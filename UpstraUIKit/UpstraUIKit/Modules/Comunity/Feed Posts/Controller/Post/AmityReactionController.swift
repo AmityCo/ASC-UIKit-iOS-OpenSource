@@ -20,13 +20,13 @@ protocol AmityReactionControllerProtocol {
 
 final class AmityReactionController: AmityReactionControllerProtocol {
     
-    private let repository = AmityReactionRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityReactionRepository()
 
     func addReaction(withReaction reaction: AmityReactionType, referenceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?) {
         Task { @MainActor in
             do {
-                let result = try await repository.addReaction(reaction.rawValue, referenceId: referenceId, referenceType: referenceType)
-                completion?(result, nil)
+                try await repository.addReaction(reaction.rawValue, referenceId: referenceId, referenceType: referenceType)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }
@@ -36,8 +36,8 @@ final class AmityReactionController: AmityReactionControllerProtocol {
     func removeReaction(withReaction reaction: AmityReactionType, referenceId: String, referenceType: AmityReactionReferenceType, completion: AmityRequestCompletion?) {
         Task { @MainActor in
             do {
-                let result = try await repository.removeReaction(reaction.rawValue, referenceId: referenceId, referenceType: referenceType)
-                completion?(result, nil)
+                try await repository.removeReaction(reaction.rawValue, referenceId: referenceId, referenceType: referenceType)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }

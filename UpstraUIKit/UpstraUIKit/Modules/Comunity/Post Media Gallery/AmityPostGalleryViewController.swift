@@ -96,7 +96,7 @@ public class AmityPostGalleryViewController: AmityViewController {
         
         let screenViewModel = AmityPostGalleryScreenViewModel()
         screenViewModel.setup(
-            postRepository: AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+            postRepository: AmityPostRepository()
         )
         
         vc.screenViewModel = screenViewModel

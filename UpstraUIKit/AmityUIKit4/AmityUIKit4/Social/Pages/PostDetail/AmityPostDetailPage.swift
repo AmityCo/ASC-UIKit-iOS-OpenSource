@@ -130,8 +130,8 @@ public struct AmityPostDetailPage: AmityPageView {
                                 // Dismiss bottom sheet
                                 host.controller?.dismiss(animated: false)
                                 
-                                let hasMembership = viewModel.post?.targetCommunity?.isJoined ?? false
-                                if !hasMembership {
+                                let membershipStatus = PostTargetMembershipStatus.determineStatus(isJoined: viewModel.post?.targetCommunity?.isJoined)
+                                if membershipStatus == .nonMember {
                                     AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: .init(host: host))
                                     return
                                 }

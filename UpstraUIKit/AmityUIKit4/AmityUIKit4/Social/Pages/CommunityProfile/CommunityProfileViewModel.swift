@@ -120,23 +120,22 @@ public class CommunityProfileViewModel: ObservableObject {
             
             // Check StoryManage Permission
             Task { @MainActor [weak self] in
+                guard let self else { return }
+                
                 let hasPermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: community.communityId)
                 let allowAllUserCreation = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
                
-                self?.hasStoryManagePermission = (allowAllUserCreation || hasPermission) && community.isJoined
-            }
-            
-            if communityObject.onlyAdminCanPost {
-                AmityUIKit4Manager.client.hasPermission(.createPrivilegedPost, forCommunity: community.communityId) { success in
-                    self.hasCreatePostPermission = success && community.isJoined
+                self.hasStoryManagePermission = (allowAllUserCreation || hasPermission) && community.isJoined
+                
+                if communityObject.onlyAdminCanPost {
+                    Task {
+                        self.hasCreatePostPermission = await AmityUIKit4Manager.client.hasPermission(.createPrivilegedPost, forCommunity: community.communityId)
+                    }
+                } else {
+                    self.hasCreatePostPermission = community.isJoined
                 }
-            } else {
-                self.hasCreatePostPermission = community.isJoined
-            }
-            
-            AmityUIKit4Manager.client.hasPermission(.createEvent, forCommunity: community.communityId) { [weak self] hasPermission in
-                guard let self else { return }
-                self.hasCreateEventPermission = hasPermission
+                
+                self.hasCreateEventPermission = await AmityUIKit4Manager.client.hasPermission(.createEvent, forCommunity: community.communityId)
             }
             
             // If the user leave the community after approved the join request, refresh the feed.
@@ -151,19 +150,19 @@ public class CommunityProfileViewModel: ObservableObject {
         // `pendingPostCount` in community model includes pending posts from other members in that community.
         // So we query for "our" pending posts & determine whether to show banner or not based on its count.
         pendingPostToken = nil
-        pendingPostToken = feedManager.getPendingCommunityFeedPosts(communityId: communityId).observe{ [weak self] collection, change, error in
+        pendingPostToken = feedManager.getPendingCommunityFeedPosts(communityId: communityId).observe{ [weak self] collection, error in
             if let _ = error {
                 return
             }
             
-            self?.shouldShowPendingBanner = collection.count() != 0
+            self?.shouldShowPendingBanner = collection.snapshots.count != 0
         }
     }
     
     func loadStories() {
         storyToken = nil
         storyCollection = storyManager.getActiveStories(in: communityId)
-        storyToken = storyCollection?.observe({ [weak self] collection, _, error in
+        storyToken = storyCollection?.observe({ [weak self] collection, error in
             let stories = collection.snapshots
             self?.stories = stories
         })
@@ -177,7 +176,7 @@ public class CommunityProfileViewModel: ObservableObject {
         
         roomPostsToken = nil
         roomPostCollection = postManager.getCommunityLiveRoomPosts(communityId: communityId)
-        roomPostsToken = roomPostCollection?.observe { [weak self] collection, _, error in
+        roomPostsToken = roomPostCollection?.observe { [weak self] collection, error in
             let posts = collection.snapshots
             self?.roomPosts = posts.flatMap({ post -> [AmityPostModel] in
                 // community linked object is only available in parent post
@@ -207,7 +206,7 @@ public class CommunityProfileViewModel: ObservableObject {
 
         collection =  postManager.getAllPinnedPost(communityId: communityId)
         
-        pinnedPostToken = collection?.observe { [weak self] collection, _, error in
+        pinnedPostToken = collection?.observe { [weak self] collection, error in
             self?.pinnedPosts = []
             self?.announcementPost = nil
             
@@ -275,12 +274,12 @@ public class CommunityProfileViewModel: ObservableObject {
     func fetchPendingJoinRequests() {
         guard let community = self.community?.object, community.requiresJoinApproval else { return }
         
-        joinRequestsToken = community.getJoinRequests(status: .pending).observe { [weak self] liveCollection, _, error in
+        joinRequestsToken = community.getJoinRequests(status: .pending).observe { [weak self] liveCollection, error in
             guard let self else { return }
             
             if let _ = error { return }
             
-            self.joinRequestCount = liveCollection.count()
+            self.joinRequestCount = liveCollection.snapshots.count
             self.updatePendingBannerState()
         }
     }

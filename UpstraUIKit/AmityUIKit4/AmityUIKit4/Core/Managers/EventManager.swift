@@ -9,7 +9,7 @@ import SwiftUI
 import AmitySDK
 
 class EventManager {
-    private let eventRepo = AmityEventRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let eventRepo = AmityEventRepository()
     
     func createEvent(options: AmityEventCreateOptions) async throws -> AmityEvent {
         return try await eventRepo.createEvent(options: options)

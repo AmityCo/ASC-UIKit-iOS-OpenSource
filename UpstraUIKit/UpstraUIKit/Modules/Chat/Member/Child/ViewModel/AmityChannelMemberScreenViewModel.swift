@@ -35,7 +35,7 @@ final class AmityChannelMemberScreenViewModel: AmityChannelMemberScreenViewModel
          addMemberController: AmityChannelAddMemberControllerProtocol,
          roleController: AmityChannelRoleControllerProtocol) {
         self.channel = channel
-        userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+        userRepository = AmityUserRepository()
         self.fetchMemberController = fetchMemberController
         self.removeMemberController = removeMemberController
         self.addMemberController = addMemberController
@@ -61,7 +61,7 @@ extension AmityChannelMemberScreenViewModel {
         
         Task { @MainActor in
             do {
-                let result = try await userRepository.isUserFlaggedByMe(withId: user.userId)
+                try await userRepository.isUserFlaggedByMe(withId: user.userId)
                 completion?(true)
             } catch let error {
                 completion?(false)
@@ -75,9 +75,10 @@ extension AmityChannelMemberScreenViewModel {
     }
     
     func getChannelEditUserPermission(_ completion: ((Bool) -> Void)?) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.editChannel, forChannel: channel.channelId, completion: { hasPermission in
+        Task { @MainActor in
+            let hasPermission = await AmityUIKitManagerInternal.shared.client.hasPermission(.editChannel, forChannel: channel.channelId)
             completion?(hasPermission)
-        })
+        }
     }
 }
 // MARK: - Action
@@ -157,10 +158,8 @@ extension AmityChannelMemberScreenViewModel {
         guard let user = member(at: indexPath).user else { return }
         Task { @MainActor in
             do {
-                let isSuccess = try await userRepository.flagUser(withId: user.userId)
-                if isSuccess {
-                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.reportSent.localizedString))
-                }
+                try await userRepository.flagUser(withId: user.userId)
+                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.reportSent.localizedString))
             } catch let error {
                 AmityHUD.show(.error(message: error.localizedDescription))
             }
@@ -171,10 +170,8 @@ extension AmityChannelMemberScreenViewModel {
         guard let user = member(at: indexPath).user else { return }
         Task { @MainActor in
             do {
-                let isSuccess = try await userRepository.unflagUser(withId: user.userId)
-                if isSuccess {
-                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.unreportSent.localizedString))
-                }
+                try await userRepository.unflagUser(withId: user.userId)
+                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.unreportSent.localizedString))
             } catch let error {
                 AmityHUD.show(.error(message: error.localizedDescription))
             }

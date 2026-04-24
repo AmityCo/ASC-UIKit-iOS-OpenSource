@@ -13,7 +13,7 @@ class AmityPostTargetPickerScreenViewModel: AmityPostTargetPickerScreenViewModel
     
     weak var delegate: AmityPostTargetPickerScreenViewModelDelegate?
     
-    private let communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let communityRepository = AmityCommunityRepository()
     private var communityCollection: AmityCollection<AmityCommunity>?
     private var communities: [AmityCommunity] = []
     private var categoryCollectionToken:AmityNotificationToken?
@@ -21,7 +21,7 @@ class AmityPostTargetPickerScreenViewModel: AmityPostTargetPickerScreenViewModel
     func observe() {
         let queryOptions = AmityCommunityQueryOptions(filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
         communityCollection = communityRepository.getCommunities(with: queryOptions)
-        categoryCollectionToken = communityCollection?.observe({ [weak self] (collection, _, _) in
+        categoryCollectionToken = communityCollection?.observe({ [weak self] (collection, _) in
             self?.communities = []
 
             guard let strongSelf = self else { return }
@@ -33,10 +33,13 @@ class AmityPostTargetPickerScreenViewModel: AmityPostTargetPickerScreenViewModel
                     dispatchGroup.enter()
                     
                     if item.onlyAdminCanPost {
-                        AmityUIKitManager.client.hasPermission(.createPrivilegedPost, forCommunity: item.communityId) { success in
-                            if success {
+                        Task { @MainActor in
+                            let hasPermission = await AmityUIKitManager.client.hasPermission(.createPrivilegedPost, forCommunity: item.communityId)
+                            
+                            if hasPermission {
                                 self?.communities.append(item)
                             }
+                            
                             dispatchGroup.leave()
                         }
                     } else {

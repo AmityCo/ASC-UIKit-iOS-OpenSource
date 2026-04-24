@@ -10,7 +10,7 @@ import AmitySDK
 
 class StreamManager {
     
-    private let streamRepository = AmityStreamRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let streamRepository = AmityStreamRepository()
     
     func createStream(title: String, description: String?, thumbnail: AmityImageData?, metadata: [String: Any]?, chatEnabled: Bool) async throws -> AmityStream {
         try await streamRepository.createStream(title: title, description: description ?? "", thumbnailImage: thumbnail, metadata: metadata, resolution: .SD, channelEnabled: chatEnabled)

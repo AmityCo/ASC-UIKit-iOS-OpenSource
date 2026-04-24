@@ -26,6 +26,7 @@ public final class AmityMessageModel {
     public var data: [AnyHashable : Any]?
     public var tags: [String]
     public var channelSegment: UInt
+    public var uniqueId: String
     
     /**
      * The post appearance settings
@@ -38,6 +39,7 @@ public final class AmityMessageModel {
     
     public init(object: AmityMessage) {
         self.object = object
+        self.uniqueId = object.uniqueId
         self.messageId = object.messageId
         self.userId = object.userId
         self.displayName = object.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
@@ -45,9 +47,9 @@ public final class AmityMessageModel {
         self.isDeleted = object.isDeleted
         self.isEdited = object.isEdited
         self.messageType = object.messageType
-        self.createdAtDate = object.createdAt
-        self.date = AmityDateFormatter.Message.getDate(date: self.isEdited ? object.editedAt : object.createdAt)
-        self.time = AmityDateFormatter.Message.getTime(date: self.isEdited ? object.editedAt : object.createdAt)
+        self.createdAtDate = object.createdAt ?? Date()
+        self.date = AmityDateFormatter.Message.getDate(date: self.isEdited ? object.editedAt ?? Date() : createdAtDate)
+        self.time = AmityDateFormatter.Message.getTime(date: self.isEdited ? object.editedAt ?? Date() : createdAtDate)
         self.flagCount = UInt(object.flagCount)
         self.data = object.data
         self.tags = object.tags

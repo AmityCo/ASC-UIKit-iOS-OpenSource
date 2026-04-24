@@ -15,7 +15,7 @@ public enum ReactionType: String {
 
 class ReactionManager {
     
-    private let reactionRepository = AmityReactionRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let reactionRepository = AmityReactionRepository()
     
     func createLiveReaction(_ reaction: String, referenceId: String, referenceType: AmityLiveReactionReferenceType, streamId: String) {
         reactionRepository.createReaction(reaction, referenceId: referenceId, referenceType: referenceType, streamId: streamId)
@@ -26,26 +26,22 @@ class ReactionManager {
     }
     
     @MainActor
-    @discardableResult
-    func addReaction(_ reactionType: ReactionType, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
+    func addReaction(_ reactionType: ReactionType, referenceId: String, referenceType: AmityReactionReferenceType) async throws {
         return try await reactionRepository.addReaction(reactionType.rawValue, referenceId: referenceId, referenceType: referenceType)
     }
     
     @MainActor
-    @discardableResult
-    func removeReaction(_ reactionType: ReactionType, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
+    func removeReaction(_ reactionType: ReactionType, referenceId: String, referenceType: AmityReactionReferenceType) async throws {
         return try await reactionRepository.removeReaction(reactionType.rawValue, referenceId: referenceId, referenceType: referenceType)
     }
     
     @MainActor
-    @discardableResult
-    func addReaction(_ reaction: String, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
+    func addReaction(_ reaction: String, referenceId: String, referenceType: AmityReactionReferenceType) async throws {
         return try await reactionRepository.addReaction(reaction, referenceId: referenceId, referenceType: referenceType)
     }
     
     @MainActor
-    @discardableResult
-    func removeReaction(_ reaction: String, referenceId: String, referenceType: AmityReactionReferenceType) async throws -> Bool {
+    func removeReaction(_ reaction: String, referenceId: String, referenceType: AmityReactionReferenceType) async throws {
         return try await reactionRepository.removeReaction(reaction, referenceId: referenceId, referenceType: referenceType)
     }
     

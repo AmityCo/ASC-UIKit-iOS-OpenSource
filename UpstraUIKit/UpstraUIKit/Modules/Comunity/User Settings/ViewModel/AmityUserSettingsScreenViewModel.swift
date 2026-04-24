@@ -21,7 +21,7 @@ final class AmityUserSettingsScreenViewModel: AmityUserSettingsScreenViewModelTy
     // MARK: - Properties
     private(set) var user: AmityUser?
     let userId: String
-    private let userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let userRepository = AmityUserRepository()
     private var userToken: AmityNotificationToken?
     private let followManager: AmityUserRelationship
     private var isFlaggedByMe: Bool?
@@ -35,7 +35,7 @@ final class AmityUserSettingsScreenViewModel: AmityUserSettingsScreenViewModelTy
     init(userId: String, userNotificationController: AmityUserNotificationSettingsControllerProtocol) {
         self.userId = userId
         self.userNotificationController = userNotificationController
-        followManager = userRepository.userRelationship
+        followManager = AmityUserRelationship()
     }
 }
 

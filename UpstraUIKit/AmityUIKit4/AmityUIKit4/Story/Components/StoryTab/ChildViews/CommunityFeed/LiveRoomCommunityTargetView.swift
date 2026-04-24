@@ -56,7 +56,7 @@ struct LiveRoomCommunityTargetView: View {
     }
     
     private func getAvatar() -> (url: URL?, displayName: String) {
-        let avatarURL = URL(string: post.room?.creator?.getAvatarInfo()?.mediumFileURL ?? "")
+        let avatarURL = URL(string: post.room?.creator?.avatar?.mediumFileURL ?? "")
         let displayName = post.room?.creator?.displayName ?? "Unknown"
         
         return (avatarURL, displayName)

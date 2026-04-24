@@ -244,7 +244,7 @@ class AmityDraftStoryPageViewModel: ObservableObject {
     @Published var avatar: URL?
     
     private var cancellable: AnyCancellable?
-    private var communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private var communityRepository = AmityCommunityRepository()
     @Published var hyperLinkConfigModel: HyperLinkModel = HyperLinkModel(url: "", urlName: "")
     
     init(targetId: String, targetType: AmityStoryTargetType, mediaType: AmityStoryMediaType) {
@@ -273,7 +273,7 @@ class AmityDraftStoryPageViewModel: ObservableObject {
                 items = []
             }
             
-            let createOption = AmityImageStoryCreateOptions(targetType: .community, tartgetId: targetId, imageFileURL: imageURL, items: items, imageDisplayMode: storyImageDisplayMode)
+            let createOption = AmityImageStoryCreateOptions(targetType: .community, targetId: targetId, imageFileURL: imageURL, items: items, imageDisplayMode: storyImageDisplayMode)
             
             try await storyManager.createImageStory(in: targetId, createOption: createOption)
             
@@ -287,7 +287,7 @@ class AmityDraftStoryPageViewModel: ObservableObject {
                 items = []
             }
             
-            let createOption = AmityVideoStoryCreateOptions(targetType: .community, tartgetId: targetId, videoFileURL: videoURL, items: items)
+            let createOption = AmityVideoStoryCreateOptions(targetType: .community, targetId: targetId, videoFileURL: videoURL, items: items)
             
             try await storyManager.createVideoStory(in: targetId, createOption: createOption)
         }

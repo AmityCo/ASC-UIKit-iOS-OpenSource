@@ -329,7 +329,7 @@ private extension AmityCommunityProfileHeaderViewController {
     
     @objc func chatTap() {
         guard let rootViewController = rootViewController else { return }
-        let channelRepository = AmityChannelRepository(client: AmityUIKitManager.client)
+        let channelRepository = AmityChannelRepository()
         channelToken = channelRepository.getChannel(screenViewModel.dataSource.community?.channelId ?? "").observeOnce { channel, error in
             if let channel = channel.snapshot {
                 AmityEventHandler.shared.communityChannelDidTap(from: rootViewController, channelId: channel.channelId, subChannelId: channel.defaultSubChannelId)

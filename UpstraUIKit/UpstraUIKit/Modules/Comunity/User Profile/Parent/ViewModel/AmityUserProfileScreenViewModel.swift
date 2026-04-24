@@ -19,7 +19,7 @@ final class AmityUserProfileScreenViewModel: AmityUserProfileScreenViewModelType
     
     // MARK: - Initializer
     init(userId: String) {
-        userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+        userRepository = AmityUserRepository()
         self.userId = userId
     }
     

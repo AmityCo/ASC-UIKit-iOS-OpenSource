@@ -458,13 +458,13 @@ final class AmityUIKitManagerInternal: NSObject {
             do {
                 await revokeDeviceTokens()
                 
-                let success = try await client.registerPushNotification(withDeviceToken: deviceToken)
+                try await client.registerPushNotification(withDeviceToken: deviceToken)
                 
-                if success, let currentUserId = _client?.currentUserId {
+                if let currentUserId = _client?.currentUserId {
                     // if register device successfully, binds device token to user id.
                     notificationTokenMap[currentUserId] = deviceToken
                 }
-                completion?(success, nil)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }
@@ -504,8 +504,8 @@ final class AmityUIKitManagerInternal: NSObject {
     
     func didUpdateClient() {
         // Update file repository to use in file service.
-        fileService.fileRepository = AmityFileRepository(client: client)
-        messageMediaService.fileRepository = AmityFileRepository(client: client)
+        fileService.fileRepository = AmityFileRepository()
+        messageMediaService.fileRepository = AmityFileRepository()
         
         let accessToken = self.client.accessToken ?? ""
         let authenticatedRequest = AnyModifier { request in

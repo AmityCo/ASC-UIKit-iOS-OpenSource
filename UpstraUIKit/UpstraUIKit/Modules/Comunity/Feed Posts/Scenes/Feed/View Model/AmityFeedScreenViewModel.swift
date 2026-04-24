@@ -42,7 +42,7 @@ final class AmityFeedScreenViewModel: AmityFeedScreenViewModelType {
         self.reactionController = reactionController
         self.isPrivate = false
         self.isLoading = false
-        self.pollRepository = AmityPollRepository(client: AmityUIKitManagerInternal.shared.client)
+        self.pollRepository = AmityPollRepository()
     }
     
 }

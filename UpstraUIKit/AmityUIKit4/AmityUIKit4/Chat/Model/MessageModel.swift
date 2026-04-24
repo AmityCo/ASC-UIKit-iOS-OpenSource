@@ -19,7 +19,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     public let parentId: String?
     public let hasReaction: Bool
     public let avatarURL: URL?
-    public let createdAt: Date
+    public let createdAt: Date?
     public let user: AmityUser?
     public let userId: String
     public let isDeleted: Bool
@@ -45,7 +45,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         self.reactionCount = message.reactionCount
         self.parentId = message.parentId
         self.displayName = message.user?.displayName ?? ""
-        self.avatarURL = URL(string: message.user?.getAvatarInfo()?.fileURL ?? "")
+        self.avatarURL = URL(string: message.user?.avatar?.fileURL ?? "")
         self.isEdited = message.isEdited
         self.createdAt = message.createdAt
         self.user = message.user

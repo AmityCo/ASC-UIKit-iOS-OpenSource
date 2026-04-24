@@ -267,8 +267,8 @@ class PostBottomSheetViewModel: ObservableObject {
     }
     
     @MainActor
-    func closePoll(id: String) async throws -> Bool {
-        return try await pollManager.closePoll(pollId: id)
+    func closePoll(id: String) async throws {
+        try await pollManager.closePoll(pollId: id)
     }
     
     func updatePostFlaggedByMeState(id: String) {

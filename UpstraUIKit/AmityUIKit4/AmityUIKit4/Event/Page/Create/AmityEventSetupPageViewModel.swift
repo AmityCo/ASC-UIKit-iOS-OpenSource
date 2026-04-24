@@ -11,7 +11,7 @@ import UIKit
 
 class AmityEventSetupPageViewModel: ObservableObject {
     
-    let fileRepostiory: AmityFileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    let fileRepostiory: AmityFileRepository = AmityFileRepository()
     let eventManager = EventManager()
     
     let event: AmityEvent?

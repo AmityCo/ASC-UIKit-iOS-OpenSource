@@ -276,7 +276,7 @@ public class AmitySocialReactionPickerViewModel: ObservableObject {
                     self.onReactionAdded?(reaction)
                 }
             } catch {
-                Log.add(event: .error, "Failed to add or remove reaction: \(error.localizedDescription)")
+                Log.add(event: .error, "Failed to add or remove reaction: \(reaction) \(error.localizedDescription)")
                 Toast.showToast(style: .warning, message: "Oops, something went wrong.")
             }
         }

@@ -77,7 +77,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
     private var roomManager = RoomManager()
     private var channelManager = ChannelManager()
     private var invitationManager = InvitationManager()
-    private var fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    private var fileRepository = AmityFileRepository()
     
     private var targetObjectToken: AmityNotificationToken?
     private var livePostToken: AmityNotificationToken?
@@ -142,29 +142,17 @@ class LiveStreamConferenceViewModel: ObservableObject {
     /// We use this post to start publishing live stream, and navigate to post detail page, after the user finish streaming.
     private var internalCreatedPost: AmityPost?
     var createdPost: AmityPost? {
-        if internalCreatedPost?.isInvalidated == false {
-            return internalCreatedPost
-        }
-        
-        return nil
+        return internalCreatedPost
     }
     
     private var internalCreatedRoom: AmityRoom?
     var createdRoom: AmityRoom? {
-        if internalCreatedRoom?.isInvalidated == false {
-            return internalCreatedRoom
-        }
-        
-        return nil
+        internalCreatedRoom
     }
     
     private var internalCreatedEvent: AmityEvent?
     var createdEvent: AmityEvent? {
-        if internalCreatedEvent?.model.isInvalidated == false {
-            return internalCreatedEvent
-        }
-        
-        return nil
+        internalCreatedEvent
     }
     
     // Co-host streaming properties
@@ -418,7 +406,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 Log.add(event: .info, "Obversing co-host events")
                 
                 // Observe watching count
-                self.presenceRepository = AmityRoomPresenceRepository(client: AmityUIKitManagerInternal.shared.client, roomId: room.roomId)
+                self.presenceRepository = AmityRoomPresenceRepository(roomId: room.roomId)
                 observeWatchingCount()
                 Log.add(event: .info, "Obversing watching count from room")
                 
@@ -496,7 +484,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 Log.add(event: .info, "Obversing co-host events")
                 
                 // Observe watching count
-                self.presenceRepository = AmityRoomPresenceRepository(client: AmityUIKitManagerInternal.shared.client, roomId: room.roomId)
+                self.presenceRepository = AmityRoomPresenceRepository(roomId: room.roomId)
                 observeWatchingCount()
                 Log.add(event: .info, "Obversing watching count from room")
                 
@@ -692,16 +680,14 @@ class LiveStreamConferenceViewModel: ObservableObject {
         // If co-host left or being removed, UI state will change to LiveStreamViewerView which still needs to observe room and post events...
         // So we only unsubscribe events when the participant is host
         if participantRole == .host {
-            if createdPost?.isInvalidated == false, let livestreamPost = createdPost?.childrenPosts.first, !livestreamPost.isInvalidated {
+            if let livestreamPost = createdPost?.childrenPosts.first {
                 livestreamPost.unsubscribeEvent(.post, withCompletion: { success, error in
                     Log.add(event: .info, "Unsubscribing post event status: \(success) Error: \(String(describing: error))")
                 })
             }
             
-            if createdRoom?.isInvalidated == false {
-                createdRoom?.unsubscribeEvent() { success, error in
-                    Log.add(event: .info, "Unsubscribing room event status: \(success) Error: \(String(describing: error))")
-                }
+            createdRoom?.unsubscribeEvent() { success, error in
+                Log.add(event: .info, "Unsubscribing room event status: \(success) Error: \(String(describing: error))")
             }
         }
     }

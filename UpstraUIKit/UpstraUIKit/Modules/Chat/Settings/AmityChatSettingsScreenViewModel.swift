@@ -115,9 +115,9 @@ final class AmityChatSettingsScreenViewModel: AmityChatSettingsScreenViewModelTy
     private var memberCount = String()
     
     init(channelId: String) {
-        communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
-        channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
-        userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+        communityRepository = AmityCommunityRepository()
+        channelRepository = AmityChannelRepository()
+        userRepository = AmityUserRepository()
         
         directChatSetting = [.report(isUserReported)]
         
@@ -246,8 +246,8 @@ extension AmityChatSettingsScreenViewModel {
         if let user = otherUser {
             Task { @MainActor in
                 do {
-                    let result = try await userRepository.flagUser(withId: user.userId)
-                    self.isUserReported = result
+                    try await userRepository.flagUser(withId: user.userId)
+                    self.isUserReported = true
                     self.delegate?.screenViewModelDidFinishReport(error: nil)
 
                 } catch let error {
@@ -262,8 +262,8 @@ extension AmityChatSettingsScreenViewModel {
         if let user = otherUser {
             Task { @MainActor in
                 do {
-                    let result = try await userRepository.unflagUser(withId: user.userId)
-                    self.isUserReported = !result
+                    try await userRepository.unflagUser(withId: user.userId)
+                    self.isUserReported = false
                     self.delegate?.screenViewModelDidFinishReport(error: nil)
                 } catch let error {
                     self.isUserReported = true

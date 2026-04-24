@@ -15,7 +15,7 @@ protocol AmityCommunityCategoryControllerProtocol {
 
 final class AmityCommunityCategoryController: AmityCommunityCategoryControllerProtocol {
     
-    private let repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityCommunityRepository()
     private var collection: AmityCollection<AmityCommunityCategory>?
     private var token: AmityNotificationToken?
     private let maxCategories: Int = 8
@@ -25,7 +25,7 @@ final class AmityCommunityCategoryController: AmityCommunityCategoryControllerPr
         token = nil
         
         collection = repository.getCategories(sortBy: .displayName, includeDeleted: false)
-        token = collection?.observe { [weak self] (collection, change, error) in
+        token = collection?.observe { [weak self] (collection, error) in
             guard let self else { return }
             
             if let error {

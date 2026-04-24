@@ -43,10 +43,9 @@ class AmityPostGalleryScreenViewModel {
         }
         // Query all the posts from the live collection
         var allPosts: [AmityPost] = []
-        for index in (0..<posts.count()) {
-            if let post = posts.object(at: index) {
-                allPosts.append(post)
-            }
+        for index in (0..<posts.snapshots.count) {
+            let post = posts.snapshots[index]
+            allPosts.append(post)
         }
         // Rebuild new datasource items
         var newItems: Array<[AmityPostGalleryScreenViewModel.Item]> = []
@@ -89,7 +88,7 @@ extension AmityPostGalleryScreenViewModel: AmityPostGalleryScreenViewModelAction
             return
         }
         posts = postRepository.getPosts(options)
-        token = posts?.observe { [weak self] _, changes, error in
+        token = posts?.observe { [weak self] _, error in
             self?.updateAndRebuildDataSource()
         }
     }

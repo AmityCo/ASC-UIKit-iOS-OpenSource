@@ -98,17 +98,19 @@ public struct AmityCommunityCommentsNotificationSettingPage: AmityPageView {
                 .opacity(viewModel.isSettingChanged ? 1.0 : 0.35)
                 .onTapGesture {
                     guard viewModel.isSettingChanged else { return }
-                    viewModel.updateSettings { status, error in
-                        if error != nil {
+                    
+                    Task {
+                        do {
+                            try await viewModel.updateSettings()
+                            
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityUpdateSuccessToastMessage.localizedString)
+                            if let navigationController = host.controller?.navigationController, navigationController.viewControllers.count > 3 {
+                                navigationController.popToViewController(navigationController.viewControllers[navigationController.viewControllers.count - 4], animated: true)
+                            } else {
+                                host.controller?.navigationController?.popViewController(animated: true)
+                            }
+                        } catch {
                             Toast.showToast(style: .success, message: "Failed to update community profile!")
-                            return
-                        }
-                        
-                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityUpdateSuccessToastMessage.localizedString)
-                        if let navigationController = host.controller?.navigationController, navigationController.viewControllers.count > 3 {
-                            navigationController.popToViewController(navigationController.viewControllers[navigationController.viewControllers.count - 4], animated: true)
-                        } else {
-                            host.controller?.navigationController?.popViewController(animated: true)
                         }
                     }
                 }
@@ -126,11 +128,13 @@ class AmityCommunityCommentsNotificationSettingPageViewModel: ObservableObject {
     
     private(set) var orginalSettings: [AmityCommunityNotificationEventType : CommunityNotificationSettingOption] = [:]
     private let community: AmityCommunity
-    private let notificaitonManager = NotificationManager()
+    private let notificationManager = NotificationManager()
     
     init(_ community: AmityCommunity) {
         self.community = community
-        getPostNotificationSettings()
+        Task {
+            await getPostNotificationSettings()
+        }
         
         cancellable = $commentReactionNotificationSetting
             .combineLatest($commentCreationNotificaitonSetting, $commentReplyNotificaitonSetting)
@@ -139,8 +143,7 @@ class AmityCommunityCommentsNotificationSettingPageViewModel: ObservableObject {
             })
     }
     
-    
-    func updateSettings(_ completion: @escaping (Bool, AmityError?) -> Void) {
+    func updateSettings() async throws {
         var updatedSetting: [AmityCommunityNotificationEventType : CommunityNotificationSettingOption] = [:]
         updatedSetting[.commentReacted] = commentReactionNotificationSetting
         updatedSetting[.commentCreated] = commentCreationNotificaitonSetting
@@ -148,25 +151,20 @@ class AmityCommunityCommentsNotificationSettingPageViewModel: ObservableObject {
         
         let events = updatedSetting.mapToNotificationEvents()
         
-        notificaitonManager.enableNotificaitonSetting(withId: community.communityId, events: events) { status, error in
-            completion(status, error)
-        }
+        try await notificationManager.enableNotificationSetting(withId: community.communityId, events: events)
     }
     
-    func getPostNotificationSettings() {
-        notificaitonManager.getCommunityNotificationSetting(withId: community.communityId) { [weak self] settings, error in
-            if error != nil {
-                self?.orginalSettings = [:]
-                return
-            }
-            
-            if let settings {
-                self?.orginalSettings = settings.mapToSettingOptionMap()
-            }
-            
-            self?.commentReactionNotificationSetting = self?.orginalSettings[.commentReacted] ?? .everyone
-            self?.commentCreationNotificaitonSetting = self?.orginalSettings[.commentCreated] ?? .everyone
-            self?.commentReplyNotificaitonSetting = self?.orginalSettings[.commentReplied] ?? .everyone
+    func getPostNotificationSettings() async {
+        let settings = try? await notificationManager.getCommunityNotificationSetting(withId: community.communityId)
+        
+        if let settings {
+            self.orginalSettings = settings.mapToSettingOptionMap()
+        } else {
+            self.orginalSettings = [:]
         }
+        
+        self.commentReactionNotificationSetting = self.orginalSettings[.commentReacted] ?? .everyone
+        self.commentCreationNotificaitonSetting = self.orginalSettings[.commentCreated] ?? .everyone
+        self.commentReplyNotificaitonSetting = self.orginalSettings[.commentReplied] ?? .everyone
     }
 }

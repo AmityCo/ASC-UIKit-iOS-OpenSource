@@ -113,9 +113,10 @@ extension FeatureViewController: UITableViewDelegate {
             present(navigationController, animated: true, completion: nil)
         case .userProfile:
             let profilePage = AmityUserProfilePage(userId: AmityUIKit4Manager.client.currentUserId ?? "")
-            let navigationController = AmitySwiftUIHostingNavigationController(rootView: profilePage)
-            navigationController.modalPresentationStyle = .fullScreen
-            present(navigationController, animated: true, completion: nil)
+            let host = AmitySwiftUIHostingController(rootView: profilePage)
+            let profilenavigationController = AmitySwiftUIHostingNavigationController(rootView: profilePage)
+            profilenavigationController.modalPresentationStyle = .fullScreen
+            self.navigationController?.pushViewController(host)
         case .syncNetworkConfig:
             Task { @MainActor in
                 

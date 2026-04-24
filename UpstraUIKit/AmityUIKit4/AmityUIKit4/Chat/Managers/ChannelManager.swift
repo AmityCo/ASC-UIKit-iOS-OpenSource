@@ -13,7 +13,7 @@ class ChannelManager {
     let repository: AmityChannelRepository
     
     init() {
-        self.repository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
+        self.repository = AmityChannelRepository()
     }
     
     func getChannel(channelId: String) -> AmityObject<AmityChannel> {
@@ -33,17 +33,17 @@ class ChannelManager {
     }
     
     @discardableResult
-    func updateChannel(builder: AmityChannelUpdateBuilder) async throws -> AmityChannel {
+    func updateChannel(builder: AmityChannelUpdateOptions) async throws -> AmityChannel {
         try await repository.editChannel(with: builder)
     }
     
     func addRole(channelId: String, userId: String, role: String) async throws {
-        let moderation = AmityChannelModeration(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        let moderation = AmityChannelModeration(channelId: channelId)
         let _ = try await moderation.addRole(role, userIds: [userId])
     }
     
     func removeRole(channelId: String, userId: String, role: String) async throws {
-        let moderation = AmityChannelModeration(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        let moderation = AmityChannelModeration(channelId: channelId)
         let _ = try await moderation.removeRole(role, userIds: [userId])
     }
 }

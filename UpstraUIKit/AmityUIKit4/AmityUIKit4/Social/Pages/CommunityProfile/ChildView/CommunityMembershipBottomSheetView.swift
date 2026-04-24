@@ -125,7 +125,6 @@ class CommunityMembershipBottomSheetViewModel: ObservableObject {
     private let userManager = UserManager()
     private var hasEditCommunityPermisison: Bool = false
     
-    
     init(_ community: AmityCommunity, _ communityMember: AmityCommunityMember) {
         self.community = community
         self.communityMember = communityMember
@@ -133,37 +132,31 @@ class CommunityMembershipBottomSheetViewModel: ObservableObject {
     }
     
    func checkPermisisonAndSetupData() {
-        hasEditCommunityPermisison { [weak self] in
-            self?.setupData()
-        }
-        
-        Task { @MainActor in
-            self.isReportedByMe = try await isReportedByMe()
-        }
+       Task {
+           await hasEditCommunityPermisison()
+           await setupData()
+           self.isReportedByMe = try await isReportedByMe()
+       }
     }
     
-    private func setupData() {
-        let isModerator = community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
+    private func setupData() async {
+        let isModerator = await community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
         self.shouldShowModeratorItems = hasEditCommunityPermisison || isModerator
     }
     
-    @discardableResult
-    func promoteToModerator() async throws -> Bool {
+    func promoteToModerator() async throws {
         try await community.moderate.addRoles([AmityCommunityRole.communityModerator.rawValue], userIds: [communityMember.userId])
     }
     
-    @discardableResult
-    func demoteToMember() async throws -> Bool {
+    func demoteToMember() async throws {
         try await community.moderate.removeRoles([AmityCommunityRole.communityModerator.rawValue], userIds: [communityMember.userId])
     }
     
-    @discardableResult
-    func reportUser() async throws -> Bool {
+    func reportUser() async throws {
         try await userManager.flagUser(withId: communityMember.userId)
     }
     
-    @discardableResult
-    func unReportUser() async throws -> Bool {
+    func unReportUser() async throws {
         try await userManager.unflagUser(withId: communityMember.userId)
     }
     
@@ -172,15 +165,11 @@ class CommunityMembershipBottomSheetViewModel: ObservableObject {
         try await userManager.isUserFlaggedByMe(withId: communityMember.userId)
     }
     
-    @discardableResult
-    func removeMember() async throws -> Bool {
+    func removeMember() async throws {
         try await community.membership.removeMembers([communityMember.userId])
     }
     
-    private func hasEditCommunityPermisison(_ completion: (() -> Void)?) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: community.communityId) { [weak self] status in
-            self?.hasEditCommunityPermisison = status
-            completion?()
-        }
+    private func hasEditCommunityPermisison() async {
+        self.hasEditCommunityPermisison = await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: community.communityId)
     }
 }

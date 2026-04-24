@@ -10,7 +10,7 @@ import AmitySDK
 
 class AmityCategoryCommunityListScreenViewModel: AmityCategoryCommunityListScreenViewModelType {
     
-    private let communityrepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let communityrepository = AmityCommunityRepository()
     private var communityCollection: AmityCollection<AmityCommunity>?
     private var communityToken: AmityNotificationToken?
     
@@ -19,7 +19,7 @@ class AmityCategoryCommunityListScreenViewModel: AmityCategoryCommunityListScree
     init(categoryId: String) {
         let queryOptions = AmityCommunityQueryOptions(filter: .all, sortBy: .displayName, categoryId: categoryId, includeDeleted: false)
         communityCollection = communityrepository.getCommunities(with: queryOptions)
-        communityToken = communityCollection?.observe{ [weak self] _,_,_  in
+        communityToken = communityCollection?.observe{ [weak self] _, _  in
             guard let strongSelf = self else { return  }
             strongSelf.delegate?.screenViewModelDidUpdateData(strongSelf)
         }
@@ -28,11 +28,11 @@ class AmityCategoryCommunityListScreenViewModel: AmityCategoryCommunityListScree
     // MARK: - Datasource
     
     func numberOfItems() -> Int {
-        return Int(communityCollection?.count() ?? 0)
+        return Int(communityCollection?.snapshots.count ?? 0)
     }
     
     func item(at indexPath: IndexPath) -> AmityCommunityModel? {
-        guard let object = communityCollection?.object(at: indexPath.row) else {
+        guard let object = communityCollection?.snapshots[indexPath.row] else {
             return nil
         }
         return AmityCommunityModel(object: object)

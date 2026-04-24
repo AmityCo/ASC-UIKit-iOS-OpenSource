@@ -61,7 +61,7 @@ public struct AmityEventAttendeesPage: AmityPageView {
                     let displayName = user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
                     
                     ZStack(alignment: .bottomTrailing) {
-                        AmityUserProfileImageView(displayName: displayName, avatarURL: URL(string: user.getAvatarInfo()?.fileURL ?? ""))
+                        AmityUserProfileImageView(displayName: displayName, avatarURL: URL(string: user.avatar?.fileURL ?? ""))
                             .frame(width: 40, height: 40)
                             .clipShape(Circle())
                         
@@ -139,7 +139,7 @@ class AmityEventAttendeesPageViewModel: ObservableObject {
         
         rsvpQueryState = .loading
         rsvpCollection = event.getRSVPs(status: .going)
-        rsvpToken = rsvpCollection?.observe({ [weak self] liveCollection, _, error in
+        rsvpToken = rsvpCollection?.observe({ [weak self] liveCollection, error in
             guard let self else { return }
             
             if let error {

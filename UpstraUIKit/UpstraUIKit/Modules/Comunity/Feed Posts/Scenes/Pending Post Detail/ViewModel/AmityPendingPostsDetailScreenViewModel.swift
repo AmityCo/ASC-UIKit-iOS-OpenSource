@@ -33,8 +33,8 @@ final class AmityPendingPostsDetailScreenViewModel: AmityPendingPostsDetailScree
     init(communityId: String, postId: String) {
         self.communityId = communityId
         self.postId = postId
-        self.communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
-        self.postRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+        self.communityRepository = AmityCommunityRepository()
+        self.postRepository = AmityPostRepository()
         self.communityViewModel = AmityPendingPostsCommunityViewModel(communityId: communityId, communityRepository: communityRepository)
         self.postViewModel = AmityPendingPostsDetailGetPostViewModel()
     }

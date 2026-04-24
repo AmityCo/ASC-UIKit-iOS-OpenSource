@@ -64,7 +64,7 @@ class LiveStreamViewerViewModel: ObservableObject {
         // Create live stream chat view model
         guard let room = post.room else { return }
         self.room = room
-        self.presenceRepository = AmityRoomPresenceRepository(client: AmityUIKitManagerInternal.shared.client, roomId: room.roomId)
+        self.presenceRepository = AmityRoomPresenceRepository(roomId: room.roomId)
         observeWatchingCount()
         
         // Start watch minute tracking for viewers in LIVE rooms
@@ -241,7 +241,7 @@ class LiveStreamViewerViewModel: ObservableObject {
             Log.add(event: .info, "Unsubscribing post event status: \(success) Error: \(String(describing: error))")
         }
         
-        if let room = self.post.room, room.isInvalidated == false {
+        if let room = self.post.room {
             room.unsubscribeEvent() { success, error in
                 Log.add(event: .info, "Unsubscribing room event status: \(success) Error: \(String(describing: error))")
             }

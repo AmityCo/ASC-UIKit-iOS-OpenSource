@@ -23,8 +23,8 @@ final class AmityFollowRequestsScreenViewModel: AmityFollowRequestsScreenViewMod
     
     // MARK: - Initializer
     init(userId: String) {
-        userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
-        followManager = userRepository.userRelationship
+        userRepository = AmityUserRepository()
+        followManager = AmityUserRelationship()
         self.userId = userId
     }
 }
@@ -45,7 +45,7 @@ extension AmityFollowRequestsScreenViewModel {
     func getFollowRequests() {
         followToken?.invalidate()
         followRequestCollection = followManager.getMyFollowers(with: AmityFollowQueryOption.pending)
-        followToken = followRequestCollection?.observe { [weak self] collection, _, error in
+        followToken = followRequestCollection?.observe { [weak self] collection, error in
             self?.prepareDataSource(collection: collection, error: error)
         }
     }
@@ -55,11 +55,8 @@ extension AmityFollowRequestsScreenViewModel {
         Task { @MainActor in
             do {
                 let result = try await followManager.acceptMyFollower(withUserId: request.sourceUserId)
-                let isSuccessful = result.0
-                if isSuccessful {
-                    self.removeRequest(at: indexPath)
-                    self.delegate?.screenViewModel(self, didAcceptRequestAt: indexPath)
-                }
+                self.removeRequest(at: indexPath)
+                self.delegate?.screenViewModel(self, didAcceptRequestAt: indexPath)
             } catch let error {
                 self.delegate?.screenViewModel(self, didFailToAcceptRequestAt: indexPath)
             }
@@ -71,11 +68,8 @@ extension AmityFollowRequestsScreenViewModel {
         Task { @MainActor in
             do {
                 let result = try await followManager.declineMyFollower(withUserId: request.sourceUserId)
-                let isSuccessful = result.0
-                if isSuccessful {
-                    self.removeRequest(at: indexPath)
-                    self.delegate?.screenViewModel(self, didDeclineRequestAt: indexPath)
-                }
+                self.removeRequest(at: indexPath)
+                self.delegate?.screenViewModel(self, didDeclineRequestAt: indexPath)
             } catch let error {
                 self.delegate?.screenViewModel(self, didFailToDeclineRequestAt: indexPath)
             }
@@ -105,8 +99,8 @@ private extension AmityFollowRequestsScreenViewModel {
         switch collection.dataStatus {
         case .fresh:
             var newRequests: [AmityFollowRelationship] = []
-            for i in 0..<collection.count() {
-                guard let follow = collection.object(at: i) else { continue }
+            for i in 0..<collection.snapshots.count {
+                let follow = collection.snapshots[i]
                 newRequests.append(follow)
             }
             

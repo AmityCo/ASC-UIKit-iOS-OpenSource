@@ -109,7 +109,9 @@ public struct AmityCommunitySettingPage: AmityPageView {
                     }
                     .onAppear {
                         /// Check notification setting to update the on/off status on view appeared...
-                        viewModel.isSocialNetworkEnabled(nil)
+                        Task {
+                            await viewModel.isSocialNetworkEnabled()
+                        }
                     }
                     .isHidden(viewConfig.isHidden(elementId: .notifications))
                     .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.notifications)
@@ -131,7 +133,9 @@ public struct AmityCommunitySettingPage: AmityPageView {
                             let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
                             
                             let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
-                                closeCommunity()
+                                Task {
+                                    await closeCommunity()
+                                }
                             }
                             alertController.addAction(cancelAction)
                             alertController.addAction(confirmAction)
@@ -181,7 +185,9 @@ public struct AmityCommunitySettingPage: AmityPageView {
                     let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingCloseCommunityAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.communitySettingCloseCommunityAlertMessage.localizedString, preferredStyle: .alert)
                     let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
                     let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.confirm.localizedString, style: .destructive) { _ in
-                        closeCommunity()
+                        Task {
+                            await closeCommunity()
+                        }
                     }
                     alertController.addAction(cancelAction)
                     alertController.addAction(confirmAction)
@@ -289,17 +295,18 @@ public struct AmityCommunitySettingPage: AmityPageView {
         }
     }
     
-    
-    private func closeCommunity() {
+    @MainActor
+    private func closeCommunity() async {
         Toast.showToast(style: .loading, message: "Closing the community.")
-        viewModel.deleteCommunity() { error in
-            if let error {
-                Toast.showToast(style: .warning, message: error.localizedDescription)
-                return
-            }
+        do {
+            try await viewModel.deleteCommunity()
             
             Toast.showToast(style: .success, message: "Successfully closed community!")
             host.controller?.navigationController?.popToRootViewController(animated: true)
+
+        } catch {
+            Toast.showToast(style: .warning, message: error.localizedDescription)
+
         }
     }
     

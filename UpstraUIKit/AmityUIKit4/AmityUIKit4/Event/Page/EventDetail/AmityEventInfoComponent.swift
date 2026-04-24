@@ -37,7 +37,12 @@ struct AmityEventInfoComponent: View {
             return liveThumbnail
         }
         
-        // 4. No thumbnail available → placeholder
+        // 4. Recorded thumbnail
+        if let recordedData = room?.recordedData.first {
+            return recordedData.thumbnailUrl
+        }
+        
+        // 5. No thumbnail available → placeholder
         return ""
     }
 

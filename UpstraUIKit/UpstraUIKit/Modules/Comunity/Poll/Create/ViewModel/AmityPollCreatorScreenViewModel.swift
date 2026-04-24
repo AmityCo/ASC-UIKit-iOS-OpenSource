@@ -25,8 +25,8 @@ final class AmityPollCreatorScreenViewModel: AmityPollCreatorScreenViewModelType
     var timeMilliseconds: Int? { didSet { validateFieldsMandatory() } }
     
     init(postTarget: AmityPostTarget) {
-        postRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
-        pollRepository = AmityPollRepository(client: AmityUIKitManagerInternal.shared.client)
+        postRepository = AmityPostRepository()
+        pollRepository = AmityPollRepository()
         self.postTarget = postTarget
     }
     

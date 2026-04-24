@@ -122,7 +122,7 @@ public struct AmityBlockedUsersPage: AmityPageView {
     @ViewBuilder
     private func getUserCellView(_ user: AmityUser, unblockAction: @escaping (AmityUser) -> Void) -> some View {
         HStack(spacing: 0) {
-            AmityUserProfileImageView(displayName: user.displayName ?? "", avatarURL: URL(string: user.getAvatarInfo()?.fileURL ?? ""))
+            AmityUserProfileImageView(displayName: user.displayName ?? "", avatarURL: URL(string: user.avatar?.fileURL ?? ""))
                 .frame(size: CGSize(width: 40, height: 40))
                 .clipShape(Circle())
             

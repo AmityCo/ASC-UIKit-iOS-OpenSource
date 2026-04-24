@@ -25,8 +25,8 @@ final class AmityCommunityRepositoryManager: AmityCommunityRepositoryManagerProt
     
     init(communityId: String) {
         self.communityId = communityId
-        communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
-        feedRepository = AmityFeedRepository(client: AmityUIKitManagerInternal.shared.client)
+        communityRepository = AmityCommunityRepository()
+        feedRepository = AmityFeedRepository()
     }
     
     func retrieveCommunity(_ completion: ((Result<AmityCommunityModel, AmityError>) -> Void)?) {

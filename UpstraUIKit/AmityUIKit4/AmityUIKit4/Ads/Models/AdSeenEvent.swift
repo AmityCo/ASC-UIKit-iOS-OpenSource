@@ -6,21 +6,26 @@
 //
 
 import Foundation
-import RealmSwift
+import CoreData
 
-class AdSeenEvent: UIKitRealmModel {
+@objc(AdSeenEvent)
+final class AdSeenEvent: NSManagedObject, FetchableModel {
     
-    @Persisted(primaryKey: true) var adId: String
-    @Persisted var lastSeen: Date?
-    
-    static func upsert(adId: String, lastSeen: Date?, in store: Realm) {
-        var object = [String: Any]()
-        object["adId"] = adId
+    @NSManaged var adId: String
+    @NSManaged var lastSeen: Date?
         
-        if let lastSeen {
-            object["lastSeen"] = lastSeen
+    static func upsert(adId: String, lastSeen: Date?, in context: NSManagedObjectContext) {
+        let model: AdSeenEvent
+        if let existing = AdSeenEvent.fetch(pKey: "adId", pValue: adId, in: context) {
+            model = existing
+        } else {
+            model = AdSeenEvent(context: context)
+            model.adId = adId
         }
-        
-        store.create(AdSeenEvent.self, value: object, update: .all)
+        model.lastSeen = lastSeen
+    }
+    
+    static func object(in context: NSManagedObjectContext, forPrimaryKey pValue: String) -> AdSeenEvent? {
+        return AdSeenEvent.fetch(pKey: "adId", pValue: pValue, in: context)
     }
 }

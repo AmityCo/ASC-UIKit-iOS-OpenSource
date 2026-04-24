@@ -31,7 +31,7 @@ class AmityEventFeedViewModel: ObservableObject {
         queryState = .loading
         
         collection = manager.getEvents(options: queryOptions)
-        token = collection?.observe { [weak self] liveCollection, _, error in
+        token = collection?.observe { [weak self] liveCollection, error in
             guard let self else { return }
             
             if let error {
@@ -80,8 +80,8 @@ class AmityEventFeedViewModel: ObservableObject {
             return
         }
         
-        AmityUIKit4Manager.client.hasPermission(.createEvent) { isAllowed in
-            self.hasCreatePermission = isAllowed
+        Task {
+            self.hasCreatePermission = await AmityUIKit4Manager.client.hasPermission(.createEvent)
         }
     }
 }

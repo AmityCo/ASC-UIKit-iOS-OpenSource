@@ -19,14 +19,14 @@ final class AmityCommunityRoleController: AmityCommunityRoleControllerProtocol {
     private let moderation: AmityCommunityModeration
     
     init(communityId: String) {
-        moderation = AmityCommunityModeration(client: AmityUIKitManagerInternal.shared.client, andCommunity: communityId)
+        moderation = AmityCommunityModeration(communityId: communityId)
     }
     
     // Add role permisstion to users
     func add(roles: [String], userIds: [String], completion: ((AmityError?) -> Void)?) {
         Task { @MainActor in
             do {
-                let result = try await moderation.addRoles(roles, userIds: userIds)
+                try await moderation.addRoles(roles, userIds: userIds)
                 completion?(nil)
             } catch let error {
                 completion?(AmityError(error: error))
@@ -38,7 +38,7 @@ final class AmityCommunityRoleController: AmityCommunityRoleControllerProtocol {
     func remove(roles: [String], userIds: [String], completion: ((AmityError?) -> Void)?) {
         Task { @MainActor in
             do {
-                let result = try await moderation.removeRoles(roles, userIds: userIds)
+                try await moderation.removeRoles(roles, userIds: userIds)
                 completion?(nil)
             } catch let error {
                 completion?(AmityError(error: error))

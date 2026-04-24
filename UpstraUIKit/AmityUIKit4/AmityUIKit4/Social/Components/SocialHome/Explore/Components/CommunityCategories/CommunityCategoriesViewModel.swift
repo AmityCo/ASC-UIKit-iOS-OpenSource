@@ -18,7 +18,7 @@ enum QueryState {
 
 class CommunityCategoriesViewModel: ObservableObject {
     
-    private let commRepo: AmityCommunityRepository = .init(client: AmityUIKitManagerInternal.shared.client)
+    private let commRepo: AmityCommunityRepository = .init()
     
     private var token: AmityNotificationToken?
     private var categoryCollection: AmityCollection<AmityCommunityCategory>?
@@ -35,7 +35,7 @@ class CommunityCategoriesViewModel: ObservableObject {
     }
     
     var loadedCategoriesCount: Int {
-        return categoryCollection?.count() ?? 0
+        return categoryCollection?.snapshots.count ?? 0
     }
     
     func fetchCategories(limit: Int? = nil) {
@@ -45,7 +45,7 @@ class CommunityCategoriesViewModel: ObservableObject {
         queryState = .loading
         
         categoryCollection = commRepo.getCategories(sortBy: .displayName, includeDeleted: false)
-        token = categoryCollection?.observe { [weak self] liveCollection, _, error in
+        token = categoryCollection?.observe { [weak self] liveCollection, error in
             guard let self else { return }
                                     
             if let error {

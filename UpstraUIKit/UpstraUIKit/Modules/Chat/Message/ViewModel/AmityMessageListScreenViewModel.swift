@@ -88,10 +88,10 @@ final class AmityMessageListScreenViewModel: AmityMessageListScreenViewModelType
         self.channelId = channelId
         self.subChannelId = subChannelId
         self.initialChannel = channel
-        membershipParticipation = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
-        channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
-        messageRepository = AmityMessageRepository(client: AmityUIKitManagerInternal.shared.client)
-        subchannelRepository = AmitySubChannelRepository(client: AmityUIKitManagerInternal.shared.client)
+        membershipParticipation = AmityChannelMembership(channelId: channelId)
+        channelRepository = AmityChannelRepository()
+        messageRepository = AmityMessageRepository()
+        subchannelRepository = AmitySubChannelRepository()
     }
     
     // MARK: - DataSource
@@ -234,8 +234,8 @@ extension AmityMessageListScreenViewModel {
         let queryOptions = AmityMessageQueryOptions(subChannelId: subChannelId, messageParentFilter: .noParent, sortOption: .lastCreated)
         messagesCollection = messageRepository.getMessages(options: queryOptions)
         
-        messagesNotificationToken = messagesCollection?.observe { [weak self] (liveCollection, change, error) in
-            self?.groupMessages(in: liveCollection, change: change)
+        messagesNotificationToken = messagesCollection?.observe { [weak self] (liveCollection, error) in
+            self?.groupMessages(in: liveCollection)
         }
         
         didEnterBackgroundObservation = NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] notification in
@@ -275,7 +275,7 @@ extension AmityMessageListScreenViewModel {
                 let _ = try await messageRepository.editTextMessage(withId: messageId, text)
                 self.delegate?.screenViewModelEvents(for: .didEditText)
             } catch let error {
-                Log.warn("Error while editing text message")
+                Log.warn("Error while editing text message \(error)")
             }
         }
     }
@@ -283,7 +283,7 @@ extension AmityMessageListScreenViewModel {
     func delete(withMessage message: AmityMessageModel, at indexPath: IndexPath) {
         Task { @MainActor in
             do {
-                let result = try await messageRepository.softDeleteMessage(withId: message.messageId)
+                try await messageRepository.softDeleteMessage(withId: message.messageId)
                 switch message.messageType {
                 case .audio:
                     AmityFileCache.shared.deleteFile(for: .audioDirectory, fileName: message.messageId + ".m4a")
@@ -292,7 +292,7 @@ extension AmityMessageListScreenViewModel {
                 }
                 self.delegate?.screenViewModelEvents(for: .didDelete(indexPath: indexPath))
             } catch let error {
-                Log.warn("Error while deleting text message")
+                Log.warn("Error while deleting text message \(error): \(message.messageId)")
             }
         }
     }
@@ -305,28 +305,20 @@ extension AmityMessageListScreenViewModel {
                 self.delegate?.screenViewModelEvents(for: .didDeeleteErrorMessage(indexPath: indexPath))
                 self.delegate?.screenViewModelEvents(for: .updateMessages)
             } catch let error {
-                Log.warn("Error while deleting failed message \(messageId)")
+                Log.warn("Error while deleting failed message \(error) \(messageId)")
             }
         }
     }
     
     func startReading() {
         Task { @MainActor in
-            do {
-                try await subchannelRepository.startMessageReceiptSync(subChannelId: subChannelId)
-            } catch let error {
-                
-            }
+            try? await subchannelRepository.startMessageReceiptSync(subChannelId: subChannelId)
         }
     }
     
     func stopReading() {
         Task { @MainActor in
-            do {
-                try await subchannelRepository.stopMessageReceiptSync(subChannelId: subChannelId)
-            } catch let error {
-                
-            }
+            try? await subchannelRepository.stopMessageReceiptSync(subChannelId: subChannelId)
         }
     }
     
@@ -396,8 +388,8 @@ extension AmityMessageListScreenViewModel {
             if isFlaggedByMe {
                 Task { @MainActor in
                     do {
-                        let result = try await self?.messageRepository.unflagMessage(withId: message.messageId)
-                        self?.handleReportResponse(at: indexPath, isSuccess: result ?? false, error: nil)
+                        try await self?.messageRepository.unflagMessage(withId: message.messageId)
+                        self?.handleReportResponse(at: indexPath, isSuccess: true, error: nil)
                     } catch let error {
                         self?.handleReportResponse(at: indexPath, isSuccess: false, error: error)
                     }
@@ -405,8 +397,8 @@ extension AmityMessageListScreenViewModel {
             } else {
                 Task { @MainActor in
                     do {
-                        let result = try await self?.messageRepository.flagMessage(withId: message.messageId)
-                        self?.handleReportResponse(at: indexPath, isSuccess: result ?? false, error: nil)
+                        try await self?.messageRepository.flagMessage(withId: message.messageId)
+                        self?.handleReportResponse(at: indexPath, isSuccess: true, error: nil)
                     } catch let error {
                         self?.handleReportResponse(at: indexPath, isSuccess: false, error: error)
                     }
@@ -431,10 +423,10 @@ private extension AmityMessageListScreenViewModel {
      Now we loop through whole collection and update the tableview for messages. The observer block also
      provides collection `change` object which can be used to track which indexpaths to add/remove/change.
      */
-    func groupMessages(in collection: AmityCollection<AmityMessage>, change: AmityCollectionChange?) {
+    func groupMessages(in collection: AmityCollection<AmityMessage>) {
         
         // First we get message from the collection
-        let storedMessages: [AmityMessageModel] = collection.allObjects().map(AmityMessageModel.init)
+        let storedMessages: [AmityMessageModel] = collection.snapshots.map(AmityMessageModel.init)
         
         // Ignore performing data if it don't change.
         guard dataSourceHash != storedMessages.hashValue else {

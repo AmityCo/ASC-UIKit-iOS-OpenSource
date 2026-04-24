@@ -21,7 +21,7 @@ public struct AmityUserModel: Equatable {
         object = user
         userId = user.userId
         displayName = user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
-        avatarURL = user.getAvatarInfo()?.fileURL ?? ""
+        avatarURL = user.avatar?.fileURL ?? ""
         about = user.userDescription
         isGlobalBan = user.isGlobalBanned
         isBrand = user.isBrand

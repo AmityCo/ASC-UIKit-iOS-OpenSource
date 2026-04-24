@@ -18,7 +18,7 @@ final class AmityChannelRemoveMemberController: AmityChannelRemoveMemberControll
     private var membershipParticipation: AmityChannelMembership?
     
     init(channelId: String) {
-        membershipParticipation = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membershipParticipation = AmityChannelMembership(channelId: channelId)
     }
     
     func remove(users: [AmityChannelMembershipModel], at indexPath: IndexPath, _ completion: @escaping (AmityError?) -> Void) {

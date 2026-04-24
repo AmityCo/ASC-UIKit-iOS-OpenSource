@@ -18,7 +18,7 @@ final class AmityChannelAddMemberController: AmityChannelAddMemberControllerProt
     private var membershipParticipation: AmityChannelMembership
     
     init(channelId: String) {
-        membershipParticipation = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membershipParticipation = AmityChannelMembership(channelId: channelId)
     }
     
     func add(currentUsers: [AmityChannelMembershipModel], newUsers users: [AmitySelectMemberModel], _ completion: @escaping (AmityError?, AmityError?) -> Void) {

@@ -27,13 +27,13 @@ final class AmityFetchUserController {
     func getUser(_ completion: @escaping (Result<GroupUser, Error>) -> Void) {
         collection = repository?.getUsers(.displayName)
         
-        token = collection?.observe { [weak self] (userCollection, change, error) in
+        token = collection?.observe { [weak self] (usercollection, error) in
             guard let strongSelf = self else { return }
             if let error = error {
                 completion(.failure(error))
             } else {
-                for index in 0..<userCollection.count() {
-                    guard let object = userCollection.object(at: index) else { continue }
+                for index in 0..<usercollection.snapshots.count {
+                    let object = usercollection.snapshots[index]
                     let model = AmitySelectMemberModel(object: object)
                     model.isSelected = strongSelf.storeUsers.contains { $0.userId == object.userId }
                     if !strongSelf.users.contains(where: { $0.userId == object.userId }) {

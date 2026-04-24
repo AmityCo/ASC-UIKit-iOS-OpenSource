@@ -20,14 +20,15 @@ final class AmityCommunityDeleteController: AmityCommunityDeleteControllerProtoc
     
     init(withCommunityId _communityId: String) {
         communityId = _communityId
-        repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityCommunityRepository()
     }
     
     func delete(_ completion: @escaping (AmityError?) -> Void) {
-        repository.deleteCommunity(withId: communityId) { (success, error) in
-            if success {
+        Task { @MainActor in
+            do {
+                try await repository.deleteCommunity(withId: communityId)
                 completion(nil)
-            } else {
+            } catch {
                 completion(AmityError(error: error) ?? .unknown)
             }
         }

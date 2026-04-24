@@ -73,7 +73,7 @@ class AmityReactionUsersScreenViewModel {
     
     init(info: AmityReactionInfo) {
         self.reactionInfo = info
-        self.reactionRepository = AmityReactionRepository(client: AmityUIKitManagerInternal.shared.client)
+        self.reactionRepository = AmityReactionRepository()
     }
     
     func fetchUserList() {
@@ -89,7 +89,7 @@ class AmityReactionUsersScreenViewModel {
         
         // Query reactions
         liveCollection = reactionRepository.getReactions(reactionInfo.referenceId, referenceType: reactionInfo.referenceType, reactionName: AmityReactionType.like.rawValue)
-        token = liveCollection?.observe({ [weak self] liveCollection, _, error in
+        token = liveCollection?.observe({ [weak self] liveCollection, error in
             guard let weakSelf = self else { return }
 
             if let error {
@@ -99,7 +99,7 @@ class AmityReactionUsersScreenViewModel {
                 weakSelf.setupScreenState(state: .loaded(data: weakSelf.reactionList, error: sdkError))
                 weakSelf.isLoadingDummyData = false
             } else {
-                let allObjects = liveCollection.allObjects()
+                let allObjects = self?.liveCollection?.snapshots ?? []
                 weakSelf.reactionList = allObjects.map { ReactionUser(reaction: $0) }
                 
                 // Change state

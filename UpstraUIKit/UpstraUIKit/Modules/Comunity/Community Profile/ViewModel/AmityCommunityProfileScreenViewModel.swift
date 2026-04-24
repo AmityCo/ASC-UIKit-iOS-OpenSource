@@ -84,18 +84,18 @@ extension AmityCommunityProfileScreenViewModel {
     
     private func prepareDataToShowCommunityProfile(community model: AmityCommunityModel) {
         community = model
-        AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: communityId) { [weak self] (hasPermission) in
-            guard let strongSelf = self else { return }
+        Task { @MainActor in
+            let hasPermission = await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: communityId)
+            
             if model.isJoined {
-                strongSelf.memberStatusCommunity = hasPermission ? .admin : .member
+                self.memberStatusCommunity = hasPermission ? .admin : .member
             } else {
-                strongSelf.memberStatusCommunity = .guest
+                self.memberStatusCommunity = .guest
             }
 
-            strongSelf.delegate?.screenViewModelDidGetCommunity(with: model)
+            self.delegate?.screenViewModelDidGetCommunity(with: model)
         }
-    }
-    
+    }    
     
     func joinCommunity() {
         communityRepositoryManager.join { [weak self] (error) in

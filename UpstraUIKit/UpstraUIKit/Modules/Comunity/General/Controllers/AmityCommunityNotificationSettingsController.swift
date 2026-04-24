@@ -66,26 +66,41 @@ final class AmityCommunityNotificationSettingsController: AmityCommunityNotifica
     
     init(withCommunityId _communityId: String) {
         communityId = _communityId
-        repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityCommunityRepository()
         notificationManager = repository.notificationManager(forCommunityId: communityId)
     }
     
     func retrieveNotificationSettings(completion: ((Result<AmityCommunityNotificationSettings, Error>) -> Void)?) {
-        notificationManager.getSettingsWithCompletion { (settings, error) in
-            if let settings = settings {
+        Task {
+            do {
+                let settings = try await notificationManager.getSettings()
                 completion?(.success(settings))
-            } else {
-                completion?(.failure(error ?? AmityError.unknown))
+            } catch {
+                completion?(.failure(error))
             }
         }
     }
     
     func enableNotificationSettings(events: [AmityCommunityNotificationEvent]?, completion: AmityRequestCompletion?) {
-        notificationManager.enable(for: events, completion: completion)
+        Task {
+            do {
+                try await notificationManager.enable(events: events ?? [])
+                completion?(true, nil)
+            } catch {
+                completion?(false, error)
+            }
+        }
     }
     
     func disableNotificationSettings(completion: AmityRequestCompletion?) {
-        notificationManager.disable(completion: completion)
+        Task {
+            do {
+                try await notificationManager.disable()
+                completion?(true, nil)
+            } catch {
+                completion?(false, error)
+            }
+        }
     }
     
 }

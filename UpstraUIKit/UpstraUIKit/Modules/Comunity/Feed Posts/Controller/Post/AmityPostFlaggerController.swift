@@ -16,13 +16,13 @@ protocol AmityPostFlaggerControllerProtocol {
 }
 
 final class AmityPostFlaggerController: AmityPostFlaggerControllerProtocol {
-    private let flagger: AmityPostRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let flagger: AmityPostRepository = AmityPostRepository()
     
     func report(withPostId postId: String, completion: AmityRequestCompletion?) {
         Task { @MainActor in
             do {
-                let result = try await flagger.flagPost(withId: postId)
-                completion?(result, nil)
+                try await flagger.flagPost(withId: postId, reason: .communityGuidelines)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }
@@ -32,8 +32,8 @@ final class AmityPostFlaggerController: AmityPostFlaggerControllerProtocol {
     func unreport(withPostId postId: String, completion: AmityRequestCompletion?) {
         Task { @MainActor in
             do {
-                let result = try await flagger.unflagPost(withId: postId)
-                completion?(result, nil)
+                try await flagger.unflagPost(withId: postId)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }

@@ -20,7 +20,7 @@ final class AmityCommunityLeaveController: AmityCommunityLeaveControllerProtocol
     
     init(withCommunityId _communityId: String) {
         communityId = _communityId
-        repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityCommunityRepository()
     }
     
     func leave(_ completion: @escaping (AmityError?) -> Void) {

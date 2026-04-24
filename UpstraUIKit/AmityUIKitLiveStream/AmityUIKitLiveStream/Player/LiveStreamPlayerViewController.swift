@@ -69,7 +69,7 @@ public class LiveStreamPlayerViewController: UIViewController {
     
     public init(streamIdToWatch: String) {
         
-        self.streamRepository = AmityStreamRepository(client: AmityUIKitManager.client)
+        self.streamRepository = AmityStreamRepository()
         self.streamIdToWatch = streamIdToWatch
         self.player = AmityVideoPlayer(client: AmityUIKitManager.client)
         

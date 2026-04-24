@@ -54,7 +54,7 @@ extension AmityLiveChatMessageQuickReaction {
     
     struct QuickReactionViewModel {
         
-        let reactionRepo = AmityReactionRepository(client: AmityUIKit4Manager.client)
+        let reactionRepo = AmityReactionRepository()
         let message: MessageModel
         
         func addQuickRaction(reaction: String) async {

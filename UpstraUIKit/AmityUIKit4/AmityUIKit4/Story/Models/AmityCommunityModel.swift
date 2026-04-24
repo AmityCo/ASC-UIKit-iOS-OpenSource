@@ -60,7 +60,7 @@ public struct AmityCommunityModel: Identifiable {
         self.channelId = object.channelId
         self.postsCount = Int(object.postsCount)
         self.membersCount = Int(object.membersCount)
-        self.createdAt = object.createdAt
+        self.createdAt = object.createdAt ?? Date()
         self.metadata = object.metadata as? [String : String]
         self.userId = object.userId
         self.tags = object.tags ?? []

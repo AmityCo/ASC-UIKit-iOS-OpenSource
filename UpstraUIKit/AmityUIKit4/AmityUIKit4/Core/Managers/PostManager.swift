@@ -14,7 +14,7 @@ enum PostTypeFilter: String {
 }
 
 class PostManager {
-    let postRepository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    let postRepository = AmityPostRepository()
     
     @discardableResult
     func getPost(withId: String) -> AmityObject<AmityPost> {
@@ -29,22 +29,19 @@ class PostManager {
         postRepository.getPosts(postIds: ids)
     }
     
-    @discardableResult
-    func deletePost(withId: String) async throws -> Bool {
+    func deletePost(withId: String) async throws {
         try await postRepository.softDeletePost(withId: withId, parentId: nil)
     }
     
-    @discardableResult
-    func flagPost(withId: String) async throws -> Bool {
-        try await postRepository.flagPost(withId: withId)
+    func flagPost(withId: String) async throws {
+        try await postRepository.flagPost(withId: withId, reason: .communityGuidelines)
     }
     
     func flagPost(withId: String, reason: AmityContentFlagReason) async throws {
         try await postRepository.flagPost(withId: withId, reason: reason)
     }
     
-    @discardableResult
-    func unflagPost(withId: String) async throws -> Bool {
+    func unflagPost(withId: String) async throws {
         try await postRepository.unflagPost(withId: withId)
     }
     
@@ -65,11 +62,11 @@ class PostManager {
         return postRepository.getGlobalPinnedPosts()
     }
     
-    func approvePost(postId: String) async throws -> Bool {
+    func approvePost(postId: String) async throws {
         try await postRepository.approvePost(withId: postId)
     }
     
-    func declinePost(postId: String) async throws -> Bool {
+    func declinePost(postId: String) async throws {
         try await postRepository.declinePost(withId: postId)
     }
     

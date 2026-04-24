@@ -15,7 +15,7 @@ protocol AmityCommentCreateControllerProtocol {
 
 final class AmityCommentCreateController: AmityCommentCreateControllerProtocol {
     
-    private let repository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityCommentRepository()
     
     func createComment(withReferenceId postId: String, referenceType: AmityCommentReferenceType, parentId: String?, text: String, metadata: [String: Any]?, mentionees: AmityMentioneesBuilder?, completion: ((AmityComment?, Error?) -> Void)?) {
         

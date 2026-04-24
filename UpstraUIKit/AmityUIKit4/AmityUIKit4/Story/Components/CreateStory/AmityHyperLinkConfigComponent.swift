@@ -208,16 +208,16 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
         
         do {
             urlTextFieldModel.errorMessage = "Please enter a whitelisted URL."
-            let isWhitelistedURL = try await AmityUIKitManagerInternal.shared.client.validateUrls(urls: [urlStr])
-            viewModel.isURLValid = isWhitelistedURL
+            try await AmityUIKitManagerInternal.shared.client.validateUrls(urls: [urlStr])
+            viewModel.isURLValid = true
         } catch {
             viewModel.isURLValid = false
         }
         
         if !word.isEmpty {
             do {
-                let isValidWord = try await AmityUIKitManagerInternal.shared.client.validateTexts(texts: [word])
-                viewModel.isURLNameValid = isValidWord
+                try await AmityUIKitManagerInternal.shared.client.validateTexts(texts: [word])
+                viewModel.isURLNameValid = true
             } catch {
                 viewModel.isURLNameValid = false
             }

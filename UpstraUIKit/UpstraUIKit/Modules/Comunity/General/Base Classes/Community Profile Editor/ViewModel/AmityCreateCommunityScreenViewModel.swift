@@ -56,7 +56,7 @@ final class AmityCreateCommunityScreenViewModel: AmityCreateCommunityScreenViewM
     private var imageData: AmityImageData?
     
     init() {
-        repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityCommunityRepository()
     }
     
     private var isRequiredFieldExisted: Bool {

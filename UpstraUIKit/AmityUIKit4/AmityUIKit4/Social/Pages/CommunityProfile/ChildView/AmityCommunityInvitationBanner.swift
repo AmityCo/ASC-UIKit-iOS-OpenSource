@@ -51,7 +51,7 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                 let inviter = viewModel.pendingInvitaion?.inviterUser
                 AmityUserProfileImageView(
                     displayName: inviter?.displayName ?? "",
-                    avatarURL: URL(string: inviter?.getAvatarInfo()?.mediumFileURL ?? "")
+                    avatarURL: URL(string: inviter?.avatar?.mediumFileURL ?? "")
                 )
                 .frame(width: 32, height: 32)
                 .clipShape(Circle())

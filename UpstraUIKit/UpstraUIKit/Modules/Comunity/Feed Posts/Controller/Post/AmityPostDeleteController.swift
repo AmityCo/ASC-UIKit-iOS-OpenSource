@@ -14,13 +14,13 @@ protocol AmityPostDeleteControllerProtocol {
 }
 
 final class AmityPostDeleteController: AmityPostDeleteControllerProtocol {
-    private let repository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityPostRepository()
     
     func delete(withPostId postId: String, parentId: String?, completion: AmityRequestCompletion?) {
         Task { @MainActor in
             do {
-                let result = try await repository.softDeletePost(withId: postId, parentId: parentId)
-                completion?(result, nil)
+                try await repository.softDeletePost(withId: postId, parentId: parentId)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }

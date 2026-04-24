@@ -21,20 +21,20 @@ final class AmityChannelFetchMemberController: AmityChannelFetchMemberController
     private var memberToken: AmityNotificationToken?
     
     init(channelId: String) {
-        membership = AmityChannelMembership(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        membership = AmityChannelMembership(channelId: channelId)
     }
     
     func fetch(roles: [String], _ completion: @escaping (Result<[AmityChannelMembershipModel], Error>) -> Void) {
         memberCollection = membership.getMembers(filter: .all, sortBy: .lastCreated, roles: roles, includeDeleted: false)
         memberToken?.invalidate()
-        memberToken = memberCollection?.observe { (collection, change, error) in
+        memberToken = memberCollection?.observe { (collection, error) in
             if let error = error {
                 completion(.failure(error))
             } else {
                 if collection.dataStatus == .fresh {
                     var members: [AmityChannelMembershipModel] = []
-                    for index in 0..<collection.count() {
-                        guard let member = collection.object(at: index) else { continue }
+                    for index in 0..<collection.snapshots.count {
+                        let member = collection.snapshots[index]
                         members.append(AmityChannelMembershipModel(member: member))
                     }
                     completion(.success(members))

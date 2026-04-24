@@ -35,7 +35,7 @@ final class AmityCommunityMemberScreenViewModel: AmityCommunityMemberScreenViewM
         self.removeMemberController = removeMemberController
         self.addMemberController = addMemberController
         self.roleController = roleController
-        self.flagger = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+        self.flagger = AmityUserRepository()
     }
     
 }
@@ -72,7 +72,8 @@ extension AmityCommunityMemberScreenViewModel {
 // MARK: - Action
 extension  AmityCommunityMemberScreenViewModel{
     func getCommunityEditUserPermission(_ completion: ((Bool) -> Void)?) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunityUser, forCommunity: community.communityId) { hasPermission in
+        Task { @MainActor in
+            let hasPermission = await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunityUser, forCommunity: community.communityId)
             completion?(hasPermission)
         }
     }
@@ -153,11 +154,8 @@ extension AmityCommunityMemberScreenViewModel {
         guard let user = member(at: indexPath).user else { return }
         Task { @MainActor in
             do {
-                let isSuccess = try await flagger.flagUser(withId: user.userId)
-                
-                if isSuccess {
-                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.reportSent.localizedString))
-                }
+                try await flagger.flagUser(withId: user.userId)
+                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.reportSent.localizedString))
             } catch let error {
                 AmityHUD.show(.error(message: error.localizedDescription))
             }
@@ -168,11 +166,8 @@ extension AmityCommunityMemberScreenViewModel {
         guard let user = member(at: indexPath).user else { return }
         Task { @MainActor in
             do {
-                let isSuccess = try await flagger.unflagUser(withId: user.userId)
-                
-                if isSuccess {
-                    AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.unreportSent.localizedString))
-                }
+                try await flagger.unflagUser(withId: user.userId)
+                AmityHUD.show(.success(message: AmityLocalizedStringSet.HUD.unreportSent.localizedString))
             } catch let error {
                 AmityHUD.show(.error(message: error.localizedDescription))
             }

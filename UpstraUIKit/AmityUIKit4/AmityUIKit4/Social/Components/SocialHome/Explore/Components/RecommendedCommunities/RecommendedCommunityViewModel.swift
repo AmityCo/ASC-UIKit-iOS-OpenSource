@@ -11,7 +11,7 @@ import Combine
 
 class RecommendedCommunityViewModel: ObservableObject {
     
-    private let repository: AmityCommunityRepository = .init(client: AmityUIKit4Manager.client)
+    private let repository = AmityCommunityRepository()
     private var token: AmityNotificationToken?
     private var joinRequestToken: AmityNotificationToken?
     private var communityCollection: AmityCollection<AmityCommunity>?
@@ -31,7 +31,7 @@ class RecommendedCommunityViewModel: ObservableObject {
         queryState = .loading
         
         communityCollection = repository.getRecommendedCommunities(includeDiscoverablePrivateCommunity: true)
-        token = communityCollection?.observe { [weak self] liveCollection, _, error in
+        token = communityCollection?.observe { [weak self] liveCollection, error in
             guard let self else { return }
             
             if let _ = error {

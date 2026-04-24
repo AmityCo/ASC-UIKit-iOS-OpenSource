@@ -107,7 +107,7 @@ struct PollVoteImageOptionView: View {
                             .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                         
                         let user = AmityUIKit4Manager.client.user?.snapshot
-                        AmityUserProfileImageView(displayName: user?.displayName ?? "", avatarURL: URL(string: user?.getAvatarInfo()?.fileURL ?? ""))
+                        AmityUserProfileImageView(displayName: user?.displayName ?? "", avatarURL: URL(string: user?.avatar?.fileURL ?? ""))
                             .frame(width: 16, height: 16)
                             .clipShape(Circle())
                             .isHidden(!answer.isVotedByUser, remove: true)

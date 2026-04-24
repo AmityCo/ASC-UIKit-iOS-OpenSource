@@ -10,15 +10,16 @@ import AmitySDK
 import UIKit
 
 class UserManager {
-    let userRepostiory = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
-    let fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    let userRelationship = AmityUserRelationship()
+    let userRepostiory = AmityUserRepository()
+    let fileRepository = AmityFileRepository()
     
     func searchUsers(keyword: String) -> AmityCollection<AmityUser> {
         userRepostiory.searchUsers(keyword, sortBy: .displayName, matchType: .partial)
     }
     
-    func editUser(user: UserModel) async throws -> Bool {
-        let builder = AmityUserUpdateBuilder()
+    func editUser(user: UserModel) async throws {
+        let builder = AmityUserUpdateOptions()
         builder.setUserDescription(user.about)
         builder.setDisplayName(user.displayName)
         
@@ -27,14 +28,14 @@ class UserManager {
             builder.setAvatar(imageData)
         }
         
-        return try await AmityUIKitManagerInternal.shared.client.editUser(builder)
+        try await AmityUIKitManagerInternal.shared.client.editUser(builder)
     }
     
-    func flagUser(withId: String) async throws -> Bool {
+    func flagUser(withId: String) async throws {
         try await userRepostiory.flagUser(withId: withId)
     }
     
-    func unflagUser(withId: String) async throws -> Bool {
+    func unflagUser(withId: String) async throws {
         try await userRepostiory.unflagUser(withId: withId)
     }
     
@@ -43,55 +44,55 @@ class UserManager {
     }
     
     func getMyFollowInfo() -> AmityObject<AmityMyFollowInfo> {
-        userRepostiory.userRelationship.getMyFollowInfo()
+        userRelationship.getMyFollowInfo()
     }
     
     func getFollowInfo(withId: String) -> AmityObject<AmityUserFollowInfo> {
-        userRepostiory.userRelationship.getFollowInfo(withUserId: withId)
+        userRelationship.getFollowInfo(withUserId: withId)
     }
     
     func getUser(withId: String) -> AmityObject<AmityUser> {
         userRepostiory.getUser(withId)
     }
     
-    func followUser(withId: String) async throws -> (Bool, AmityFollowResponse) {
-        try await userRepostiory.userRelationship.follow(withUserId: withId)
+    func followUser(withId: String) async throws -> AmityFollowResponse {
+        try await userRelationship.follow(withUserId: withId)
     }
     
-    func acceptMyFollower(withId: String) async throws -> (Bool, AmityFollowResponse) {
-        try await userRepostiory.userRelationship.acceptMyFollower(withUserId: withId)
+    func acceptMyFollower(withId: String) async throws -> AmityFollowResponse {
+        try await userRelationship.acceptMyFollower(withUserId: withId)
     }
     
-    func declineMyFollower(withId: String) async throws -> (Bool, AmityFollowResponse) {
-        try await userRepostiory.userRelationship.declineMyFollower(withUserId: withId)
+    func declineMyFollower(withId: String) async throws -> AmityFollowResponse {
+        try await userRelationship.declineMyFollower(withUserId: withId)
     }
     
-    func unfollowUser(withId: String) async throws -> (Bool, AmityFollowResponse) {
-        try await userRepostiory.userRelationship.unfollow(withUserId: withId)
+    func unfollowUser(withId: String) async throws -> AmityFollowResponse {
+        try await userRelationship.unfollow(withUserId: withId)
     }
     
     func blockUser(withId: String) async throws {
-        try await userRepostiory.userRelationship.blockUser(userId: withId)
+        try await userRelationship.blockUser(userId: withId)
     }
     
     func unblockUser(withId: String) async throws {
-        try await userRepostiory.userRelationship.unblockUser(userId: withId)
+        try await userRelationship.unblockUser(userId: withId)
     }
     
     func getMyFollowings(_ option: AmityFollowQueryOption) -> AmityCollection<AmityFollowRelationship> {
-        userRepostiory.userRelationship.getMyFollowings(with: option)
+        userRelationship.getMyFollowings(with: option)
     }
     
     func getMyFollowers(_ option: AmityFollowQueryOption) -> AmityCollection<AmityFollowRelationship> {
-        userRepostiory.userRelationship.getMyFollowers(with: option)
+        userRelationship.getMyFollowers(with: option)
     }
     
     func getUserFollowings(withId: String) -> AmityCollection<AmityFollowRelationship> {
-        userRepostiory.userRelationship.getFollowings(withUserId: withId)
+        userRelationship.getFollowings(withUserId: withId)
     }
     
     func getUserFollowers(withId: String) -> AmityCollection<AmityFollowRelationship> {
-        userRepostiory.userRelationship.getFollowers(withUserId: withId)
+        userRelationship.getFollowers(withUserId: withId)
     }
     
     func getBlockedUsers() -> AmityCollection<AmityUser> {

@@ -35,13 +35,13 @@ final class AmitySearchUserController {
         } else {
             let request =  DispatchWorkItem { [weak self] in
                 self?.collection = self?.repository?.searchUsers(text, sortBy: .displayName)
-                self?.token = self?.collection?.observe { (userCollection, change, error) in
+                self?.token = self?.collection?.observe { (usercollection, error) in
                     guard let strongSelf = self else { return }
                     if let error = error {
                         completion(.failure(.unknown))
                     } else {
-                        for index in 0..<userCollection.count() {
-                            guard let object = userCollection.object(at: index) else { continue }
+                        for index in 0..<usercollection.snapshots.count {
+                            let object = usercollection.snapshots[index]
                             let model = AmitySelectMemberModel(object: object)
                             model.isSelected = storeUsers.contains { $0.userId == object.userId }
                             if !strongSelf.users.contains(where: { $0.userId == object.userId }) {

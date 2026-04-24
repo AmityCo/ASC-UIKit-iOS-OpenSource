@@ -78,7 +78,7 @@ final class AmityRecentChatScreenViewModel: AmityRecentChatScreenViewModelType {
     
     init(channelType: AmityChannelType) {
         self.channelType = channelType
-        channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
+        channelRepository = AmityChannelRepository()
     }
     
     required init?(coder: NSCoder) {
@@ -108,7 +108,7 @@ final class AmityRecentChatScreenViewModel: AmityRecentChatScreenViewModelType {
             currentUser = userModel
             allUsers.append(userModel)
         }
-        let builder = AmityCommunityChannelBuilder()
+        let builder = AmityCommunityChannelCreateOptions()
         let userIds = allUsers.map{ $0.userId }
         let channelId = userIds.sorted().joined(separator: "-")
         let channelDisplayName = users.count == 1 ? users.first?.displayName ?? "" : allUsers.map { $0.displayName ?? "" }.joined(separator: "-")
@@ -141,7 +141,7 @@ final class AmityRecentChatScreenViewModel: AmityRecentChatScreenViewModelType {
     
     }
     
-    private func createNewCommiunityChannel(builder: AmityCommunityChannelBuilder) {
+    private func createNewCommiunityChannel(builder: AmityCommunityChannelCreateOptions) {
         AmityAsyncAwaitTransformer.toCompletionHandler(asyncFunction: channelRepository.createChannel, parameters: builder) { [weak self] channelObject, error in
             guard let weakSelf = self else { return }
             if let error = error {
@@ -161,7 +161,7 @@ final class AmityRecentChatScreenViewModel: AmityRecentChatScreenViewModelType {
             currentUser = userModel
             allUsers.append(userModel)
         }
-        let builder = AmityConversationChannelBuilder()
+        let builder = AmityConversationChannelCreateOptions()
         let userIds = users.map{ $0.userId }
         let channelDisplayName = users.count == 1 ? users.first?.displayName ?? "" : allUsers.map { $0.displayName ?? "" }.joined(separator: "-")
         let metaData: [String:Any] = [
@@ -226,36 +226,27 @@ private extension AmityRecentChatScreenViewModel {
     func getChannelList() {
         switch channelType {
         case .community:
-            let query = AmityChannelQuery()
-            query.types = [AmityChannelQueryType.community]
-            query.filter = .userIsMember
-            query.includeDeleted = false
+            let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.community], filter: .userIsMember, includeDeleted: false)
             channelsCollection = channelRepository.getChannels(with: query)
         case .conversation:
-            let query = AmityChannelQuery()
-            query.types = [AmityChannelQueryType.conversation]
-            query.includeDeleted = false
+            let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.conversation], includeDeleted: false)
             channelsCollection = channelRepository.getChannels(with: query)
         default:
             break
         }
-        channelsToken = channelsCollection?.observe { [weak self] (collection, change, error) in
+        channelsToken = channelsCollection?.observe { [weak self] (collection, error) in
             self?.prepareDataSource()
         }
     }
     
     private func prepareDataSource() {
         AmityHUD.hide()
-        guard let collection = channelsCollection else {
-            return
-        }
-        var _channels: [AmityChannelModel] = []
-        for index in 0..<collection.count() {
-            guard let channel = collection.object(at: index) else { return }
-            let model = AmityChannelModel(object: channel)
-            _channels.append(model)
-        }
-        channels = _channels
+        guard let channelsCollection else { return }
+        
+        let snapshots = channelsCollection.snapshots
+        let channelList = snapshots.map { AmityChannelModel(object: $0) }
+        self.channels = channelList
+        
         delegate?.screenViewModelLoadingState(for: .loaded)
         delegate?.screenViewModelDidGetChannel()
         delegate?.screenViewModelEmptyView(isEmpty: channels.isEmpty)

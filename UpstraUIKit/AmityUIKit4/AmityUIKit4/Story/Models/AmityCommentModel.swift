@@ -65,12 +65,12 @@ public struct AmityCommentModel: Identifiable, Equatable  {
         commentId = comment.commentId
         displayName = comment.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
         isAuthorBrand = comment.user?.isBrand ?? false
-        avatarURL = comment.user?.getAvatarInfo()?.fileURL ?? ""
+        avatarURL = comment.user?.avatar?.fileURL ?? ""
         text = comment.data?["text"] as? String ?? ""
         isDeleted = comment.isDeleted
         isEdited = comment.isEdited
-        createdAt = comment.createdAt
-        updatedAt = comment.updatedAt
+        createdAt = comment.createdAt ?? Date()
+        updatedAt = comment.updatedAt ?? Date()
         childrenNumber = comment.childrenNumber
         parentId = comment.parentId
         userId = comment.userId

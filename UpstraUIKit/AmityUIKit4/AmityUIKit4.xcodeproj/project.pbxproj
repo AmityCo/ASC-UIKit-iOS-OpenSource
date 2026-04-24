@@ -11,7 +11,7 @@
 		684AE1012B0C5B0200FD7270 /* AmityUIKit4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1002B0C5B0200FD7270 /* AmityUIKit4Tests.swift */; };
 		685F16C22BFCABAD0016685F /* AmityReactionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C12BFCABAD0016685F /* AmityReactionList.swift */; };
 		685F16C62BFCABB50016685F /* ReactionTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C52BFCABB50016685F /* ReactionTabBarView.swift */; };
-		92E620EC2F88006100CD9184 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = 92E620EB2F88006100CD9184 /* SharedFrameworks */; };
+		ED105C622F9B7FAA00D92287 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED105C612F9B7FAA00D92287 /* SharedFrameworks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,12 +58,13 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Ads/AssetSync/AssetSyncEngine.swift,
+				Ads/Database/CoreDataStore.swift,
+				Ads/Database/DataStore.xcdatamodeld,
+				Ads/Database/FetchableModel.swift,
 				Ads/Engine/AdEngine.swift,
 				Ads/Models/AdAsset.swift,
 				Ads/Models/AdSeenEvent.swift,
-				Ads/Models/RealmStore.swift,
 				"Ads/Models/SDKModel+Extension.swift",
-				Ads/Models/UIKitRealmModel.swift,
 				Ads/Paginator/FixedFrequencyAdInjector.swift,
 				Ads/Paginator/StoryFixedFrequencyAdInjector.swift,
 				Ads/Paginator/TimeWindowAdsInjector.swift,
@@ -764,7 +765,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				92E620EC2F88006100CD9184 /* SharedFrameworks in Frameworks */,
+				ED105C622F9B7FAA00D92287 /* SharedFrameworks in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1241,7 +1242,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		92E620EB2F88006100CD9184 /* SharedFrameworks */ = {
+		ED105C612F9B7FAA00D92287 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SharedFrameworks;
 		};

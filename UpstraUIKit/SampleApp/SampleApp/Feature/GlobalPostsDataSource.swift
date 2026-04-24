@@ -19,24 +19,24 @@ class GlobalPostsDataSource {
     
     init(client: AmityClient) {
         self.client = client
-        self.feedRepository = AmityFeedRepository(client: client)
+        self.feedRepository = AmityFeedRepository()
     }
     
     // MARK:- Feed Observer
     func observePostsFeedChanges(changeHandler:@escaping ()->()) {
         postCollection = feedRepository.getGlobalFeed()
-        feedCollectionToken = postCollection?.observe({(collection, _, error) in
+        feedCollectionToken = postCollection?.observe({(collection, error) in
             changeHandler()
         })
     }
     
     func getPostAtIndex(index: Int) -> PostPreviewModel? {
-        guard let post = postCollection?.object(at: index) else { return nil }
+        guard let post = postCollection?.snapshots[index] else { return nil }
         return PostPreviewModel(post: post)
     }
     
     func getNumberOfFeedItems() -> Int {
-        let count = Int(postCollection?.count() ?? 0)
+        let count = Int(postCollection?.snapshots.count ?? 0)
         return count
     }
     
@@ -82,7 +82,7 @@ struct PostPreviewModel {
         myReactions = post.myReactions as? [String]
         allCommentCount = Int(post.commentsCount)
         isDeleted = post.isDeleted
-        createdAt = PostPreviewModel.dateFormatter.string(from: post.createdAt)
+        createdAt = PostPreviewModel.dateFormatter.string(from: post.createdAt ?? Date())
         
         var postDataType = post.dataType
         if post.childrenPosts.count > 0 {

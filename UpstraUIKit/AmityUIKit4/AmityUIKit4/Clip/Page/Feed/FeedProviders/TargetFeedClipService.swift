@@ -77,11 +77,9 @@ class TargetFeedClipService: ClipService {
         token?.invalidate()
         token = nil
         
-        token = postCollection.observe { [weak self ] liveCollection, _, error in
+        token = postCollection.observe { [weak self ] liveCollection, error in
             guard let self, liveCollection.dataStatus == .fresh && !isFetchingParentPosts else { return }
-            
-            Log.add(event: .info, "Clip Posts fetched, \(liveCollection.count())")
-            
+                        
             // Handle error
             if let error {
                 self.loadingState = .error
@@ -164,11 +162,9 @@ class TargetFeedClipService: ClipService {
     
     func fetchParentPosts(ids: [String], completion: @escaping () -> Void) {
         Log.add(event: .info, "Fetching parent posts \(ids)")
-        parentPostsToken = postManager.getPosts(ids: ids).observe { [weak self] liveCollection, _, error in
+        parentPostsToken = postManager.getPosts(ids: ids).observe { [weak self] liveCollection, error in
             guard let self, liveCollection.dataStatus == .fresh else { return }
-            
-            Log.add(event: .info, "Fetched parent posts: \(liveCollection.count())")
-            
+                        
             parentPostsToken?.invalidate()
             parentPostsToken = nil
             

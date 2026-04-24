@@ -212,7 +212,7 @@ class SocialHomePageNavigationViewModel: ObservableObject {
             cleanupToken()
         }
         
-        invitaionsToken = invitationManager.getMyCommunityInvitations().observe { [weak self] collection, _ , error in
+        invitaionsToken = invitationManager.getMyCommunityInvitations().observe { [weak self] collection, error in
             guard let self else { return }
             hasInvitations = collection.snapshots.contains { $0.isSeen() == false }
         }

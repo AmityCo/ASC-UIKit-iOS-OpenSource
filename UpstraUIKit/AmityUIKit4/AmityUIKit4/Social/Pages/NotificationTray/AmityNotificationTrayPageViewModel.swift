@@ -30,7 +30,7 @@ class AmityNotificationTrayPageViewModel: ObservableObject {
         isLoading = true
         
         collection = trayManager.getNotificationTrayItems()
-        token = collection?.observe { [weak self] liveCollection, _, error in
+        token = collection?.observe { [weak self] liveCollection, error in
             guard let self else { return }
             
             if let error {

@@ -14,8 +14,8 @@ class ChatManager {
     let channelRepository: AmityChannelRepository
     
     init() {
-        self.repository = AmityMessageRepository(client: AmityUIKitManagerInternal.shared.client)
-        self.channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
+        self.repository = AmityMessageRepository()
+        self.channelRepository = AmityChannelRepository()
     }
     
     func queryMessages(options: AmityMessageQueryOptions) -> AmityCollection<AmityMessage> {
@@ -32,17 +32,17 @@ class ChatManager {
     }
 
     @MainActor
-    func updateTextMessage(messageId: String, text: String) async throws -> Bool {
+    func updateTextMessage(messageId: String, text: String) async throws {
         return try await repository.editTextMessage(withId: messageId, text)
     }
     
     @MainActor
-    func deleteMessage(messageId: String) async throws -> Bool {
+    func deleteMessage(messageId: String) async throws {
         return try await repository.softDeleteMessage(withId: messageId)
     }
     
     @MainActor
-    func flagMessage(messageId: String) async throws -> Bool {
+    func flagMessage(messageId: String) async throws {
         return try await repository.flagMessage(withId: messageId)
     }
     
@@ -52,7 +52,7 @@ class ChatManager {
     }
     
     @MainActor
-    func unflagMessage(messageId: String) async throws -> Bool {
+    func unflagMessage(messageId: String) async throws {
         return try await repository.unflagMessage(withId: messageId)
     }
     
@@ -61,6 +61,6 @@ class ChatManager {
     }
     
     func getCurrentUserChannelMember(channelId: String) -> AmityChannelMember? {
-        return channelRepository.getChannel(channelId).snapshot?.currentMembership
+        return channelRepository.getChannel(channelId).snapshot?.currentMember
     }
 }

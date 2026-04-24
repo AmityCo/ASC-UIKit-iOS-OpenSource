@@ -19,7 +19,7 @@ final class AmityChannelRoleController: AmityChannelRoleControllerProtocol {
     private var moderation: AmityChannelModeration?
     
     init(channelId: String) {
-        moderation = AmityChannelModeration(client: AmityUIKitManagerInternal.shared.client, andChannel: channelId)
+        moderation = AmityChannelModeration(channelId: channelId)
     }
     
     // Add role permisstion to users

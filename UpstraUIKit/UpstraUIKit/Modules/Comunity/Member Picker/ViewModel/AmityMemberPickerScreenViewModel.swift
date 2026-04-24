@@ -31,7 +31,7 @@ final class AmityMemberPickerScreenViewModel: AmityMemberPickerScreenViewModelTy
     private var isSearch: Bool = false
     
     init() {
-        userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+        userRepository = AmityUserRepository()
         fetchUserController = AmityFetchUserController(repository: userRepository)
         searchUserController = AmitySearchUserController(repository: userRepository)
         selectUserContrller = AmitySelectUserController()

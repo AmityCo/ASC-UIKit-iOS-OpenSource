@@ -86,7 +86,7 @@ class ChatFeatureViewController: UIViewController {
     }
     
     func joinToTheChannel(channelId: String) {
-        channelRepository = AmityChannelRepository(client: AmityUIKitManager.client)
+        channelRepository = AmityChannelRepository()
         Task { @MainActor in
             do {
                 let channel = try await channelRepository?.joinChannel(channelId: channelId)

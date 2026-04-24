@@ -59,7 +59,7 @@ class UIKitPaginator<T: AmityModel> {
     
     func load() {
         token?.invalidate()
-        token = liveCollection?.observe { [weak self] collection, _, error in
+        token = liveCollection?.observe { [weak self] collection, error in
             self?.integrateRecommendedAds(defaultContents: collection.snapshots, excludeId: self?.excludedId)
         }
     }

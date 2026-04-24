@@ -9,12 +9,14 @@
 import UIKit
 import AmitySDK
 
+typealias AmityPostRequestCompletion = (AmityPost?, Error?) -> Void
+
 protocol AmityPostUpdateControllerProtocol {
     func update(withPostId postId: String, text: String, completion: AmityPostRequestCompletion?)
 }
 
 final class AmityPostUpdateController: AmityPostUpdateControllerProtocol {
-    private let repository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityPostRepository()
     
     func update(withPostId postId: String, text: String, completion: AmityPostRequestCompletion?) {
         let textBuilder = AmityTextPostBuilder()

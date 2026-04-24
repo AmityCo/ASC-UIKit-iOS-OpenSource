@@ -11,43 +11,23 @@ import AmitySDK
 public class StoryPermissionChecker {
     
     public static func checkUserHasManagePermission(communityId: String) async -> Bool {
-        await withCheckedContinuation { continuation in
-            Task { @MainActor in
-                AmityUIKitManagerInternal.shared.client.hasPermission(.manageStoryCommunity, forCommunity: communityId) { hasPermission in
-                    continuation.resume(returning: hasPermission)
-                }
-            }
-        }
+        await AmityUIKitManagerInternal.shared.client.hasPermission(.manageStoryCommunity, forCommunity: communityId)
     }
 }
 
 class ChatPermissionChecker {
     
-    static func hasModeratorPermission(for channel: String, _ completion: @escaping (Bool) -> Void) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.muteChannel, forChannel: channel) { status in
-            completion(status)
-        }
+    static func hasModeratorPermission(for channel: String) async -> Bool {
+        await AmityUIKitManagerInternal.shared.client.hasPermission(.muteChannel, forChannel: channel)
     }
 }
 
 class CommunityPermissionChecker {
     static func hasDeleteCommunityPostPermission(communityId: String) async -> Bool {
-        await withCheckedContinuation { continuation in
-            Task { @MainActor in
-                AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunityPost, forCommunity: communityId) { hasPermission in
-                    continuation.resume(returning: hasPermission)
-                }
-            }
-        }
+        await AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunityPost, forCommunity: communityId)
     }
     
     static func hasDeleteCommunityCommentPermission(communityId: String) async -> Bool {
-        await withCheckedContinuation { continuation in
-            Task { @MainActor in
-                AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunityComment, forCommunity: communityId) { hasPermission in
-                    continuation.resume(returning: hasPermission)
-                }
-            }
-        }
+        await AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunityComment, forCommunity: communityId)
     }
 }

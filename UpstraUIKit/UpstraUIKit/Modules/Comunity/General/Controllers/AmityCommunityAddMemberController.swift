@@ -23,7 +23,7 @@ final class AmityCommunityAddMemberController: AmityCommunityAddMemberController
     private var membershipParticipation: AmityCommunityMembership
         
     init(communityId: String) {
-        membershipParticipation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+        membershipParticipation = AmityCommunityMembership(communityId: communityId)
     }
     
     func add(currentUsers: [AmityCommunityMembershipModel], newUsers users: [AmitySelectMemberModel], _ completion: @escaping (_ addMemberError: AmityError?, _ removeMemberError: AmityError?) -> Void) {
@@ -42,7 +42,7 @@ final class AmityCommunityAddMemberController: AmityCommunityAddMemberController
             
             if !diffAddUsers.isEmpty {
                 do {
-                    let addMemberResult = try await membershipParticipation.addMembers(diffAddUsers)
+                    try await membershipParticipation.addMembers(diffAddUsers)
                 } catch let error {
                     addMemberError = AmityError(error: error) ?? .unknown
                 }
@@ -50,7 +50,7 @@ final class AmityCommunityAddMemberController: AmityCommunityAddMemberController
             
             if !diffRemoveUsers.isEmpty {
                 do {
-                    let removeMemberResult = try await membershipParticipation.removeMembers(diffRemoveUsers)
+                    try await membershipParticipation.removeMembers(diffRemoveUsers)
                 } catch let error {
                     removeMemberError = AmityError(error: error) ?? .unknown
                 }

@@ -55,7 +55,7 @@ struct MessageStatusView: View {
                 AmityLiveChatMessageQuickReaction(message: message)
             }
 
-            Text(dateFormat.string(from: message.createdAt))
+            Text(dateFormat.string(from: message.createdAt ?? Date()))
                 .modifier(StatusStyle(viewConfig: viewConfig))
                 .isHidden(message.syncState != .synced)
                 .accessibilityIdentifier(AccessibilityID.Chat.MessageList.bubbleTimestamp)

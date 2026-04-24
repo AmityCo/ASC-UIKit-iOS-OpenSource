@@ -62,8 +62,8 @@ public class AmityMessageListViewModel: ObservableObject {
     public init(subChannelId: String) {
         self.subChannelId = subChannelId
         
-        ChatPermissionChecker.hasModeratorPermission(for: subChannelId) { hasPermission in
-            self.hasModeratorPermission = hasPermission
+        Task {
+            self.hasModeratorPermission = await ChatPermissionChecker.hasModeratorPermission(for: subChannelId)
         }
         
         self.delegate = AmityUIKit4Manager.client.delegate
@@ -75,7 +75,7 @@ public class AmityMessageListViewModel: ObservableObject {
     
     public func queryMessages() {
         
-        let channel = AmityChannelRepository(client: AmityUIKit4Manager.client).getChannel(subChannelId).snapshot
+        let channel = AmityChannelRepository().getChannel(subChannelId).snapshot
         channel?.subscribeEvent(completion: { isSuccess, _ in
             if !isSuccess {
                 Log.chat.warning("Failed to subscribe to events for channel \(self.subChannelId)")
@@ -91,7 +91,7 @@ public class AmityMessageListViewModel: ObservableObject {
         
         token?.invalidate()
         token = nil
-        token = messageCollection?.observe({ [weak self] collection, _, error in
+        token = messageCollection?.observe({ [weak self] collection, error in
             guard let self else { return }
             
             if let error {
@@ -135,7 +135,7 @@ public class AmityMessageListViewModel: ObservableObject {
                 
                 self.messages = messageModels
                 
-                if collection.count() > self.pagination.currentItemsCount && self.pagination.isInProgress {
+                if messages.count > self.pagination.currentItemsCount && self.pagination.isInProgress {
                     self.pagination.end(anchor: nil)
                 }
             }
@@ -149,7 +149,7 @@ public class AmityMessageListViewModel: ObservableObject {
         if !messages.isEmpty && collection.hasNext && !pagination.isInProgress {
             // Set first message as an anchor for this pagination
             pagination.start(anchor: messages.first?.id ?? "")
-            pagination.currentItemsCount = collection.count()
+            pagination.currentItemsCount = collection.snapshots.count
             
             collection.nextPage()
         }
@@ -178,7 +178,7 @@ public class AmityMessageListViewModel: ObservableObject {
         guard let messageCollection else { return false }
         
         let loadingStatus = messageCollection.loadingStatus
-        return messageCollection.count() >= 20 && messageCollection.hasNext && loadingStatus != .error
+        return messageCollection.snapshots.count >= 20 && messageCollection.hasNext && loadingStatus != .error
     }
     
     @MainActor

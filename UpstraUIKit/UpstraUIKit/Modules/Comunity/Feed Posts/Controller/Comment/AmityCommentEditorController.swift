@@ -16,13 +16,13 @@ protocol AmityCommentEditorControllerProtocol {
 
 final class AmityCommentEditorController: AmityCommentEditorControllerProtocol {
     
-    private var commentRepository: AmityCommentRepository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
+    private var commentRepository: AmityCommentRepository = AmityCommentRepository()
     
     func delete(withCommentId commentId: String, completion: AmityRequestCompletion?) {
         Task { @MainActor in
             do {
-                let result = try await commentRepository.softDeleteComment(withId: commentId)
-                completion?(result, nil)
+                try await commentRepository.softDeleteComment(withId: commentId)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }

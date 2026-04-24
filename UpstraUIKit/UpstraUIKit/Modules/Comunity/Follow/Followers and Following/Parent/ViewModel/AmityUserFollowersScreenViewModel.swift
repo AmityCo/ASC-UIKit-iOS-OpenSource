@@ -19,7 +19,7 @@ final class AmityUserFollowersScreenViewModel: AmityUserFollowersScreenViewModel
     private var userToken: AmityNotificationToken?
     
     init(userId: String) {
-        userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+        userRepository = AmityUserRepository()
         self.userId = userId
     }
 }

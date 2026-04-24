@@ -32,13 +32,11 @@ public class AmityUserRelationshipPageViewModel: ObservableObject {
         try await userManager.blockUser(withId: userId)
     }
     
-    @discardableResult
-    func flagUser(userId: String) async throws -> Bool {
+    func flagUser(userId: String) async throws {
         try await userManager.flagUser(withId: userId)
     }
     
-    @discardableResult
-    func unflaguser(userId: String) async throws -> Bool {
+    func unflaguser(userId: String) async throws{
         try await userManager.unflagUser(withId: userId)
     }
     

@@ -15,7 +15,7 @@ protocol AmityCommunityTrendingControllerProtocol {
 
 final class AmityCommunityTrendingController: AmityCommunityTrendingControllerProtocol {
     
-    private let repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityCommunityRepository()
     private var collection: AmityCollection<AmityCommunity>?
     private var token: AmityNotificationToken?
     private let maxTrending: Int = 5
@@ -26,7 +26,7 @@ final class AmityCommunityTrendingController: AmityCommunityTrendingControllerPr
         token = nil
         
         collection = repository.getTrendingCommunities()
-        token = collection?.observe { [weak self] (collection, change, error) in
+        token = collection?.observe { [weak self] (collection, error) in
             guard let self else { return }
             
             // In case of error, show error

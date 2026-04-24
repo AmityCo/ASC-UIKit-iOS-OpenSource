@@ -6,24 +6,28 @@
 //
 
 import SwiftUI
+import AmitySDK
 
+// NOTE:
+// Retrieve EVENT model based on eventId instead of accessing it through target community. In new sdk, event object is not attached to post or room.
 struct LiveRoomGlobalTargetView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     private let post: AmityPostModel
     private var isEventRoom: Bool = false
     
+    @StateObject var viewModel = LiveRoomGlobalTargetViewModel()
+    
     init(post: AmityPostModel) {
         self.post = post
-        
-        if let _ = post.targetCommunity?.event {
-           isEventRoom = true
-        }
     }
     
     var body: some View {
         getStoryView(avatar: getAvatar(),
                      cornerAvatar: getCornerAvatar(),
                      name: getName())
+        .onAppear {
+            viewModel.loadEvent(eventId: post.eventId)
+        }
     }
     
     private func getStoryView(avatar: (URL?, ImageResource),
@@ -83,21 +87,42 @@ struct LiveRoomGlobalTargetView: View {
     }
     
     private func getAvatar() -> (url: URL?, placeholder: ImageResource) {
-        let avatarURL = URL(string: (isEventRoom ? post.targetCommunity?.event?.coverImage?.mediumFileURL : post.targetCommunity?.avatar?.mediumFileURL) ?? "")
-        let placeholder = isEventRoom ? AmityIcon.eventImagePlaceholder.imageResource : AmityIcon.defaultCommunity.imageResource
-
+        let fileURL = viewModel.event?.coverImage?.mediumFileURL ?? post.targetCommunity?.avatar?.mediumFileURL
+        let avatarURL = URL(string: (fileURL ?? ""))
+        let placeholder = viewModel.event != nil ? AmityIcon.eventImagePlaceholder.imageResource : AmityIcon.defaultCommunity.imageResource
+                            
         return (avatarURL, placeholder)
     }
     
     private func getCornerAvatar() -> (url: URL?, displayName: String) {
-        let avatarURL = URL(string: post.room?.creator?.getAvatarInfo()?.mediumFileURL ?? "")
+        let avatarURL = URL(string: post.room?.creator?.avatar?.mediumFileURL ?? "")
         let name = post.room?.creator?.displayName ?? "Unknown"
-        
         return (avatarURL, name)
     }
     
     private func getName() -> String {
-        let name = isEventRoom ? post.targetCommunity?.event?.title : post.targetCommunity?.displayName
+        let name = viewModel.event?.title ?? post.targetCommunity?.displayName
         return name ?? "Unknown"
+    }
+}
+
+class LiveRoomGlobalTargetViewModel: ObservableObject {
+    
+    @Published var event: AmityEvent?
+    
+    private let eventRepo = AmityEventRepository()
+    private var token: AmityNotificationToken?
+    
+    func loadEvent(eventId: String?) {
+        guard let eventId else { return }
+        
+        token = eventRepo.getEvent(id: eventId).observe{ liveObject, error in
+            
+            if let snapshot = liveObject.snapshot {
+                self.event = snapshot
+                self.token?.invalidate()
+                return
+            }
+        }
     }
 }

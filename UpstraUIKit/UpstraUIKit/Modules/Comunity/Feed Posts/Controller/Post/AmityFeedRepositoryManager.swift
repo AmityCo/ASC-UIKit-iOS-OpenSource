@@ -25,7 +25,7 @@ protocol AmityFeedRepositoryManagerProtocol: AnyObject {
 
 final class AmityFeedRepositoryManager: AmityFeedRepositoryManagerProtocol {
     
-    private let repository = AmityFeedRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityFeedRepository()
     private var collection: AmityCollection<AmityPost>?
     private var token: AmityNotificationToken?
     private var participation: AmityCommunityMembership?
@@ -52,11 +52,11 @@ final class AmityFeedRepositoryManager: AmityFeedRepositoryManagerProtocol {
         case .customPostRankingGlobalFeed:
             collection = repository.getCustomRankingGlobalFeed()
         case .myFeed:
-            collection = repository.getMyFeedSorted(by: .lastCreated, includeDeleted: false)
+            collection = repository.getMyFeed(sortBy: .lastCreated, includeDeleted: false)
         case .userFeed(let userId):
             // If current userId is passing through .userFeed, handle this case as .myFeed type.
             if userId == AmityUIKitManagerInternal.shared.currentUserId {
-                collection = repository.getMyFeedSorted(by: .lastCreated, includeDeleted: false)
+                collection = repository.getMyFeed(sortBy: .lastCreated, includeDeleted: false)
             } else {
                 collection = repository.getUserFeed(userId, sortBy: .lastCreated, includeDeleted: false)
             }
@@ -69,7 +69,7 @@ final class AmityFeedRepositoryManager: AmityFeedRepositoryManagerProtocol {
         token?.invalidate()
         token = nil
         
-        token = collection?.observe { [weak self] (collection, change, error) in
+        token = collection?.observe { [weak self] (collection, error) in
             guard let strongSelf = self else { return }
             if let error = AmityError(error: error) {
                 completion?(.failure(error))
@@ -87,12 +87,13 @@ final class AmityFeedRepositoryManager: AmityFeedRepositoryManagerProtocol {
     private func prepareDataSource(feedType: AmityPostFeedType) -> [AmityPostModel] {
         guard let collection = collection else { return [] }
         var models = [AmityPostModel]()
-        for i in 0..<collection.count() {
-            guard let post = collection.object(at: i), !post.isDeleted else { continue }
+        for i in 0..<collection.snapshots.count {
+            let post = collection.snapshots[i]
+            guard !post.isDeleted else { continue }
             
             let model = AmityPostModel(post: post)
             if let communityId = model.targetCommunity?.communityId {
-                participation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+                participation = AmityCommunityMembership(communityId: communityId)
                 model.isModerator = participation?.getMember(withId: post.postedUserId)?.hasModeratorRole ?? false
                 switch feedType {
                 case .communityFeed(let feedCommunityId), .pendingPostsFeed(let feedCommunityId):

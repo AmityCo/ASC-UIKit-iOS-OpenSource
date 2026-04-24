@@ -32,7 +32,7 @@ struct CommunityModel {
 
 class AmityCommunitySetupPageViewModel: ObservableObject {
     let communityManager: CommunityManager = CommunityManager()
-    let fileRepostiory: AmityFileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    let fileRepostiory: AmityFileRepository = AmityFileRepository()
     let postManager: PostManager = PostManager()
     let mode: AmityCommunitySetupPageMode
     var token: AmityNotificationToken?
@@ -131,7 +131,7 @@ class AmityCommunitySetupPageViewModel: ObservableObject {
             return
         }
         
-        token = postManager.getGlobalPinnedPost().observe({ [weak self] liveCollection, _, error in
+        token = postManager.getGlobalPinnedPost().observe({ [weak self] liveCollection, error in
             guard let self, liveCollection.dataStatus == .fresh else { return }
             
             let snapshots = liveCollection.snapshots
@@ -151,10 +151,10 @@ class AmityCommunitySetupPageViewModel: ObservableObject {
             return
         }
         
-        joinRequestToken = community.getJoinRequests(status: .pending).observe { [weak self] liveCollection, _, error in
+        joinRequestToken = community.getJoinRequests(status: .pending).observe { [weak self] liveCollection, error in
             guard let self, liveCollection.dataStatus == .fresh else { return }
             
-            self.hasPendingJoinRequests = liveCollection.count() > 0
+            self.hasPendingJoinRequests = liveCollection.snapshots.count > 0
             
             self.joinRequestToken?.invalidate()
             self.joinRequestToken = nil

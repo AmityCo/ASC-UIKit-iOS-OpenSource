@@ -11,7 +11,7 @@ import Combine
 
 class TrendingCommunityViewModel: ObservableObject {
     
-    private let repository: AmityCommunityRepository = .init(client: AmityUIKit4Manager.client)
+    private let repository = AmityCommunityRepository()
     private var token: AmityNotificationToken?
     private var communityCollection: AmityCollection<AmityCommunity>?
     private var joinRequestToken: AmityNotificationToken?
@@ -37,7 +37,7 @@ class TrendingCommunityViewModel: ObservableObject {
         queryState = .loading
         
         communityCollection = repository.getTrendingCommunities(includeDiscoverablePrivateCommunity: true)
-        token = communityCollection?.observe { [weak self] liveCollection, _, error in
+        token = communityCollection?.observe { [weak self] liveCollection, error in
             guard let self else { return }
             
             if let _ = error {
@@ -141,7 +141,7 @@ class JoinRequestManager {
     private var token: AmityNotificationToken?
     private var cache: [String: AmityJoinRequest] = [:]
     private var queryCache: Set<String> = [] // Cache of communityId being queried.
-    private let repository: AmityCommunityRepository = .init(client: AmityUIKit4Manager.client)
+    private let repository = AmityCommunityRepository()
     private var isFetching = false
     
     func fetchJoinRequests(communityIds: [String], completion: @escaping ([String: AmityJoinRequest]) -> Void) {
@@ -164,7 +164,7 @@ class JoinRequestManager {
         guard !isFetching else { return }
         isFetching = true
         
-        token = repository.getJoinRequestList(communityIds: communityIds).observe({ [weak self] liveCollection, _, error in
+        token = repository.getJoinRequestList(communityIds: communityIds).observe({ [weak self] liveCollection, error in
             guard let self else { return }
             
             // Stop observing

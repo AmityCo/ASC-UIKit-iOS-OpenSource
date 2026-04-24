@@ -15,7 +15,7 @@ protocol AmityPendingPostsDetailGetPostViewModelProtocol {
 
 final class AmityPendingPostsDetailGetPostViewModel: AmityPendingPostsDetailGetPostViewModelProtocol {
     
-    private let repository = AmityPostRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let repository = AmityPostRepository()
     private var postObject: AmityObject<AmityPost>?
     private var token: AmityNotificationToken?
     
@@ -42,7 +42,7 @@ final class AmityPendingPostsDetailGetPostViewModel: AmityPendingPostsDetailGetP
         guard let _post = postObject?.snapshot else { return nil }
         let post = AmityPostModel(post: _post)
         if let communityId = post.targetCommunity?.communityId {
-            let participation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+            let participation = AmityCommunityMembership(communityId: communityId)
             post.isModerator = participation.getMember(withId: post.postedUserId)?.hasModeratorRole ?? false
         }
         return post

@@ -18,7 +18,7 @@ final class AmityCommunityUserRolesController: AmityCommunityUserRolesController
     private var membership: AmityCommunityMember?
     
     init(communityId: String) {
-        membershipParticipation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+        membershipParticipation = AmityCommunityMembership(communityId: communityId)
     }
     
     func getUserRoles(withUserId userId: String, role: AmityCommunityRole) -> Bool {

@@ -7,7 +7,6 @@
 
 import Foundation
 import AmitySDK
-import RealmSwift
 
 extension AmityAdsSettings {
     

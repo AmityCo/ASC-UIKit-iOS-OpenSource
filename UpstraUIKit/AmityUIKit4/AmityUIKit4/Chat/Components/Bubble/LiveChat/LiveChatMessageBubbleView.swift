@@ -157,8 +157,8 @@ struct LiveChatMessageBubbleView<Content: View>: View {
 
 class LiveChatMessageBubbleViewModel: ObservableObject {
     let message: MessageModel
-    let messageRepo = AmityMessageRepository(client: AmityUIKit4Manager.client)
-    let reactionRepo = AmityReactionRepository(client: AmityUIKit4Manager.client)
+    let messageRepo = AmityMessageRepository()
+    let reactionRepo = AmityReactionRepository()
     
     @Published var repliedMessage: MessageModel.RepliedMessage?
     @Published var isReportedByMe: Bool = false

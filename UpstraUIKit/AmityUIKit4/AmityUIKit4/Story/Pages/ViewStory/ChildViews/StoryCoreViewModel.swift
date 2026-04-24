@@ -176,14 +176,12 @@ class StoryCoreViewModel: ObservableObject, Equatable {
     }
     
     @MainActor
-    @discardableResult
-    func addReaction(storyId: String) async throws -> Bool {
+    func addReaction(storyId: String) async throws {
         try await storyManager.addReaction(storyId: storyId)
     }
     
     @MainActor
-    @discardableResult
-    func removeReaction(storyId: String) async throws -> Bool {
+    func removeReaction(storyId: String) async throws {
         try await storyManager.removeReaction(storyId: storyId)
     }
     

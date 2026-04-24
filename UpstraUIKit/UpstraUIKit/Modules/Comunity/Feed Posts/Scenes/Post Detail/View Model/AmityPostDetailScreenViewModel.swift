@@ -36,7 +36,7 @@ final class AmityPostDetailScreenViewModel: AmityPostDetailScreenViewModelType {
         self.commentController = commentController
         self.reactionController = reactionController
         self.childrenController = childrenController
-        self.pollRepository = AmityPollRepository(client: AmityUIKitManagerInternal.shared.client)
+        self.pollRepository = AmityPollRepository()
     }
     
 }
@@ -110,7 +110,7 @@ extension AmityPostDetailScreenViewModel {
             if let community = post.targetCommunity {
                 self.community = community
                 let communityId = community.communityId
-                let participation = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+                let participation = AmityCommunityMembership(communityId: communityId)
                 post.isModerator = participation.getMember(withId: post.postedUserId)?.hasModeratorRole ?? false
             }
             let component = prepareComponents(post: post)

@@ -41,11 +41,21 @@ class AmityUserPendingFollowRequestsPageViewModel: ObservableObject {
     
     @discardableResult
     func acceptMyFollower(_ userId: String) async throws -> Bool {
-        try await userManager.acceptMyFollower(withId: userId).0
+        do {
+            let result = try await userManager.acceptMyFollower(withId: userId)
+            return true
+        } catch {
+           return false
+        }
     }
     
     @discardableResult
     func declineMyFollower(_ userId: String) async throws -> Bool {
-        try await userManager.declineMyFollower(withId: userId).0
+        do {
+            let result = try await userManager.declineMyFollower(withId: userId)
+            return true
+        } catch {
+            return false
+        }
     }
 }

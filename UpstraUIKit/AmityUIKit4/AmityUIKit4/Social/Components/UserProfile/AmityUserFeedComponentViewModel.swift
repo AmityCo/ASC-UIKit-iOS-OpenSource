@@ -77,7 +77,7 @@ class AmityUserFeedComponentViewModel: ObservableObject {
     
     private func loadPosts(feedSources: [AmityFeedSource]) {
         userFeedCollection = feedManager.getUserFeed(userId: userId, feedSources: feedSources)
-        token = userFeedCollection?.observe({ [weak self] (collection, changes, error) in
+        token = userFeedCollection?.observe({ [weak self] (collection, error) in
             if let error {
                 self?.debouner.run {
                     self?.posts.removeAll()
@@ -89,14 +89,14 @@ class AmityUserFeedComponentViewModel: ObservableObject {
             }
             
             self?.debouner.run {
-                guard !collection.allObjects().isEmpty else {
+                guard !collection.snapshots.isEmpty else {
                     self?.posts.removeAll()
                     self?.emptyFeedState = .empty
                     return
                 }
                 
                 self?.emptyFeedState = nil
-                let posts = collection.allObjects()
+                let posts = collection.snapshots
                 
                 self?.posts = posts.filter { !$0.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" } }
             }

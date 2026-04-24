@@ -9,7 +9,7 @@ import Foundation
 import AmitySDK
 
 class FeedManager {
-    private let feedRepository = AmityFeedRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let feedRepository = AmityFeedRepository()
     
     func getGlobalFeedPosts() -> AmityCollection<AmityPost> {
         feedRepository.getGlobalFeed()

@@ -17,13 +17,13 @@ protocol AmityCommentFlaggerControllerProtocol {
 
 final class AmityCommentFlaggerController: AmityCommentFlaggerControllerProtocol {
     
-    private var flagger: AmityCommentRepository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
+    private var flagger: AmityCommentRepository = AmityCommentRepository()
     
     func report(withCommentId commentId: String, completion: AmityRequestCompletion?) {
         Task { @MainActor in
             do {
-                let result = try await flagger.flagComment(withId: commentId)
-                completion?(result, nil)
+                try await flagger.flagComment(withId: commentId)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }
@@ -33,8 +33,8 @@ final class AmityCommentFlaggerController: AmityCommentFlaggerControllerProtocol
     func unreport(withCommentId commentId: String, completion: AmityRequestCompletion?) {
         Task { @MainActor in
             do {
-                let result = try await flagger.unflagComment(withId: commentId)
-                completion?(result, nil)
+                try await flagger.unflagComment(withId: commentId)
+                completion?(true, nil)
             } catch let error {
                 completion?(false, error)
             }

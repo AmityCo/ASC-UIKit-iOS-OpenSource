@@ -11,7 +11,7 @@ import AVFoundation
 
 class AmityDraftClipPageViewModel: ObservableObject {
     
-    let fileRepo = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    let fileRepo = AmityFileRepository()
     
     @Published var isUploadingClip = false
     @Published var uploadProgress: Double = 0

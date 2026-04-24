@@ -9,7 +9,7 @@ import Foundation
 import AmitySDK
 
 class PollManager {
-    private let pollRepository = AmityPollRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let pollRepository = AmityPollRepository()
     
     func createTextPoll(question: String, answers: [String], isMultipleSelection: Bool, closedIn: Int) async throws -> String {
         
@@ -37,11 +37,11 @@ class PollManager {
         return try await pollRepository.createPoll(createOptions)
     }
     
-    func deletePoll(pollId: String) async throws -> Bool {
+    func deletePoll(pollId: String) async throws {
         return try await pollRepository.deletePoll(withId: pollId)
     }
     
-    func votePoll(pollId: String, answerIds: [String]) async throws -> Bool {
+    func votePoll(pollId: String, answerIds: [String]) async throws {
         return try await pollRepository.votePoll(withId: pollId, answerIds: answerIds)
     }
     
@@ -49,7 +49,7 @@ class PollManager {
         return try await pollRepository.unvotePoll(withId: pollId)
     }
     
-    func closePoll(pollId: String) async throws -> Bool {
+    func closePoll(pollId: String) async throws {
         return try await pollRepository.closePoll(withId: pollId)
     }
 }

@@ -48,12 +48,12 @@ struct CommunityListView: View {
 
 class CommunityListViewModel: ObservableObject {
 
-    private let repository: AmityCommunityRepository = .init(client: AmityUIKit4Manager.client)
+    private let repository = AmityCommunityRepository()
     private var token: AmityNotificationToken?
     private var communityCollection: AmityCollection<AmityCommunity>?
     private let categoryId: String
     
-    private let categoryRepository: AmityCommunityRepository = .init(client: AmityUIKit4Manager.client)
+    private let categoryRepository = AmityCommunityRepository()
     private var categoryToken: AmityNotificationToken?
     
     @Published var communities: [AmityCommunityModel] = []
@@ -83,7 +83,7 @@ class CommunityListViewModel: ObservableObject {
         
         let queryOptions = AmityCommunityQueryOptions(filter: .all, sortBy: .lastCreated, categoryId: categoryId, includeDeleted: false)
         communityCollection = repository.getCommunities(with: queryOptions)
-        token = communityCollection?.observe { [weak self] liveCollection, _, error in
+        token = communityCollection?.observe { [weak self] liveCollection, error in
             guard let self else { return }
             
             if let _ = error {

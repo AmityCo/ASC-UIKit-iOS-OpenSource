@@ -22,18 +22,18 @@ final class AmityCommunityListRepositoryManager: AmityCommunityListRepositoryMan
     private var token: AmityNotificationToken?
     
     init() {
-        repository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityCommunityRepository()
     }
     
     func search(withText text: String?, filter: AmityCommunityQueryFilter, _ completion: (([AmityCommunityModel]) -> Void)?) {
         let queryOptions = AmityCommunitySearchOptions(keyword: text, filter: filter, sortBy: .displayName, categoryId: nil, includeDeleted: false)
         collection = repository.searchCommunities(with: queryOptions)
         token?.invalidate()
-        token = collection?.observe { (collection, change, error) in
+        token = collection?.observe { (collection, error) in
             if collection.dataStatus == .fresh {
                 var communityList: [AmityCommunityModel] = []
-                for index in 0..<collection.count() {
-                    guard let object = collection.object(at: index) else { continue }
+                for index in 0..<collection.snapshots.count {
+                    let object = collection.snapshots[index]
                     let model = AmityCommunityModel(object: object)
                     communityList.append(model)
                 }

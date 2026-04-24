@@ -117,6 +117,7 @@ public class AmityPostModel: Identifiable {
     
     var room: AmityRoom?
     var event: AmityEvent?
+    var eventId: String?
     
     let object: AmityPost
     let childrenPosts: [AmityPost]
@@ -189,15 +190,16 @@ public class AmityPostModel: Identifiable {
         childrenPosts = post.childrenPosts
         parentPostId = post.parentPostId
         postedUser = Author(
-            avatarURL: post.postedUser?.getAvatarInfo()?.fileURL,
+            avatarURL: post.postedUser?.avatar?.fileURL,
             displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, isGlobalBan: post.postedUser?.isGlobalBanned ?? false, isBrand: post.postedUser?.isBrand ?? false)
         isFromBrand = post.postedUser?.isBrand ?? false
-        timestamp = post.createdAt.relativeTime
+        timestamp = post.createdAt?.relativeTime ?? ""
         postedUserId = post.postedUserId
         sharedCount = Int(post.sharedCount)
         allCommentCount = Int(post.commentsCount)
         links = post.links
         pinnedProductId = post.pinnedProductId
+        eventId = post.eventId
         
         // reactions are ordered by the count. if the count is equal, order by alphabet
         // if the count is 1 and the reaction is the same as current user's first reaction, remove it from the list
@@ -239,7 +241,7 @@ public class AmityPostModel: Identifiable {
         analytic = post.analytics
         impression = post.impression
         
-        if let pollInfo = post.getPollInfo() {
+        if let pollInfo = post.childrenPosts.first?.getPollInfo() {
             poll = PollModel(poll: pollInfo)
             text = poll?.question ?? ""
         }

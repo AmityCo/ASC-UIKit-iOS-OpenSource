@@ -123,11 +123,11 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         self.targetId = targetId
         self.targetType = targetType
          
-        communityRepository = AmityCommunityRepository(client: client)
-        userRepository = AmityUserRepository(client: client)
-        fileRepository = AmityFileRepository(client: client)
-        streamRepository = AmityStreamRepository(client: client)
-        postRepository = AmityPostRepository(client: client)
+        communityRepository = AmityCommunityRepository()
+        userRepository = AmityUserRepository()
+        fileRepository = AmityFileRepository()
+        streamRepository = AmityStreamRepository()
+        postRepository = AmityPostRepository()
         broadcaster = AmityVideoBroadcaster(client: client)
         mentionManager = ASCMentionManager(withType: .post(communityId: targetId))
         

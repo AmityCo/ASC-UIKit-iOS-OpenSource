@@ -23,7 +23,7 @@ class PollPostComposerViewModel: ObservableObject {
     @Published var textOptions: [PollOption] = [PollOption(index: 0), PollOption(index: 1)]
     @Published var imageOptions: [PollImageOption] = [PollImageOption(), PollImageOption()]
     
-    let fileRepository = AmityFileRepository(client: AmityUIKitManagerInternal.shared.client)
+    let fileRepository = AmityFileRepository()
     
     init(targetId: String?, targetType: AmityPostTargetType, event: AmityEvent?) {
         self.targetId = targetId

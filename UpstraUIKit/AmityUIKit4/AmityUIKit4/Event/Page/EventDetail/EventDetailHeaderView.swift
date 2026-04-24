@@ -141,7 +141,7 @@ struct EventDetailHeaderView: View {
                 // Hosted By Section
                 HStack(alignment: .center, spacing: 12) {
                     
-                    let avatarUrl = event.creator?.getAvatarInfo()?.fileURL ?? ""
+                    let avatarUrl = event.creator?.avatar?.fileURL ?? ""
                     AmityUserProfileImageView(displayName: event.creator?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: avatarUrl))
                         .frame(width: 40, height: 40)
                         .clipShape(Circle())

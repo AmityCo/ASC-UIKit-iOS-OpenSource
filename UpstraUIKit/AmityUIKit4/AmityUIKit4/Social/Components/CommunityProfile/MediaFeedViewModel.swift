@@ -143,7 +143,7 @@ class MediaFeedViewModel: ObservableObject {
     private func loadUserPosts(userId: String, isClipFeed: Bool, dataTypes: [AmityPostDataType]) {
 
         postCollection = feedManager.getUserFeed(userId: userId, feedSources: currentFeedSources, dataTypes: dataTypes, matchingOnlyParentPost: false)
-        token = postCollection?.observe({ [weak self] (collection, changes, error) in
+        token = postCollection?.observe({ [weak self] (collection, error) in
             guard let self else { return }
             
             if let error {
@@ -193,7 +193,7 @@ class MediaFeedViewModel: ObservableObject {
     // Investigate further to remove debouncer.
     private func loadPosts(_ queryOptions: AmityPostQueryOptions, isClipFeed: Bool) {
         postCollection = postManager.getPosts(options: queryOptions)
-        token = postCollection?.observe({ [weak self] (collection, changes, error) in
+        token = postCollection?.observe({ [weak self] (collection, error) in
             guard let self else { return }
             
             if let error {
@@ -266,10 +266,9 @@ class MediaFeedViewModel: ObservableObject {
     
     func fetchParentPosts(ids: [String], completion: @escaping () -> Void) {
         Log.add(event: .info, "Fetching parent posts \(ids)")
-        parentPostsToken = postManager.getPosts(ids: ids).observe { [weak self] liveCollection, _, error in
+        parentPostsToken = postManager.getPosts(ids: ids).observe { [weak self] liveCollection, error in
             guard let self, liveCollection.dataStatus == .fresh else { return }
             
-            Log.add(event: .info, "Fetched parent posts: \(liveCollection.count())")
             parentPostsToken?.invalidate()
             parentPostsToken = nil
             
@@ -340,8 +339,10 @@ class MediaFeedViewModel: ObservableObject {
             }
         }
     }
+    
     func getClipContent(at index: Int) -> AmityPostModel.ClipContent? {
-        guard let postCollection, let post = postCollection.object(at: index) else { return nil }
+        guard let postCollection else { return nil }
+        let post = postCollection.snapshots[index]
         
         let model = AmityPostModel(post: post)
         
@@ -353,7 +354,8 @@ class MediaFeedViewModel: ObservableObject {
     }
 
     func getVideoContent(at index: Int) -> AmityPostModel? {
-        guard let postCollection, let post = postCollection.object(at: index) else { return nil }
+        guard let postCollection else { return nil }
+        let post = postCollection.snapshots[index]
         
         let model = AmityPostModel(post: post)
         

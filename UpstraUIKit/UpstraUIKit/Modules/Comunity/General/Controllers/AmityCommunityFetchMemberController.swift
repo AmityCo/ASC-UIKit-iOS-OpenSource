@@ -21,18 +21,18 @@ final class AmityCommunityFetchMemberController: AmityCommunityFetchMemberContro
     private var memberToken: AmityNotificationToken?
     
     init(communityId: String) {
-        membership = AmityCommunityMembership(client: AmityUIKitManagerInternal.shared.client, andCommunityId: communityId)
+        membership = AmityCommunityMembership(communityId: communityId)
     }
     
     func fetch(roles: [String], _ completion: @escaping (Result<[AmityCommunityMembershipModel], Error>) -> Void) {
         memberCollection = membership?.getMembers(filter: .member, roles: roles, sortBy: .lastCreated, includeDeleted: false)
-        memberToken = memberCollection?.observe { (collection, change, error) in
+        memberToken = memberCollection?.observe { (collection, error) in
             if let error = error {
                 completion(.failure(error))
             } else {
                 var members: [AmityCommunityMembershipModel] = []
-                for index in 0..<collection.count() {
-                    guard let member = collection.object(at: index) else { continue }
+                for index in 0..<collection.snapshots.count {
+                    let member = collection.snapshots[index]
                     members.append(AmityCommunityMembershipModel(member: member))
                 }
                 completion(.success(members))

@@ -40,7 +40,7 @@ final class AmityRecentChatTableViewCell: UITableViewCell, Nibbable {
     }
     
     private func setupView() {
-        repository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityUserRepository()
         
         containerDisplayNameView.backgroundColor = AmityColorSet.backgroundColor
         containerMessageView.backgroundColor = AmityColorSet.backgroundColor

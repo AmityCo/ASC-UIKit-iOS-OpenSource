@@ -41,8 +41,8 @@ public struct AmityCommentModel {
         text = comment.data?["text"] as? String ?? ""
         isDeleted = comment.isDeleted
         isEdited = comment.isEdited
-        createdAt = comment.createdAt
-        updatedAt = comment.updatedAt
+        createdAt = comment.createdAt ?? Date()
+        updatedAt = comment.updatedAt ?? Date()
         childrenNumber = Int(comment.childrenNumber)
         parentId = comment.parentId
         userId = comment.userId

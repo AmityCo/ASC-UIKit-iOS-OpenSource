@@ -29,9 +29,9 @@ final class AmityUserProfileHeaderScreenViewModel: AmityUserProfileHeaderScreenV
     // MARK: - Initializer
     
     init(userId: String) {
-        userRepository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
-        channelRepository = AmityChannelRepository(client: AmityUIKitManagerInternal.shared.client)
-        followManager = userRepository.userRelationship
+        userRepository = AmityUserRepository()
+        channelRepository = AmityChannelRepository()
+        followManager = AmityUserRelationship()
         self.userId = userId
     }
 }
@@ -95,7 +95,7 @@ extension AmityUserProfileHeaderScreenViewModel {
     }
     
     func createChannel() {
-        let builder = AmityConversationChannelBuilder()
+        let builder = AmityConversationChannelCreateOptions()
         builder.setUserId(userId)
         builder.setDisplayName(user?.displayName ?? "")
         
@@ -111,8 +111,8 @@ extension AmityUserProfileHeaderScreenViewModel {
         Task { @MainActor in
             do {
                 let result = try await followManager.follow(withUserId: userId)
-                self.followStatus = result.1.status
-                self.delegate?.screenViewModel(self, didFollowUser: result.1.status, error: nil)
+                self.followStatus = result.status
+                self.delegate?.screenViewModel(self, didFollowUser: result.status, error: nil)
             } catch let error {
                 self.delegate?.screenViewModel(self, didFollowUser: .none, error: AmityError(error: error))
             }
@@ -123,8 +123,8 @@ extension AmityUserProfileHeaderScreenViewModel {
         Task { @MainActor in
             do {
                 let result = try await followManager.unfollow(withUserId: userId)
-                self.followStatus = result.1.status
-                self.delegate?.screenViewModel(self, didUnfollowUser: result.1.status, error: nil)
+                self.followStatus = result.status
+                self.delegate?.screenViewModel(self, didUnfollowUser: result.status, error: nil)
 
             } catch let error {
                 self.delegate?.screenViewModel(self, didUnfollowUser: .pending, error: AmityError(error: error))

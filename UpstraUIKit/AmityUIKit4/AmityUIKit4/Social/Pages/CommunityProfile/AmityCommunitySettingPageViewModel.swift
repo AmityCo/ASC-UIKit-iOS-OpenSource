@@ -8,6 +8,7 @@
 import Foundation
 import AmitySDK
 
+@MainActor
 class AmityCommunitySettingPageViewModel: ObservableObject {
     @Published var shouldShowEditProfile: Bool = false
     @Published var shouldShowPendingInvitations: Bool = false
@@ -31,8 +32,8 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
         checkPermissionAndSetupData()
     }
  
-    func deleteCommunity(completion: ((AmityError?) -> Void)?) {
-        communityManager.deleteCommunity(withId: community.communityId, completion: completion)
+    func deleteCommunity() async throws {
+        try await communityManager.deleteCommunity(withId: community.communityId)
     }
     
     func leaveCommunity() async throws {
@@ -40,28 +41,13 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
     }
     
     private func checkPermissionAndSetupData() {
-        dispatchGroup.enter()
-        hasEditCommunityPermisison() { [weak self] in
-            self?.dispatchGroup.leave()
-        }
-        
-        dispatchGroup.enter()
-        hasDeleteCommunityPermission() { [weak self] in
-            self?.dispatchGroup.leave()
-        }
-        
-        dispatchGroup.enter()
-        isSocialUserNotificationEnabled { [weak self] in
-            self?.dispatchGroup.leave()
-        }
-        
-        dispatchGroup.enter()
-        isSocialNetworkEnabled { [weak self] in
-            self?.dispatchGroup.leave()
-        }
-        
-        dispatchGroup.notify(queue: .main) { [weak self] in
-            self?.setupData()
+        Task {
+            await hasEditCommunityPermisison()
+            await hasDeleteCommunityPermission()
+            await isSocialUserNotificationEnabled()
+            await isSocialNetworkEnabled()
+            
+            self.setupData()
         }
     }
     
@@ -75,47 +61,28 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
         self.shouldShowCloseCommunity = hasDeleteCommunityPermission || isModerator
     }
     
-    private func hasEditCommunityPermisison(_ completion: (() -> Void)?) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: community.communityId) { [weak self] status in
-            self?.hasEditCommunityPermission = status
-            completion?()
-        }
+    private func hasEditCommunityPermisison() async {
+        self.hasEditCommunityPermission = await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: community.communityId)
     }
     
-    private func hasDeleteCommunityPermission(_ completion: (() -> Void)?) {
-        AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunity, forCommunity: community.communityId) { [weak self] (status) in
-            self?.hasDeleteCommunityPermission = status
-            completion?()
-        }
+    private func hasDeleteCommunityPermission() async {
+        self.hasDeleteCommunityPermission = await AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunity, forCommunity: community.communityId)
     }
     
-    private func isSocialUserNotificationEnabled(_ completion: (() -> Void)?) {
-        notificationManger.getUserNotificationSetting { [weak self] settings, error in
-            if let socialModule = settings?.modules.first(where: { $0.moduleType == .social }) {
-                self?.isSocialUserNotificationEnabled = socialModule.isEnabled
-                completion?()
-                return
-            }
-            
-            self?.isSocialUserNotificationEnabled = false
-            completion?()
+    private func isSocialUserNotificationEnabled() async {
+        let settings = try? await notificationManger.getUserNotificationSetting()
+        if let socialModule = settings?.modules.first(where: { $0.moduleType == .social }) {
+            self.isSocialUserNotificationEnabled = socialModule.isEnabled
+            return
         }
+        
+        self.isSocialUserNotificationEnabled = false
     }
     
-    func isSocialNetworkEnabled(_ completion: (() -> Void)?) {
-        notificationManger.getCommunityNotificationSetting(withId: community.communityId) { [weak self] settings, error in
-            if let settings {
-                self?.isSocialNetworkEnabled = settings.isSocialNetworkEnabled
-                self?.isNotificationEnabled = settings.isEnabled
-                print("Setting Social \(settings.isSocialNetworkEnabled) Noti\(settings.isEnabled)")
-                completion?()
-                return
-            }
-            
-            self?.isSocialNetworkEnabled = false
-            self?.isNotificationEnabled = false
-            completion?()
-        }
+    func isSocialNetworkEnabled() async {
+        let settings = try? await notificationManger.getCommunityNotificationSetting(withId: community.communityId)
+        self.isSocialNetworkEnabled = settings?.isSocialNetworkEnabled ?? false
+        self.isNotificationEnabled = settings?.isEnabled ?? false
     }
     
     func refreshCommunitySnapshot() {

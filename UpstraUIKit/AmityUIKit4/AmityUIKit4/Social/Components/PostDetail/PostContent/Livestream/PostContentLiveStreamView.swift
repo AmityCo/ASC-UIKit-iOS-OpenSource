@@ -35,7 +35,13 @@ struct PostContentLiveStreamView: View {
         if let liveThumbnail = room?.liveThumbnailUrl, !liveThumbnail.isEmpty {
             return liveThumbnail
         }
-        // 3. No thumbnail available → placeholder
+        
+        // 3. Recorded thumbnail
+        if let recordedData = room?.recordedData.first {
+            return recordedData.thumbnailUrl
+        }
+        
+        // 4. No thumbnail available → placeholder
         return nil
     }
 

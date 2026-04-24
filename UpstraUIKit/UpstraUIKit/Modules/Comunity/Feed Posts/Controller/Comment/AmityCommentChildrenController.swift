@@ -11,7 +11,7 @@ import AmitySDK
 final class AmityCommentChildrenController {
     
     private let postId: String
-    private let commentRepository: AmityCommentRepository = AmityCommentRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let commentRepository: AmityCommentRepository = AmityCommentRepository()
     
     init(postId: String) {
         self.postId = postId
@@ -44,11 +44,11 @@ final class AmityCommentChildrenController {
             commentChildrenResults[parentId] = []
             let queryOptions = AmityCommentQueryOptions(referenceId: postId, referenceType: .post, filterByParentId: true, parentId: parentId, orderBy: .descending, includeDeleted: true)
             commentChildrenCollections[parentId] = commentRepository.getComments(with: queryOptions)
-            commentChildrenTokens[parentId] = commentChildrenCollections[parentId]?.observe { [weak self] collection, _, _ in
+            commentChildrenTokens[parentId] = commentChildrenCollections[parentId]?.observe { [weak self] collection, _ in
                 guard let strongSelf = self else { return }
                 var commentModels: [AmityCommentModel] = []
-                for i in 0..<collection.count() {
-                    guard let childComment = collection.object(at: i) else { continue }
+                for i in 0..<collection.snapshots.count {
+                    let childComment = collection.snapshots[i]
                     commentModels.append(AmityCommentModel(comment: childComment))
                 }
                 strongSelf.commentChildrenResults[parentId] = commentModels

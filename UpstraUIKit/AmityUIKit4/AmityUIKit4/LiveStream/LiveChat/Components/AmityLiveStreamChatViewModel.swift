@@ -200,9 +200,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         }
     }
     
-    private func unsubscribeChannel(_ channel: AmityChannel) {
-        guard !channel.model.isInvalidated else { return }
-        
+    private func unsubscribeChannel(_ channel: AmityChannel) {        
         channel.unSubscribeEvent(completion: { status, error in
             if error != nil {
                 Log.add(event: .error, "Failed to unsubscribe from the live chat channel: \(error?.localizedDescription ?? "Unknown error")")
@@ -259,7 +257,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     
     private func observeChannelMembership(_ channel: AmityChannel) {
         // Setup initial state based on current membership
-        if let member = channel.currentMembership {
+        if let member = channel.currentMember {
             isUserMuted = member.isMuted
             updateComposeBarState()
         }
@@ -318,7 +316,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     @MainActor
     func promoteModerator(userId: String) async throws {
         guard let channel = self.channel else { return }
-        let builder = AmityChannelUpdateBuilder(channelId: channel.channelId)
+        let builder = AmityChannelUpdateOptions(channelId: channel.channelId)
         var metadata: [String: Any] = [:]
         
         if var moderators = channel.metadata?["moderators"] as? [String] {
@@ -340,7 +338,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     @MainActor
     func demoteModerator(userId: String) async throws {
         guard let channel = self.channel else { return }
-        let builder = AmityChannelUpdateBuilder(channelId: channel.channelId)
+        let builder = AmityChannelUpdateOptions(channelId: channel.channelId)
         var metadata: [String: Any] = [:]
         
         if var moderators = channel.metadata?["moderators"] as? [String] {
@@ -361,7 +359,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     @MainActor
     func muteMember(userId: String) async throws {
         guard let channel = self.channel else { return }
-        let builder = AmityChannelUpdateBuilder(channelId: channel.channelId)
+        let builder = AmityChannelUpdateOptions(channelId: channel.channelId)
         var metadata: [String: Any] = [:]
         
         if let moderators = channel.metadata?["moderators"] as? [String] {
@@ -382,7 +380,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     @MainActor
     func unmuteMember(userId: String) async throws {
         guard let channel = self.channel else { return }
-        let builder = AmityChannelUpdateBuilder(channelId: channel.channelId)
+        let builder = AmityChannelUpdateOptions(channelId: channel.channelId)
         var metadata: [String: Any] = [:]
         
         if let moderators = channel.metadata?["moderators"] as? [String] {

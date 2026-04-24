@@ -43,7 +43,7 @@ private extension AmityMessageListHeaderView {
 
 private extension AmityMessageListHeaderView {
     func setupView() {
-        repository = AmityUserRepository(client: AmityUIKitManagerInternal.shared.client)
+        repository = AmityUserRepository()
         
         contentView.backgroundColor = AmityColorSet.backgroundColor
         

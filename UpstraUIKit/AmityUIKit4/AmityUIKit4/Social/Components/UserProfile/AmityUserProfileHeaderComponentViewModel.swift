@@ -48,14 +48,12 @@ class AmityUserProfileHeaderComponentViewModel: ObservableObject {
             .assign(to: &$followRequestCount)
     }
     
-    @discardableResult
-    func follow() async throws -> Bool {
-        try await userManager.followUser(withId: userId).0
+    func follow() async throws {
+        try await userManager.followUser(withId: userId)
     }
     
-    @discardableResult
-    func unfollow() async throws -> Bool {
-        try await userManager.unfollowUser(withId: userId).0
+    func unfollow() async throws {
+        try await userManager.unfollowUser(withId: userId)
     }
     
     func unblock() async throws {

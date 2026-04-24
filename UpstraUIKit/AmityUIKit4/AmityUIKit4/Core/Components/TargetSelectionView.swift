@@ -100,63 +100,55 @@ class TargetSelectionViewModel: ObservableObject {
     private var communityCollection: AmityCollection<AmityCommunity>?
     private var cancellable: AnyCancellable?
     
-    private let communityRepository = AmityCommunityRepository(client: AmityUIKitManagerInternal.shared.client)
+    private let communityRepository = AmityCommunityRepository()
     
     init(contentType: PostMenuType) {
         let queryOptions = AmityCommunityQueryOptions(filter: .userIsMember, sortBy: .displayName, includeDeleted: false)
         communityCollection = communityRepository.getCommunities(with: queryOptions)
         
         cancellable = communityCollection?.$snapshots
-            .flatMap { communities in
-                Publishers.MergeMany(
-                    communities.map { community -> AnyPublisher<AmityCommunityModel?, Never> in
-                        let communityModel = AmityCommunityModel(object: community)
-                        
-                        // Story permission specifically need to check without considering onlyAdminCanPost
-                        if contentType == .story {
-                            return Future<AmityCommunityModel?, Never> { promise in
-                                
-                                AmityUIKit4Manager.client.hasPermission(.manageStoryCommunity, forCommunity: community.communityId) { success in
-                                    let hasPermission = success
-                                    let allowAllUserCreation = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
-                                    let hasStoryManagePermission = (allowAllUserCreation || hasPermission) && communityModel.isJoined
-                                    
-                                    if hasStoryManagePermission {
-                                        promise(.success(communityModel))
-                                    } else {
-                                        promise(.success(nil))
-                                    }
-                                }
-                            }
-                            .eraseToAnyPublisher()
-                        }
-                        
-                        // Check for post permission
-                        if community.onlyAdminCanPost {
-                            return Future<AmityCommunityModel?, Never> { promise in
-                                AmityUIKit4Manager.client.hasPermission(.createPrivilegedPost, forCommunity: community.communityId) { success in
-                                    if success {
-                                        promise(.success(communityModel))
-                                    } else {
-                                        promise(.success(nil))
-                                    }
-                                }
-                            }
-                            .eraseToAnyPublisher()
-                        } else {
-                            return Just(communityModel).eraseToAnyPublisher()
-                        }
-                    }
-                )
-                .collect()
-            }
-            .compactMap { $0.compactMap { $0 } }
-            .assign(to: \.communities, on: self)
-
+            .sink(receiveValue: { communities in
+                Task { @MainActor in
+                    let filteredCommunities = await self.processCommunities(communities, contentType: contentType)
+                    self.communities = filteredCommunities
+                }
+            })
     }
     
     func loadMore() {
         guard let collection = communityCollection, collection.hasNext else { return }
         collection.nextPage()
+    }
+    
+    func processCommunities(_ communities: [AmityCommunity], contentType: PostMenuType) async -> [AmityCommunityModel] {
+        var filteredCommunities: [AmityCommunityModel] = []
+        
+        for community in communities {
+            let communityModel = AmityCommunityModel(object: community)
+            
+            if contentType == .story {
+                let canManageStory = await AmityUIKit4Manager.client.hasPermission(.manageStoryCommunity, forCommunity: community.communityId)
+                
+                let canCreateStory = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
+                let hasManageStoryPermission = (canCreateStory || canManageStory) && communityModel.isJoined
+
+                if hasManageStoryPermission {
+                    filteredCommunities.append(communityModel)
+                }
+                
+                continue
+            }
+            
+            if community.onlyAdminCanPost {
+                let hasCreatePermission = await AmityUIKit4Manager.client.hasPermission(.createPrivilegedPost, forCommunity: community.communityId)
+                if hasCreatePermission {
+                    filteredCommunities.append(communityModel)
+                }
+            } else {
+                filteredCommunities.append(communityModel)
+            }
+        }
+        
+        return filteredCommunities
     }
 }
