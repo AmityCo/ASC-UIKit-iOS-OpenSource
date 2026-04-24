@@ -107,7 +107,6 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
             if let settings {
                 self?.isSocialNetworkEnabled = settings.isSocialNetworkEnabled
                 self?.isNotificationEnabled = settings.isEnabled
-                print("Setting Social \(settings.isSocialNetworkEnabled) Noti\(settings.isEnabled)")
                 completion?()
                 return
             }
