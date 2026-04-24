@@ -17,4 +17,6 @@ extension Notification.Name {
     public static let didLivestreamStatusUpdated = Notification.Name("didLivestreamStatusUpdated")
     public static let didPollUpdated = Notification.Name("didPollUpdated")
     static let configDidUpdate = Notification.Name("amityConfigDidUpdate")
+    public static let forceRefreshNewsfeed = Notification.Name("forceRefreshNewsfeed")
+    public static let refreshNewsfeedIfNeeded = Notification.Name("refreshNewsfeedIfNeeded")
 }
