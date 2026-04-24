@@ -691,7 +691,6 @@
 				Social/Pages/SocialHome/AmitySocialHomePage.swift,
 				Social/Pages/SocialHome/ChildViews/SocialHomeContainerView.swift,
 				Social/Pages/SocialHome/ChildViews/SocialHomePageTabView.swift,
-				Social/Pages/SocialHome/ChildViews/SocialHomeTabState.swift,
 				Social/Pages/UserProfile/AmityBlockedUsersPage.swift,
 				Social/Pages/UserProfile/AmityBlockedUsersPageViewModel.swift,
 				Social/Pages/UserProfile/AmityEditUserProfilePage.swift,
