@@ -84,6 +84,11 @@ public struct AmitySocialHomePage: AmityPageView {
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
         }
+        .onChange(of: viewModel.selectedTab) { newTab in
+            if newTab == .newsFeed {
+                NotificationCenter.default.post(name: .refreshNewsfeedIfNeeded, object: nil)
+            }
+        }
     }
 }
 

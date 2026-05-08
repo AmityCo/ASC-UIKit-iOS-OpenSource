@@ -21,7 +21,6 @@ public struct AmityNewsFeedComponent: AmityComponentView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var postFeedViewModel = PostFeedViewModel(feedType: .globalFeed)
     @StateObject private var viewModel = AmityNewsFeedComponentViewModel()
-    @EnvironmentObject private var tabState: SocialHomeTabState
     @State private var pullToRefreshShowing: Bool = false
     @State private var isCurrentFeedEmpty: Bool = false
     
@@ -48,15 +47,21 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                 isCurrentFeedEmpty = false
             }
         }
-        .onReceive(tabState.$selectedTab) { tab in
-            guard tab == .newsFeed,
-                  postFeedViewModel.postItems.isEmpty,
+        .onReceive(NotificationCenter.default.publisher(for: .forceRefreshNewsfeed)) { _ in
+            refreshNewsfeed()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .refreshNewsfeedIfNeeded)) { _ in
+            guard postFeedViewModel.postItems.isEmpty,
                   postFeedViewModel.feedLoadingStatus == .loaded,
                   isCurrentFeedEmpty else { return }
-            viewModel.loadStoryTargets()
-            viewModel.loadRoomPosts()
-            postFeedViewModel.loadFeed(feedType: .globalFeed)
+            refreshNewsfeed()
         }
+    }
+
+    private func refreshNewsfeed() {
+        viewModel.loadStoryTargets()
+        viewModel.loadRoomPosts()
+        postFeedViewModel.loadFeed(feedType: .globalFeed)
     }
     
     @ViewBuilder

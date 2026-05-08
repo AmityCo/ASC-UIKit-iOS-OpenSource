@@ -12,7 +12,6 @@ struct SocialHomeContainerView: View {
     @Binding var selectedTab: AmitySocialHomePageTab
     @State private var page: Page = .first()
     @State private var tabs: [AmitySocialHomePageTab]
-    @StateObject private var tabState = SocialHomeTabState()
     private let pageId: PageId?
     
     init(_ selectedTab: Binding<AmitySocialHomePageTab>, pageId: PageId?) {
@@ -26,7 +25,6 @@ struct SocialHomeContainerView: View {
             switch tab {
             case .newsFeed:
                 AmityNewsFeedComponent(pageId: pageId)
-                    .environmentObject(tabState)
             case .explore:
                 AmityExplorePageContainer()
             case .myCommunities:
@@ -45,9 +43,7 @@ struct SocialHomeContainerView: View {
             if !tabs.contains(selectedTab) {
                 tabs.append(selectedTab)
             }
-            
-            tabState.selectedTab = selectedTab
-            
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 page.update(.new(index: tabs.firstIndex(of: selectedTab) ?? 0))
             }

@@ -193,7 +193,7 @@ public class AmityPostModel: Identifiable {
             avatarURL: post.postedUser?.avatar?.fileURL,
             displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, isGlobalBan: post.postedUser?.isGlobalBanned ?? false, isBrand: post.postedUser?.isBrand ?? false)
         isFromBrand = post.postedUser?.isBrand ?? false
-        timestamp = post.createdAt?.relativeTime ?? ""
+        timestamp = post.createdAt.relativeTime
         postedUserId = post.postedUserId
         sharedCount = Int(post.sharedCount)
         allCommentCount = Int(post.commentsCount)

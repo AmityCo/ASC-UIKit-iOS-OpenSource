@@ -113,7 +113,7 @@ struct NotificationTrayInvitationItemView: View {
                     
                     Spacer(minLength: 12)
                     
-                    Text(invitation.createdAt?.relativeTime ?? Date().relativeTime)
+                    Text(invitation.createdAt.relativeTime)
                         .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                 }
                 

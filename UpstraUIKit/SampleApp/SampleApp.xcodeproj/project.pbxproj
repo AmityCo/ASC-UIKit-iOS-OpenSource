@@ -26,7 +26,6 @@
 		B78DA49B24BED7DA00EE902B /* SampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */; };
 		D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; };
 		D478D16A26240A5E006EA140 /* AmityUIKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		ED105C5E2F9B7F7700D92287 /* SharedFrameworks in Frameworks */ = {isa = PBXBuildFile; productRef = ED105C5D2F9B7F7700D92287 /* SharedFrameworks */; };
 		ED32E6F92EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */; };
 		ED32E6FA2EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		ED32E6FB2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; };
@@ -90,8 +89,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		684187EE2EA621F6000D4C6A /* AmityLiveKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityLiveKit.xcframework; path = /Users/zayar/Desktop/Amity/EkoMessagingSDKUIKitIOS/UpstraUIKit/AmityUIKit4/../../../../../Downloads/AmityLiveKit.xcframework; sourceTree = "<absolute>"; };
-		684187F12EA62203000D4C6A /* LiveKitWebRTC.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LiveKitWebRTC.xcframework; path = /Users/zayar/Desktop/Amity/EkoMessagingSDKUIKitIOS/UpstraUIKit/AmityUIKit4/../../../../../Downloads/LiveKitWebRTC.xcframework; sourceTree = "<absolute>"; };
 		684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		684AE1302B0C8CB900FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -100,13 +97,8 @@
 		68D870F92F35D4380071D3E3 /* AmityUIKitConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AmityUIKitConfig.json; sourceTree = "<group>"; };
 		68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Eko Corporation Company Limited"; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = ../Shared/RealmSwift.xcframework; sourceTree = "<group>"; };
 		68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityLiveKit.xcframework; path = ../Shared/AmityLiveKit.xcframework; sourceTree = "<group>"; };
-		68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LiveKitWebRTC.xcframework; path = ../Shared/LiveKitWebRTC.xcframework; sourceTree = "<group>"; };
 		92DBE8E92ACA98CF007D873C /* SampleAppDistribution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleAppDistribution.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0BD0B3B26DDDFCC0054088B /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityLiveVideoBroadcastKit.xcframework; path = ../Shared/AmityLiveVideoBroadcastKit.xcframework; sourceTree = "<group>"; };
-		A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityVideoPlayerKit.xcframework; path = ../Shared/AmityVideoPlayerKit.xcframework; sourceTree = "<group>"; };
-		A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = ../Shared/MobileVLCKit.xcframework; sourceTree = "<group>"; };
 		A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B78DA47524BED7D300EE902B /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B78DA48B24BED7DA00EE902B /* SampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,14 +108,13 @@
 		B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppUITests.swift; sourceTree = "<group>"; };
 		B78DA49C24BED7DA00EE902B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D45B3A93264A840300F6FF52 /* Realm.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Amity Technologies (Thailand) Co., Ltd."; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = ../Shared/Realm.xcframework; sourceTree = "<group>"; };
-		D45D45B726204253008F7C2C /* AmitySDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmitySDK.xcframework; path = ../Shared/AmitySDK.xcframework; sourceTree = "<group>"; };
 		D478D153262409E5006EA140 /* AmityUIKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED6B548E2F84DBF100E0A555 /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AmityUIKitLiveStream.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/UpstraUIKit-gswkxqfquohuvsbjrpagulvboqvr/Build/Products/Debug-iphonesimulator/AmityUIKitLiveStream.framework"; sourceTree = "<group>"; };
 		ED6BDC7A2F8511E300E0A555 /* AmityUIKitLiveStream.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityUIKitLiveStream.xcframework; path = ../Shared/AmityUIKitLiveStream.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		ED32E6F72EE03EE600AACA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		ED32E6F72EE03EE600AACA20 /* Exceptions for "SampleApp" folder in "SampleApp" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"GoogleService-Info.plist",
@@ -131,7 +122,7 @@
 			);
 			target = B78DA47424BED7D300EE902B /* SampleApp */;
 		};
-		ED32E6F82EE03EE600AACA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		ED32E6F82EE03EE600AACA20 /* Exceptions for "SampleApp" folder in "SampleAppDistribution" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -141,7 +132,19 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		ED32E6922EE03EE600AACA20 /* SampleApp */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (ED32E6F72EE03EE600AACA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ED32E6F82EE03EE600AACA20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = SampleApp; sourceTree = "<group>"; };
+		ED32E6922EE03EE600AACA20 /* SampleApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				ED32E6F72EE03EE600AACA20 /* Exceptions for "SampleApp" folder in "SampleApp" target */,
+				ED32E6F82EE03EE600AACA20 /* Exceptions for "SampleApp" folder in "SampleAppDistribution" target */,
+			);
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = SampleApp;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -167,7 +170,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDFF401E2F869B7200984A8B /* AmityUIKitLiveStream.framework in Frameworks */,
-				ED105C5E2F9B7F7700D92287 /* SharedFrameworks in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
 				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
 			);
@@ -245,10 +247,6 @@
 			children = (
 				ED6BDC7A2F8511E300E0A555 /* AmityUIKitLiveStream.xcframework */,
 				ED6B548E2F84DBF100E0A555 /* AmityUIKitLiveStream.framework */,
-				684187F12EA62203000D4C6A /* LiveKitWebRTC.xcframework */,
-				684187EE2EA621F6000D4C6A /* AmityLiveKit.xcframework */,
-				68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */,
-				68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */,
 				68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */,
 				684AE1402B0C9B4E00FD7270 /* AmityUIKit4.framework */,
 				684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */,
@@ -256,13 +254,9 @@
 				684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */,
 				68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */,
 				A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */,
-				A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */,
-				A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */,
-				A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */,
 				A0BD0B3B26DDDFCC0054088B /* AmityUIKitLiveStream.framework */,
 				D45B3A93264A840300F6FF52 /* Realm.xcframework */,
 				D478D153262409E5006EA140 /* AmityUIKit.framework */,
-				D45D45B726204253008F7C2C /* AmitySDK.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -315,7 +309,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				ED105C5D2F9B7F7700D92287 /* SharedFrameworks */,
+				1D768973CC4024F804FCC93F /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -391,6 +385,7 @@
 			mainGroup = B78DA46C24BED7D300EE902B;
 			packageReferences = (
 				92DBE89F2ACA98BB007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				6254CFEAC6B6FD23CC8A6240 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			productRefGroup = B78DA47624BED7D300EE902B /* Products */;
 			projectDirPath = "";
@@ -896,6 +891,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		6254CFEAC6B6FD23CC8A6240 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../SharedFrameworks;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		92DBE89F2ACA98BB007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -916,14 +918,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1D768973CC4024F804FCC93F /* SharedFrameworks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6254CFEAC6B6FD23CC8A6240 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			productName = SharedFrameworks;
+		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
-		};
-		ED105C5D2F9B7F7700D92287 /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

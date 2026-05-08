@@ -303,7 +303,7 @@ public class AmityPostModel {
         postedUser = Author(
             avatarURL: post.postedUser?.getAvatarInfo()?.fileURL,
             displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, isGlobalBan: post.postedUser?.isGlobalBanned ?? false)
-        subtitle = post.isEdited ? String.localizedStringWithFormat(AmityLocalizedStringSet.PostDetail.postDetailCommentEdit.localizedString, post.createdAt?.relativeTime ?? Date().relativeTime) : post.createdAt?.relativeTime ?? Date().relativeTime
+        subtitle = post.isEdited ? String.localizedStringWithFormat(AmityLocalizedStringSet.PostDetail.postDetailCommentEdit.localizedString, post.createdAt.relativeTime) : post.createdAt.relativeTime
         postedUserId = post.postedUserId
         sharedCount = Int(post.sharedCount)
         reactionsCount = Int(post.reactionsCount)
