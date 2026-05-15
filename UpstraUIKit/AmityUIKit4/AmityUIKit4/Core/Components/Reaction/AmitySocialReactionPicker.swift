@@ -186,7 +186,7 @@ public struct AmitySocialReactionPicker: AmityComponentView {
                         }
                         .overlay(
                             ZStack {
-                                Text(reaction.name.capitalizeFirstLetter())
+                                Text(AmityStringProvider.common.resolveReactionDisplayName(reaction.name))
                                     .applyTextStyle(.captionSmall(.white))
                                     .lineLimit(1)
                                     .padding(.horizontal, 6)
@@ -277,7 +277,7 @@ public class AmitySocialReactionPickerViewModel: ObservableObject {
                 }
             } catch {
                 Log.add(event: .error, "Failed to add or remove reaction: \(reaction) \(error.localizedDescription)")
-                Toast.showToast(style: .warning, message: "Oops, something went wrong.")
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.oopsSomethingWentWrong.localizedString)
             }
         }
     }

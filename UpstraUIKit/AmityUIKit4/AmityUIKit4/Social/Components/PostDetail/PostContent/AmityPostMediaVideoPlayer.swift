@@ -119,7 +119,7 @@ struct AmityPostMediaVideoPlayer: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 60, height: 60)
 
-                Text("This video is no longer available.")
+                Text(AmityLocalizedStringSet.Social.videoNoLongerAvailable.localizedString)
                     .foregroundColor(.white)
                     .font(.system(size: 17))
             }
@@ -159,7 +159,7 @@ struct AmityPostMediaVideoPlayer: View {
             } else {
                 Color.black
                     .overlay(
-                        Text("Video is not available")
+                        Text(AmityLocalizedStringSet.Social.videoNotAvailable.localizedString)
                             .foregroundColor(.white)
                             .font(.system(size: 17))
                     )
@@ -337,7 +337,7 @@ struct AmityPostMediaVideoPlayer: View {
                                 .frame(width: 20, height: 20)
                                 .foregroundColor(Color(viewConfig.defaultDarkTheme.baseColor))
                         }
-                        Text("Tag products")
+                        Text(AmityLocalizedStringSet.Social.tagProducts.localizedString)
                             .applyTextStyle(.bodyBold(Color(viewConfig.defaultDarkTheme.baseColor)))
                         Spacer()
                         Text("\(productCount)")
@@ -354,7 +354,7 @@ struct AmityPostMediaVideoPlayer: View {
             } else {
                 BottomSheetItemView(
                     icon: AmityIcon.viewPostIcon.getImageResource(),
-                    text: "View post"
+                    text: AmityLocalizedStringSet.Social.socialViewPost.localizedString
                 )
                 .onTapGesture {
                     showBottomSheet = false

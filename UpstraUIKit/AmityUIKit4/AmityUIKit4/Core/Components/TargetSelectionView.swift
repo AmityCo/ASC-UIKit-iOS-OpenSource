@@ -38,7 +38,7 @@ struct TargetSelectionView<Content: View>: View {
                     headerView()
                     
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        Text("My Communities")
+                        Text(AmityLocalizedStringSet.Social.myCommunities.localizedString)
                             .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade3)))
                             .padding([.leading, .top], 16)
                             .padding(.bottom, 8)

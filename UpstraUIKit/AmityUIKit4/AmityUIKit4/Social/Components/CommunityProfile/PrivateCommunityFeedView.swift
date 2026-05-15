@@ -22,12 +22,12 @@ public struct PrivateCommunityFeedView: View {
                 .frame(width: 60, height: 60)
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
             
-            Text("This community is private")
+            Text(AmityLocalizedStringSet.Social.privateCommunityTitle.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 .padding(.top, 8)
                 .padding(.bottom, 4)
             
-            Text("Join this community to see its content and members.")
+            Text(AmityLocalizedStringSet.Social.privateCommunityDescription.localizedString)
                 .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade3)))
         }
         .background(Color(viewConfig.theme.backgroundColor))

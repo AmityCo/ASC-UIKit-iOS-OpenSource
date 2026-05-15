@@ -98,7 +98,7 @@ struct LiveStreamViewerView: View {
                                     Text("\(viewModel.watchingCount.formattedCountString)")
                                         .applyTextStyle(.captionBold(.white))
                                 } else {
-                                    Text(AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString)
+                                    Text(AmityLocalizedStringSet.General.live.localizedString)
                                         .applyTextStyle(.captionBold(.white))
                                 }
                             }
@@ -295,7 +295,7 @@ struct LiveStreamViewerView: View {
                                                 // Event Creator info
                                                 if let creator = event.creator {
                                                     HStack(spacing: 4) {
-                                                        Text("By \(creator.displayName ?? "")")
+                                                        Text(AmityLocalizedStringSet.General.byAuthor.localized(arguments: creator.displayName ?? ""))
                                                             .applyTextStyle(.caption(Color.white))
                                                             .lineLimit(1)
                                                         
@@ -343,7 +343,7 @@ struct LiveStreamViewerView: View {
                                             // Streamer info
                                             if let streamer = room.creator {
                                                 HStack(spacing: 4) {
-                                                    Text("By \(streamer.displayName ?? "")")
+                                                    Text(AmityLocalizedStringSet.General.byAuthor.localized(arguments: streamer.displayName ?? ""))
                                                         .applyTextStyle(.caption(Color.white.opacity(0.8)))
                                                         .lineLimit(1)
                                                     
@@ -406,7 +406,7 @@ struct LiveStreamViewerView: View {
         }
         .onChange(of: networkMonitor.isConnected) { isConnected in
             if !isConnected {
-                Toast.showToast(style: .loading, message: "Waiting for network...", bottomPadding: 60, autoHide: false)
+                Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.livestreamWaitingNetworkToast.localizedString, bottomPadding: 60, autoHide: false)
             } else {
                 Toast.hideToastIfPresented(immediately: true)
             }
@@ -582,7 +582,7 @@ struct LiveStreamViewerView: View {
         let copyLinkConfig = viewConfig.forElement(.copyLink)
         let shareLinkConfig = viewConfig.forElement(.shareLink)
         
-        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "", tintColor: .white)
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? AmityLocalizedStringSet.Social.socialCopyLivestreamLink.localizedString, tintColor: .white)
             .onTapGesture {
                 showBottomSheet.toggle()
                 
@@ -594,7 +594,7 @@ struct LiveStreamViewerView: View {
                 }
             }
         
-        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "", tintColor: .white)
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? AmityLocalizedStringSet.Social.socialShareTo.localizedString, tintColor: .white)
             .onTapGesture {
                 showBottomSheet.toggle()
                 
@@ -609,7 +609,7 @@ struct LiveStreamViewerView: View {
             Color.black
                 .frame(height: 50)
             
-            Text("This live stream has started, but with limited visibility until the post has been approved.")
+            Text(AmityLocalizedStringSet.Social.livestreamLimitedVisibility.localizedString)
                 .applyTextStyle(.body(Color(viewConfig.theme.secondaryColor.blend(.shade2))))
                 .multilineTextAlignment(.center)
                 .padding(.leading, 32)
@@ -624,7 +624,7 @@ struct LiveStreamViewerView: View {
             Color.black
                 .frame(height: 50)
             
-            Text("Join community to interact with live stream.")
+            Text(AmityLocalizedStringSet.Social.livestreamJoinToInteract.localizedString)
                 .applyTextStyle(.body(Color(viewConfig.theme.secondaryColor.blend(.shade2))))
                 .multilineTextAlignment(.center)
                 .padding(.leading, 32)

@@ -170,7 +170,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         
                         if isEventHost || isModerator {
                             let icon = isEventHost ? AmityIcon.eventHostBadge.imageResource : viewConfig.getImage(elementId: .moderatorBadge, placeholder: "moderatorBadgeIcon")
-                            let title = isEventHost ? "Host" : viewConfig.getText(elementId: .moderatorBadge) ?? ""
+                            let title = isEventHost ? AmityLocalizedStringSet.Social.livestreamHost.localizedString : viewConfig.getText(elementId: .moderatorBadge) ?? ""
                             let isBadgeHidden = viewConfig.isHidden(elementId: .moderatorBadge)
                             
                             PostAuthorBadge(badgeType: isEventHost ? .host : .moderator, icon: icon, title: title)
@@ -180,7 +180,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                                 .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                         }
                         
-                        Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
+                        Text("\(post.timestamp)\(post.isEdited ? " \(AmityLocalizedStringSet.Comment.editedText.localizedString)" : "")")
                             .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                             .isHidden(viewConfig.isHidden(elementId: .timestamp))
                             .accessibilityIdentifier(AccessibilityID.Social.PostContent.timestamp)
@@ -238,7 +238,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                                 
                                 let hasJoinedCommunity = post.targetCommunity?.isJoined ?? false
                                 if !hasJoinedCommunity {
-                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                                     return
                                 }
                                 
@@ -365,7 +365,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         openProductWebView(productId: productId)
                     })
                     .lineLimit(style == .detail ? 1000 : 8)
-                    .moreButtonText("...See more")
+                    .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                     .font(AmityTextStyle.body(.clear).getFont())
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .attributedColor(viewConfig.theme.primaryColor)
@@ -408,7 +408,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 if !description.isEmpty {
                     ExpandableText(description)
                         .lineLimit(8)
-                        .moreButtonText("...See more")
+                        .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .attributedColor(viewConfig.theme.primaryColor)
@@ -450,7 +450,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 if !description.isEmpty {
                     ExpandableText(description)
                         .lineLimit(8)
-                        .moreButtonText("...See more")
+                        .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .attributedColor(viewConfig.theme.primaryColor)
@@ -506,7 +506,10 @@ public struct AmityPostContentComponent: AmityComponentView {
                 }
                 .isHidden(post.allReactions.count == 0)
                 
-                Text("\(post.allCommentCount.formattedCountString) \(post.allCommentCount == 1 ? "comment" : "comments")")
+                let commentCountText = post.allCommentCount == 1
+                    ? AmityLocalizedStringSet.Social.postCommentCountSingular.localized(arguments: post.allCommentCount.formattedCountString)
+                    : AmityLocalizedStringSet.Social.postCommentCountPlural.localized(arguments: post.allCommentCount.formattedCountString)
+                Text(commentCountText)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     .isHidden(post.allCommentCount == 0)
                 
@@ -532,7 +535,7 @@ public struct AmityPostContentComponent: AmityComponentView {
             // We do not show "Join community to interact" view anymore
             HStack(spacing: 4) {
                 let reactionIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .reactionButton, key: "icon", of: String.self) ?? "")
-                let reactionTitle = viewConfig.getConfig(elementId: .reactionButton, key: "text", of: String.self) ?? ""
+                let reactionTitle = viewConfig.getConfig(elementId: .reactionButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Comment.reactButtonText.localizedString
                 HStack(spacing: 3) {
                     Color.clear
                         .frame(width: 0, height: 0)
@@ -544,7 +547,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         .resizable()
                         .frame(width: 20.0, height: 20.0)
 
-                    Text(post.myReaction != nil ? post.myReaction!.name.capitalizeFirstLetter() : reactionTitle)
+                    Text(post.myReaction != nil ? AmityStringProvider.common.resolveReactionDisplayName(post.myReaction!.name) : reactionTitle)
                         .applyTextStyle(.bodyBold(Color(post.myReaction != nil ? viewConfig.theme.baseColor : viewConfig.theme.baseColorShade2)))
                         .lineLimit(1)
                 }
@@ -555,7 +558,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
                         
                         if !shouldAllowInteraction {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                             return
                         }
                         
@@ -578,7 +581,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
                         
                         if !shouldAllowInteraction {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                             return
                         }
                         
@@ -598,7 +601,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
                         
                         if !shouldAllowInteraction {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                             return
                         }
                         
@@ -607,7 +610,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     }
                 }) {
                     let commentIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .commentButton, key: "icon", of: String.self) ?? "")
-                    let commentTitle = viewConfig.getConfig(elementId: .commentButton, key: "text", of: String.self) ?? ""
+                    let commentTitle = viewConfig.getConfig(elementId: .commentButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.postCommentButtonText.localizedString
                     HStack(spacing: 3) {
                         Image(commentIcon)
                             .resizable()
@@ -664,8 +667,9 @@ public struct AmityPostContentComponent: AmityComponentView {
                                     .frame(width: 20, height: 20)
                                 
                                 let repliesCount = comment.childrenNumber
-                                let word = WordsGrammar(count: repliesCount, set: .reply)
-                                let finalText = "View \(repliesCount) \(word.value)"
+                                let finalText = repliesCount == 1
+                                    ? AmityLocalizedStringSet.Social.postViewRepliesSingular.localized(arguments: "\(repliesCount)")
+                                    : AmityLocalizedStringSet.Social.postViewRepliesPlural.localized(arguments: "\(repliesCount)")
                                 Text(finalText)
                                     .applyTextStyle(.captionBold(Color(viewConfig.theme.secondaryColorShade1)))
                             }
@@ -740,7 +744,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         let copyLinkConfig = viewConfig.forElement(.copyLink)
         let shareLinkConfig = viewConfig.forElement(.shareLink)
 
-        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "")
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? AmityLocalizedStringSet.Social.socialCopyPostLink.localizedString)
             .onTapGesture {
                 showShareBottomSheet.toggle()
                 
@@ -752,7 +756,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                 }
             }
         
-        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "")
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? AmityLocalizedStringSet.Social.socialShareTo.localizedString)
             .onTapGesture {
                 showShareBottomSheet.toggle()
                 
@@ -796,7 +800,7 @@ extension AmityPostContentComponent {
                     .frame(width: 16, height: 16)
             }
             
-            Text(post.targetCommunity?.displayName ?? "Unknown")
+            Text(post.targetCommunity?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString)
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
                 .onTapGesture {
@@ -818,7 +822,7 @@ extension AmityPostContentComponent {
     var targetUserNameLabel: some View {
         HStack(spacing: 8) {
             
-            Text(post.targetUser?.displayName ?? "Unknown")
+            Text(post.targetUser?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString)
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
                 .onTapGesture {

@@ -1,0 +1,1290 @@
+/* 
+  AmityLocalizable.strings
+  AmityUIKit
+
+  Created by Sarawoot Khunsri on 8/6/2563 BE.
+  Copyright © 2563 Amity Communication. All rights reserved.
+*/
+
+// MARK: - Story
+
+// General
+"amity_common_button_cancel" = "ยกเลิก";
+"save" = "บันทึก";
+"retry" = "ลองอีกครั้ง";
+"amity_common_button_delete" = "ลบ";
+"discard" = "ละทิ้ง";
+"leave" = "ออก";
+"confirm" = "ยืนยัน";
+"edit" = "แก้ไข";
+"general_anonymous" = "ผู้ไม่ประสงค์ออกนาม";
+"permission_required" = "ต้องการสิทธิ์!!";
+"camera_access_denied" = "กรุณาอนุญาตการเข้าถึงกล้องในการตั้งค่า iOS";
+"on" = "เปิด";
+"off" = "ปิด";
+"done" = "เสร็จสิ้น";
+
+// Create Story
+"created_story_successfully" = "แชร์สตอรี่สำเร็จ";
+"crated_story_failed" = "แชร์สตอรี่ไม่สำเร็จ";
+"creating_story" = "กำลังอัปโหลด...";
+
+// View Story
+"delete_story_title" = "ลบสตอรี่นี้?";
+"delete_story_message" = "สตอรี่นี้จะถูกลบอย่างถาวร คุณจะไม่สามารถดูหรือค้นหาสตอรี่นี้ได้อีก";
+"amity_story_delete_button" = "ลบสตอรี่";
+"story_deleted_toast_message" = "ลบสตอรี่แล้ว";
+"failed_story_banner_message" = "อัปโหลดไม่สำเร็จ";
+"failed_story_alert_title" = "อัปโหลดสตอรี่ไม่สำเร็จ";
+"failed_story_alert_message" = "คุณต้องการละทิ้งหรือลองอัปโหลดอีกครั้ง?";
+"common_label_join_community_to_interact" = "เข้าร่วมชุมชนเพื่อโต้ตอบ";
+
+
+// Comment Tray
+"comment_tray_component_title" = "ความคิดเห็น";
+"comment_text_field_placeholder" = "พูดอะไรดีๆ สิ...";
+"no_comment_available" = "ยังไม่มีความคิดเห็น";
+"delete_comment_title" = "ลบความคิดเห็น";
+"social_label_delete_comment_message" = "ความคิดเห็นนี้จะถูกลบอย่างถาวร";
+"deleted_comment_message" = "ความคิดเห็นนี้ถูกลบแล้ว";
+"deleted_reply_comment_message" = "การตอบกลับนี้ถูกลบแล้ว";
+"edit_comment_bottom_sheet_title" = "แก้ไขความคิดเห็น";
+"delete_comment_bottom_sheet_title" = "ลบความคิดเห็น";
+"report_comment_bottom_sheet_title" = "รายงานความคิดเห็น";
+"unreport_comment_bottom_sheet_title" = "ยกเลิกรายงานความคิดเห็น";
+"comment_reported_message" = "รายงานความคิดเห็นแล้ว";
+"comment_unreported_message" = "ยกเลิกรายงานความคิดเห็นแล้ว";
+"report_reply_bottom_sheet_title" = "รายงานการตอบกลับ";
+"unreport_reply_bottom_sheet_title" = "ยกเลิกรายงานการตอบกลับ";
+"reply_reported_message" = "รายงานการตอบกลับแล้ว";
+"reply_unreported_message" = "ยกเลิกรายงานการตอบกลับแล้ว";
+"comment_react_button_text" = "ถูกใจ";
+"comment_reacted_button_text" = "ถูกใจ";
+"comment_reply_button_text" = "ตอบกลับ";
+"comment_edited_text" = "(แก้ไขแล้ว)";
+"view_more_reply_text" = "ดูการตอบกลับเพิ่มเติม";
+"reply_unavailable_toast_message" = "การตอบกลับนี้ไม่มีอยู่แล้ว";
+"disable_create_comment_text" = "ปิดการแสดงความคิดเห็นสำหรับสตอรี่นี้";
+"comment_with_banned_words_error_message" = "ความคิดเห็นของคุณมีคำที่ไม่เหมาะสม กรุณาตรวจสอบและลบออก";
+"comment_with_not_allowed_link_error" = "ความคิดเห็นของคุณมีลิงก์ที่ไม่อนุญาต กรุณาตรวจสอบและลบออก";
+"edit_reply_bottom_sheet_title" = "แก้ไขการตอบกลับ";
+"delete_reply_bottom_sheet_title" = "ลบการตอบกลับ";
+"delete_reply_title" = "ลบการตอบกลับ";
+"delete_reply_message" = "การตอบกลับนี้จะถูกลบอย่างถาวร";
+"comment_unavailable_toast_message" = "ความคิดเห็นนี้ไม่มีอยู่แล้ว";
+"post_unavailable_toast_message" = "โพสต์นี้ไม่มีอยู่แล้ว";
+"social_label_this_clip_is_no_longer_available" = "คลิปนี้ไม่มีอยู่แล้ว";
+"comment_edit_error" = "แก้ไขความคิดเห็นไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+// Toast
+"chat_toast_loading" = "กำลังโหลดแชท...";
+"chat_toast_copied" = "คัดลอกแล้ว";
+"chat_toast_delete_error" = "ไม่สามารถลบข้อความได้ กรุณาลองอีกครั้ง";
+"chat_toast_link_not_allow" = "ข้อความของคุณไม่ถูกส่งเพราะมีลิงก์ที่ไม่อนุญาต";
+"chat_toast_banned_word" = "ข้อความของคุณไม่ถูกส่งเพราะมีคำที่ถูกบล็อก";
+"chat_toast_report_message" = "รายงานข้อความแล้ว";
+"chat_toast_un_report_message" = "ยกเลิกรายงานข้อความแล้ว";
+"chat_toast_report_message_error" = "รายงานข้อความไม่สำเร็จ กรุณาลองอีกครั้ง";
+"chat_toast_un_report_message_error" = "ยกเลิกรายงานข้อความไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+// Button
+"chat_deleted_message_text" = "ข้อความนี้ถูกลบแล้ว";
+
+"chat_button_reply" = "ตอบกลับ";
+"chat_button_copy" = "คัดลอก";
+"chat_button_delete" = "ลบ";
+"chat_button_report" = "รายงาน";
+"chat_button_un_report" = "ยกเลิกรายงาน";
+"chat_button_ok" = "ตกลง";
+
+// Error
+"chat_error_loading_chat_title" = "ไม่สามารถโหลดแชทได้";
+"chat_error_banned_chat_title" = "คุณถูกแบนจากแชท";
+"chat_error_banned_chat_sub_title" = "คุณไม่สามารถเข้าร่วมแชทนี้ได้จนกว่าจะถูกปลดแบน";
+
+"chat_char_limit_alert_title" = "ไม่สามารถส่งข้อความได้";
+"chat_char_limit_alert_message" = "ข้อความของคุณยาวเกินไป กรุณาย่อข้อความแล้วลองอีกครั้ง";
+"chat_delete_alert_title" = "ลบข้อความนี้?";
+"chat_delete_alert_message" = "ข้อความนี้จะถูกลบจากอุปกรณ์ของเพื่อนคุณด้วย";
+"chat_delete_action_sheet_title" = "ข้อความของคุณไม่ถูกส่ง";
+
+"chat_user_is_muted" = "คุณถูกปิดเสียงโดยผู้ดูแลช่อง";
+"chat_channel_is_muted" = "ช่องนี้ถูกตั้งค่าเป็นอ่านอย่างเดียวโดยผู้ดูแลช่อง";
+
+"chat_sending_status" = "กำลังส่ง...";
+"network_connectivity_status" = "กำลังรอเครือข่าย...";
+
+"chat_mention_everyone" = "แจ้งเตือนทุกคน";
+"chat_reply_preview" = "กำลังตอบกลับ %@";
+"chat_member_count" = "%@ สมาชิก";
+
+// Social
+"social_label_find_community_or_create_your_own" = "ค้นหาชุมชนหรือสร้างชุมชนของคุณเอง";
+"amity_social_label_find_community_or_create_your_own" = "ค้นหาชุมชนหรือสร้างชุมชนของคุณเอง";
+"edit_post_bottom_sheet_title" = "แก้ไขโพสต์";
+"delete_post_bottom_sheet_title" = "ลบโพสต์";
+"report_post_bottom_sheet_title" = "รายงานโพสต์";
+"unreport_post_bottom_sheet_title" = "ยกเลิกรายงานโพสต์";
+"delete_post_title" = "ลบโพสต์นี้?";
+"delete_post_message" = "โพสต์นี้จะถูกลบอย่างถาวร คุณจะไม่สามารถดูหรือค้นหาโพสต์นี้ได้อีก";
+"post_reported_message" = "รายงานโพสต์แล้ว";
+"post_unreported_message" = "ยกเลิกรายงานโพสต์แล้ว";
+"post_failed_reported_message" = "รายงานโพสต์ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"post_failed_unreported_message" = "ยกเลิกรายงานโพสต์ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"post_deleted_toast_message" = "ลบโพสต์แล้ว";
+"post_detail_page_title" = "โพสต์";
+"create_post_bottom_sheet_title" = "โพสต์";
+"amity_social_button_story" = "สตอรี่";
+"community_page_join_title" = "เข้าร่วม";
+"community_page_joined_title" = "เข้าร่วมแล้ว";
+"community_page_pending_post_title" = "โพสต์รอตรวจสอบ";
+
+"reaction_list_unable_to_load_title" = "ไม่สามารถโหลดปฏิกิริยาได้";
+"reaction_list_unrable_to_load_subtitle" = "ปฏิกิริยาไม่พร้อมใช้งานสำหรับข้อความนี้";
+"reaction_list_no_reactions_title" = "ยังไม่มีปฏิกิริยา";
+"reaction_list_no_reactions_subtitle" = "เป็นคนแรกที่แสดงปฏิกิริยาต่อข้อความนี้!";
+"reaction_list_tap_to_remove" = "แตะเพื่อลบปฏิกิริยา";
+"reaction_tab_all" = "ทั้งหมด";
+
+"reach_mention_limit_title" = "ไม่สามารถกล่าวถึงผู้ใช้ได้";
+"chat_reach_mention_limit_Message" = "คุณกล่าวถึงผู้ใช้ครบ 30 คนแล้วในแชทนี้";
+"ads_sponsored_label" = "สนับสนุน";
+"community_setup_alert_title" = "ออกโดยไม่สร้างเสร็จ?";
+"community_setup_alert_message" = "ความคืบหน้าจะไม่ถูกบันทึกและชุมชนจะไม่ถูกสร้าง";
+"community_setup_edit_alert_title" = "มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก";
+"community_setup_edit_alert_message" = "คุณแน่ใจหรือไม่ว่าต้องการละทิ้งการเปลี่ยนแปลง? การเปลี่ยนแปลงจะหายไปเมื่อคุณออกจากหน้านี้";
+
+"livestream_player_ended_title" = "การถ่ายทอดสดนี้จบลงแล้ว";
+"livestream_player_ended_message" = "การเล่นย้อนหลังจะพร้อมให้คุณชมในเร็วๆ นี้";
+
+"livestream_player_error_title" = "ไม่สามารถเล่นย้อนหลังได้";
+"livestream_player_error_message" = "การถ่ายทอดสดนี้สั้นเกินไปจึงไม่มีการเล่นย้อนหลัง";
+
+"livestream_player_terminated_title" = "การถ่ายทอดสดนี้ถูกยุติ";
+"livestream_player_terminated_message" = "ดูเหมือนว่าการถ่ายทอดสดนี้ขัดต่อแนวทางการกลั่นกรองเนื้อหาของเรา";
+"livestream_player_banned_title" = "คุณถูกแบน";
+"livestream_player_banned_message" = "คุณไม่สามารถเข้าถึงการถ่ายทอดสดนี้ได้อีกต่อไป";
+"livestream_player_unavailable_title" = "การถ่ายทอดสดนี้ไม่พร้อมใช้งานในขณะนี้";
+"livestream_player_unavailable_message" = "กรุณาลองอีกครั้งในภายหลัง";
+"livestream_player_reconnecting_title" = "กำลังเชื่อมต่อใหม่";
+"livestream_player_reconnecting_message" = "เนื่องจากการเชื่อมต่อไม่ดี การถ่ายทอดสดนี้ถูกหยุดชั่วคราว จะกลับมาเล่นอัตโนมัติเมื่อการเชื่อมต่อเสถียร";
+"livestream_player_recorded" = "บันทึก";
+"livestream_player_upcoming_live" = "ถ่ายทอดสดเร็วๆ นี้";
+
+// Community Setting
+"community_setting_community_permissions_title" = "สิทธิ์ชุมชน";
+"community_setting_notifications_title" = "การตั้งค่าของคุณ";
+"community_setting_edit_profile" = "โปรไฟล์ชุมชน";
+"community_setting_members" = "สมาชิก";
+"community_setting_notifications" = "การแจ้งเตือน";
+"community_setting_post_permissions" = "สิทธิ์การโพสต์";
+"community_setting_story_comments" = "ความคิดเห็นสตอรี่";
+"community_setting_leave_community" = "ออกจากชุมชน";
+"community_setting_close_community" = "ปิดชุมชน";
+"community_setting_close_community_description" = "การปิดชุมชนนี้จะลบหน้าชุมชนรวมถึงเนื้อหาและความคิดเห็นทั้งหมด";
+
+"community_setting_leave_community_alert_title" = "ออกจากชุมชน?";
+"community_setting_leave_community_alert_message" = "คุณจะไม่สามารถโพสต์และโต้ตอบในชุมชนนี้ได้อีก";
+"community_setting_leave_community_failed_alert_title" = "ไม่สามารถออกจากชุมชนได้";
+"community_setting_leave_community_failed_alert_message" = "คุณเป็นผู้ดูแลคนเดียวในกลุ่มนี้ หากต้องการออกจากชุมชน กรุณาแต่งตั้งสมาชิกคนอื่นเป็นผู้ดูแล";
+"community_setting_close_community_alert_title" = "ปิดชุมชน?";
+"social_button_close_community_msg" = "สมาชิกทั้งหมดจะถูกลบออกจากชุมชน โพสต์ ข้อความ ปฏิกิริยา และสื่อทั้งหมดที่แชร์ในชุมชนจะถูกลบ ไม่สามารถยกเลิกได้";
+"community_post_permission_title" = "ใครสามารถโพสต์ในชุมชนนี้ได้";
+"community_post_permission_description" = "คุณสามารถควบคุมว่าใครสร้างโพสต์ในชุมชนของคุณได้";
+"community_post_permission_everyone_can_post_setting" = "ทุกคนสามารถโพสต์ได้";
+"community_post_permission_admin_review_setting" = "แอดมินตรวจสอบโพสต์";
+"community_post_permission_only_admin_can_post_setting" = "เฉพาะแอดมินเท่านั้นที่โพสต์ได้";
+"community_story_setting_title" = "อนุญาตความคิดเห็นในสตอรี่ชุมชน";
+"community_story_setting_description" = "เปิดเพื่อรับความคิดเห็นในสตอรี่ของชุมชนนี้";
+
+"community_notification_setting_page_title" = "การแจ้งเตือน";
+"community_notification_setting_title" = "อนุญาตการแจ้งเตือน";
+"community_notification_setting_description" = "เปิดเพื่อรับการแจ้งเตือนแบบพุชจากชุมชนนี้";
+"community_notification_setting_posts" = "โพสต์";
+"community_notification_setting_comments" = "ความคิดเห็น";
+"community_notification_setting_stories" = "สตอรี่";
+"community_notification_setting_option_everyone" = "ทุกคน";
+"community_notification_setting_option_only_moderator" = "ผู้ดูแลเท่านั้น";
+"community_notification_setting_option_off" = "ปิด";
+"community_notification_setting_post_reaction_title" = "ปฏิกิริยาต่อโพสต์";
+"community_notification_setting_post_reaction_description" = "รับการแจ้งเตือนเมื่อมีคนแสดงปฏิกิริยาต่อโพสต์ของคุณในชุมชนนี้";
+"community_notification_setting_post_creation_title" = "โพสต์ใหม่";
+"community_notification_setting_post_creation_description" = "รับการแจ้งเตือนเมื่อมีคนสร้างโพสต์ใหม่ในชุมชนนี้";
+"community_notification_setting_comment_reaction_title" = "ปฏิกิริยาต่อความคิดเห็น";
+"community_notification_setting_comment_reaction_description" = "รับการแจ้งเตือนเมื่อมีคนถูกใจความคิดเห็นของคุณในชุมชนนี้";
+"community_notification_setting_comment_creation_title" = "ความคิดเห็นใหม่";
+"community_notification_setting_comment_creation_description" = "รับการแจ้งเตือนเมื่อมีคนแสดงความคิดเห็นในโพสต์ของคุณในชุมชนนี้";
+"community_notification_setting_comment_reply_title" = "การตอบกลับ";
+"community_notification_setting_comment_reply_description" = "รับการแจ้งเตือนเมื่อมีคนตอบกลับความคิดเห็นของคุณในชุมชนนี้";
+"community_notification_setting_story_creation_title" = "สตอรี่ใหม่";
+"community_notification_setting_story_creation_description" = "รับการแจ้งเตือนเมื่อมีคนสร้างสตอรี่ใหม่ในชุมชนนี้";
+"community_notification_setting_story_reaction_title" = "ปฏิกิริยาต่อสตอรี่";
+"community_notification_setting_story_reaction_Description" = "รับการแจ้งเตือนเมื่อมีคนแสดงปฏิกิริยาต่อสตอรี่ของคุณในชุมชนนี้";
+"community_notification_setting_story_comment_title" = "ความคิดเห็นสตอรี่";
+"community_notification_setting_story_comment_description" = "รับการแจ้งเตือนเมื่อมีคนแสดงความคิดเห็นในสตอรี่ของคุณในชุมชนนี้";
+
+"community_member_count_singular" = "%@ สมาชิก";
+"community_member_count_plural" = "%@ สมาชิก";
+
+"explore_categories_see_more" = "ดูเพิ่มเติม";
+"expandable_text_see_more" = "...ดูเพิ่มเติม";
+"explore_trending_now_component_title" = "กำลังมาแรง";
+"amity_social_label_recommended_for_you" = "แนะนำสำหรับคุณ";
+
+"community_all_categories_title" = "หมวดหมู่ทั้งหมด";
+"community_list_empty_state_title" = "ยังไม่มีชุมชน";
+
+"featured_post_badge" = "แนะนำ";
+"featured_post_edit_confirmation_title" = "แก้ไขโพสต์แนะนำทั่วโลก?";
+"featured_post_edit_confirmation" = "โพสต์ที่คุณกำลังแก้ไขถูกแนะนำทั่วโลก หากคุณแก้ไข โพสต์จะต้องได้รับการอนุมัติใหม่และจะไม่ถูกแนะนำทั่วโลกอีก";
+
+"global_featured_community_edit_confirmation_title" = "เปลี่ยนการตั้งค่าความเป็นส่วนตัวของชุมชน?";
+"global_featured_community_edit_confirmation_msg" = "ชุมชนนี้มีโพสต์แนะนำทั่วโลก การเปลี่ยนชุมชนจากสาธารณะเป็นส่วนตัวจะลบโพสต์เหล่านี้ออกจากการแนะนำทั่วโลก";
+
+"user_profile_edit_alert_title" = "มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก";
+"user_profile_edit_alert_message" = "คุณแน่ใจหรือไม่ว่าต้องการละทิ้งการเปลี่ยนแปลง? การเปลี่ยนแปลงจะหายไปเมื่อคุณออกจากหน้านี้";
+"user_profile_edit_success" = "อัปเดตโปรไฟล์ของคุณสำเร็จ!";
+"user_profile_edit_banned_word" = "ไม่สามารถอัปเดตโปรไฟล์ได้เนื่องจากมีคำที่ไม่เหมาะสม";
+"user_profile_edit_failed" = "บันทึกโปรไฟล์ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"user_profile_follow_request_title" = "คำขอติดตามใหม่";
+"amity_social_user_profile_all_post_title" = "โพสต์ชุมชนสาธารณะและโปรไฟล์";
+"amity_social_user_profile_community_post_title" = "โพสต์ชุมชนสาธารณะ";
+"amity_social_user_profile_user_post_title" = "โพสต์โปรไฟล์";
+
+// Polls
+"poll_close_alert_title" = "ปิดโพล?";
+"poll_close_alert_desc" = "ระยะเวลาโพลที่คุณตั้งไว้จะถูกข้ามและโพลจะถูกปิดทันที";
+"poll_close_button" = "ปิดโพล";
+"poll_close_toast_error" = "อ๊ะ เกิดข้อผิดพลาด";
+
+
+"poll_remaining_days_left" = "วัน เหลือ";
+"poll_remaining_hours_left" = "ชม. เหลือ";
+"poll_remaining_minutes_left" = "น. เหลือ";
+
+"poll_question_title" = "คำถามโพล";
+"poll_post_title" = "หัวข้อโพสต์";
+"poll_post_title_optional" = "(ไม่บังคับ)";
+"poll_post_title_textfield_placeholder" = "ตั้งหัวข้อให้โพลของคุณ";
+"poll_question_textfield_placeholder" = "คำถามโพลของคุณคืออะไร?";
+"poll_multiple_selection_title" = "เลือกได้หลายตัวเลือก";
+"poll_multiple_selection_desc" = "ให้ผู้เข้าร่วมโหวตได้มากกว่าหนึ่งตัวเลือก";
+
+"poll_post_create_error" = "สร้างโพสต์ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"poll_post_create_ban_word_error" = "โพสต์ของคุณไม่ถูกเผยแพร่เนื่องจากมีคำที่ไม่เหมาะสม";
+"poll_create_posting_toast" = "กำลังโพสต์...";
+
+"poll_duration_title" = "ระยะเวลาโพล";
+"poll_duration_desc" = "คุณสามารถปิดโพลก่อนระยะเวลาที่ตั้งไว้ได้เสมอ";
+"poll_ends_on_label" = "สิ้นสุดวันที่";
+
+"poll_options_title" = "ตัวเลือก";
+"poll_options_desc" = "โพลต้องมีอย่างน้อย 2 ตัวเลือก";
+"amity_social_button_add_option" = "เพิ่มตัวเลือก";
+"amity_social_button_accept_invite" = "ยอมรับ";
+
+"poll_option_label" = "ตัวเลือก";
+
+"poll_answer_result_no_votes" = "ยังไม่มีโหวต";
+"poll_answer_result_voted_by_you" = "โหวตโดยคุณ";
+"poll_answer_result_voted_by_single_participant" = "โหวตโดย 1 ผู้เข้าร่วม";
+"poll_answer_result_voted_by_multiple_participants" = "โหวตโดย %@ ผู้เข้าร่วม";
+"poll_answer_result_voted_by_and_you" = "และคุณ";
+
+"poll_duration_pick_date_and_time" = "เลือกวันที่และเวลา";
+"poll_duration_done_button" = "เสร็จสิ้น";
+
+"poll_duration_singular_day" = "%d วัน";
+"poll_duration_plural_days" = "%d วัน";
+"amity_social_poll_date_time_format" = "%1$@ เวลา %2$@";
+
+"poll_select_one_option_label" = "เลือกหนึ่งตัวเลือก";
+"poll_select_one_or_more_option_label" = "เลือกหนึ่งตัวเลือกหรือมากกว่า";
+
+"poll_see_full_results_label" = "ดูผลลัพธ์ทั้งหมด";
+"poll_see_results_label" = "ดูผลลัพธ์";
+"poll_back_to_vote_label" = "กลับไปที่โพล";
+"poll_see_more_options_label" = "ดูอีก %d ตัวเลือก";
+
+"poll_vote_counts" = "%@ โหวต";
+"poll_vote_button" = "โหวต";
+"poll_unvote_button" = "ยกเลิกโหวต";
+"poll_label" = "โพล";
+
+"poll_option_char_limit_error" = "ตัวเลือกโพลต้องไม่เกิน %d ตัวอักษร";
+"poll_question_char_limit_error" = "คำถามโพลต้องไม่เกิน %d ตัวอักษร";
+"poll_title_char_limit_error" = "หัวข้อโพลต้องไม่เกิน %d ตัวอักษร";
+
+"poll_target_my_timeline" = "ไทม์ไลน์ของฉัน";
+
+"post_delete_error" = "ลบโพสต์ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"post_create_error" = "สร้างโพสต์ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"post_edit_error" = "แก้ไขโพสต์ไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+"social_modal_dialog_title_discard_post" = "ละทิ้งโพสต์นี้?";
+"post_discard_alert_message" = "โพสต์จะถูกละทิ้งอย่างถาวร ไม่สามารถยกเลิกได้";
+
+"search_no_results_found_title" = "ไม่พบผลลัพธ์";
+"search_char_limit_not_reached" = "เริ่มค้นหาโดยพิมพ์\nอย่างน้อย 3 ตัวอักษร";
+
+"live_stream_target_live_on_label" = "ถ่ายทอดสดบน";
+"live_stream_duration_label" = "สด %@";
+"live_stream_my_timeline_label" = "ไทม์ไลน์ของฉัน";
+"live_stream_end_live_label" = "จบการถ่ายทอดสด";
+
+"live_stream_alert_end_live_title" = "จบการถ่ายทอดสด?";
+"live_stream_alert_end_live_desc" = "หากคุณจบการถ่ายทอดสด จะจบสำหรับผู้ชมทุกคนด้วย";
+"live_stream_alert_end_button" = "จบ";
+
+"live_stream_change_thumbnail_label" = "เปลี่ยนรูปขนาดย่อ";
+"live_stream_delete_thumbnail_label" = "ลบรูปขนาดย่อ";
+"live_stream_add_thumbnail_label" = "เพิ่มรูปขนาดย่อ";
+
+"live_stream_input_add_stream_title" = "เพิ่มหัวข้อถ่ายทอดสด...";
+"live_stream_input_add_stream_desc" = "เพิ่มคำอธิบาย (ไม่บังคับ)";
+
+"live_stream_alert_end_at_max_duration_title" = "การถ่ายทอดสดสิ้นสุดแล้ว";
+"live_stream_alert_end_at_max_duration_message" = "การถ่ายทอดสดของคุณถูกยุติโดยอัตโนมัติเนื่องจากถึงขีดจำกัด 4 ชั่วโมง";
+
+"live_stream_alert_discard_stream_title" = "มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก";
+"live_stream_alert_discard_stream_message" = "คุณแน่ใจหรือไม่ว่าต้องการละทิ้งการเปลี่ยนแปลง? การเปลี่ยนแปลงจะหายไปเมื่อคุณออกจากหน้านี้";
+
+"live_stream_alert_stream_error_title" = "ไม่สามารถเริ่มถ่ายทอดสดได้";
+"live_stream_alert_stream_error_message" = "เกิดข้อผิดพลาดขณะดำเนินการคำขอของคุณ กรุณาลองอีกครั้ง";
+
+"live_stream_alert_thumbnail_upload_error_title" = "อัปโหลดไม่สำเร็จ";
+"live_stream_alert_thumbnail_upload_error_message" = "กรุณาลองอีกครั้ง";
+
+"live_stream_alert_thumbnail_upload_inappropriate_error_title" = "รูปภาพไม่เหมาะสม";
+"live_stream_alert_thumbnail_upload_inappropriate_error_message" = "กรุณาเลือกรูปภาพอื่นเพื่ออัปโหลด";
+
+"live_stream_toast_end_at_max_duration_message" = "การถ่ายทอดสดจะจบลงโดยอัตโนมัติเมื่อถึงขีดจำกัด 4 ชั่วโมง";
+
+"live_stream_permission_open_settings_label" = "เปิดการตั้งค่า";
+"live_stream_permission_camera_and_microphone_title" = "อนุญาตการเข้าถึงกล้องและไมโครโฟน";
+
+"live_stream_starting_state_title" = "กำลังเริ่มถ่ายทอดสด";
+"live_stream_reconnecting_state_title" = "กำลังเชื่อมต่อใหม่";
+"live_stream_reconnecting_state_message" = "เนื่องจากการเชื่อมต่อไม่ดี การถ่ายทอดสดนี้ถูกหยุดชั่วคราว จะกลับมาเล่นอัตโนมัติเมื่อการเชื่อมต่อเสถียร";
+"live_stream_ending_state_title" = "การถ่ายทอดสดจะจบลงใน";
+
+"post_detail_deleted_post_title" = "เกิดข้อผิดพลาด";
+"post_detail_deleted_post_message" = "เนื้อหาที่คุณกำลังหาไม่พร้อมใช้งาน";
+"post_detail_deleted_post_button_title" = "กลับ";
+
+"live_stream_terminated_page_title" = "ถ่ายทอดสดถูกยุติ";
+"live_stream_terminated_page_desc_section_title" = "หมายความว่าอย่างไร?";
+
+"live_stream_terminated_watcher_title" = "การถ่ายทอดสดถูก\nยุติแล้ว";
+"live_stream_terminated_streamer_title" = "การถ่ายทอดสดของคุณถูก\nยุติแล้ว";
+
+"live_stream_terminated_watcher_desc" = "ดูเหมือนว่าการถ่ายทอดสดที่คุณดูอยู่ขัดต่อแนวทางการกลั่นกรองเนื้อหาของเรา";
+"live_stream_terminated_streamer_desc" = "ดูเหมือนว่าการถ่ายทอดสดของคุณขัดต่อแนวทางการกลั่นกรองเนื้อหาของเรา";
+
+"live_stream_terminated_playback_desc" = "จะไม่มีการเล่นย้อนหลังของการถ่ายทอดสดนี้ในฟีดใดๆ";
+"live_stream_terminated_streamer_content_desc" = "การถ่ายทอดสดนี้ถูกยุติสำหรับผู้ชมทุกคนด้วย";
+
+"amity_social_status_live_stream" = "ถ่ายทอดสด";
+
+
+"live_stream_setting_readonly_title" = "ตั้งค่าถ่ายทอดสดเป็นอ่านอย่างเดียว";
+"live_stream_setting_readonly_description" = "สมาชิกที่ไม่ใช่ผู้ถ่ายทอดสามารถอ่านข้อความได้แต่ไม่สามารถส่งข้อความ";
+
+// Alt Text
+"alt_text_button_title" = "ALT";
+"alt_text_title" = "ข้อความทางเลือก";
+"alt_text_edit_title" = "แก้ไขข้อความทางเลือก";
+"social_label_view_original_post" = "ดูโพสต์";
+"alt_text_placeholder" = "อธิบายรูปภาพนี้สั้นๆ เพื่อช่วยให้ผู้ใช้ที่มีปัญหาทางสายตาเข้าใจเนื้อหา";
+"alt_text_failed_to_add" = "เพิ่มข้อความทางเลือกไม่สำเร็จ กรุณาลองอีกครั้ง";
+"alt_text_failed_to_edit" = "แก้ไขข้อความทางเลือกไม่สำเร็จ กรุณาลองอีกครั้ง";
+"alt_text_includes_banned_words" = "ข้อความทางเลือกของคุณมีคำที่ไม่เหมาะสม";
+"alt_text_includes_not_allowed_link" = "ข้อความทางเลือกของคุณมีลิงก์ที่ไม่อนุญาต";
+"alt_text_updated" = "อัปเดตข้อความทางเลือกแล้ว";
+
+"product_tags_added" = "เพิ่มแท็กสินค้าแล้ว";
+"product_tags_updated" = "อัปเดตแท็กสินค้าแล้ว";
+"product_tag_limit_title" = "ถึงขีดจำกัดแท็กสินค้าแล้ว";
+"product_tag_limit_message" = "คุณสามารถแท็กสินค้าได้สูงสุด 20 รายการต่อโพสต์";
+"social_label_product_tagging_unavailable_title" = "การแท็กสินค้าไม่พร้อมใช้งาน";
+"product_tag_unavailable_description" = "โพสต์ของคุณยังสามารถเผยแพร่ได้ แต่แท็กสินค้าจะถูกลบออก";
+"product_tag_unavailable_while_streaming_message" = "สินค้าที่คุณแท็กไว้จะถูกลบออกและจะไม่แสดงให้ผู้ชมเห็น";
+"product_tag_review_post" = "ตรวจสอบโพสต์";
+"product_tag_publish" = "เผยแพร่";
+"product_tag_edit_live" = "แก้ไขถ่ายทอดสด";
+"product_tag_go_live" = "เริ่มถ่ายทอดสด";
+"product_tag_disable_cohost_title" = "ปิดการจัดการแท็กสินค้าของผู้ร่วมจัด?";
+"product_tag_disable_cohost_message" = "หากคุณปิด ผู้ร่วมจัดจะไม่สามารถเพิ่ม ลบ หรือปักหมุดสินค้าในการถ่ายทอดสดนี้";
+"product_tag_disable_button" = "ปิด";
+"product_tag_toast_added" = "เพิ่มแท็กสินค้าแล้ว";
+"product_tag_toast_pinned" = "ปักหมุดแท็กสินค้าแล้ว";
+"product_tag_toast_unpinned" = "ยกเลิกปักหมุดแท็กสินค้าแล้ว";
+"product_tag_toast_pin_failed" = "ปักหมุดแท็กสินค้าไม่สำเร็จ กรุณาลองอีกครั้ง";
+"product_tag_toast_unpin_failed" = "ยกเลิกปักหมุดแท็กสินค้าไม่สำเร็จ กรุณาลองอีกครั้ง";
+"product_tag_toast_removed" = "ลบแท็กสินค้าแล้ว";
+"product_tag_toast_cohost_manage_enabled" = "ตอนนี้คุณสามารถจัดการสินค้าที่แท็กในการถ่ายทอดสดนี้ได้แล้ว";
+"product_tag_selection_discard_title" = "ละทิ้งการเลือกสินค้า?";
+"product_tag_selection_discard_message" = "คุณมีสินค้าที่เลือกไว้แต่ยังไม่ได้เพิ่ม หากคุณปิดตอนนี้ การเลือกจะหายไป";
+"product_tag_discard_title" = "ละทิ้งแท็กสินค้า";
+"product_tag_discard_message" = "คุณมีสินค้าที่แท็กไว้แต่ยังไม่ได้บันทึก หากคุณออกตอนนี้ การเปลี่ยนแปลงจะหายไป";
+"product_tag_discard" = "ละทิ้ง";
+"product_tag_tagged_products" = "สินค้าที่แท็ก";
+"product_tag_add_products" = "เพิ่มสินค้า";
+"product_tag_pinned_label" = "ปักหมุด";
+"product_tag_unlisted_label" = "ไม่แสดง";
+"product_tag_pin_button" = "ปักหมุด";
+"product_tag_unpin_button" = "ยกเลิกปักหมุด";
+"product_tag_no_products_title" = "ยังไม่มีสินค้าที่แท็ก";
+"product_tag_no_products_message" = "คุณสามารถเพิ่มหรือลบสินค้าได้ตลอดเวลา และปักหมุดเพื่อควบคุมสิ่งที่ผู้ชมเห็นขณะถ่ายทอดสด";
+"product_tag_pinned_product_section" = "สินค้าที่ปักหมุด";
+"product_tag_other_products_section" = "สินค้าอื่นๆ";
+"live_stream_ending_stream_title" = "กำลังจบการถ่ายทอดสด";
+"live_stream_waiting_for_approval_title" = "รอการอนุมัติ";
+"live_stream_waiting_for_approval_message" = "การถ่ายทอดสดเริ่มแล้ว แต่จะมองเห็นได้จำกัดจนกว่าโพสต์จะได้รับการอนุมัติ";
+"live_stream_waiting_for_cohost" = "กำลังรอผู้ร่วมจัดเตรียมพร้อม...";
+
+"notification_tray_empty_state_title" = "ไม่มีการแจ้งเตือน";
+
+"report_page_submit_button" = "ส่ง";
+"report_page_info_label" = "บอกเราว่าทำไมคุณถึงรายงานเนื้อหานี้ รายงานของคุณจะถูกตรวจสอบโดยผู้ดูแลและเก็บเป็นความลับ";
+"report_reason_page_title" = "เหตุผลในการรายงาน";
+"report_reason_others_page_title" = "อื่นๆ";
+
+"report_reason_success_toast_message" = "รายงาน%@แล้ว";
+
+"report_reason_others_input_title" = "อธิบายเหตุผลของคุณ";
+"report_reason_others_input_placeholder" = "แชร์รายละเอียดเพิ่มเติมเกี่ยวกับปัญหานี้";
+"report_reason_close_button" = "ปิด";
+"report_reason_done_button" = "เสร็จสิ้น";
+
+"report_reason_error_toast_message" = "รายงาน%@ไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+"report_reason_content_type_post" = "โพสต์";
+"report_reason_content_type_comment" = "ความคิดเห็น";
+"report_reason_content_type_reply" = "การตอบกลับ";
+"report_reason_content_type_message" = "ข้อความ";
+
+"social_label_report_reason_community_guidelines" = "ขัดต่อแนวทางชุมชน";
+"social_label_report_reason_false_information" = "ข้อมูลเท็จหรือข้อมูลที่ผิด";
+"social_label_report_reason_harassment_or_bullying" = "การคุกคามหรือการกลั่นแกล้ง";
+"social_label_report_reason_self_harm_or_suicide" = "การทำร้ายตัวเองหรือการฆ่าตัวตาย";
+"social_label_report_reason_selling_restricted" = "การขายและโปรโมตสินค้าต้องห้าม";
+"social_label_report_reason_sexual_content_or_nudity" = "เนื้อหาทางเพศหรือภาพเปลือย";
+"social_label_report_reason_spam_or_scams" = "สแปมหรือการหลอกลวง";
+"social_label_report_reason_violence_or_threatening" = "ความรุนแรงหรือเนื้อหาที่คุกคาม";
+
+// Live Chat
+"live_chat_delete_message" = "ลบข้อความ";
+"live_chat_report_message" = "รายงานข้อความ";
+"live_chat_unreport_message" = "ยกเลิกรายงานข้อความ";
+"live_chat_toast_report_message" = "รายงานข้อความแล้ว";
+"live_chat_toast_unreport_message" = "ยกเลิกรายงานข้อความแล้ว";
+"live_chat_promote_to_moderator" = "เลื่อนตำแหน่งเป็นผู้ดูแล";
+"live_chat_demote_to_member" = "ลดตำแหน่งเป็นสมาชิก";
+"live_chat_mute_user" = "ปิดเสียงผู้ใช้";
+"live_chat_unmute_user" = "เปิดเสียงผู้ใช้";
+"live_chat_promote_to_moderator_title" = "เลื่อนตำแหน่งผู้ดูแล";
+"live_chat_promote_to_moderator_desc" = "คุณแน่ใจหรือไม่ว่าต้องการเลื่อนตำแหน่งสมาชิกนี้เป็นผู้ดูแล? พวกเขาจะได้รับสิทธิ์ผู้ดูแลทั้งหมดในการถ่ายทอดสดนี้";
+"live_chat_demote_to_member_title" = "ลดตำแหน่งผู้ดูแล";
+"live_chat_demote_to_member_desc" = "คุณแน่ใจหรือไม่ว่าต้องการลดตำแหน่งผู้ดูแลนี้? พวกเขาจะสูญเสียสิทธิ์ผู้ดูแลทั้งหมดในการถ่ายทอดสดนี้";
+"live_chat_promote_button" = "เลื่อนตำแหน่ง";
+"live_chat_demote_button" = "ลดตำแหน่ง";
+"live_chat_promote_to_moderator_success_toast" = "เลื่อนตำแหน่งผู้ใช้แล้ว";
+"live_chat_promote_to_moderator_failed_toast" = "เลื่อนตำแหน่งผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"live_chat_demote_to_member_success_toast" = "ลดตำแหน่งผู้ใช้แล้ว";
+"live_chat_demote_to_member_failed_toast" = "ลดตำแหน่งผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"live_chat_mute_user_title" = "ยืนยันการปิดเสียง";
+"live_chat_mute_user_desc" = "คุณแน่ใจหรือไม่ว่าต้องการปิดเสียงผู้ใช้นี้? พวกเขาจะไม่สามารถส่งข้อความได้อีก";
+"live_chat_unmute_user_title" = "ยืนยันการเปิดเสียง";
+"live_chat_unmute_user_desc" = "คุณแน่ใจหรือไม่ว่าต้องการเปิดเสียงผู้ใช้นี้? พวกเขาจะสามารถส่งข้อความได้";
+"live_chat_mute_button" = "ปิดเสียง";
+"live_chat_unmute_button" = "เปิดเสียง";
+"live_chat_mute_user_success_toast" = "ปิดเสียงผู้ใช้แล้ว";
+"live_chat_mute_user_failed_toast" = "ปิดเสียงผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"live_chat_unmute_user_success_toast" = "เปิดเสียงผู้ใช้แล้ว";
+"live_chat_unmute_user_failed_toast" = "เปิดเสียงผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+"community_update_success_toast_message" = "อัปเดตโปรไฟล์ชุมชนสำเร็จ";
+
+"pending_join_request_alert_title" = "คุณมีคำขอเข้าร่วมที่รอดำเนินการ";
+"pending_join_request_alert_message" = "กรุณาจัดการคำขอเหล่านี้ก่อนปิดการอนุมัติสมาชิก";
+
+"community_leave_alert_pending_request_message" = "หากคุณเปลี่ยนใจ คุณจะต้องขอเข้าร่วมใหม่";
+
+"community_join_toast_success_message" = "คุณเข้าร่วม %@ แล้ว";
+"community_join_toast_request_success_message" = "ส่งคำขอเข้าร่วมแล้ว คุณจะได้รับการแจ้งเตือนเมื่อคำขอได้รับการยอมรับ";
+
+"user_join_accepted_toast_success_message" = "ยอมรับคำขอเข้าร่วมแล้ว";
+"user_join_accepted_toast_error_message" = "ยอมรับคำขอเข้าร่วมไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+"user_join_declined_toast_success_message" = "ปฏิเสธคำขอเข้าร่วมแล้ว";
+"user_join_decliend_toast_error_message" = "ปฏิเสธคำขอเข้าร่วมไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+"user_join_request_accept_label" = "ยอมรับ";
+"user_join_request_decline_label" = "ปฏิเสธ";
+
+"user_join_request_decline_alert_banner_message" = "การปฏิเสธคำขอเข้าร่วมไม่สามารถยกเลิกได้ ผู้ใช้ต้องส่งคำขอใหม่หากถูกปฏิเสธ";
+
+"community_pending_request_tab_posts_title" = "โพสต์ (%@)";
+"community_pending_request_tab_join_requests_title" = "คำขอเข้าร่วม (%@)";
+"community_pending_request_page_title" = "คำขอที่รอดำเนินการ";
+"community_join_request_empty_state_title" = "ไม่มีคำขอที่รอดำเนินการ";
+"community_pending_posts_empty_state_title" = "ไม่มีโพสต์ที่รอดำเนินการ";
+
+"error_guest_user" = "สร้างบัญชีหรือเข้าสู่ระบบเพื่อดำเนินการต่อ";
+
+// Explore Event Feed
+"explore_event_view_all" = "ดูทั้งหมด";
+
+// My Event Feed
+"my_event_feed_upcoming" = "กำลังจะมาถึง";
+"my_event_feed_past" = "ผ่านไปแล้ว";
+
+// Event Detail Page Alert
+"event_detail_alert_edit_not_possible_title" = "ไม่สามารถแก้ไขได้";
+"amity_social_label_you_can_no_longer_edit_this_event_changes_are_restricte" = "คุณไม่สามารถแก้ไขกิจกรรมนี้ได้อีก การเปลี่ยนแปลงถูกจำกัดก่อนเวลาเริ่มต้น 15 นาที";
+"event_detail_alert_leave_without_finishing_title" = "ออกโดยไม่สร้างเสร็จ?";
+"event_detail_alert_leave_without_finishing_message" = "การเปลี่ยนแปลงที่คุณทำอาจไม่ถูกบันทึก";
+"event_detail_alert_delete_event_title" = "ลบกิจกรรมนี้?";
+"event_detail_alert_delete_event_message" = "กิจกรรมนี้จะถูกลบอย่างถาวร คุณและคนอื่นๆ จะไม่สามารถดูหรือค้นหากิจกรรมนี้ได้อีก";
+"amity_event_alert_pending_join_request_title" = "คุณจะสามารถ RSVP ได้เมื่อคำขอเข้าร่วมของคุณได้รับการอนุมัติ";
+"amity_event_alert_pending_join_request_message" = "ส่งคำขอเข้าร่วมชุมชนแล้ว คุณจะได้รับแจ้งเมื่อคำขอได้รับการอนุมัติ";
+
+// Event Discussion Feed
+"amity_social_empty_state_empty_feed_no_posts" = "ยังไม่มีโพสต์";
+
+// Event Info Component
+"event_info_about_the_event" = "เกี่ยวกับกิจกรรม";
+"event_info_see_more" = "...ดูเพิ่มเติม";
+"event_info_event_link" = "ลิงก์กิจกรรม";
+"event_info_event_address" = "ที่อยู่กิจกรรม";
+"event_info_address_copied" = "คัดลอกที่อยู่แล้ว";
+"event_info_copy" = "คัดลอก";
+"event_info_link_copied" = "คัดลอกลิงก์แล้ว";
+"event_info_stream_status_live" = "สด";
+"event_info_stream_status_recorded" = "บันทึก";
+"event_info_stream_status_upcoming_live" = "ถ่ายทอดสดเร็วๆ นี้";
+
+// Event Detail Header
+"event_detail_header_unknown_user" = "ผู้ใช้ที่ไม่รู้จัก";
+"event_detail_header_starts" = "เริ่ม";
+"event_detail_header_event_type" = "ประเภทกิจกรรม";
+"event_detail_header_in_person" = "พบกันจริง";
+"event_detail_header_virtual" = "ออนไลน์";
+"event_detail_header_hosted_by" = "จัดโดย";
+"social_button_happening_now" = "กำลังดำเนินอยู่";
+"event_detail_header_status_upcoming" = "กำลังจะมาถึง";
+"event_detail_header_status_cancelled" = "ยกเลิกแล้ว";
+"event_detail_header_status_ended" = "สิ้นสุดแล้ว";
+"event_detail_header_attendees" = "ผู้เข้าร่วม";
+"event_detail_header_event_added_to_calendar" = "เพิ่มกิจกรรมลงในปฏิทินของคุณแล้ว";
+"event_detail_header_no_calendar_access" = "ไม่มีสิทธิ์เข้าถึงปฏิทิน กรุณาเปิดสิทธิ์ในการตั้งค่า";
+"event_detail_header_attending_status_change_not_allowed" = "ไม่สามารถเปลี่ยนสถานะการเข้าร่วมได้เมื่อกิจกรรมเริ่มแล้ว";
+"event_detail_header_update_attending_status_failed" = "อัปเดตสถานะการเข้าร่วมไม่สำเร็จ กรุณาลองอีกครั้ง";
+"event_detail_header_add_to_calendar" = "เพิ่มลงในปฏิทิน";
+"event_detail_header_going" = "ไป";
+"event_detail_header_not_going" = "ไม่ไป";
+"event_detail_header_rsvp" = "RSVP";
+"event_detail_header_update_attending_status_success" = "อัปเดตสถานะการเข้าร่วมสำเร็จ";
+"event_detail_header_livestream_setup_info" = "คุณสามารถเริ่มตั้งค่าถ่ายทอดสดก่อนกิจกรรมเริ่ม 15 นาที";
+
+// Event Attendees Page
+"event_attendees_page_title" = "ผู้เข้าร่วม";
+
+// Join Community Sheet
+"join_community_sheet_title" = "เข้าร่วมชุมชนเพื่อดำเนินการต่อ";
+"join_community_sheet_description" = "เป็นสมาชิกของ %@ เพื่อเข้าร่วมกิจกรรมและการสนทนา";
+"join_community_sheet_join_and_rsvp" = "เข้าร่วมชุมชนและตอบรับ";
+"join_community_sheet_join" = "เข้าร่วมชุมชน";
+"join_community_sheet_cancel" = "ยกเลิก";
+
+// Add Calendar Event Sheet
+"add_calendar_sheet_title" = "คุณจะได้รับการแจ้งเตือน";
+"add_calendar_sheet_description" = "คุณยังสามารถติดตามกิจกรรมนี้ได้โดยเพิ่มลงในปฏิทินของอุปกรณ์";
+"add_calendar_sheet_add_button" = "เพิ่มลงในปฏิทิน";
+
+// Event List Pages
+"event_list_past_events_title" = "กิจกรรมที่ผ่านไปแล้ว";
+"event_list_upcoming_events_title" = "กิจกรรมที่กำลังจะมาถึง";
+"event_list_tab_all" = "ทั้งหมด";
+"event_list_tab_hosting" = "เป็นเจ้าภาพ";
+
+// Event Detail Page
+"amity_social_label_edit_event" = "แก้ไขกิจกรรม";
+"event_detail_page_delete_event" = "ลบกิจกรรม";
+"event_detail_page_event_deleted" = "ลบกิจกรรมแล้ว";
+"event_detail_page_delete_failed" = "ลบกิจกรรมไม่สำเร็จ กรุณาลองอีกครั้ง";
+"event_detail_page_setup_livestream" = "ตั้งค่าถ่ายทอดสด";
+
+// Event Setup Page
+"event_setup_event_name_title" = "ชื่อกิจกรรม";
+"event_setup_event_name_placeholder" = "ตั้งชื่อกิจกรรมของคุณ";
+"event_setup_event_details_title" = "รายละเอียดกิจกรรม";
+"event_setup_event_details_placeholder" = "แชร์ว่ากิจกรรมนี้เกี่ยวกับอะไร";
+"event_setup_leave_alert_title" = "ออกโดยไม่สร้างเสร็จ?";
+"event_setup_leave_alert_message" = "ความคืบหน้าจะไม่ถูกบันทึกและกิจกรรมจะไม่ถูกสร้าง";
+"event_setup_camera" = "กล้อง";
+"event_setup_photo" = "รูปภาพ";
+"event_setup_date_and_time" = "วันที่และเวลา";
+"event_setup_timezone" = "เขตเวลา";
+"event_setup_starts_on" = "เริ่มวันที่";
+"event_setup_no_end_time_info" = "กิจกรรมที่ไม่ได้ระบุเวลาสิ้นสุดจะสิ้นสุดหลังจาก 12 ชั่วโมง";
+"event_setup_add_end_date_time" = "เพิ่มวันที่และเวลาสิ้นสุด";
+"social_button_event_setup_ends_on" = "สิ้นสุดวันที่";
+"event_setup_location" = "สถานที่";
+"event_setup_location_placeholder" = "เลือกว่ากิจกรรมจะจัดที่ไหน";
+"event_setup_creating" = "กำลังสร้าง...";
+"event_setup_saving" = "กำลังบันทึก...";
+"event_setup_successfully_created" = "สร้างกิจกรรมสำเร็จ";
+"event_setup_successfully_updated" = "อัปเดตกิจกรรมสำเร็จ";
+"amity_social_error_event_setup_update_time_limit_error" = "ไม่สามารถอัปเดตกิจกรรมได้เนื่องจากต้องเริ่มอย่างน้อย 15 นาทีจากตอนนี้";
+"event_setup_create_time_limit_error" = "ไม่สามารถสร้างกิจกรรมได้เนื่องจากต้องเริ่มอย่างน้อย 15 นาทีจากตอนนี้";
+"event_setup_create_link_not_allowed_error" = "ไม่สามารถสร้างกิจกรรมได้เนื่องจากมีลิงก์ที่ไม่อนุญาต";
+"event_setup_update_link_not_allowed_error" = "ไม่สามารถอัปเดตกิจกรรมได้เนื่องจากมีลิงก์ที่ไม่อนุญาต";
+"event_setup_create_ban_word_error" = "ไม่สามารถสร้างกิจกรรมได้เนื่องจากมีคำที่ไม่เหมาะสม";
+"event_setup_update_ban_word_error" = "ไม่สามารถอัปเดตกิจกรรมได้เนื่องจากมีคำที่ไม่เหมาะสม";
+"event_setup_create_failed" = "สร้างกิจกรรมไม่สำเร็จ กรุณาลองอีกครั้ง";
+"event_setup_update_failed" = "อัปเดตกิจกรรมไม่สำเร็จ กรุณาลองอีกครั้ง";
+"event_setup_create_button" = "สร้างกิจกรรม";
+"event_setup_save_button" = "บันทึก";
+"event_setup_upload_failed_title" = "อัปโหลดไม่สำเร็จ";
+"event_setup_upload_failed_message" = "อัปโหลดรูปภาพไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+// Community Event Feed
+"community_event_feed_upcoming" = "กำลังจะมาถึง";
+"community_event_feed_past" = "ผ่านไปแล้ว";
+
+// Event Target Selection
+"event_target_selection_no_communities" = "คุณยังไม่ได้เข้าร่วมชุมชนใดเลย";
+
+// Event Empty State
+"event_empty_state_no_events" = "ยังไม่มีกิจกรรม";
+
+// Live Stream Co-Host Invite
+"livestream_invite_cohost_title" = "เชิญผู้ร่วมจัด";
+"livestream_cohosting_section_title" = "การร่วมจัด";
+"livestream_remove_cohost_button" = "ลบออก";
+"livestream_cancel_invitation_button" = "ยกเลิก";
+"livestream_invitation_cancelled_toast" = "ยกเลิกคำเชิญแล้ว";
+"social_toast_invitation_cancel_failed_toast" = "ยกเลิกคำเชิญไม่สำเร็จ";
+"livestream_whos_watching_title" = "ใครกำลังดู";
+"livestream_invite_button" = "เชิญ";
+"livestream_invitation_sent_toast" = "ส่งคำเชิญแล้ว";
+"livestream_invitation_send_failed_toast" = "ส่งคำเชิญไม่สำเร็จ";
+"livestream_confirm_invite_cohost_title" = "ยืนยันการเชิญผู้ร่วมจัด";
+"livestream_confirm_invite_cohost_message" = "หากพวกเขาตอบรับคำเชิญ จะเข้าร่วมเป็นผู้ร่วมจัดพร้อมสิทธิ์ผู้ดูแล สามารถเปิดกล้องและไมค์ ปรากฏบนเวที และช่วยจัดการแชทได้";
+"livestream_no_viewers_title" = "ไม่มีผู้ชมในขณะนี้";
+"livestream_no_viewers_message" = "ผู้ชมที่เข้าร่วมการถ่ายทอดสดจะ\nปรากฏที่นี่";
+
+// Live Stream Co-Host Join
+"livestream_join_as_cohost_title" = "เข้าร่วมเป็นผู้ร่วมจัด";
+"livestream_join_as_cohost_message" = "%@ เชิญคุณเข้าร่วมการถ่ายทอดสดเป็นผู้ร่วมจัด คุณจะเข้าสู่ห้องเตรียมความพร้อมก่อนออกอากาศ";
+"livestream_accept_button" = "ยอมรับ";
+"livestream_decline_button" = "ปฏิเสธ";
+
+// Live Stream Badges
+"amity_social_status_host_badge" = "โฮสต์";
+"amity_social_button_cohost" = "ผู้ร่วมจัด";
+
+// Live Stream Banned Page
+"livestream_banned_title" = "คุณถูกแบน";
+"livestream_banned_message" = "คุณไม่สามารถเข้าถึงการถ่ายทอดสดนี้ได้อีกต่อไป";
+"livestream_banned_ok_button" = "ตกลง";
+
+// Live Stream Backstage
+"livestream_backstage_header_title" = "คุณอยู่ในห้องเตรียมความพร้อม";
+"livestream_backstage_setup_message" = "ตั้งค่ากล้อง ไมค์ และแสงของคุณก่อนเริ่มถ่ายทอดสด";
+"livestream_backstage_join_live_button" = "เข้าร่วม LIVE";
+
+// Live Stream Chat Compose Bar
+"livestream_chat_placeholder" = "แชท...";
+"livestream_chat_muted_message" = "คุณถูกปิดเสียง";
+"livestream_chat_readonly_message" = "การถ่ายทอดสดนี้เป็นโหมดอ่านอย่างเดียว";
+"livestream_chat_send_failed_message" = "ส่งข้อความไม่สำเร็จ กรุณาลองอีกครั้ง";
+
+// Live Stream Chat Feed
+"livestream_chat_deleted_message" = "ข้อความนี้ถูกลบแล้ว";
+"livestream_chat_unknown_user" = "ผู้ใช้ที่ไม่รู้จัก";
+"livestream_chat_invite_as_cohost" = "เชิญเป็นผู้ร่วมจัด";
+"amity_common_label_message_not_sent" = "ข้อความของคุณไม่ถูกส่ง";
+
+// Live Stream Player Page
+"livestream_leave_backstage_title" = "ออกจากห้องเตรียมความพร้อม";
+"livestream_leave_backstage_message" = "คุณแน่ใจหรือไม่ว่าต้องการออกจากห้องเตรียมความพร้อม? คุณจะกลับเป็นผู้ชมและต้องได้รับคำเชิญใหม่เพื่อเข้าร่วมอีกครั้ง";
+"livestream_left_stage_toast" = "คุณออกจากเวทีแล้วและกำลังดูในฐานะผู้ชม";
+"livestream_invitation_no_longer_valid" = "คำเชิญไม่มีผลแล้ว";
+"livestream_accept_invitation_failed" = "ยอมรับคำเชิญไม่สำเร็จ";
+"amity_social_toast_snackbar_invitation_declined" = "ปฏิเสธคำเชิญแล้ว";
+"livestream_decline_invitation_failed" = "ปฏิเสธคำเชิญไม่สำเร็จ";
+"livestream_left_backstage_toast" = "คุณออกจากห้องเตรียมความพร้อมแล้ว";
+
+// Live Stream Alerts
+"livestream_alert_cancel_cohost_invitation_title" = "ยกเลิกคำเชิญผู้ร่วมจัด";
+"social_modal_alert_cancel_cohost_invitation_message" = "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำเชิญนี้? พวกเขาจะไม่ถูกเชิญเป็นผู้ร่วมจัดอีกต่อไปและจะยังคงเป็นผู้ชม";
+"livestream_alert_cohost_leave_title" = "ออกจากการถ่ายทอดสด";
+"livestream_alert_cohost_leave_message" = "คุณแน่ใจหรือไม่ว่าต้องการออกจากการถ่ายทอดสดนี้? คุณจะหยุดออกอากาศและออกจากเซสชันทั้งหมด";
+"livestream_alert_leave_as_cohost_title" = "ออกจากการเป็นผู้ร่วมจัด";
+"livestream_alert_leave_as_cohost_message" = "คุณแน่ใจหรือไม่ว่าต้องการหยุดการร่วมจัด? คุณจะออกจากเวทีและดูต่อในฐานะผู้ชม";
+"livestream_alert_remove_cohost_title" = "ลบผู้ร่วมจัดออกจากการถ่ายทอดสด";
+"livestream_alert_remove_cohost_message" = "คุณแน่ใจหรือไม่ว่าต้องการลบผู้ร่วมจัดนี้ออกจากการถ่ายทอดสด? พวกเขาจะหยุดออกอากาศทันทีและกลับเป็นผู้ชม";
+"livestream_alert_confirm_button" = "ยืนยัน";
+"livestream_alert_remove_button" = "ลบออก";
+"amity_livestream_cancel_invitation_label" = "ยกเลิกคำเชิญ";
+"amity_livestream_remove_from_live" = "นำออกจากไลฟ์สด";
+
+// MARK: - Reaction Display Names
+"amity_social_reaction_like" = "ถูกใจ";
+"amity_social_reaction_love" = "รัก";
+"amity_social_reaction_fire" = "ไฟ";
+"amity_social_reaction_happy" = "มีความสุข";
+"amity_social_reaction_sad" = "เศร้า";
+"amity_social_reaction_heart" = "หัวใจ";
+"amity_social_reaction_grinning" = "ยิ้มกว้าง";
+
+// MARK: - Reaction UI
+"amity_common_reaction_all_tab" = "ทั้งหมด";
+
+// MARK: - Ad Info
+"amity_common_ad_about_title" = "เกี่ยวกับโฆษณานี้";
+"amity_common_ad_why_title" = "ทำไมจึงเห็นโฆษณานี้?";
+"amity_common_ad_why_description" = "คุณเห็นโฆษณานี้เพราะแสดงให้ผู้ใช้ทุกคนในระบบ";
+"amity_common_ad_about_advertiser" = "เกี่ยวกับผู้โฆษณา";
+"amity_common_ad_advertiser_name" = "ชื่อผู้โฆษณา: %@";
+
+// MARK: - Common UI
+"amity_social_label_optional" = " (ไม่บังคับ)";
+"amity_common_required_indicator" = " *";
+
+// MARK: - Chat
+"amity_chat_edit_message" = "แก้ไขข้อความ";
+
+// MARK: - Social
+"amity_social_my_communities" = "ชุมชนของฉัน";
+"amity_social_pending_posts_title" = "โพสต์รอตรวจสอบ";
+"amity_social_post_accepted_toast" = "ยอมรับโพสต์แล้ว";
+"amity_social_post_declined_toast" = "ปฏิเสธโพสต์แล้ว";
+"amity_social_accept_button" = "ยอมรับ";
+"amity_social_decline_button" = "ปฏิเสธ";
+"amity_social_save_button" = "บันทึก";
+"amity_social_camera_button" = "กล้อง";
+"amity_social_photo_button" = "รูปภาพ";
+
+// MARK: - Phase 2 Localization Keys
+
+// Common
+"amity_common_unknown" = "ไม่ทราบ";
+"amity_common_unknown_error" = "ข้อผิดพลาดที่ไม่ทราบ";
+"amity_common_next" = "ถัดไป";
+"amity_common_just_now" = "เมื่อกี้";
+"amity_common_time_days_suffix" = "ว";
+"amity_common_time_hours_suffix" = "ชม";
+"amity_common_time_minutes_suffix" = "น";
+"amity_common_time_seconds_suffix" = "วิ";
+"amity_common_time_am" = "ก่อนเที่ยง";
+"amity_common_time_pm" = "หลังเที่ยง";
+"amity_social_button_keep_editing" = "แก้ไขต่อ";
+"amity_common_yes" = "ใช่";
+"amity_common_no" = "ไม่";
+"amity_common_remove" = "ลบออก";
+"amity_common_join" = "เข้าร่วม";
+"amity_common_unblock" = "ปลดบล็อก";
+"amity_common_post" = "โพสต์";
+"amity_common_view" = "ดู";
+"amity_common_moderator" = "ผู้ดูแล";
+"amity_social_status_live" = "สด";
+"amity_common_pending" = "รอดำเนินการ";
+"amity_social_button_social_home_clips_button" = "คลิป";
+"amity_social_tab_tab_clips" = "คลิป";
+"amity_common_nothing_here_yet" = "ยังไม่มีอะไรให้ดู";
+"amity_common_by_author" = "โดย %@";
+
+// Social - Clip
+"amity_social_empty_state_social_home_empty_title" = "ฟีดของคุณว่างเปล่า";
+"amity_social_clip_explore_community" = "สำรวจชุมชน";
+"amity_social_clip_create_community" = "สร้างชุมชน";
+"amity_social_clip_unable_to_load" = "ไม่สามารถโหลดคลิปได้";
+"amity_social_clip_watch_next" = "ดูคลิปถัดไป";
+"amity_clip_alert_max_file_size_title" = "เกินขนาดไฟล์สูงสุด";
+"amity_clip_alert_unsupported_video_title" = "ประเภทวิดีโอไม่รองรับ";
+"amity_clip_alert_max_duration_title" = "คลิปต้องไม่เกิน 15 นาที";
+"amity_clip_alert_too_short_title" = "คลิปสั้นเกินไป";
+"amity_clip_alert_discard_title" = "ยกเลิกคลิปนี้?";
+"amity_clip_alert_failed_upload_title" = "อัปโหลดล้มเหลว";
+"amity_clip_alert_max_file_size_message" = "กรุณาเลือกวิดีโอที่มีขนาดไฟล์เล็กกว่านี้";
+"amity_clip_alert_unsupported_video_message" = "กรุณาเลือกวิดีโออื่นเพื่ออัปโหลด";
+"amity_clip_alert_too_short_message" = "คลิปต้องมีความยาวอย่างน้อย 1 วินาที";
+"amity_clip_alert_discard_message" = "คลิปจะถูกลบอย่างถาวร ไม่สามารถเลิกทำได้";
+"amity_clip_alert_failed_upload_message" = "กรุณาตรวจสอบการเชื่อมต่อหรือเลือกวิดีโออื่นเพื่ออัปโหลด";
+"amity_social_see_less" = "ดูน้อยลง";
+
+// Social - Community
+"amity_social_cancel_request" = "ยกเลิกคำขอ";
+"amity_social_private_community_title" = "ชุมชนนี้เป็นส่วนตัว";
+"amity_social_private_community_description" = "เข้าร่วมชุมชนนี้เพื่อดูเนื้อหาและสมาชิก";
+"amity_social_decline_pending_post_message" = "การปฏิเสธโพสต์รอตรวจสอบจะลบโพสต์ที่เลือกออกจากชุมชนอย่างถาวร";
+"amity_social_max_upload_limit_title" = "ถึงขีดจำกัดการอัปโหลดแล้ว";
+"amity_social_max_upload_limit_message" = "คุณอัปโหลดได้สูงสุด 10 %@";
+"amity_social_no_post_to_review" = "ไม่มีโพสต์ให้ตรวจสอบ";
+"amity_social_add_category" = "เพิ่มหมวดหมู่";
+"amity_social_add_member" = "เพิ่มสมาชิก";
+"amity_social_start_search_hint" = "เริ่มค้นหาโดยพิมพ์อย่างน้อย 3 ตัวอักษร";
+"amity_social_no_community_yet" = "ยังไม่มีชุมชน";
+"amity_social_no_community_yet_description" = "มาสร้างชุมชนของคุณเองกันเถอะ";
+"amity_social_categories_label" = "หมวดหมู่";
+
+// Social - Invitation
+"amity_social_decline_invitation_title" = "ปฏิเสธคำเชิญ?";
+"amity_social_decline_invitation_message" = "หากคุณเปลี่ยนใจ คุณจะต้องขอเข้าร่วมใหม่";
+
+// Social - Content Report
+"amity_social_report_thanks_title" = "ขอบคุณสำหรับการรายงาน";
+"amity_social_report_thanks_message" = "ผู้ดูแลของเราจะตรวจสอบเนื้อหานี้และดำเนินการหากละเมิดแนวทางของเรา";
+
+// Social - Error/Banned
+"amity_social_content_unavailable" = "เนื้อหาที่คุณกำลังหาไม่พร้อมใช้งาน";
+"amity_social_banned_title" = "คุณถูกแบน";
+"amity_social_banned_message" = "จากกิจกรรมก่อนหน้า บัญชีของคุณถูกแบนจากฟีดทั้งหมด";
+
+// Social - User Profile
+"amity_social_no_requests_to_review" = "ไม่มีคำขอให้ตรวจสอบ";
+"amity_social_decline_follow_request_message" = "การปฏิเสธคำขอติดตามไม่สามารถยกเลิกได้ ผู้ใช้ต้องส่งคำขอใหม่หากถูกปฏิเสธ";
+"amity_social_manage_blocked_users" = "จัดการผู้ใช้ที่ถูกบล็อก";
+"amity_social_report_user" = "รายงานผู้ใช้";
+"amity_social_unreport_user" = "ยกเลิกการรายงานผู้ใช้";
+"amity_social_block_user" = "บล็อกผู้ใช้";
+"amity_social_unblock_user" = "เลิกบล็อกผู้ใช้";
+"amity_social_edit_profile" = "แก้ไขโปรไฟล์";
+"social_label_edit_user_display_name_title" = "ชื่อที่แสดง";
+"amity_social_edit_post" = "แก้ไขโพสต์";
+
+// Social - Products/Poll
+"amity_social_tag_products" = "แท็กสินค้า";
+"amity_social_products_tagged" = "แท็กสินค้าแล้ว";
+"amity_social_products_tagged_in_post" = "สินค้าที่แท็กในโพสต์นี้";
+"amity_social_products_tagged_in_photo" = "สินค้าที่แท็กในรูปภาพนี้";
+"amity_social_products_tagged_in_video" = "สินค้าที่แท็กในวิดีโอนี้";
+"amity_social_upload_image" = "อัปโหลดรูปภาพ";
+"amity_social_upload_new_image" = "อัปโหลดรูปภาพใหม่";
+"amity_social_image_upload_failed" = "ไม่สามารถอัปโหลดรูปภาพได้";
+"amity_social_option_n" = "ตัวเลือก %d";
+"amity_social_choose_poll_type" = "เลือกประเภทโพล";
+"amity_social_poll_type_text_only" = "โพลตัวอักษร";
+"amity_social_poll_type_image" = "โพลรูปภาพ";
+"amity_social_start_typing_to_search" = "พิมพ์เพื่อค้นหาสินค้า";
+"amity_social_search_by_product_name" = "ค้นหาตามชื่อสินค้า";
+"amity_social_edit_tags" = "แก้ไขแท็ก";
+"amity_social_already_tagged" = "แท็กแล้ว";
+
+// Social - Post/LiveStream
+"amity_social_live_on" = "ถ่ายทอดสดบน";
+"amity_social_livestream_limited_visibility" = "การถ่ายทอดสดเริ่มแล้ว แต่จะมองเห็นได้จำกัดจนกว่าโพสต์จะได้รับการอนุมัติ";
+"amity_social_livestream_join_to_interact" = "เข้าร่วมชุมชนเพื่อโต้ตอบกับการถ่ายทอดสด";
+
+// Social - Event
+"amity_social_event_platform" = "แพลตฟอร์ม";
+"amity_social_event_platform_livestream" = "ไลฟ์สตรีม";
+"amity_social_event_platform_external" = "แพลตฟอร์มภายนอก";
+"amity_social_label_event_platform_livestream_description" = "ผู้ใช้สามารถเข้าร่วมไลฟ์สตรีมบนแอปหรือเว็บไซต์";
+"amity_social_label_event_platform_external_description" = "ผู้ใช้จะเข้าร่วมกิจกรรมบนแพลตฟอร์มภายนอก";
+"amity_social_time_event_date_today" = "วันนี้ %1$@ ถึง %2$@";
+"amity_social_label_event_date_tomorrow" = "พรุ่งนี้ %1$@ ถึง %2$@";
+"amity_social_time_event_date_yesterday" = "เมื่อวาน %1$@ ถึง %2$@";
+"amity_social_event_date_time_format" = "%1$@ เวลา %2$@";
+
+// Story
+"amity_social_replying_to" = "กำลังตอบกลับ";
+"amity_social_share_story" = "แชร์สตอรี่";
+"amity_social_unsaved_changes_message" = "คุณแน่ใจหรือไม่ว่าต้องการยกเลิก? การเปลี่ยนแปลงของคุณจะไม่ถูกบันทึก";
+"amity_social_remove_link_button" = "ลบลิงก์";
+"amity_social_remove_link_title" = "ลบลิงก์?";
+"amity_social_remove_link_message" = "ลิงก์นี้จะถูกลบออกจากสตอรี่";
+"amity_social_discard_story_title" = "ละทิ้งสตอรี่?";
+"amity_social_discard_story_message" = "สตอรี่จะถูกละทิ้งอย่างถาวร ไม่สามารถยกเลิกได้";
+"amity_story_camera_photo_button" = "รูปภาพ";
+"amity_story_camera_video_button" = "วิดีโอ";
+"amity_social_label_hyperlink_url" = "URL";
+"amity_social_label_hyperlink_customize_info" = "ข้อความนี้จะแสดงบนลิงก์แทน URL";
+
+// Video Player
+"amity_social_video_no_longer_available" = "วิดีโอนี้ไม่มีให้ดูแล้ว";
+"amity_social_photo_no_longer_available" = "รูปภาพนี้ไม่มีให้ดูแล้ว";
+"amity_social_video_not_available" = "ไม่สามารถแสดงวิดีโอได้";
+
+// Social Home Tab Titles
+"social_home_newsfeed_tab" = "นิวส์ฟีด";
+"social_home_explore_tab" = "สำรวจ";
+"social_home_my_communities_tab" = "ชุมชนของฉัน";
+"social_home_communities_tab" = "ชุมชน";
+"social_home_events_tab" = "กิจกรรม";
+
+// Community Member Labels
+"community_member_label_singular" = "สมาชิก";
+"community_member_label_plural" = "สมาชิก";
+
+// Community Membership Page
+"community_membership_all_members_title" = "สมาชิกทั้งหมด";
+"community_membership_tab_moderators" = "ผู้ดูแล";
+"community_membership_add_success" = "เพิ่มสมาชิกเข้าชุมชนสำเร็จ!";
+"community_membership_add_failed" = "เพิ่มสมาชิกเข้าชุมชนไม่สำเร็จ";
+"community_membership_invite_success" = "ส่งคำเชิญสมาชิกเข้าชุมชนสำเร็จ";
+"community_membership_invite_failed" = "ส่งคำเชิญไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_community_remove_member" = "นำออกจากชุมชน";
+
+// Post Actions
+"post_comment_button_text" = "แสดงความคิดเห็น";
+"post_comment_count_singular" = "%@ ความคิดเห็น";
+"post_comment_count_plural" = "%@ ความคิดเห็น";
+"post_view_replies_singular" = "ดู %@ ความคิดเห็น";
+"post_view_replies_plural" = "ดู %@ ความคิดเห็น";
+
+// Navigation / Tab labels
+"social_home_my_event_tab" = "กิจกรรมของฉัน";
+"social_search_posts_tab" = "โพสต์";
+"social_search_users_tab" = "ผู้ใช้";
+"social_community_nav_title" = "ชุมชน";
+"social_tab_tab_videos" = "วิดีโอ";
+
+// Buttons
+"amity_social_video_button" = "วิดีโอ";
+"amity_social_explore_community_button" = "สำรวจชุมชน";
+
+// User Profile
+"user_profile_followings" = "กำลังติดตาม";
+"user_profile_followers" = "ผู้ติดตาม";
+"user_profile_following_button" = "ติดตามแล้ว";
+
+// Community Pending Requests
+"community_pending_request_singular" = "คำขอที่รอการอนุมัติ";
+"community_join_request_singular" = "คำขอเข้าร่วม";
+"community_join_request_plural" = "คำขอเข้าร่วม";
+"community_pending_requires_approval" = "%@ ต้องรออนุมัติ";
+"community_pending_require_approval" = "%@ ต้องรออนุมัติ";
+"community_posts_pending_review" = "โพสต์ของคุณกำลังรอการตรวจสอบ";
+
+// Media Feed Tabs
+"social_media_feed_photos_tab" = "รูปภาพ";
+
+// Empty Feed States
+"community_empty_feed_no_photos" = "ยังไม่มีรูปภาพ";
+"community_empty_feed_no_videos" = "ยังไม่มีวิดีโอ";
+"community_empty_feed_no_clips" = "ยังไม่มีคลิป";
+
+// Post Menu Types
+"post_menu_type_poll" = "โพล";
+"amity_social_button_social_home_create_story_button" = "สตอรี่";
+"post_menu_type_clip" = "คลิป";
+"post_menu_type_event" = "กิจกรรม";
+
+// Community Profile Labels (post count)
+"community_post_label_singular" = "โพสต์";
+"community_post_label_plural" = "โพสต์";
+
+// Community Profile Menu
+"community_settings_option_title" = "การตั้งค่าชุมชน";
+"community_information_option_title" = "ข้อมูลชุมชน";
+
+// Copy/Share Link
+"amity_social_copy_link" = "คัดลอกลิงก์";
+"amity_social_share_to" = "แชร์ไปยัง";
+
+// Invite Member
+"community_invite_member_title" = "เชิญสมาชิก";
+"community_invite_member_description" = "เชิญผู้คนมาเข้าร่วมชุมชนของคุณ";
+"community_invite_member_button" = "เชิญ";
+
+// Search
+"search_user_placeholder" = "ค้นหาผู้ใช้";
+"amity_search_placeholder" = "ค้นหา";
+"amity_search_community_user_placeholder" = "ค้นหาชุมชนและผู้ใช้";
+"amity_search_my_communities_placeholder" = "ค้นหาชุมชนของฉัน";
+
+// MARK: - Community Setup Page
+"community_setup_page_title" = "สร้างชุมชน";
+"community_setup_edit_page_title" = "แก้ไขชุมชน";
+"community_setup_name_title" = "ชื่อชุมชน";
+"community_setup_name_placeholder" = "ตั้งชื่อชุมชนของคุณ";
+"community_setup_about_title" = "เกี่ยวกับ";
+"community_setup_about_placeholder" = "กรอกคำอธิบาย";
+"community_setup_category_title" = "หมวดหมู่";
+"community_setup_category_placeholder" = "เลือกหมวดหมู่";
+"community_setup_privacy_title" = "ความเป็นส่วนตัว";
+"community_setup_privacy_public_title" = "สาธารณะ";
+"community_setup_privacy_public_description" = "ทุกคนค้นหาชุมชนได้ เนื้อหาจะมองเห็นได้โดยทุกคน";
+"community_setup_privacy_private_title" = "ส่วนตัว";
+"community_setup_privacy_private_description" = "เฉพาะสมาชิกที่ได้รับเชิญจากผู้ดูแลเท่านั้นที่สามารถเข้าร่วม ดู และค้นหาโพสต์ในชุมชนนี้ได้";
+"community_setup_privacy_private_visible_title" = "ส่วนตัวและมองเห็นได้";
+"community_setup_privacy_private_visible_description" = "ทุกคนค้นหาชุมชนได้ เนื้อหาจะถูกซ่อนจากผู้ที่ไม่ใช่สมาชิก";
+"community_setup_privacy_private_hidden_title" = "ส่วนตัวและซ่อน";
+"community_setup_privacy_private_hidden_description" = "ชุมชนและเนื้อหาจะถูกซ่อนจากผู้ที่ไม่ใช่สมาชิก และไม่สามารถค้นหาพบได้";
+"community_setup_membership_title" = "การเป็นสมาชิก";
+"community_setup_membership_description" = "ต้องได้รับการอนุมัติจากผู้ดูแล";
+"community_setup_membership_sub_description" = "ผู้ใช้จะเป็นสมาชิกได้เมื่อคำขอเข้าร่วมได้รับการอนุมัติจากผู้ดูแลชุมชน";
+"community_setup_add_member_title" = "สมาชิก";
+"community_setup_add_member_button" = "เพิ่ม";
+"community_setup_create_button" = "สร้างชุมชน";
+"community_setup_create_success" = "สร้างชุมชนสำเร็จ!";
+"community_setup_create_failed" = "ไม่สามารถสร้างชุมชนได้!";
+"community_setup_save_failed" = "ไม่สามารถบันทึกโปรไฟล์ชุมชนได้ กรุณาลองอีกครั้ง";
+
+// MARK: - Community Setting Page
+"community_setting_pending_invitations" = "คำเชิญที่รอดำเนินการ";
+"social_button_last_moderator_leave_community_msg" = "เนื่องจากคุณเป็นผู้ดูแลและสมาชิกคนสุดท้าย การออกจะปิดชุมชนนี้ด้วย โพสต์ทั้งหมดในชุมชนจะถูกลบ ไม่สามารถย้อนกลับได้";
+"community_setting_leaving_toast" = "กำลังออกจากชุมชน";
+"community_setting_leave_success" = "ออกจากชุมชนสำเร็จ!";
+"community_setting_closing_toast" = "กำลังปิดชุมชน";
+"community_setting_close_success" = "ปิดชุมชนสำเร็จ!";
+
+// MARK: - Context-specific Copy Link
+"amity_social_copy_profile_link" = "คัดลอกลิงก์โปรไฟล์";
+"amity_social_label_copy_post_link" = "คัดลอกลิงก์โพสต์";
+"amity_social_copy_clip_link" = "คัดลอกลิงก์คลิป";
+"amity_social_copy_livestream_link" = "คัดลอกลิงก์ไลฟ์สตรีม";
+
+// MARK: - Search
+"search_member_placeholder" = "ค้นหาสมาชิก";
+
+// MARK: - Story
+
+// MARK: - User Profile Toasts
+"user_blocked_toast" = "บล็อกผู้ใช้แล้ว";
+"user_unblocked_toast" = "ยกเลิกการบล็อกผู้ใช้แล้ว";
+"user_reported_toast" = "รายงานผู้ใช้แล้ว";
+"user_unreported_toast" = "ยกเลิกการรายงานผู้ใช้แล้ว";
+"user_block_failed_toast" = "บล็อกผู้ใช้ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"user_unblock_failed_toast" = "ยกเลิกการบล็อกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"user_report_failed_toast" = "รายงานผู้ใช้ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"user_unreport_failed_toast" = "ยกเลิกการรายงานไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+
+// MARK: - Follow Requests
+"follow_request_declined_toast" = "ปฏิเสธคำขอติดตามแล้ว";
+"follow_request_accept_failed_toast" = "ยอมรับคำขอติดตามไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"follow_request_decline_failed_toast" = "ปฏิเสธคำขอติดตามไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+
+// MARK: - User Profile Alerts
+"social_label_user_unblock_title" = "ยกเลิกการบล็อกผู้ใช้?";
+"unblock_user_alert_message" = "ผู้ใช้จะสามารถเห็นโพสต์และความคิดเห็นที่คุณสร้างได้ พวกเขาจะไม่ได้รับการแจ้งเตือนว่าคุณยกเลิกการบล็อกแล้ว";
+"unable_to_follow_alert_title" = "ไม่สามารถติดตามผู้ใช้รายนี้ได้";
+"unable_to_follow_alert_message" = "เกิดข้อผิดพลาด กรุณาลองใหม่ในภายหลัง";
+"edit_user_about_title" = "เกี่ยวกับ";
+
+// MARK: - Community Member Management
+"community_profile_update_failed_toast" = "อัปเดตโปรไฟล์ชุมชนไม่สำเร็จ";
+"community_member_removed_toast" = "นำสมาชิกออกจากชุมชนนี้แล้ว";
+"community_member_reported_toast" = "รายงานสมาชิกแล้ว";
+"community_member_unreported_toast" = "ยกเลิกการรายงานสมาชิกแล้ว";
+"community_member_report_failed_toast" = "รายงานสมาชิกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"community_member_unreport_failed_toast" = "ยกเลิกการรายงานไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"community_member_remove_failed_toast" = "นำสมาชิกออกไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"community_member_promote_success_toast" = "เลื่อนตำแหน่งเป็นผู้ดูแลสำเร็จ";
+"community_member_promote_failed_toast" = "เลื่อนตำแหน่งไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"community_member_demote_success_toast" = "ลดตำแหน่งเป็นสมาชิกสำเร็จ";
+"community_member_demote_failed_toast" = "ลดตำแหน่งไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"community_member_promote_to_moderator" = "เลื่อนตำแหน่งเป็นผู้ดูแล";
+"community_member_demote_to_member" = "ลดตำแหน่งเป็นสมาชิก";
+"amity_social_toast_snackbar_join_community_failed" = "เข้าร่วมชุมชนไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"community_join_cancel_request_failed_toast" = "ยกเลิกคำขอเข้าร่วมไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+"community_join_request_no_longer_available_toast" = "คำขอเข้าร่วมนี้ไม่พร้อมใช้งานแล้ว";
+"community_unjoined_toast" = "ออกจากชุมชนแล้ว";
+
+// MARK: - Community Notification Settings
+"community_notification_leave_alert_message" = "การเปลี่ยนแปลงของคุณอาจไม่ถูกบันทึก";
+
+// MARK: - Post Composer
+"post_composer_hashtag_limit_alert_title" = "ถึงขีดจำกัดแฮชแท็ก";
+"post_composer_hashtag_limit_alert_message" = "คุณสามารถเพิ่มแฮชแท็กได้สูงสุด 30 รายการต่อโพสต์";
+"post_composer_link_limit_alert_title" = "ถึงขีดจำกัดลิงก์";
+"post_composer_link_limit_alert_message" = "คุณสามารถเพิ่มลิงก์ได้สูงสุด 100 รายการต่อโพสต์";
+"post_composer_products_unavailable_toast" = "สินค้าบางรายการที่คุณแท็กไม่พร้อมใช้งานแล้ว";
+
+// MARK: - Poll
+"post_sent_for_review_alert_title" = "ส่งโพสต์เพื่อตรวจสอบแล้ว";
+"post_sent_for_review_alert_message" = "โพสต์ของคุณถูกส่งไปยังรายการรอดำเนินการ จะเผยแพร่เมื่อได้รับการอนุมัติจากผู้ดูแลกลุ่ม";
+"amity_post_composer_loading_updating" = "กำลังอัปเดต...";
+"amity_post_composer_title_placeholder" = "หัวข้อ (ไม่บังคับ)";
+"amity_post_composer_body_placeholder" = "เกิดอะไรขึ้น...";
+"amity_post_composer_body_clip_placeholder" = "เกิดอะไรขึ้น? (ไม่บังคับ)";
+"amity_post_composer_posts_sent_for_review_title" = "โพสต์ถูกส่งเพื่อตรวจสอบ";
+"amity_post_composer_post_updates_sent_for_review_title" = "การอัปเดตโพสต์ถูกส่งเพื่อตรวจสอบ";
+"amity_post_composer_post_sent_for_review_message" = "โพสต์ของคุณถูกส่งไปยังรายการรอดำเนินการ จะเผยแพร่เมื่อได้รับการอนุมัติจากผู้ดูแลชุมชน";
+"amity_post_composer_post_update_sent_for_review_message" = "การอัปเดตโพสต์ของคุณถูกส่งไปยังรายการรอดำเนินการ จะเผยแพร่เมื่อได้รับการอนุมัติจากผู้ดูแลชุมชน";
+"poll_ended_toast" = "การสำรวจสิ้นสุดแล้ว";
+"poll_post_unavailable_toast" = "โพสต์นี้ไม่พร้อมใช้งานแล้ว";
+"poll_generic_error_toast" = "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+"poll_vote_removed_toast" = "ลบการโหวตแล้ว";
+"post_review_failed_toast" = "ตรวจสอบโพสต์ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง";
+
+// MARK: - Notification Tray
+"notification_tray_generic_error_toast" = "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+
+// MARK: - Story
+"story_link_limit_toast" = "ไม่สามารถเพิ่มลิงก์มากกว่าหนึ่งรายการในเรื่องราวของคุณ";
+
+// MARK: - LiveStream
+"livestream_co_host_accepted_toast" = "โฮสต์ร่วมยอมรับคำเชิญแล้ว";
+"livestream_co_host_declined_toast" = "โฮสต์ร่วมปฏิเสธคำเชิญแล้ว";
+"livestream_co_host_left_toast" = "โฮสต์ร่วมออกจากไลฟ์สดแล้ว";
+"livestream_co_host_left_stage_toast" = "โฮสต์ร่วมออกจากเวทีแล้ว";
+"livestream_co_host_removed_toast" = "นำโฮสต์ร่วมออกจากไลฟ์แล้ว";
+"livestream_remove_co_host_failed_toast" = "นำโฮสต์ร่วมออกไม่สำเร็จ";
+"livestream_follow_to_interact_toast" = "ติดตามผู้ใช้เพื่อโต้ตอบ";
+"livestream_waiting_network_toast" = "กำลังรอการเชื่อมต่อเครือข่าย...";
+
+// MARK: - LiveStream Display Fallbacks
+
+// MARK: - Media
+"amity_media_processing" = "กำลังประมวลผลสื่อ...";
+
+// MARK: - Event
+"amity_event_starts_on" = "เริ่มต้น";
+"amity_event_location_address_title" = "ที่อยู่";
+"amity_event_location_address_placeholder" = "ระบุที่อยู่ของสถานที่จัดงาน";
+"amity_event_location_title" = "สถานที่";
+
+// MARK: - LiveStream Permissions
+"amity_livestream_permission_photos_title" = "อนุญาตการเข้าถึงรูปภาพ";
+"amity_livestream_permission_photos_message" = "อนุญาตให้ใช้รูปภาพจากอุปกรณ์นี้เป็นภาพปกไลฟ์สด";
+
+// MARK: - LiveStream Co-Host Product Tags
+"amity_livestream_cohost_product_tags_title" = "อนุญาตให้โฮสต์ร่วมจัดการแท็กสินค้า";
+"amity_livestream_cohost_product_tags_description" = "เมื่อเปิดใช้งาน โฮสต์ร่วมสามารถเพิ่มหรือลบสินค้าที่แท็กไว้ และปักหมุดหรือเลิกปักหมุดสินค้าระหว่างไลฟ์สดได้";
+
+// MARK: - User Profile Alerts
+"amity_user_unblock_title" = "เลิกบล็อกผู้ใช้?";
+"amity_user_unblock_message_format" = "%@ จะสามารถเห็นโพสต์และความคิดเห็นที่คุณสร้างขึ้นได้แล้ว พวกเขาจะไม่ได้รับการแจ้งเตือน";
+"amity_user_unfollow_title" = "เลิกติดตามผู้ใช้นี้?";
+"amity_user_unfollow_message" = "หากคุณเปลี่ยนใจ คุณจะต้องส่งคำขอติดตามใหม่อีกครั้ง";
+"amity_user_unfollow_button" = "เลิกติดตาม";
+"amity_user_block_title" = "บล็อกผู้ใช้?";
+"amity_user_block_message_format" = "%@ จะไม่สามารถเห็นโพสต์และความคิดเห็นที่คุณสร้างขึ้น พวกเขาจะไม่ได้รับการแจ้งเตือน";
+
+// MARK: - Community Invitations
+"amity_community_pending_invitations_title" = "คำเชิญที่รอดำเนินการ";
+"amity_community_invitation_joined_format" = "คุณเข้าร่วม %@ แล้ว";
+"amity_community_invitation_expired" = "คำเชิญนี้ไม่พร้อมใช้งานอีกต่อไป";
+
+// MARK: - Notification Tray Sections
+"amity_notification_tray_requests_title" = "คำขอ";
+"amity_notification_tray_recent_title" = "ล่าสุด";
+"amity_notification_tray_older_title" = "เก่ากว่า";
+"amity_notification_tray_decline_failed" = "ไม่สามารถปฏิเสธคำเชิญได้ กรุณาลองอีกครั้ง";
+"amity_notification_tray_accept_invitation_failed" = "ไม่สามารถรับคำเชิญได้ กรุณาลองอีกครั้ง";
+"amity_notification_tray_invited_to_join_format" = "%@ เชิญคุณเข้าร่วม %@";
+"amity_notification_tray_invited_to_join_separator" = " เชิญคุณเข้าร่วม ";
+
+// MARK: - Poll Image Options
+"amity_poll_image_options_title" = "ตัวเลือก";
+"amity_poll_image_options_description" = "โพลต้องมีอย่างน้อย 2 ตัวเลือก และต้องอัปโหลดรูปภาพสำหรับทุกตัวเลือก";
+
+// MARK: - User Profile Edit
+"amity_user_profile_about_title" = "เกี่ยวกับ";
+"amity_user_profile_about_placeholder" = "เกี่ยวกับตัวเอง";
+"amity_user_follow_requests_title_format" = "คำขอติดตาม (%d)";
+
+// MARK: - Master keys (aligned with DLS)
+"amity_social_button_add_link" = "เพิ่มลิงก์";
+"amity_social_button_add_products" = "เพิ่มสินค้า";
+"amity_social_button_block" = "บล็อก";
+"amity_social_button_by" = "โดย";
+"amity_social_button_community" = "ชุมชน";
+"amity_social_button_community_and" = "และ";
+"amity_social_button_delete_comment_warning_message" = "ความคิดเห็นนี้จะถูกลบอย่างถาวร";
+"amity_social_button_delete_message_failed" = "ไม่สามารถลบข้อความได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_button_delete_post_warning_message" = "โพสต์นี้จะถูกลบอย่างถาวร";
+"amity_social_button_discard" = "ยกเลิกการเปลี่ยนแปลง";
+"amity_social_button_edit_user_save_button" = "บันทึก";
+"amity_social_button_event_progress_not_saved" = "ความคืบหน้าของคุณจะไม่ถูกบันทึก และกิจกรรมของคุณจะไม่ถูกสร้าง";
+"amity_social_button_image" = "รูปภาพ";
+"amity_social_button_join_group" = "เข้าร่วมกลุ่ม";
+"amity_social_button_leave" = "ออก";
+"amity_social_button_my_timeline" = "ไทม์ไลน์ของฉัน";
+"amity_social_button_pending_invitation" = "คำเชิญที่รอดำเนินการ";
+"amity_social_button_pending_post_decline_button" = "ปฏิเสธ";
+"amity_social_button_poll_duration_1_day" = "1 วัน";
+"amity_social_button_poll_duration_14_days" = "14 วัน";
+"amity_social_button_poll_duration_3_days" = "3 วัน";
+"amity_social_button_poll_duration_30_days" = "30 วัน";
+"amity_social_button_poll_voter" = "%@ โหวต";
+"amity_social_button_poll_voters" = "%@ โหวต";
+"amity_social_button_poll_duration_7_days" = "7 วัน";
+"amity_social_button_post_composer_file_button" = "ไฟล์แนบ";
+"amity_social_button_post_content_share_button" = "แชร์";
+"amity_social_button_post_to" = "โพสต์ถึง";
+"amity_social_button_select_event_target_my_timeline" = "ไทม์ไลน์ของฉัน";
+"amity_social_button_select_poll_target_my_timeline" = "ไทม์ไลน์ของฉัน";
+"amity_social_button_unblock" = "เลิกบล็อก";
+"amity_social_button_user_follow_button" = "ติดตาม";
+"amity_social_button_user_following_button" = "กำลังติดตาม";
+"amity_social_button_user_profile_follower" = "ผู้ติดตาม";
+"amity_social_button_user_profile_following" = "กำลังติดตาม";
+"amity_social_button_v3_loadmore" = "โหลดเพิ่มเติม";
+"amity_social_empty_state_explore_empty" = "หน้าสำรวจของคุณว่างเปล่า";
+"amity_social_error_close_community_error_title" = "ไม่สามารถปิดชุมชนได้";
+"amity_social_label_blocked_user_feed" = "คุณได้บล็อกผู้ใช้รายนี้";
+"amity_social_label_blocked_user_feed_info" = "เลิกบล็อกเพื่อดูโพสต์ของพวกเขา";
+"amity_social_label_blocked_user_image_feed" = "คุณได้บล็อกผู้ใช้รายนี้";
+"amity_social_label_blocked_user_image_feed_info" = "เลิกบล็อกเพื่อดูโพสต์ของพวกเขา";
+"amity_social_label_blocked_user_video_feed" = "คุณได้บล็อกผู้ใช้รายนี้";
+"amity_social_label_blocked_user_video_feed_info" = "เลิกบล็อกเพื่อดูโพสต์ของพวกเขา";
+"amity_social_label_community_setup_invite_members_description" = "พวกเขาจะเข้าร่วมเป็นสมาชิกหลังจากยอมรับคำเชิญของคุณ";
+"amity_social_label_community_setup_invite_members_title" = "เชิญสมาชิก";
+"amity_social_label_customize_link_text" = "กำหนดข้อความลิงก์เอง";
+"amity_social_label_enter_valid_url" = "กรุณากรอก URL ที่ถูกต้อง";
+"amity_social_label_enter_whitelisted_url" = "กรุณากรอก URL ที่อยู่ในรายการที่อนุญาต";
+"amity_social_label_follow_request_accepted" = "%1$@ กำลังติดตามคุณอยู่";
+"amity_social_label_join_to_attend_events" = "เป็นสมาชิกของ %@ เพื่อเข้าร่วมกิจกรรมและการสนทนา";
+"amity_social_label_msg_blocked_word" = "ข้อความของคุณไม่ถูกส่งเนื่องจากมีคำต้องห้าม";
+"amity_social_label_no_internet_connection" = "ไม่มีการเชื่อมต่ออินเทอร์เน็ต";
+"amity_social_label_no_users_available" = "ไม่มีผู้ใช้";
+"amity_social_label_user_demoted" = "ลดตำแหน่งเป็นสมาชิกสำเร็จแล้ว!";
+"amity_social_label_no_description_available" = "ไม่มีคำอธิบาย";
+"amity_social_failed_to_delete_story_please_try_again" = "ลบสตอรี่ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_social_error_post_text_exceed_error_message" = "โพสต์ของคุณไม่ถูกโพสต์เนื่องจากเกินขีดจำกัด %d ตัวอักษร";
+"amity_social_error_post_ban_word_error_message" = "โพสต์ของคุณไม่ถูกโพสต์เนื่องจากมีคำที่ถูกบล็อก";
+"amity_social_error_post_link_not_allowed_error_message" = "โพสต์ของคุณไม่ถูกโพสต์เนื่องจากมีลิงก์ที่ไม่ได้รับอนุญาต";
+"amity_social_status_allow_camera_desc" = "ซึ่งช่วยให้คุณบันทึกและถ่ายทอดสดได้\nจากอุปกรณ์นี้";
+"social_toast_failed_generic" = "โอ้ เกิดข้อผิดพลาดบางอย่าง";
+"amity_social_label_private_user_feed" = "บัญชีนี้เป็นส่วนตัว";
+"amity_social_label_private_user_feed_info" = "ติดตามผู้ใช้รายนี้เพื่อดูโพสต์ของพวกเขา";
+"amity_social_label_private_user_image_feed" = "บัญชีนี้เป็นส่วนตัว";
+"amity_social_label_private_user_image_feed_info" = "ติดตามผู้ใช้รายนี้เพื่อดูโพสต์ของพวกเขา";
+"amity_social_label_private_user_video_feed" = "บัญชีนี้เป็นส่วนตัว";
+"amity_social_label_private_user_video_feed_info" = "ติดตามผู้ใช้รายนี้เพื่อดูโพสต์ของพวกเขา";
+"amity_social_label_select_event_target_title" = "สร้างกิจกรรมใน";
+"amity_social_label_text_contains_blocklisted" = "ข้อความของคุณมีคำที่อยู่ในรายการบล็อก";
+"amity_social_label_your_message_is_too_long_please_shorten_your_message_an" = "ข้อความของคุณยาวเกินไป กรุณาย่อข้อความแล้วลองใหม่อีกครั้ง";
+"amity_social_modal_dialog_cohost_invitation_description" = "หาก %@ ยอมรับคำเชิญของคุณ พวกเขาจะกลายเป็นผู้ร่วมจัดงานที่มีสิทธิ์ผู้ดูแล ผู้ร่วมจัดงานสามารถเปิดกล้องและไมโครโฟน ปรากฏบนเวทีร่วมกับคุณ และช่วยจัดการแชทในกิจกรรมได้";
+"amity_social_modal_dialog_something_went_wrong" = "เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้งในภายหลัง";
+"amity_social_permission_post_permission_admin_review" = "ต้องได้รับการตรวจสอบจากผู้ดูแล";
+"amity_social_placeholder_edit_user_about_hint" = "กรอกคำอธิบาย";
+"amity_social_placeholder_hyperlink_name_hint" = "ตั้งชื่อลิงก์ของคุณ";
+"amity_social_placeholder_hyperlink_url_hint" = "https://example.com";
+"amity_social_toast_community_report_failed" = "ไม่สามารถรายงานชุมชนได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_toast_community_setup_toast_create_failed" = "ไม่สามารถสร้างชุมชนได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_toast_community_unreport_failed" = "ไม่สามารถยกเลิกการรายงานชุมชนได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_toast_leave_community_failed" = "ไม่สามารถออกจากชุมชนได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_toast_member_unban_failed" = "ไม่สามารถยกเลิกการแบนสมาชิกได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_toast_product_tag_add_failed" = "ไม่สามารถเพิ่มแท็กสินค้าได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_toast_product_tag_remove_failed" = "ไม่สามารถลบแท็กสินค้าได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_toast_snackbar_close_community_failed" = "ไม่สามารถปิดชุมชนได้ กรุณาลองใหม่อีกครั้งในภายหลัง";
+"amity_social_toast_snackbar_story_shared" = "แชร์สตอรี่สำเร็จ";
+"amity_social_toast_update_cohost_permission_failed" = "ไม่สามารถอัปเดตสิทธิ์การแท็กสินค้าของผู้ร่วมจัดงานได้ กรุณาลองใหม่อีกครั้ง";
+
+// Cross-platform gap keys — wrong-key fixes batch
+"post_composer_blocked_link_error" = "โพสต์ของคุณไม่ถูกโพสต์เนื่องจากมีลิงก์ที่ไม่อนุญาต";
+"post_title_char_limit_error" = "ชื่อโพสต์ต้องไม่เกิน %d ตัวอักษร";
+"comment_delete_failed_toast" = "ไม่สามารถลบความคิดเห็นได้ กรุณาลองใหม่อีกครั้ง";
+"comment_report_failed_toast" = "ไม่สามารถรายงานความคิดเห็นได้ กรุณาลองใหม่อีกครั้ง";
+"comment_unreport_failed_toast" = "ไม่สามารถยกเลิกการรายงานความคิดเห็นได้ กรุณาลองใหม่อีกครั้ง";
+"community_member_ban_failed_toast" = "ไม่สามารถแบนสมาชิกได้ กรุณาลองใหม่อีกครั้ง";
+"chat_toast_report_message_failed" = "ไม่สามารถรายงานข้อความได้ กรุณาลองใหม่อีกครั้ง";
+"reply_report_failed_toast" = "ไม่สามารถรายงานการตอบกลับได้ กรุณาลองใหม่อีกครั้ง";
+"reply_unreport_failed_toast" = "ไม่สามารถยกเลิกการรายงานการตอบกลับได้ กรุณาลองใหม่อีกครั้ง";
+
+// New keys for toast address/link copied (separate from button variants)
+"amity_social_toast_snackbar_address_copied" = "คัดลอกที่อยู่แล้ว";
+"amity_social_toast_snackbar_link_copied" = "คัดลอกลิงก์แล้ว";
+
+// New iOS keys for rows 251, 1107, 1134
+"amity_social_member_removed_toast" = "นำสมาชิกออกจากชุมชนนี้แล้ว";
+"community_add_member_failed_toast" = "ไม่สามารถเพิ่มสมาชิกในชุมชนนี้ได้ กรุณาลองใหม่อีกครั้ง";
+"amity_social_upload_image_failed" = "ไม่สามารถอัปโหลดรูปภาพได้ กรุณาลองใหม่อีกครั้ง";

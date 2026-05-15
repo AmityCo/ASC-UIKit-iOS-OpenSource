@@ -36,7 +36,7 @@ public struct AmityPendingPostListComponent: AmityComponentView {
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 60)
                 .overlay(
-                    Text("Decline pending post will permanently delete the selected post from community.")
+                    Text(AmityLocalizedStringSet.Social.declinePendingPostMessage.localizedString)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .padding([.leading, .trailing], 16)
                 )

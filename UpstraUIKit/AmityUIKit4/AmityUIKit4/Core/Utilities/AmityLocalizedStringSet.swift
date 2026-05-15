@@ -11,22 +11,51 @@ public struct AmityLocalizedStringSet {
     private init() { }
     
     public struct General {
-        static let delete = "delete"
-        static let cancel = "cancel"
+        static let delete = "amity_common_button_delete"
+        static let cancel = "amity_common_button_cancel"
         static let save = "save"
         static let retry = "retry"
         static let discard = "discard"
         static let leave = "leave"
-        static let confirm = "confirm"
-        static let okay = "okay"
-        static let anonymous = "general_anonymous"
+         static let confirm = "confirm"
+         static let anonymous = "general_anonymous"
         static let permissionRequired = "permission_required"
         static let cameraAccessDenied = "camera_access_denied"
         static let on = "on"
         static let off = "off"
         static let edit = "edit"
-        static let noInternetConnection = "no_internet_connection"
         static let done = "done"
+        // Ad Info
+        static let adAboutTitle = "amity_common_ad_about_title"
+        static let adWhyTitle = "amity_common_ad_why_title"
+        static let adWhyDescription = "amity_common_ad_why_description"
+        static let adAboutAdvertiser = "amity_common_ad_about_advertiser"
+        static let adAdvertiserName = "amity_common_ad_advertiser_name"
+        static let optionalLabel = "amity_social_label_optional"
+        static let requiredIndicator = "amity_common_required_indicator"
+        static let unknown = "amity_common_unknown"
+        static let unknownError = "amity_common_unknown_error"
+        static let next = "amity_common_next"
+        static let justNow = "amity_common_just_now"
+        static let timeDaysSuffix = "amity_common_time_days_suffix"
+        static let timeHoursSuffix = "amity_common_time_hours_suffix"
+        static let timeMinutesSuffix = "amity_common_time_minutes_suffix"
+        static let timeSecondsSuffix = "amity_common_time_seconds_suffix"
+        static let timeAm = "amity_common_time_am"
+        static let timePm = "amity_common_time_pm"
+        static let yes = "amity_common_yes"
+        static let no = "amity_common_no"
+        static let remove = "amity_common_remove"
+        static let join = "amity_common_join"
+        static let unblock = "amity_common_unblock"
+        static let post = "amity_common_post"
+        static let view = "amity_common_view"
+        static let moderator = "amity_common_moderator"
+        static let live = "amity_social_status_live"
+        static let pending = "amity_common_pending"
+        static let clips = "amity_social_button_social_home_clips_button"
+        static let nothingHereYet = "amity_common_nothing_here_yet"
+        static let byAuthor = "amity_common_by_author"
     }
     
     public struct Story {
@@ -35,11 +64,22 @@ public struct AmityLocalizedStringSet {
         static let createdStoryFailed = "crated_story_failed"
         static let deleteStoryTitle = "delete_story_title"
         static let deleteStoryMessage = "delete_story_message"
+        static let storyDeleteButton = "amity_story_delete_button"
         static let storyDeletedToastMessage = "story_deleted_toast_message"
+        static let failedToDeleteStoryToastMessage = "amity_social_failed_to_delete_story_please_try_again"
         static let failedStoryBannerMessage = "failed_story_banner_message"
         static let failedStoryAlertTitle = "failed_story_alert_title"
         static let failedStoryAlertMessage = "failed_story_alert_message"
-        static let nonMemberReactStoryMessage = "non_member_react_story_message"
+        static let replyingTo = "amity_social_replying_to"
+        static let shareStory = "amity_social_share_story"
+        static let unsavedChangesMessage = "amity_social_unsaved_changes_message"
+        static let removeLinkButton = "amity_social_remove_link_button"
+        static let removeLinkTitle = "amity_social_remove_link_title"
+        static let removeLinkMessage = "amity_social_remove_link_message"
+        static let discardStoryTitle = "amity_social_discard_story_title"
+        static let discardStoryMessage = "amity_social_discard_story_message"
+        static let cameraPhotoButton = "amity_story_camera_photo_button"
+        static let cameraVideoButton = "amity_story_camera_video_button"
     }
     
     public struct Comment {
@@ -47,7 +87,7 @@ public struct AmityLocalizedStringSet {
         static let commentTextFieldPlacholder = "comment_text_field_placeholder"
         static let noCommentAvailable = "no_comment_available"
         static let deleteCommentTitle = "delete_comment_title"
-        static let deleteCommentMessage = "delete_comment_message"
+        static let deleteCommentMessage = "social_label_delete_comment_message"
         static let deletedCommentMessage = "deleted_comment_message"
         static let deletedReplyCommentMessage = "deleted_reply_comment_message"
         static let editCommentBottomSheetTitle = "edit_comment_bottom_sheet_title"
@@ -77,7 +117,7 @@ public struct AmityLocalizedStringSet {
         static let deleteReplyMessage = "delete_reply_message"
         static let commentUnavailableToastMessage = "comment_unavailable_toast_message"
         static let postUnavailableToastMessage = "post_unavailable_toast_message"
-        static let clipUnavailableToastMessage = "clip_unavailable_toast_message"
+        static let clipNoLongerAvailable = "social_label_this_clip_is_no_longer_available"
         static let commentEditError = "comment_edit_error"
     }
     
@@ -127,6 +167,7 @@ public struct AmityLocalizedStringSet {
         
         static let reachMentionLimitTitle = "reach_mention_limit_title"
         static let reachMentionLimitMessage = "chat_reach_mention_limit_Message"
+        static let editMessage = "amity_chat_edit_message"
     }
     
     public struct LiveChat {
@@ -167,12 +208,21 @@ public struct AmityLocalizedStringSet {
         static let noReactionTitle = "reaction_list_no_reactions_title"
         static let noReactionSubtitle = "reaction_list_no_reactions_subtitle"
         static let tapToRemove = "reaction_list_tap_to_remove"
-        static let allTab = "All"
+        static let allTab = "amity_common_reaction_all_tab"
+
+        // Reaction display name keys (resolved via AmityStringProvider.common)
+        static let reactionLike = "amity_social_reaction_like"
+        static let reactionLove = "amity_social_reaction_love"
+        static let reactionFire = "amity_social_reaction_fire"
+        static let reactionHappy = "amity_social_reaction_happy"
+        static let reactionSad = "amity_social_reaction_sad"
+        static let reactionHeart = "amity_social_reaction_heart"
+        static let reactionGrinning = "amity_social_reaction_grinning"
     }
     
     public enum Social {
-        static let emptyNewsFeedTitle = "empty_newsfeed_title"
-        static let emptyNewsFeedDescription = "empty_newsfeed_description"
+        static let keepEditing = "amity_social_button_keep_editing"
+        static let emptyNewsFeedDescription = "amity_social_label_find_community_or_create_your_own"
         static let editPostBottomSheetTitle = "edit_post_bottom_sheet_title"
         static let deletePostBottomSheetTitle = "delete_post_bottom_sheet_title"
         static let reportPostBottomSheetTitle = "report_post_bottom_sheet_title"
@@ -187,11 +237,10 @@ public struct AmityLocalizedStringSet {
         static let postDetailPageTitle = "post_detail_page_title"
         static let sponsored = "ads_sponsored_label"
         static let createPostBottomSheetTitle = "create_post_bottom_sheet_title"
-        static let createStoryBottomSheetTitle = "create_story_bottom_sheet_title"
+        static let createStoryBottomSheetTitle = "amity_social_button_story"
         static let communityPageJoinTitle = "community_page_join_title"
         static let communityPageJoinedTitle = "community_page_joined_title"
         static let communityPagePendingPostTitle = "community_page_pending_post_title"
-        static let nonMemberReactPostMessage = "non_member_react_post_message"
         static let communitySetupAlertTitle = "community_setup_alert_title"
         static let communitySetupAlertMessage = "community_setup_alert_message"
         static let communitySetupEditAlertTitle = "community_setup_edit_alert_title"
@@ -209,13 +258,11 @@ public struct AmityLocalizedStringSet {
         static let livestreamPlayerUnavailableMessage = "livestream_player_unavailable_message"
         static let livestreamPlayerReconnectingTitle = "livestream_player_reconnecting_title"
         static let livestreamPlayerReconnectingMessage = "livestream_player_reconnecting_message"
-        static let livestreamPlayerLive = "livestream_player_live"
         static let livestreamPlayerRecorded = "livestream_player_recorded"
         static let livestreamPlayerUpcomingLive = "livestream_player_upcoming_live"
         static let liveStreamSettingReadOnlyTitle = "live_stream_setting_readonly_title"
         static let liveStreamSettingReadOnlyDescription = "live_stream_setting_readonly_description"
         
-        static let communitySettingBasicInfoTitle = "community_setting_basic_info_title"
         static let communitySettingCommunityPermissionsTitle = "community_setting_community_permissions_title"
         static let communitySettingNotificationsTitle = "community_setting_notifications_title"
         static let communitySettingEditProfile = "community_setting_edit_profile";
@@ -232,7 +279,7 @@ public struct AmityLocalizedStringSet {
         static let communitySettingLeaveCommunityFailedAlertTitle = "community_setting_leave_community_failed_alert_title"
         static let communitySettingLeaveCommunityFailedAlertMessage = "community_setting_leave_community_failed_alert_message"
         static let communitySettingCloseCommunityAlertTitle = "community_setting_close_community_alert_title"
-        static let communitySettingCloseCommunityAlertMessage = "community_setting_close_community_alert_message"
+        static let communitySettingCloseCommunityAlertMessage = "social_button_close_community_msg"
         
         static let communityPostPermissionTitle = "community_post_permission_title"
         static let communityPostPermissionDescription = "community_post_permission_description"
@@ -272,10 +319,22 @@ public struct AmityLocalizedStringSet {
         
         static let communityMemberCountSingular = "community_member_count_singular"
         static let communityMemberCountPlural = "community_member_count_plural"
+        static let communityMemberLabelSingular = "community_member_label_singular"
+        static let communityMemberLabelPlural = "community_member_label_plural"
+        
+        // Community Membership Page
+        static let communityMembershipAllMembersTitle = "community_membership_all_members_title"
+        static let communityMembershipTabModerators = "community_membership_tab_moderators"
+        static let communityMembershipAddSuccess = "community_membership_add_success"
+        static let communityMembershipAddFailed = "community_membership_add_failed"
+        static let communityMembershipInviteSuccess = "community_membership_invite_success"
+        static let communityMembershipInviteFailed = "community_membership_invite_failed"
+        static let communityRemoveMember = "amity_community_remove_member"
         
         static let exploreCategoriesSeeMore = "explore_categories_see_more"
+        static let expandableTextSeeMore = "expandable_text_see_more"
         static let exploreTrendingComponentTitle = "explore_trending_now_component_title"
-        static let exploreRecommendedComponentTitle = "explore_recommended_communities_component_title"
+        static let exploreRecommendedComponentTitle = "amity_social_label_recommended_for_you"
         
         static let searchNoResultsFound = "search_no_results_found_title"
         static let searchCharLimitNotReached = "search_char_limit_not_reached"
@@ -299,17 +358,15 @@ public struct AmityLocalizedStringSet {
         static let userProfileFollowRequestTitle = "user_profile_follow_request_title"
         
         
-        static let userProfileAllPostTitle = "Public community & profile posts"
-        static let userProfileCommunityPostTitle = "Public community posts"
-        static let userProfileUserPostTitle = "Profile posts"
+        static let userProfileAllPostTitle = "amity_social_user_profile_all_post_title"
+        static let userProfileCommunityPostTitle = "amity_social_user_profile_community_post_title"
+        static let userProfileUserPostTitle = "amity_social_user_profile_user_post_title"
         
         // Poll
         static let pollCloseAlertTitle = "poll_close_alert_title"
         static let pollCloseAlertDesc = "poll_close_alert_desc"
         static let pollCloseButton = "poll_close_button"
         static let pollCloseToastError = "poll_close_toast_error"
-
-        static let pollStatusEnded = "poll_status_ended"
 
         static let pollRemainingDaysLeft = "poll_remaining_days_left"
         static let pollRemainingHoursLeft = "poll_remaining_hours_left"
@@ -333,8 +390,6 @@ public struct AmityLocalizedStringSet {
 
         static let pollOptionsTitle = "poll_options_title"
         static let pollOptionsDesc = "poll_options_desc"
-        static let pollAddOption = "poll_add_option"
-
         static let pollOptionLabel = "poll_option_label"
 
         static let pollAnswerResultNoVotes = "poll_answer_result_no_votes"
@@ -349,6 +404,7 @@ public struct AmityLocalizedStringSet {
 
         static let pollDurationSingularDay = "poll_duration_singular_day"
         static let pollDurationPluralDays = "poll_duration_plural_days"
+        static let pollDateTimeFormat = "amity_social_poll_date_time_format"
 
         static let pollSelectOneOptionLabel = "poll_select_one_option_label"
         static let pollSelectOneOrMoreOptionLabel = "poll_select_one_or_more_option_label"
@@ -374,9 +430,8 @@ public struct AmityLocalizedStringSet {
         static let postCreateError = "post_create_error"
         static let postEditError = "post_edit_error"
         
-        static let postDiscardAlertTitle = "post_discard_alert_title"
+        static let postDiscardAlertTitle = "social_modal_dialog_title_discard_post"
         static let postDiscardAlertMessage = "post_discard_alert_message"
-        static let postDiscardAlertButtonKeepEditing = "post_discard_alert_button_keep_editing"
         
         // Live Stream Creation
         static let liveStreamTargetLiveOnLabel = "live_stream_target_live_on_label"
@@ -414,7 +469,7 @@ public struct AmityLocalizedStringSet {
 
         static let liveStreamPermissionOpenSettingsLabel = "live_stream_permission_open_settings_label"
         static let liveStreamPermissionCameraAndMicrophoneTitle = "live_stream_permission_camera_and_microphone_title"
-        static let liveStreamPermissionCameraAndMicrophoneMessage = "live_stream_permission_camera_and_microphone_message"
+        static let liveStreamPermissionCameraAndMicrophoneMessage = "amity_social_status_allow_camera_desc"
 
         static let liveStreamStartingStateTitle = "live_stream_starting_state_title"
         static let liveStreamReconnectingStateTitle = "live_stream_reconnecting_state_title"
@@ -437,11 +492,12 @@ public struct AmityLocalizedStringSet {
         static let liveStreamTerminatedPlaybackDesc = "live_stream_terminated_playback_desc"
         static let liveStreamTerminatedStreamerContentDesc = "live_stream_terminated_streamer_content_desc"
         
-        static let liveStreamLabel = "live_stream_label"
+        static let liveStreamLabel = "amity_social_status_live_stream"
         
         static let altTextButtonTitle = "alt_text_button_title"
         static let altTextTitle = "alt_text_title"
         static let altTextEditTitle = "alt_text_edit_title"
+        static let socialViewPost = "social_label_view_original_post"
         static let altTextPlaceholder = "alt_text_placeholder"
         static let altTextFailedToAdd = "alt_text_failed_to_add"
         static let altTextFailedToEdit = "alt_text_failed_to_edit"
@@ -454,8 +510,8 @@ public struct AmityLocalizedStringSet {
         static let productTagsUpdated = "product_tags_updated"
         static let productTagLimitTitle = "product_tag_limit_title"
         static let productTagLimitMessage = "product_tag_limit_message"
-        static let productTagUnavailableTitle = "product_tag_unavailable_title"
-        static let productTagUnavailableMessage = "product_tag_unavailable_message"
+        static let productTagUnavailableTitle = "social_label_product_tagging_unavailable_title"
+        static let productTagUnavailableMessage = "product_tag_unavailable_description"
         static let productTagUnavailableWhileStreamingMessage = "product_tag_unavailable_while_streaming_message"
         static let productTagReviewPost = "product_tag_review_post"
         static let productTagPublish = "product_tag_publish"
@@ -475,7 +531,6 @@ public struct AmityLocalizedStringSet {
         static let productTagSelectionDiscardMessage = "product_tag_selection_discard_message"
         static let productTagDiscardTitle = "product_tag_discard_title"
         static let productTagDiscardMessage = "product_tag_discard_message"
-        static let productTagKeepEditing = "product_tag_keep_editing"
         static let productTagDiscard = "product_tag_discard"
         static let productTagTaggedProducts = "product_tag_tagged_products"
         static let productTagAddProducts = "product_tag_add_products"
@@ -493,7 +548,6 @@ public struct AmityLocalizedStringSet {
         static let liveStreamWaitingForCoHost = "live_stream_waiting_for_cohost"
 
         static let notificationTrayEmptyStateTitle = "notification_tray_empty_state_title"
-        static let notificationTrayTitle = "notification_tray_title"
         
         static let reportPageSubmitButton = "report_page_submit_button"
         static let reportPageInfoLabel = "report_page_info_label"
@@ -508,18 +562,28 @@ public struct AmityLocalizedStringSet {
         static let reportReasonDoneButton = "report_reason_done_button"
 
         static let reportReasonErrorToastMessage = "report_reason_error_toast_message"
+        static let reportReasonContentTypePost = "report_reason_content_type_post"
+        static let reportReasonContentTypeComment = "report_reason_content_type_comment"
+        static let reportReasonContentTypeReply = "report_reason_content_type_reply"
+        static let reportReasonContentTypeMessage = "report_reason_content_type_message"
+        static let reportReasonCommunityGuidelines = "social_label_report_reason_community_guidelines"
+        static let reportReasonFalseInformation = "social_label_report_reason_false_information"
+        static let reportReasonHarassmentOrBullying = "social_label_report_reason_harassment_or_bullying"
+        static let reportReasonSelfHarmOrSuicide = "social_label_report_reason_self_harm_or_suicide"
+        static let reportReasonSellingRestricted = "social_label_report_reason_selling_restricted"
+        static let reportReasonSexualContentOrNudity = "social_label_report_reason_sexual_content_or_nudity"
+        static let reportReasonSpamOrScams = "social_label_report_reason_spam_or_scams"
+        static let reportReasonViolenceOrThreatening = "social_label_report_reason_violence_or_threatening"
         
         static let communityUpdateSuccessToastMessage = "community_update_success_toast_message"
         
         static let pendingJoinRequestAlertTitle = "pending_join_request_alert_title"
         static let pendingJoinRequestAlertMessage = "pending_join_request_alert_message"
         
-        static let communityLeaveAlertTitle = "community_leave_alert_title"
         static let communityLeaveAlertPendingRequestMessage = "community_leave_alert_pending_request_message"
         
         static let communityJoinToastSuccessMessage = "community_join_toast_success_message"
         static let communityJoinToastRequestSuccessMessage = "community_join_toast_request_success_message"
-        static let communityJoinToastErrorMessage = "community_join_toast_error_message"
         
         static let userJoinAcceptedToastSuccessMessage = "user_join_accepted_toast_success_message"
         static let userJoinAcceptedToastErrorMessage = "user_join_accepted_toast_error_message"
@@ -540,30 +604,30 @@ public struct AmityLocalizedStringSet {
         
         static let errorGuestUser = "error_guest_user"
 
-        static let exploreEventRecommendedForYou = "explore_event_recommended_for_you"
         static let exploreEventViewAll = "explore_event_view_all"
 
         static let myEventFeedUpcoming = "my_event_feed_upcoming"
         static let myEventFeedPast = "my_event_feed_past"
 
         static let eventDetailAlertEditNotPossibleTitle = "event_detail_alert_edit_not_possible_title"
-        static let eventDetailAlertEditNotPossibleMessage = "event_detail_alert_edit_not_possible_message"
+        static let eventDetailAlertEditNotPossibleMessage = "amity_social_label_you_can_no_longer_edit_this_event_changes_are_restricte"
         static let eventDetailAlertLeaveWithoutFinishingTitle = "event_detail_alert_leave_without_finishing_title"
         static let eventDetailAlertLeaveWithoutFinishingMessage = "event_detail_alert_leave_without_finishing_message"
         static let eventDetailAlertDeleteEventTitle = "event_detail_alert_delete_event_title"
         static let eventDetailAlertDeleteEventMessage = "event_detail_alert_delete_event_message"
+        static let eventDetailAlertPendingJoinRequestTitle = "amity_event_alert_pending_join_request_title"
+        static let eventDetailAlertPendingJoinRequestMessage = "amity_event_alert_pending_join_request_message"
 
-        static let eventDiscussionFeedNoPostsYet = "event_discussion_feed_no_posts_yet"
+        static let eventDiscussionFeedNoPostsYet = "amity_social_empty_state_empty_feed_no_posts"
 
         static let eventInfoAboutTheEvent = "event_info_about_the_event"
         static let eventInfoSeeMore = "event_info_see_more"
         static let eventInfoEventLink = "event_info_event_link"
-        static let eventInfoLiveStream = "event_info_live_stream"
+        static let eventInfoLiveStream = "amity_social_status_live_stream"
         static let eventInfoEventAddress = "event_info_event_address"
         static let eventInfoAddressCopied = "event_info_address_copied"
         static let eventInfoCopy = "event_info_copy"
         static let eventInfoLinkCopied = "event_info_link_copied"
-        static let eventInfoStreamStatusEnded = "event_info_stream_status_ended"
         static let eventInfoStreamStatusLive = "event_info_stream_status_live"
         static let eventInfoStreamStatusRecorded = "event_info_stream_status_recorded"
         static let eventInfoStreamStatusUpcomingLive = "event_info_stream_status_upcoming_live"
@@ -574,7 +638,6 @@ public struct AmityLocalizedStringSet {
         static let eventDetailHeaderInPerson = "event_detail_header_in_person"
         static let eventDetailHeaderVirtual = "event_detail_header_virtual"
         static let eventDetailHeaderHostedBy = "event_detail_header_hosted_by"
-        static let eventDetailHeaderStatusHappeningNow = "event_detail_header_status_happening_now"
         static let eventDetailHeaderStatusUpcoming = "event_detail_header_status_upcoming"
         static let eventDetailHeaderStatusCancelled = "event_detail_header_status_cancelled"
         static let eventDetailHeaderStatusEnded = "event_detail_header_status_ended"
@@ -582,11 +645,11 @@ public struct AmityLocalizedStringSet {
         static let eventDetailHeaderEventAddedToCalendar = "event_detail_header_event_added_to_calendar"
         static let eventDetailHeaderNoCalendarAccess = "event_detail_header_no_calendar_access"
         static let eventDetailHeaderAttendingStatusChangeNotAllowed = "event_detail_header_attending_status_change_not_allowed"
-        static let eventDetailHeaderJoinCommunityFailed = "event_detail_header_join_community_failed"
         static let eventDetailHeaderUpdateAttendingStatusFailed = "event_detail_header_update_attending_status_failed"
         static let eventDetailHeaderAddToCalendar = "event_detail_header_add_to_calendar"
         static let eventDetailHeaderGoing = "event_detail_header_going"
         static let eventDetailHeaderNotGoing = "event_detail_header_not_going"
+        static let eventDetailHeaderRsvp = "event_detail_header_rsvp"
         static let eventDetailHeaderUpdateAttendingStatusSuccess = "event_detail_header_update_attending_status_success"
         static let eventDetailHeaderLivestreamSetupInfo = "event_detail_header_livestream_setup_info"
 
@@ -606,9 +669,9 @@ public struct AmityLocalizedStringSet {
         static let eventListUpcomingEventsTitle = "event_list_upcoming_events_title"
         static let eventListTabAll = "event_list_tab_all"
         static let eventListTabHosting = "event_list_tab_hosting"
-        static let eventListHappeningNowTitle = "event_list_happening_now_title"
+        static let eventListHappeningNowTitle = "social_button_happening_now"
 
-        static let eventDetailPageEditEvent = "event_detail_page_edit_event"
+        static let eventDetailPageEditEvent = "amity_social_label_edit_event"
         static let eventDetailPageDeleteEvent = "event_detail_page_delete_event"
         static let eventDetailPageEventDeleted = "event_detail_page_event_deleted"
         static let eventDetailPageDeleteFailed = "event_detail_page_delete_failed"
@@ -618,8 +681,7 @@ public struct AmityLocalizedStringSet {
         static let eventSetupEventNamePlaceholder = "event_setup_event_name_placeholder"
         static let eventSetupEventDetailsTitle = "event_setup_event_details_title"
         static let eventSetupEventDetailsPlaceholder = "event_setup_event_details_placeholder"
-        static let eventSetupCreateEventTitle = "event_setup_create_event_title"
-        static let eventSetupEditEventTitle = "event_setup_edit_event_title"
+        static let eventSetupEditEventTitle = "amity_social_label_edit_event"
         static let eventSetupLeaveAlertTitle = "event_setup_leave_alert_title"
         static let eventSetupLeaveAlertMessage = "event_setup_leave_alert_message"
         static let eventSetupCamera = "event_setup_camera"
@@ -629,16 +691,16 @@ public struct AmityLocalizedStringSet {
         static let eventSetupStartsOn = "event_setup_starts_on"
         static let eventSetupNoEndTimeInfo = "event_setup_no_end_time_info"
         static let eventSetupAddEndDateTime = "event_setup_add_end_date_time"
-        static let eventSetupEndsOn = "event_setup_ends_on"
+        static let eventSetupEndsOn = "social_button_event_setup_ends_on"
         static let eventSetupLocation = "event_setup_location"
         static let eventSetupLocationPlaceholder = "event_setup_location_placeholder"
         static let eventSetupCreating = "event_setup_creating"
         static let eventSetupSaving = "event_setup_saving"
         static let eventSetupSuccessfullyCreated = "event_setup_successfully_created"
         static let eventSetupSuccessfullyUpdated = "event_setup_successfully_updated"
-        static let eventSetupUpdateTimeLimitError = "event_setup_update_time_limit_error"
+        static let eventSetupUpdateTimeLimitError = "amity_social_error_event_setup_update_time_limit_error"
         static let eventSetupCreateTimeLimitError = "event_setup_create_time_limit_error"
-        static let eventSetupUpdateTimeLimitErrorGeneric = "event_setup_update_time_limit_error_generic"
+        static let eventSetupUpdateTimeLimitErrorGeneric = "amity_social_error_event_setup_update_time_limit_error"
         static let eventSetupCreateLinkNotAllowedError = "event_setup_create_link_not_allowed_error"
         static let eventSetupUpdateLinkNotAllowedError = "event_setup_update_link_not_allowed_error"
         static let eventSetupCreateBanWordError = "event_setup_create_ban_word_error"
@@ -663,7 +725,7 @@ public struct AmityLocalizedStringSet {
         static let livestreamRemoveCoHostButton = "livestream_remove_cohost_button"
         static let livestreamCancelInvitationButton = "livestream_cancel_invitation_button"
         static let livestreamInvitationCancelledToast = "livestream_invitation_cancelled_toast"
-        static let livestreamInvitationCancelFailedToast = "livestream_invitation_cancel_failed_toast"
+        static let livestreamInvitationCancelFailedToast = "social_toast_invitation_cancel_failed_toast"
         static let livestreamWhosWatchingTitle = "livestream_whos_watching_title"
         static let livestreamInviteButton = "livestream_invite_button"
         static let livestreamInvitationSentToast = "livestream_invitation_sent_toast"
@@ -680,12 +742,12 @@ public struct AmityLocalizedStringSet {
         static let livestreamDeclineButton = "livestream_decline_button"
 
         // Live Stream Badges
-        static let livestreamHostBadge = "livestream_host_badge"
-        static let livestreamCoHostBadge = "livestream_cohost_badge"
-        static let livestreamModeratorBadge = "livestream_moderator_badge"
+        static let livestreamHost = "amity_social_status_host_badge"
+        static let livestreamCoHost = "amity_social_button_cohost"
+        static let livestreamModeratorBadge = "amity_common_moderator"
 
         // Live Stream Banned Page
-        static let livestreamBannedPageTitle = "livestream_banned_page_title"
+        static let livestreamBannedPageTitle = "amity_social_status_live_stream"
         static let livestreamBannedTitle = "livestream_banned_title"
         static let livestreamBannedMessage = "livestream_banned_message"
         static let livestreamBannedOkButton = "livestream_banned_ok_button"
@@ -705,8 +767,7 @@ public struct AmityLocalizedStringSet {
         static let livestreamChatDeletedMessage = "livestream_chat_deleted_message"
         static let livestreamChatUnknownUser = "livestream_chat_unknown_user"
         static let livestreamChatInviteAsCoHost = "livestream_chat_invite_as_cohost"
-        static let livestreamChatMessageNotSentTitle = "livestream_chat_message_not_sent_title"
-        static let livestreamChatDeleteAction = "livestream_chat_delete_action"
+        static let livestreamChatMessageNotSentTitle = "amity_common_label_message_not_sent"
 
         // Live Stream Player Page
         static let livestreamLeaveBackstageTitle = "livestream_leave_backstage_title"
@@ -714,13 +775,13 @@ public struct AmityLocalizedStringSet {
         static let livestreamLeftStageToast = "livestream_left_stage_toast"
         static let livestreamInvitationNoLongerValid = "livestream_invitation_no_longer_valid"
         static let livestreamAcceptInvitationFailed = "livestream_accept_invitation_failed"
-        static let livestreamInvitationDeclinedToast = "livestream_invitation_declined_toast"
+        static let livestreamInvitationDeclinedToast = "amity_social_toast_snackbar_invitation_declined"
         static let livestreamDeclineInvitationFailed = "livestream_decline_invitation_failed"
         static let livestreamLeftBackstageToast = "livestream_left_backstage_toast"
 
         // Live Stream Alerts
         static let livestreamAlertCancelCoHostInvitationTitle = "livestream_alert_cancel_cohost_invitation_title"
-        static let livestreamAlertCancelCoHostInvitationMessage = "livestream_alert_cancel_cohost_invitation_message"
+        static let livestreamAlertCancelCoHostInvitationMessage = "social_modal_alert_cancel_cohost_invitation_message"
         static let livestreamAlertCoHostLeaveTitle = "livestream_alert_cohost_leave_title"
         static let livestreamAlertCoHostLeaveMessage = "livestream_alert_cohost_leave_message"
         static let livestreamAlertLeaveAsCoHostTile = "livestream_alert_leave_as_cohost_title"
@@ -729,5 +790,468 @@ public struct AmityLocalizedStringSet {
         static let livestreamAlertRemoveCoHostMessage = "livestream_alert_remove_cohost_message"
         static let livestreamAlertConfirmButton = "livestream_alert_confirm_button"
         static let livestreamAlertRemoveButton = "livestream_alert_remove_button"
+        static let livestreamCancelInvitationLabel = "amity_livestream_cancel_invitation_label"
+        static let livestreamRemoveFromLive = "amity_livestream_remove_from_live"
+        static let myCommunities = "amity_social_my_communities"
+        
+        // Social Home Tab Titles
+        static let socialHomeNewsfeedTab = "social_home_newsfeed_tab"
+        static let socialHomeExploreTab = "social_home_explore_tab"
+        static let socialHomeMyCommunitiesTab = "social_home_my_communities_tab"
+        static let socialHomeCommunitiesTab = "social_home_communities_tab"
+        static let socialHomeEventsTab = "social_home_events_tab"
+        static let socialHomeClipsTab = "amity_social_tab_tab_clips"
+        static let pendingPostsTitle = "amity_social_pending_posts_title"
+        static let postAcceptedToast = "amity_social_post_accepted_toast"
+        static let postDeclinedToast = "amity_social_post_declined_toast"
+        static let acceptButton = "amity_social_accept_button"
+        static let declineButton = "amity_social_decline_button"
+        static let saveButton = "amity_social_save_button"
+        static let cameraButton = "amity_social_camera_button"
+        static let photoButton = "amity_social_photo_button"
+        
+        // Clip
+        static let clipFeedEmptyTitle = "amity_social_empty_state_social_home_empty_title"
+        static let clipExploreCommunity = "amity_social_clip_explore_community"
+        static let clipCreateCommunity = "amity_social_clip_create_community"
+        static let clipUnableToLoad = "amity_social_clip_unable_to_load"
+        static let clipWatchNext = "amity_social_clip_watch_next"
+        static let clipAlertMaxFileSizeTitle = "amity_clip_alert_max_file_size_title"
+        static let clipAlertUnsupportedVideoTitle = "amity_clip_alert_unsupported_video_title"
+        static let clipAlertMaxDurationTitle = "amity_clip_alert_max_duration_title"
+        static let clipAlertTooShortTitle = "amity_clip_alert_too_short_title"
+        static let clipAlertDiscardTitle = "amity_clip_alert_discard_title"
+        static let clipAlertFailedUploadTitle = "amity_clip_alert_failed_upload_title"
+        static let clipAlertMaxFileSizeMessage = "amity_clip_alert_max_file_size_message"
+        static let clipAlertUnsupportedVideoMessage = "amity_clip_alert_unsupported_video_message"
+        static let clipAlertTooShortMessage = "amity_clip_alert_too_short_message"
+        static let clipAlertDiscardMessage = "amity_clip_alert_discard_message"
+        static let clipAlertFailedUploadMessage = "amity_clip_alert_failed_upload_message"
+        static let seeLess = "amity_social_see_less"
+        
+        // Community
+        static let cancelRequest = "amity_social_cancel_request"
+        static let privateCommunityTitle = "amity_social_private_community_title"
+        static let privateCommunityDescription = "amity_social_private_community_description"
+        static let declinePendingPostMessage = "amity_social_decline_pending_post_message"
+        static let maxUploadLimitTitle = "amity_social_max_upload_limit_title"
+        static let maxUploadLimitMessage = "amity_social_max_upload_limit_message"
+        static let noPostToReview = "amity_social_no_post_to_review"
+        static let addCategory = "amity_social_add_category"
+        static let addMember = "amity_social_add_member"
+        static let startSearchHint = "amity_social_start_search_hint"
+        static let noCommunityYet = "amity_social_no_community_yet"
+        static let noCommunityYetDescription = "amity_social_no_community_yet_description"
+        static let categoriesLabel = "amity_social_categories_label"
+        
+        // Invitation
+        static let declineInvitationTitle = "amity_social_decline_invitation_title"
+        static let declineInvitationMessage = "amity_social_decline_invitation_message"
+        
+        // Content Report
+        static let reportThanksTitle = "amity_social_report_thanks_title"
+        static let reportThanksMessage = "amity_social_report_thanks_message"
+        
+        // Error/Banned
+        static let contentUnavailable = "amity_social_content_unavailable"
+        static let bannedTitle = "amity_social_banned_title"
+        static let bannedMessage = "amity_social_banned_message"
+        static let postTextExceedErrorMessage = "amity_social_error_post_text_exceed_error_message"
+        static let postBanWordErrorMessage = "amity_social_error_post_ban_word_error_message"
+        static let postLinkNotAllowedErrorMessage = "amity_social_error_post_link_not_allowed_error_message"
+        static let noDescriptionAvailable = "amity_social_label_no_description_available"
+        
+        // User Profile
+        static let noRequestsToReview = "amity_social_no_requests_to_review"
+        static let declineFollowRequestMessage = "amity_social_decline_follow_request_message"
+        static let manageBlockedUsers = "amity_social_manage_blocked_users"
+        static let reportUser = "amity_social_report_user"
+        static let unreportUser = "amity_social_unreport_user"
+        static let blockUser = "amity_social_block_user"
+        static let unblockUser = "amity_social_unblock_user"
+        static let editProfile = "amity_social_edit_profile"
+        static let displayName = "social_label_edit_user_display_name_title"
+        static let editPost = "amity_social_edit_post"
+        
+        // Products/Poll
+        static let tagProducts = "amity_social_tag_products"
+        static let productsTagged = "amity_social_products_tagged"
+        static let productsTaggedInPost = "amity_social_products_tagged_in_post"
+        static let productsTaggedInPhoto = "amity_social_products_tagged_in_photo"
+        static let productsTaggedInVideo = "amity_social_products_tagged_in_video"
+        static let addOption = "amity_social_button_add_option"
+        static let uploadImage = "amity_social_upload_image"
+        static let uploadNewImage = "amity_social_upload_new_image"
+        static let imageUploadFailed = "amity_social_image_upload_failed"
+        static let optionN = "amity_social_option_n"
+        static let choosePollType = "amity_social_choose_poll_type"
+        static let pollTypeTextOnly = "amity_social_poll_type_text_only"
+        static let pollTypeImage = "amity_social_poll_type_image"
+        static let startTypingToSearch = "amity_social_start_typing_to_search"
+        static let searchByProductName = "amity_social_search_by_product_name"
+        static let editTags = "amity_social_edit_tags"
+        static let alreadyTagged = "amity_social_already_tagged"
+        
+        // Post/LiveStream
+        static let liveOn = "amity_social_live_on"
+        static let livestreamLimitedVisibility = "amity_social_livestream_limited_visibility"
+        static let livestreamJoinToInteract = "amity_social_livestream_join_to_interact"
+        static let videoNoLongerAvailable = "amity_social_video_no_longer_available"
+        static let photoNoLongerAvailable = "amity_social_photo_no_longer_available"
+        static let videoNotAvailable = "amity_social_video_not_available"
+        
+        // Event
+        static let eventPlatform = "amity_social_event_platform"
+        static let eventPlatformLivestream = "amity_social_event_platform_livestream"
+        static let eventPlatformExternal = "amity_social_event_platform_external"
+        static let eventPlatformLivestreamDescription = "amity_social_label_event_platform_livestream_description"
+        static let eventPlatformExternalDescription = "amity_social_label_event_platform_external_description"
+        static let eventDateToday = "amity_social_time_event_date_today"
+        static let eventDateTomorrow = "amity_social_label_event_date_tomorrow"
+        static let eventDateYesterday = "amity_social_time_event_date_yesterday"
+        static let eventDateTimeFormat = "amity_social_event_date_time_format"
+
+        // Post actions
+        static let postCommentButtonText = "post_comment_button_text"
+        static let postCommentCountSingular = "post_comment_count_singular"
+        static let postCommentCountPlural = "post_comment_count_plural"
+        static let postViewRepliesSingular = "post_view_replies_singular"
+        static let postViewRepliesPlural = "post_view_replies_plural"
+
+        // Navigation tabs
+        static let socialHomeMyEventTab = "social_home_my_event_tab"
+        static let socialSearchPostsTab = "social_search_posts_tab"
+        static let socialSearchUsersTab = "social_search_users_tab"
+        static let socialCommunityNavTitle = "social_community_nav_title"
+        static let socialMediaFeedVideosTab = "social_tab_tab_videos"
+
+        // Buttons
+        static let videoButton = "amity_social_video_button"
+        static let exploreCommunityButton = "amity_social_explore_community_button"
+
+        // User Profile
+        static let userProfileFollowings = "user_profile_followings"
+        static let userProfileFollowers = "user_profile_followers"
+        static let userProfileFollowingButton = "user_profile_following_button"
+
+        // Community Pending
+        static let communityPendingRequestSingular = "community_pending_request_singular"
+        static let communityJoinRequestSingular = "community_join_request_singular"
+        static let communityJoinRequestPlural = "community_join_request_plural"
+        static let communityPendingRequiresApproval = "community_pending_requires_approval"
+        static let communityPendingRequireApproval = "community_pending_require_approval"
+        static let communityPostsPendingReview = "community_posts_pending_review"
+
+        // Media Feed Tabs
+        static let socialMediaFeedPhotosTab = "social_media_feed_photos_tab"
+
+        // Empty Feed States
+        static let communityEmptyFeedNoPosts = "amity_social_empty_state_empty_feed_no_posts"
+        static let communityEmptyFeedNoPhotos = "community_empty_feed_no_photos"
+        static let communityEmptyFeedNoVideos = "community_empty_feed_no_videos"
+        static let communityEmptyFeedNoClips = "community_empty_feed_no_clips"
+
+        // Post Menu Types
+        static let postMenuTypePoll = "post_menu_type_poll"
+        static let postMenuTypeStory = "amity_social_button_social_home_create_story_button"
+        static let postMenuTypeClip = "post_menu_type_clip"
+        static let postMenuTypeEvent = "post_menu_type_event"
+        static let postMenuTypeLiveStream = "amity_social_status_live_stream"
+
+        // Community Profile Labels (post count)
+        static let communityPostLabelSingular = "community_post_label_singular"
+        static let communityPostLabelPlural = "community_post_label_plural"
+
+        // Community Profile Menu
+        static let communitySettingsOptionTitle = "community_settings_option_title"
+        static let communityInformationOptionTitle = "community_information_option_title"
+
+        // Copy/Share Link
+        static let socialCopyLink = "amity_social_copy_link"
+        static let socialShareTo = "amity_social_share_to"
+
+        // Invite Member
+        static let communityInviteMemberTitle = "community_invite_member_title"
+        static let communityInviteMemberDescription = "community_invite_member_description"
+        static let communityInviteMemberButton = "community_invite_member_button"
+
+        // Search
+        static let searchUserPlaceholder = "search_user_placeholder"
+        static let searchPlaceholder = "amity_search_placeholder"
+        static let searchCommunityUserPlaceholder = "amity_search_community_user_placeholder"
+        static let searchMyCommunitiesPlaceholder = "amity_search_my_communities_placeholder"
+
+        // Community Setup
+        static let communitySetupPageTitle = "community_setup_page_title"
+        static let communitySetupEditPageTitle = "community_setup_edit_page_title"
+        static let communitySetupNameTitle = "community_setup_name_title"
+        static let communitySetupNamePlaceholder = "community_setup_name_placeholder"
+        static let communitySetupAboutTitle = "community_setup_about_title"
+        static let communitySetupAboutPlaceholder = "community_setup_about_placeholder"
+        static let communitySetupCategoryTitle = "community_setup_category_title"
+        static let communitySetupCategoryPlaceholder = "community_setup_category_placeholder"
+        static let communitySetupPrivacyTitle = "community_setup_privacy_title"
+        static let communitySetupPrivacyPublicTitle = "community_setup_privacy_public_title"
+        static let communitySetupPrivacyPublicDescription = "community_setup_privacy_public_description"
+        static let communitySetupPrivacyPrivateTitle = "community_setup_privacy_private_title"
+        static let communitySetupPrivacyPrivateDescription = "community_setup_privacy_private_description"
+        static let communitySetupPrivacyPrivateVisibleTitle = "community_setup_privacy_private_visible_title"
+        static let communitySetupPrivacyPrivateVisibleDescription = "community_setup_privacy_private_visible_description"
+        static let communitySetupPrivacyPrivateHiddenTitle = "community_setup_privacy_private_hidden_title"
+        static let communitySetupPrivacyPrivateHiddenDescription = "community_setup_privacy_private_hidden_description"
+        static let communitySetupMembershipTitle = "community_setup_membership_title"
+        static let communitySetupMembershipDescription = "community_setup_membership_description"
+        static let communitySetupMembershipSubDescription = "community_setup_membership_sub_description"
+        static let communitySetupAddMemberTitle = "community_setup_add_member_title"
+        static let communitySetupAddMemberButton = "community_setup_add_member_button"
+        static let communitySetupCreateButton = "community_setup_create_button"
+        static let communitySetupCreateSuccess = "community_setup_create_success"
+        static let communitySetupCreateFailed = "community_setup_create_failed"
+        static let communitySetupSaveFailed = "community_setup_save_failed"
+
+        // Community Setting
+        static let communitySettingPendingInvitations = "community_setting_pending_invitations"
+        static let communitySettingLeaveAlertMessage = "social_button_last_moderator_leave_community_msg"
+        static let communitySettingLeavingToast = "community_setting_leaving_toast"
+        static let communitySettingLeaveSuccess = "community_setting_leave_success"
+        static let communitySettingClosingToast = "community_setting_closing_toast"
+        static let communitySettingCloseSuccess = "community_setting_close_success"
+
+        // Context-specific Copy Link
+        static let socialCopyProfileLink = "amity_social_copy_profile_link"
+        static let socialCopyPostLink = "amity_social_label_copy_post_link"
+        static let socialCopyClipLink = "amity_social_copy_clip_link"
+        static let socialCopyLivestreamLink = "amity_social_copy_livestream_link"
+
+        // Search
+        static let searchMemberPlaceholder = "search_member_placeholder"
+
+        // User Profile - Toast Messages
+        static let userBlockedToast = "user_blocked_toast"
+        static let userUnblockedToast = "user_unblocked_toast"
+        static let userReportedToast = "user_reported_toast"
+        static let userUnreportedToast = "user_unreported_toast"
+        static let userBlockFailedToast = "user_block_failed_toast"
+        static let userUnblockFailedToast = "user_unblock_failed_toast"
+        static let userReportFailedToast = "user_report_failed_toast"
+        static let userUnreportFailedToast = "user_unreport_failed_toast"
+        static let followRequestDeclinedToast = "follow_request_declined_toast"
+        static let followRequestAcceptFailedToast = "follow_request_accept_failed_toast"
+        static let followRequestDeclineFailedToast = "follow_request_decline_failed_toast"
+
+        // User Profile - Alert
+        static let unblockUserAlertTitle = "social_label_user_unblock_title"
+        static let unblockUserAlertMessage = "unblock_user_alert_message"
+        static let unableToFollowAlertTitle = "unable_to_follow_alert_title"
+        static let unableToFollowAlertMessage = "unable_to_follow_alert_message"
+
+        // Edit User Profile
+        static let editUserAboutTitle = "edit_user_about_title"
+
+        // Community Member Management - Toast
+        static let communityProfileUpdateFailedToast = "community_profile_update_failed_toast"
+        static let communityMemberRemovedToast = "community_member_removed_toast"
+        static let communityMemberReportedToast = "community_member_reported_toast"
+        static let communityMemberUnreportedToast = "community_member_unreported_toast"
+        static let communityMemberReportFailedToast = "community_member_report_failed_toast"
+        static let communityMemberUnreportFailedToast = "community_member_unreport_failed_toast"
+        static let communityMemberRemoveFailedToast = "community_member_remove_failed_toast"
+        static let communityMemberPromoteSuccessToast = "community_member_promote_success_toast"
+        static let communityMemberPromoteFailedToast = "community_member_promote_failed_toast"
+        static let communityMemberDemoteSuccessToast = "community_member_demote_success_toast"
+        static let communityMemberDemoteFailedToast = "community_member_demote_failed_toast"
+        static let communityMemberPromoteToModerator = "community_member_promote_to_moderator"
+        static let communityMemberDemoteToMember = "community_member_demote_to_member"
+        static let communityJoinFailedToast = "amity_social_toast_snackbar_join_community_failed"
+        static let communityJoinRequestNoLongerAvailableToast = "community_join_request_no_longer_available_toast"
+        static let communityJoinCancelRequestFailedToast = "community_join_cancel_request_failed_toast"
+        static let communityUnjoinedToast = "community_unjoined_toast"
+        static let postReviewFailedToast = "post_review_failed_toast"
+
+        // Community Notification Settings - Alert
+        static let communityNotificationLeaveAlertMessage = "community_notification_leave_alert_message"
+
+        // Post Composer - Alert
+        static let postComposerHashtagLimitAlertTitle = "post_composer_hashtag_limit_alert_title"
+        static let postComposerHashtagLimitAlertMessage = "post_composer_hashtag_limit_alert_message"
+        static let postComposerLinkLimitAlertTitle = "post_composer_link_limit_alert_title"
+        static let postComposerLinkLimitAlertMessage = "post_composer_link_limit_alert_message"
+        static let postComposerProductsUnavailableToast = "post_composer_products_unavailable_toast"
+
+        // Poll
+        static let postSentForReviewAlertTitle = "post_sent_for_review_alert_title"
+        static let postSentForReviewAlertMessage = "post_sent_for_review_alert_message"
+        static let postComposerLoadingUpdating = "amity_post_composer_loading_updating"
+        static let postComposerTitlePlaceholder = "amity_post_composer_title_placeholder"
+        static let postComposerBodyPlaceholder = "amity_post_composer_body_placeholder"
+        static let postComposerBodyClipPlaceholder = "amity_post_composer_body_clip_placeholder"
+        static let postComposerPostsSentForReviewTitle = "amity_post_composer_posts_sent_for_review_title"
+        static let postComposerPostUpdatesSentForReviewTitle = "amity_post_composer_post_updates_sent_for_review_title"
+        static let postComposerPostSentForReviewMessage = "amity_post_composer_post_sent_for_review_message"
+        static let postComposerPostUpdateSentForReviewMessage = "amity_post_composer_post_update_sent_for_review_message"
+        static let pollEndedToast = "poll_ended_toast"
+        static let pollPostUnavailableToast = "poll_post_unavailable_toast"
+        static let pollGenericErrorToast = "poll_generic_error_toast"
+        static let pollVoteRemovedToast = "poll_vote_removed_toast"
+
+        // Notification Tray
+        static let notificationTrayGenericErrorToast = "notification_tray_generic_error_toast"
+        static let notificationTrayInvitationDeclinedToast = "amity_social_toast_snackbar_invitation_declined"
+
+        // Story
+        static let storyLinkLimitToast = "story_link_limit_toast"
+
+        // LiveStream - Toast
+        static let livestreamCoHostAcceptedToast = "livestream_co_host_accepted_toast"
+        static let livestreamCoHostDeclinedToast = "livestream_co_host_declined_toast"
+        static let livestreamCoHostLeftToast = "livestream_co_host_left_toast"
+        static let livestreamCoHostLeftStageToast = "livestream_co_host_left_stage_toast"
+        static let livestreamCoHostRemovedToast = "livestream_co_host_removed_toast"
+        static let livestreamRemoveCoHostFailedToast = "livestream_remove_co_host_failed_toast"
+        static let livestreamFollowToInteractToast = "livestream_follow_to_interact_toast"
+        static let joinCommunityToast = "common_label_join_community_to_interact"
+        static let livestreamWaitingNetworkToast = "livestream_waiting_network_toast"
+
+        // Story
+        static let storyTargetDefaultName = "amity_social_button_story"
+
+         // LiveStream - Display Fallbacks
+
+
+        // Media
+        static let mediaProcessing = "amity_media_processing"
+
+        // Event Date Picker
+        static let eventStartsOn = "amity_event_starts_on"
+        static let eventLocationAddressTitle = "amity_event_location_address_title"
+        static let eventLocationAddressPlaceholder = "amity_event_location_address_placeholder"
+        static let eventLocationTitle = "amity_event_location_title"
+
+        // LiveStream Permissions - Photos
+        static let livestreamPermissionPhotosTitle = "amity_livestream_permission_photos_title"
+        static let livestreamPermissionPhotosMessage = "amity_livestream_permission_photos_message"
+
+        // LiveStream Co-Host Product Tags
+        static let livestreamCoHostProductTagsTitle = "amity_livestream_cohost_product_tags_title"
+        static let livestreamCoHostProductTagsDescription = "amity_livestream_cohost_product_tags_description"
+
+        // User Profile - Block/Unblock/Unfollow Alerts
+        static let userUnblockTitle = "amity_user_unblock_title"
+        static let userUnblockMessageFormat = "amity_user_unblock_message_format"
+        static let userUnfollowTitle = "amity_user_unfollow_title"
+        static let userUnfollowMessage = "amity_user_unfollow_message"
+        static let userUnfollowButton = "amity_user_unfollow_button"
+        static let userBlockTitle = "amity_user_block_title"
+        static let userBlockMessageFormat = "amity_user_block_message_format"
+
+        // Community Pending Invitations
+        static let communityPendingInvitationsTitle = "amity_community_pending_invitations_title"
+        static let communityInvitationJoinedFormat = "amity_community_invitation_joined_format"
+        static let communityInvitationExpired = "amity_community_invitation_expired"
+        static let communityInvitationDeclined = "amity_social_toast_snackbar_invitation_declined"
+
+        // Notification Tray Sections
+        static let notificationTrayRequestsTitle = "amity_notification_tray_requests_title"
+        static let notificationTrayRecentTitle = "amity_notification_tray_recent_title"
+        static let notificationTrayOlderTitle = "amity_notification_tray_older_title"
+        static let notificationTrayDeclineFailed = "amity_notification_tray_decline_failed"
+        static let notificationTrayAcceptInvitationFailed = "amity_notification_tray_accept_invitation_failed"
+        static let notificationTrayInvitedToJoinFormat = "amity_notification_tray_invited_to_join_format"
+        static let notificationTrayInvitedToJoinSeparator = "amity_notification_tray_invited_to_join_separator"
+
+        // Poll Image Options
+        static let pollImageOptionsTitle = "amity_poll_image_options_title"
+        static let pollImageOptionsDescription = "amity_poll_image_options_description"
+
+        // User Profile Edit Fields
+        static let userProfileAboutTitle = "amity_user_profile_about_title"
+        static let userProfileAboutPlaceholder = "amity_user_profile_about_placeholder"
+        static let userFollowRequestsTitleFormat = "amity_user_follow_requests_title_format"
+        
+        // MARK: - Master keys (aligned with DLS)
+        static let addLink = "amity_social_button_add_link"
+        static let addProducts = "amity_social_button_add_products"
+         static let block = "amity_social_button_block"
+         static let by = "amity_social_button_by"
+        static let community = "amity_social_button_community"
+        static let communityAnd = "amity_social_button_community_and"
+        static let deleteCommentWarningMessage = "amity_social_button_delete_comment_warning_message"
+        static let deleteMessageFailed = "amity_social_button_delete_message_failed"
+        static let deletePostWarningMessage = "amity_social_button_delete_post_warning_message"
+        static let discard = "amity_social_button_discard"
+        static let editUserSaveButton = "amity_social_button_edit_user_save_button"
+        static let eventProgressNotSaved = "amity_social_button_event_progress_not_saved"
+        static let image = "amity_social_button_image"
+        static let joinGroup = "amity_social_button_join_group"
+        static let leave = "amity_social_button_leave"
+        static let myTimeline = "amity_social_button_my_timeline"
+        static let pendingInvitation = "amity_social_button_pending_invitation"
+        static let pendingPostDeclineButton = "amity_social_button_pending_post_decline_button"
+        static let pollDuration1Day = "amity_social_button_poll_duration_1_day"
+        static let pollDuration14Days = "amity_social_button_poll_duration_14_days"
+        static let pollDuration3Days = "amity_social_button_poll_duration_3_days"
+        static let pollDuration30Days = "amity_social_button_poll_duration_30_days"
+        static let pollDuration7Days = "amity_social_button_poll_duration_7_days"
+        static let pollVoter = "amity_social_button_poll_voter"
+        static let pollVoters = "amity_social_button_poll_voters"
+        static let postComposerFileButton = "amity_social_button_post_composer_file_button"
+        static let postContentShareButton = "amity_social_button_post_content_share_button"
+        static let postTo = "amity_social_button_post_to"
+        static let selectEventTargetMyTimeline = "amity_social_button_select_event_target_my_timeline"
+        static let selectPollTargetMyTimeline = "amity_social_button_select_poll_target_my_timeline"
+        static let unblock = "amity_social_button_unblock"
+        static let userFollowButton = "amity_social_button_user_follow_button"
+        static let userFollowingButton = "amity_social_button_user_following_button"
+        static let userProfileFollower = "amity_social_button_user_profile_follower"
+        static let userProfileFollowing = "amity_social_button_user_profile_following"
+        static let v3Loadmore = "amity_social_button_v3_loadmore"
+        static let stateExploreEmpty = "amity_social_empty_state_explore_empty"
+        static let closeCommunityErrorTitle = "amity_social_error_close_community_error_title"
+        static let blockedUserFeed = "amity_social_label_blocked_user_feed"
+        static let blockedUserFeedInfo = "amity_social_label_blocked_user_feed_info"
+        static let blockedUserImageFeed = "amity_social_label_blocked_user_image_feed"
+        static let blockedUserImageFeedInfo = "amity_social_label_blocked_user_image_feed_info"
+        static let blockedUserVideoFeed = "amity_social_label_blocked_user_video_feed"
+        static let blockedUserVideoFeedInfo = "amity_social_label_blocked_user_video_feed_info"
+        static let communitySetupInviteMembersDescription = "amity_social_label_community_setup_invite_members_description"
+        static let communitySetupInviteMembersTitle = "amity_social_label_community_setup_invite_members_title"
+        static let customizeLinkText = "amity_social_label_customize_link_text"
+        static let hyperlinkUrlLabel = "amity_social_label_hyperlink_url"
+        static let hyperlinkCustomizeInfo = "amity_social_label_hyperlink_customize_info"
+        static let enterValidUrl = "amity_social_label_enter_valid_url"
+        static let enterWhitelistedUrl = "amity_social_label_enter_whitelisted_url"
+        static let followRequestAccepted = "amity_social_label_follow_request_accepted"
+        static let joinToAttendEvents = "amity_social_label_join_to_attend_events"
+        static let msgBlockedWord = "amity_social_label_msg_blocked_word"
+        static let noInternetConnection = "amity_social_label_no_internet_connection"
+        static let noUsersAvailable = "amity_social_label_no_users_available"
+        static let oopsSomethingWentWrong = "social_toast_failed_generic"
+        static let privateUserFeed = "amity_social_label_private_user_feed"
+        static let privateUserFeedInfo = "amity_social_label_private_user_feed_info"
+        static let privateUserImageFeed = "amity_social_label_private_user_image_feed"
+        static let privateUserImageFeedInfo = "amity_social_label_private_user_image_feed_info"
+        static let privateUserVideoFeed = "amity_social_label_private_user_video_feed"
+        static let privateUserVideoFeedInfo = "amity_social_label_private_user_video_feed_info"
+        static let selectEventTargetTitle = "amity_social_label_select_event_target_title"
+
+        static let textContainsBlocklisted = "amity_social_label_text_contains_blocklisted"
+        static let yourMessageIsTooLongPleaseShortenYourMessageAn = "amity_social_label_your_message_is_too_long_please_shorten_your_message_an"
+        static let dialogCohostInvitationDescription = "amity_social_modal_dialog_cohost_invitation_description"
+        static let dialogSomethingWentWrong = "amity_social_modal_dialog_something_went_wrong"
+        static let postPermissionAdminReview = "amity_social_permission_post_permission_admin_review"
+        static let editUserAboutHint = "amity_social_placeholder_edit_user_about_hint"
+        static let hyperlinkNameHint = "amity_social_placeholder_hyperlink_name_hint"
+        static let hyperlinkUrlHint = "amity_social_placeholder_hyperlink_url_hint"
+        static let communityReportFailed = "amity_social_toast_community_report_failed"
+        static let communitySetupToastCreateFailed = "amity_social_toast_community_setup_toast_create_failed"
+        static let communityUnreportFailed = "amity_social_toast_community_unreport_failed"
+        static let leaveCommunityFailed = "amity_social_toast_leave_community_failed"
+        static let memberUnbanFailed = "amity_social_toast_member_unban_failed"
+        static let productTagAddFailed = "amity_social_toast_product_tag_add_failed"
+        static let productTagRemoveFailed = "amity_social_toast_product_tag_remove_failed"
+        static let snackbarCloseCommunityFailed = "amity_social_toast_snackbar_close_community_failed"
+        static let snackbarStoryShared = "amity_social_toast_snackbar_story_shared"
+        static let updateCohostPermissionFailed = "amity_social_toast_update_cohost_permission_failed"
+        static let acceptInvite = "amity_social_button_accept_invite"
     }
 }

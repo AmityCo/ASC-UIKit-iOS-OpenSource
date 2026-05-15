@@ -28,10 +28,10 @@ struct AmityProductTagSelectionHeaderElement: AmityElementView {
     var body: some View {
         AmityView(configId: configId,
                   config: { configDict -> (createModeTitle: String, editModeTitle: String, livestreamModeTitle: String, doneButtonText: String) in
-            let createModeTitle = configDict["create_mode_title"] as? String ?? "Tag products"
-            let editModeTitle = configDict["edit_mode_title"] as? String ?? "Edit tags"
-            let livestreamModeTitle = configDict["livestream_mode_title"] as? String ?? "Add products"
-            let doneButtonText = configDict["done_button_text"] as? String ?? "Done"
+            let createModeTitle = configDict["create_mode_title"] as? String ?? AmityLocalizedStringSet.Social.tagProducts.localizedString
+            let editModeTitle = configDict["edit_mode_title"] as? String ?? AmityLocalizedStringSet.Social.editTags.localizedString
+            let livestreamModeTitle = configDict["livestream_mode_title"] as? String ?? AmityLocalizedStringSet.Social.addProducts.localizedString
+            let doneButtonText = configDict["done_button_text"] as? String ?? AmityLocalizedStringSet.General.done.localizedString
             return (createModeTitle, editModeTitle, livestreamModeTitle, doneButtonText)
         }) { config in
             if mode == .livestream {

@@ -21,7 +21,10 @@ public struct AmityCreateStoryPage: AmityPageView {
     
     @State private var allowedCaptureVideoLength = 60.0
     private let cameraManager = CameraManager()
-    private let segmentedPickerTitles: [String] = ["Photo", "Video"]
+    private let segmentedPickerTitles: [String] = [
+        AmityLocalizedStringSet.Story.cameraPhotoButton.localizedString,
+        AmityLocalizedStringSet.Story.cameraVideoButton.localizedString
+    ]
     
     @State private var selectedPickerIndex: Int = 0
     @State private var cameraMode: CameraOutputMode = .stillImage
@@ -61,7 +64,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                                     if cameraStatus == .notDetermined || cameraStatus == .accessDenied {
                                         let alertController = UIAlertController(title: AmityLocalizedStringSet.General.permissionRequired.localizedString, message: AmityLocalizedStringSet.General.cameraAccessDenied.localizedString, preferredStyle: .alert)
                                         
-                                        let action = UIAlertAction(title: "OK", style: .default) { _ in
+                                        let action = UIAlertAction(title: AmityLocalizedStringSet.Chat.okButton.localizedString, style: .default) { _ in
                                             alertController.dismiss(animated: true)
                                         }
                                         alertController.addAction(action)

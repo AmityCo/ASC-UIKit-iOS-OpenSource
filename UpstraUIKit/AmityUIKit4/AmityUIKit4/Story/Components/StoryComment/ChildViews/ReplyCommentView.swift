@@ -383,8 +383,10 @@ struct ReplyCommentView: View {
                     
                     let repliesCount = hasTargetReply ? parentComment.childrenNumber - 1 : parentComment.childrenNumber
                     
-                    let word = WordsGrammar(count: repliesCount, set: .reply)
-                    let finalText = hasTargetReply ? AmityLocalizedStringSet.Comment.viewMoreReplyText.localizedString : "View \(repliesCount) \(word.value)"
+                    let defaultViewRepliesText = repliesCount == 1
+                        ? AmityLocalizedStringSet.Social.postViewRepliesSingular.localized(arguments: "\(repliesCount)")
+                        : AmityLocalizedStringSet.Social.postViewRepliesPlural.localized(arguments: "\(repliesCount)")
+                    let finalText = hasTargetReply ? AmityLocalizedStringSet.Comment.viewMoreReplyText.localizedString : defaultViewRepliesText
                     Text(finalText)
                         .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade1)))
                 }

@@ -189,7 +189,7 @@ public struct TextEditorSuggestionView: View {
             }
         } else if viewModel.users.isEmpty {
             // No results state
-            SuggestionNoResultView(text: "No results found")
+            SuggestionNoResultView(text: AmityLocalizedStringSet.Social.searchNoResultsFound.localizedString)
                 .padding(.top, 12)
         } else {
             // Results state
@@ -212,7 +212,7 @@ public struct TextEditorSuggestionView: View {
     private var productListView: some View {
         if viewModel.searchKeyword.count < 2 {
             // Empty state - if the keyword is < 2
-            SuggestionEmptyStateView(text: "Start typing to search for products")
+            SuggestionEmptyStateView(text: AmityLocalizedStringSet.Social.startTypingToSearch.localizedString)
                 .padding(.top, 12)
         } else if viewModel.productLoadingStatus == .loading && viewModel.products.isEmpty {
             // Loading state
@@ -221,7 +221,7 @@ public struct TextEditorSuggestionView: View {
             }
         } else if viewModel.products.isEmpty {
             // No results state
-            SuggestionNoResultView(text: "No results found")
+            SuggestionNoResultView(text: AmityLocalizedStringSet.Social.searchNoResultsFound.localizedString)
                 .padding(.top, 12)
         } else {
             // Results state
@@ -304,7 +304,7 @@ struct ProductSuggestionRow: View {
                     .lineLimit(1)
 
                 if isAlreadyTagged {
-                    Text("Already tagged")
+                    Text(AmityLocalizedStringSet.Social.alreadyTagged.localizedString)
                         .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                         .lineLimit(1)
                         .padding(.top, 4)

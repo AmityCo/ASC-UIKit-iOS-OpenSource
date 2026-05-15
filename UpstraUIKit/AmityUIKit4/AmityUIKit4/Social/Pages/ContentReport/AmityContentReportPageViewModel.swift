@@ -24,11 +24,13 @@ enum ContentReportType {
     var description: String {
         switch self {
         case .message:
-            return "message"
+            return AmityLocalizedStringSet.Social.reportReasonContentTypeMessage.localizedString
         case .post:
-            return "post"
+            return AmityLocalizedStringSet.Social.reportReasonContentTypePost.localizedString
         case .comment(_, let isReply):
-            return isReply ? "reply" : "comment"
+            return isReply
+                ? AmityLocalizedStringSet.Social.reportReasonContentTypeReply.localizedString
+                : AmityLocalizedStringSet.Social.reportReasonContentTypeComment.localizedString
         }
     }
 }

@@ -40,7 +40,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
     
     public var body: some View {
         HStack(spacing: 10) {
-            let headerLabel = viewConfig.forElement(.headerLabel).text ?? ""
+            let headerLabel = viewConfig.forElement(.headerLabel).text ?? AmityLocalizedStringSet.Social.community.localizedString
             Text(headerLabel)
                 .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
                 .padding([.top, .bottom], 15.5)

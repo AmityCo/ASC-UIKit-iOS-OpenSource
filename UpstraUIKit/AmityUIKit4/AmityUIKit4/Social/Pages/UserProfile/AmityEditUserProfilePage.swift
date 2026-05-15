@@ -18,8 +18,8 @@ public struct AmityEditUserProfilePage: AmityPageView {
     private let userId: String
     @StateObject private var viewConfig: AmityViewConfigController
     @State private var displayNameTextFieldModel = InfoTextFieldModel(
-        title: "Display name",
-        placeholder: "Display name",
+        title: AmityLocalizedStringSet.Social.displayName.localizedString,
+        placeholder: AmityLocalizedStringSet.Social.displayName.localizedString,
         isMandatory: false,
         isExpandable: true,
         maxCharCount: 100
@@ -27,8 +27,8 @@ public struct AmityEditUserProfilePage: AmityPageView {
     @State private var displayNameText: String = ""
 
     @State private var aboutTextFieldModel = InfoTextFieldModel(
-        title: "About",
-        placeholder: "About",
+        title: AmityLocalizedStringSet.Social.userProfileAboutTitle.localizedString,
+        placeholder: AmityLocalizedStringSet.Social.userProfileAboutPlaceholder.localizedString,
         isMandatory: false,
         showOptionalTitle: true,
         isExpandable: true,
@@ -83,17 +83,17 @@ public struct AmityEditUserProfilePage: AmityPageView {
             .padding(.top, 10)
         }
         .onReceive(viewModel.$user) { user in
-            let userDisplayNameTitle = viewConfig.getConfig(elementId: .userDisplayNameTitle, key: "text", of: String.self) ?? "Display Name"
+            let userDisplayNameTitle = viewConfig.getConfig(elementId: .userDisplayNameTitle, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.displayName.localizedString
             displayNameTextFieldModel = InfoTextFieldModel(
                 title: userDisplayNameTitle,
-                placeholder: "Display Name",
+                placeholder: AmityLocalizedStringSet.Social.displayName.localizedString,
                 isMandatory: false,
                 isExpandable: true,
                 maxCharCount: 100
             )
             displayNameText = user?.displayName ?? ""
             
-            let aboutTitle = viewConfig.getConfig(elementId: .userAboutTitle, key: "text", of: String.self) ?? "About"
+            let aboutTitle = viewConfig.getConfig(elementId: .userAboutTitle, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.editUserAboutTitle.localizedString
             aboutTextFieldModel = InfoTextFieldModel(
                 title: aboutTitle,
                 placeholder: aboutTitle,
@@ -126,7 +126,7 @@ public struct AmityEditUserProfilePage: AmityPageView {
     
     @ViewBuilder
     private var navigationBarView: some View {
-        let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "Edit Profile"
+        let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.editProfile.localizedString
         AmityNavigationBar(title: title, leading: {
             let backButton = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .backButtonElement, key: "image", of: String.self) ?? "")
             Image(backButton)
@@ -138,7 +138,7 @@ public struct AmityEditUserProfilePage: AmityPageView {
                 .onTapGesture {
                     let alert = UIAlertController(title: AmityLocalizedStringSet.Social.userProfileEditAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.userProfileEditAlertMessage.localizedString, preferredStyle: .alert)
                     let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
-                    let discardAction = UIAlertAction(title: AmityLocalizedStringSet.General.discard.localizedString, style: .destructive) { _ in
+                    let discardAction = UIAlertAction(title: AmityLocalizedStringSet.Social.discard.localizedString, style: .destructive) { _ in
                         host.controller?.navigationController?.popViewController()
                     }
                     
@@ -192,7 +192,7 @@ public struct AmityEditUserProfilePage: AmityPageView {
                 .cornerRadius(4)
                 .overlay (
                     ZStack {
-                        let updateButtonText = viewConfig.getConfig(elementId: .updateUserProfileButton, key: "text", of: String.self) ?? "Save"
+                        let updateButtonText = viewConfig.getConfig(elementId: .updateUserProfileButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.editUserSaveButton.localizedString
                         Text(updateButtonText)
                             .applyTextStyle(.bodyBold(isExistingDataChanged ? .white : .gray))
                     }

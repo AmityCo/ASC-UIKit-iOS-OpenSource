@@ -23,9 +23,7 @@ struct LiveStreamPlaybackPlayerView: UIViewControllerRepresentable {
     
     public func makeUIViewController(context: Context) -> AVPlayerViewController {
         let headers = [
-            "Authorization": "Bearer \(AmityUIKitManagerInternal.shared.client.accessToken ?? "")"
-        ]
-        
+            "Authorization": "Bearer \(AmityUIKitManagerInternal.shared.client.accessToken ?? "")"] // l10n:ok HTTP header key not user-facing
         let url = URL(string: room.recordedData.first?.playbackUrl ?? "")
         let asset = AVURLAsset(url: url ?? URL(fileURLWithPath: ""), options: ["AVURLAssetHTTPHeaderFieldsKey": headers])
         let playerItem = AVPlayerItem(asset: asset)

@@ -49,15 +49,15 @@ struct AmityMediaFeedContainer: View {
         VStack(spacing: 0) {
             if imageFeedModel.emptyFeedState != .private {
                 HStack {
-                    ChipTabButton(title: "Photos", selected: currentTab == .photos) {
+                    ChipTabButton(title: AmityLocalizedStringSet.Social.socialMediaFeedPhotosTab.localizedString, selected: currentTab == .photos) {
                         currentTab = .photos
                     }
                     
-                    ChipTabButton(title: "Videos", selected: currentTab == .videos) {
+                    ChipTabButton(title: AmityLocalizedStringSet.Social.socialMediaFeedVideosTab.localizedString, selected: currentTab == .videos) {
                         currentTab = .videos
                     }
                     
-                    ChipTabButton(title: "Clips", selected: currentTab == .clips) {
+                    ChipTabButton(title: AmityLocalizedStringSet.Social.socialHomeClipsTab.localizedString, selected: currentTab == .clips) {
                         currentTab = .clips
                     }
                     

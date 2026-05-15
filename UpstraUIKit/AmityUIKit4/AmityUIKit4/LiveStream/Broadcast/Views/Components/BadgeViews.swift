@@ -17,7 +17,7 @@ struct HostBadgeView: View {
                 .scaledToFit()
                 .frame(width: 12, height: 9)
 
-            Text(AmityLocalizedStringSet.Social.livestreamHostBadge.localizedString)
+            Text(AmityLocalizedStringSet.Social.livestreamHost.localizedString)
                 .applyTextStyle(.captionSmall(.white))
         }
         .padding(.vertical, 2)
@@ -37,7 +37,7 @@ struct CoHostBadgeView: View {
                 .scaledToFit()
                 .frame(width: 12, height: 9)
 
-            Text(AmityLocalizedStringSet.Social.livestreamCoHostBadge.localizedString)
+            Text(AmityLocalizedStringSet.Social.livestreamCoHost.localizedString)
                 .applyTextStyle(.captionSmall(.white))
         }
         .padding(.vertical, 2)

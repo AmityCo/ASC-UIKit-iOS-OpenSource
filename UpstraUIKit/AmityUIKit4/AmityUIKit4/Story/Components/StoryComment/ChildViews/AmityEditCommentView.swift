@@ -81,7 +81,7 @@ public struct AmityEditCommentView: View {
                         hideKeyboard()
                         saveAction(editedComment)
                     } label: {
-                        Text(AmityLocalizedStringSet.General.save.localizedString)
+                        Text(AmityLocalizedStringSet.Social.saveButton.localizedString)
                             .applyTextStyle(.captionBold(.white))
                             .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
                     }

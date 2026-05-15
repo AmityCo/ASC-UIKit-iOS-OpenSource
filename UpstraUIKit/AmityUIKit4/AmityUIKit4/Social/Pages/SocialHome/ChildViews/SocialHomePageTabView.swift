@@ -99,25 +99,27 @@ struct SocialHomePageTabView: View {
                 
                 return item
             })
-            
-            print("Filtered Tab Items: \(tabItems.count)")
         }
     }
     
     private func getTitle(tab: AmitySocialHomePageTab) -> String {
         switch tab {
         case .newsFeed:
-            return viewConfig.forElement(.newsFeedButton).text ?? ""
+            let t = viewConfig.forElement(.newsFeedButton).text
+            return (t?.isEmpty == false) ? t! : AmityLocalizedStringSet.Social.socialHomeNewsfeedTab.localizedString
         case .explore:
-            return viewConfig.forElement(.exploreButton).text ?? ""
+            let t = viewConfig.forElement(.exploreButton).text
+            return (t?.isEmpty == false) ? t! : AmityLocalizedStringSet.Social.socialHomeExploreTab.localizedString
         case .clips:
-            return viewConfig.forElement(.clipsButton).text ?? ""
+            let t = viewConfig.forElement(.clipsButton).text
+            return (t?.isEmpty == false) ? t! : AmityLocalizedStringSet.Social.socialHomeClipsTab.localizedString
         case .myCommunities:
-            return viewConfig.forElement(.myCommunitiesButton).text ?? ""
+            let t = viewConfig.forElement(.myCommunitiesButton).text
+            return (t?.isEmpty == false) ? t! : AmityLocalizedStringSet.Social.socialHomeMyCommunitiesTab.localizedString
         case .communities:
-            return "Communities"
+            return AmityLocalizedStringSet.Social.socialHomeCommunitiesTab.localizedString
         case .events:
-            return "Events"
+            return AmityLocalizedStringSet.Social.socialHomeEventsTab.localizedString
         }
     }
     

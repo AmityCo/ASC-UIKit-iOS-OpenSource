@@ -47,7 +47,7 @@ struct UserRelationshipTabView: View {
                     .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                     .padding(.top, 24)
                 
-                Text("Nothing here to see yet")
+                Text(AmityLocalizedStringSet.General.nothingHereYet.localizedString)
                     .applyTextStyle(.title(Color(viewConfig.theme.baseColorShade3)))
                     .padding(.top, 8)
                     .padding(.bottom, 24)

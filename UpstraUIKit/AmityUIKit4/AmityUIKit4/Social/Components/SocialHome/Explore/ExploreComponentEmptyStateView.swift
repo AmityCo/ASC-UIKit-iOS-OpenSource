@@ -36,11 +36,11 @@ struct ExploreComponentEmptyStateView: View {
                     .scaledToFit()
                     .frame(width: 160, height: 160)
                     
-                Text("No community yet")
+                Text(AmityLocalizedStringSet.Social.noCommunityYet.localizedString)
                     .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.top, 24)
                 
-                Text("Let's create your own communities")
+                Text(AmityLocalizedStringSet.Social.noCommunityYetDescription.localizedString)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
                     .multilineTextAlignment(.center)
                     .padding(.top, 4)
@@ -58,7 +58,7 @@ struct ExploreComponentEmptyStateView: View {
                             .frame(width: 16, height: 16)
                             .foregroundColor(Color(.white))
                         
-                        Text("Create Community")
+                        Text(AmityLocalizedStringSet.Social.communitySetupCreateButton.localizedString)
                             .font(.body)
                             .fontWeight(.semibold)
                             .foregroundColor(Color(.white))

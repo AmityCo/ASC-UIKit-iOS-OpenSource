@@ -130,7 +130,7 @@ struct ClipFeedView: View {
                         .frame(width: 16, height: 16)
                 }
                 
-                Text(post.targetCommunity?.displayName ?? "Unknown")
+                Text(post.targetCommunity?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString)
                     .applyTextStyle(.titleBold(Color.white))
                     .lineLimit(1)
                 

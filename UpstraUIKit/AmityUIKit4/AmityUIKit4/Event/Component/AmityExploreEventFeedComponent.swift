@@ -36,7 +36,7 @@ public struct AmityExploreEventFeedComponent: AmityComponentView {
                         .padding(.bottom, 8)
                 }
                 
-                Text(AmityLocalizedStringSet.Social.exploreEventRecommendedForYou.localizedString)
+                Text(AmityLocalizedStringSet.Social.exploreRecommendedComponentTitle.localizedString)
                     .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                     .padding(.top, 16)
                     .padding(.bottom, 8)

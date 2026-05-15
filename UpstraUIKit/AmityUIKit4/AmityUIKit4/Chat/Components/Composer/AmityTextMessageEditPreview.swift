@@ -17,7 +17,7 @@ struct AmityTextMessageEditPreview: View {
         HStack(spacing: 12) {
             
             VStack(alignment: .leading, spacing: 4) {
-                Text("Edit Message")
+                Text(AmityLocalizedStringSet.Chat.editMessage.localizedString)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(Color.white)
                 Text(message.text)
@@ -44,6 +44,6 @@ struct AmityTextMessageEditPreview: View {
 
 #if DEBUG
 #Preview {
-    AmityTextMessageEditPreview(message: .init(id: UUID().uuidString, text: "I want to eat kfc tonight", type: .text, hasReaction: false, parentId: nil), closeAction: { })
+    AmityTextMessageEditPreview(message: .init(id: UUID().uuidString, text: "I want to eat kfc tonight", type: .text, hasReaction: false, parentId: nil), closeAction: { }) // l10n:ok preview mock data
 }
 #endif

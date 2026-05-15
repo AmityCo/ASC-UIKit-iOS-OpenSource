@@ -31,13 +31,13 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .illustration))
                 .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.illustration)
             
-            let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? ""
+            let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.clipFeedEmptyTitle.localizedString
             Text(title)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 .isHidden(viewConfig.isHidden(elementId: .title))
                 .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.title)
             
-            let description = viewConfig.getConfig(elementId: .description, key: "text", of: String.self) ?? ""
+            let description = viewConfig.getConfig(elementId: .description, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.emptyNewsFeedDescription.localizedString
             Text(description)
                 .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade3)))
                 .padding(.top, 4)
@@ -45,7 +45,7 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
                 .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.description)
             
             let exploreCommunityButtonIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .exploreCommunitiesButton, key: "icon", of: String.self) ?? "")
-            let exploreCommunityButtonText = viewConfig.getConfig(elementId: .exploreCommunitiesButton, key: "text", of: String.self) ?? ""
+            let exploreCommunityButtonText = viewConfig.getConfig(elementId: .exploreCommunitiesButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.exploreCommunityButton.localizedString
             HStack(alignment: .center, spacing: 8) {
                 Image(exploreCommunityButtonIcon)
                     .resizable()
@@ -66,7 +66,7 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
             .isHidden(viewConfig.isHidden(elementId: .exploreCommunitiesButton))
             .accessibilityIdentifier(AccessibilityID.Social.EmptyNewsFeed.exploreCommunitiesButton)
             
-            let createCommunityButtonText = viewConfig.getConfig(elementId: .createCommunityButton, key: "text", of: String.self) ?? ""
+            let createCommunityButtonText = viewConfig.getConfig(elementId: .createCommunityButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.communitySetupCreateButton.localizedString
             Text(createCommunityButtonText)
                 .applyTextStyle(.body(Color(viewConfig.theme.primaryColor)))
                 .padding(.top, 14)

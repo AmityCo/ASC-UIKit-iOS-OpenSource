@@ -80,7 +80,7 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
                         presentationMode.wrappedValue.dismiss()
                     }
             } trailing: {
-                let btnTitle = isEditMode ? AmityLocalizedStringSet.General.save.localizedString : AmityLocalizedStringSet.General.done.localizedString
+                let btnTitle = isEditMode ? AmityLocalizedStringSet.Social.saveButton.localizedString : AmityLocalizedStringSet.General.done.localizedString
                 Button(btnTitle) {
                     Task { @MainActor in
                         do {
@@ -146,10 +146,10 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
             .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         }
         .onChange(of: networkMonitor.isConnected) { isConnected in
-            Log.add(event: .info, "NetworkConnect: \(isConnected ? "Connected" : "Disconnected")")
+            Log.add(event: .info, "NetworkConnect: \(isConnected ? "Connected" : "Disconnected")") // l10n:ok debug log not user-facing
             self.isConnected = isConnected
             if !isConnected {
-                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.General.noInternetConnection.localizedString, bottomPadding: isKeyboardOnScreen ? 150 : 0)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.noInternetConnection.localizedString, bottomPadding: isKeyboardOnScreen ? 150 : 0)
             }
         }
         .onReceive(keyboardPublisher) { keyboardEvent in
@@ -169,7 +169,7 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
     
     private func checkValidation(altText: String) async throws {
         guard isConnected else {
-            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.General.noInternetConnection.localizedString)
+            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.noInternetConnection.localizedString)
             return
         }
         

@@ -327,7 +327,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         .applyTextStyle(.caption(.white))
                         .padding(.horizontal, 4)
                     
-                    Text("By \(story.creatorName)")
+                    Text(AmityLocalizedStringSet.General.byAuthor.localized(arguments: story.creatorName))
                         .applyTextStyle(.caption(.white))
                         .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.creatorDisplayNameTextView)
                         .lineLimit(1)
@@ -506,7 +506,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
 
                 AmityUserAction.perform(host: host) {
                     guard isCommunityMember else {
-                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Story.nonMemberReactStoryMessage.localizedString)
+                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                         return
                     }
                     
@@ -571,7 +571,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     showRetryAlert.toggle()
                 })
                 
-                let discardAction = UIAlertAction(title: AmityLocalizedStringSet.General.discard.localizedString, style: .destructive, handler: {_ in
+                let discardAction = UIAlertAction(title: AmityLocalizedStringSet.Social.discard.localizedString, style: .destructive, handler: {_ in
                     let alertViewController = UIAlertController(title: AmityLocalizedStringSet.Story.deleteStoryTitle.localizedString, message: AmityLocalizedStringSet.Story.deleteStoryMessage.localizedString, preferredStyle: .alert)
                     
                     let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .default) { _ in
@@ -655,7 +655,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     @ViewBuilder
     private func getBottomSheetView() -> some View {
         VStack(spacing: 0) {
-            BottomSheetItemView(icon: AmityIcon.trashBinIcon.getImageResource(), text: "Delete story", isDestructive: true)
+            BottomSheetItemView(icon: AmityIcon.trashBinIcon.getImageResource(), text: AmityLocalizedStringSet.Story.storyDeleteButton.localizedString, isDestructive: true)
                 .onTapGesture {
                     let alertController = UIAlertController(title: AmityLocalizedStringSet.Story.deleteStoryTitle.localizedString, message: AmityLocalizedStringSet.Story.deleteStoryMessage.localizedString, preferredStyle: .alert)
                     
@@ -669,7 +669,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                             case let .content(story) = item.type {
                             Task { @MainActor in
                                 try await viewModel.deleteStory(storyId: story.storyId, host)
-                                Toast.showToast(style: .success, message: "Successfully deleted the story.")
+                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Story.storyDeletedToastMessage.localizedString)
                             }
                         }
                     }

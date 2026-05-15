@@ -41,7 +41,7 @@ class AmityNotificationTrayPageViewModel: ObservableObject {
                 if error.isAmityErrorCode(.unknown) {
                     return
                 } else {
-                    Toast.showToast(style: .warning, message: "Oops, something went wrong")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.notificationTrayGenericErrorToast.localizedString)
                 }
                 
                 return
@@ -62,11 +62,11 @@ class AmityNotificationTrayPageViewModel: ObservableObject {
             
             var finalSections: [NotificationSection] = []
             if !recentItemBucket.isEmpty {
-                finalSections.append(NotificationSection(title: "Recent", notifications: recentItemBucket))
+                finalSections.append(NotificationSection(title: AmityLocalizedStringSet.Social.notificationTrayRecentTitle.localizedString, notifications: recentItemBucket))
             }
             
             if !oldItemBucket.isEmpty {
-                finalSections.append(NotificationSection(title: "Older", notifications: oldItemBucket))
+                finalSections.append(NotificationSection(title: AmityLocalizedStringSet.Social.notificationTrayOlderTitle.localizedString, notifications: oldItemBucket))
             }
             
             self.sections = finalSections

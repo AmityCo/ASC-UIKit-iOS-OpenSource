@@ -50,7 +50,9 @@ class AmityViewConfigController: NSObject, ObservableObject {
                              of type: T.Type) -> T? {
         let configId = constructConfigId(pageId: pageId, componentId: componentId, elementId: elementId)
         let config = AmityUIKitConfigController.shared.getConfig(configId: configId)
-        return config[key] as? T
+        let value = config[key] as? T
+        if let str = value as? String, str.isEmpty { return nil }
+        return value
     }
     
     public func getText(elementId: ElementId) -> String? {
@@ -89,7 +91,8 @@ struct ElementConfiguration {
     let icon: String? // Deprecated
     
     init(config: [String: Any]) {
-        text = config["text"] as? String
+        let rawText = config["text"] as? String
+        text = (rawText?.isEmpty == false) ? rawText : nil
         image = config["image"] as? String
         icon = config["icon"] as? String ?? image
     }

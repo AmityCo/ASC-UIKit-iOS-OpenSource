@@ -28,7 +28,7 @@ public struct AmityInvitationSection: AmityComponentView {
     
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NotificationTraySectionTitle(title: "Requests")
+            NotificationTraySectionTitle(title: AmityLocalizedStringSet.Social.notificationTrayRequestsTitle.localizedString)
             
             ForEach(Array(viewModel.invitations), id: \.invitationId) { invitation in
                 NotificationTrayInvitationItemView(invitation: invitation)

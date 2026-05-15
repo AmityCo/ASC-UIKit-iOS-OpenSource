@@ -12,7 +12,10 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     @StateObject private var viewConfig: AmityViewConfigController
     @State private var tabIndex: Int = 0
-    @State private var tabs: [String] = ["Members", "Moderators"]
+    @State private var tabs: [String] = [
+        AmityLocalizedStringSet.Social.communitySettingMembers.localizedString,
+        AmityLocalizedStringSet.Social.communityMembershipTabModerators.localizedString
+    ]
     @StateObject private var viewModel = AmityCommunityMembershipPageViewModel()
     private let community: AmityCommunity
     
@@ -83,7 +86,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     
     
     private var navigationBarView: some View {
-        return AmityNavigationBar(title: "All members", showBackButton: true) {
+        return AmityNavigationBar(title: AmityLocalizedStringSet.Social.communityMembershipAllMembersTitle.localizedString, showBackButton: true) {
             Image(AmityIcon.plusIcon.getImageResource())
                 .renderingMode(.template)
                 .resizable()
@@ -113,9 +116,9 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             Task { @MainActor in
                 do {
                     let _ = try await community.membership.addMembers(users.map {$0.userId})
-                    Toast.showToast(style: .success, message: "Successfully added members to this community!")
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMembershipAddSuccess.localizedString)
                 } catch {
-                    Toast.showToast(style: .warning, message: "Failed to add members to this community")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityMembershipAddFailed.localizedString)
                 }
             }
         }
@@ -130,9 +133,9 @@ public struct AmityCommunityMembershipPage: AmityPageView {
                 do {
                     try await community.createInvitations(users.map { $0.userId })
                     self.host.controller?.presentedViewController?.dismiss(animated: true)
-                    Toast.showToast(style: .success, message: "Successfully invited members to this community.")
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMembershipInviteSuccess.localizedString)
                 } catch {
-                    Toast.showToast(style: .warning, message: "Failed to invite members. Please try again.")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityMembershipInviteFailed.localizedString)
                 }
             }
         }

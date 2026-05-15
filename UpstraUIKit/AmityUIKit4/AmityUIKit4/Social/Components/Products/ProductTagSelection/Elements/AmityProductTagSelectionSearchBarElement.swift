@@ -22,7 +22,7 @@ struct AmityProductTagSelectionSearchBarElement: AmityElementView {
     var body: some View {
         AmityView(configId: configId,
                   config: { configDict -> String in
-            let placeholder = configDict["placeholder"] as? String ?? "Search by product name"
+            let placeholder = configDict["placeholder"] as? String ?? AmityLocalizedStringSet.Social.searchByProductName.localizedString
             return placeholder
         }) { placeholder in
             HStack(spacing: 8) {

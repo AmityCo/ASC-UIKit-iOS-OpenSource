@@ -66,7 +66,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     }
         
     public var debugDescription: String {
-        return "Id: \(self.id) | Text: \(self.text) | Metadata: \(String(describing: self.metadata)) | Mentionees: \(self.mentionees)"
+        return "Id: \(self.id) | Text: \(self.text) | Metadata: \(String(describing: self.metadata)) | Mentionees: \(self.mentionees)" // l10n:ok debug description not user-facing
     }
     
     // Replied message
@@ -78,18 +78,19 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
 
 fileprivate extension AmityMessageType {
     
+    // l10n:ok internal type descriptions used for debug/logging, not displayed in UI
     var description: String {
         switch self {
         case .audio:
-            return "Audio Message"
+            return "Audio Message" // l10n:ok internal type name used for debug/logging
         case .file:
-            return "File Message"
+            return "File Message" // l10n:ok internal type name used for debug/logging
         case .image:
-            return "Image Message"
+            return "Image Message" // l10n:ok internal type name used for debug/logging
         case .video:
-            return "Video Message"
+            return "Video Message" // l10n:ok internal type name used for debug/logging
         case .custom:
-            return "Custom Message"
+            return "Custom Message" // l10n:ok internal type name used for debug/logging
         default:
             return "-"
         }
@@ -124,8 +125,8 @@ extension MessageModel {
         self.reactionCount = 0
     }
     
-    static let preview = MessageModel.init(id: UUID().uuidString, text: "Let's catch up!", type: .text, hasReaction: false, parentId: nil)
-    static let previewWithParent = MessageModel.init(id: UUID().uuidString, text: "Let's catch up! Its been a long time since we met", type: .text, hasReaction: false, parentId: "1234")
+    static let preview = MessageModel.init(id: UUID().uuidString, text: "Let's catch up!", type: .text, hasReaction: false, parentId: nil) // l10n:ok preview mock data
+    static let previewWithParent = MessageModel.init(id: UUID().uuidString, text: "Let's catch up! Its been a long time since we met", type: .text, hasReaction: false, parentId: "1234") // l10n:ok preview mock data
 }
 
 extension MessageModel: Equatable {

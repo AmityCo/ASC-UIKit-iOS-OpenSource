@@ -184,7 +184,7 @@ struct MediaViewer: View {
                                         .aspectRatio(contentMode: .fit)
                                         .frame(size: CGSize(width: 60, height: 60))
                                     
-                                    Text(media.type == .image ? "This photo is no longer available." : "This video is no longer available.")
+                                    Text(media.type == .image ? AmityLocalizedStringSet.Social.photoNoLongerAvailable.localizedString : AmityLocalizedStringSet.Social.videoNoLongerAvailable.localizedString)
                                         .applyTextStyle(.title(.white))
                                 }
                             }
@@ -358,7 +358,7 @@ struct MediaViewer: View {
                 let currentMedia = page.index < medias.count ? medias[page.index] : nil
                 
                 if showViewParentPost {
-                    BottomSheetItemView(icon: AmityIcon.viewPostIcon.getImageResource(), text: "View post")
+                    BottomSheetItemView(icon: AmityIcon.viewPostIcon.getImageResource(), text: AmityLocalizedStringSet.Social.socialViewPost.localizedString)
                         .onTapGesture {
                             showBottomSheet.toggle()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
@@ -368,7 +368,7 @@ struct MediaViewer: View {
                 }
                 
                 if canEditAltText {
-                    BottomSheetItemView(icon: AmityIcon.editCommentIcon.getImageResource(), text: "Edit alt text")
+                    BottomSheetItemView(icon: AmityIcon.editCommentIcon.getImageResource(), text: AmityLocalizedStringSet.Social.altTextEditTitle.localizedString)
                         .onTapGesture {
                             showBottomSheet.toggle()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {

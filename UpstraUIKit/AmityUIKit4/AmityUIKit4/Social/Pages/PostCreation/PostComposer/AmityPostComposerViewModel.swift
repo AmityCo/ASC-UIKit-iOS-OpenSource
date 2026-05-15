@@ -88,7 +88,7 @@ class AmityPostComposerViewModel: ObservableObject {
         if let event {
             self.displayName = event.title
         } else {
-            self.displayName = targetType == .community ? community?.displayName ?? "" : "My Timeline"
+            self.displayName = targetType == .community ? community?.displayName ?? "" : AmityLocalizedStringSet.Social.selectPollTargetMyTimeline.localizedString
         }
         self.originalPostText = ""
         self.originalMedias = []

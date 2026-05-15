@@ -88,7 +88,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
     // Target
     private var targetId: String
     var targetType: AmityPostTargetType
-    @Published var targetDisplayName: String = AmityLocalizedStringSet.Social.liveStreamMyTimelineLabel.localizedString
+    @Published var targetDisplayName: String = AmityLocalizedStringSet.Social.myTimeline.localizedString
     
     // UIState for broadcaster
     @Published var broadcasterState: LiveStreamBroadcasterState = .idle
@@ -353,7 +353,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
                     if !productTagsArray.isEmpty {
                         let returnedTagCount = post.childrenPosts.first?.getMediaProductTags().count ?? 0
                         if returnedTagCount != productTagsArray.count {
-                            Toast.showToast(style: .warning, message: "Some products that you've tagged are no longer available.", bottomPadding: 60)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postComposerProductsUnavailableToast.localizedString, bottomPadding: 60)
                         }
                     }
                 }
@@ -559,18 +559,18 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 // Update invited co-host waiting status if invitation is rejected and co-host left from back-stage or stage
                 if event.type == .invitationRejected {
                     self?.invitedCoHost = (false, nil, false)
-                    Toast.showToast(style: .warning, message: "Co-host declined the invitation.", bottomPadding: 60)
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamCoHostDeclinedToast.localizedString, bottomPadding: 60)
                 } else if event.type == .invitationAccepted {
                     self?.invitedCoHost.invitationAccepted = true
-                    Toast.showToast(style: .success, message: "Co-host accepted the invitation.", bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostAcceptedToast.localizedString, bottomPadding: 60)
                 } else if event.type == .coHostStageLeft {
                     if self?.invitedCoHost.invitationAccepted == true {
-                        Toast.showToast(style: .success, message: "Co-host left the stage.", bottomPadding: 60)
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftStageToast.localizedString, bottomPadding: 60)
                     }
                     self?.invitedCoHost = (false, nil, false)
                 } else if event.type == .coHostLeft {
                     self?.invitedCoHost = (false, nil, false)
-                    Toast.showToast(style: .success, message: "Co-host left the live stream.", bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftToast.localizedString, bottomPadding: 60)
                 } else if event.type == .coHostRemoved {
                     if self?.participantRole == .host {
                         self?.invitedCoHost = (false, nil, false)
@@ -603,9 +603,9 @@ class LiveStreamConferenceViewModel: ObservableObject {
         if let createdRoom, let coHostInvitation {
             do {
                 try await createdRoom.cancelInvitation(coHostInvitation.invitationId)
-                Toast.showToast(style: .success, message: "Invitation cancelled.", bottomPadding: 60)
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelledToast.localizedString, bottomPadding: 60)
             } catch {
-                Toast.showToast(style: .warning, message: "Failed to cancel invitation.", bottomPadding: 60)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelFailedToast.localizedString, bottomPadding: 60)
             }
         }
     }
@@ -615,9 +615,9 @@ class LiveStreamConferenceViewModel: ObservableObject {
         if let createdRoom {
             do {
                 try await roomManager.removeCohost(roomId: createdRoom.roomId, userId: userId)
-                Toast.showToast(style: .success, message: "Co-host removed from live.", bottomPadding: 60)
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostRemovedToast.localizedString, bottomPadding: 60)
             } catch {
-                Toast.showToast(style: .warning, message: "Failed to remove co-host.", bottomPadding: 60)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamRemoveCoHostFailedToast.localizedString, bottomPadding: 60)
             }
         }
     }
@@ -863,7 +863,7 @@ extension LiveStreamConferenceViewModel {
                 
                 self.targetObjectToken?.invalidate()
                 self.targetObjectToken = nil
-                self.targetDisplayName = AmityLocalizedStringSet.Social.liveStreamMyTimelineLabel.localizedString
+                self.targetDisplayName = AmityLocalizedStringSet.Social.myTimeline.localizedString
             })
         @unknown default:
             break
@@ -920,7 +920,7 @@ extension LiveStreamConferenceViewModel {
             
             // Show warning if some tagged products are no longer available
             if sentCount > 0 && taggedProducts.count != sentCount {
-                Toast.showToast(style: .warning, message: "Some products that you've tagged are no longer available.", bottomPadding: 60)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postComposerProductsUnavailableToast.localizedString, bottomPadding: 60)
             }
         } catch {
         }
@@ -967,20 +967,21 @@ extension LiveStreamConferenceViewModel {
 
 extension LiveStreamUIState {
     
+    // l10n:ok debug state description used only in Log.add() calls, not displayed in UI
     var strValue: String {
         switch self {
         case .setup:
-            "Setup"
+            "Setup" // l10n:ok debug state string, only used in Log.add() calls
         case .readyToStart:
-            "Ready to start"
+            "Ready to start" // l10n:ok debug state string, only used in Log.add() calls
         case .started:
-            "Started"
+            "Started" // l10n:ok debug state string, only used in Log.add() calls
         case .streaming:
-            "Streaming"
+            "Streaming" // l10n:ok debug state string, only used in Log.add() calls
         case .ending:
-            "Ending"
+            "Ending" // l10n:ok debug state string, only used in Log.add() calls
         case .ended(let reason):
-            "Ended with reason: \(reason.rawValue)"
+            "Ended with reason: \(reason.rawValue)" // l10n:ok debug state string, only used in Log.add() calls
         }
     }
 }

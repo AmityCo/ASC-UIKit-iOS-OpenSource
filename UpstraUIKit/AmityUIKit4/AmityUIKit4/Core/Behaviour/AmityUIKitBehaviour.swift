@@ -104,11 +104,11 @@ open class AmityGlobalBehavior {
     }
     
     open func handleNonMemberAction(context: Context?) {
-        Toast.showToast(style: .warning, message: "Join community to interact.")
+        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
     }
     
     open func handleNonFollowerAction(context: Context?) {
-        Toast.showToast(style: .warning, message: "Follow user to interact.")
+        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamFollowToInteractToast.localizedString)
     }
     
     open func onPostProductTagClick(context: AmityGlobalBehavior.Context) {

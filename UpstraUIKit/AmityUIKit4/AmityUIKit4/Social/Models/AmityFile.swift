@@ -12,7 +12,7 @@ import MobileCoreServices
 extension AmityFileData {
     
     var fileName: String {
-        return attributes["name"] as? String ?? "Unknown"
+        return attributes["name"] as? String ?? AmityLocalizedStringSet.General.unknown.localizedString
     }
     
 }

@@ -79,7 +79,7 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
                         .isHidden(viewConfig.isHidden(elementId: .myTimelineAvatar), remove: true)
                         .accessibilityIdentifier(AccessibilityID.Social.PostTargetSelection.myTimelineAvatar)
                         
-                    let myTimelineTitle = viewConfig.getConfig(elementId: .myTimelineText, key: "text", of: String.self) ?? ""
+                    let myTimelineTitle = viewConfig.getConfig(elementId: .myTimelineText, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.myTimeline.localizedString
                     Text(myTimelineTitle)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         .isHidden(viewConfig.isHidden(elementId: .myTimelineText), remove: true)

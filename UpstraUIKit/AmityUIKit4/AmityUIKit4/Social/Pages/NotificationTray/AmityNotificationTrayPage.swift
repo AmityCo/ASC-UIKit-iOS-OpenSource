@@ -26,7 +26,7 @@ public struct AmityNotificationTrayPage: AmityPageView {
     
     public var body: some View {
         VStack(spacing: 0) {
-            AmityNavigationBar(title: AmityLocalizedStringSet.Social.notificationTrayTitle.localizedString, showBackButton: true)
+            AmityNavigationBar(title: AmityLocalizedStringSet.Social.communityNotificationSettingPageTitle.localizedString, showBackButton: true)
             
             ZStack {
                 ScrollView(.vertical, showsIndicators: false) {
@@ -128,7 +128,7 @@ public struct AmityNotificationTrayPage: AmityPageView {
                 .scaledToFit()
                 .frame(width: 60, height: 60)
             
-            Text(AmityLocalizedStringSet.General.noInternetConnection.localizedString)
+            Text(AmityLocalizedStringSet.Social.noInternetConnection.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
         }
     }

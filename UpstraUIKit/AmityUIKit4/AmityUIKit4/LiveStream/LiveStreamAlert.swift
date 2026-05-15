@@ -111,11 +111,11 @@ class LiveStreamAlert: ObservableObject {
             case .cancelCoHostInvitation(let action):
                 return .default(Text(AmityLocalizedStringSet.Social.livestreamAlertConfirmButton.localizedString), action: action)
             case .coHostLeave(let action), .leaveAsCoHost(action: let action):
-                return .destructive(Text(AmityLocalizedStringSet.General.leave.localizedString), action: action)
+                return .destructive(Text(AmityLocalizedStringSet.Social.leave.localizedString), action: action)
             case .removeCoHost(let action):
                 return .destructive(Text(AmityLocalizedStringSet.Social.livestreamAlertRemoveButton.localizedString), action: action)
             case .streamDiscard(let action):
-                return .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: action)
+                return .destructive(Text(AmityLocalizedStringSet.Social.discard.localizedString), action: action)
             case .disableCoHostProductTag(let action):
                 return .destructive(Text(AmityLocalizedStringSet.Social.productTagDisableButton.localizedString), action: action)
             case .productTaggingDisabled(let action):

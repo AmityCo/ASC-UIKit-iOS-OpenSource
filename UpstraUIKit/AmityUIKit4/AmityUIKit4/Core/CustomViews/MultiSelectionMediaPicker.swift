@@ -60,7 +60,7 @@ struct MultiSelectionMediaPicker: UIViewControllerRepresentable {
             var videos: [URL] = []
             
             DispatchQueue.main.async {
-                self.showLoadingOverlay(on: picker.view, message: "Processing media...")
+                self.showLoadingOverlay(on: picker.view, message: AmityLocalizedStringSet.Social.mediaProcessing.localizedString)
             }
             
             for result in results {

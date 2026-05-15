@@ -77,23 +77,24 @@ public struct AmityCommentTrayComponent: AmityComponentView {
             CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
                 commentCoreViewModel.editingComment = comment
             } reportAction: { comment in
-                
+
                 let commentId = comment?.commentId ?? ""
-                
-                // Dismiss bottom sheet
-                host.controller?.dismiss(animated: false)
-                
+
                 if commentCoreViewModel.targetMembershipStatus == .nonMember {
                     AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: .init(host: host))
                     return
                 }
-                
+
                 AmityUserAction.perform(host: host) {
                     let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil))
                         .updateTheme(with: viewConfig)
                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                     vc.isNavigationBarHidden = true
-                    self.host.controller?.present(vc, animated: true)
+                    // Wait for the bottom-sheet dismissal animation (0.35s) to finish
+                    // before presenting, otherwise UIKit silently drops the present.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        UIApplication.topViewController()?.present(vc, animated: true)
+                    }
                 }
             }
         }

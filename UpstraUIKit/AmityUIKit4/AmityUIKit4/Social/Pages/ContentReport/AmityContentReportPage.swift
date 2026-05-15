@@ -69,7 +69,7 @@ struct AmityContentReportPage: View {
                                 .padding(.vertical, 12)
                             
                             ForEach(reasons, id: \.description) { item in
-                                OptionButton(title: item.description, isSelected: viewModel.selectedReason?.isEqual(item: item) ?? false) {
+                                OptionButton(title: item.localizedDescription, isSelected: viewModel.selectedReason?.isEqual(item: item) ?? false) {
                                     viewModel.selectedReason = item
                                 }
                             }
@@ -82,7 +82,7 @@ struct AmityContentReportPage: View {
                             }, label: {
                                 HStack {
                                     let otherReason = AmityContentFlagReason.others("")
-                                    Text(otherReason.description)
+                                    Text(otherReason.localizedDescription)
                                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                                     
                                     Spacer()
@@ -114,7 +114,7 @@ struct AmityContentReportPage: View {
                             if viewModel.submissionState == .success {
                                 self.host.controller?.dismiss(animated: true)
                                 
-                                let toastMessage = AmityLocalizedStringSet.Social.reportReasonSuccessToastMessage.localized(arguments: viewModel.type.description.capitalized)
+                                let toastMessage = AmityLocalizedStringSet.Social.reportReasonSuccessToastMessage.localized(arguments: viewModel.type.description)
                                 Toast.showToast(style: .success, message: toastMessage)
                             }
                         }
@@ -139,5 +139,30 @@ extension AmityContentFlagReason {
     
     func isEqual(item: AmityContentFlagReason) -> Bool {
         return self.description == item.description
+    }
+    
+    var localizedDescription: String {
+        switch self {
+        case .communityGuidelines:
+            return AmityLocalizedStringSet.Social.reportReasonCommunityGuidelines.localizedString
+        case .harassmentOrBullying:
+            return AmityLocalizedStringSet.Social.reportReasonHarassmentOrBullying.localizedString
+        case .selfHarmOrSuicide:
+            return AmityLocalizedStringSet.Social.reportReasonSelfHarmOrSuicide.localizedString
+        case .violenceOrThreateningContent:
+            return AmityLocalizedStringSet.Social.reportReasonViolenceOrThreatening.localizedString
+        case .sellingRestrictedItems:
+            return AmityLocalizedStringSet.Social.reportReasonSellingRestricted.localizedString
+        case .sexualContentOrNudity:
+            return AmityLocalizedStringSet.Social.reportReasonSexualContentOrNudity.localizedString
+        case .spamOrScams:
+            return AmityLocalizedStringSet.Social.reportReasonSpamOrScams.localizedString
+        case .falseInformation:
+            return AmityLocalizedStringSet.Social.reportReasonFalseInformation.localizedString
+        case .others:
+            return AmityLocalizedStringSet.Social.reportReasonOthersPageTitle.localizedString
+        @unknown default:
+            return self.description
+        }
     }
 }

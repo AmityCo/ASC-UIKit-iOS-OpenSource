@@ -450,7 +450,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
         let alert = UIAlertController(title: AmityLocalizedStringSet.Social.livestreamChatMessageNotSentTitle.localizedString, message: nil, preferredStyle: .actionSheet)
         alert.overrideUserInterfaceStyle = .dark
 
-        let deleteAction = UIAlertAction(title: AmityLocalizedStringSet.Social.livestreamChatDeleteAction.localizedString, style: .destructive) { _ in
+        let deleteAction = UIAlertAction(title: AmityLocalizedStringSet.General.delete.localizedString, style: .destructive) { _ in
             Task.runOnMainActor {
                 try await viewModel.deleteMessage(message.id)
             }

@@ -129,9 +129,7 @@ class AVPlayerLayerCache {
     /// Create a new AVPlayerLayer for the given URL
     private func createPlayerLayer(for url: URL) -> AVPlayerLayer {
         let headers: [String : String] = [
-            "Authorization": "Bearer \(AmityUIKitManagerInternal.shared.client.accessToken ?? "")"
-        ]
-        // Do not add auth headers for guest user, clip doesn't play
+            "Authorization": "Bearer \(AmityUIKitManagerInternal.shared.client.accessToken ?? "")"] // l10n:ok HTTP header key not user-facing
         let asset: AVURLAsset
         if AmityUIKitManagerInternal.shared.isGuestUser {
             asset = AVURLAsset(url: url)

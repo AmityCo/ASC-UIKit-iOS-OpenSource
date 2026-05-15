@@ -78,7 +78,7 @@ class PollStatus {
     init(poll: AmityPostModel.PollModel, isInPendingFeed: Bool) {
         self.isInPendingFeed = isInPendingFeed
         if poll.isClosed {
-            statusInfo = AmityLocalizedStringSet.Social.pollStatusEnded.localizedString
+            statusInfo = AmityLocalizedStringSet.Social.eventDetailHeaderStatusEnded.localizedString
         } else {
             let closedInDate = poll.createdAt.addingTimeInterval(Double(poll.closedIn) / 1000)
             computeRemainingTime(closedInDate: closedInDate, isInPendingFeed: isInPendingFeed)
@@ -91,7 +91,7 @@ class PollStatus {
         if closedInDate > currentDate {
             
             if isInPendingFeed {
-                statusInfo = AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationFormatter.string(from: closedInDate)
+                statusInfo = AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationDateString(from: closedInDate)
                 return
             }
             
@@ -120,7 +120,7 @@ class PollStatus {
             }
             
         } else {
-            statusInfo = AmityLocalizedStringSet.Social.pollStatusEnded.localizedString
+            statusInfo = AmityLocalizedStringSet.Social.eventDetailHeaderStatusEnded.localizedString
         }
     }
     

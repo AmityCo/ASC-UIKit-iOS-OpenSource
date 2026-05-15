@@ -105,7 +105,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
             
             Spacer()
             
-            Text("Add Member")
+            Text(AmityLocalizedStringSet.Social.addMember.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
@@ -127,7 +127,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .padding(.leading, 12)
             
             ZStack(alignment: .trailing) {
-                TextField("Search user", text: $viewModel.searchKeyword)
+                TextField(AmityLocalizedStringSet.Social.searchUserPlaceholder.localizedString, text: $viewModel.searchKeyword)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                 
                 Button(
@@ -244,7 +244,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                             .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
                             .isHidden(!selectedUsers.isEmpty, remove: true)
                         
-                        Text("Add member")
+                        Text(AmityLocalizedStringSet.Social.addMember.localizedString)
                             .applyTextStyle(.bodyBold(.white))
                     }
                 )
@@ -266,7 +266,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 .frame(width: 60, height: 60)
             
-            Text("No results found")
+            Text(AmityLocalizedStringSet.Social.searchNoResultsFound.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
         }
         .padding(.top, 100)
@@ -281,7 +281,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 .frame(width: 60, height: 60)
         
-            Text("Start your search by typing at least 3 letters")
+            Text(AmityLocalizedStringSet.Social.startSearchHint.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 .multilineTextAlignment(.center)
         }

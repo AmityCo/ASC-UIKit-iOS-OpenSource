@@ -59,7 +59,7 @@ public struct AmityPostComposerPage: AmityPageView {
         .localizedString
     
     private var loadingToastMessage: String {
-        viewModel.isInCreateMode ? "Posting..." : "Updating..."
+        viewModel.isInCreateMode ? AmityLocalizedStringSet.Social.pollCreatePostingToast.localizedString : AmityLocalizedStringSet.Social.postComposerLoadingUpdating.localizedString
     }
     
     var clipURL: URL? {
@@ -80,9 +80,9 @@ public struct AmityPostComposerPage: AmityPageView {
     var placeholderText: String {
         switch viewModel.mode {
         case .createClip:
-            return "What's going on? (optional)"
+            return AmityLocalizedStringSet.Social.postComposerBodyClipPlaceholder.localizedString
         default:
-            return "What's going on..."
+            return AmityLocalizedStringSet.Social.postComposerBodyPlaceholder.localizedString
         }
     }
     
@@ -142,7 +142,7 @@ public struct AmityPostComposerPage: AmityPageView {
                     clipPreview
                     
                     ExpandableTextEditorView(isTextEditorFocused: .constant(false), input: $viewModel.postTitle)
-                        .placeholder("Title (Optional)")
+                        .placeholder(AmityLocalizedStringSet.Social.postComposerTitlePlaceholder.localizedString)
                         .font(AmityTextStyle.titleBold(.clear).getFont())
                         .placeholderColor(Color(viewConfig.theme.baseColorShade2))
                         .textColor(Color(viewConfig.theme.baseColor))
@@ -185,14 +185,14 @@ public struct AmityPostComposerPage: AmityPageView {
                                 message: AmityLocalizedStringSet.Social.productTagLimitMessage.localizedString,
                                 preferredStyle: .alert
                             )
-                            alert.addAction(UIAlertAction(title: AmityLocalizedStringSet.General.okay.localizedString, style: .cancel))
+                            alert.addAction(UIAlertAction(title: AmityLocalizedStringSet.Chat.okButton.localizedString, style: .cancel))
                             host.controller?.present(alert, animated: true)
                             textEditorViewModel.reachProductTagLimit = false
                         }
                     }
                     .onChange(of: textEditorViewModel.reachHashtagLimit) { reached in
                         if reached {
-                            let alert = UIAlertController(title: "Hashtag limit reached", message: "You can only add hashtag up to 30 hashtags per post.", preferredStyle: .alert)
+                            let alert = UIAlertController(title: AmityLocalizedStringSet.Social.postComposerHashtagLimitAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.postComposerHashtagLimitAlertMessage.localized(arguments: 30), preferredStyle: .alert)
                             let action = UIAlertAction(title: "OK", style: .cancel)
                             alert.addAction(action)
                             host.controller?.present(alert, animated: true)
@@ -431,7 +431,7 @@ public struct AmityPostComposerPage: AmityPageView {
     
     @ViewBuilder
     private var navigationBarView: some View {
-        let editPageTitle = viewConfig.forElement(.editPostTitle).text ?? "Edit Post"
+        let editPageTitle = viewConfig.forElement(.editPostTitle).text ?? AmityLocalizedStringSet.Social.editPost.localizedString
         AmityNavigationBar(title: viewModel.isInCreateMode ? viewModel.displayName : editPageTitle) {
             if viewModel.isInClipComposerMode {
                 AmityNavigationBar.BackButton {
@@ -450,8 +450,8 @@ public struct AmityPostComposerPage: AmityPageView {
                     }
             }
         } trailing: {
-            let createPostButtonTitle = viewConfig.forElement(.createNewPostButton).text ?? "Post"
-            let editPostButtonTitle = viewConfig.forElement(.editPostButton).text ?? "Save"
+            let createPostButtonTitle = viewConfig.forElement(.createNewPostButton).text ?? AmityLocalizedStringSet.General.post.localizedString
+            let editPostButtonTitle = viewConfig.forElement(.editPostButton).text ?? AmityLocalizedStringSet.Social.saveButton.localizedString
             
             let hasContent = !viewModel.postText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !mediaAttatchmentViewModel.medias.isEmpty || viewModel.isInClipComposerMode
             let canCreatePost = hasContent && !isLoading && mediaAttatchmentViewModel.areAttachmentsReady
@@ -472,7 +472,7 @@ public struct AmityPostComposerPage: AmityPageView {
             .accessibilityIdentifier(viewModel.isInCreateMode ? AccessibilityID.Social.PostComposer.createNewPostButton : AccessibilityID.Social.PostComposer.editPostButton)
         }
         .alert(isPresented: $showDismissAlert) {
-            Alert(title: Text(AmityLocalizedStringSet.Social.postDiscardAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.postDiscardAlertMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.Social.postDiscardAlertButtonKeepEditing.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: {
+            Alert(title: Text(AmityLocalizedStringSet.Social.postDiscardAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.postDiscardAlertMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.Social.keepEditing.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.discard.localizedString), action: {
                 
                 switch viewModel.mode {
                 case .createClip:
@@ -517,11 +517,11 @@ public struct AmityPostComposerPage: AmityPageView {
         : AmityLocalizedStringSet.Social.postEditError.localizedString
         
         if viewModel.postText.utf16Count > maxCharLimit {
-            message = "Your post wasn't posted because it exceeds the 50,000 characters limit."
+            message = String(format: AmityLocalizedStringSet.Social.postTextExceedErrorMessage.localizedString, maxCharLimit)
         } else if error.isAmityErrorCode(.banWordFound) {
-            message = "Your post wasn't posted because it contains a blocked word."
+            message = AmityLocalizedStringSet.Social.postBanWordErrorMessage.localizedString
         } else if error.isAmityErrorCode(.linkNotAllowed) {
-            message = "Your post wasn't posted because it contains a link that's not allowed."
+            message = AmityLocalizedStringSet.Social.postLinkNotAllowedErrorMessage.localizedString
         } else {
             message =
             viewModel.isInCreateMode
@@ -701,7 +701,6 @@ public struct AmityPostComposerPage: AmityPageView {
                     
                     // Notify that post images have been updated after successful edit
                     // Include the post and deleted file IDs as userInfo
-                    print("DeletedFileIds \(deletedMediaFileIds)" )
                     NotificationCenter.default.post(
                         name: .didPostImageUpdated,
                         object: post,
@@ -725,15 +724,15 @@ public struct AmityPostComposerPage: AmityPageView {
 
                 host.controller?.navigationController?.dismiss(animated: true, completion: {
                     if showProductTagWarning {
-                        Toast.showToast(style: .warning, message: "Some products that you've tagged are no longer available.")
+                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postComposerProductsUnavailableToast.localizedString)
                     }
                     if post?.getFeedType() == .reviewing {
-                        let title = isInCreateMode ? "Posts sent for review" : "Post updates sent for review"
-                        let message = isInCreateMode ? "Your post has been submitted to the pending list. It will be published once approved by the community moderator" : "Your post update has been submitted to the pending list. It will be published once approved by the community moderator"
+                        let title = isInCreateMode ? AmityLocalizedStringSet.Social.postComposerPostsSentForReviewTitle.localizedString : AmityLocalizedStringSet.Social.postComposerPostUpdatesSentForReviewTitle.localizedString
+                        let message = isInCreateMode ? AmityLocalizedStringSet.Social.postComposerPostSentForReviewMessage.localizedString : AmityLocalizedStringSet.Social.postComposerPostUpdateSentForReviewMessage.localizedString
                         
                         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
                         
-                        let okAction = UIAlertAction(title: AmityLocalizedStringSet.General.okay.localizedString, style: .cancel)
+                        let okAction = UIAlertAction(title: AmityLocalizedStringSet.Chat.okButton.localizedString, style: .cancel)
                         alertController.addAction(okAction)
                         
                         UIApplication.topViewController()?.present(alertController, animated: true)
@@ -766,10 +765,10 @@ public struct AmityPostComposerPage: AmityPageView {
     }
     
     private func showAlertForLinkLimit() {
-        let alert = UIAlertController(title: "Link limit reached", message: "You can only add up to 100 links per post.", preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .cancel)
+        let alert = UIAlertController(title: AmityLocalizedStringSet.Social.postComposerLinkLimitAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.postComposerLinkLimitAlertMessage.localizedString, preferredStyle: .alert)
+        let action = UIAlertAction(title: AmityLocalizedStringSet.Chat.okButton.localizedString, style: .cancel)
         alert.addAction(action)
-        
+
         UIApplication.topViewController()?.present(alert, animated: true)
     }
     

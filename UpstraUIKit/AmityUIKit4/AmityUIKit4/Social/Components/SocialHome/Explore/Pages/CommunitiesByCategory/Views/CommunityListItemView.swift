@@ -112,7 +112,7 @@ struct CommunityInfoView: View {
                                             Log.add(event: .success, "Join request cancelled for community \(community.displayName)")
                                         } catch let error {
                                             Log.warn("Error while cancelling join request \(error)")
-                                            Toast.showToast(style: .success, message: "Failed to cancel your request. Please try again.")
+                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityJoinCancelRequestFailedToast.localizedString)
                                         }
                                     } else {
                                         joinAction()
@@ -127,7 +127,7 @@ struct CommunityInfoView: View {
             .frame(height: 48)
             .alert(isPresented: $showLeaveCommunityAlert) {
                 
-                Alert(title: Text(AmityLocalizedStringSet.Social.communityLeaveAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.communityLeaveAlertPendingRequestMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.leave.localizedString), action: {
+                Alert(title: Text(AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.communityLeaveAlertPendingRequestMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.leave.localizedString), action: {
                     
                     Task { @MainActor in
                         let isSuccess = try await viewModel.leaveCommunity(communityId: community.communityId)
@@ -145,7 +145,7 @@ struct CommunityInfoView: View {
             if isJoined {
                 let isSuccess = try await viewModel.leaveCommunity(communityId: communityId)
                 Log.add(event: .info, "Leaving Community Status: \(isSuccess)")
-                Toast.showToast(style: .success, message: "You unjoined \(community.displayName)!")
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityUnjoinedToast.localized(arguments: community.displayName))
             } else {
                 do {
                     let result = try await community.object.join()
@@ -159,7 +159,7 @@ struct CommunityInfoView: View {
                         break
                     }
                 } catch {
-                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinToastErrorMessage.localizedString)
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinFailedToast.localizedString)
                 }
             }
         }
@@ -207,7 +207,7 @@ struct CommunityJoinButton: View {
                     .scaledToFit()
                     .frame(width: 16, height: 16)
                 
-                Text("Pending")
+                Text(AmityLocalizedStringSet.General.pending.localizedString)
                     .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
             }
         }

@@ -124,7 +124,7 @@ struct ManageProductTagListComponent: AmityComponentView {
                         Button(action: {
                             onAddProducts()
                         }) {
-                            Text(AmityLocalizedStringSet.Social.productTagAddProducts.localizedString)
+                            Text(AmityLocalizedStringSet.Social.addProducts.localizedString)
                                 .applyTextStyle(.bodyBold(.white))
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 10)
@@ -230,7 +230,7 @@ struct ManageProductTagListComponent: AmityComponentView {
                         Button(action: {
                             onAddProducts()
                         }) {
-                            Text(AmityLocalizedStringSet.Social.productTagAddProducts.localizedString)
+                            Text(AmityLocalizedStringSet.Social.addProducts.localizedString)
                                 .applyTextStyle(.bodyBold(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.baseColor) : Color(hex: "#40434E")))
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)

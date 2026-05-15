@@ -51,7 +51,20 @@ public struct AmityCommunityPostPermissionPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .frame(width: 24, height: 20)
                 .onTapGesture {
-                    host.controller?.navigationController?.popViewController()
+                    if community.postSettings != viewModel.selectedSetting {
+                        let alert = UIAlertController(title: AmityLocalizedStringSet.Social.eventDetailAlertLeaveWithoutFinishingTitle.localizedString, message: AmityLocalizedStringSet.Social.communityNotificationLeaveAlertMessage.localizedString, preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
+                        let leaveAction = UIAlertAction(title: AmityLocalizedStringSet.Social.leave.localizedString, style: .destructive) { _ in
+                            host.controller?.navigationController?.popViewController()
+                        }
+
+                        alert.addAction(cancelAction)
+                        alert.addAction(leaveAction)
+
+                        host.controller?.present(alert, animated: true)
+                    } else {
+                        host.controller?.navigationController?.popViewController()
+                    }
                 }
             
             Spacer()
@@ -61,7 +74,7 @@ public struct AmityCommunityPostPermissionPage: AmityPageView {
             
             Spacer()
             
-            Text(AmityLocalizedStringSet.General.save.localizedString)
+            Text(AmityLocalizedStringSet.Social.saveButton.localizedString)
                 .applyTextStyle(.title(Color(viewConfig.theme.primaryColor)))
                 .opacity(community.postSettings == viewModel.selectedSetting ? 0.35 : 1.0)
                 .onTapGesture {
@@ -74,7 +87,7 @@ public struct AmityCommunityPostPermissionPage: AmityPageView {
                                 navigationController.popToViewController(navigationController.viewControllers[1], animated: true)
                             }
                         } catch {
-                            Toast.showToast(style: .success, message: "Failed to update community profile!")
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityProfileUpdateFailedToast.localizedString)
                         }
                     }
                 }

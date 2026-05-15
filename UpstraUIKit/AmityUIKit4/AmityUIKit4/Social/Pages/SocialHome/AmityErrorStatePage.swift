@@ -21,11 +21,11 @@ struct AmityErrorStatePage: View {
                     .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 
                 VStack(spacing: 10) {
-                    Text("Something went wrong")
+                    Text(AmityLocalizedStringSet.Social.postDetailDeletedPostTitle.localizedString)
                         .applyTextStyle(.headline(Color(viewConfig.theme.baseColorShade2)))
                         .multilineTextAlignment(.center)
 
-                    Text("The content you're looking for is unavailable.")
+                    Text(AmityLocalizedStringSet.Social.contentUnavailable.localizedString)
                         .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade3)))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)
@@ -42,7 +42,7 @@ struct AmityErrorStatePage: View {
                 Button {
                     host.controller?.dismissOrPop()
                 } label: {
-                    Text("OK")
+                    Text(AmityLocalizedStringSet.Chat.okButton.localizedString)
                         .applyTextStyle(.bodyBold(.white))
                         .frame(maxWidth: .infinity)
                         .contentShape(Rectangle())

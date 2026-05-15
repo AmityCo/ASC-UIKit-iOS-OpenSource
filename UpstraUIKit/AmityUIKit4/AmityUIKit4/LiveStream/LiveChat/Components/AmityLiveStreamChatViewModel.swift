@@ -203,7 +203,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     private func unsubscribeChannel(_ channel: AmityChannel) {        
         channel.unSubscribeEvent(completion: { status, error in
             if error != nil {
-                Log.add(event: .error, "Failed to unsubscribe from the live chat channel: \(error?.localizedDescription ?? "Unknown error")")
+                Log.add(event: .error, "Failed to unsubscribe from the live chat channel: \(error?.localizedDescription ?? AmityLocalizedStringSet.General.unknownError.localizedString)")
             } else {
                 Log.add(event: .info, "UnSubscribed to the live chat channel: \(channel.channelId)")
             }
@@ -419,7 +419,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
                         try await self.demoteModerator(userId: self.coHostUserId)
                     }
                 } catch {
-                    print("Error updating moderator: \(error)")
+                    Log.add(event: .error, "Error updating moderator status for co-host: \(error.localizedDescription)")
                 }
             }
             

@@ -1,0 +1,1288 @@
+/* 
+  AmityLocalizable.strings
+  AmityUIKit
+
+  Created by Sarawoot Khunsri on 8/6/2563 BE.
+  Copyright © 2563 Amity Communication. All rights reserved.
+*/
+
+// MARK: - Story
+
+// General
+"amity_common_button_cancel" = "Cancel";
+"save" = "Save";
+"retry" = "Retry";
+"amity_common_button_delete" = "Delete";
+"discard" = "Discard";
+"leave" = "Leave";
+ "confirm" = "Confirm";
+ "edit" = "Edit";
+"general_anonymous" = "Anonymous";
+"permission_required" = "Permission Required!!";
+"camera_access_denied" = "Please grant camera permission in iOS settings.";
+"on" = "On";
+"off" = "Off";
+"done" = "Done";
+
+// Create Story
+"created_story_successfully" = "Successfully shared story";
+"crated_story_failed" = "Failed to share story";
+"creating_story" = "Uploading...";
+
+// View Story
+"delete_story_title" = "Delete this story?";
+"delete_story_message" = "This story will be permanently deleted. You’ll no longer be able to see and find this story";
+"amity_story_delete_button" = "Delete story";
+"story_deleted_toast_message" = "Story deleted";
+"amity_social_failed_to_delete_story_please_try_again" = "Failed to delete story. Please try again.";
+"failed_story_banner_message" = "Failed to upload";
+"failed_story_alert_title" = "Failed to upload story";
+"failed_story_alert_message" = "Would you like to discard or retry uploading?";
+
+// Comment Tray
+"comment_tray_component_title" = "Comments";
+"comment_text_field_placeholder" = "Say something nice...";
+"no_comment_available" = "No comments yet";
+"delete_comment_title" = "Delete comment";
+"social_label_delete_comment_message" = "This comment will be permanently removed.";
+"deleted_comment_message" = "This comment has been deleted";
+"deleted_reply_comment_message" = "This reply has been deleted";
+"edit_comment_bottom_sheet_title" = "Edit comment";
+"delete_comment_bottom_sheet_title" = "Delete comment";
+"report_comment_bottom_sheet_title" = "Report comment.";
+"unreport_comment_bottom_sheet_title" = "Unreport comment.";
+"comment_reported_message" = "Comment reported.";
+"comment_unreported_message" = "Comment unreported.";
+"report_reply_bottom_sheet_title" = "Report reply";
+"unreport_reply_bottom_sheet_title" = "Unreport reply.";
+"reply_reported_message" = "Reply reported.";
+"reply_unreported_message" = "Reply unreported.";
+"comment_react_button_text" = "Like";
+"comment_reacted_button_text" = "Like";
+"comment_reply_button_text" = "Reply";
+"comment_edited_text" = "(edited)";
+"view_more_reply_text" = "View more replies";
+"reply_unavailable_toast_message" = "This reply is no longer available.";
+"disable_create_comment_text" = "Comments are disabled for this story";
+"comment_with_banned_words_error_message" = "Your comment contains inappropriate word. Please review and delete it.";
+"comment_with_not_allowed_link_error" = "Your comment contains a link that's not allowed. Please review and delete it.";
+"edit_reply_bottom_sheet_title" = "Edit reply";
+"delete_reply_bottom_sheet_title" = "Delete reply";
+"delete_reply_title" = "Delete reply";
+"delete_reply_message" = "This reply will be permanently deleted.";
+"comment_unavailable_toast_message" = "This comment is no longer available.";
+"post_unavailable_toast_message" = "This post is no longer available.";
+"social_label_this_clip_is_no_longer_available" = "This clip is no longer available.";
+"comment_edit_error" = "Failed to edit comment. Please try again.";
+
+// Toast
+"chat_toast_loading" = "Loading chat...";
+"chat_toast_copied" = "Copied";
+"chat_toast_delete_error" = "Unable to delete message. Please try again.";
+"chat_toast_link_not_allow" = "Your message wasn’t sent as it contained a link that’s not allowed.";
+"chat_toast_banned_word" = "Your message wasn’t sent as it contained a blocked word.";
+"chat_toast_report_message" = "Message reported.";
+"chat_toast_un_report_message" = "Message unreported.";
+"chat_toast_report_message_error" = "This message failed to be reported. Please try again.";
+"chat_toast_un_report_message_error" = "This message failed to be unreported. Please try again.";
+
+// Button
+"chat_deleted_message_text" = "This message was deleted";
+
+"chat_button_reply" = "Reply";
+"chat_button_copy" = "Copy";
+"chat_button_delete" = "Delete";
+"chat_button_report" = "Report";
+"chat_button_un_report" = "Unreport";
+"chat_button_ok" = "OK";
+
+// Error
+"chat_error_loading_chat_title" = "Couldn't Load Chat";
+"chat_error_banned_chat_title" = "You are banned from chat";
+"chat_error_banned_chat_sub_title" = "You won’t be able to participate in this chat until you’ve been unbanned.";
+
+"chat_char_limit_alert_title" = "Unable to send message";
+"chat_char_limit_alert_message" = "Your message is too long. Please shorten your message and try again.";
+"chat_delete_alert_title" = "Delete this message?";
+"chat_delete_alert_message" = "This message will also be removed from your friend’s devices.";
+"chat_delete_action_sheet_title" = "Your message wasn’t sent.";
+
+"chat_user_is_muted" = "You’ve been muted by the channel moderator.";
+"chat_channel_is_muted" = "This channel has been set to read-only by the channel moderator.";
+
+"chat_sending_status" = "sending...";
+"network_connectivity_status" = "Waiting for network...";
+
+"chat_mention_everyone" = "Notify everyone";
+"chat_reply_preview" = "Replying to %@";
+"chat_member_count" = "%@ members";
+
+ // Social
+"social_label_find_community_or_create_your_own" = "Find community or create your own ";
+"amity_social_label_find_community_or_create_your_own" = "Find community or create your own.";
+"edit_post_bottom_sheet_title" = "Edit post";
+"delete_post_bottom_sheet_title" = "Delete post";
+"report_post_bottom_sheet_title" = "Report post";
+"unreport_post_bottom_sheet_title" = "Unreport post";
+"delete_post_title" = "Delete this post?";
+"delete_post_message" = "This post will be permanently deleted. You'll no longer see and find this post.";
+"post_reported_message" = "Post reported";
+"post_unreported_message" = "Post unreported";
+"post_failed_reported_message" = "Failed to report post. Please try again.";
+"post_failed_unreported_message" = "Failed to unreport post. Please try again.";
+"post_deleted_toast_message" = "Post deleted";
+"post_detail_page_title" = "Post";
+"create_post_bottom_sheet_title" = "Post";
+"amity_social_button_story" = "Story";
+"community_page_join_title" = "Join";
+"community_page_joined_title" = "Joined";
+ "community_page_pending_post_title" = "Pending post";
+ 
+"reaction_list_unable_to_load_title" = "Unable to load reactions";
+"reaction_list_unrable_to_load_subtitle" = "Reactions aren't available for this message";
+"reaction_list_no_reactions_title" = "No reactions yet";
+"reaction_list_no_reactions_subtitle" = "Be the first to react to this message!";
+"reaction_list_tap_to_remove" = "Tap to remove reaction";
+"reaction_tab_all" = "All";
+
+"reach_mention_limit_title" = "Unable to mention user";
+"chat_reach_mention_limit_Message" = "You have reached maximum 30 mentioned users in a chat.";
+"ads_sponsored_label" = "Sponsored";
+"community_setup_alert_title" = "Leave without finishing?";
+"community_setup_alert_message" = "Your progress won’t be saved and your community won’t be created.";
+"community_setup_edit_alert_title" = "Unsaved changes";
+"community_setup_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+
+"livestream_player_ended_title" = "This live stream has ended.";
+"livestream_player_ended_message" = "Playback will be available for you to watch shortly.";
+
+"livestream_player_error_title" = "Playback unavailable.";
+"livestream_player_error_message" = "This live stream was too short to have a playback.";
+
+"livestream_player_terminated_title" = "The stream has been terminated.";
+"livestream_player_terminated_message" = "It looks like this live stream goes against our content moderation guidelines.";
+"livestream_player_banned_title" = "You’ve been banned.";
+"livestream_player_banned_message" = "You can no longer access this live stream.";
+"livestream_player_unavailable_title" = "This stream is currently unavailable.";
+"livestream_player_unavailable_message" = "Please try again later.";
+"livestream_player_reconnecting_title" = "Reconnecting";
+"livestream_player_reconnecting_message" = "Due to poor connection, this live stream has been paused. It will resume automatically once the connection is stable.";
+"livestream_player_recorded" = "RECORDED";
+"livestream_player_upcoming_live" = "UPCOMING LIVE";
+
+ // Community Setting
+ "community_setting_community_permissions_title" = "Community permissions";
+"community_setting_notifications_title" = "Your preferences";
+"community_setting_edit_profile" = "Community profile";
+"community_setting_members" = "Members";
+"community_setting_notifications" = "Notifications";
+"community_setting_post_permissions" = "Post permissions";
+"community_setting_story_comments" = "Story comments";
+"community_setting_leave_community" = "Leave community";
+"community_setting_close_community" = "Close community";
+"community_setting_close_community_description" = "Closing this community will remove the community  page and all its content and comments.";
+
+"community_setting_leave_community_alert_title" = "Leave community?";
+"community_setting_leave_community_alert_message" = "You will no longer be able to post and interact in this community.";
+"community_setting_leave_community_failed_alert_title" = "Unable to leave community";
+"community_setting_leave_community_failed_alert_message" = "You’re the only moderator in this group. To leave community, nominate other members to moderator role.";
+"community_setting_close_community_alert_title" = "Close community?";
+"social_button_close_community_msg" = "All members will be removed from the community. All posts, messages, reactions, and media shared in community will be deleted. This cannot be undone.";
+"community_post_permission_title" = "Who can post on this community";
+"community_post_permission_description" = "You can control who can create posts in your community.";
+"community_post_permission_everyone_can_post_setting" = "Everyone can post";
+"community_post_permission_admin_review_setting" = "Admin review post";
+"community_post_permission_only_admin_can_post_setting" = "Only admins can post";
+"community_story_setting_title" = "Allow comments on community stories";
+"community_story_setting_description" = "Turn on to receive comments on stories in this community.";
+
+"community_notification_setting_page_title" = "Notifications";
+"community_notification_setting_title" = "Allow notifications";
+"community_notification_setting_description" = "Turn on to receive push notifications from this community.";
+"community_notification_setting_posts" = "Posts";
+"community_notification_setting_comments" = "Comments";
+"community_notification_setting_stories" = "Stories";
+"community_notification_setting_option_everyone" = "Everyone";
+"community_notification_setting_option_only_moderator" = "Only moderator";
+"community_notification_setting_option_off" = "Off";
+"community_notification_setting_post_reaction_title" = "React posts";
+"community_notification_setting_post_reaction_description" = "Receive notifications when someone reacts to your posts in this community.";
+"community_notification_setting_post_creation_title" = "New posts";
+"community_notification_setting_post_creation_description" = "Receive notifications when someone creates a new post in this community.";
+"community_notification_setting_comment_reaction_title" = "React comments";
+"community_notification_setting_comment_reaction_description" = "Receive notifications when someone likes your comment in this community.";
+"community_notification_setting_comment_creation_title" = "New comments";
+"community_notification_setting_comment_creation_description" = "Receive notifications when someone comments on your posts in this community.";
+"community_notification_setting_comment_reply_title" = "Replies";
+"community_notification_setting_comment_reply_description" = "Receive notifications when someone replies to your comments in this community.";
+"community_notification_setting_story_creation_title" = "New stories";
+"community_notification_setting_story_creation_description" = "Receive notifications when someone creates a new story in this community.";
+"community_notification_setting_story_reaction_title" = "Story reactions";
+"community_notification_setting_story_reaction_Description" = "Receive notifications when someone reacts to your story in this community.";
+"community_notification_setting_story_comment_title" = "Story comments";
+"community_notification_setting_story_comment_description" = "Receive notifications when someone comments on your story in this community.";
+
+"community_member_count_singular" = "%@ member";
+"community_member_count_plural" = "%@ members";
+
+"explore_categories_see_more" = "See More";
+"expandable_text_see_more" = "...See more";
+ "explore_trending_now_component_title" = "Trending Now";
+ "amity_social_label_recommended_for_you" = "Recommended for you";
+
+"community_all_categories_title" = "All Categories";
+"community_list_empty_state_title" = "No community yet";
+
+"featured_post_badge" = "Featured";
+"featured_post_edit_confirmation_title" = "Edit globally featured post?";
+"featured_post_edit_confirmation" = "The post you're editing has been featured globally. If you edit your post, it would need to be re-approved, and will no longer be globally featured.";
+
+"global_featured_community_edit_confirmation_title" = "Change community privacy settings?";
+"global_featured_community_edit_confirmation_msg" = "This community has globally featured posts. Changing the community from public to private will remove these posts from being featured globally";
+
+"user_profile_edit_alert_title" = "Unsaved changes";
+"user_profile_edit_alert_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+"user_profile_edit_success" = "Successfully updated your profile!";
+"user_profile_edit_banned_word" = "Your profile wasn't updated as it contains an inappropriate word.";
+"user_profile_edit_failed" = "Failed to save your profile. Please try again.";
+"user_profile_follow_request_title" = "New follow requests";
+"amity_social_user_profile_all_post_title" = "Public community & profile posts";
+"amity_social_user_profile_community_post_title" = "Public community posts";
+"amity_social_user_profile_user_post_title" = "Profile posts";
+
+// Polls
+"poll_close_alert_title" = "Close Poll?";
+"poll_close_alert_desc" = "The Poll duration you've set will be ignored and your poll will be closed immediately.";
+"poll_close_button" = "Close poll";
+"poll_close_toast_error" = "Oops, something went wrong";
+
+
+"poll_remaining_days_left" = "%@d left";
+"poll_remaining_hours_left" = "%@h left";
+"poll_remaining_minutes_left" = "%@m left";
+
+"poll_question_title" = "Poll question";
+"poll_post_title" = "Post title";
+"poll_post_title_optional" = "(Optional)";
+"poll_post_title_textfield_placeholder" = "Give your poll a headline";
+"poll_question_textfield_placeholder" = "What's your poll question?";
+"poll_multiple_selection_title" = "Multiple selection";
+"poll_multiple_selection_desc" = "Let participants vote more than one option.";
+
+"poll_post_create_error" = "Failed to create post. Please try again.";
+"poll_post_create_ban_word_error" = "Your post wasn't posted as it contains an inappropriate word.";
+"poll_create_posting_toast" = "Posting...";
+
+"poll_duration_title" = "Poll duration";
+"poll_duration_desc" = "You can always close the poll before the set duration.";
+"poll_ends_on_label" = "Ends on";
+
+"poll_options_title" = "Options";
+ "poll_options_desc" = "Poll must contain at least 2 options";
+ 
+"poll_option_label" = "Option";
+
+"poll_answer_result_no_votes" = "No votes";
+"poll_answer_result_voted_by_you" = "Voted by you";
+"poll_answer_result_voted_by_single_participant" = "Voted by 1 participant";
+"poll_answer_result_voted_by_multiple_participants" = "Voted by %@ participants";
+"poll_answer_result_voted_by_and_you" = "and you";
+
+"poll_duration_pick_date_and_time" = "Pick date and time";
+"poll_duration_done_button" = "Done";
+
+"poll_duration_singular_day" = "%d day";
+"poll_duration_plural_days" = "%d days";
+"amity_social_poll_date_time_format" = "%1$@ at %2$@";
+
+"poll_select_one_option_label" = "Select one option";
+"poll_select_one_or_more_option_label" = "Select one or more options";
+
+"poll_see_full_results_label" = "See full results";
+"poll_see_results_label" = "See results";
+"poll_back_to_vote_label" = "Back to poll";
+"poll_see_more_options_label" = "See %d more options";
+
+"poll_vote_counts" = "%@ voters";
+"poll_vote_button" = "Vote";
+"poll_unvote_button" = "Unvote";
+"poll_label" = "Poll";
+
+"poll_option_char_limit_error" = "Poll option cannot exceed %d characters.";
+"poll_question_char_limit_error" = "Poll question cannot exceed %d characters.";
+"poll_title_char_limit_error" = "Poll title cannot exceed %d characters.";
+
+"poll_target_my_timeline" = "My Timeline";
+
+"post_delete_error" = "Failed to delete post. Please try again.";
+"post_create_error" = "Failed to create post. Please try again.";
+"post_edit_error" = "Failed to edit post. Please try again.";
+
+"social_modal_dialog_title_discard_post" = "Discard this post?";
+"post_discard_alert_message" = "The post will be permanently discarded. It cannot be undone.";
+
+"search_no_results_found_title" = "No results found";
+"search_char_limit_not_reached" = "Start your search by typing\nat least 3 letters";
+
+"live_stream_target_live_on_label" = "Live on";
+"live_stream_duration_label" = "LIVE %@";
+"live_stream_my_timeline_label" = "My timeline";
+"live_stream_end_live_label" = "End live";
+
+"live_stream_alert_end_live_title" = "End live stream?";
+"live_stream_alert_end_live_desc" = "If you end your live stream, it will also end for all your viewers.";
+"live_stream_alert_end_button" = "End";
+
+"live_stream_change_thumbnail_label" = "Change thumbnail";
+"live_stream_delete_thumbnail_label" = "Delete thumbnail";
+"live_stream_add_thumbnail_label" = "Add thumbnail";
+
+"live_stream_input_add_stream_title" = "Add live stream title...";
+"live_stream_input_add_stream_desc" = "Add description (optional)";
+
+"live_stream_alert_end_at_max_duration_title" = "Live stream ended";
+"live_stream_alert_end_at_max_duration_message" = "Your live stream has been automatically terminated since you reached 4-hour limit.";
+
+"live_stream_alert_discard_stream_title" = "Unsaved changes";
+"live_stream_alert_discard_stream_message" = "Are you sure you want to discard the changes? They will be lost when you leave this page.";
+
+"live_stream_alert_stream_error_title" = "Cannot start live stream";
+"live_stream_alert_stream_error_message" = "Something went wrong while trying to complete your request. Please try again.";
+
+"live_stream_alert_thumbnail_upload_error_title" = "Upload failed";
+"live_stream_alert_thumbnail_upload_error_message" = "Please try again.";
+
+"live_stream_alert_thumbnail_upload_inappropriate_error_title" = "Inappropriate image";
+"live_stream_alert_thumbnail_upload_inappropriate_error_message" = "Please choose a different image to upload.";
+
+"live_stream_toast_end_at_max_duration_message" = "Your live will automatically end once it reaches 4-hour limit.";
+
+"live_stream_permission_open_settings_label" = "Open settings";
+"live_stream_permission_camera_and_microphone_title" = "Allow access to your camera and microphone";
+"amity_social_status_allow_camera_desc" = "This lets you record and live stream\nfrom this device.";
+
+"live_stream_starting_state_title" = "Starting live stream";
+"live_stream_reconnecting_state_title" = "Reconnecting";
+"live_stream_reconnecting_state_message" = "Due to poor connection, this live stream has been paused. It will resume automatically once the connection is stable.";
+"live_stream_ending_state_title" = "Live stream ends in";
+
+"post_detail_deleted_post_title" = "Something went wrong";
+"post_detail_deleted_post_message" = "The content you’re looking for is unavailable.";
+"post_detail_deleted_post_button_title" = "Go Back";
+
+"live_stream_terminated_page_title" = "Live terminated";
+"live_stream_terminated_page_desc_section_title" = "What does it mean?";
+
+"live_stream_terminated_watcher_title" = "The live stream has been\nterminated.";
+"live_stream_terminated_streamer_title" = "Your live stream has been\nterminated.";
+
+"live_stream_terminated_watcher_desc" = "It looks like the live stream you’re watching goes against our content moderation guidelines.";
+"live_stream_terminated_streamer_desc" = "It looks like your live stream goes against our content moderation guidelines.";
+
+"live_stream_terminated_playback_desc" = "There will be no playback of this live stream on any feeds.";
+"live_stream_terminated_streamer_content_desc" = "The live stream has also been terminated for all your viewers.";
+
+"amity_social_status_live_stream" = "Live stream";
+
+
+"live_stream_setting_readonly_title" = "Set live stream to read-only";
+"live_stream_setting_readonly_description" = "Members who are not streamer can read messages but cannot send any messages.";
+
+// Alt Text
+"alt_text_button_title" = "ALT";
+"alt_text_title" = "Alt text";
+"alt_text_edit_title" = "Edit alt text";
+"social_label_view_original_post" = "View post";
+"alt_text_placeholder" = "Describe this photo briefly to help visually impaired users understand its content";
+"alt_text_failed_to_add" = "Failed to add alt text. Please try again.";
+"alt_text_failed_to_edit" = "Failed to edit alt text. Please try again.";
+"alt_text_includes_banned_words" = "Your alt text contains an inappropriate word.";
+"alt_text_includes_not_allowed_link" = "Your alt text contains a link that is not allowed.";
+"alt_text_updated" = "Alt text updated.";
+
+"product_tags_added" = "Product tags have been added";
+"product_tags_updated" = "Product tags have been updated.";
+"product_tag_limit_title" = "Product tag limit reached";
+"product_tag_limit_message" = "You can only tag up to 20 products per post.";
+"social_label_product_tagging_unavailable_title" = "Product tagging isn't available";
+"product_tag_unavailable_description" = "Your post can still be published, but product tags will be removed.";
+"product_tag_unavailable_while_streaming_message" = "Any products you've tagged will be removed and won't be shown to viewers.";
+"product_tag_review_post" = "Review post";
+"product_tag_publish" = "Publish";
+"product_tag_edit_live" = "Edit live";
+"product_tag_go_live" = "Go live";
+"product_tag_disable_cohost_title" = "Disable co-host product tags control?";
+"product_tag_disable_cohost_message" = "If you disable this, the co-host can't add, remove, or pin products in this live stream.";
+"product_tag_disable_button" = "Disable";
+"product_tag_toast_added" = "Product tags added.";
+"product_tag_toast_pinned" = "Product tag pinned.";
+"product_tag_toast_unpinned" = "Product tag unpinned.";
+"product_tag_toast_pin_failed" = "Failed to pin product tag. Please try again.";
+"product_tag_toast_unpin_failed" = "Failed to unpin product tag. Please try again.";
+"product_tag_toast_removed" = "Product tag removed.";
+"product_tag_toast_cohost_manage_enabled" = "You can now manage tagged products in this live stream.";
+"product_tag_selection_discard_title" = "Discard product selection?";
+"product_tag_selection_discard_message" = "You have products selected that haven't been added yet. If you close now, your selection will be lost.";
+"product_tag_discard_title" = "Discard product tags";
+"product_tag_discard_message" = "You have tagged products that haven't been saved yet. If you leave now, your changes will be lost.";
+"product_tag_discard" = "Discard";
+"product_tag_tagged_products" = "Tagged products";
+"product_tag_add_products" = "Add products";
+"product_tag_pinned_label" = "Pinned";
+"product_tag_unlisted_label" = "Unlisted";
+"product_tag_pin_button" = "Pin";
+"product_tag_unpin_button" = "Unpin";
+"product_tag_no_products_title" = "No products tagged yet";
+"product_tag_no_products_message" = "You can add or remove products anytime and pin them to control what viewers see while you're live.";
+"product_tag_pinned_product_section" = "Pinned product";
+"product_tag_other_products_section" = "Other products";
+"live_stream_ending_stream_title" = "Ending live stream";
+"live_stream_waiting_for_approval_title" = "Waiting for approval";
+"live_stream_waiting_for_approval_message" = "This live stream has started. However, it will have limited visibility until your post has been approved.";
+"live_stream_waiting_for_cohost" = "Waiting for co-host to get ready...";
+
+"notification_tray_empty_state_title" = "No notifications";
+"report_page_submit_button" = "Submit";
+"report_page_info_label" = "Tell us why you're reporting this content. Your report will be reviewed by our moderators and kept confidential.";
+"report_reason_page_title" = "Report reason";
+"report_reason_others_page_title" = "Others";
+
+"report_reason_success_toast_message" = "%@ reported.";
+
+"report_reason_others_input_title" = "Describe your reason";
+"report_reason_others_input_placeholder" = "Share more details about this issue";
+"report_reason_close_button" = "Close";
+"report_reason_done_button" = "Done";
+
+"report_reason_error_toast_message" = "Failed to report %@. Please try again.";
+
+"report_reason_content_type_post" = "Post";
+"report_reason_content_type_comment" = "Comment";
+"report_reason_content_type_reply" = "Reply";
+"report_reason_content_type_message" = "Message";
+
+"social_label_report_reason_community_guidelines" = "Against community guidelines";
+"social_label_report_reason_false_information" = "False information or misinformation";
+"social_label_report_reason_harassment_or_bullying" = "Harassment or bullying";
+"social_label_report_reason_self_harm_or_suicide" = "Self-harm or suicide";
+"social_label_report_reason_selling_restricted" = "Selling and promoting restricted items";
+"social_label_report_reason_sexual_content_or_nudity" = "Sexual content or nudity";
+"social_label_report_reason_spam_or_scams" = "Spam or scams";
+"social_label_report_reason_violence_or_threatening" = "Violence or threatening content";
+
+// Live Chat
+"live_chat_delete_message" = "Delete message";
+"live_chat_report_message" = "Report message";
+"live_chat_unreport_message" = "UnReport message";
+"live_chat_toast_report_message" = "Message reported";
+"live_chat_toast_unreport_message" = "Message unreported";
+"live_chat_promote_to_moderator" = "Promote to moderator";
+"live_chat_demote_to_member" = "Demote to member";
+"live_chat_mute_user" = "Mute user";
+"live_chat_unmute_user" = "Unmute user";
+"live_chat_promote_to_moderator_title" = "Moderator promotion";
+"live_chat_promote_to_moderator_desc" = "Are you sure you want to promote this member to moderator? They will gain access to all moderator permissions in this live stream.";
+"live_chat_demote_to_member_title" = "Moderator demotion";
+"live_chat_demote_to_member_desc" = "Are you sure you want to demote this moderator? They will lose access to all moderator permissions in this live stream.";
+"live_chat_promote_button" = "Promote";
+"live_chat_demote_button" = "Demote";
+"live_chat_promote_to_moderator_success_toast" = "User promoted.";
+"live_chat_promote_to_moderator_failed_toast" = "Failed to promote user. Please try again.";
+"live_chat_demote_to_member_success_toast" = "Successfully demoted to member!";
+"live_chat_demote_to_member_failed_toast" = "Failed to demote user. Please try again.";
+"live_chat_mute_user_title" = "Confirm mute";
+"live_chat_mute_user_desc" = "Are you sure you want to mute this user? They will no longer be able to send messages.";
+"live_chat_unmute_user_title" = "Confirm unmute";
+"live_chat_unmute_user_desc" = "Are you sure you want to unmute this user? They can now send messages.";
+"live_chat_mute_button" = "Mute";
+"live_chat_unmute_button" = "Unmute";
+"live_chat_mute_user_success_toast" = "User muted";
+"live_chat_mute_user_failed_toast" = "Failed to mute user. Please try again.";
+"live_chat_unmute_user_success_toast" = "User unmuted";
+"live_chat_unmute_user_failed_toast" = "Failed to unmute user. Please try again.";
+
+"community_update_success_toast_message" = "Successfully updated community profile.";
+
+"pending_join_request_alert_title" = "You have pending join requests";
+"pending_join_request_alert_message" = "Please address these requests before switching off membership approval.";
+
+"community_leave_alert_pending_request_message" = "If you change your mind, you’ll have to request to join again.";
+
+"community_join_toast_success_message" = "You joined %@.";
+"community_join_toast_request_success_message" = "Requested to join. You will be notified once your request is accepted.";
+
+"user_join_accepted_toast_success_message" = "Join request accepted.";
+"user_join_accepted_toast_error_message" = "Failed to accept join request. Please try again.";
+
+"user_join_declined_toast_success_message" = "Join request declined.";
+"user_join_decliend_toast_error_message" = "Failed to decline join request. Please try again.";
+
+"user_join_request_accept_label" = "Accept";
+"user_join_request_decline_label" = "Decline";
+
+"user_join_request_decline_alert_banner_message" = "Declining a join request is irreversible. The user must send a new request if declined.";
+
+"community_pending_request_tab_posts_title" = "Posts (%@)";
+"community_pending_request_tab_join_requests_title" = "Join requests (%@)";
+"community_pending_request_page_title" = "Pending requests";
+"community_join_request_empty_state_title" = "No pending requests";
+"community_pending_posts_empty_state_title" = "No pending posts";
+
+"error_guest_user" = "Create an account or sign in to continue.";
+
+ // Explore Event Feed
+ "explore_event_view_all" = "View all";
+
+// My Event Feed
+"my_event_feed_upcoming" = "Upcoming";
+"my_event_feed_past" = "Past";
+
+// Event Detail Page Alert
+"event_detail_alert_edit_not_possible_title" = "Editing is not possible";
+"amity_social_label_you_can_no_longer_edit_this_event_changes_are_restricte" = "You can no longer edit this event. Changes are restricted 15 minutes before the start time.";
+"event_detail_alert_leave_without_finishing_title" = "Leave without finishing?";
+"event_detail_alert_leave_without_finishing_message" = "Your changes that you made may not be saved.";
+"event_detail_alert_delete_event_title" = "Delete this event?";
+"event_detail_alert_delete_event_message" = "This event will be permanently deleted. You and others will no longer see and find this event.";
+"amity_event_alert_pending_join_request_title" = "You'll be able to RSVP once your join request is accepted";
+"amity_event_alert_pending_join_request_message" = "Requested to join the community. You'll be notified once your request is accepted.";
+
+// Event Discussion Feed
+"amity_social_empty_state_empty_feed_no_posts" = "No posts yet";
+
+// Event Info Component
+"event_info_about_the_event" = "About the event";
+"event_info_see_more" = "...See more";
+"event_info_event_link" = "Event link";
+"event_info_event_address" = "Event address";
+"event_info_address_copied" = "Address copied.";
+"event_info_copy" = "Copy";
+"event_info_link_copied" = "Link copied";
+"event_info_stream_status_live" = "Live";
+"event_info_stream_status_recorded" = "Recorded";
+"event_info_stream_status_upcoming_live" = "Upcoming Live";
+
+// Event Detail Header
+"event_detail_header_unknown_user" = "Unknown user";
+"event_detail_header_starts" = "Starts";
+"event_detail_header_event_type" = "Event type";
+"event_detail_header_in_person" = "In-person";
+"event_detail_header_virtual" = "Virtual";
+"event_detail_header_hosted_by" = "Hosted by";
+"event_detail_header_status_upcoming" = "Upcoming";
+"event_detail_header_status_cancelled" = "Cancelled";
+"event_detail_header_status_ended" = "Ended";
+"event_detail_header_attendees" = "Attendees";
+"event_detail_header_event_added_to_calendar" = "Event added to your calendar.";
+"event_detail_header_no_calendar_access" = "No access to your calendar. Please enable permissions in your Settings.";
+"event_detail_header_attending_status_change_not_allowed" = "Your attending status cannot be changed once the event has started.";
+"event_detail_header_update_attending_status_failed" = "Failed to update your attending status. Please try again.";
+"event_detail_header_add_to_calendar" = "Add to calendar";
+"event_detail_header_going" = "Going";
+"event_detail_header_not_going" = "Not going";
+"event_detail_header_rsvp" = "RSVP";
+"event_detail_header_update_attending_status_success" = "Successfully updated your attending status.";
+"event_detail_header_livestream_setup_info" = "You can start setting up live 15 minutes before the event starts.";
+
+// Event Attendees Page
+"event_attendees_page_title" = "Attendees";
+
+// Join Community Sheet
+"join_community_sheet_title" = "Join community to continue";
+"join_community_sheet_description" = "Become a member of %@ to attend events and join the conversation.";
+"join_community_sheet_join_and_rsvp" = "Join community and RSVP";
+"join_community_sheet_join" = "Join community";
+"join_community_sheet_cancel" = "Cancel";
+
+// Add Calendar Event Sheet
+"add_calendar_sheet_title" = "You'll be notified";
+"add_calendar_sheet_description" = "You can also keep track of this event by adding it to your device's calendar.";
+"add_calendar_sheet_add_button" = "Add to calendar";
+
+// Event List Pages
+"event_list_past_events_title" = "Past events";
+"event_list_upcoming_events_title" = "Upcoming events";
+"event_list_tab_all" = "All";
+ "event_list_tab_hosting" = "Hosting";
+ "social_button_happening_now" = "Happening now";
+
+// Event Detail Page
+"amity_social_label_edit_event" = "Edit event";
+"event_detail_page_delete_event" = "Delete event";
+"event_detail_page_event_deleted" = "Event deleted.";
+"event_detail_page_delete_failed" = "Failed to delete event. Please try again.";
+"event_detail_page_setup_livestream" = "Set up live stream";
+
+// Event Setup Page
+"event_setup_event_name_title" = "Event name";
+"event_setup_event_name_placeholder" = "Name your event";
+"event_setup_event_details_title" = "Event details";
+ "event_setup_event_details_placeholder" = "Share what this event is all about";
+ "amity_social_label_edit_event" = "Edit event";
+"event_setup_leave_alert_title" = "Leave without finishing?";
+"event_setup_leave_alert_message" = "Your progress won't be saved and your event won't be created.";
+"event_setup_camera" = "Camera";
+"event_setup_photo" = "Photo";
+"event_setup_date_and_time" = "Date and time";
+"event_setup_timezone" = "Timezone";
+"event_setup_starts_on" = "Starts on";
+"event_setup_no_end_time_info" = "Event without specified end time will end after 12 hours.";
+"event_setup_add_end_date_time" = "Add end date and time";
+"social_button_event_setup_ends_on" = "Ends on";
+"event_setup_location" = "Location";
+"event_setup_location_placeholder" = "Select where this event will be happening";
+"event_setup_creating" = "Creating...";
+"event_setup_saving" = "Saving...";
+"event_setup_successfully_created" = "Successfully created event.";
+"event_setup_successfully_updated" = "Successfully updated event.";
+"amity_social_error_event_setup_update_time_limit_error" = "Your event wasn't updated as it needs to start at least 15 minutes from now.";
+"event_setup_create_time_limit_error" = "Your event wasn't created as it needs to start at least 15 minutes from now.";
+"event_setup_create_link_not_allowed_error" = "Your event wasn't created as it contains a link that's not allowed.";
+"event_setup_update_link_not_allowed_error" = "Your event wasn't updated as it contains a link that's not allowed.";
+"event_setup_create_ban_word_error" = "Your event wasn't created as it contains an inappropriate word.";
+"event_setup_update_ban_word_error" = "Your event wasn't updated as it contains an inappropriate word.";
+"event_setup_create_failed" = "Failed to create event. Please try again.";
+"event_setup_update_failed" = "Failed to update event. Please try again.";
+"event_setup_create_button" = "Create event";
+"event_setup_save_button" = "Save";
+"event_setup_upload_failed_title" = "Upload failed";
+"event_setup_upload_failed_message" = "Failed to upload image. Please try again.";
+
+// Community Event Feed
+"community_event_feed_upcoming" = "Upcoming";
+"community_event_feed_past" = "Past";
+
+// Event Target Selection
+"event_target_selection_no_communities" = "You haven't joined any communities yet.";
+
+// Event Empty State
+"event_empty_state_no_events" = "No events yet";
+
+// Live Stream Co-Host Invite
+"livestream_invite_cohost_title" = "Invite co-host";
+"livestream_cohosting_section_title" = "Co-hosting";
+"livestream_remove_cohost_button" = "Remove";
+"livestream_cancel_invitation_button" = "Cancel";
+"livestream_invitation_cancelled_toast" = "Invitation cancelled.";
+"social_toast_invitation_cancel_failed_toast" = "Failed to cancel invitation.";
+"livestream_whos_watching_title" = "Who's watching";
+"livestream_invite_button" = "Invite";
+"livestream_invitation_sent_toast" = "Invitation sent.";
+"livestream_invitation_send_failed_toast" = "Failed to send invitation.";
+"livestream_confirm_invite_cohost_title" = "Confirm invite co-host";
+"livestream_confirm_invite_cohost_message" = "If they accept your invitation, they'll join as a co-host with moderator access. They can turn on their camera and mic, appear on stage, and help manage chat.";
+"livestream_no_viewers_title" = "No viewers available right now";
+"livestream_no_viewers_message" = "Viewers who join your livestream will\nappear here.";
+
+// Live Stream Co-Host Join
+"livestream_join_as_cohost_title" = "Join as co-host";
+"livestream_join_as_cohost_message" = "%@ invited you to join their live stream as a co-host. You'll enter the backstage room to prepare before going live.";
+"livestream_accept_button" = "Accept";
+"livestream_decline_button" = "Decline";
+
+// Live Stream Badges
+"amity_social_status_host_badge" = "Host";
+"amity_social_button_cohost" = "Co-host";
+
+// Live Stream Banned Page
+"livestream_banned_title" = "You've been banned.";
+"livestream_banned_message" = "You can no longer access this live stream.";
+"livestream_banned_ok_button" = "OK";
+
+// Live Stream Backstage
+"livestream_backstage_header_title" = "You're in the backstage";
+"livestream_backstage_setup_message" = "Set up your camera, mic, and lighting before the livestream begins.";
+"livestream_backstage_join_live_button" = "Join LIVE";
+
+// Live Stream Chat Compose Bar
+"livestream_chat_placeholder" = "Chat...";
+"livestream_chat_muted_message" = "You have been muted.";
+"livestream_chat_readonly_message" = "This live stream is now read-only.";
+"livestream_chat_send_failed_message" = "Failed to send message. Please try again.";
+
+// Live Stream Chat Feed
+"livestream_chat_deleted_message" = "This message was deleted.";
+"livestream_chat_unknown_user" = "Unknown User";
+"livestream_chat_invite_as_cohost" = "Invite as co-host";
+"amity_common_label_message_not_sent" = "Your message wasn't sent";
+ 
+ // Live Stream Player Page
+"livestream_leave_backstage_title" = "Leave backstage";
+"livestream_leave_backstage_message" = "Are you sure you want to leave backstage? You'll return to viewer mode and need a new invite to rejoin.";
+"livestream_left_stage_toast" = "You left the stage and are now watching as a viewer.";
+"livestream_invitation_no_longer_valid" = "This invitation is no longer available.";
+"livestream_accept_invitation_failed" = "Failed to accept invitation. Please try again.";
+"amity_social_toast_snackbar_invitation_declined" = "Invitation declined.";
+"livestream_decline_invitation_failed" = "Failed to decline invitation. Please try again.";
+"livestream_left_backstage_toast" = "You have left the backstage.";
+
+// Live Stream Alerts
+"livestream_alert_cancel_cohost_invitation_title" = "Cancel co-host invitation";
+"social_modal_alert_cancel_cohost_invitation_message" = "Are you sure you want to cancel this invitation? They'll no longer be invited as a co-host and will remain as a viewer.";
+"livestream_alert_cohost_leave_title" = "Leave live stream";
+"livestream_alert_cohost_leave_message" = "Are you sure you want to leave this livestream? You’ll stop broadcasting and exit the session completely.";
+"livestream_alert_leave_as_cohost_title" = "Leave as co-host";
+"livestream_alert_leave_as_cohost_message" = "Are you sure you want to stop co-hosting? You'll leave the stage and continue watching as a viewer.";
+"livestream_alert_remove_cohost_title" = "Remove co-host from live";
+"livestream_alert_remove_cohost_message" = "Are you sure you want to remove this co-host from the live stream? They'll immediately stop broadcasting and return as a viewer.";
+"livestream_alert_confirm_button" = "Confirm";
+"livestream_alert_remove_button" = "Remove";
+"amity_livestream_cancel_invitation_label" = "Cancel invitation";
+"amity_livestream_remove_from_live" = "Remove from live";
+
+// MARK: - Reaction Display Names
+"amity_social_reaction_like" = "Like";
+"amity_social_reaction_love" = "Love";
+"amity_social_reaction_fire" = "Fire";
+"amity_social_reaction_happy" = "Happy";
+"amity_social_reaction_sad" = "Sad";
+"amity_social_reaction_heart" = "Heart";
+"amity_social_reaction_grinning" = "Grinning";
+
+// MARK: - Reaction UI
+"amity_common_reaction_all_tab" = "All";
+
+// MARK: - Ad Info
+"amity_common_ad_about_title" = "About this advertisement";
+"amity_common_ad_why_title" = "Why this advertisement?";
+"amity_common_ad_why_description" = "You're seeing this advertisement because it was displayed to all users in the system.";
+"amity_common_ad_about_advertiser" = "About this advertiser";
+"amity_common_ad_advertiser_name" = "Advertiser name: %@";
+
+// MARK: - Common UI
+"amity_social_label_optional" = " (Optional)";
+"amity_common_required_indicator" = " *";
+
+// MARK: - Chat
+"amity_chat_edit_message" = "Edit Message";
+
+// MARK: - Social
+"amity_social_my_communities" = "My Communities";
+"amity_social_pending_posts_title" = "Pending posts";
+"amity_social_post_accepted_toast" = "Post accepted.";
+"amity_social_post_declined_toast" = "Post declined.";
+"amity_social_status_host_badge" = "Host";
+"amity_social_accept_button" = "Accept";
+"amity_social_decline_button" = "Decline";
+"amity_social_save_button" = "Save";
+"amity_social_camera_button" = "Camera";
+"amity_social_photo_button" = "Photo";
+
+// MARK: - Phase 2 Localization Keys
+
+// Common
+"amity_common_unknown" = "Unknown";
+"amity_common_unknown_error" = "Unknown error";
+"amity_common_next" = "Next";
+"amity_common_just_now" = "Just now";
+"amity_common_time_days_suffix" = "d";
+"amity_common_time_hours_suffix" = "h";
+"amity_common_time_minutes_suffix" = "m";
+"amity_common_time_seconds_suffix" = "s";
+"amity_common_time_am" = "AM";
+"amity_common_time_pm" = "PM";
+"amity_social_button_keep_editing" = "Keep editing";
+"amity_common_yes" = "Yes";
+"amity_common_no" = "No";
+"amity_common_remove" = "Remove";
+"amity_common_join" = "Join";
+"amity_common_unblock" = "Unblock";
+"amity_common_post" = "Post";
+"amity_common_view" = "View";
+"amity_common_moderator" = "Moderator";
+"amity_social_status_live" = "LIVE";
+"amity_common_pending" = "Pending";
+"amity_social_button_social_home_clips_button" = "Clips";
+"amity_social_tab_tab_clips" = "Clips";
+"amity_common_nothing_here_yet" = "Nothing here to see yet";
+"amity_common_by_author" = "By %@";
+
+// Social - Clip
+"amity_social_empty_state_social_home_empty_title" = "Your feed is empty";
+"amity_social_clip_explore_community" = "Explore community";
+"amity_social_clip_create_community" = "Create community";
+"amity_social_clip_unable_to_load" = "Unable to load clip";
+ "amity_social_clip_watch_next" = "Watch next clip";
+"amity_clip_alert_max_file_size_title" = "Maximum file size limit reached";
+"amity_clip_alert_unsupported_video_title" = "Unsupported video type";
+"amity_clip_alert_max_duration_title" = "Clip must be under 15 minutes";
+"amity_clip_alert_too_short_title" = "Clip too short";
+"amity_clip_alert_discard_title" = "Discard this clip?";
+"amity_clip_alert_failed_upload_title" = "Failed to upload";
+"amity_clip_alert_max_file_size_message" = "Please choose a video with smaller file size.";
+"amity_clip_alert_unsupported_video_message" = "Please choose a different video to upload.";
+"amity_clip_alert_too_short_message" = "Clip must be at least 1 second long.";
+"amity_clip_alert_discard_message" = "The clip will be permanently discarded. It cannot be undone.";
+"amity_clip_alert_failed_upload_message" = "Please check your connection or choose a different video to upload";
+"amity_social_see_less" = "See less";
+
+// Social - Community
+"amity_social_cancel_request" = "Cancel request";
+"amity_social_private_community_title" = "This community is private";
+ "amity_social_private_community_description" = "Join this community to see its content and members.";
+ "amity_social_label_no_description_available" = "No description available";
+"amity_social_decline_pending_post_message" = "Decline pending post will permanently delete the selected post from community.";
+"amity_social_max_upload_limit_title" = "Maximum upload limit reached";
+"amity_social_max_upload_limit_message" = "You've reached the upload limit of 10 %@. Any additional %@ will not be saved.";
+"amity_social_no_post_to_review" = "No post to review";
+ "amity_social_add_category" = "Add Category";
+"amity_social_add_member" = "Add Member";
+"amity_social_start_search_hint" = "Start your search by typing at least 3 letters";
+"amity_social_no_community_yet" = "No community yet";
+"amity_social_no_community_yet_description" = "Let's create your own communities";
+"amity_social_categories_label" = "Categories";
+
+// Social - Invitation
+"amity_social_decline_invitation_title" = "Decline invitation?";
+"amity_social_decline_invitation_message" = "If you change your mind, you'll have to request to join again.";
+
+// Social - Content Report
+"amity_social_report_thanks_title" = "Thanks for your report.";
+"amity_social_report_thanks_message" = "Our moderators will review this content and take action if it violates our guidelines.";
+
+// Social - Error/Banned
+"amity_social_content_unavailable" = "The content you're looking for is unavailable.";
+"amity_social_banned_title" = "You've been banned.";
+"amity_social_banned_message" = "Based on your previous activities, your account has been banned from all feeds.";
+"amity_social_error_post_text_exceed_error_message" = "Your post wasn't posted because it exceeds the %d characters limit";
+"amity_social_error_post_ban_word_error_message" = "Your post wasn't posted because it contains a blocked word.";
+"amity_social_error_post_link_not_allowed_error_message" = "Your post wasn't posted because it contains a link that's not allowed.";
+
+// Social - User Profile
+"amity_social_no_requests_to_review" = "No requests to review";
+"amity_social_decline_follow_request_message" = "Declining a follow request is irreversible. The user must send a new request if declined.";
+"amity_social_manage_blocked_users" = "Manage blocked users";
+"amity_social_report_user" = "Report user";
+"amity_social_unreport_user" = "Unreport user";
+"amity_social_block_user" = "Block user";
+"amity_social_unblock_user" = "Unblock user";
+"amity_social_edit_profile" = "Edit Profile";
+"social_label_edit_user_display_name_title" = "Display Name";
+"amity_social_edit_post" = "Edit Post";
+
+// Social - Products/Poll
+"amity_social_tag_products" = "Tag products";
+"amity_social_products_tagged" = "Products tagged";
+"amity_social_products_tagged_in_post" = "Products tagged in this post";
+"amity_social_products_tagged_in_photo" = "Products tagged in this photo";
+"amity_social_products_tagged_in_video" = "Products tagged in this video";
+"amity_social_button_add_option" = "Add option";
+"amity_social_upload_image" = "Upload image";
+"amity_social_upload_new_image" = "Upload new image";
+"amity_social_image_upload_failed" = "Your image couldn't be uploaded";
+"amity_social_option_n" = "Option %d";
+"amity_social_choose_poll_type" = "Choose poll type";
+"amity_social_poll_type_text_only" = "Text-only poll";
+"amity_social_poll_type_image" = "Image poll";
+"amity_social_start_typing_to_search" = "Start typing to search for products.";
+"amity_social_search_by_product_name" = "Search by product name";
+"amity_social_edit_tags" = "Edit tags";
+"amity_social_already_tagged" = "Already tagged";
+
+// Social - Post/LiveStream
+"amity_social_live_on" = "Live on";
+"amity_social_livestream_limited_visibility" = "This live stream has started, but with limited visibility until the post has been approved.";
+"amity_social_livestream_join_to_interact" = "Join community to interact with live stream";
+
+// Social - Event
+"amity_social_event_platform" = "Platform";
+"amity_social_event_platform_livestream" = "Live stream";
+"amity_social_event_platform_external" = "External platform";
+"amity_social_label_event_platform_livestream_description" = "Users can join the live stream on the app or website.";
+"amity_social_label_event_platform_external_description" = "Users will join the event on an external platform.";
+"amity_social_time_event_date_today" = "Today, %1$@ to %2$@";
+"amity_social_label_event_date_tomorrow" = "Tomorrow, %1$@ to %2$@";
+"amity_social_time_event_date_yesterday" = "Yesterday, %1$@ to %2$@";
+"amity_social_event_date_time_format" = "%1$@ at %2$@";
+
+// Story
+"amity_social_replying_to" = "Replying to";
+ "amity_social_share_story" = "Share Story";
+ "amity_social_unsaved_changes_message" = "Are you sure you want to cancel? Your changes won't be saved.";
+"amity_social_remove_link_button" = "Remove link";
+"amity_social_remove_link_title" = "Remove link?";
+"amity_social_remove_link_message" = "This link will be removed from story.";
+"amity_social_discard_story_title" = "Discard story?";
+"amity_social_discard_story_message" = "The story will be permanently discarded. It cannot be undone.";
+"amity_story_camera_photo_button" = "Photo";
+"amity_story_camera_video_button" = "Video";
+"amity_social_label_hyperlink_url" = "URL";
+"amity_social_label_hyperlink_customize_info" = "This text will show on the link instead of URL.";
+
+// Video Player
+"amity_social_video_no_longer_available" = "This video is no longer available.";
+"amity_social_photo_no_longer_available" = "This photo is no longer available.";
+"amity_social_video_not_available" = "Video not available.";
+
+// Social Home Tab Titles
+"social_home_newsfeed_tab" = "Newsfeed";
+"social_home_explore_tab" = "Explore";
+"social_home_my_communities_tab" = "My Communities";
+"social_home_communities_tab" = "Communities";
+"social_home_events_tab" = "Events";
+// Community Member Labels
+"community_member_label_singular" = "member";
+"community_member_label_plural" = "members";
+
+// Community Membership Page
+"community_membership_all_members_title" = "All members";
+"community_membership_tab_moderators" = "Moderators";
+"community_membership_add_success" = "Successfully added members to this community!";
+"community_membership_add_failed" = "Failed to add members to this community. Please try again.";
+"community_membership_invite_success" = "Successfully invited members to this community.";
+"community_membership_invite_failed" = "Failed to invite members. Please try again.";
+"amity_community_remove_member" = "Remove from community";
+
+// Post Actions
+"post_comment_button_text" = "Comment";
+"post_comment_count_singular" = "%@ comment";
+"post_comment_count_plural" = "%@ comments";
+"post_view_replies_singular" = "View %@ reply";
+"post_view_replies_plural" = "View %@ replies";
+
+// Navigation / Tab labels
+"social_home_my_event_tab" = "My Event";
+"social_search_posts_tab" = "Posts";
+"social_search_users_tab" = "Users";
+"social_community_nav_title" = "Community";
+"social_tab_tab_videos" = "Videos";
+
+// Buttons
+"amity_social_video_button" = "Video";
+"amity_social_explore_community_button" = "Explore Community";
+
+// User Profile
+"user_profile_followings" = "Followings";
+"user_profile_followers" = "Followers";
+"user_profile_following_button" = "Following";
+
+// Community Pending Requests
+ "community_pending_request_singular" = "Pending request";
+ "community_join_request_singular" = "join request";
+"community_join_request_plural" = "join requests";
+"community_pending_requires_approval" = "%@ requires approval";
+"community_pending_require_approval" = "%@ require approval";
+"community_posts_pending_review" = "Your posts are pending for review";
+
+// Media Feed Tabs
+"social_media_feed_photos_tab" = "Photos";
+
+// Empty Feed States
+"community_empty_feed_no_photos" = "No photos yet";
+"community_empty_feed_no_videos" = "No videos yet";
+"community_empty_feed_no_clips" = "No clips yet";
+
+// Post Menu Types
+"post_menu_type_poll" = "Poll";
+"amity_social_button_social_home_create_story_button" = "Story";
+"post_menu_type_clip" = "Clip";
+"post_menu_type_event" = "Event";
+
+// Community Profile Labels (post count)
+"community_post_label_singular" = "post";
+"community_post_label_plural" = "posts";
+
+// Community Profile Menu
+"community_settings_option_title" = "Community settings";
+"community_information_option_title" = "Community information";
+
+// Copy/Share Link
+"amity_social_copy_link" = "Copy link";
+"amity_social_share_to" = "Share to";
+
+// Invite Member
+"community_invite_member_title" = "Invite member";
+"community_invite_member_description" = "Invite people to join your community";
+ "community_invite_member_button" = "Invite";
+ 
+// Search
+"search_user_placeholder" = "Search user";
+"amity_search_placeholder" = "Search";
+"amity_search_community_user_placeholder" = "Search community and user";
+"amity_search_my_communities_placeholder" = "Search my communities";
+
+// MARK: - Community Setup Page
+"community_setup_page_title" = "Create community";
+"community_setup_edit_page_title" = "Edit community";
+"community_setup_name_title" = "Community name";
+"community_setup_name_placeholder" = "Name your community";
+"community_setup_about_title" = "About";
+"community_setup_about_placeholder" = "Enter description";
+"community_setup_category_title" = "Categories";
+"community_setup_category_placeholder" = "Select category";
+"community_setup_privacy_title" = "Privacy";
+"community_setup_privacy_public_title" = "Public";
+"community_setup_privacy_public_description" = "Community is discoverable by anyone. Content is visible to anyone.";
+"community_setup_privacy_private_title" = "Private";
+"community_setup_privacy_private_description" = "Only members invited by the moderators can join, view, and search the posts in this community.";
+"community_setup_privacy_private_visible_title" = "Private & visible";
+"community_setup_privacy_private_visible_description" = "Community is discoverable by anyone. Content is hidden from non-members.";
+"community_setup_privacy_private_hidden_title" = "Private & hidden";
+"community_setup_privacy_private_hidden_description" = "Community and content are hidden from non-members, and cannot be discovered via search.";
+"community_setup_membership_title" = "Membership";
+"community_setup_membership_description" = "Requires moderator approval";
+"community_setup_membership_sub_description" = "Users will become members only when their join request is approved by a moderator of this community.";
+"community_setup_add_member_title" = "Member";
+"community_setup_add_member_button" = "Add";
+"community_setup_create_button" = "Create community";
+"community_setup_create_success" = "Successfully created community!";
+"community_setup_create_failed" = "Failed to create community";
+"community_setup_save_failed" = "Failed to save your community profile. Please try again.";
+
+// MARK: - Community Setting Page
+"community_setting_pending_invitations" = "Pending invitations";
+"social_button_last_moderator_leave_community_msg" = "As you're the last moderator and member, leaving will also close this community. All posts shared in community will be deleted. This cannot be undone.";
+"community_setting_leaving_toast" = "Leaving the community.";
+"community_setting_leave_success" = "Successfully left community!";
+"community_setting_closing_toast" = "Closing the community.";
+"community_setting_close_success" = "Successfully closed community!";
+
+// MARK: - Context-specific Copy Link
+"amity_social_copy_profile_link" = "Copy profile link";
+"amity_social_label_copy_post_link" = "Copy post link";
+"amity_social_copy_clip_link" = "Copy clip link";
+"amity_social_copy_livestream_link" = "Copy live stream link";
+
+// MARK: - Search
+"search_member_placeholder" = "Search member";
+
+// MARK: - Story
+// User Profile - Toast
+"user_blocked_toast" = "User blocked.";
+"user_unblocked_toast" = "User unblocked.";
+"user_reported_toast" = "User reported.";
+"user_unreported_toast" = "User unreported.";
+"user_block_failed_toast" = "Failed to block user. Please try again.";
+"user_unblock_failed_toast" = "Failed to unblock user. Please try again.";
+"user_report_failed_toast" = "Failed to report user. Please try again.";
+"user_unreport_failed_toast" = "Failed to unreport user. Please try again.";
+"follow_request_declined_toast" = "Following request declined.";
+"follow_request_accept_failed_toast" = "Failed to accept follow request. Please try again.";
+"follow_request_decline_failed_toast" = "Failed to decline follow request. Please try again.";
+"social_label_user_unblock_title" = "Unblock user?";
+"unblock_user_alert_message" = "They will now be able to see posts and comments that you've created. They won't be notified that you've unblocked them.";
+"unable_to_follow_alert_title" = "Unable to follow this user";
+"unable_to_follow_alert_message" = "Oops! something went wrong. Please try again later.";
+"edit_user_about_title" = "About";
+
+// Community Member Management
+"community_profile_update_failed_toast" = "Failed to update community";
+"community_member_removed_toast" = "Member removed from this community.";
+"community_member_reported_toast" = "Member reported.";
+"community_member_unreported_toast" = "Member unreported.";
+"community_member_report_failed_toast" = "Failed to report member. Please try again.";
+"community_member_unreport_failed_toast" = "Failed to unreport member. Please try again.";
+"community_member_remove_failed_toast" = "Failed to remove member. Please try again.";
+"community_member_promote_success_toast" = "Successfully promoted to moderator!";
+"community_member_promote_failed_toast" = "Failed to promote member. Please try again.";
+"community_member_demote_success_toast" = "Successfully demoted to member!";
+"community_member_demote_failed_toast" = "Failed to demote member. Please try again.";
+"community_member_promote_to_moderator" = "Promote to moderator";
+"community_member_demote_to_member" = "Demote to member";
+"amity_social_label_user_demoted" = "Successfully demoted to member!";
+"amity_social_toast_snackbar_join_community_failed" = "Failed to join the community. Please try again.";
+"community_join_request_no_longer_available_toast" = "This join request is no longer available.";
+"community_join_cancel_request_failed_toast" = "Failed to cancel your request. Please try again.";
+"community_unjoined_toast" = "You unjoined %@!";
+"post_review_failed_toast" = "Failed to review post. Please try again.";
+"community_notification_leave_alert_message" = "Your changes that you made may not be saved.";
+
+// Post Composer
+"post_composer_hashtag_limit_alert_title" = "Hashtag limit reached";
+"post_composer_hashtag_limit_alert_message" = "You can only add hashtag up to %d hashtags per post.";
+"post_composer_link_limit_alert_title" = "Link limit reached";
+"post_composer_link_limit_alert_message" = "You can only add up to 100 links per post.";
+"post_composer_products_unavailable_toast" = "Some products that you've tagged are no longer available.";
+
+// Poll
+"post_sent_for_review_alert_title" = "Post sent for review";
+"post_sent_for_review_alert_message" = "Your post has been submitted to the pending list. It will be published once approved by the community moderator.";
+"amity_post_composer_loading_updating" = "Updating...";
+"amity_post_composer_title_placeholder" = "Title (Optional)";
+"amity_post_composer_body_placeholder" = "What's going on...";
+"amity_post_composer_body_clip_placeholder" = "What's going on? (optional)";
+"amity_post_composer_posts_sent_for_review_title" = "Posts sent for review";
+"amity_post_composer_post_updates_sent_for_review_title" = "Post updates sent for review";
+"amity_post_composer_post_sent_for_review_message" = "Your post has been submitted to the pending list. It will be published once approved by the community moderator.";
+"amity_post_composer_post_update_sent_for_review_message" = "Your post update has been submitted to the pending list. It will be published once approved by the community moderator";
+"poll_ended_toast" = "Poll ended.";
+"poll_post_unavailable_toast" = "This post is no longer available.";
+"poll_generic_error_toast" = "Oops, something went wrong.";
+"poll_vote_removed_toast" = "Vote removed.";
+
+// Notification Tray
+"notification_tray_generic_error_toast" = "Oops, something went wrong";
+"amity_social_toast_snackbar_invitation_declined" = "Invitation declined.";
+
+// Story
+"story_link_limit_toast" = "Can't add more than one link to your story.";
+
+// LiveStream
+"livestream_co_host_accepted_toast" = "Co-host accepted the invitation.";
+"livestream_co_host_declined_toast" = "Co-host declined the invitation.";
+"livestream_co_host_left_toast" = "Co-host left the live stream.";
+"livestream_co_host_left_stage_toast" = "Co-host left the stage.";
+"livestream_co_host_removed_toast" = "Co-host removed from live.";
+"livestream_remove_co_host_failed_toast" = "Failed to remove co-host.";
+ "livestream_follow_to_interact_toast" = "Follow user to interact.";
+ "common_label_join_community_to_interact" = "Join community to interact.";
+ "livestream_waiting_network_toast" = "Waiting for network...";
+
+// MARK: - LiveStream Display Fallbacks
+"amity_social_status_host_badge" = "Host";
+
+// MARK: - Media
+"amity_media_processing" = "Processing media...";
+
+// MARK: - Event
+ "amity_event_starts_on" = "Starts on";
+ "amity_event_location_address_title" = "Address";
+"amity_event_location_address_placeholder" = "Enter address of where this event will be happening";
+"amity_event_location_title" = "Location";
+
+// MARK: - LiveStream Permissions
+"amity_livestream_permission_photos_title" = "Allow access to your photos";
+"amity_livestream_permission_photos_message" = "This lets you use photos from this device as live stream thumbnail image.";
+
+// MARK: - LiveStream Co-Host Product Tags
+"amity_livestream_cohost_product_tags_title" = "Allow co-host to manage product tags";
+"amity_livestream_cohost_product_tags_description" = "When enabled, co-host can add or remove tagged products and pin or unpin a product during the live stream.";
+
+// MARK: - User Profile Alerts
+"amity_user_unblock_title" = "Unblock user?";
+"amity_user_unblock_message_format" = "%@ will now be able to see posts and comments that you've created. They won't be notified that you've unblocked them.";
+"amity_user_unfollow_title" = "Unfollow this user?";
+"amity_user_unfollow_message" = "If you change your mind, you'll have to request to follow them again.";
+"amity_user_unfollow_button" = "Unfollow";
+"amity_user_block_title" = "Block user?";
+"amity_user_block_message_format" = "%@ won't be able to see posts and comments that you've created. They won't be notified that you've blocked them.";
+
+// MARK: - Community Invitations
+"amity_community_pending_invitations_title" = "Pending invitations";
+"amity_community_invitation_joined_format" = "You joined %@.";
+"amity_community_invitation_expired" = "This invitation is no longer available.";
+"amity_social_toast_snackbar_invitation_declined" = "Invitation declined.";
+
+// MARK: - Notification Tray Sections
+"amity_notification_tray_requests_title" = "Requests";
+"amity_notification_tray_recent_title" = "Recent";
+"amity_notification_tray_older_title" = "Older";
+"amity_notification_tray_decline_failed" = "Failed to decline invitation. Please try again.";
+"amity_notification_tray_accept_invitation_failed" = "Failed to accept invitation. Please try again.";
+"amity_notification_tray_invited_to_join_format" = "%@ invited you to join %@.";
+"amity_notification_tray_invited_to_join_separator" = " invited you to join ";
+
+// MARK: - Poll Image Options
+"amity_poll_image_options_title" = "Options";
+"amity_poll_image_options_description" = "Poll must contain at least 2 options, and an image must be uploaded for every option.";
+
+// MARK: - User Profile Edit
+
+"amity_user_profile_about_title" = "About";
+"amity_user_profile_about_placeholder" = "About";
+"amity_user_follow_requests_title_format" = "Follow requests (%d)";
+
+// MARK: - Master keys (aligned with DLS)
+"amity_social_button_add_link" = "Add Link";
+"amity_social_button_add_products" = "Add products";
+"amity_social_button_block" = "Block";
+"amity_social_button_by" = "By";
+"amity_social_button_community" = "Community";
+"amity_social_button_community_and" = "and";
+"amity_social_button_delete_comment_warning_message" = "This comment will be permanently deleted.";
+"amity_social_button_delete_message_failed" = "Unable to delete message. Please try again.";
+"amity_social_button_delete_post_warning_message" = "This post will be permanently deleted.";
+"amity_social_button_discard" = "Discard";
+"amity_social_button_edit_user_save_button" = "Save";
+"amity_social_button_event_progress_not_saved" = "Your progress won't be saved and your event won't be created.";
+"amity_social_button_image" = "Image";
+"amity_social_button_join_group" = "Join group";
+"amity_social_button_leave" = "Leave";
+"amity_social_button_my_timeline" = "My timeline";
+"amity_social_button_pending_invitation" = "Pending invitation";
+"amity_social_button_pending_post_decline_button" = "Decline";
+"amity_social_button_poll_duration_1_day" = "1 day";
+"amity_social_button_poll_duration_14_days" = "14 days";
+"amity_social_button_poll_duration_3_days" = "3 days";
+"amity_social_button_poll_duration_30_days" = "30 days";
+"amity_social_button_poll_duration_7_days" = "7 days";
+"amity_social_button_poll_voter" = "%@ vote";
+"amity_social_button_poll_voters" = "%@ votes";
+"amity_social_button_post_composer_file_button" = "Attachment";
+"amity_social_button_post_content_share_button" = "Share";
+"amity_social_button_post_to" = "Post to";
+"amity_social_button_select_event_target_my_timeline" = "My Timeline";
+"amity_social_button_select_poll_target_my_timeline" = "My Timeline";
+"amity_social_button_unblock" = "Unblock";
+"amity_social_button_user_follow_button" = "Follow";
+"amity_social_button_user_following_button" = "Following";
+"amity_social_button_user_profile_follower" = "followers";
+"amity_social_button_user_profile_following" = "following";
+"amity_social_button_v3_loadmore" = "Load More";
+"amity_social_empty_state_explore_empty" = "Your explore is empty";
+"amity_social_error_close_community_error_title" = "Unable to close community";
+"amity_social_label_blocked_user_feed" = "You've blocked this user";
+"amity_social_label_blocked_user_feed_info" = "Unblock to see their posts.";
+"amity_social_label_blocked_user_image_feed" = "You've blocked this user";
+"amity_social_label_blocked_user_image_feed_info" = "Unblock to see their posts.";
+"amity_social_label_blocked_user_video_feed" = "You've blocked this user";
+"amity_social_label_blocked_user_video_feed_info" = "Unblock to see their posts.";
+"amity_social_label_community_setup_invite_members_description" = "They will join as members after accepting your invitation.";
+"amity_social_label_community_setup_invite_members_title" = "Invite members";
+"amity_social_label_customize_link_text" = "Customize link text";
+"amity_social_label_enter_valid_url" = "Please enter a valid URL.";
+"amity_social_label_enter_whitelisted_url" = "Please enter a whitelisted URL.";
+"amity_social_label_follow_request_accepted" = "%1$@ is now following you.";
+"amity_social_label_join_to_attend_events" = "Become a member of %@ to attend events and join the conversation.";
+"amity_social_label_msg_blocked_word" = "Your message wasn't sent as it contained a blocked word.";
+"amity_social_label_no_internet_connection" = "No internet connection.";
+"amity_social_label_no_users_available" = "No users available";
+"social_toast_failed_generic" = "Oops, something went wrong.";
+"amity_social_label_private_user_feed" = "This account is private";
+"amity_social_label_private_user_feed_info" = "Follow this user to see their posts.";
+"amity_social_label_private_user_image_feed" = "This account is private";
+"amity_social_label_private_user_image_feed_info" = "Follow this user to see their posts.";
+"amity_social_label_private_user_video_feed" = "This account is private";
+"amity_social_label_private_user_video_feed_info" = "Follow this user to see their posts.";
+"amity_social_label_select_event_target_title" = "Create event in";
+"amity_social_label_text_contains_blocklisted" = "Your text contains a blocklisted word.";
+"amity_social_label_your_message_is_too_long_please_shorten_your_message_an" = "Your message is too long. Please shorten your message and try again.";
+"amity_social_modal_dialog_cohost_invitation_description" = "If they accept your invitation, they'll join as a co-host with moderator access. They can turn on their camera and mic, appear on stage, and help manage chat.";
+"amity_social_modal_dialog_something_went_wrong" = "Something went wrong. Please try again later.";
+"amity_social_permission_post_permission_admin_review" = "Admin review required";
+"amity_social_placeholder_edit_user_about_hint" = "Enter description";
+"amity_social_placeholder_hyperlink_name_hint" = "Name your link";
+"amity_social_placeholder_hyperlink_url_hint" = "https://example.com";
+"amity_social_toast_community_report_failed" = "Failed to report community. Please try again.";
+"amity_social_toast_community_setup_toast_create_failed" = "Failed to create community. Please try again.";
+"amity_social_toast_community_unreport_failed" = "Failed to unreport community. Please try again.";
+"amity_social_toast_leave_community_failed" = "Failed to leave the community. Please try again.";
+"amity_social_toast_member_unban_failed" = "Failed to unban member. Please try again.";
+"amity_social_toast_product_tag_add_failed" = "Failed to add product tags. Please try again.";
+"amity_social_toast_product_tag_remove_failed" = "Failed to remove product tag. Please try again.";
+"amity_social_toast_snackbar_close_community_failed" = "Failed to close community. Please try again later.";
+"amity_social_toast_snackbar_story_shared" = "Successfully shared story";
+"amity_social_toast_update_cohost_permission_failed" = "Failed to update co-host product tagging permission. Please try again.";
+
+// Cross-platform gap keys — wrong-key fixes batch
+"post_composer_blocked_link_error" = "Your post wasn't posted because it contains a link that is not allowed.";
+"post_title_char_limit_error" = "Post title cannot exceed %d characters.";
+"comment_delete_failed_toast" = "Failed to delete comment. Please try again.";
+"comment_report_failed_toast" = "Failed to report comment. Please try again.";
+"comment_unreport_failed_toast" = "Failed to unreport comment. Please try again.";
+"community_member_ban_failed_toast" = "Failed to ban member. Please try again.";
+"chat_toast_report_message_failed" = "Failed to report message. Please try again.";
+"reply_report_failed_toast" = "Failed to report reply. Please try again.";
+"reply_unreport_failed_toast" = "Failed to unreport reply. Please try again.";
+
+// New keys for toast address/link copied (separate from button variants)
+"amity_social_toast_snackbar_address_copied" = "Address copied";
+"amity_social_toast_snackbar_link_copied" = "Link copied.";
+
+// New iOS keys for rows 251, 1107, 1134
+"amity_social_member_removed_toast" = "Member removed from this community.";
+"community_add_member_failed_toast" = "Failed to add members to this community. Please try again.";
+"amity_social_upload_image_failed" = "Failed to upload image. Please try again.";
+
+
+"amity_social_button_accept_invite" = "Accept";

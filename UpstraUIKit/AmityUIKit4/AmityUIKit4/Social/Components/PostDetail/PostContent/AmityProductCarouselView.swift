@@ -25,7 +25,7 @@ struct AmityProductCarouselView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("Products tagged")
+            Text(AmityLocalizedStringSet.Social.productsTagged.localizedString)
                 .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                 .padding(.horizontal, 16)
 
@@ -190,7 +190,7 @@ private struct ProductCarouselCardView: View {
 
             // Product detail
             if isUnavailable {
-                Text("Unlisted")
+                Text(AmityLocalizedStringSet.Social.productTagUnlistedLabel.localizedString)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .lineLimit(1)
                     .frame(width: 100, alignment: .leading)

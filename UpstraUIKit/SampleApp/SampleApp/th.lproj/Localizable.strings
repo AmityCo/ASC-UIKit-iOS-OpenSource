@@ -1,0 +1,4 @@
+/* Thai localization marker for SampleApp.
+   This file enables iOS to recognize Thai as a supported language,
+   which allows embedded frameworks (AmityUIKit4) to load their
+   own th.lproj resources via NSLocalizedString. */

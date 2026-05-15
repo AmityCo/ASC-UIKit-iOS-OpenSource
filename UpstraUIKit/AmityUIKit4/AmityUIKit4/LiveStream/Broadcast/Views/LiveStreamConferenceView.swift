@@ -495,7 +495,7 @@ struct LiveStreamConferenceView: View {
         })
         .onChange(of: networkMonitor.isConnected) { isConnected in
             if !isConnected {
-                Toast.showToast(style: .loading, message: "Waiting for network...", bottomPadding: 60, autoHide: false)
+                Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.livestreamWaitingNetworkToast.localizedString, bottomPadding: 60, autoHide: false)
             } else {
                 Toast.hideToastIfPresented(immediately: true)
             }
@@ -519,7 +519,7 @@ struct LiveStreamConferenceView: View {
                     
                     self.dismissToPostDetailPage(postId: postId)
 
-                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.General.noInternetConnection.localizedString, bottomPadding: 60)
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.noInternetConnection.localizedString, bottomPadding: 60)
                     
                     return
                 }
@@ -705,7 +705,7 @@ struct LiveStreamConferenceView: View {
                                 // Event Creator info
                                 if let creator = event.creator {
                                     HStack(spacing: 4) {
-                                        Text("By \(creator.displayName ?? "")")
+                                        Text(AmityLocalizedStringSet.General.byAuthor.localized(arguments: creator.displayName ?? ""))
                                             .applyTextStyle(.caption(Color.white))
                                             .lineLimit(1)
                                         
@@ -727,7 +727,7 @@ struct LiveStreamConferenceView: View {
                                     viewModel.targetDisplayName = selectedTarget.displayName
                                     viewModel.targetType = .community
                                 } else {
-                                    viewModel.targetDisplayName = AmityLocalizedStringSet.Social.liveStreamMyTimelineLabel.localizedString
+                                    viewModel.targetDisplayName = AmityLocalizedStringSet.Social.myTimeline.localizedString
                                     viewModel.targetType = .user
                                 }
                             }, isOpenedFromLiveStreamPage: true)
@@ -838,7 +838,7 @@ struct LiveStreamConferenceView: View {
                         // Event Creator info
                         if let creator = event.creator {
                             HStack(spacing: 4) {
-                                Text("By \(creator.displayName ?? "")")
+                                Text(AmityLocalizedStringSet.General.byAuthor.localized(arguments: creator.displayName ?? ""))
                                     .applyTextStyle(.caption(Color.white))
                                     .lineLimit(1)
                                 
@@ -884,7 +884,7 @@ struct LiveStreamConferenceView: View {
                     // Streamer info
                     if let streamer = viewModel.createdRoom?.creator {
                         HStack(spacing: 4) {
-                            Text("By \(streamer.displayName ?? "")")
+                            Text(AmityLocalizedStringSet.General.byAuthor.localized(arguments: streamer.displayName ?? ""))
                                 .applyTextStyle(.caption(Color.white.opacity(0.8)))
                                 .lineLimit(1)
                             
@@ -1229,7 +1229,7 @@ struct LiveStreamConferenceView: View {
         let copyLinkConfig = viewConfig.forElement(.copyLink)
         let shareLinkConfig = viewConfig.forElement(.shareLink)
         
-        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "", tintColor: .white)
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? AmityLocalizedStringSet.Social.socialCopyLivestreamLink.localizedString, tintColor: .white)
             .onTapGesture {
                 showSettingSheet.toggle()
                 
@@ -1241,7 +1241,7 @@ struct LiveStreamConferenceView: View {
                 }
             }
         
-        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "", tintColor: .white)
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? AmityLocalizedStringSet.Social.socialShareTo.localizedString, tintColor: .white)
             .onTapGesture {
                 showSettingSheet.toggle()
                 
@@ -1288,7 +1288,7 @@ struct LiveStreamConferenceView: View {
             VStack(spacing: 20) {
                 Spacer()
                 
-                AmityUserProfileImageView(displayName: user?.displayName ?? "CoHost", avatarURL: URL(string: user?.avatarURL ?? ""))
+                AmityUserProfileImageView(displayName: user?.displayName ?? AmityLocalizedStringSet.Social.livestreamCoHost.localizedString, avatarURL: URL(string: user?.avatarURL ?? ""))
                     .frame(width: 64, height: 64)
                     .clipShape(Circle())
                 
@@ -1317,7 +1317,7 @@ struct LiveStreamConferenceView: View {
             let isBrandUser = viewModel.participantRole == .host ? isCoHostBrand : isCurrentUserBrand
             
             HStack(spacing: 4) {
-                Text(displayName ?? "Co-Host")
+                Text(displayName ?? AmityLocalizedStringSet.Social.livestreamCoHost.localizedString)
                     .applyTextStyle(.body(.white))
                     .lineLimit(1)
                 
@@ -1363,7 +1363,7 @@ struct LiveStreamConferenceView: View {
                 
                 // Show cancel invitation if the invited co-host is still waiting and has not accepted yet
                 if viewModel.invitedCoHost.isWaiting && viewModel.invitedCoHost.invitationAccepted == false {
-                    Text(viewModel.invitedCoHost.user?.displayName ?? "Invite co-host")
+                    Text(viewModel.invitedCoHost.user?.displayName ?? AmityLocalizedStringSet.Social.livestreamInviteCoHostTitle.localizedString)
                         .applyTextStyle(.titleBold(.white))
                     
                     Rectangle()
@@ -1371,7 +1371,7 @@ struct LiveStreamConferenceView: View {
                         .frame(height: 1)
                         .padding(.top, 12)
                     
-                    BottomSheetItemView(icon: AmityIcon.unfollowingUserIcon.imageResource, text: "Cancel invitation", isDestructive: true)
+                    BottomSheetItemView(icon: AmityIcon.unfollowingUserIcon.imageResource, text: AmityLocalizedStringSet.Social.livestreamCancelInvitationLabel.localizedString, isDestructive: true)
                         .onTapGesture {
                             // Remove co-host action
                             showCoHostMenuActionSheet.toggle()
@@ -1385,7 +1385,7 @@ struct LiveStreamConferenceView: View {
                             }
                         }
                 } else {
-                    Text(viewModel.invitedCoHost.user?.displayName ?? "CoHost")
+                    Text(viewModel.invitedCoHost.user?.displayName ?? AmityLocalizedStringSet.Social.livestreamCoHost.localizedString)
                         .applyTextStyle(.titleBold(.white))
                     
                     CoHostBadgeView()
@@ -1397,14 +1397,14 @@ struct LiveStreamConferenceView: View {
                         .padding(.top, 12)
                     
                     SettingToggleButtonView(isEnabled: $viewModel.isCoHostManageProductTagEnable,
-                                            title: "Allow co-host to manage product tags",
-                                            description: "When enabled, co-host can add or remove tagged products and pin or unpin a product during the live stream.")
+                                            title: AmityLocalizedStringSet.Social.livestreamCoHostProductTagsTitle.localizedString,
+                                            description: AmityLocalizedStringSet.Social.livestreamCoHostProductTagsDescription.localizedString)
                         .contentShape(Rectangle())
                         .padding(EdgeInsets(top: 20, leading: 20, bottom: 16, trailing: 20))
                         .isHidden(!viewModel.isProductTagEnabled)
                     
                     
-                    BottomSheetItemView(icon: AmityIcon.unfollowingUserIcon.imageResource, text: "Remove from live", isDestructive: true)
+                    BottomSheetItemView(icon: AmityIcon.unfollowingUserIcon.imageResource, text: AmityLocalizedStringSet.Social.livestreamRemoveFromLive.localizedString, isDestructive: true)
                         .onTapGesture {
                             // Remove co-host action
                             showCoHostMenuActionSheet.toggle()
@@ -1419,7 +1419,7 @@ struct LiveStreamConferenceView: View {
                 }
                     
             } else if viewModel.participantRole == .coHost {
-                BottomSheetItemView(icon: AmityIcon.LiveStream.leaveIcon.imageResource, text: "Leave as co-host", isDestructive: true)
+                BottomSheetItemView(icon: AmityIcon.LiveStream.leaveIcon.imageResource, text: AmityLocalizedStringSet.Social.livestreamAlertLeaveAsCoHostTile.localizedString, isDestructive: true)
                     .onTapGesture {
                         // Co-Host leave action
                         showCoHostMenuActionSheet.toggle()

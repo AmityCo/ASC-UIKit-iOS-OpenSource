@@ -42,7 +42,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
     
     
     private var navigationBarView: some View {
-        return AmityNavigationBar(title: "Follow requests (\(viewModel.users.count))", showBackButton: true)
+        return AmityNavigationBar(title: String(format: AmityLocalizedStringSet.Social.userFollowRequestsTitleFormat.localizedString, viewModel.users.count), showBackButton: true)
     }
     
     @ViewBuilder
@@ -55,7 +55,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
                 .scaledToFit()
                 .frame(width: 60, height: 60)
             
-            Text("No requests to review")
+            Text(AmityLocalizedStringSet.Social.noRequestsToReview.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
             
             Spacer()
@@ -93,7 +93,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
             .fill(Color(viewConfig.theme.baseColorShade4))
             .frame(height: 60)
             .overlay(
-                Text("Declining a follow request is irreversible. The user must send a new request if declined.")
+                Text(AmityLocalizedStringSet.Social.declineFollowRequestMessage.localizedString)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .padding([.leading, .trailing], 16)
             )
@@ -156,7 +156,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
             Rectangle()
                 .fill(Color(viewConfig.theme.primaryColor))
                 .overlay (
-                    Text("Accept")
+                    Text(AmityLocalizedStringSet.Social.acceptButton.localizedString)
                         .applyTextStyle(.bodyBold(.white))
                 )
                 .cornerRadius(8)
@@ -166,7 +166,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
                             try await viewModel.acceptMyFollower(user.userId)
                             Toast.showToast(style: .success, message: "\(user.displayName) is now following you.")
                         } catch {
-                            Toast.showToast(style: .warning, message: "Failed to accept follow request. Please try again.")
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.followRequestAcceptFailedToast.localizedString)
                         }
                     }
                 }
@@ -175,7 +175,7 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
             Rectangle()
                 .fill(.clear)
                 .overlay (
-                    Text("Decline")
+                    Text(AmityLocalizedStringSet.Social.declineButton.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 )
                 .cornerRadius(8)
@@ -187,9 +187,9 @@ public struct AmityUserPendingFollowRequestsPage: AmityPageView {
                     Task { @MainActor in
                         do {
                             try await viewModel.declineMyFollower(user.userId)
-                            Toast.showToast(style: .success, message: "Following request declined.")
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.followRequestDeclinedToast.localizedString)
                         } catch {
-                            Toast.showToast(style: .warning, message: "Failed to decline follow request. Please try again.")
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.followRequestDeclineFailedToast.localizedString)
                         }
                     }
                 }

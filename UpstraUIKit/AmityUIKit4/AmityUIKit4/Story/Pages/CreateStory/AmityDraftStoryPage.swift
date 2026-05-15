@@ -87,7 +87,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                             
                             Button {
                                 guard viewModel.hyperLinkConfigModel.url.isEmpty else {
-                                    Toast.showToast(style: .warning, message: "Can’t add more than one link to your story.")
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.storyLinkLimitToast.localizedString)
                                     return
                                 }
                                 showHyperLinkSheet = true
@@ -140,7 +140,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                             
                             do {
                                 try await viewModel.createStory(displayMode: previewDisplayMode)
-                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Story.createdStorySuccessfully.localizedString)
+                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.snackbarStoryShared.localizedString)
                             } catch {
                                 Log.add(event: .error, "StoryCreation: Failed - Error \(error)")
                                 Toast.showToast(style: .warning, message: error.localizedDescription)
@@ -158,7 +158,7 @@ public struct AmityDraftStoryPage: AmityPageView {
             AmityHyperLinkConfigComponent(isPresented: $showHyperLinkSheet, data: $viewModel.hyperLinkConfigModel, pageId: id)
         })
         .alert(isPresented: $isAlertShown, content: {
-            Alert(title: Text("Discard story?"), message: Text("The story will be permanently discarded. It cannot be undone."), primaryButton: .cancel(), secondaryButton: .destructive(Text("Discard"), action: {
+            Alert(title: Text(AmityLocalizedStringSet.Story.discardStoryTitle.localizedString), message: Text(AmityLocalizedStringSet.Story.discardStoryMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.discard.localizedString), action: {
                 host.controller?.navigationController?.popViewController(animated: true)
             }))
         })
@@ -224,7 +224,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                     .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.shareStoryButtonAvatar)
             }
             
-            Text("Share Story")
+            Text(AmityLocalizedStringSet.Story.shareStory.localizedString)
                 .applyTextStyle(.body(Color(viewConfig.defaultLightTheme.baseColor)))
             
             Image(shareIcon)

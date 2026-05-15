@@ -71,9 +71,9 @@ public struct AmityCommunityStoriesNotificationSettingPage: AmityPageView {
                 .frame(width: 24, height: 20)
                 .onTapGesture {
                     if viewModel.isSettingChanged {
-                        let alert = UIAlertController(title: "Leave without finishing?", message: "Your changes that you made may not be saved.", preferredStyle: .alert)
-                        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-                        let leaveAction = UIAlertAction(title: "Leave", style: .destructive) { _ in
+                        let alert = UIAlertController(title: AmityLocalizedStringSet.Social.eventDetailAlertLeaveWithoutFinishingTitle.localizedString, message: AmityLocalizedStringSet.Social.communityNotificationLeaveAlertMessage.localizedString, preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
+                        let leaveAction = UIAlertAction(title: AmityLocalizedStringSet.Social.leave.localizedString, style: .destructive) { _ in
                             host.controller?.navigationController?.popViewController()
                         }
                         
@@ -93,7 +93,7 @@ public struct AmityCommunityStoriesNotificationSettingPage: AmityPageView {
             
             Spacer()
             
-            Text(AmityLocalizedStringSet.General.save.localizedString)
+            Text(AmityLocalizedStringSet.Social.saveButton.localizedString)
                 .applyTextStyle(.title(Color(viewConfig.theme.primaryColor)))
                 .opacity(viewModel.isSettingChanged ? 1.0 : 0.35)
                 .onTapGesture {
@@ -110,7 +110,7 @@ public struct AmityCommunityStoriesNotificationSettingPage: AmityPageView {
                                 host.controller?.navigationController?.popViewController(animated: true)
                             }
                         } catch let error {
-                            Toast.showToast(style: .success, message: "Failed to update community profile!")
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityProfileUpdateFailedToast.localizedString)
                         }
                     }
                 }

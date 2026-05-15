@@ -137,7 +137,7 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
         }
         .alert(isPresented: $showMaximumMediaAlert) {
             let typeString = currentType == .image ? "images" : "videoes"
-            return Alert(title: Text("Maximum upload limit reached"), message: Text("You’ve reached the upload limit of 10 \(typeString). Any additional \(typeString) will not be saved."), dismissButton: .cancel(Text("Close")))
+            return Alert(title: Text(AmityLocalizedStringSet.Social.maxUploadLimitTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.maxUploadLimitMessage.localized(arguments: typeString, typeString)), dismissButton: .cancel(Text("Close")))
         }
         .fullScreenCover(isPresented: $showCamera.isShown) {
             ImageVideoCameraPicker(viewModel: pickerViewModel, mediaType: $showCamera.type, sourceType: $showCamera.source)

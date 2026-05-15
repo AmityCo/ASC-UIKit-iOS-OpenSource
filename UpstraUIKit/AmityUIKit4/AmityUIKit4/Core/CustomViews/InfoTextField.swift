@@ -114,11 +114,11 @@ struct InfoTextField: View {
                     .accessibilityIdentifier(titleTextAccessibilityId ?? "titleTextAccessibilityId")
                 
                 if data.isMandatory {
-                    Text(" *")
+                    Text(AmityLocalizedStringSet.General.requiredIndicator.localizedString)
                         .applyTextStyle(.titleBold(Color(alertColor)))
                 } else {
                     if data.showOptionalTitle {
-                        Text(" (Optional)")
+                        Text(AmityLocalizedStringSet.General.optionalLabel.localizedString)
                             .applyTextStyle(.caption(Color(infoTextColor)))
                     }
                 }

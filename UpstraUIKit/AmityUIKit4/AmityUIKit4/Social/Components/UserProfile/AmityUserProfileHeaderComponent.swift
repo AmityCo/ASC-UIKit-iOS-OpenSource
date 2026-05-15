@@ -42,7 +42,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
             userHeaderView
             
             ExpandableText(user.about)
-                .moreButtonText("...See more")
+                .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .attributedColor(viewConfig.theme.primaryColor)
                 .moreButtonColor(Color(viewConfig.theme.primaryColor))
@@ -135,7 +135,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 Text((viewModel.followInfo?.followingCount ?? 0).formattedCountString)
                     .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 
-                let followingText = viewConfig.getConfig(elementId: .userFollowing, key: "text", of: String.self) ?? "followings"
+                let followingText = viewConfig.getConfig(elementId: .userFollowing, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.userProfileFollowings.localizedString
                 Text(followingText)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.leading, 4)
@@ -163,7 +163,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                     .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     .padding(.leading, 12)
                 
-                let followerText = viewConfig.getConfig(elementId: .userFollower, key: "text", of: String.self) ?? "followers"
+                let followerText = viewConfig.getConfig(elementId: .userFollower, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.userProfileFollowers.localizedString
                 Text(followerText)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.leading, 4)
@@ -216,7 +216,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
     @ViewBuilder
     private var followButton: some View {
         let followUserIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .followUserButton, key: "image", of: String.self) ?? "")
-        let followUserText = viewConfig.getConfig(elementId: .followUserButton, key: "text", of: String.self) ?? "Follow"
+        let followUserText = viewConfig.getConfig(elementId: .followUserButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString
         getRelationshipButton(followUserIcon, followUserText, Color(viewConfig.theme.primaryColor))
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
@@ -226,8 +226,8 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                         do {
                             try await viewModel.follow()
                         } catch {
-                            let alert = UIAlertController(title: "Unable to follow this user", message: "Oops! something went wrong. Please try again later.", preferredStyle: .alert)
-                            let action = UIAlertAction(title: "OK", style: .cancel)
+                            let alert = UIAlertController(title: AmityLocalizedStringSet.Social.unableToFollowAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.unableToFollowAlertMessage.localizedString, preferredStyle: .alert)
+                            let action = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
                             alert.addAction(action)
                             host.controller?.present(alert, animated: true)
                         }
@@ -241,7 +241,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
     @ViewBuilder
     private var pendingRequestButton: some View {
         let pendingUserIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .pendingUserButton, key: "image", of: String.self) ?? "")
-        let pendingUserText = viewConfig.getConfig(elementId: .pendingUserButton, key: "text", of: String.self) ?? "Cancel request"
+        let pendingUserText = viewConfig.getConfig(elementId: .pendingUserButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.cancelRequest.localizedString
         getRelationshipButton(pendingUserIcon, pendingUserText, .clear)
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
@@ -259,7 +259,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
     @ViewBuilder
     private var followingButton: some View {
         let followingUserIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .followingUserButton, key: "image", of: String.self) ?? "")
-        let followingUserText = viewConfig.getConfig(elementId: .followingUserButton, key: "text", of: String.self) ?? "Following"
+        let followingUserText = viewConfig.getConfig(elementId: .followingUserButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.userFollowingButton.localizedString
         getRelationshipButton(followingUserIcon, followingUserText, .clear)
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
@@ -274,19 +274,19 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
     @ViewBuilder
     private var unblockButton: some View {
         let unblockUserIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .unblockUserButton, key: "image", of: String.self) ?? "")
-        let unblockUserText = viewConfig.getConfig(elementId: .unblockUserButton, key: "text", of: String.self) ?? "Following"
+        let unblockUserText = viewConfig.getConfig(elementId: .unblockUserButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.unblock.localizedString
         getRelationshipButton(unblockUserIcon, unblockUserText, .clear)
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)
                 
                 AmityUserAction.perform(host: host) {
-                    showAlert(title: "Unblock user?", message: "\(user.displayName) will now be able to see posts and comments that you’ve created. They won’t be notified that you’ve unblocked them.", btnTitle: "Unblock", btnAction: {
+                    showAlert(title: AmityLocalizedStringSet.Social.userUnblockTitle.localizedString, message: String(format: AmityLocalizedStringSet.Social.userUnblockMessageFormat.localizedString, user.displayName), btnTitle: AmityLocalizedStringSet.Social.unblock.localizedString, btnAction: {
                         Task { @MainActor in
                             do {
                                 try await viewModel.unblock()
-                                Toast.showToast(style: .success, message: "User unblocked.")
+                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userUnblockedToast.localizedString)
                             } catch {
-                                Toast.showToast(style: .warning, message: "Failed to unblocked user. Please try again.")
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userUnblockFailedToast.localizedString)
                             }
                         }
                     })
@@ -325,13 +325,13 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
     @ViewBuilder
     private var bottomSheetView: some View {
         VStack(spacing: 0) {
-            BottomSheetItemView(icon: AmityIcon.unfollowingUserIcon.getImageResource(), text: "Unfollow")
+            BottomSheetItemView(icon: AmityIcon.unfollowingUserIcon.getImageResource(), text: AmityLocalizedStringSet.Social.userUnfollowButton.localizedString)
                 .onTapGesture {
                     showBottomSheet.toggle()
                     
                     AmityUserAction.perform(host: host) {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            showAlert(title: "Unfollow this user?", message: "If you change your mind, you’ll have to request to follow them again.", btnTitle: "Unfollow", btnAction: {
+                            showAlert(title: AmityLocalizedStringSet.Social.userUnfollowTitle.localizedString, message: AmityLocalizedStringSet.Social.userUnfollowMessage.localizedString, btnTitle: AmityLocalizedStringSet.Social.userUnfollowButton.localizedString, btnAction: {
                                 Task { @MainActor in
                                     try await viewModel.unfollow()
                                 }
@@ -345,7 +345,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
     
     private func showAlert(title: String, message: String, btnTitle: String, btnAction: @escaping () -> Void) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
         let btnAction = UIAlertAction(title: btnTitle, style: .destructive) { _ in
             btnAction()
         }

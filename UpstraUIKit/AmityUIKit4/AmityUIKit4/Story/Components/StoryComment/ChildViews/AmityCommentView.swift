@@ -137,7 +137,7 @@ public struct AmityCommentView: View {
                                 commentButtonAction(.userProfile(userId))
                             })
                             .lineLimit(seeMoreLineLimit)
-                            .moreButtonText("...See more")
+                            .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                             .font(AmityTextStyle.body(.clear).getFont())
                             .foregroundColor(Color(viewConfig.theme.baseColor))
                             .attributedColor(viewConfig.theme.primaryColor)
@@ -230,7 +230,7 @@ public struct AmityCommentView: View {
                             .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.timestampTextView)
                         
-                        Text(comment.myReaction != nil ? comment.myReaction!.name.capitalizeFirstLetter() : AmityLocalizedStringSet.Comment.reactButtonText.localizedString)
+                        Text(comment.myReaction != nil ? AmityStringProvider.common.resolveReactionDisplayName(comment.myReaction!.name) : AmityLocalizedStringSet.Comment.reactButtonText.localizedString)
                             .applyTextStyle(.captionBold(comment.myReaction != nil ? Color(viewConfig.theme.baseColor) : Color(viewConfig.theme.baseColorShade2)))
                             .lineLimit(1)
                             .tapAndDragSimutaneousGesture(longPressSensitivity: 150, tapAction: {
@@ -258,7 +258,7 @@ public struct AmityCommentView: View {
                                             if error.isAmityErrorCode(.itemNotFound) {
                                                 let message: String
                                                 if let post = commentCoreViewModel.post, post.dataTypeInternal == .clip {
-                                                    message = AmityLocalizedStringSet.Comment.clipUnavailableToastMessage.localizedString
+                                                    message = AmityLocalizedStringSet.Comment.clipNoLongerAvailable.localizedString
                                                 } else {
                                                     message = AmityLocalizedStringSet.Comment.postUnavailableToastMessage.localizedString
                                                 }
@@ -341,7 +341,7 @@ public struct AmityCommentView: View {
                 .resizable()
                 .frame(width: 12, height: 12)
                 .padding(.leading, 6)
-            Text("Moderator")
+            Text(AmityLocalizedStringSet.General.moderator.localizedString)
                 .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
                 .padding(.trailing, 6)
         }

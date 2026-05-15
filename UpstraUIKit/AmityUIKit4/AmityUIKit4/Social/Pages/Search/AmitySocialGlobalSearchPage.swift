@@ -18,7 +18,11 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     
     @State private var tabIndex: Int = 0
-    @State private var tabs: [String] = ["Posts", "Communities", "Users"]
+    @State private var tabs: [String] = [
+        AmityLocalizedStringSet.Social.socialSearchPostsTab.localizedString,
+        AmityLocalizedStringSet.Social.socialHomeCommunitiesTab.localizedString,
+        AmityLocalizedStringSet.Social.socialSearchUsersTab.localizedString
+    ]
     
     public init(searchKeyword: String? = nil) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .socialGlobalSearchPage))

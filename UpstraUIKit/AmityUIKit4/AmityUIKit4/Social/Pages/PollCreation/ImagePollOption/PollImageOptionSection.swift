@@ -27,7 +27,7 @@ struct PollImageOptionSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             
-            PollSectionHeader(title: "Options", description: "Poll must contain at least 2 options, and an image must be uploaded for every option.")
+            PollSectionHeader(title: AmityLocalizedStringSet.Social.pollImageOptionsTitle.localizedString, description: AmityLocalizedStringSet.Social.pollImageOptionsDescription.localizedString)
                 .padding(.bottom, 20)
             
             LazyVGrid(columns: columns, spacing: 8) {
@@ -61,7 +61,7 @@ struct PollImageOptionSection: View {
                             .frame(width: 20, height: 20)
                             .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                         
-                        Text("Add option")
+                        Text(AmityLocalizedStringSet.Social.addOption.localizedString)
                             .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade1)))
                             .padding(.horizontal)
                     }
@@ -140,7 +140,7 @@ struct PollImageOptionView: View {
                                             HStack(spacing: 0) {
                                                 HStack(spacing: 4) {
                                                     
-                                                    Text("ALT")
+                                                    Text(AmityLocalizedStringSet.Social.altTextButtonTitle.localizedString)
                                                         .applyTextStyle(.captionBold(.white))
                                                         .padding(.leading, 8)
                                                         .padding(.vertical, style: .spacingXS)
@@ -178,7 +178,7 @@ struct PollImageOptionView: View {
                                         .frame(width: 24, height: 24)
                                         .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                                     
-                                    Text("Upload image")
+                                    Text(AmityLocalizedStringSet.Social.uploadImage.localizedString)
                                         .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade1)))
                                 }
                             }
@@ -220,13 +220,13 @@ struct PollImageOptionView: View {
                         self.showRetryActionSheet = true
                     }
                     .actionSheet(isPresented: $showRetryActionSheet) {
-                        ActionSheet(title: Text("Your image couldn’t be uploaded"), buttons: [
-                            .default(Text("Retry"), action: {
+                        ActionSheet(title: Text(AmityLocalizedStringSet.Social.imageUploadFailed.localizedString), buttons: [
+                            .default(Text(AmityLocalizedStringSet.General.retry.localizedString), action: {
                                 if let image = option.image {
                                     uploadImage(image: image)
                                 }
                             }),
-                            .default(Text("Upload new image"), action: {
+                            .default(Text(AmityLocalizedStringSet.Social.uploadNewImage.localizedString), action: {
                                 showImagePicker = true
                             }),
                             .cancel()
@@ -239,7 +239,7 @@ struct PollImageOptionView: View {
             TextField("", text: $text)
                 .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                 .placeholder(when: text.isEmpty, placeholder: {
-                    Text("Option \(index + 1)")
+                    Text(AmityLocalizedStringSet.Social.optionN.localized(arguments: index + 1))
                         .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
                 })
                 .frame(height: 40)

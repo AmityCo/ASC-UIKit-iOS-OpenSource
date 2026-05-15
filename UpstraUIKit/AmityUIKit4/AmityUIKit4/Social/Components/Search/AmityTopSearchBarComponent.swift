@@ -89,11 +89,11 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
     var placeholderText: String {
         switch viewModel.searchType {
         case .posts:
-            "Search"
+            AmityLocalizedStringSet.Social.searchPlaceholder.localizedString
         case .community, .user:
-            "Search community and user"
+            AmityLocalizedStringSet.Social.searchCommunityUserPlaceholder.localizedString
         case .myCommunities:
-            "Search my communities"
+            AmityLocalizedStringSet.Social.searchMyCommunitiesPlaceholder.localizedString
         }
     }
 }

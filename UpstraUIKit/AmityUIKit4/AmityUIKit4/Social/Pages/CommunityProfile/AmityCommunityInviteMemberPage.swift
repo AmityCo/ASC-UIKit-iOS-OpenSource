@@ -128,7 +128,7 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
                 .padding(.leading, 12)
             
             ZStack(alignment: .trailing) {
-                TextField("Search user", text: $viewModel.searchKeyword)
+                TextField(AmityLocalizedStringSet.Social.searchUserPlaceholder.localizedString, text: $viewModel.searchKeyword)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                 
                 Button(
@@ -267,7 +267,7 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 .frame(width: 60, height: 60)
             
-            Text("No results found")
+            Text(AmityLocalizedStringSet.Social.searchNoResultsFound.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
         }
         .padding(.top, 100)
@@ -282,7 +282,7 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 .frame(width: 60, height: 60)
             
-            Text("Start your search by typing at least 3 letters")
+            Text(AmityLocalizedStringSet.Social.startSearchHint.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 .multilineTextAlignment(.center)
         }

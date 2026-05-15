@@ -30,7 +30,7 @@ public struct AmityLivestreamPostTargetSelectionPage: AmityPageView {
     
     public var body: some View {
         VStack {
-            let navTitle = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "Live on"
+            let navTitle = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.liveOn.localizedString
             let closeButton = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
                         
             AmityPostTargetSelectionPage.HeaderView(title: navTitle, closeIcon: closeButton) {

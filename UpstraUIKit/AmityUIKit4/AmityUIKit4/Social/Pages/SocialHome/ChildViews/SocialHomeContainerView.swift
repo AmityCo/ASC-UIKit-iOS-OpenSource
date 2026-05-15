@@ -34,7 +34,7 @@ struct SocialHomeContainerView: View {
             case .events:
                 AmityEventPageContainer()
             case .clips:
-                Text("Clips")
+                Text(AmityLocalizedStringSet.General.clips.localizedString)
             }
         }
         .allowsDragging(false)

@@ -63,6 +63,6 @@ struct AmityTextMessageReplyPreview: View {
 
 #if DEBUG
 #Preview {
-    AmityTextMessageReplyPreview(message: .init(id: UUID().uuidString, text: "Hello", type: .text, hasReaction: false, parentId: nil), closeAction: { })
+    AmityTextMessageReplyPreview(message: .init(id: UUID().uuidString, text: "Hello", type: .text, hasReaction: false, parentId: nil), closeAction: { }) // l10n:ok preview mock data
 }
 #endif

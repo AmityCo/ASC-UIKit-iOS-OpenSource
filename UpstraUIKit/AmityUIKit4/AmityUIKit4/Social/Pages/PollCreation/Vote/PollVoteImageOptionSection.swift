@@ -164,7 +164,7 @@ struct PollVoteImageOptionView: View {
         if answer.voteCount > 0 {
             let voteCountExcludingUser = answer.isVotedByUser ? answer.voteCount - 1 : answer.voteCount
             
-            var final = voteCountExcludingUser > 1 ? "\(voteCountExcludingUser.formattedCountString) voters" : "1 voter"
+            var final = voteCountExcludingUser > 1 ? String(format: AmityLocalizedStringSet.Social.pollVoters.localizedString, "\(voteCountExcludingUser.formattedCountString)") : String(format: AmityLocalizedStringSet.Social.pollVoter.localizedString, "1")
             final += answer.isVotedByUser ? " " + AmityLocalizedStringSet.Social.pollAnswerResultVotedByAndYou.localizedString : ""
             return final
         }

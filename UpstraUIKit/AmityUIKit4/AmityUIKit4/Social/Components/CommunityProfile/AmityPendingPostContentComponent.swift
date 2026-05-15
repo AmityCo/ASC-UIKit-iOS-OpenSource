@@ -68,7 +68,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             VStack(alignment: .leading, spacing: 3) {
                 authorDisplayNameLabel
                 
-                Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
+                Text("\(post.timestamp)\(post.isEdited ? " \(AmityLocalizedStringSet.Comment.editedText.localizedString)" : "")")
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .isHidden(viewConfig.isHidden(elementId: .timestamp))
                 
@@ -89,16 +89,16 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 })
                 .buttonStyle(BorderlessButtonStyle())
                 .bottomSheet(isShowing: $showBottomSheet, height: .contentSize) {
-                    getItemView(AmityIcon.trashBinIcon.getImageResource(), text: "Delete post", isDestructive: true)
+                    getItemView(AmityIcon.trashBinIcon.getImageResource(), text: AmityLocalizedStringSet.Social.deletePostBottomSheetTitle.localizedString, isDestructive: true)
                         .padding(.bottom, 32)
                         .onTapGesture {
                             Task { @MainActor in
                                 do {
                                     showBottomSheet.toggle()
                                     try await viewModel.deletePost()
-                                    Toast.showToast(style: .success, message: "Post deleted.")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.postDeletedToastMessage.localizedString)
                                 } catch {
-                                    Toast.showToast(style: .warning, message: "Failed to delete post.")
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postDeleteError.localizedString)
                                 }
                             }
                         }
@@ -190,7 +190,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                         openProductWebView(productId: productId)
                     })
                     .lineLimit(8)
-                    .moreButtonText("...See more")
+                    .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                     .font(AmityTextStyle.body(.clear).getFont())
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .backgroundColor(Color(viewConfig.theme.backgroundColor))
@@ -219,14 +219,14 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             Rectangle()
                 .fill(Color(viewConfig.theme.primaryColor))
                 .overlay (
-                    Text(viewConfig.getText(elementId: .postAcceptButton) ?? "Accept")
+                    Text(viewConfig.getText(elementId: .postAcceptButton) ?? AmityLocalizedStringSet.Social.acceptButton.localizedString)
                         .applyTextStyle(.bodyBold(.white))
                 )
                 .cornerRadius(8)
                 .onTapGesture {
                     Task { @MainActor in
                         try await viewModel.approvePost()
-                        Toast.showToast(style: .success, message: "Post accepted.")
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.postAcceptedToast.localizedString)
                     }
                 }
                 .isHidden(viewConfig.isHidden(elementId: .postAcceptButton))
@@ -236,7 +236,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             Rectangle()
                 .fill(.clear)
                 .overlay (
-                    Text(viewConfig.getText(elementId: .postDeclineButton) ?? "Decline")
+                    Text(viewConfig.getText(elementId: .postDeclineButton) ?? AmityLocalizedStringSet.Social.pendingPostDeclineButton.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 )
                 .cornerRadius(8)
@@ -248,9 +248,9 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                     Task { @MainActor in
                         do {
                             try await viewModel.declinePost()
-                            Toast.showToast(style: .success, message: "Post declined.")
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.postDeclinedToast.localizedString)
                         } catch {
-                            Toast.showToast(style: .warning, message: "Failed to review post. Please try again.")
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postReviewFailedToast.localizedString)
                         }
                     }
                 }
@@ -289,7 +289,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 if !description.isEmpty {
                     ExpandableText(description)
                         .lineLimit(8)
-                        .moreButtonText("...See more")
+                        .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .attributedColor(viewConfig.theme.primaryColor)
@@ -331,7 +331,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 if !description.isEmpty {
                     ExpandableText(description)
                         .lineLimit(8)
-                        .moreButtonText("...See more")
+                        .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .attributedColor(viewConfig.theme.primaryColor)

@@ -129,7 +129,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                     
                     if let community = viewModel.community, community.isJoined {
                         
-                        let optionTitle = community.hasModeratorRole ? "Community settings" : "Community information"
+                        let optionTitle = community.hasModeratorRole ? AmityLocalizedStringSet.Social.communitySettingsOptionTitle.localizedString : AmityLocalizedStringSet.Social.communityInformationOptionTitle.localizedString
                         let optionIcon = community.hasModeratorRole ? AmityIcon.settingIcon.imageResource : AmityIcon.communityInformationIcon.imageResource
                         BottomSheetItemView(icon: optionIcon, text: optionTitle)
                             .onTapGesture {
@@ -147,7 +147,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                         let copyLinkConfig = viewConfig.forElement(.copyLink)
                         let shareLinkConfig = viewConfig.forElement(.shareLink)
                         
-                        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "")
+                        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? AmityLocalizedStringSet.Social.socialCopyProfileLink.localizedString)
                             .onTapGesture {
                                 showMenuBottomSheet.toggle()
                                 
@@ -159,7 +159,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                                 }
                             }
                         
-                        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "")
+                        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? AmityLocalizedStringSet.Social.socialShareTo.localizedString)
                             .onTapGesture {
                                 showMenuBottomSheet.toggle()
                                 
@@ -349,7 +349,7 @@ extension AmityCommunityProfilePage {
                         }
                 }
                 
-                BottomSheetItemView(icon: AmityIcon.createClipMenuIcon.imageResource, text: "Clip", iconSize: CGSize(width: 20, height: 20))
+                BottomSheetItemView(icon: AmityIcon.createClipMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.postMenuTypeClip.localizedString, iconSize: CGSize(width: 20, height: 20))
                     .onTapGesture {
                         showCreateBottomSheet.toggle()
                         host.controller?.dismiss(animated: false)
@@ -358,7 +358,7 @@ extension AmityCommunityProfilePage {
                     }
                 
                 if viewModel.hasCreateEventPermission {
-                    BottomSheetItemView(icon: AmityIcon.createEventMenuIcon.imageResource, text: "Event", iconSize: CGSize(width: 20, height: 20))
+                    BottomSheetItemView(icon: AmityIcon.createEventMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.postMenuTypeEvent.localizedString, iconSize: CGSize(width: 20, height: 20))
                         .onTapGesture {
                             showCreateBottomSheet.toggle()
                             host.controller?.dismiss(animated: false)

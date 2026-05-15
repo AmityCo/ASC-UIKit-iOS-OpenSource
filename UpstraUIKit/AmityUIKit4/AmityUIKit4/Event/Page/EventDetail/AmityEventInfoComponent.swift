@@ -240,7 +240,7 @@ struct AmityEventInfoComponent: View {
     func getStreamStatus(status: AmityRoomStatus) -> String {
         switch status {
         case .ended, .terminated:
-            return AmityLocalizedStringSet.Social.eventInfoStreamStatusEnded.localizedString
+            return AmityLocalizedStringSet.Social.eventDetailHeaderStatusEnded.localizedString
         case .live, .waitingReconnect:
             return AmityLocalizedStringSet.Social.eventInfoStreamStatusLive.localizedString
         case .recorded:

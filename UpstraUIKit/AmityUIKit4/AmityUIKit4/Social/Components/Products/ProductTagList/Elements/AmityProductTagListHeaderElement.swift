@@ -74,13 +74,13 @@ struct AmityProductTagListHeaderElement: AmityElementView {
         // Fallback to default text based on render mode
         switch renderMode {
         case .post:
-            return "Products tagged in this post"
+            return AmityLocalizedStringSet.Social.productsTaggedInPost.localizedString
         case .livestream:
-            return "Products tagged"
+            return AmityLocalizedStringSet.Social.productsTagged.localizedString
         case .image:
-            return "Products tagged in this photo"
+            return AmityLocalizedStringSet.Social.productsTaggedInPhoto.localizedString
         case .video:
-            return "Products tagged in this video"
+            return AmityLocalizedStringSet.Social.productsTaggedInVideo.localizedString
         }
     }
 }

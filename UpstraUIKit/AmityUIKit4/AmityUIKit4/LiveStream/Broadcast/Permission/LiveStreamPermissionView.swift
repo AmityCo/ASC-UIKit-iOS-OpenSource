@@ -13,7 +13,7 @@ struct LiveStreamPermission {
     let message: String
     
     static let cameraAndMicrophone = LiveStreamPermission(title: AmityLocalizedStringSet.Social.liveStreamPermissionCameraAndMicrophoneTitle.localizedString, message: AmityLocalizedStringSet.Social.liveStreamPermissionCameraAndMicrophoneMessage.localizedString)
-    static let photos = LiveStreamPermission(title: "Allow access to your photos", message: "This lets you use photos from this device as live stream thumbnail image.")
+    static let photos = LiveStreamPermission(title: AmityLocalizedStringSet.Social.livestreamPermissionPhotosTitle.localizedString, message: AmityLocalizedStringSet.Social.livestreamPermissionPhotosMessage.localizedString)
     
     init(title: String, message: String) {
         self.title = title

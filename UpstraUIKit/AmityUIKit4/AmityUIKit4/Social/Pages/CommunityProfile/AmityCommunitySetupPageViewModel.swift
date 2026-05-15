@@ -14,7 +14,7 @@ enum AddMemberModelType {
 
 struct AddMemberModel {
     var id: String {
-        return user?.userId ?? "AddMember"
+        return user?.userId ?? "AddMember" // l10n:ok internal model ID fallback, never displayed as UI text
     }
     var user: AmityUserModel?
     var type: AddMemberModelType

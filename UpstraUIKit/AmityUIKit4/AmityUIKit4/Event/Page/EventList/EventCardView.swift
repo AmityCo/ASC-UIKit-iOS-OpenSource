@@ -63,7 +63,7 @@ struct EventCardView: View {
         self.title = event.title
         self.author = event.creator?.displayName ?? "-"
         self.time = EventTimestamp(startTime: event.startTime, endTime: event.endTime).formattedTime
-        self.badge = event.type == .inPerson ? "In-person" : "Virtual"
+        self.badge = event.type == .inPerson ? AmityLocalizedStringSet.Social.eventDetailHeaderInPerson.localizedString : AmityLocalizedStringSet.Social.eventDetailHeaderVirtual.localizedString
         self.isBrand = event.creator?.isBrand ?? false
         self.imageURL = event.coverImage?.mediumFileURL
         self.isHost = event.creator?.userId == AmityUIKit4Manager.client.currentUserId
@@ -187,7 +187,7 @@ struct EventCardView: View {
                 .lineLimit(style == .large ? 2 : 1)
             
             HStack(spacing: 4) {
-                Text("By \(author)")
+                Text(AmityLocalizedStringSet.General.byAuthor.localized(arguments: author))
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .lineLimit(1)
 
@@ -284,15 +284,15 @@ struct EventTimestamp {
         if Calendar.current.isDateInYesterday(startTime) {
             let finalStartTime = Formatters.eventTimeFormatter.string(from: startTime)
             let finalEndTime = formatEndTime(endTime: endTime, startTime: startTime)
-            formattedTime = "Yesterday, \(finalStartTime) to \(finalEndTime)"
+            formattedTime = String(format: AmityLocalizedStringSet.Social.eventDateYesterday.localizedString, finalStartTime, finalEndTime)
         } else if Calendar.current.isDateInToday(startTime) {
             let finalStartTime = Formatters.eventTimeFormatter.string(from: startTime)
             let finalEndTime = formatEndTime(endTime: endTime, startTime: startTime)
-            formattedTime = "Today, \(finalStartTime) to \(finalEndTime)"
+            formattedTime = String(format: AmityLocalizedStringSet.Social.eventDateToday.localizedString, finalStartTime, finalEndTime)
         } else if Calendar.current.isDateInTomorrow(startTime) {
             let finalStartTime = Formatters.eventTimeFormatter.string(from: startTime)
             let finalEndTime = formatEndTime(endTime: endTime, startTime: startTime)
-            formattedTime = "Tomorrow, \(finalStartTime) to \(finalEndTime)"
+            formattedTime = String(format: AmityLocalizedStringSet.Social.eventDateTomorrow.localizedString, finalStartTime, finalEndTime)
         } else {
             let finalStartTime = Formatters.eventDateAndTimeFormatter.string(from: startTime)
             let finalEndTime = formatEndTime(endTime: endTime, startTime: startTime)

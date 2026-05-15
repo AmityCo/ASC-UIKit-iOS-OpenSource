@@ -168,7 +168,7 @@ public struct AmityJoinRequestContentComponent: AmityComponentView {
                             Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userJoinAcceptedToastSuccessMessage.localizedString)
                         } catch {
                             if error.isAmityErrorCode(.itemNotFound) {
-                                Toast.showToast(style: .warning, message: "This join request is no longer available.")
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinRequestNoLongerAvailableToast.localizedString)
                             } else {
                                 Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userJoinAcceptedToastErrorMessage.localizedString)
                             }
@@ -179,7 +179,7 @@ public struct AmityJoinRequestContentComponent: AmityComponentView {
             Rectangle()
                 .fill(.clear)
                 .overlay (
-                    Text(AmityLocalizedStringSet.Social.userJoinRequestDeclineLabel.localizedString)
+                    Text(AmityLocalizedStringSet.Social.declineButton.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 )
                 .cornerRadius(8)
@@ -194,7 +194,7 @@ public struct AmityJoinRequestContentComponent: AmityComponentView {
                             Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userJoinDeclinedToastSuccessMessage.localizedString)
                         } catch let error {
                             if error.isAmityErrorCode(.itemNotFound) {
-                                Toast.showToast(style: .warning, message: "This join request is no longer available.")
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinRequestNoLongerAvailableToast.localizedString)
                             } else {
                                 Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userJoinDeclinedToastErrorMessage.localizedString)
                             }

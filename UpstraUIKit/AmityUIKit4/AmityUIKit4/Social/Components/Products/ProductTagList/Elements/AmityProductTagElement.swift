@@ -125,7 +125,7 @@ struct AmityProductTagElement: AmityElementView {
                         .frame(width: 9, height: 9)
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                     
-                    Text("Pinned")
+                    Text(AmityLocalizedStringSet.Social.productTagPinnedLabel.localizedString)
                         .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                 }
                 .padding(.horizontal, 8)
@@ -148,7 +148,7 @@ struct AmityProductTagElement: AmityElementView {
             // Product Info
             VStack(alignment: .leading, spacing: 4) {
                 // Unlisted label - only when inactive
-                Text("Unlisted")
+                Text(AmityLocalizedStringSet.Social.productTagUnlistedLabel.localizedString)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .isHidden(!isInactive)
                 
@@ -175,7 +175,7 @@ struct AmityProductTagElement: AmityElementView {
                     
                     // View Button (v2) - shown in livestream mode
                     if renderMode == .livestream {
-                        Text("View")
+                        Text(AmityLocalizedStringSet.General.view.localizedString)
                             .applyTextStyle(.captionBold(.white))
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)

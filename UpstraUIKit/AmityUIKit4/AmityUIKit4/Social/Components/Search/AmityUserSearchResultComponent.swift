@@ -61,7 +61,7 @@ public struct AmityUserSearchResultComponent: AmityComponentView {
                         .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                         .frame(width: 60, height: 60)
                     
-                    Text("No results found")
+                    Text(AmityLocalizedStringSet.Social.searchNoResultsFound.localizedString)
                         .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 }
             }

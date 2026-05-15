@@ -106,10 +106,10 @@ public struct AmityProductTagSelectionComponent: AmityComponentView {
             .environmentObject(viewConfig)
             .alert(isPresented: $showDiscardAlert) {
                 Alert(
-                    title: Text(mode == .livestream ? "Discard product selection?" : "Discard product tags"),
-                    message: Text(mode == .livestream ? "You have products selected that haven't been added yet. If you close now, your selection will be lost." : "You have tagged products that haven't been saved yet. If you leave now, your changes will be lost."),
-                    primaryButton: .cancel(Text("Keep editing")),
-                    secondaryButton: .destructive(Text("Discard")) {
+                    title: Text(mode == .livestream ? AmityLocalizedStringSet.Social.productTagSelectionDiscardTitle.localizedString : AmityLocalizedStringSet.Social.productTagDiscardTitle.localizedString),
+                    message: Text(mode == .livestream ? AmityLocalizedStringSet.Social.productTagSelectionDiscardMessage.localizedString : AmityLocalizedStringSet.Social.productTagDiscardMessage.localizedString),
+                    primaryButton: .cancel(Text(AmityLocalizedStringSet.Social.keepEditing.localizedString)),
+                    secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.discard.localizedString)) {
                         onClose()
                     }
                 )
@@ -121,7 +121,7 @@ public struct AmityProductTagSelectionComponent: AmityComponentView {
             // Tagged products section
             if !viewModel.selectedProducts.isEmpty {
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Tagged products")
+                    Text(AmityLocalizedStringSet.Social.productTagTaggedProducts.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         .padding(.horizontal, 16)
                         .padding(.top, 12)
@@ -227,7 +227,7 @@ public struct AmityProductTagSelectionComponent: AmityComponentView {
                             }
                             onDone()
                         }) {
-                            Text("Add products")
+                            Text(AmityLocalizedStringSet.Social.addProducts.localizedString)
                                 .applyTextStyle(.bodyBold(.white))
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)

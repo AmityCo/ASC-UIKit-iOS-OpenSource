@@ -53,6 +53,6 @@ struct ProductTaggingButtonElement: AmityElementView {
                 }
             }
         }
-        .accessibilityLabel(productCount > 0 ? "\(productCount) products tagged" : "Add products")
+        .accessibilityLabel(productCount > 0 ? "\(productCount) products tagged" : AmityLocalizedStringSet.Social.addProducts.localizedString)
     }
 }

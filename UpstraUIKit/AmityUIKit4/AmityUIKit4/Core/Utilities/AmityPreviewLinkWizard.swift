@@ -136,7 +136,7 @@ public struct LinkDetail: CustomStringConvertible, Equatable {
     }
     
     public var description: String {
-        return "Index: \(index), Length: \(length), Range: \(range)\n, URL: \(url)"
+        return "Index: \(index), Length: \(length), Range: \(range)\n, URL: \(url)" // l10n:ok debug description not user-facing
     }
 }
 

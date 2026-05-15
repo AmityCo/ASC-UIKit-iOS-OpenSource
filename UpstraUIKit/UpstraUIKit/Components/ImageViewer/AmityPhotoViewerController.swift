@@ -9,6 +9,7 @@
 import UIKit
 import AVKit
 import Photos
+import AmityUIKit4
 
 extension AmityPhotoViewerController {
 

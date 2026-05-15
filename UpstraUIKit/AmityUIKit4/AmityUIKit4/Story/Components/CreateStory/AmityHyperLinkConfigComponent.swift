@@ -32,12 +32,11 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
     @Binding private var data: HyperLinkModel
     @StateObject private var viewModel = AmityHyperLinkConfigComponentViewModel()
     @State private var isRemoveLinkAlertShown: Bool = false
-    @State private var isUnsavedAlertShown: Bool = false
     
     @State private var showActivityIndicator: Bool = false
     
-    @State private var urlTextFieldModel = InfoTextFieldModel(title: "URL", placeholder: "https://example.com", isMandatory: true, errorMessage: "Please enter a valid URL.")
-    @State private var urlNameTextFieldModel = InfoTextFieldModel(title: "Customize link text", placeholder: "Name your link", isMandatory: false, infoMessage: "This text will show on the link instead of URL.", errorMessage: "Your text contains a blocklisted word.", maxCharCount: 30)
+    @State private var urlTextFieldModel = InfoTextFieldModel(title: AmityLocalizedStringSet.Social.hyperlinkUrlLabel.localizedString, placeholder: AmityLocalizedStringSet.Social.hyperlinkUrlHint.localizedString, isMandatory: true, errorMessage: AmityLocalizedStringSet.Social.enterValidUrl.localizedString)
+    @State private var urlNameTextFieldModel = InfoTextFieldModel(title: AmityLocalizedStringSet.Social.customizeLinkText.localizedString, placeholder: AmityLocalizedStringSet.Social.hyperlinkNameHint.localizedString, isMandatory: false, infoMessage: AmityLocalizedStringSet.Social.hyperlinkCustomizeInfo.localizedString, errorMessage: AmityLocalizedStringSet.Social.textContainsBlocklisted.localizedString, maxCharCount: 30)
     
     @StateObject private var viewConfig: AmityViewConfigController
     @Environment(\.colorScheme) private var colorScheme
@@ -49,114 +48,67 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
     }
     
     public var body: some View {
-        NavigationView {
-            VStack(spacing: 16) {
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade4))
-                
-                InfoTextField(data: $urlTextFieldModel,
-                              text: $viewModel.urlText,
-                              isValid: $viewModel.isURLValid,
-                              titleTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkURLTitleTextView,
-                              textFieldAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkURLTextField,
-                              descriptionTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkErrorTextView)
-                .alertColor(viewConfig.theme.alertColor)
-                .dividerColor(viewConfig.theme.baseColorShade4)
-                .infoTextColor(viewConfig.theme.baseColorShade2)
-                .textFieldTextColor(viewConfig.theme.baseColor)
-                .onChange(of: viewModel.urlText) { text in
-                    viewModel.isURLValid = text.isEmpty ? true : text.isValidURL
-                    
-                    if !text.isValidURL {
-                        urlTextFieldModel.errorMessage = "Please enter a valid URL."
-                    }
-                }
-                
-                InfoTextField(data: $urlNameTextFieldModel,
-                              text: $viewModel.urlNameText,
-                              isValid: $viewModel.isURLNameValid,
-                              titleTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkTitleTextView,
-                              textFieldAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkTextField,
-                              descriptionTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkDescriptionTextView,
-                              charCountTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkCharacterLimitTextView)
-                .alertColor(viewConfig.theme.alertColor)
-                .dividerColor(viewConfig.theme.baseColorShade4)
-                .infoTextColor(viewConfig.theme.baseColorShade2)
-                .textFieldTextColor(viewConfig.theme.baseColor)
-                .onChange(of: viewModel.urlNameText) { text in
-                    if text.isEmpty {
-                        viewModel.isURLNameValid = true
-                    }
-                }
-                              
-                
-                if !data.url.isEmpty {
-                    getRemoveLinkButton()
-                }
-                Spacer()
-            }
-            .padding([.leading, .trailing], 16)
-            .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
-            .navigationTitle("Add link")
-            .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.titleTextView)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {
-                        isUnsavedAlertShown.toggle()
-                    }, label: {
-                        Text(viewConfig.getConfig(elementId: .cancelButtonElement, key: "cancel_button_text", of: String.self) ?? "Cancel")
-                            .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
-                    })
-                    .buttonStyle(.plain)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .alert(isPresented: $isUnsavedAlertShown) {
-                        Alert(title: Text("Unsaved changes"),
-                              message: Text("Are you sure you want to cancel? Your changes won't be saved."),
-                              primaryButton: .default(Text("No")
-                                .foregroundColor(.accentColor)),
-                              secondaryButton: .default(Text("Yes")
-                                .foregroundColor(.accentColor), action: {
-                            isPresented.toggle()
-                        }))
-                    }
-                    .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.cancelButton)
-                    .isHidden(viewConfig.isHidden(elementId: .cancelButtonElement))
-                }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(action: {
-                        Task { @MainActor in
-                            guard await checkValidation(urlStr: viewModel.urlText, word: viewModel.urlNameText) else { return }
-                            
-                            data.url = viewModel.urlText
-                            data.urlName = viewModel.urlNameText
-                            isPresented.toggle()
-                        }
-                    }, label: {
-                        Text(viewConfig.getConfig(elementId: .doneButtonElement, key: "done_button_text", of: String.self) ?? "Done")
-                            .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
-                    })
-                    .buttonStyle(.plain)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .disabled(!viewModel.isURLValid || viewModel.urlText.isEmpty)
-                    .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.doneButton)
-                    .isHidden(viewConfig.isHidden(elementId: .doneButtonElement))
+        VStack(spacing: 16) {
+            navigationBar
+
+            Rectangle()
+                .frame(height: 1)
+                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
+
+            InfoTextField(data: $urlTextFieldModel,
+                          text: $viewModel.urlText,
+                          isValid: $viewModel.isURLValid,
+                          titleTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkURLTitleTextView,
+                          textFieldAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkURLTextField,
+                          descriptionTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.hyperlinkErrorTextView)
+            .alertColor(viewConfig.theme.alertColor)
+            .dividerColor(viewConfig.theme.baseColorShade4)
+            .infoTextColor(viewConfig.theme.baseColorShade2)
+            .textFieldTextColor(viewConfig.theme.baseColor)
+            .onChange(of: viewModel.urlText) { text in
+                viewModel.isURLValid = text.isEmpty ? true : text.isValidURL
+
+                if !text.isValidURL {
+                    urlTextFieldModel.errorMessage = AmityLocalizedStringSet.Social.enterValidUrl.localizedString
                 }
             }
-            .onChange(of: isPresented) { value in
-                hideKeyboard()
-                // Update the data as soon as this view is presented.
-                if value {
-                    viewModel.urlText = data.url
-                    viewModel.urlNameText = data.urlName
-                    
-                    viewModel.isURLValid = true
+
+            InfoTextField(data: $urlNameTextFieldModel,
+                          text: $viewModel.urlNameText,
+                          isValid: $viewModel.isURLNameValid,
+                          titleTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkTitleTextView,
+                          textFieldAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkTextField,
+                          descriptionTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkDescriptionTextView,
+                          charCountTextAccessibilityId: AccessibilityID.Story.AmityHyperLinkConfigComponent.customizeLinkCharacterLimitTextView)
+            .alertColor(viewConfig.theme.alertColor)
+            .dividerColor(viewConfig.theme.baseColorShade4)
+            .infoTextColor(viewConfig.theme.baseColorShade2)
+            .textFieldTextColor(viewConfig.theme.baseColor)
+            .onChange(of: viewModel.urlNameText) { text in
+                if text.isEmpty {
                     viewModel.isURLNameValid = true
                 }
             }
-            .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.componentContaier)
+
+
+            if !data.url.isEmpty {
+                getRemoveLinkButton()
+            }
+            Spacer()
+        }
+        .padding([.leading, .trailing], 16)
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.componentContaier)
+        .onChange(of: isPresented) { value in
+            hideKeyboard()
+            // Update the data as soon as this view is presented.
+            if value {
+                viewModel.urlText = data.url
+                viewModel.urlNameText = data.urlName
+
+                viewModel.isURLValid = true
+                viewModel.isURLNameValid = true
+            }
         }
         .overlay(
             ProgressView().progressViewStyle(.circular)
@@ -165,6 +117,48 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
         .onChange(of: colorScheme) { value in
             viewConfig.updateTheme()
         }
+    }
+
+    private var navigationBar: some View {
+        HStack(alignment: .center, spacing: 0) {
+            Button(action: {
+                showUnsavedChangesAlert()
+            }, label: {
+                Text(viewConfig.getConfig(elementId: .cancelButtonElement, key: "cancel_button_text", of: String.self) ?? AmityLocalizedStringSet.General.cancel.localizedString)
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+            })
+            .buttonStyle(.plain)
+            .foregroundColor(Color(viewConfig.theme.baseColor))
+            .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.cancelButton)
+            .isHidden(viewConfig.isHidden(elementId: .cancelButtonElement))
+
+            Spacer()
+
+            Text(AmityLocalizedStringSet.Social.addLink.localizedString)
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.titleTextView)
+
+            Spacer()
+
+            Button(action: {
+                Task { @MainActor in
+                    guard await checkValidation(urlStr: viewModel.urlText, word: viewModel.urlNameText) else { return }
+
+                    data.url = viewModel.urlText
+                    data.urlName = viewModel.urlNameText
+                    isPresented.toggle()
+                }
+            }, label: {
+                Text(viewConfig.getConfig(elementId: .doneButtonElement, key: "done_button_text", of: String.self) ?? AmityLocalizedStringSet.General.done.localizedString)
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+            })
+            .buttonStyle(.plain)
+            .foregroundColor(Color(viewConfig.theme.baseColor))
+            .disabled(!viewModel.isURLValid || viewModel.urlText.isEmpty)
+            .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.doneButton)
+            .isHidden(viewConfig.isHidden(elementId: .doneButtonElement))
+        }
+        .frame(height: 38)
     }
     
     func getRemoveLinkButton() -> some View {
@@ -176,17 +170,17 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
                     Image(AmityIcon.trashBinRedIcon.getImageResource())
                         .frame(width: 20, height: 20)
                         .padding(.trailing, 6)
-                    Text("Remove link")
+                    Text(AmityLocalizedStringSet.Story.removeLinkButton.localizedString)
                         .applyTextStyle(.body(Color(viewConfig.theme.alertColor)))
                         .accessibilityIdentifier(AccessibilityID.Story.AmityHyperLinkConfigComponent.removeLinkButtonTextView)
                     Spacer()
                 }
             })
             .alert(isPresented: $isRemoveLinkAlertShown) {
-                Alert(title: Text("Remove link?"),
-                      message: Text("This link will be removed from story."),
+                Alert(title: Text(AmityLocalizedStringSet.Story.removeLinkTitle.localizedString),
+                      message: Text(AmityLocalizedStringSet.Story.removeLinkMessage.localizedString),
                       primaryButton: .cancel(),
-                      secondaryButton: .destructive(Text("Remove"), action: {
+                      secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.remove.localizedString), action: {
                     data.url = ""
                     data.urlName = ""
                     isPresented.toggle()
@@ -203,11 +197,24 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
         
     }
     
+    private func showUnsavedChangesAlert() {
+        let alert = UIAlertController(
+            title: AmityLocalizedStringSet.Social.communitySetupEditAlertTitle.localizedString,
+            message: AmityLocalizedStringSet.Story.unsavedChangesMessage.localizedString,
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: AmityLocalizedStringSet.General.no.localizedString, style: .cancel))
+        alert.addAction(UIAlertAction(title: AmityLocalizedStringSet.General.yes.localizedString, style: .default) { _ in
+            isPresented = false
+        })
+        UIApplication.topViewController()?.present(alert, animated: true)
+    }
+
     private func checkValidation(urlStr: String, word: String) async -> Bool {
         showActivityIndicator = true
         
         do {
-            urlTextFieldModel.errorMessage = "Please enter a whitelisted URL."
+            urlTextFieldModel.errorMessage = AmityLocalizedStringSet.Social.enterWhitelistedUrl.localizedString
             try await AmityUIKitManagerInternal.shared.client.validateUrls(urls: [urlStr])
             viewModel.isURLValid = true
         } catch {

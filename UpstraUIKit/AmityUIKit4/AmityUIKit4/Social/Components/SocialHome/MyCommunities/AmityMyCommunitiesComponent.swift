@@ -38,7 +38,7 @@ public struct AmityMyCommunitiesComponent: AmityComponentView {
                             Image(AmityIcon.plusIcon.imageResource)
                         )
                     
-                    Text("Create community")
+                    Text(AmityLocalizedStringSet.Social.communitySetupCreateButton.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         .lineLimit(1)
                     

@@ -36,7 +36,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
     public var body: some View {
         VStack(spacing: 28) {
             let cameraButtonIcon = viewConfig.getConfig(elementId: .cameraButton, key: "image", of: String.self) ?? ""
-            let cameraButtonTitle = viewConfig.getConfig(elementId: .cameraButton, key: "text", of: String.self) ?? ""
+            let cameraButtonTitle = viewConfig.getConfig(elementId: .cameraButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.cameraButton.localizedString
             getItemView(image: AmityIcon.getImageResource(named: cameraButtonIcon),
                         title: cameraButtonTitle,
                         isHidden: false) {
@@ -55,7 +55,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.cameraButton)
                         
             let imageButtonIcon = viewConfig.getConfig(elementId: .imageButton, key: "image", of: String.self) ?? ""
-            let imageButtonTitle = viewConfig.getConfig(elementId: .imageButton, key: "text", of: String.self) ?? ""
+            let imageButtonTitle = viewConfig.getConfig(elementId: .imageButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.photoButton.localizedString
             getItemView(image: AmityIcon.getImageResource(named: imageButtonIcon),
                         title: imageButtonTitle,
                         isHidden: viewModel.medias.first?.type ?? .image != .image) {
@@ -70,7 +70,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.imageButton)
             
             let videoButtonIcon = viewConfig.getConfig(elementId: .videoButton, key: "image", of: String.self) ?? ""
-            let videoButtonTitle = viewConfig.getConfig(elementId: .videoButton, key: "text", of: String.self) ?? ""
+            let videoButtonTitle = viewConfig.getConfig(elementId: .videoButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.videoButton.localizedString
             getItemView(image: AmityIcon.getImageResource(named: videoButtonIcon),
                         title: videoButtonTitle,
                         isHidden: viewModel.medias.first?.type ?? .video != .video) {
@@ -133,7 +133,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
         }
         .alert(isPresented: $showMaximumMediaAlert) {
             let typeString = currentType == .image ? "images" : "videoes"
-            return Alert(title: Text("Maximum upload limit reached"), message: Text("You’ve reached the upload limit of 10 \(typeString). Any additional \(typeString) will not be saved."), dismissButton: .cancel(Text("Close")))
+            return Alert(title: Text(AmityLocalizedStringSet.Social.maxUploadLimitTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.maxUploadLimitMessage.localized(arguments: typeString, typeString)), dismissButton: .cancel(Text("Close")))
         }
         .fullScreenCover(isPresented: $showCamera.isShown) {
             ImageVideoCameraPicker(viewModel: pickerViewModel, mediaType: $showCamera.type, sourceType: $showCamera.source)

@@ -17,18 +17,19 @@ enum LiveStreamBroadcasterState: Int, Equatable {
     case reconnecting
     case idle
     
+    // l10n:ok debug state description used only in Log.add() calls, not displayed in UI
     var strValue: String {
-        switch self {
+              switch self {
         case .disconnected:
-            "Disconnected"
+            "Disconnected" // l10n:ok debug state string, only used in Log.add() calls
         case .disconnecting:
-            "Disconnecting"
+            "Disconnecting" // l10n:ok debug state string, only used in Log.add() calls
         case .connecting:
-            "Connecting"
+            "Connecting" // l10n:ok debug state string, only used in Log.add() calls
         case .connected:
-            "Connected"
+            "Connected" // l10n:ok debug state string, only used in Log.add() calls
         case .reconnecting:
-            "Reconnecting"
+            "Reconnecting" // l10n:ok debug state string, only used in Log.add() calls
         case .idle:
             "idle"
         @unknown default:
@@ -107,7 +108,7 @@ class LiveStreamBroadcasterViewModel: ObservableObject {
         do {
             try await capture.set(cameraPosition: position)
         } catch {
-            print("Error switching camera position: \(error.localizedDescription)")
+            Log.add(event: .error, "Error switching camera position: \(error.localizedDescription)")
         }
     }
     
@@ -151,7 +152,7 @@ class LiveStreamBroadcasterViewModel: ObservableObject {
                 try await capture.set(options: CameraCaptureOptions(position: cameraPosition, dimensions: ratio.getDimensions()))
                 self.forceRefreshID = UUID()
             } catch {
-                print("Error switching camera position: \(error.localizedDescription)")
+                Log.add(event: .error, "Error switching camera capture ratio: \(error.localizedDescription)")
             }
         }
     }

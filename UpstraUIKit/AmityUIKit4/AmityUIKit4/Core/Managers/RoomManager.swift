@@ -52,7 +52,7 @@ class RoomManager {
         do {
             try await repository.updateCohostPermissions(roomId: roomId, cohostId: cohostId, canManageProductTags: canManageProductTags)
         } catch {
-            print("Error")
+            Log.add(event: .error, "Failed to update cohost permissions: \(error)")
         }
     }
 }

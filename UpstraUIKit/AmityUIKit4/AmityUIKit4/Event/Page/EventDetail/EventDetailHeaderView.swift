@@ -332,7 +332,7 @@ struct EventDetailHeaderView: View {
                 }
                 
             } catch {
-                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.eventDetailHeaderJoinCommunityFailed.localizedString)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinFailedToast.localizedString)
             }
         }
     }
@@ -402,7 +402,7 @@ extension AmityEventStatus {
     var statusDescription: String {
         switch self {
         case .live:
-            return AmityLocalizedStringSet.Social.eventDetailHeaderStatusHappeningNow.localizedString
+            return AmityLocalizedStringSet.Social.eventListHappeningNowTitle.localizedString
         case .scheduled:
             return AmityLocalizedStringSet.Social.eventDetailHeaderStatusUpcoming.localizedString
         case .cancelled:

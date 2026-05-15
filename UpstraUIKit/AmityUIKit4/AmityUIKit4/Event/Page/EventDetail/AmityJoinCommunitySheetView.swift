@@ -52,7 +52,7 @@ struct AmityJoinCommunitySheetView: View {
                 Button {
                     cancelAction?()
                 } label: {
-                    Text(AmityLocalizedStringSet.Social.joinCommunitySheetCancel.localizedString)
+                    Text(AmityLocalizedStringSet.General.cancel.localizedString)
                 }
                 .buttonStyle(AmityLineButtonStyle(viewConfig: viewConfig))
             }

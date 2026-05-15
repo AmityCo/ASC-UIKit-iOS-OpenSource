@@ -62,7 +62,7 @@ struct CommunityMemberTabView: View {
                 .frame(width: 20, height: 16)
                 .padding(.leading, 12)
             
-            TextField("Search member", text: $viewModel.searchKeyword)
+            TextField(AmityLocalizedStringSet.Social.searchMemberPlaceholder.localizedString, text: $viewModel.searchKeyword)
                 .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
         }
         .frame(height: 40)

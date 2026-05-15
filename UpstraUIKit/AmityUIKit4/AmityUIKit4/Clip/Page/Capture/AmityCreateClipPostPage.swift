@@ -105,7 +105,7 @@ public struct AmityCreateClipPostPage: AmityPageView {
             videoCaptureButton
                 .padding(.bottom, 32)
             
-            let info = LiveStreamPermission(title: AmityLocalizedStringSet.Social.liveStreamPermissionCameraAndMicrophoneTitle.localizedString, message: "This lets you record videos\nfrom this device.")
+            let info = LiveStreamPermission(title: AmityLocalizedStringSet.Social.liveStreamPermissionCameraAndMicrophoneTitle.localizedString, message: AmityLocalizedStringSet.Social.liveStreamPermissionCameraAndMicrophoneMessage.localizedString)
             LiveStreamPermissionView(info: info)
                 .visibleWhen(permissionChecker.shouldAskForCameraPermission() || permissionChecker.shouldAskForMicrophonePermission())
         }

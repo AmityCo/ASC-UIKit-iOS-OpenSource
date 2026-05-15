@@ -26,7 +26,7 @@ struct StoryCommunityFeedView: View {
     @ViewBuilder
     private var storyTargetView: some View {
         if let storyTarget = viewModel.communityFeedStoryTarget {
-            StoryTargetView(radius: 56.0, componentId: id, storyTarget: storyTarget, storyTargetName: "Story", hideLockIcon: true, cornerImage: {
+            StoryTargetView(radius: 56.0, componentId: id, storyTarget: storyTarget, storyTargetName: AmityLocalizedStringSet.Social.storyTargetDefaultName.localizedString, hideLockIcon: true, cornerImage: {
                 viewModel.hasManagePermission ? AmityCreateNewStoryButtonElement(componentId: id)
                     .frame(width: 18, height: 18)
                     .offset(x: 19, y: 19) : nil

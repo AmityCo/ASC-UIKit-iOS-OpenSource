@@ -31,7 +31,7 @@ enum PollDuration: Identifiable, Equatable {
         case .day3, .day7, .day14, .day30:
             return AmityLocalizedStringSet.Social.pollDurationPluralDays.localized(arguments: unit)
         case .custom(let date):
-            return AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationFormatter.string(from: date)
+            return AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationDateString(from: date)
         }
     }
     
@@ -200,11 +200,39 @@ struct OptionButton: View {
 
 class Formatters {
     
-    static var pollDurationFormatter: DateFormatter = {
+    /// Date-only formatter used together with `pollTimeFormatter` to produce a
+    /// localized "{date} at {time}" string (see `pollDurationDateString(from:)`).
+    static var pollDateOnlyFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.current
         dateFormatter.timeZone = TimeZone.current
-        dateFormatter.dateFormat = "MMM d' at 'h:mm a" // 24 Sep at 9:41 AM
+        dateFormatter.dateFormat = "MMM d"
+        return dateFormatter
+    }()
+
+    /// Returns a localized "{date} at {time}" string for a poll end date
+    /// (e.g. "Sep 24 at 9:41 AM" in English, "ก.ย. 24 เวลา 9:41 ก่อนเที่ยง" in Thai).
+    /// The connector word ("at") is sourced from `amity_social_poll_date_time_format`
+    /// instead of being hardcoded into the format string.
+    static func pollDurationDateString(from date: Date) -> String {
+        let dateString = pollDateOnlyFormatter.string(from: date)
+        let timeString = pollTimeFormatter.string(from: date)
+        return AmityLocalizedStringSet.Social.pollDateTimeFormat.localized(arguments: dateString, timeString)
+    }
+
+    /// 12-hour time formatter with AM/PM (e.g. "9:41 AM" in English, "9:41
+    /// ก่อนเที่ยง" in Thai). The AM/PM markers are sourced from
+    /// `amity_common_time_am` / `amity_common_time_pm` instead of CLDR — iOS's
+    /// `DateFormatter` ignores the `a` pattern width and always returns the
+    /// abbreviated CLDR form (Latin "AM"/"PM" for many locales), so we override
+    /// `amSymbol` / `pmSymbol` with our own localized strings.
+    static var pollTimeFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current
+        dateFormatter.timeZone = TimeZone.current
+        dateFormatter.dateFormat = "h:mm a"
+        dateFormatter.amSymbol = AmityLocalizedStringSet.General.timeAm.localizedString
+        dateFormatter.pmSymbol = AmityLocalizedStringSet.General.timePm.localizedString
         return dateFormatter
     }()
     
@@ -214,15 +242,27 @@ class Formatters {
         formatter.maximumFractionDigits = 2
         return formatter
     }()
-    
-    static var eventDurationFormatter: DateFormatter = {
+
+    /// Date-only formatter used together with `eventTimeFormatter` to produce a
+    /// localized "{date} at {time}" string (see `eventStartEndDateString(from:)`).
+    static var eventDateOnlyFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.current
         dateFormatter.timeZone = TimeZone.current
-        dateFormatter.dateFormat = "d MMM yyyy' at 'H:mm" // 24 Sep at 9:41 AM
+        dateFormatter.dateFormat = "d MMM yyyy"
         return dateFormatter
     }()
-    
+
+    /// Returns a localized "{date} at {time}" string (e.g. "13 May 2026 at 14:30"
+    /// in English, "13 พ.ค. 2569 เวลา 14:30" in Thai). The connector word ("at")
+    /// is sourced from `amity_social_event_date_time_format` instead of being
+    /// hardcoded into the format string.
+    static func eventStartEndDateString(from date: Date) -> String {
+        let dateString = eventDateOnlyFormatter.string(from: date)
+        let timeString = eventTimeFormatter.string(from: date)
+        return AmityLocalizedStringSet.Social.eventDateTimeFormat.localized(arguments: dateString, timeString)
+    }
+
     static var eventTimeFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.current

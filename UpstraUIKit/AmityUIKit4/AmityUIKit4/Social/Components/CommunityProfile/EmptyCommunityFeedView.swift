@@ -26,13 +26,13 @@ public enum EmptyCommunityFeedViewType {
     var description: String {
         switch self {
         case .post:
-            "No posts yet"
+            AmityLocalizedStringSet.Social.communityEmptyFeedNoPosts.localizedString
         case .image:
-            "No photos yet"
+            AmityLocalizedStringSet.Social.communityEmptyFeedNoPhotos.localizedString
         case .video:
-            "No videos yet"
+            AmityLocalizedStringSet.Social.communityEmptyFeedNoVideos.localizedString
         case .clip:
-            "No clips yet"
+            AmityLocalizedStringSet.Social.communityEmptyFeedNoClips.localizedString
         }
     }
 }

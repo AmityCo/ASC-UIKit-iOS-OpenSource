@@ -185,7 +185,7 @@ struct PostContentPollView: View {
                         
                         // Days Remaining or Ended
                         let pollStatus = PollStatus(poll: poll, isInPendingFeed: isInPendingFeed)
-                        let statusInfo = viewModel.isPollClosedOnServer ? AmityLocalizedStringSet.Social.pollStatusEnded.localizedString : pollStatus.statusInfo
+                        let statusInfo = viewModel.isPollClosedOnServer ? AmityLocalizedStringSet.Social.eventDetailHeaderStatusEnded.localizedString : pollStatus.statusInfo
                         Text(statusInfo)
                             .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))
                     }
@@ -316,11 +316,11 @@ class PostContentPollViewModel: ObservableObject {
             } catch let error {
                 if error.isErrorCode(400000) {
                     self.isPollClosedOnServer = true
-                    Toast.showToast(style: .warning, message: "Poll ended.")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.pollEndedToast.localizedString)
                 } else if error.isErrorCode(400400) {
-                    Toast.showToast(style: .warning, message: "This post is no longer available.")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.pollPostUnavailableToast.localizedString)
                 } else {
-                    Toast.showToast(style: .warning, message: "Oops, something went wrong.")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.oopsSomethingWentWrong.localizedString)
                 }
                 
                 Log.add(event: .error, "Error while voting poll \(error)")
@@ -333,7 +333,7 @@ class PostContentPollViewModel: ObservableObject {
         Task.runOnMainActor { [weak self] in
             do {
                 let _ = try await self?.pollManager.unvotePoll(pollId: poll.id)
-                Toast.showToast(style: .success, message: "Vote removed.")
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.pollVoteRemovedToast.localizedString)
                 
                 /// Send didPollUpdated event to update global feed data source
                 /// This event is observed in PostFeedViewModel and AmityPostDetailPageViewModel
@@ -343,11 +343,11 @@ class PostContentPollViewModel: ObservableObject {
             } catch let error {
                 if error.isErrorCode(400000) {
                     self?.isPollClosedOnServer = true
-                    Toast.showToast(style: .warning, message: "Poll ended.")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.pollEndedToast.localizedString)
                 } else if error.isErrorCode(400400) {
-                    Toast.showToast(style: .warning, message: "This post is no longer available.")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.pollPostUnavailableToast.localizedString)
                 } else {
-                    Toast.showToast(style: .warning, message: "Oops, something went wrong.")
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.oopsSomethingWentWrong.localizedString)
                 }
                 
                 Log.add(event: .error, "Error while voting poll \(error)")

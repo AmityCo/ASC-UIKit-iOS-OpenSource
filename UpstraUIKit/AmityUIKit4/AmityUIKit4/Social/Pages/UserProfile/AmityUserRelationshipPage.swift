@@ -15,7 +15,7 @@ public struct AmityUserRelationshipPage: AmityPageView {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     @StateObject private var viewConfig: AmityViewConfigController
     @State private var tabIndex: Int = 0
-    @State private var tabs: [String] = ["Following", "Followers"]
+    @State private var tabs: [String] = [AmityLocalizedStringSet.Social.userFollowingButton.localizedString, "Followers"]
     private let userId: String
     @StateObject private var viewModel: AmityUserRelationshipPageViewModel
     @State private var showBottomSheet: (isShown: Bool, userId: String) = (false, "")
@@ -94,7 +94,7 @@ public struct AmityUserRelationshipPage: AmityPageView {
     
     private var bottomSheetView: some View {
         VStack(spacing: 0) {
-            BottomSheetItemView(icon: isSelectedUserReported ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource(), text: isSelectedUserReported ? "Unreport user" : "Report user")
+            BottomSheetItemView(icon: isSelectedUserReported ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource(), text: isSelectedUserReported ? AmityLocalizedStringSet.Social.unreportUser.localizedString : AmityLocalizedStringSet.Social.reportUser.localizedString)
                 .onTapGesture {
                     showBottomSheet.isShown.toggle()
                     
@@ -103,17 +103,17 @@ public struct AmityUserRelationshipPage: AmityPageView {
                             if isSelectedUserReported {
                                 do {
                                     try await viewModel.unflaguser(userId: showBottomSheet.userId)
-                                    Toast.showToast(style: .success, message: "User unreported.")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userUnreportedToast.localizedString)
                                 } catch {
-                                    Toast.showToast(style: .warning, message: "Failed to unreport user. Please try again.")
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userUnreportFailedToast.localizedString)
                                 }
         
                             } else {
                                 do {
                                     try await viewModel.flagUser(userId: showBottomSheet.userId)
-                                    Toast.showToast(style: .success, message: "User reported.")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userReportedToast.localizedString)
                                 } catch {
-                                    Toast.showToast(style: .warning, message: "Failed to report user. Please try again.")
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userReportFailedToast.localizedString)
                                 }
                             }
                         }
@@ -125,19 +125,19 @@ public struct AmityUserRelationshipPage: AmityPageView {
                     }
                 }
             
-            BottomSheetItemView(icon: AmityIcon.blockUserIcon.getImageResource(), text: "Block user")
+            BottomSheetItemView(icon: AmityIcon.blockUserIcon.getImageResource(), text: AmityLocalizedStringSet.Social.blockUser.localizedString)
                 .onTapGesture {
                     showBottomSheet.isShown.toggle()
                     
                     AmityUserAction.perform(host: host) {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            showAlert(title: "Block user?", message: "\(viewModel.user?.displayName ?? "") won’t be able to see posts and comments that you’ve created. They won’t be notified that you’ve blocked them.", btnTitle: "Block", btnAction: {
+                            showAlert(title: AmityLocalizedStringSet.Social.userBlockTitle.localizedString, message: String(format: AmityLocalizedStringSet.Social.userBlockMessageFormat.localizedString, viewModel.user?.displayName ?? ""), btnTitle: AmityLocalizedStringSet.Social.block.localizedString, btnAction: {
                                 Task { @MainActor in
                                     do {
                                         try await viewModel.block(userId: showBottomSheet.userId)
-                                        Toast.showToast(style: .success, message: "User blocked.")
+                                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userBlockedToast.localizedString)
                                     } catch {
-                                        Toast.showToast(style: .warning, message: "Failed to block user. Please try again.")
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userBlockFailedToast.localizedString)
                                     }
                                 }
                             })
@@ -157,7 +157,7 @@ public struct AmityUserRelationshipPage: AmityPageView {
     
     private func showAlert(title: String, message: String, btnTitle: String, btnAction: @escaping () -> Void) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
         let btnAction = UIAlertAction(title: btnTitle, style: .destructive) { _ in
             btnAction()
         }

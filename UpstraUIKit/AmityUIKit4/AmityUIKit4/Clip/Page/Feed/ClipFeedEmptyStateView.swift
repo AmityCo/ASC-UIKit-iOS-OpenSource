@@ -26,11 +26,11 @@ struct ClipFeedEmptyStateView: View {
                     .scaledToFit()
                     .frame(width: 160, height: 160)
                 
-                Text("Your feed is empty")
+                Text(AmityLocalizedStringSet.Social.clipFeedEmptyTitle.localizedString)
                     .applyTextStyle(.titleBold(Color.white))
                     .padding(.top, 16)
                 
-                Text("Find community or create your own. ")
+                Text(AmityLocalizedStringSet.Social.emptyNewsFeedDescription.localizedString)
                     .applyTextStyle(.caption(.white))
                     .padding(.top, 8)
                 
@@ -45,7 +45,7 @@ struct ClipFeedEmptyStateView: View {
                             .frame(width: 20, height: 20)
                             .foregroundColor(.white)
                         
-                        Text("Explore community")
+                        Text(AmityLocalizedStringSet.Social.clipExploreCommunity.localizedString)
                             .applyTextStyle(.bodyBold(Color.white))
                     }
                 }
@@ -56,7 +56,7 @@ struct ClipFeedEmptyStateView: View {
                 Button {
                     onTapAction?(.createCommunity)
                 } label: {
-                    Text("Create community")
+                    Text(AmityLocalizedStringSet.Social.clipCreateCommunity.localizedString)
                         .applyTextStyle(.bodyBold(Color.white))
                         .padding(.bottom, 16)
                 }
@@ -108,7 +108,7 @@ struct ClipFeedLoadingStateView: View {
                     .scaledToFit()
                     .frame(width: 28, height: 28)
                 
-                Text("Unable to load clip")
+                Text(AmityLocalizedStringSet.Social.clipUnableToLoad.localizedString)
                     .applyTextStyle(.bodyBold(Color.white))
                     .padding(.vertical, 16)
             }
@@ -174,14 +174,14 @@ struct ClipFeedDeletedStateView: View {
                     .scaledToFit()
                     .frame(width: 60, height: 60)
                 
-                Text("This clip is no longer available.")
+                Text(AmityLocalizedStringSet.Comment.clipNoLongerAvailable.localizedString)
                     .applyTextStyle(.body(Color.white))
                     .padding(.top, 16)
                 
                 Button {
                     onTapAction?(.watchNextClip)
                 } label: {
-                    Text("Watch next clip")
+                    Text(AmityLocalizedStringSet.Social.clipWatchNext.localizedString)
                         .applyTextStyle(.bodyBold(Color.white))
                 }
                 .contentShape(Rectangle())

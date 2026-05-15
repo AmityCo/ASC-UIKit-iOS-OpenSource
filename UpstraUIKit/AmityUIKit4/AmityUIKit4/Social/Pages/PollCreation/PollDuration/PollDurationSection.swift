@@ -40,7 +40,7 @@ struct PollDurationSection: View {
             
             if !duration.isCustomDate {
                 let endDate = Calendar.current.date(byAdding: .day, value: duration.unit, to: Date())
-                Text(AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationFormatter.string(from: endDate ?? Date()))
+                Text(AmityLocalizedStringSet.Social.pollEndsOnLabel.localizedString + " " + Formatters.pollDurationDateString(from: endDate ?? Date()))
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
             }
         }

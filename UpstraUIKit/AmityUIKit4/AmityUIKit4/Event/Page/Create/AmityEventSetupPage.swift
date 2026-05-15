@@ -84,7 +84,7 @@ public struct AmityEventSetupPage: AmityPageView {
                 switch mode {
                 case .create:
                     VStack(spacing: 4) {
-                        Text(AmityLocalizedStringSet.Social.eventSetupCreateEventTitle.localizedString)
+                        Text(AmityLocalizedStringSet.Social.eventSetupCreateButton.localizedString)
                             .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                         
                         Text(mode.pageTitle)
@@ -117,7 +117,7 @@ public struct AmityEventSetupPage: AmityPageView {
                 EmptyView()
             }, showDivider: false, isTransparent: false)
             .alert(isPresented: $showDismissAlert) {
-                Alert(title: Text(AmityLocalizedStringSet.Social.eventSetupLeaveAlertTitle.localizedString), message: Text( isInCreateMode ? AmityLocalizedStringSet.Social.eventSetupLeaveAlertMessage.localizedString : AmityLocalizedStringSet.Social.eventDetailAlertLeaveWithoutFinishingMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.General.cancel.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.leave.localizedString), action: {
+                Alert(title: Text(AmityLocalizedStringSet.Social.eventSetupLeaveAlertTitle.localizedString), message: Text( isInCreateMode ? AmityLocalizedStringSet.Social.eventSetupLeaveAlertMessage.localizedString : AmityLocalizedStringSet.Social.eventDetailAlertLeaveWithoutFinishingMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.General.cancel.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.leave.localizedString), action: {
                     
                     dismissScreen()
                 }))
@@ -277,7 +277,7 @@ public struct AmityEventSetupPage: AmityPageView {
                 .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                 .padding(.top, 8)
             
-            Button(Formatters.eventDurationFormatter.string(from: draft.startDate)) {
+            Button(Formatters.eventStartEndDateString(from: draft.startDate)) {
                 hideKeyboard()
                 
                 sheetHandler.showSheet(for: .startDate(current: draft.startDate, onSelection: { date in
@@ -313,7 +313,7 @@ public struct AmityEventSetupPage: AmityPageView {
                     .padding(.top, 8)
                 
                 HStack {
-                    Button(Formatters.eventDurationFormatter.string(from: draft.endDate)) {
+                    Button(Formatters.eventStartEndDateString(from: draft.endDate)) {
                         hideKeyboard()
                         
                         let startDate = Calendar.current.date(byAdding: .hour, value: 1, to: draft.startDate) ?? draft.startDate
@@ -495,7 +495,7 @@ public struct AmityEventSetupPage: AmityPageView {
         let alertController = UIAlertController(
             title: AmityLocalizedStringSet.Social.eventSetupUploadFailedTitle.localizedString, message: AmityLocalizedStringSet.Social.eventSetupUploadFailedMessage.localizedString, preferredStyle: .alert)
         let confirmAction = UIAlertAction(
-            title: AmityLocalizedStringSet.General.okay.localizedString,
+            title: AmityLocalizedStringSet.Chat.okButton.localizedString,
             style: .default) { action in
                 
             }

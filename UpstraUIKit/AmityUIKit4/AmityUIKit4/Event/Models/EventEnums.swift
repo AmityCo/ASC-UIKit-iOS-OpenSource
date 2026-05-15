@@ -17,7 +17,7 @@ public enum AmityEventSetupPageMode {
         case .create(_, let targetName):
             return targetName
         case .edit:
-            return "Edit event"
+            return AmityLocalizedStringSet.Social.eventDetailPageEditEvent.localizedString
         }
     }
 }
@@ -27,9 +27,9 @@ extension AmityEventType {
     var title: String {
         switch self {
         case .virtual:
-            return "Virtual"
+            return AmityLocalizedStringSet.Social.eventDetailHeaderVirtual.localizedString
         case .inPerson:
-            return "In-person"
+            return AmityLocalizedStringSet.Social.eventDetailHeaderInPerson.localizedString
         @unknown default:
             return ""
         }

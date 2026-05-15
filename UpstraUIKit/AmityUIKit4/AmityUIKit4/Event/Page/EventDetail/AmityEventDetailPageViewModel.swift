@@ -249,11 +249,11 @@ enum EventRSVPButtonState: String {
     var title: String {
         switch self {
         case .unanswered:
-            return "RSVP"
+            return AmityLocalizedStringSet.Social.eventDetailHeaderRsvp.localizedString
         case .going:
-            return "Going"
+            return AmityLocalizedStringSet.Social.eventDetailHeaderGoing.localizedString
         case .notGoing:
-            return "Not going"
+            return AmityLocalizedStringSet.Social.eventDetailHeaderNotGoing.localizedString
         case .none:
             return ""
         }

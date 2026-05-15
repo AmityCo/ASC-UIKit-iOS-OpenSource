@@ -34,9 +34,7 @@ struct AmityMediaPlayer: UIViewRepresentable {
         let view = UIView()
 
         let headers = [
-            "Authorization": "Bearer \(AmityUIKitManagerInternal.shared.client.accessToken ?? "")"
-        ]
-                
+            "Authorization": "Bearer \(AmityUIKitManagerInternal.shared.client.accessToken ?? "")"] // l10n:ok HTTP header key not user-facing
         let asset = AVURLAsset(url: url, options: ["AVURLAssetHTTPHeaderFieldsKey": headers])
         let playerItem = AVPlayerItem(asset: asset)
         let player = AVPlayer(playerItem: playerItem)

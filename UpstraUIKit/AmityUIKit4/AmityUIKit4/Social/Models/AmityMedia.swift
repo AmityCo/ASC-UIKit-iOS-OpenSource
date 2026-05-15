@@ -211,7 +211,7 @@ public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
     }
     
     public func getAltText(hasDefault: Bool = true) -> String? {
-        let fallback = "No description available"
+        let fallback = AmityLocalizedStringSet.Social.noDescriptionAvailable.localizedString
         
         if altText != nil {
             return altText

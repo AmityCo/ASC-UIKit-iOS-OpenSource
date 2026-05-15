@@ -196,11 +196,11 @@ struct AmityNavigationBar: View {
         Color.green.opacity(0.1)
         
         VStack {
-            AmityNavigationBar(title: "My Page")
+            AmityNavigationBar(title: "My Page") // l10n:ok SwiftUI preview stub
             
-            AmityNavigationBar(title: "My Page", showBackButton: true)
+            AmityNavigationBar(title: "My Page", showBackButton: true) // l10n:ok SwiftUI preview stub
             
-            AmityNavigationBar(title: "My Page", showBackButton: true) {
+            AmityNavigationBar(title: "My Page", showBackButton: true) { // l10n:ok SwiftUI preview stub
                 HStack {
                     Image(systemName: "leaf.fill")
                     
@@ -208,7 +208,7 @@ struct AmityNavigationBar: View {
                 }
             }
             
-            AmityNavigationBar(title: "My Page") {
+            AmityNavigationBar(title: "My Page") { // l10n:ok SwiftUI preview stub
                 Image(systemName: "leaf.fill")
                     .padding(6)
             } trailing: {

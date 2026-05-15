@@ -73,23 +73,38 @@ struct AmityTimezoneListView: View {
 }
 
 struct TimeZoneFormatter {
-    
+
+    /// DateFormatter that emits the timezone's *exemplar city* localized for the
+    /// current locale (CLDR `VVV` pattern). e.g. "Asia/Bangkok" → "Bangkok" in
+    /// English, "กรุงเทพ" in Thai. Splitting the IANA identifier (the previous
+    /// approach) always produced the English ASCII city since the identifier is
+    /// locale-independent.
+    private static let cityFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = .current
+        formatter.dateFormat = "VVV"
+        return formatter
+    }()
+
     static func string(from timezone: TimeZone) -> String {
         let seconds = timezone.secondsFromGMT()
         let hours = seconds / 3600
         let minutes = abs(seconds % 3600) / 60
-        
+
         let sign = hours >= 0 ? "+" : ""
         let offset = minutes > 0
         ? String(format: "%@%02d:%02d", sign, hours, minutes)
         : String(format: "%@%02d:00", sign, hours)
-        
-        // Get a readable name for the timezone
+
+        // Localized timezone name (e.g. "Indochina Time" / "เวลามาตรฐานอินโดจีน")
         let name = timezone.localizedName(for: .standard, locale: .current) ?? timezone.identifier
-        
-        // Get a city from the identifier (e.g., "Asia/Shanghai" -> "Shanghai")
-        let city = timezone.identifier.components(separatedBy: "/").last ?? ""
-        
+
+        // Localized exemplar city for the timezone (e.g. "Bangkok" / "กรุงเทพ").
+        // Falls back to the last identifier component if the formatter returns empty.
+        cityFormatter.timeZone = timezone
+        let localizedCity = cityFormatter.string(from: Date())
+        let city = localizedCity.isEmpty ? (timezone.identifier.components(separatedBy: "/").last ?? "") : localizedCity
+
         return "(GMT \(offset)) \(name) - \(city)"
     }
 }

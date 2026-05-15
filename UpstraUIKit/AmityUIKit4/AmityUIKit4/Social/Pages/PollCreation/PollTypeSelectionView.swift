@@ -17,7 +17,7 @@ struct PollTypeSelectionView: View {
     var body: some View {
         VStack(spacing: 0) {
             
-            Text("Choose poll type")
+            Text(AmityLocalizedStringSet.Social.choosePollType.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .padding(.top, 24)
                 .padding(.bottom, 12)
@@ -43,7 +43,7 @@ struct PollTypeSelectionView: View {
                 .frame(height: 1)
                 .padding(.vertical, 16)
             
-            Button("Next") {
+            Button(AmityLocalizedStringSet.General.next.localizedString) {
                 onNextAction(selectedPollType)
             }
             .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig))
@@ -87,7 +87,7 @@ struct PollTypeSelectionView: View {
                     .frame(maxWidth: .infinity)
                     .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
                     
-                    Text(type == .text ? "Text-only poll" : "Image poll")
+                    Text(type == .text ? AmityLocalizedStringSet.Social.pollTypeTextOnly.localizedString : AmityLocalizedStringSet.Social.pollTypeImage.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         .padding(.horizontal, 12)
                         .padding(.top, style: .spacingLG)

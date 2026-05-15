@@ -13,7 +13,10 @@ struct AmityCommunitiesPageContainer: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     @State private var tabIndex: Int = 0
-    @State private var tabs: [String] = ["Explore", "My communities"]
+    @State private var tabs: [String] = [
+        AmityLocalizedStringSet.Social.socialHomeExploreTab.localizedString,
+        AmityLocalizedStringSet.Social.socialHomeMyCommunitiesTab.localizedString
+    ]
     
     public init() { }
     

@@ -13,12 +13,15 @@ struct AmityEventPageContainer: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     @State private var tabIndex: Int = 0
-    @State private var tabs: [String] = ["Explore", "My event"]
+    @State private var tabs: [String] = [
+        AmityLocalizedStringSet.Social.socialHomeExploreTab.localizedString,
+        AmityLocalizedStringSet.Social.socialHomeMyEventTab.localizedString
+    ]
     
     public init() {
-        var items: [String] = ["Explore"]
+        var items: [String] = [AmityLocalizedStringSet.Social.socialHomeExploreTab.localizedString]
         if !AmityUIKitManagerInternal.shared.isGuestUser {
-            items.append("My event")
+            items.append(AmityLocalizedStringSet.Social.socialHomeMyEventTab.localizedString)
         }
         
         self._tabs = State(initialValue: items)

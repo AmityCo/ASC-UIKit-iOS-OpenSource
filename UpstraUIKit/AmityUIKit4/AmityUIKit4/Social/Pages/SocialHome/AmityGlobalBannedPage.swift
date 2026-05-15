@@ -15,7 +15,7 @@ struct AmityGlobalBannedPage: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            AmityNavigationBar(title: "Community", showBackButton: false, showDivider: true)
+            AmityNavigationBar(title: AmityLocalizedStringSet.Social.community.localizedString, showBackButton: false, showDivider: true)
             
             Spacer()
             
@@ -27,11 +27,11 @@ struct AmityGlobalBannedPage: View {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .frame(width: 56, height: 42)
                 
-                Text("You’ve been banned.")
+                Text(AmityLocalizedStringSet.Social.bannedTitle.localizedString)
                     .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
                     .multilineTextAlignment(.center)
                 
-                Text("Based on your previous activities, you account has been banned from all feeds.")
+                Text(AmityLocalizedStringSet.Social.bannedMessage.localizedString)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade1)))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 16)

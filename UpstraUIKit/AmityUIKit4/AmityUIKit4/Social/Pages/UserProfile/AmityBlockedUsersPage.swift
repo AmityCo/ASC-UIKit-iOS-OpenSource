@@ -44,7 +44,7 @@ public struct AmityBlockedUsersPage: AmityPageView {
     
     @ViewBuilder
     private var navigationBarView: some View {
-        let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "Manage blocked users"
+        let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.manageBlockedUsers.localizedString
         AmityNavigationBar(title: title, showBackButton: true)
     }
     
@@ -61,15 +61,15 @@ public struct AmityBlockedUsersPage: AmityPageView {
                 } else {
                     ForEach(Array(viewModel.blockedUsers.enumerated()), id: \.element.userId) { index, user in
                         getUserCellView(user, unblockAction: { user in
-                            let alert = UIAlertController(title: "Unblock user?", message: "They will now be able to see posts and comments that you’ve created. They won’t be notified that you’ve unblocked them.", preferredStyle: .alert)
-                            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
-                            let unblockAction = UIAlertAction(title: "Unblock", style: .destructive) { _ in
+                            let alert = UIAlertController(title: AmityLocalizedStringSet.Social.unblockUserAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.unblockUserAlertMessage.localizedString, preferredStyle: .alert)
+                            let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
+                            let unblockAction = UIAlertAction(title: AmityLocalizedStringSet.Social.unblock.localizedString, style: .destructive) { _ in
                                 Task { @MainActor in
                                     do {
                                         try await viewModel.unblockUser(withId: user.userId)
-                                        Toast.showToast(style: .success, message: "User unblocked.")
+                                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userUnblockedToast.localizedString)
                                     } catch {
-                                        Toast.showToast(style: .warning, message: "Failed to unblock user. Please try again.")
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.userUnblockFailedToast.localizedString)
                                     }
                                 }
                             }
@@ -105,7 +105,7 @@ public struct AmityBlockedUsersPage: AmityPageView {
                     .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                     .padding(.top, 24)
                 
-                Text("Nothing here to see yet")
+                Text(AmityLocalizedStringSet.General.nothingHereYet.localizedString)
                     .applyTextStyle(.title(Color(viewConfig.theme.baseColorShade3)))
                     .padding(.top, 8)
                     .padding(.bottom, 24)
@@ -126,7 +126,7 @@ public struct AmityBlockedUsersPage: AmityPageView {
                 .frame(size: CGSize(width: 40, height: 40))
                 .clipShape(Circle())
             
-            Text(user.displayName ?? "Unknown")
+            Text(user.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString)
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
                 .padding(.leading, 8)
@@ -143,7 +143,7 @@ public struct AmityBlockedUsersPage: AmityPageView {
             Button {
                 unblockAction(user)
             } label: {
-                Text("Unblock")
+                Text(AmityLocalizedStringSet.Social.unblock.localizedString)
                     .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                     .padding(8)
                     .overlay (

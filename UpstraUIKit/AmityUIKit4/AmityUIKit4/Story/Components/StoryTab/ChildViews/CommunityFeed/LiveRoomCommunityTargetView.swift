@@ -57,7 +57,7 @@ struct LiveRoomCommunityTargetView: View {
     
     private func getAvatar() -> (url: URL?, displayName: String) {
         let avatarURL = URL(string: post.room?.creator?.avatar?.mediumFileURL ?? "")
-        let displayName = post.room?.creator?.displayName ?? "Unknown"
+        let displayName = post.room?.creator?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString
         
         return (avatarURL, displayName)
     }
@@ -68,6 +68,6 @@ struct LiveRoomCommunityTargetView: View {
     
     private func getName() -> String {
         let name = post.room?.creator?.displayName
-        return name ?? "Unknown"
+        return name ?? AmityLocalizedStringSet.General.unknown.localizedString
     }
 }

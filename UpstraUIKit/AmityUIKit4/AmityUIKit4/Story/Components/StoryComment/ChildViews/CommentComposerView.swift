@@ -33,7 +33,7 @@ struct CommentComposerView: View {
     var contentView: some View {
         if viewModel.allowCreateComment {
             HStack(spacing: 0) {
-                Text("Replying to")
+                Text(AmityLocalizedStringSet.Story.replyingTo.localizedString)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                     .padding(.leading, 16)
                 Text(" \(viewModel.replyState.comment?.displayName ?? AmityLocalizedStringSet.General.anonymous)")
@@ -105,7 +105,7 @@ struct CommentComposerView: View {
                                         message = AmityLocalizedStringSet.Comment.replyUnavailableToastMessage.localizedString
                                     }
                                 } else if let post = viewModel.post, post.dataTypeInternal == .clip {
-                                    message = AmityLocalizedStringSet.Comment.clipUnavailableToastMessage.localizedString
+                                    message = AmityLocalizedStringSet.Comment.clipNoLongerAvailable.localizedString
                                 } else {
                                     message = AmityLocalizedStringSet.Comment.postUnavailableToastMessage.localizedString
                                 }
@@ -121,9 +121,9 @@ struct CommentComposerView: View {
                     
                     hideKeyboard()
                 } label: {
-                    Text("Post")
+                    Text(AmityLocalizedStringSet.General.post.localizedString)
                         .overlay(
-                            Text("Post")
+                            Text(AmityLocalizedStringSet.General.post.localizedString)
                                 .foregroundColor(Color(viewConfig.theme.primaryColor))
                                 .opacity(viewModel.text.isEmpty ? 0.4 : 1.0)
                         )

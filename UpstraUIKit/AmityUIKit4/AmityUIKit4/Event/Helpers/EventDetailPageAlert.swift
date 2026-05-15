@@ -29,7 +29,7 @@ class EventDetailPageAlert: ObservableObject {
             case .deleteConfirmation:
                 AmityLocalizedStringSet.Social.eventDetailAlertDeleteEventTitle.localizedString
             case .pendingJoinRequest:
-                "You’ll be able to RSVP once your join request is accepted"
+                AmityLocalizedStringSet.Social.eventDetailAlertPendingJoinRequestTitle.localizedString
             }
         }
         
@@ -42,7 +42,7 @@ class EventDetailPageAlert: ObservableObject {
             case .deleteConfirmation:
                 AmityLocalizedStringSet.Social.eventDetailAlertDeleteEventMessage.localizedString
             case .pendingJoinRequest:
-                "Requested to join the community. You'll be notified once your request is accepted."
+                AmityLocalizedStringSet.Social.eventDetailAlertPendingJoinRequestMessage.localizedString
             }
         }
         
@@ -62,7 +62,7 @@ class EventDetailPageAlert: ObservableObject {
         var secondaryButton: Alert.Button {
             switch self {
             case .editDiscardConfirmation(let action):
-                return .destructive(Text(AmityLocalizedStringSet.General.leave.localizedString), action: action)
+                return .destructive(Text(AmityLocalizedStringSet.Social.discard.localizedString), action: action)
             case .deleteConfirmation(let action):
                 return .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: action)
             default:

@@ -52,7 +52,7 @@ struct PollVoteTextOptionView: View {
 
 #if DEBUG
 #Preview {
-    PollVoteTextOptionView(title: "Succulents 🌵", isSelected: true, allowMultiSelection: true, onSelection: { })
+    PollVoteTextOptionView(title: "Succulents 🌵", isSelected: true, allowMultiSelection: true, onSelection: { }) // l10n:ok SwiftUI preview stub
         .environmentObject(AmityViewConfigController(pageId: .postDetailPage))
 }
 #endif

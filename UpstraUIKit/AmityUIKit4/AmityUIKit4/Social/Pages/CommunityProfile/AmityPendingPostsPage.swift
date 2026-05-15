@@ -45,7 +45,7 @@ public struct AmityPendingPostsPage: AmityPageView {
     
     
     private var navigationBarView: some View {
-        let title = viewConfig.getText(elementId: .title) ?? "Pending posts"
+        let title = viewConfig.getText(elementId: .title) ?? AmityLocalizedStringSet.Social.pendingPostsTitle.localizedString
 
         return AmityNavigationBar(title: "\(title) (\(viewModel.posts.count))", showBackButton: true)
     }
@@ -61,7 +61,7 @@ public struct AmityPendingPostsPage: AmityPageView {
                 .scaledToFit()
                 .frame(width: 60, height: 60)
             
-            Text("No post to review")
+            Text(AmityLocalizedStringSet.Social.noPostToReview.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
             
             Spacer()
@@ -100,7 +100,7 @@ public struct AmityPendingPostsPage: AmityPageView {
             .fill(Color(viewConfig.theme.baseColorShade4))
             .frame(height: 60)
             .overlay(
-                Text("Decline pending post will permanently delete the selected post from community.")
+                Text(AmityLocalizedStringSet.Social.declinePendingPostMessage.localizedString)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .padding([.leading, .trailing], 16)
             )

@@ -23,7 +23,7 @@ extension AmityPostModel {
         var badgeTitle: String {
             switch self {
             case .live:
-                return AmityLocalizedStringSet.Social.livestreamPlayerLive.localizedString
+                return AmityLocalizedStringSet.General.live.localizedString
             case .recorded:
                 return AmityLocalizedStringSet.Social.livestreamPlayerRecorded.localizedString
             case .idle:

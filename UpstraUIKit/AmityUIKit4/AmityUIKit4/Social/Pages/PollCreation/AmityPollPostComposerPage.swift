@@ -82,7 +82,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
                             }
                         }
                         .alert(isPresented: $showCloseAlert) {
-                            Alert(title: Text(AmityLocalizedStringSet.Social.postDiscardAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.postDiscardAlertMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.Social.postDiscardAlertButtonKeepEditing.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: {
+                            Alert(title: Text(AmityLocalizedStringSet.Social.postDiscardAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.postDiscardAlertMessage.localizedString), primaryButton: .cancel(Text(AmityLocalizedStringSet.Social.keepEditing.localizedString)), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.discard.localizedString), action: {
                                 host.controller?.navigationController?.dismiss(animated: true)
                             }))
                         }
@@ -397,9 +397,9 @@ public struct AmityPollPostComposerPage: AmityPageView {
     func handleSuccess(post: AmityPost) {
         host.controller?.navigationController?.dismiss(animated: true, completion: {
             if post.getFeedType() == .reviewing {
-                let alertController = UIAlertController(title: "Post sent for review", message: "Your post has been submitted to the pending list. It will be published once approved by the group moderator.", preferredStyle: .alert)
+                let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.postSentForReviewAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.postSentForReviewAlertMessage.localizedString, preferredStyle: .alert)
                 
-                let okAction = UIAlertAction(title: AmityLocalizedStringSet.General.okay.localizedString, style: .cancel)
+                let okAction = UIAlertAction(title: AmityLocalizedStringSet.Chat.okButton.localizedString, style: .cancel)
                 alertController.addAction(okAction)
                 
                 UIApplication.topViewController()?.present(alertController, animated: true)

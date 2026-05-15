@@ -93,7 +93,7 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
             
             Spacer()
             
-            Text("Select category")
+            Text(AmityLocalizedStringSet.Social.communitySetupCategoryPlaceholder.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
             Spacer()
@@ -119,7 +119,7 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
                             .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
                             .isHidden(!selectedCategories.isEmpty, remove: true)
                         
-                        Text("Add Category")
+                        Text(AmityLocalizedStringSet.Social.addCategory.localizedString)
                             .applyTextStyle(.bodyBold(.white))
                     }
                 )

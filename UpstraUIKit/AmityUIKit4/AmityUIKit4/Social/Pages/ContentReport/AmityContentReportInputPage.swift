@@ -71,7 +71,7 @@ struct AmityContentReportInputPage: View {
                                 if viewModel.submissionState == .success {
                                     self.host.controller?.dismiss(animated: true)
                                     
-                                    let toastMessage = AmityLocalizedStringSet.Social.reportReasonSuccessToastMessage.localized(arguments: viewModel.type.description.capitalized)
+                                    let toastMessage = AmityLocalizedStringSet.Social.reportReasonSuccessToastMessage.localized(arguments: viewModel.type.description)
                                     Toast.showToast(style: .success, message: toastMessage)
                                 }
                             }

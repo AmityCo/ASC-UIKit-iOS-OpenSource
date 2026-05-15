@@ -92,11 +92,12 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                             Task.runOnMainActor {
                                 let invitation = await room.getInvitation()
                                 self.coHostInvitation = invitation
-                                
-                                if invitation?.status == .pending {
-                                    self.showInvitedAsCoHostSheet = true
-                                } else {
-                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, bottomPadding: 60)
+                                if let invitation {
+                                    if invitation.status == .pending {
+                                        self.showInvitedAsCoHostSheet = true
+                                    } else {
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, bottomPadding: 60)
+                                    }
                                 }
                             }
                         }
@@ -135,7 +136,7 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                 
                 // Display co-host left toast if the user is a viewer when co-host left
                 if event.type == .coHostLeft && self?.currentState == .viewer && event.room.status == .live {
-                    Toast.showToast(style: .success, message: "Co-host left the live stream.", bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftToast.localizedString, bottomPadding: 60)
                 }
                 
                 // Ensure the invitation is for the current user since BE is sending events to all users in the room
@@ -229,10 +230,8 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
             let productTags = updatedPost.getMediaProductTags()
             taggedProducts = productTags.compactMap { $0.product }
             pinnedProductId = updatedPost.pinnedProductId
-            
-            print("[Playback] Successfully updated product tags for post: \(childPost.postId)")
         } catch {
-            print("[Playback] Failed to update product tags: \(error.localizedDescription)")
+            Log.add(event: .error, "[Playback] Failed to update product tags: \(error.localizedDescription)")
         }
     }
     
@@ -242,13 +241,12 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
             let productSettings = try await AmityUIKitManagerInternal.shared.client.getProductCatalogueSetting()
             await MainActor.run {
                 self.isProductTagEnabled = productSettings.enabled
-                print("Product Catalogue enabled from client: \(self.isProductTagEnabled)")
             }
         } catch {
             // Default to false if error or not available
             await MainActor.run {
                 self.isProductTagEnabled = false
-                print("Product Catalogue setting not available: \(error.localizedDescription)")
+                Log.add(event: .error, "Product Catalogue setting not available: \(error.localizedDescription)")
             }
         }
     }

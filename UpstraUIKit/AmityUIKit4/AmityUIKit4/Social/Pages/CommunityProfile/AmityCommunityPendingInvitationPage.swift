@@ -69,7 +69,7 @@ public struct AmityCommunityPendingInvitationPage: AmityPageView {
     }
     
     private var navigationBarView: some View {
-        AmityNavigationBar(title: "Pending invitations", showBackButton: true)
+            AmityNavigationBar(title: AmityLocalizedStringSet.Social.communityPendingInvitationsTitle.localizedString, showBackButton: true)
     }
     
     private func getUserView(_ user: AmityUserModel) -> some View {
@@ -108,7 +108,7 @@ public struct AmityCommunityPendingInvitationPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 .padding(.top, 24)
             
-            Text("Nothing here to see yet")
+            Text(AmityLocalizedStringSet.General.nothingHereYet.localizedString)
                 .applyTextStyle(.title(Color(viewConfig.theme.baseColorShade3)))
                 .padding(.top, 8)
                 .padding(.bottom, 24)

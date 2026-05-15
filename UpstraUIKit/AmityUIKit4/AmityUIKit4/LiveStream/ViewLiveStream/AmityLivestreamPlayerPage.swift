@@ -209,7 +209,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                 },
                 onPinToggle: { productId, isPinned in
                     // Pin/unpin disabled for recorded livestream
-                    print("Cannot pin/unpin products in recorded livestream")
+                    Log.add(event: .info, "Cannot pin/unpin products in recorded livestream")
                 },
                 onProductRemove: { productId in
                     Task {
@@ -272,7 +272,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
             }, onDismiss: {
                 let alert = UIAlertController(title: AmityLocalizedStringSet.Social.livestreamLeaveBackstageTitle.localizedString, message: AmityLocalizedStringSet.Social.livestreamLeaveBackstageMessage.localizedString, preferredStyle: .alert)
                 let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel, handler: nil)
-                let leaveAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
+                let leaveAction = UIAlertAction(title: AmityLocalizedStringSet.Social.leave.localizedString, style: .destructive) { _ in
                     viewModel.leaveRoom()
                     viewModel.currentState = .viewer
                 }

@@ -23,34 +23,34 @@ class ClipPostAlert: ObservableObject {
         var title: String {
             switch self {
             case .maxFileSize:
-                "Maximum file size limit reached"
+                AmityLocalizedStringSet.Social.clipAlertMaxFileSizeTitle.localizedString
             case .unsupportedVideoType:
-                "Unsupported video type"
+                AmityLocalizedStringSet.Social.clipAlertUnsupportedVideoTitle.localizedString
             case .maxClipDuration:
-                "Clip must be under 15 minutes"
+                AmityLocalizedStringSet.Social.clipAlertMaxDurationTitle.localizedString
             case .clipTooShort:
-                "Clip too short"
+                AmityLocalizedStringSet.Social.clipAlertTooShortTitle.localizedString
             case .discardClip:
-                "Discard this clip?"
+                AmityLocalizedStringSet.Social.clipAlertDiscardTitle.localizedString
             case .failedToUpload:
-                "Failed to upload"
+                AmityLocalizedStringSet.Social.clipAlertFailedUploadTitle.localizedString
             }
         }
         
         var message: String {
             switch self {
             case .maxFileSize:
-                "Please choose a video with smaller file size."
+                AmityLocalizedStringSet.Social.clipAlertMaxFileSizeMessage.localizedString
             case .unsupportedVideoType:
-                "Please choose a different video to upload."
+                AmityLocalizedStringSet.Social.clipAlertUnsupportedVideoMessage.localizedString
             case .maxClipDuration:
-                "Please choose a different video to upload."
+                AmityLocalizedStringSet.Social.clipAlertUnsupportedVideoMessage.localizedString
             case .clipTooShort:
-                "Clip must be at least 1 second long."
+                AmityLocalizedStringSet.Social.clipAlertTooShortMessage.localizedString
             case .discardClip:
-                "The clip will be permanently discarded. It cannot be undone."
+                AmityLocalizedStringSet.Social.clipAlertDiscardMessage.localizedString
             case .failedToUpload:
-                "Please check your connection or choose a different video to upload"
+                AmityLocalizedStringSet.Social.clipAlertFailedUploadMessage.localizedString
             }
         }
         
@@ -69,7 +69,7 @@ class ClipPostAlert: ObservableObject {
         var primaryButton: Alert.Button {
             switch self {
             case .discardClip:
-                return .default(Text("Keep editing"))
+                return .default(Text(AmityLocalizedStringSet.Social.keepEditing.localizedString))
             default:
                 return .cancel()
                 
@@ -80,7 +80,7 @@ class ClipPostAlert: ObservableObject {
         var secondaryButton: Alert.Button {
             switch self {
             case .discardClip(let action):
-                return .destructive(Text(AmityLocalizedStringSet.General.discard.localizedString), action: action)
+                return .destructive(Text(AmityLocalizedStringSet.Social.discard.localizedString), action: action)
             default:
                 return .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString))
             }

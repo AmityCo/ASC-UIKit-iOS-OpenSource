@@ -52,7 +52,7 @@ struct AmityProductTagSelectionItemElement: AmityElementView {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 if isAlreadyTagged {
-                    Text("Already tagged")
+                    Text(AmityLocalizedStringSet.Social.alreadyTagged.localizedString)
                         .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                         .lineLimit(1)
                         .padding(.top, 8)

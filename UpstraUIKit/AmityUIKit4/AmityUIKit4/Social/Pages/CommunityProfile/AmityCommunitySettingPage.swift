@@ -27,7 +27,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
             navigationBarView
                 .padding([.top, .bottom], 16)
             
-            Text(AmityLocalizedStringSet.Social.communitySettingBasicInfoTitle.localizedString)
+            Text(AmityLocalizedStringSet.Social.communityInformationOptionTitle.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .frame(maxWidth: .infinity, alignment: .leading)
             
@@ -52,7 +52,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
             
             /// Community member pending Invitations setting
             if viewModel.shouldShowPendingInvitations {
-                getItemView(AmityIcon.pendingInvitationIcon.getImageResource(), "Pending invitations")
+                getItemView(AmityIcon.pendingInvitationIcon.getImageResource(), AmityLocalizedStringSet.Social.communitySettingPendingInvitations.localizedString)
                     .onTapGesture {
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToPendingInvitationsPage(getPageBehaviorContext())
                     }
@@ -129,10 +129,10 @@ public struct AmityCommunitySettingPage: AmityPageView {
                     .contentShape(Rectangle())
                     .onTapGesture {
                         if viewModel.community.membersCount == 1 {
-                            let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString, message: "As you’re the last moderator and member, leaving will also close this community. All posts shared in community will be deleted. This cannot be undone.", preferredStyle: .alert)
+                            let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.communitySettingLeaveAlertMessage.localizedString, preferredStyle: .alert)
                             let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
                             
-                            let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
+                            let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.Social.leave.localizedString, style: .destructive) { _ in
                                 Task {
                                     await closeCommunity()
                                 }
@@ -152,7 +152,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
                             
                             let alertController = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
                             let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
-                            let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.General.leave.localizedString, style: .destructive) { _ in
+                            let confirmAction = UIAlertAction(title: AmityLocalizedStringSet.Social.leave.localizedString, style: .destructive) { _ in
                                 leaveCommunity()
                             }
                             alertController.addAction(cancelAction)
@@ -270,11 +270,11 @@ public struct AmityCommunitySettingPage: AmityPageView {
     
     
     private func leaveCommunity() {
-        Toast.showToast(style: .loading, message: "Leaving the community.")
+        Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.communitySettingLeavingToast.localizedString)
         Task { @MainActor in
             do {
                 try await viewModel.leaveCommunity()
-                Toast.showToast(style: .success, message: "Successfully leaved community!")
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communitySettingLeaveSuccess.localizedString)
                 
                 // Pop to Community Profile Page
                 host.controller?.navigationController?.popToViewController(AmityCommunityProfilePage.self, animated: true)
@@ -283,7 +283,7 @@ public struct AmityCommunitySettingPage: AmityPageView {
                     Toast.hideToastIfPresented()
                     
                     let alertController = UIAlertController(title: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityFailedAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.communitySettingLeaveCommunityFailedAlertMessage.localizedString, preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: AmityLocalizedStringSet.General.okay.localizedString, style: .cancel)
+                    let okAction = UIAlertAction(title: AmityLocalizedStringSet.Chat.okButton.localizedString, style: .cancel)
                     alertController.addAction(okAction)
                     host.controller?.present(alertController, animated: true)
                     
@@ -297,11 +297,12 @@ public struct AmityCommunitySettingPage: AmityPageView {
     
     @MainActor
     private func closeCommunity() async {
-        Toast.showToast(style: .loading, message: "Closing the community.")
+        Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.communitySettingClosingToast.localizedString)
         do {
             try await viewModel.deleteCommunity()
+        
             
-            Toast.showToast(style: .success, message: "Successfully closed community!")
+            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communitySettingCloseSuccess.localizedString)
             host.controller?.navigationController?.popToRootViewController(animated: true)
 
         } catch {

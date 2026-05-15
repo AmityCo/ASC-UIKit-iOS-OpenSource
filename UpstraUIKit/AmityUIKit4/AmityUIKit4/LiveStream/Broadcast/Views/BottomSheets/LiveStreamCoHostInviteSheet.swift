@@ -92,16 +92,16 @@ struct LiveStreamCoHostInviteSheet: View {
             .padding(.top, 24)
             .padding(.bottom, 12)
             
-            let buttonTitle = invitedCoHost.invitationAccepted ? AmityLocalizedStringSet.Social.livestreamRemoveCoHostButton.localizedString : AmityLocalizedStringSet.Social.livestreamCancelInvitationButton.localizedString
+            let buttonTitle = invitedCoHost.invitationAccepted ? AmityLocalizedStringSet.Social.livestreamRemoveCoHostButton.localizedString : AmityLocalizedStringSet.General.cancel.localizedString
             ViewerRow(viewer: user, buttonTitle: buttonTitle, enableButton: true, action: {
                 Task.runOnMainActor {
                     if invitedCoHost.invitationAccepted {
                         // Remove co-host if already accepted invitation
                         do {
                             try await self.viewModel.removeCoHostFromStream(userId: user.userId)
-                            Toast.showToast(style: .success, message: "Co-host removed from live.", bottomPadding: 60)
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostRemovedToast.localizedString, bottomPadding: 60)
                         } catch {
-                            Toast.showToast(style: .warning, message: "Failed to remove co-host.", bottomPadding: 60)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamRemoveCoHostFailedToast.localizedString, bottomPadding: 60)
                         }
                     } else {
                         // Decline co-host invitation if not yet accepted

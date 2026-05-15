@@ -21,7 +21,7 @@ struct AmityProductTagEmptyElement: AmityElementView {
     var body: some View {
         AmityView(configId: configId,
                   config: { configDict -> String in
-            let text = configDict["text"] as? String ?? "Start typing to search for products"
+            let text = configDict["text"] as? String ?? AmityLocalizedStringSet.Social.startTypingToSearch.localizedString
             return text
         }) { text in
             VStack(spacing: 16) {

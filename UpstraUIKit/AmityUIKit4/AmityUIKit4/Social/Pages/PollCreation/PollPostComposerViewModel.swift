@@ -18,7 +18,7 @@ class PollPostComposerViewModel: ObservableObject {
     let postManager = PostManager()
     let communityManager = CommunityManager()
     
-    @Published var pollTarget = AmityLocalizedStringSet.Social.pollTargetMyTimeline.localizedString
+    @Published var pollTarget = AmityLocalizedStringSet.Social.selectPollTargetMyTimeline.localizedString
     @Published var isCreatingPollPost = false
     @Published var textOptions: [PollOption] = [PollOption(index: 0), PollOption(index: 1)]
     @Published var imageOptions: [PollImageOption] = [PollImageOption(), PollImageOption()]

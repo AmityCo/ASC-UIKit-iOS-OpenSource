@@ -80,7 +80,7 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                 Rectangle()
                     .fill(Color(viewConfig.theme.primaryColor))
                     .overlay(
-                        Text("Join")
+                        Text(AmityLocalizedStringSet.General.join.localizedString)
                             .applyTextStyle(.bodyBold(.white))
                     )
                     .cornerRadius(8)
@@ -97,7 +97,7 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                         Toast.showToast(
                                             style: .success,
-                                            message: "You joined \(community.displayName)")
+                                            message: String(format: AmityLocalizedStringSet.Social.communityInvitationJoinedFormat.localizedString, community.displayName))
                                     }
                                 } catch {
                                     if error.isAmityErrorCode(.business) {
@@ -107,12 +107,11 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                                         }
                                         Toast.showToast(
                                             style: .warning,
-                                            message: "This invitation is no longer available.")
+                                            message: AmityLocalizedStringSet.Social.communityInvitationExpired.localizedString)
                                     } else {
                                         Toast.showToast(
                                             style: .warning,
-                                            message:
-                                                "Failed to accept invitation. Please try again.")
+                                            message: AmityLocalizedStringSet.Social.notificationTrayAcceptInvitationFailed.localizedString)
                                     }
                                 }
                             }
@@ -122,7 +121,7 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                 Rectangle()
                     .fill(.clear)
                     .overlay(
-                        Text("Decline")
+                        Text(AmityLocalizedStringSet.Social.declineButton.localizedString)
                             .applyTextStyle(.bodyBold(Color(viewConfig.theme.secondaryColor)))
                     )
                     .cornerRadius(8)
@@ -142,11 +141,11 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
         .padding(.horizontal)
         .alert(isPresented: $isDeclineAlertShown) {
             Alert(
-                title: Text("Decline invitation?"),
-                message: Text("If you change your mind, you’ll have to request to join again."),
+                title: Text(AmityLocalizedStringSet.Social.declineInvitationTitle.localizedString),
+                message: Text(AmityLocalizedStringSet.Social.declineInvitationMessage.localizedString),
                 primaryButton: .cancel(),
                 secondaryButton: .destructive(
-                    Text("Decline"),
+                    Text(AmityLocalizedStringSet.Social.declineButton.localizedString),
                     action: {
 
                         Task { @MainActor in
@@ -163,7 +162,7 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                                             animated: true)
                                     }
                                     Toast.showToast(
-                                        style: .success, message: "Invitation declined.")
+                                        style: .success, message: AmityLocalizedStringSet.Social.communityInvitationDeclined.localizedString)
                                 } catch {
                                     if error.isAmityErrorCode(.business) {
                                         if community.isPublic == false {
@@ -172,12 +171,11 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                                         }
                                         Toast.showToast(
                                             style: .warning,
-                                            message: "This invitation is no longer available.")
+                                            message: AmityLocalizedStringSet.Social.communityInvitationExpired.localizedString)
                                     } else {
                                         Toast.showToast(
                                             style: .warning,
-                                            message:
-                                                "Failed to decline invitation. Please try again.")
+                                            message: AmityLocalizedStringSet.Social.notificationTrayDeclineFailed.localizedString)
                                     }
                                 }
                             }
@@ -193,7 +191,7 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
 
         if case let .community(_, community) = invitation.target, let community {
             return
-                "\(invitation.inviterUser?.displayName ?? "Unknown") invited you to join \(community.displayName)"
+                "\(invitation.inviterUser?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString) invited you to join \(community.displayName)"
         }
 
         return ""
@@ -206,7 +204,7 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
         }
 
         if case let .community(_, community) = invitation.target, let community {
-            let inviterName = invitation.inviterUser?.displayName ?? "Unknown"
+            let inviterName = invitation.inviterUser?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString
     
             let boldAttributes: [NSAttributedString.Key: Any] = [
                 .font: UIFont.boldSystemFont(ofSize: 15),

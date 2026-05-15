@@ -18,7 +18,7 @@ struct AmityEventLocationView: View {
     @State private var externalLink: String = ""
     
     @State private var addressTextFieldModel: InfoTextFieldModel = InfoTextFieldModel(
-        title: "Address", placeholder: "Enter address of where this event will be happening", isMandatory: false,
+        title: AmityLocalizedStringSet.Social.eventLocationAddressTitle.localizedString, placeholder: AmityLocalizedStringSet.Social.eventLocationAddressPlaceholder.localizedString, isMandatory: false,
         isExpandable: true, maxCharCount: 180)
     @State private var address = ""
     @State private var isAddressValid: Bool = true
@@ -49,11 +49,11 @@ struct AmityEventLocationView: View {
                 Spacer()
             }
             
-            AmityNavigationBar(title: "Location", showDivider: true) {
+            AmityNavigationBar(title: AmityLocalizedStringSet.Social.eventLocationTitle.localizedString, showDivider: true) {
                 Button {
                     presentationMode.wrappedValue.dismiss()
                 } label: {
-                    Text("Cancel")
+                    Text(AmityLocalizedStringSet.General.cancel.localizedString)
                         .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                 }.padding(.leading, 8)
             } trailing: {
@@ -69,7 +69,7 @@ struct AmityEventLocationView: View {
                     
                     presentationMode.wrappedValue.dismiss()
                 } label: {
-                    Text("Done")
+                    Text(AmityLocalizedStringSet.General.done.localizedString)
                         .applyTextStyle(.body(Color(isInputValid ? viewConfig.theme.primaryColor : viewConfig.theme.primaryColor.blend(.shade2))))
                 }
                 .disabled(!isInputValid)
@@ -77,7 +77,7 @@ struct AmityEventLocationView: View {
             }
             
             VStack(alignment: .leading, spacing: 16) {
-                Text("Event Type")
+                Text(AmityLocalizedStringSet.Social.eventDetailHeaderEventType.localizedString)
                     .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 
                 Button(action: {
@@ -100,18 +100,18 @@ struct AmityEventLocationView: View {
                 
                 if draft.type == .virtual {
                     // Platform
-                    Text("Platform")
+                    Text(AmityLocalizedStringSet.Social.eventPlatform.localizedString)
                         .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                         .padding(.top, 8)
                     
-                    EventPlatformRadioButtonView(isSelected: draft.platform == .livestream, icon: AmityIcon.createLivestreamMenuIcon.imageResource, title: EventPlatform.livestream.rawValue, description: "Users can join the live stream on the app or website.")
+                    EventPlatformRadioButtonView(isSelected: draft.platform == .livestream, icon: AmityIcon.createLivestreamMenuIcon.imageResource, title: AmityLocalizedStringSet.Social.eventPlatformLivestream.localizedString, description: AmityLocalizedStringSet.Social.eventPlatformLivestreamDescription.localizedString)
                         .onTapGesture {
                             draft.platform = .livestream
-                            
+
                             validateLocationInputs()
                         }
-                    
-                    EventPlatformRadioButtonView(isSelected: draft.platform == .external, icon: AmityIcon.externalPlatformIcon.imageResource, title: EventPlatform.external.rawValue, description: "Users will join the event on an external platform.")
+
+                    EventPlatformRadioButtonView(isSelected: draft.platform == .external, icon: AmityIcon.externalPlatformIcon.imageResource, title: AmityLocalizedStringSet.Social.eventPlatformExternal.localizedString, description: AmityLocalizedStringSet.Social.eventPlatformExternalDescription.localizedString)
                         .onTapGesture {
                             draft.platform = .external
                             
@@ -120,7 +120,7 @@ struct AmityEventLocationView: View {
                         .padding(.top, 16)
                     
                     VStack(alignment: .trailing) {
-                        TextField("Event link", text: $externalLink)
+                        TextField("Event link", text: $externalLink) // l10n:ok placeholder text for URL input field — technical label not requiring localization
                             .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
                             .padding(.horizontal, 12)
                             .frame(height: 40)

@@ -75,7 +75,7 @@ struct LiveRoomGlobalTargetView: View {
     
     @ViewBuilder
     private var liveBadge: some View {
-        Text("LIVE")
+        Text(AmityLocalizedStringSet.General.live.localizedString)
             .applyTextStyle(.custom(10, .semibold, .white))
             .padding(.horizontal, 4)
             .padding(.vertical, 2)
@@ -96,13 +96,13 @@ struct LiveRoomGlobalTargetView: View {
     
     private func getCornerAvatar() -> (url: URL?, displayName: String) {
         let avatarURL = URL(string: post.room?.creator?.avatar?.mediumFileURL ?? "")
-        let name = post.room?.creator?.displayName ?? "Unknown"
+        let name = post.room?.creator?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString
         return (avatarURL, name)
     }
     
     private func getName() -> String {
         let name = viewModel.event?.title ?? post.targetCommunity?.displayName
-        return name ?? "Unknown"
+        return name ?? AmityLocalizedStringSet.General.unknown.localizedString
     }
 }
 

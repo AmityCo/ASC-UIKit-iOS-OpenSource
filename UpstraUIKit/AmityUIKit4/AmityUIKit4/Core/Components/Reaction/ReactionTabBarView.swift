@@ -49,7 +49,7 @@ struct ReactionTabBarItemView: View {
                             .scaledToFit()
                             .frame(width: 20, height: 20)
                     } else {
-                        Text(tabItem.name)
+                        Text(AmityStringProvider.common.resolveReactionDisplayName(tabItem.name))
                             .applyTextStyle(.titleBold(currentTab == tabItem.index ? Color(viewConfig.theme.highlightColor) : Color(viewConfig.theme.baseInverseColor)))
                     }
                     

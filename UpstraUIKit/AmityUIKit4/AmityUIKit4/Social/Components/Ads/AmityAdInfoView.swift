@@ -24,7 +24,7 @@ struct AmityAdInfoView: View {
                 Spacer()
             }
             
-            Text("About this advertisement")
+            Text(AmityLocalizedStringSet.General.adAboutTitle.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
@@ -34,7 +34,7 @@ struct AmityAdInfoView: View {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 .offset(y: -1)
             
-            Text("Why this advertisement?")
+            Text(AmityLocalizedStringSet.General.adWhyTitle.localizedString)
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .padding(.top, 24)
             
@@ -42,7 +42,7 @@ struct AmityAdInfoView: View {
                 Image(AmityIcon.infoIcon.imageResource)
                     .padding(.top, 2)
                 
-                Text("You're seeing this advertisement because it was displayed to all users in the system.")
+                Text(AmityLocalizedStringSet.General.adWhyDescription.localizedString)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                 
                 Spacer()
@@ -50,7 +50,7 @@ struct AmityAdInfoView: View {
             .padding()
             .background(Color(viewConfig.theme.baseColorShade4))
             
-            Text("About this advertiser")
+            Text(AmityLocalizedStringSet.General.adAboutAdvertiser.localizedString)
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                 .padding(.top, 24)
             
@@ -58,7 +58,7 @@ struct AmityAdInfoView: View {
                 Image(AmityIcon.infoIcon.imageResource)
                     .padding(.top, 2)
 
-                Text("Advertiser name: \(advertiserName)")
+                Text(AmityLocalizedStringSet.General.adAdvertiserName.localized(arguments: advertiserName))
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
 
                 Spacer()

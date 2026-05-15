@@ -67,30 +67,30 @@ class EventSetupPageSheetHandler: ObservableObject {
             }
         case .startDate(let current, let onSelection):
             if #available(iOS 16.0, *) {
-                AmityDatePickerView(title: "Starts on", selection: current, onSelection: { selectedDate in
+                AmityDatePickerView(title: AmityLocalizedStringSet.Social.eventStartsOn.localizedString, selection: current, onSelection: { selectedDate in
                     onSelection(selectedDate)
                 })
                 .presentationDetents([.height(530), .height(550)])
                 .presentationDragIndicator(.automatic)
             } else {
-                AmityDatePickerView(title: "Starts on", selection: current, onSelection: { selectedDate in
+                AmityDatePickerView(title: AmityLocalizedStringSet.Social.eventStartsOn.localizedString, selection: current, onSelection: { selectedDate in
                     onSelection(selectedDate)
                 })
             }
         case .endDate(let current, let startDate, let onSelection):
             if #available(iOS 16.0, *) {
-                AmityDatePickerView(title: "Ends on", selection: current, startDate: startDate, onSelection: { selectedDate in
+                AmityDatePickerView(title:                 AmityLocalizedStringSet.Social.eventSetupEndsOn.localizedString, selection: current, startDate: startDate, onSelection: { selectedDate in
                     onSelection(selectedDate)
                 })
                 .presentationDetents([.height(530), .height(550)])
                 .presentationDragIndicator(.automatic)
             } else {
-                AmityDatePickerView(title: "Ends on", selection: current, startDate: startDate, onSelection: { selectedDate in
+                AmityDatePickerView(title:                 AmityLocalizedStringSet.Social.eventSetupEndsOn.localizedString, selection: current, startDate: startDate, onSelection: { selectedDate in
                     onSelection(selectedDate)
                 })
             }
         case .none:
-            Text("Oops! You should not be seeing this screen.\nPlease report to our team if you see this screen")
+            Text("Oops! You should not be seeing this screen.\nPlease report to our team if you see this screen") // l10n:ok dev-only unreachable error state, never shown to end users
         }
     }
 }

@@ -121,7 +121,7 @@ struct NotificationTrayInvitationItemView: View {
                     Rectangle()
                         .fill(Color(viewConfig.theme.primaryColor))
                         .overlay(
-                            Text("Join")
+                            Text(AmityLocalizedStringSet.General.join.localizedString)
                                 .applyTextStyle(.bodyBold(.white))
                         )
                         .cornerRadius(8)
@@ -135,18 +135,17 @@ struct NotificationTrayInvitationItemView: View {
                                     {
                                         Toast.showToast(
                                             style: .success,
-                                            message: "You joined \(community.displayName)")
+                                            message: String(format: AmityLocalizedStringSet.Social.communityInvitationJoinedFormat.localizedString, community.displayName))
                                     }
                                 } catch {
                                     if error.isAmityErrorCode(.business) {
                                         Toast.showToast(
                                             style: .warning,
-                                            message: "This invitation is no longer available.")
+                                            message: AmityLocalizedStringSet.Social.communityInvitationExpired.localizedString)
                                     } else {
                                         Toast.showToast(
                                             style: .warning,
-                                            message:
-                                                "Failed to accept invitation. Please try again.")
+                                            message: AmityLocalizedStringSet.Social.notificationTrayAcceptInvitationFailed.localizedString)
                                     }
                                 }
                             }
@@ -155,7 +154,7 @@ struct NotificationTrayInvitationItemView: View {
                     Rectangle()
                         .fill(.clear)
                         .overlay(
-                            Text("Decline")
+Text(AmityLocalizedStringSet.Social.declineButton.localizedString)
                                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.secondaryColor)))
                         )
                         .cornerRadius(8)
@@ -174,25 +173,25 @@ struct NotificationTrayInvitationItemView: View {
         .padding(16)
         .alert(isPresented: $isDeclineAlertShown) {
             Alert(
-                title: Text("Decline invitation?"),
-                message: Text("If you change your mind, you’ll have to request to join again."),
+                title: Text(AmityLocalizedStringSet.Social.declineInvitationTitle.localizedString),
+                message: Text(AmityLocalizedStringSet.Social.declineInvitationMessage.localizedString),
                 primaryButton: .cancel(),
                 secondaryButton: .destructive(
-                    Text("Decline"),
+                    Text(AmityLocalizedStringSet.Social.declineButton.localizedString),
                     action: {
                         Task { @MainActor in
                             do {
                                 try await invitation.reject()
-                                Toast.showToast(style: .success, message: "Invitation declined.")
+                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.notificationTrayInvitationDeclinedToast.localizedString)
                             } catch {
                                 if error.isAmityErrorCode(.business) {
                                     Toast.showToast(
                                         style: .warning,
-                                        message: "This invitation is no longer available.")
+                                        message: AmityLocalizedStringSet.Social.communityInvitationExpired.localizedString)
                                 } else {
                                     Toast.showToast(
                                         style: .warning,
-                                        message: "Failed to decline invitation. Please try again.")
+                                        message: AmityLocalizedStringSet.Social.notificationTrayDeclineFailed.localizedString)
                                 }
                             }
                         }
@@ -202,8 +201,8 @@ struct NotificationTrayInvitationItemView: View {
     
     private func getText() -> String {
         if case let .community(_, community) = invitation.target, let community {
-            return
-            "\(invitation.inviterUser?.displayName ?? "Unknown") invited you to join \(community.displayName)"
+            let inviterName = invitation.inviterUser?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString
+            return String(format: AmityLocalizedStringSet.Social.notificationTrayInvitedToJoinFormat.localizedString, inviterName, community.displayName)
         }
         
         return ""
@@ -212,7 +211,7 @@ struct NotificationTrayInvitationItemView: View {
     @available(iOS 15, *)
     private func getHightlightedText() -> AttributedString {
         if case let .community(_, community) = invitation.target, let community {
-            let inviterName = invitation.inviterUser?.displayName ?? "Unknown"
+            let inviterName = invitation.inviterUser?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString
             let communityName = community.displayName
             
             // Define attributes
@@ -235,7 +234,7 @@ struct NotificationTrayInvitationItemView: View {
             
             // Add middle text (regular)
             attributedString.append(
-                NSAttributedString(string: " invited you to join ", attributes: regularAttributes))
+                NSAttributedString(string: AmityLocalizedStringSet.Social.notificationTrayInvitedToJoinSeparator.localizedString, attributes: regularAttributes))
             
             // Add community name (bold)
             attributedString.append(

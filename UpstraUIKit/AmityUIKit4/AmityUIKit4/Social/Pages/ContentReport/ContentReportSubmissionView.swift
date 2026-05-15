@@ -26,11 +26,11 @@ struct ContentReportSuccessView: View {
                     .frame(width: 56, height: 56)
                     .foregroundColor(Color(viewConfig.theme.primaryColor))
                 
-                Text("Thanks for your report.")
+                Text(AmityLocalizedStringSet.Social.reportThanksTitle.localizedString)
                     .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
                     .padding(.top, 16)
                 
-                Text("Our moderators will review this content and take action if it violates our guidelines.")
+                Text(AmityLocalizedStringSet.Social.reportThanksMessage.localizedString)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
                     .multilineTextAlignment(.center)
                     .padding(.top, 8)

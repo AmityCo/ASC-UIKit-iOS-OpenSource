@@ -100,7 +100,7 @@ struct PostBottomSheetView: View {
                             } catch let error {
                                 /// Delay showing toast as deleting post will effect post data source
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.pollCloseToastError.localizedString)
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.oopsSomethingWentWrong.localizedString)
                                 }
                             }
                         }
@@ -221,7 +221,7 @@ struct PostBottomSheetView: View {
         let copyLinkConfig = viewConfig.forElement(.copyLink)
         let shareLinkConfig = viewConfig.forElement(.shareLink)
         
-        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "")
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? AmityLocalizedStringSet.Social.socialCopyPostLink.localizedString)
             .onTapGesture {
                 isShown.toggle()
                 
@@ -233,7 +233,7 @@ struct PostBottomSheetView: View {
                 }
             }
         
-        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "")
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? AmityLocalizedStringSet.Social.socialShareTo.localizedString)
             .onTapGesture {
                 isShown.toggle()
                 

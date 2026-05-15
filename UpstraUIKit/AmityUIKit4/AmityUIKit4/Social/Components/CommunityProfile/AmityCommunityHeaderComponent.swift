@@ -97,7 +97,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
             HStack(spacing: 0) {
                 Text(community.postsCount.formattedCountString)
                     .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
-                Text(community.postsCount == 1 ? "post" : "posts")
+                Text(community.postsCount == 1 ? AmityLocalizedStringSet.Social.communityPostLabelSingular.localizedString : AmityLocalizedStringSet.Social.communityPostLabelPlural.localizedString)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.leading, 4)
                 
@@ -109,7 +109,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                     Text(community.membersCount.formattedCountString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                     
-                    Text(community.membersCount == 1 ? "member" : "members")
+                    Text(community.membersCount == 1 ? AmityLocalizedStringSet.Social.communityMemberLabelSingular.localizedString : AmityLocalizedStringSet.Social.communityMemberLabelPlural.localizedString)
                         .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
                         .padding(.leading, 4)
                 }                        
@@ -163,11 +163,11 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         do {
                             try await viewModel.joinCommunity()
                             
-                            let toastMessage = requiresJoinApproval ? "Requested to join. You will be notified once your request is accepted." : "You joined \(community.displayName)."
+                            let toastMessage = requiresJoinApproval ? AmityLocalizedStringSet.Social.communityJoinToastRequestSuccessMessage.localizedString : String(format: AmityLocalizedStringSet.Social.communityJoinToastSuccessMessage.localizedString, community.displayName)
                             Toast.showToast(style: .success, message: toastMessage)
                             
                         } catch {
-                            Toast.showToast(style: .warning, message: "Failed to join the community. Please try again.")
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityJoinFailedToast.localizedString)
                         }
                     }
                 }
@@ -203,7 +203,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .scaledToFit()
                         .frame(width: 20, height: 20)
                     
-                    Text("Cancel request")
+                    Text(AmityLocalizedStringSet.Social.cancelRequest.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.secondaryColor)))
                 }
             }
@@ -218,8 +218,11 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
         let shouldDefinitelyHideBanner = viewConfig.isHidden(elementId: .communityPendingPost) || viewModel.joinStatus != .joined
         
         if community.hasModeratorRole {
-            let pendingRequestWord = WordsGrammar(count: viewModel.pendingPostCount + viewModel.joinRequestCount, singular: "Pending request", plural: "Pending requests")
-            BannerView(title: pendingRequestWord.value, message: getTextForPendingRequestBanner())
+            let totalCount = viewModel.pendingPostCount + viewModel.joinRequestCount
+            let pendingRequestTitle = totalCount == 1
+                ? AmityLocalizedStringSet.Social.communityPendingRequestSingular.localizedString
+                :                 AmityLocalizedStringSet.Social.communityPendingRequestPageTitle.localizedString
+            BannerView(title: pendingRequestTitle, message: getTextForPendingRequestBanner())
                 .isHidden(!viewModel.shouldShowPendingBanner || shouldDefinitelyHideBanner)
                 .onTapGesture {
                     let selectedTab: AmityPendingRequestPageTab = (viewModel.pendingPostCount == 0 && viewModel.joinRequestCount > 0) ? .joinRequests : .pendingPosts
@@ -227,8 +230,10 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                     onPendingRequestBannerTap?(selectedTab)
                 }
         } else {
-            let pendingRequestWord = WordsGrammar(count: viewModel.pendingPostCount, singular: "Pending request", plural: "Pending requests")
-            BannerView(title: pendingRequestWord.value, message: "Your posts are pending for review")
+            let pendingRequestTitle = viewModel.pendingPostCount == 1
+                ? AmityLocalizedStringSet.Social.communityPendingRequestSingular.localizedString
+                :                 AmityLocalizedStringSet.Social.communityPendingRequestPageTitle.localizedString
+            BannerView(title: pendingRequestTitle, message: AmityLocalizedStringSet.Social.communityPostsPendingReview.localizedString)
                 .isHidden(!viewModel.shouldShowPendingBanner || shouldDefinitelyHideBanner)
                 .onTapGesture {
                     onPendingRequestBannerTap?(.pendingPosts)
@@ -263,7 +268,9 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
         var values: [String] = []
         
         let postWord = WordsGrammar(count: viewModel.pendingPostCount, set: .post)
-        let requestWord = WordsGrammar(count: viewModel.joinRequestCount, singular: "join request", plural: "join requests")
+        let requestWord = viewModel.joinRequestCount == 1
+            ? AmityLocalizedStringSet.Social.communityJoinRequestSingular.localizedString
+            : AmityLocalizedStringSet.Social.communityJoinRequestPlural.localizedString
                 
         if viewModel.pendingPostCount > 0 {
             let countValue = viewModel.pendingPostCount > 10 ? "10+" : "\(viewModel.pendingPostCount)"
@@ -272,14 +279,15 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
         
         if viewModel.joinRequestCount > 0 {
             let countValue = viewModel.joinRequestCount > 10 ? "10+" : "\(viewModel.joinRequestCount)"
-            values.append("\(countValue) \(requestWord.value)")
+            values.append("\(countValue) \(requestWord)")
         }
         
         let totalRequestCount = viewModel.pendingPostCount + viewModel.joinRequestCount
-        let requireVerb = WordsGrammar(count: totalRequestCount, singular: "requires", plural: "require")
-        
         let combinedWords = values.joined(separator: " and ")
-        let finalText = combinedWords + " \(requireVerb.value) approval"
+        let approvalFormat = totalRequestCount == 1
+            ? AmityLocalizedStringSet.Social.communityPendingRequiresApproval.localizedString
+            : AmityLocalizedStringSet.Social.communityPendingRequireApproval.localizedString
+        let finalText = String(format: approvalFormat, combinedWords)
         return finalText
     }
     

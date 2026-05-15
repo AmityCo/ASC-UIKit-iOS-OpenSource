@@ -401,7 +401,7 @@ final public class LiveStreamBroadcastViewController: UIViewController {
         let end = UIAlertAction(title: "End", style: .default) { [weak self] action in
             self?.finishLive()
         }
-        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        let cancel = UIAlertAction(title: AmityLocalizedStringSet.Social.cancel2.localizedString, style: .cancel, handler: nil)
         alertController.addAction(end)
         alertController.addAction(cancel)
         present(alertController, animated: true, completion: nil)
@@ -442,7 +442,7 @@ final public class LiveStreamBroadcastViewController: UIViewController {
             
             actionSheet.addAction(removeCoverPhotoAction)
             
-            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.Social.cancel2.localizedString, style: .cancel, handler: nil)
             
             actionSheet.addAction(cancelAction)
             

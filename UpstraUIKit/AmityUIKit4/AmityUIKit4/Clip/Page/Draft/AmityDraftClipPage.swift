@@ -188,7 +188,7 @@ public struct AmityDraftClipPage: AmityPageView {
                     
                 } label: {
                     HStack(spacing: 4) {
-                        Text("Next")
+                        Text(AmityLocalizedStringSet.General.next.localizedString)
                             .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         
                         Image(AmityIcon.rightArrowIcon.imageResource)

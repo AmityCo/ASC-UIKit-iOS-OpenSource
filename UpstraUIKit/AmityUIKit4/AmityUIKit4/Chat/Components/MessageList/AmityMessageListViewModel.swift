@@ -161,7 +161,7 @@ public class AmityMessageListViewModel: ObservableObject {
             do {
                 let _ = try await chatManager.deleteMessage(messageId: messageId)
             } catch {
-                toastState = .init(style: .warning, message: AmityLocalizedStringSet.Chat.toastDeleteErrorMessage.localizedString)
+                toastState = .init(style: .warning, message: AmityLocalizedStringSet.Social.deleteMessageFailed.localizedString)
             }
         }
     }

@@ -21,31 +21,31 @@ struct CommunityMembershipBottomSheetView: View {
     var body: some View {
         VStack(spacing: 0) {
             if viewModel.shouldShowModeratorItems {
-                getItemView(viewModel.isModerator ? AmityIcon.communityMemberIcon.getImageResource() : AmityIcon.communityModeratorIcon.getImageResource(), text: viewModel.isModerator ? "Demote to member" : "Promote to moderator")
+                getItemView(viewModel.isModerator ? AmityIcon.communityMemberIcon.getImageResource() : AmityIcon.communityModeratorIcon.getImageResource(), text: viewModel.isModerator ? AmityLocalizedStringSet.Social.communityMemberDemoteToMember.localizedString : AmityLocalizedStringSet.Social.communityMemberPromoteToModerator.localizedString)
                     .onTapGesture {
                         Task { @MainActor in
                             showBottomSheet.toggle()
                             if viewModel.isModerator {
                                 do {
                                     let _ = try await viewModel.demoteToMember()
-                                    Toast.showToast(style: .success, message: "Successfully demoted to member!")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberDemoteSuccessToast.localizedString)
                                 } catch {
-                                    Toast.showToast(style: .warning, message: "Failed to demote member. Please try again.")
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityMemberDemoteFailedToast.localizedString)
                                 }
                                 
                             } else {
                                 do {
                                     let _ = try await viewModel.promoteToModerator()
-                                    Toast.showToast(style: .success, message: "Successfully promoted to moderator!")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberPromoteSuccessToast.localizedString)
                                 } catch {
-                                    Toast.showToast(style: .success, message: "Failed to promote member. Please try again.")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberPromoteFailedToast.localizedString)
                                 }
                             }
                         }
                     }
             }
             
-            getItemView(viewModel.isReportedByMe ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource(), text: viewModel.isReportedByMe ? "Unreport user" : "Report user")
+            getItemView(viewModel.isReportedByMe ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource(), text: viewModel.isReportedByMe ? AmityLocalizedStringSet.Social.unreportUser.localizedString : AmityLocalizedStringSet.Social.reportUser.localizedString)
                 .onTapGesture {
                     
                     AmityUserAction.perform {
@@ -55,17 +55,17 @@ struct CommunityMembershipBottomSheetView: View {
                             if viewModel.isReportedByMe {
                                 do {
                                     let _ = try await viewModel.unReportUser()
-                                    Toast.showToast(style: .success, message: "Member unreported.")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberUnreportedToast.localizedString)
                                 } catch {
-                                    Toast.showToast(style: .warning, message: "Failed to unreport member. Please try again.")
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityMemberUnreportFailedToast.localizedString)
                                 }
                                 
                             } else {
                                 do {
                                     let _ = try await viewModel.reportUser()
-                                    Toast.showToast(style: .success, message: "Member reported.")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberReportedToast.localizedString)
                                 } catch {
-                                    Toast.showToast(style: .success, message: "Failed to report member. Please try again.")
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberReportFailedToast.localizedString)
                                 }
                             }
                         }
@@ -74,15 +74,15 @@ struct CommunityMembershipBottomSheetView: View {
             
             
             if viewModel.shouldShowModeratorItems {
-                getItemView(AmityIcon.trashBinIcon.getImageResource(), text: "Remove from community", isDestructive: true)
+                getItemView(AmityIcon.trashBinIcon.getImageResource(), text: AmityLocalizedStringSet.Social.communityRemoveMember.localizedString, isDestructive: true)
                     .onTapGesture {
                         Task { @MainActor in
                             showBottomSheet.toggle()
                             do {
                                 try await viewModel.removeMember()
-                                Toast.showToast(style: .success, message: "Member removed from this community.")
+                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberRemovedToast.localizedString)
                             } catch {
-                                Toast.showToast(style: .success, message: "Failed to remove member. Please try again.")
+                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberRemoveFailedToast.localizedString)
                             }
                         }
                     }

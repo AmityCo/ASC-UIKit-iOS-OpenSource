@@ -122,7 +122,7 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
                                 
                                 if error.isAmityErrorCode(.banWordFound) {
                                     
-                                    errorMessage = AmityLocalizedStringSet.Chat.toastBannedWord.localizedString
+                                    errorMessage = AmityLocalizedStringSet.Social.msgBlockedWord.localizedString
                                 } else if error.isAmityErrorCode(.linkNotAllowed) {
                                     
                                     errorMessage = AmityLocalizedStringSet.Chat.toastLinkNotAllow.localizedString
@@ -153,7 +153,7 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
             .padding(.horizontal)
             .background(Color(viewConfig.theme.backgroundColor))
             .alert(isPresented: $showingLongMessageAlert, content: {
-                Alert(title: Text(AmityLocalizedStringSet.Chat.charLimitAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Chat.charLimitAlertMessage.localizedString), dismissButton: .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString)))
+                Alert(title: Text(AmityLocalizedStringSet.Chat.charLimitAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.yourMessageIsTooLongPleaseShortenYourMessageAn.localizedString), dismissButton: .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString)))
             })
             .alert(isPresented: $textEditorViewModel.reachMentionLimit) {
                 return Alert(title: Text(AmityLocalizedStringSet.Chat.reachMentionLimitTitle.localizedString), message: Text(AmityLocalizedStringSet.Chat.reachMentionLimitMessage.localizedString), dismissButton: .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString), action: {

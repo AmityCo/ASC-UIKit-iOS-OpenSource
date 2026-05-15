@@ -82,7 +82,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                 switch type {
                 case .post:
                     let createPostButton = viewConfig.getConfig(elementId: .createPostButton, key: "image", of: String.self) ?? ""
-                    let createPostTitle = viewConfig.getConfig(elementId: .createPostButton, key: "text", of: String.self) ?? ""
+                    let createPostTitle = viewConfig.getConfig(elementId: .createPostButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString
                     getItemView(image: AmityIcon.getImageResource(named: createPostButton), title: createPostTitle)
                         .onTapGesture {
                             handlePostMenuAction(type)
@@ -90,7 +90,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createPostButton)
                 case .story:
                     let createStoryButton = viewConfig.getConfig(elementId: .createStoryButton, key: "image", of: String.self) ?? ""
-                    let createStoryTitle = viewConfig.getConfig(elementId: .createStoryButton, key: "text", of: String.self) ?? ""
+                    let createStoryTitle = viewConfig.getConfig(elementId: .createStoryButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.createStoryBottomSheetTitle.localizedString
                     getItemView(image: AmityIcon.getImageResource(named: createStoryButton), title: createStoryTitle)
                         .onTapGesture {
                             handlePostMenuAction(type)
@@ -99,25 +99,25 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createStoryButton)
                 case .poll:
                     let icon = AmityIcon.createPollMenuIcon
-                    getItemView(image: icon.imageResource, title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
+                    getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypePoll.localizedString, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
                 case .liveStream:
                     let icon = AmityIcon.createLivestreamMenuIcon
-                    getItemView(image: icon.imageResource, title: type.rawValue)
+                    getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeLiveStream.localizedString)
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
                 case .clip:
                     let icon = AmityIcon.createClipMenuIcon
-                    getItemView(image: icon.imageResource, title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
+                    getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeClip.localizedString, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
                 case .event:
                     let icon = AmityIcon.createEventMenuIcon
-                    getItemView(image: icon.imageResource, title: type.rawValue, imageSize: CGSize(width: 18, height: 18))
+                    getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeEvent.localizedString, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }

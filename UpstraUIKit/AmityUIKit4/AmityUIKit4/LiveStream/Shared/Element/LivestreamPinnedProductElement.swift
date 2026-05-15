@@ -145,7 +145,7 @@ struct LivestreamPinnedProductElement: AmityElementView {
                         
                         HStack(spacing: 0) {
                             if isInactive {
-                                Text("Unlisted")
+                                Text(AmityLocalizedStringSet.Social.productTagUnlistedLabel.localizedString)
                                     .applyTextStyle(.caption(Color(viewConfig.defaultDarkTheme.baseColorShade2)))
                             } else if product.price != nil {
                                 Text(formatPrice(product))
@@ -183,7 +183,7 @@ struct LivestreamPinnedProductElement: AmityElementView {
                                             .frame(width: 20, height: 20)
                                             .foregroundColor(Color(viewConfig.defaultDarkTheme.secondaryColor))
                                         
-                                        Text("Unpin")
+                                        Text(AmityLocalizedStringSet.Social.productTagUnpinButton.localizedString)
                                             .applyTextStyle(.captionBold(Color(viewConfig.defaultDarkTheme.secondaryColor)))
                                     }
                                     .frame(height: 28)
@@ -195,7 +195,7 @@ struct LivestreamPinnedProductElement: AmityElementView {
                                 }
                             } else {
                                 // Viewer: View button — 50% opacity when inactive
-                                Text("View")
+                                Text(AmityLocalizedStringSet.General.view.localizedString)
                                     .applyTextStyle(.captionBold(.white))
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 6)

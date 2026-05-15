@@ -21,7 +21,7 @@ struct AmityProductTagNoResultElement: AmityElementView {
     var body: some View {
         AmityView(configId: configId,
                   config: { configDict -> String in
-            let text = configDict["text"] as? String ?? "No results found"
+            let text = configDict["text"] as? String ?? AmityLocalizedStringSet.Social.searchNoResultsFound.localizedString
             return text
         }) { text in
             VStack(spacing: 16) {

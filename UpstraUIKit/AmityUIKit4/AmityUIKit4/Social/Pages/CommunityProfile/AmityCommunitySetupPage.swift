@@ -48,18 +48,18 @@ public struct AmityCommunitySetupPage: AmityPageView {
     
     /// Community Name data
     @State private var nameTextFieldModel: InfoTextFieldModel = InfoTextFieldModel(
-        title: "Community name", placeholder: "Name your community", isMandatory: false,
+        title: AmityLocalizedStringSet.Social.communitySetupNameTitle.localizedString, placeholder: AmityLocalizedStringSet.Social.communitySetupNamePlaceholder.localizedString, isMandatory: false,
         maxCharCount: 30)
     @State private var isTextValid: Bool = true
     
     /// About data
     @State private var aboutTextFieldModel: InfoTextFieldModel = InfoTextFieldModel(
-        title: "About", placeholder: "Enter Description", isMandatory: false,
+        title: AmityLocalizedStringSet.Social.communitySetupAboutTitle.localizedString, placeholder: AmityLocalizedStringSet.Social.communitySetupAboutPlaceholder.localizedString, isMandatory: false,
         showOptionalTitle: true, isExpandable: true, maxCharCount: 180)
     
     /// Categories data
     @State private var categoryTextFieldModel = InfoTextFieldModel(
-        title: "Categories", placeholder: "Select Category", isMandatory: false,
+        title: AmityLocalizedStringSet.Social.communitySetupCategoryTitle.localizedString, placeholder: AmityLocalizedStringSet.Social.communitySetupCategoryPlaceholder.localizedString, isMandatory: false,
         showOptionalTitle: true)
     @State private var categoryText: String = ""
     
@@ -173,7 +173,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                     HStack {
                                         let privacyTitle =
                                         viewConfig.getText(elementId: .communityPrivacyTitle)
-                                        ?? ""
+                                        ?? AmityLocalizedStringSet.Social.communitySetupPrivacyTitle.localizedString
                                         Text(privacyTitle)
                                             .applyTextStyle(
                                                 .titleBold(Color(viewConfig.theme.baseColor))
@@ -187,10 +187,10 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                     
                                     let publicTitle =
                                     viewConfig.getText(elementId: .communityPrivacyPublicTitle)
-                                    ?? ""
+                                    ?? AmityLocalizedStringSet.Social.communitySetupPrivacyPublicTitle.localizedString
                                     let publicDesc =
                                     viewConfig.getText(
-                                        elementId: .communityPrivacyPublicDescription) ?? ""
+                                        elementId: .communityPrivacyPublicDescription) ?? AmityLocalizedStringSet.Social.communitySetupPrivacyPublicDescription.localizedString
                                     let publicIcon = viewConfig.getImage(
                                         elementId: .communityPrivacyPublicIcon)
                                     PrivacyRadioButtonView(
@@ -211,9 +211,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                     PrivacyRadioButtonView(
                                         isSelected: draft.privacy == .privateAndVisible,
                                         icon: AmityIcon.globePrivateIcon.imageResource,
-                                        title: "Private & visible",
+                                        title: AmityLocalizedStringSet.Social.communitySetupPrivacyPrivateVisibleTitle.localizedString,
                                         description:
-                                            "Community is discoverable by anyone. Content is hidden from non-members."
+                                            AmityLocalizedStringSet.Social.communitySetupPrivacyPrivateVisibleDescription.localizedString
                                     )
                                     .onTapGesture {
                                         if pageMode == .create {
@@ -226,9 +226,9 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         elementId: .communityPrivacyPrivateIcon)
                                     PrivacyRadioButtonView(
                                         isSelected: draft.privacy == .privateAndHidden,
-                                        icon: privateIcon, title: "Private & hidden",
+                                        icon: privateIcon, title: AmityLocalizedStringSet.Social.communitySetupPrivacyPrivateHiddenTitle.localizedString,
                                         description:
-                                            "Community and content are hidden from non-members, and cannot be discovered via search."
+                                            AmityLocalizedStringSet.Social.communitySetupPrivacyPrivateHiddenDescription.localizedString
                                     )
                                     .onTapGesture {
                                         if pageMode == .create {
@@ -246,7 +246,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                     .frame(height: 1)
                                 
                                 VStack(spacing: 16) {
-                                    let communityMembershipTitle = viewConfig.getText(elementId: .communityMembershipTitle) ?? ""
+                                    let communityMembershipTitle = viewConfig.getText(elementId: .communityMembershipTitle) ?? AmityLocalizedStringSet.Social.communitySetupMembershipTitle.localizedString
                                     HStack {
                                         Text(communityMembershipTitle)
                                             .applyTextStyle(
@@ -256,7 +256,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                     }
                                     
                                     HStack(spacing: 10) {
-                                        let commMembershipDescription = viewConfig.getText(elementId: .communityMembershipDescription) ?? ""
+                                        let commMembershipDescription = viewConfig.getText(elementId: .communityMembershipDescription) ?? AmityLocalizedStringSet.Social.communitySetupMembershipDescription.localizedString
                                         VStack(spacing: 6) {
                                             Text(commMembershipDescription)
                                                 .applyTextStyle(
@@ -264,7 +264,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                                 )
                                                 .frame(maxWidth: .infinity, alignment: .leading)
                                             
-                                            let commMembershipSubDescription = viewConfig.getText(elementId: .communityMembershipSubDescription) ?? ""
+                                            let commMembershipSubDescription = viewConfig.getText(elementId: .communityMembershipSubDescription) ?? AmityLocalizedStringSet.Social.communitySetupMembershipSubDescription.localizedString
                                             Text(commMembershipSubDescription)
                                             .applyTextStyle(
                                                 .caption(Color(viewConfig.theme.baseColorShade1))
@@ -348,10 +348,10 @@ public struct AmityCommunitySetupPage: AmityPageView {
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
             
-            nameTextFieldModel.title = viewConfig.getText(elementId: .communityNameTitle) ?? ""
-            aboutTextFieldModel.title = viewConfig.getText(elementId: .communityAboutTitle) ?? ""
+            nameTextFieldModel.title = viewConfig.getText(elementId: .communityNameTitle) ?? AmityLocalizedStringSet.Social.communitySetupNameTitle.localizedString
+            aboutTextFieldModel.title = viewConfig.getText(elementId: .communityAboutTitle) ?? AmityLocalizedStringSet.Social.communitySetupAboutTitle.localizedString
             categoryTextFieldModel.title =
-            viewConfig.getText(elementId: .communityCategoryTitle) ?? ""
+            viewConfig.getText(elementId: .communityCategoryTitle) ?? AmityLocalizedStringSet.Social.communitySetupCategoryTitle.localizedString
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
@@ -383,8 +383,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
             
             let title =
             pageMode == .create
-            ? viewConfig.getText(elementId: .title) ?? ""
-            : viewConfig.getText(elementId: .communityEditTitle) ?? ""
+            ? viewConfig.getText(elementId: .title) ?? AmityLocalizedStringSet.Social.communitySetupPageTitle.localizedString
+            : viewConfig.getText(elementId: .communityEditTitle) ?? AmityLocalizedStringSet.Social.communitySetupEditPageTitle.localizedString
             Text(title)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                 .accessibilityIdentifier(AccessibilityID.Social.CommunitySetup.title)
@@ -436,7 +436,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
         } else {
             VStack(alignment: .leading, spacing: 24) {
                 HStack {
-                    Text("Categories")
+                    Text(AmityLocalizedStringSet.Social.categoriesLabel.localizedString)
                         .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                     
                     Spacer()
@@ -477,7 +477,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
     private func getAddMemberView(_ geometry: GeometryProxy) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             HStack {
-                let addMemberTitle = viewConfig.getText(elementId: .communityAddMemberTitle) ?? ""
+                let addMemberTitle = viewConfig.getText(elementId: .communityAddMemberTitle) ?? AmityLocalizedStringSet.Social.communitySetupAddMemberTitle.localizedString
                 Text(addMemberTitle)
                     .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                     .accessibilityIdentifier(
@@ -524,14 +524,14 @@ public struct AmityCommunitySetupPage: AmityPageView {
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
                     let inviteMemberTitle =
-                    viewConfig.getText(elementId: .communityInviteMemberTitle) ?? ""
+                    viewConfig.getText(elementId: .communityInviteMemberTitle) ?? AmityLocalizedStringSet.Social.communityInviteMemberTitle.localizedString
                     Text(inviteMemberTitle)
                         .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                         .accessibilityIdentifier(
                             AccessibilityID.Social.CommunitySetup.communityAddMemberTitle)
                     
                     let inviteMemberDesc =
-                    viewConfig.getText(elementId: .communityInviteMemberDescription) ?? ""
+                    viewConfig.getText(elementId: .communityInviteMemberDescription) ?? AmityLocalizedStringSet.Social.communityInviteMemberDescription.localizedString
                     Text(inviteMemberDesc)
                         .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                 }
@@ -596,7 +596,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                         .frame(width: 20.0, height: 20.0)
                     
                     let communityCreateButtonText =
-                    viewConfig.getText(elementId: .communityCreateButton) ?? ""
+                    viewConfig.getText(elementId: .communityCreateButton) ?? AmityLocalizedStringSet.Social.communitySetupCreateButton.localizedString
                     Text(communityCreateButtonText)
                         .applyTextStyle(.bodyBold(.white))
                 }
@@ -653,7 +653,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                     editCommunity(community)
                 }
             } label: {
-                Text(viewConfig.getText(elementId: .communityEditButton) ?? "Save")
+                Text(viewConfig.getText(elementId: .communityEditButton) ?? AmityLocalizedStringSet.Social.saveButton.localizedString)
                     .applyTextStyle(.bodyBold(.white))
 
             }
@@ -668,7 +668,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
     private func getBottomSheetView() -> some View {
         VStack(spacing: 28) {
             
-            let cameraTitle = viewConfig.getText(elementId: .cameraButton) ?? "Camera"
+            let cameraTitle = viewConfig.getText(elementId: .cameraButton) ?? AmityLocalizedStringSet.Social.cameraButton.localizedString
             let cameraImage = viewConfig.getImage(elementId: .cameraButton)
             getItemView(
                 image: cameraImage, title: cameraTitle,
@@ -682,7 +682,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                     showBottomSheet.toggle()
                 })
             
-            let photoTitle = viewConfig.getText(elementId: .imageButton) ?? "Photo"
+            let photoTitle = viewConfig.getText(elementId: .imageButton) ?? AmityLocalizedStringSet.Social.photoButton.localizedString
             let photoImage = viewConfig.getImage(elementId: .imageButton)
             getItemView(
                 image: photoImage, title: photoTitle,
@@ -768,11 +768,11 @@ public struct AmityCommunitySetupPage: AmityPageView {
                     // Set the updated stack
                     host.controller?.navigationController?.setViewControllers(
                         viewControllers, animated: true)
-                    Toast.showToast(style: .success, message: "Successfully created community!")
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communitySetupCreateSuccess.localizedString)
                 }
                 
             } catch {
-                Toast.showToast(style: .warning, message: "Failed to create community!")
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communitySetupCreateFailed.localizedString)
             }
             
             enableTouchEvent = true
@@ -805,7 +805,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
             } catch {
                 Toast.showToast(
                     style: .warning,
-                    message: "Failed to save your community profile. Please try again.")
+                    message: AmityLocalizedStringSet.Social.communitySetupSaveFailed.localizedString)
             }
             
             enableTouchEvent = true
@@ -825,7 +825,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 title: AmityLocalizedStringSet.Social.pendingJoinRequestAlertTitle.localizedString, message: AmityLocalizedStringSet.Social.pendingJoinRequestAlertMessage.localizedString, preferredStyle: .alert)
             
             let confirmAction = UIAlertAction(
-                title: AmityLocalizedStringSet.General.okay.localizedString,
+                title: AmityLocalizedStringSet.Chat.okButton.localizedString,
                 style: .default) { action in
                     completion()
                 }
@@ -861,8 +861,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 .localizedString
             let leaveAction = UIAlertAction(
                 title: pageMode == .create
-                ? AmityLocalizedStringSet.General.leave.localizedString
-                : AmityLocalizedStringSet.General.discard.localizedString,
+                ? AmityLocalizedStringSet.Social.leave.localizedString
+                : AmityLocalizedStringSet.Social.discard.localizedString,
                 style: .destructive
             ) { action in
                 completion()
@@ -915,7 +915,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 }
                 
                 let isBrandUser = member.user?.isBrand ?? false
-                UserDisplayNameLabel(name: member.user?.displayName ?? "Unknown", isBrand: isBrandUser, textStyle: .caption(Color(viewConfig.theme.baseColor)), spacing: 1)
+                UserDisplayNameLabel(name: member.user?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString, isBrand: isBrandUser, textStyle: .caption(Color(viewConfig.theme.baseColor)), spacing: 1)
             }
             .frame(width: 64, height: 68)
         }

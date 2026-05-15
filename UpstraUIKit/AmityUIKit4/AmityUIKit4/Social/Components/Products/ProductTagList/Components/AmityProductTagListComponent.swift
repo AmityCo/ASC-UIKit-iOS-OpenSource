@@ -201,7 +201,7 @@ struct AmityProductTagListComponent_Previews: PreviewProvider {
     static var previews: some View {
         VStack {
             // Preview with sample data would go here
-            Text("ProductTagListComponent Preview")
+            Text("ProductTagListComponent Preview") // l10n:ok SwiftUI preview stub, not shipped UI
         }
         .padding()
     }

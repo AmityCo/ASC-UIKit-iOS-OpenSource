@@ -40,7 +40,7 @@ struct PollTextOptionSection: View {
                         
                         Image(systemName: "plus")
                         
-                        Text(AmityLocalizedStringSet.Social.pollAddOption.localizedString)
+                        Text(AmityLocalizedStringSet.Social.addOption.localizedString)
                             .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         
                         Spacer()

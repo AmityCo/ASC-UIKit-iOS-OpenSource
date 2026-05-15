@@ -129,7 +129,7 @@ struct ClipFeedItemOverlayView: View {
                                                 /// This event is observed in PostFeedViewModel
                                                 NotificationCenter.default.post(name: .didPostReacted, object: post.object)
                                             } else {
-                                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.nonMemberReactPostMessage.localizedString)
+                                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                                             }
                                         }
                                     }, longPressAction: {
@@ -260,7 +260,7 @@ struct ClipFeedItemOverlayView: View {
         }
         .bottomSheet(isShowing: $showMoreOption, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             VStack(spacing: 0) {
-                BottomSheetItemView(icon: AmityIcon.viewPostIcon.imageResource, text: "View post")
+                BottomSheetItemView(icon: AmityIcon.viewPostIcon.imageResource, text: AmityLocalizedStringSet.Social.socialViewPost.localizedString)
                     .onTapGesture {
                         playerController.pause()
                         
@@ -288,7 +288,7 @@ struct ClipFeedItemOverlayView: View {
         let copyLinkConfig = viewConfig.forElement(.copyLink)
         let shareLinkConfig = viewConfig.forElement(.shareLink)
         
-        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? "")
+        BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? AmityLocalizedStringSet.Social.socialCopyClipLink.localizedString)
             .onTapGesture {
                 showMoreOption.toggle()
                 
@@ -300,7 +300,7 @@ struct ClipFeedItemOverlayView: View {
                 }
             }
         
-        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? "")
+        BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? AmityLocalizedStringSet.Social.socialShareTo.localizedString)
             .onTapGesture {
                 showMoreOption.toggle()
                 
@@ -357,7 +357,7 @@ extension ClipFeedItemOverlayView {
                 Button {
                     togglePostContentExpantion()
                 } label: {
-                    Text("See less")
+                    Text(AmityLocalizedStringSet.Social.seeLess.localizedString)
                         .applyTextStyle(.bodyBold(.white))
                 }
                 .padding(.top, 12)
@@ -391,7 +391,7 @@ extension ClipFeedItemOverlayView {
                         .padding(.horizontal, 4)
                         .layoutPriority(2)
                     
-                    Text("\(post.timestamp)\(post.isEdited ? " (edited)" : "")")
+                    Text("\(post.timestamp)\(post.isEdited ? " \(AmityLocalizedStringSet.Comment.editedText.localizedString)" : "")")
                         .applyTextStyle(.caption(Color.white))
                         .isHidden(viewConfig.isHidden(elementId: .timestamp))
                         .accessibilityIdentifier(AccessibilityID.Social.PostContent.timestamp)
@@ -406,7 +406,7 @@ extension ClipFeedItemOverlayView {
                             .resizable()
                             .frame(width: 12, height: 12)
                             .padding(.leading, 6)
-                        Text(elementConfig.text ?? "Moderator")
+                        Text(elementConfig.text ?? AmityLocalizedStringSet.General.moderator.localizedString)
                             .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
                             .padding(.trailing, 6)
                     }
@@ -430,7 +430,7 @@ extension ClipFeedItemOverlayView {
             onTapAction?(.userProfile(userId: userId))
         })
         .lineLimit(postContentLineLimit)
-        .moreButtonText("...See more")
+        .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
         .font(AmityTextStyle.body(.clear).getFont())
         .foregroundColor(Color.white)
         .attributedColor(UIColor.white)

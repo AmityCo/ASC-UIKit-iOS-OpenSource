@@ -71,7 +71,7 @@ struct CommunityCellView: View {
                         .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityCategoryName)
                 }
                 
-                Text("\(model.membersCount.formattedCountString) members")
+                Text(model.membersCount == 1 ? AmityLocalizedStringSet.Social.communityMemberCountSingular.localized(arguments: model.membersCount.formattedCountString) : AmityLocalizedStringSet.Social.communityMemberCountPlural.localized(arguments: model.membersCount.formattedCountString))
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .lineLimit(1)
                     .isHidden(viewConfig.isHidden(elementId: .communityMembersCount))

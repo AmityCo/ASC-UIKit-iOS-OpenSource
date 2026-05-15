@@ -1,16 +1,17 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Script: link_shared_frameworks.rb
+# Script: link-local-shareFramework-package.rb
 #
 # Purpose:
-#   1. Remove xcframeworks listed in FRAMEWORKS_TO_REMOVE from the SampleApp target's
-#      Frameworks and Embed Frameworks build phases, and remove their PBXFileReferences.
-#   2. Add SharedFrameworks as a local Swift Package dependency in SampleApp.xcodeproj
-#      and link the SharedFrameworks product to the SampleApp target.
+#   For each configured project:
+#     1. Remove specified xcframeworks from the target's Frameworks and Embed
+#        Frameworks build phases, and remove their PBXFileReferences.
+#     2. Add SharedFrameworks as a local Swift Package dependency in the project
+#        and link the SharedFrameworks product to the target.
 #
 # Usage:
-#   ruby scripts/link_shared_frameworks.rb
+#   ruby scripts/link-local-shareFramework-package.rb
 #
 # Requirements:
 #   gem install xcodeproj
@@ -18,132 +19,188 @@
 require 'xcodeproj'
 require 'pathname'
 
-# ── Paths ──────────────────────────────────────────────────────────────────────
+# ── Shared constants ───────────────────────────────────────────────────────────
 
-SCRIPT_DIR   = Pathname.new(__FILE__).dirname.realpath
-REPO_ROOT    = SCRIPT_DIR.parent
-PROJECT_PATH = REPO_ROOT / 'UpstraUIKit' / 'SampleApp' / 'SampleApp.xcodeproj'
-# Path to SharedFrameworks relative to the .xcodeproj directory
-SHARED_FRAMEWORKS_RELATIVE_PATH = '../SharedFrameworks'
-SHARED_FRAMEWORKS_PRODUCT_NAME  = 'SharedFrameworks'
-TARGET_NAME          = 'SampleApp'
-FRAMEWORKS_TO_REMOVE = %w[
-  AmitySDK.xcframework
-  AmityLiveVideoBroadcastKit.xcframework
-  AmityVideoPlayerKit.xcframework
-  MobileVLCKit.xcframework
-  AmityLiveKit.xcframework
-  LiveKitWebRTC.xcframework
+SCRIPT_DIR = Pathname.new(__FILE__).dirname.realpath
+REPO_ROOT  = SCRIPT_DIR.parent
+
+SHARED_FRAMEWORKS_PRODUCT_NAME = 'SharedFrameworks'
+
+# ── Project configurations ─────────────────────────────────────────────────────
+#
+# Each entry describes one .xcodeproj to modify:
+#   :project_path           - path relative to REPO_ROOT
+#   :target_name            - the target to modify inside that project
+#   :frameworks_to_remove   - xcframework names to strip out
+#   :shared_pkg_relative    - path to SharedFrameworks relative to the .xcodeproj
+
+CONFIGURATIONS = [
+  {
+    project_path:         'UpstraUIKit/AmityUIKit4/AmityUIKit4.xcodeproj',
+    target_name:          'AmityUIKit4',
+    frameworks_to_remove: %w[
+      AmityLiveKit.xcframework
+      AmitySDK.xcframework
+      LiveKitWebRTC.xcframework
+    ],
+    shared_pkg_relative:  '../SharedFrameworks'
+  },
+  {
+    project_path:         'UpstraUIKit/AmityUIKit.xcodeproj',
+    target_name:          'AmityUIKit',
+    frameworks_to_remove: %w[
+      AmitySDK.xcframework
+    ],
+    shared_pkg_relative:  'SharedFrameworks'
+  },
+  {
+    project_path:         'UpstraUIKit/AmityUIKitLiveStream/AmityUIKitLiveStream.xcodeproj',
+    target_name:          'AmityUIKitLiveStream',
+    frameworks_to_remove: %w[
+      AmityLiveVideoBroadcastKit.xcframework
+      AmitySDK.xcframework
+      AmityVideoPlayerKit.xcframework
+      MobileVLCKit.xcframework
+    ],
+    shared_pkg_relative:  '../SharedFrameworks'
+  },
+  {
+    project_path:         'UpstraUIKit/SampleApp/SampleApp.xcodeproj',
+    target_name:          'SampleApp',
+    frameworks_to_remove: %w[
+      AmitySDK.xcframework
+      AmityLiveVideoBroadcastKit.xcframework
+      AmityVideoPlayerKit.xcframework
+      MobileVLCKit.xcframework
+      AmityLiveKit.xcframework
+      LiveKitWebRTC.xcframework
+    ],
+    shared_pkg_relative:  '../SharedFrameworks'
+  }
 ].freeze
 
-# ── Sanity checks ─────────────────────────────────────────────────────────────
+# ── Helper: process one project ────────────────────────────────────────────────
 
-abort "ERROR: Project not found at #{PROJECT_PATH}" unless PROJECT_PATH.exist?
+def process_project(config)
+  project_path   = REPO_ROOT / config[:project_path]
+  target_name    = config[:target_name]
+  to_remove      = config[:frameworks_to_remove]
+  shared_pkg_rel = config[:shared_pkg_relative]
 
-puts "Opening project: #{PROJECT_PATH}"
-project = Xcodeproj::Project.open(PROJECT_PATH)
+  puts "\n#{'=' * 70}"
+  puts "Project : #{config[:project_path]}"
+  puts "Target  : #{target_name}"
+  puts '=' * 70
 
-# ── Locate SampleApp target ───────────────────────────────────────────────────
+  abort "ERROR: Project not found at #{project_path}" unless project_path.exist?
 
-target = project.targets.find { |t| t.name == TARGET_NAME }
-abort "ERROR: Target '#{TARGET_NAME}' not found in project." unless target
+  project = Xcodeproj::Project.open(project_path)
 
-puts "Found target: #{target.name}"
+  target = project.targets.find { |t| t.name == target_name }
+  abort "ERROR: Target '#{target_name}' not found in #{project_path}" unless target
 
-# ── Step 1: Remove xcframeworks from SampleApp target ─────────────────────────
+  # ── Step 1: Remove xcframeworks ──────────────────────────────────────────────
 
-puts "\n── Step 1: Removing #{FRAMEWORKS_TO_REMOVE.count} framework(s) from #{TARGET_NAME} ──"
+  puts "\n── Step 1: Removing #{to_remove.count} framework(s) from '#{target_name}' ──"
 
-FRAMEWORKS_TO_REMOVE.each do |framework_name|
-  puts "\n  [#{framework_name}]"
+  to_remove.each do |framework_name|
+    puts "\n  [#{framework_name}]"
 
-  # Remove from Frameworks build phase
-  frameworks_phase = target.frameworks_build_phase
-  build_files = frameworks_phase.files.select do |bf|
-    bf.file_ref&.path&.end_with?(framework_name) ||
-      bf.display_name == framework_name
-  end
-
-  if build_files.empty?
-    puts "    [skip] Not found in Frameworks build phase (already removed?)"
-  else
-    build_files.each do |bf|
-      puts "    Removing '#{bf.display_name}' from Frameworks build phase"
-      frameworks_phase.remove_build_file(bf)
-    end
-  end
-
-  # Remove from Embed Frameworks (CopyFiles) build phase
-  embed_phases = target.copy_files_build_phases.select { |p| p.name == 'Embed Frameworks' }
-  embed_phases.each do |phase|
-    embed_files = phase.files.select do |bf|
+    # Remove from Frameworks build phase
+    frameworks_phase = target.frameworks_build_phase
+    build_files = frameworks_phase.files.select do |bf|
       bf.file_ref&.path&.end_with?(framework_name) ||
         bf.display_name == framework_name
     end
-    if embed_files.empty?
-      puts "    [skip] Not found in Embed Frameworks phase"
+
+    if build_files.empty?
+      puts '    [skip] Not found in Frameworks build phase (already removed?)'
     else
-      embed_files.each do |bf|
-        puts "    Removing '#{bf.display_name}' from Embed Frameworks phase"
-        phase.remove_build_file(bf)
+      build_files.each do |bf|
+        puts "    Removing '#{bf.display_name}' from Frameworks build phase"
+        frameworks_phase.remove_build_file(bf)
+      end
+    end
+
+    # Remove from Embed Frameworks (CopyFiles) build phase
+    embed_phases = target.copy_files_build_phases.select { |p| p.name == 'Embed Frameworks' }
+    embed_phases.each do |phase|
+      embed_files = phase.files.select do |bf|
+        bf.file_ref&.path&.end_with?(framework_name) ||
+          bf.display_name == framework_name
+      end
+      if embed_files.empty?
+        puts '    [skip] Not found in Embed Frameworks phase'
+      else
+        embed_files.each do |bf|
+          puts "    Removing '#{bf.display_name}' from Embed Frameworks phase"
+          phase.remove_build_file(bf)
+        end
+      end
+    end
+
+    # Remove the PBXFileReference from the project
+    file_refs = project.files.select { |f| f.path&.end_with?(framework_name) }
+    if file_refs.empty?
+      puts '    [skip] No PBXFileReference found'
+    else
+      file_refs.each do |ref|
+        puts "    Removing PBXFileReference: #{ref.path}"
+        ref.remove_from_project
       end
     end
   end
 
-  # Remove the PBXFileReference from the project
-  file_refs = project.files.select { |f| f.path&.end_with?(framework_name) }
-  if file_refs.empty?
-    puts "    [skip] No PBXFileReference found"
-  else
-    file_refs.each do |ref|
-      puts "    Removing PBXFileReference: #{ref.path}"
-      ref.remove_from_project
-    end
+  # ── Step 2: Add SharedFrameworks local Swift Package ─────────────────────────
+
+  puts "\n── Step 2: Adding SharedFrameworks as local Swift Package ──"
+
+  existing_local_pkg = project.root_object.package_references.find do |pkg|
+    pkg.isa == 'XCLocalSwiftPackageReference' &&
+      pkg.relative_path == shared_pkg_rel
   end
+
+  if existing_local_pkg
+    puts '  [skip] XCLocalSwiftPackageReference for SharedFrameworks already exists'
+    local_pkg_ref = existing_local_pkg
+  else
+    puts "  Adding XCLocalSwiftPackageReference → #{shared_pkg_rel}"
+    local_pkg_ref = project.new(Xcodeproj::Project::Object::XCLocalSwiftPackageReference)
+    local_pkg_ref.relative_path = shared_pkg_rel
+    project.root_object.package_references << local_pkg_ref
+  end
+
+  existing_product_dep = target.package_product_dependencies.find do |dep|
+    dep.product_name == SHARED_FRAMEWORKS_PRODUCT_NAME
+  end
+
+  if existing_product_dep
+    puts "  [skip] Package product dependency '#{SHARED_FRAMEWORKS_PRODUCT_NAME}' already exists on target"
+  else
+    puts "  Adding package product dependency '#{SHARED_FRAMEWORKS_PRODUCT_NAME}' to target '#{target_name}'"
+    product_dep = project.new(Xcodeproj::Project::Object::XCSwiftPackageProductDependency)
+    product_dep.product_name = SHARED_FRAMEWORKS_PRODUCT_NAME
+    product_dep.package = local_pkg_ref
+    target.package_product_dependencies << product_dep
+  end
+
+  # ── Save ─────────────────────────────────────────────────────────────────────
+
+  puts "\n── Saving project ──"
+  project.save
+  puts "Done. Project saved to #{project_path}"
 end
 
-# ── Step 2: Add SharedFrameworks as a local Swift Package dependency ───────────
+# ── Run all configurations ─────────────────────────────────────────────────────
 
-puts "\n── Step 2: Adding SharedFrameworks as local Swift Package ──"
+CONFIGURATIONS.each { |config| process_project(config) }
 
-# Check if a local package reference to SharedFrameworks already exists
-existing_local_pkg = project.root_object.package_references.find do |pkg|
-  pkg.isa == 'XCLocalSwiftPackageReference' &&
-    pkg.relative_path == SHARED_FRAMEWORKS_RELATIVE_PATH
-end
-
-if existing_local_pkg
-  puts "  [skip] XCLocalSwiftPackageReference for SharedFrameworks already exists"
-  local_pkg_ref = existing_local_pkg
-else
-  puts "  Adding XCLocalSwiftPackageReference → #{SHARED_FRAMEWORKS_RELATIVE_PATH}"
-  local_pkg_ref = project.new(Xcodeproj::Project::Object::XCLocalSwiftPackageReference)
-  local_pkg_ref.relative_path = SHARED_FRAMEWORKS_RELATIVE_PATH
-  project.root_object.package_references << local_pkg_ref
-end
-
-# Check if product dependency is already added to the target
-existing_product_dep = target.package_product_dependencies.find do |dep|
-  dep.product_name == SHARED_FRAMEWORKS_PRODUCT_NAME
-end
-
-if existing_product_dep
-  puts "  [skip] Package product dependency '#{SHARED_FRAMEWORKS_PRODUCT_NAME}' already exists on target"
-else
-  puts "  Adding package product dependency '#{SHARED_FRAMEWORKS_PRODUCT_NAME}' to target '#{TARGET_NAME}'"
-  product_dep = project.new(Xcodeproj::Project::Object::XCSwiftPackageProductDependency)
-  product_dep.product_name = SHARED_FRAMEWORKS_PRODUCT_NAME
-  product_dep.package = local_pkg_ref
-  target.package_product_dependencies << product_dep
-end
-
-# ── Save ──────────────────────────────────────────────────────────────────────
-
-puts "\n── Saving project ──"
-project.save
-puts "Done. Project saved to #{PROJECT_PATH}"
-puts ""
-puts "Next steps:"
-puts "  1. Open SampleApp.xcodeproj in Xcode"
-puts "  2. Xcode will resolve the SharedFrameworks local package automatically"
-puts "  3. Verify the SampleApp target links SharedFrameworks under Frameworks, Libraries, and Embedded Content"
+puts "\n#{'=' * 70}"
+puts 'All projects processed.'
+puts '=' * 70
+puts ''
+puts 'Next steps:'
+puts '  1. Open each .xcodeproj (or the workspace) in Xcode'
+puts '  2. Xcode will resolve the SharedFrameworks local package automatically'
+puts '  3. Verify each target links SharedFrameworks under'
+puts '     Frameworks, Libraries, and Embedded Content'
