@@ -63,7 +63,7 @@ public struct AmityEventDetailPage: AmityPageView {
                 AmityEventInfoComponent(viewModel: viewModel)
                     .isHidden(currentTab != 0)
                 
-                AmityEventDiscussionFeedComponent(viewModel: viewModel)
+                AmityEventDiscussionFeedComponent(viewModel: viewModel, page: self)
                     .isHidden(currentTab != 1)
             }, onHeaderStateChange: { isCollapsed in
                 self.isHeaderCollapsed = isCollapsed

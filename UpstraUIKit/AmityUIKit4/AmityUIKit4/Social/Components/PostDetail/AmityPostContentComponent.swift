@@ -151,7 +151,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         }
                         
                         // If user posts to his own feed, we hide this part
-                        if post.postTargetType == .user && post.postedUserId != post.targetId {
+                        if post.postTargetType == .user && post.postedUserId != post.targetId && !hideTarget {
                             Image(AmityIcon.arrowIcon.getImageResource())
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
