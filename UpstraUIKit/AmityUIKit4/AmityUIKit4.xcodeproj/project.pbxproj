@@ -872,7 +872,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				7AE9C13B9164771CCD460EA4 /* SharedFrameworks */,
+				9835900E048A65E59E31DF8A /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -924,7 +924,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				4708377A57BE2A8614D83284 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				8186B74B5CFD7FD06BEE1C86 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1266,16 +1266,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		4708377A57BE2A8614D83284 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		8186B74B5CFD7FD06BEE1C86 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7AE9C13B9164771CCD460EA4 /* SharedFrameworks */ = {
+		9835900E048A65E59E31DF8A /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 4708377A57BE2A8614D83284 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 8186B74B5CFD7FD06BEE1C86 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */
