@@ -310,6 +310,16 @@ struct MediaAttachmentView: View {
         let imageExtension = media.localUrl?.pathExtension.lowercased() ?? ""
         let needsConversion = !allowedFormats.contains(imageExtension)
 
+        // Validate file size: reject images over 1 GB
+        let maxImageFileSize: Int64 = 1_073_741_824 // 1 GB
+        if let url = media.localUrl,
+           let fileSize = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+           Int64(fileSize) > maxImageFileSize {
+            media.state = .error
+            mediaViewModel.updateMediaState(media)
+            return
+        }
+
         // Set uploading state immediately before starting async upload
         media.state = .uploading(progress: 0)
         mediaViewModel.updateMediaState(media)
@@ -354,6 +364,15 @@ struct MediaAttachmentView: View {
     
     // Note: No need for conversion as png image is extracted from UIImage internally in SDK
     private func uploadImage(image: UIImage) {
+        // Validate file size: reject images over 1 GB
+        let maxImageFileSize: Int64 = 1_073_741_824 // 1 GB
+        if let imageData = image.jpegData(compressionQuality: 1.0),
+           Int64(imageData.count) > maxImageFileSize {
+            media.state = .error
+            mediaViewModel.updateMediaState(media)
+            return
+        }
+
         // Set uploading state immediately before starting async upload
         media.state = .uploading(progress: 0)
         mediaViewModel.updateMediaState(media)

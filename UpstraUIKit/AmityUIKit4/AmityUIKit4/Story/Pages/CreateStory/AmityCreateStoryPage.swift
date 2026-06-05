@@ -221,7 +221,6 @@ public struct AmityCreateStoryPage: AmityPageView {
                     .frame(width: 67, height: 67)
             }
             .frame(width: 72, height: 72)
-            .offset(x: 0, y: -32)
         }
         .buttonStyle(.plain)
         .overlay(
@@ -234,6 +233,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                 videoCaptureButtonSelected.toggle()
             })
         )
+        .offset(x: 0, y: -32)
         .onChange(of: videoCaptureButtonSelected) { isSelected in
             isSelected ? startRecordingVideo() : stopRecordingVideo()
         }

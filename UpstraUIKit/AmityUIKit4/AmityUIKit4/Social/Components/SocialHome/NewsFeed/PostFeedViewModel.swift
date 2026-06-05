@@ -57,6 +57,9 @@ class PostFeedViewModel: ObservableObject {
         /// Clear out recentlyCreatedPosts on fresh data loading
         recentlyCreatedPosts.removeAll()
         
+        /// Clear stale feed error so the UI reflects the new collection state
+        feedError = nil
+        
         let collection: AmityCollection<AmityPost>
         
         var paginatorCommunityId: String? = nil

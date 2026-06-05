@@ -443,11 +443,15 @@ final class AmityUIKitManagerInternal: NSObject {
                                sessionHandler: SessionHandler) async throws {
         
         try await client.loginAsVisitor(authSignature: authSignature, authSignatureExpiresAt: authSignatureExpiresAt, sessionHandler: sessionHandler)
+        // Subscribe to visitor usage-limit events. SDK only emits for visitor/bot users.
+        AmityVisitorUsageLimitObserver.shared.start()
+        
         didUpdateClient()
     }
     
     func unregisterDevice() {
         AmityFileCache.shared.clearCache()
+        AmityVisitorUsageLimitObserver.shared.stop()
         self._client?.logout()
     }
     
@@ -520,7 +524,7 @@ final class AmityUIKitManagerInternal: NSObject {
         
         // Initialize AdEngine so that we can start fetching ad settings here
         let _ = AdEngine.shared
-        
+
         Task {
             await fetchShareableLinkConfig()
         }

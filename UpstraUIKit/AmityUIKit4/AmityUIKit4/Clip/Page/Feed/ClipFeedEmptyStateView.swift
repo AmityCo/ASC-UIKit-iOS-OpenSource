@@ -53,12 +53,14 @@ struct ClipFeedEmptyStateView: View {
                 .foregroundColor(.white)
                 .buttonStyle(AmityLineButtonStyle(viewConfig: viewConfig, size: .compact, vPadding: 10, borderColor: .white))
                 
-                Button {
-                    onTapAction?(.createCommunity)
-                } label: {
-                    Text(AmityLocalizedStringSet.Social.clipCreateCommunity.localizedString)
-                        .applyTextStyle(.bodyBold(Color.white))
-                        .padding(.bottom, 16)
+                if !AmityUIKitManagerInternal.shared.isGuestUser {
+                    Button {
+                        onTapAction?(.createCommunity)
+                    } label: {
+                        Text(AmityLocalizedStringSet.Social.clipCreateCommunity.localizedString)
+                            .applyTextStyle(.bodyBold(Color.white))
+                            .padding(.bottom, 16)
+                    }
                 }
             }
         }

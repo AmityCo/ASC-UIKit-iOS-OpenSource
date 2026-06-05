@@ -8,6 +8,7 @@
 import AmitySDK
 import SwiftUI
 
+@available(*, deprecated, message: "This navigation behavior is depracated & is no longer in use.")
 open class AmityLivestreamBehavior {
     
     public init() {}

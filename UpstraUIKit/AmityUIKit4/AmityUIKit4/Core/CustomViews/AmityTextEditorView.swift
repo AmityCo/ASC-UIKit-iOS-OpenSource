@@ -201,9 +201,8 @@ public struct AmityTextEditorView: View {
                                                 .padding([.top, .bottom], 10)
                                                 .contentShape(Rectangle())
                                                 .onTapGesture {
-                                                    let indexPath = IndexPath(row: index, section: 0)
-                                                    viewModel.mentionManager.addMention(from: viewModel.textView, in: viewModel.textView.text, at: indexPath)
-                                                    
+                                                    viewModel.selectMentionUser(user: user)
+
                                                     self.text = viewModel.textView.text
                                                     mentionData.metadata = viewModel.mentionManager.getMetadata()
                                                     mentionData.mentionee = viewModel.mentionManager.getMentionees()
@@ -240,6 +239,11 @@ public struct AmityTextEditorView: View {
             }
         }
         .frame(height: textEditorHeight)
+        .alert(isPresented: $viewModel.reachMentionLimit) {
+            Alert(title: Text(AmityLocalizedStringSet.Social.reachMentionLimitTitle.localizedString),
+                  message: Text(AmityLocalizedStringSet.Social.reachMentionLimitMessage.localizedString),
+                  dismissButton: .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString)))
+        }
     }
     
     

@@ -74,6 +74,8 @@ public enum PageId: String {
     case upcomingEventsPage = "upcoming_events_page"
     case pastEventsPage = "past_events_page"
     case eventAttendeesPage = "event_attendees_page"
+
+    case visitorUsageLimitPage = "visitor_usage_limit_page"
 }
 
 public enum ComponentId: String {

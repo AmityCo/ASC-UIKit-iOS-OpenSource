@@ -56,7 +56,7 @@ struct AmityEventPageContainer: View {
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
-            .padding(.top, isGuestUser ? 0 : 8)
+            .padding(.top, isGuestUser ? -16 : 8)
         }
         .updateTheme(with: viewConfig)
     }

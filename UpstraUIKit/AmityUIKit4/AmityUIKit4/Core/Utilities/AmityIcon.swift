@@ -128,6 +128,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case mediaUploadErrorIcon = "mediaUploadErrorIcon"
     case starIcon = "starIcon"
     case infoIcon = "infoIcon"
+    case amityIcWarningDocument = "amityIcWarningDocument"
     case adAvatarPlaceholder = "adAvatarPlaceholder"
     case upArrowIcon = "upArrowIcon"
     case communityProfilePlaceholder = "communityProfilePlaceholder"

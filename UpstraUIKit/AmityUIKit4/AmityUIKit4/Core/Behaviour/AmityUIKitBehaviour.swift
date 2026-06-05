@@ -124,4 +124,20 @@ open class AmityGlobalBehavior {
         browserVC.modalPresentationStyle = .pageSheet
         UIApplication.topViewController()?.present(browserVC, animated: true)
     }
+
+    open func handleVisitorUsageLimitReached() {
+        DispatchQueue.main.async {
+            guard let topVC = UIApplication.topViewController(),
+                  !(topVC is AmitySwiftUIHostingController<AmityVisitorUsageLimitPage>) else { return }
+
+            let host = AmitySwiftUIHostingController(rootView: AmityVisitorUsageLimitPage())
+            host.modalPresentationStyle = .fullScreen
+            host.isModalInPresentation = true
+            topVC.present(host, animated: false)
+        }
+    }
+
+    open func handleVisitorUsageLimitSignIn() {
+        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.visitorUsageLimitToast.localizedString)
+    }
 }

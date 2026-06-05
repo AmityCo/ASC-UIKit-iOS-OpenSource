@@ -142,6 +142,21 @@ struct LiveStreamConferenceView: View {
                                         showProductTagSheet = false
                                     },
                                     onAddProducts: {
+                                        // Re-check co-host product-tag permission. Guards against the host
+                                        // revoking "Allow co-host to manage product tags" while the co-host
+                                        // has the manage sheet open (PDT-2563).
+                                        if viewModel.participantRole == .coHost && !viewModel.isCoHostManageProductTagEnable {
+                                            UIApplication.topViewController()?.dismiss(animated: true) {
+                                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                                    liveStreamAlert.show(for: .coHostProductTagRevoked(action: {
+                                                        LiveStreamAlert.shared.hide()
+                                                    }))
+                                                }
+                                            }
+                                            showProductTagSheet = false
+                                            return
+                                        }
+
                                         previousProductCount = manageVM.taggedProducts.count
                                         let productSelectionComponent = AmityProductTagSelectionComponent(
                                             pageId: .createLivestreamPage,

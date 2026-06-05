@@ -1288,3 +1288,9 @@
 "amity_social_member_removed_toast" = "นำสมาชิกออกจากชุมชนนี้แล้ว";
 "community_add_member_failed_toast" = "ไม่สามารถเพิ่มสมาชิกในชุมชนนี้ได้ กรุณาลองใหม่อีกครั้ง";
 "amity_social_upload_image_failed" = "ไม่สามารถอัปโหลดรูปภาพได้ กรุณาลองใหม่อีกครั้ง";
+
+// Visitor Usage Limit
+"amity_social_visitor_limit_title" = "คุณใช้งานถึงขีดจำกัดรายวันแล้ว";
+"amity_social_visitor_limit_subtitle" = "สร้างบัญชีหรือเข้าสู่ระบบเพื่อสำรวจชุมชนต่อ";
+"amity_social_visitor_limit_sign_in" = "เข้าสู่ระบบ";
+"amity_social_visitor_limit_toast" = "สร้างบัญชีหรือเข้าสู่ระบบเพื่อใช้งานต่อ";

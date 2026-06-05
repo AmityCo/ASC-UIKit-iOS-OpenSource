@@ -198,6 +198,18 @@ public struct AmityPostComposerPage: AmityPageView {
                             host.controller?.present(alert, animated: true)
                         }
                     }
+                    .onChange(of: textEditorViewModel.reachMentionLimit) { reached in
+                        if reached {
+                            let alert = UIAlertController(
+                                title: AmityLocalizedStringSet.Social.reachMentionLimitTitle.localizedString,
+                                message: AmityLocalizedStringSet.Social.reachMentionLimitMessage.localizedString,
+                                preferredStyle: .alert
+                            )
+                            alert.addAction(UIAlertAction(title: AmityLocalizedStringSet.Chat.okButton.localizedString, style: .cancel))
+                            host.controller?.present(alert, animated: true)
+                            textEditorViewModel.reachMentionLimit = false
+                        }
+                    }
                     
                     if let link = viewModel.previewedLink, !viewModel.didRemoveLinkPreview, mediaAttatchmentViewModel.medias.isEmpty {
                         PreviewLinkView(viewModel: self.viewModel.previewLinkViewModel)

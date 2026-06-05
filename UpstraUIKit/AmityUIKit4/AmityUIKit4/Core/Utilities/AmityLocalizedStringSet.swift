@@ -222,6 +222,8 @@ public struct AmityLocalizedStringSet {
     
     public enum Social {
         static let keepEditing = "amity_social_button_keep_editing"
+        static let reachMentionLimitTitle = "social_reach_mention_limit_title"
+        static let reachMentionLimitMessage = "social_reach_mention_limit_message"
         static let emptyNewsFeedDescription = "amity_social_label_find_community_or_create_your_own"
         static let editPostBottomSheetTitle = "edit_post_bottom_sheet_title"
         static let deletePostBottomSheetTitle = "delete_post_bottom_sheet_title"
@@ -527,6 +529,7 @@ public struct AmityLocalizedStringSet {
         static let productTagToastUnpinFailed = "product_tag_toast_unpin_failed"
         static let productTagToastRemoved = "product_tag_toast_removed"
         static let productTagToastCoHostManageEnabled = "product_tag_toast_cohost_manage_enabled"
+        static let productTagCoHostRevokedMessage = "product_tag_cohost_revoked_message"
         static let productTagSelectionDiscardTitle = "product_tag_selection_discard_title"
         static let productTagSelectionDiscardMessage = "product_tag_selection_discard_message"
         static let productTagDiscardTitle = "product_tag_discard_title"
@@ -1253,5 +1256,11 @@ public struct AmityLocalizedStringSet {
         static let snackbarStoryShared = "amity_social_toast_snackbar_story_shared"
         static let updateCohostPermissionFailed = "amity_social_toast_update_cohost_permission_failed"
         static let acceptInvite = "amity_social_button_accept_invite"
+        
+        // Visitor Usage Limit
+        static let visitorUsageLimitTitle = "amity_social_visitor_limit_title"
+        static let visitorUsageLimitSubtitle = "amity_social_visitor_limit_subtitle"
+        static let visitorUsageLimitSignIn = "amity_social_visitor_limit_sign_in"
+        static let visitorUsageLimitToast = "amity_social_visitor_limit_toast"
     }
 }

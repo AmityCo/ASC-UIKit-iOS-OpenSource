@@ -240,7 +240,11 @@ class MediaFeedViewModel: ObservableObject {
     }
     
     func processMedias(posts: [AmityPost]) {
-        let allItems = posts.flatMap { post -> [AmityMedia] in
+        // Exclude posts pending admin review (or otherwise not yet published) —
+        // their media must not appear in the user/community media gallery.
+        let publishedPosts = posts.filter { $0.getFeedType() == .published }
+
+        let allItems = publishedPosts.flatMap { post -> [AmityMedia] in
             let model = AmityPostModel(post: post)
             return model.medias
         }

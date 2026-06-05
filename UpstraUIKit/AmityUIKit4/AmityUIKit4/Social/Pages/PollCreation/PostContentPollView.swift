@@ -90,12 +90,10 @@ struct PostContentPollView: View {
                     if poll.isImagePoll {
                         LazyVGrid(columns: columns, spacing: 8) {
                             ForEach(options, id: \.id) { answer in
-                                let isCommunityJoined = post.targetCommunity?.isJoined ?? true
-                                let isPollSelectionDisabled = isInPendingFeed || !isCommunityJoined
-                                PollVoteImageOptionView(mode: .vote, answer: answer, totalVote: 0, highestVote: 0, isSelected: selectedAnswers.contains(answer.id), allowMultiSelection: poll.canVoteMultipleOptions, isSelectionDisabled: isPollSelectionDisabled) {
-                                    
+                                PollVoteImageOptionView(mode: .vote, answer: answer, totalVote: 0, highestVote: 0, isSelected: selectedAnswers.contains(answer.id), allowMultiSelection: poll.canVoteMultipleOptions, isSelectionDisabled: isInPendingFeed) {
+
                                     guard !poll.isVoted || !poll.isClosed else { return }
-                                    
+
                                     selectAnswer(answer: answer)
                                 } onExpand: {
                                     openImageInMediaViewer(answer: answer)
@@ -105,12 +103,9 @@ struct PostContentPollView: View {
 //                        .transition(.opacity.combined(with: .scale))
                     } else {
                         ForEach(options) { answer in
-                            
-                            let isCommunityJoined = post.targetCommunity?.isJoined ?? true
-                            let isPollSelectionDisabled = isInPendingFeed || !isCommunityJoined
                             PollVoteTextOptionView(title: answer.text, isSelected: selectedAnswers.contains(answer.id), allowMultiSelection: poll.canVoteMultipleOptions, onSelection: {
                                 guard !poll.isVoted || !poll.isClosed else { return }
-                                
+
                                 selectAnswer(answer: answer)
                             })
                         }

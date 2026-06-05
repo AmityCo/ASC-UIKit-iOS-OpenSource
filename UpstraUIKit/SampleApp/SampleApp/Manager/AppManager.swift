@@ -26,7 +26,9 @@ class AppManager {
     }
     
     private var isUserRegistered: Bool {
-        return UserDefaults.standard.value(forKey: UserDefaultsKey.userId) != nil
+        guard let userId = UserDefaults.standard.value(forKey: UserDefaultsKey.userId) as? String else { return false }
+        // Visitors are not auto-restored on relaunch — they must re-enter via the register screen.
+        return !userId.hasPrefix("visitor")
     }
     
     // MARK: - AmityUIKit setup
@@ -47,8 +49,9 @@ class AppManager {
             AmityUIKitManager.set(theme: preset.theme)
         }
         
-        // if user has logged in previosly, register the user automatically.
-        if let currentUserId = UserDefaults.standard.value(forKey: UserDefaultsKey.userId) as? String {
+        // If a non-visitor user has logged in previously, register them automatically.
+        // Visitors are intentionally NOT auto-restored — they must re-enter via the register screen.
+        if isUserRegistered, let currentUserId = UserDefaults.standard.value(forKey: UserDefaultsKey.userId) as? String {
             register(withUserId: currentUserId)
         }
         
@@ -67,6 +70,8 @@ class AppManager {
         
         let livestreamBehavior = CustomV4LivestreamBehavior()
         AmityUIKit4Manager.behaviour.livestreamBehavior = livestreamBehavior
+
+        AmityUIKit4Manager.behaviour.globalBehavior = CustomV4GlobalBehavior()
         #endif
 
         // Disable swipe to back gesture behavior
@@ -184,6 +189,17 @@ class AppManager {
 
 
 #if canImport(AmityUIKit4)
+
+class CustomV4GlobalBehavior: AmityGlobalBehavior {
+
+    override func handleVisitorUsageLimitSignIn() {
+        Toast.showToast(style: .warning, message: "Create an account or sign in to continue.")
+        // Tear down the visitor session and route the user to the starting page
+        // (RegisterNavigationController). `AppManager.unregister()` already does
+        // logout, clears UserDefaults, and swaps the rootViewController.
+        AppManager.shared.unregister()
+    }
+}
 
 class CustomV4LivestreamBehavior: AmityLivestreamBehavior {
     

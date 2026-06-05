@@ -313,31 +313,33 @@ extension AmityCommunityProfilePage {
         .padding(.bottom, 8)
         .bottomSheet(isShowing: $showCreateBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             VStack(spacing: 0) {
-                BottomSheetItemView(icon: AmityIcon.createPostMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
-                    .onTapGesture {
-                        showCreateBottomSheet.toggle()
-                        host.controller?.dismiss(animated: false)
-                        let context = AmityCommunityProfilePageBehavior.Context(page: self)
-                        AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostComposerPage(context: context, community: viewModel.community)
-                    }
-                
-                BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
-                    .onTapGesture {
-                        showCreateBottomSheet.toggle()
-                        host.controller?.dismiss(animated: false)
-                        
-                        showPollSelectionView.toggle()
-                    }
-                
-                BottomSheetItemView(icon: AmityIcon.createLivestreamMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.liveStreamLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
-                    .onTapGesture {
-                        showCreateBottomSheet.toggle()
-                        host.controller?.dismiss(animated: false)
-                        
-                        let context = AmityCommunityProfilePageBehavior.Context(page: self)
-                        AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToLivestreamPostComposerPage(context: context, community: viewModel.community)
-                    }
-                
+                if viewModel.hasCreatePostPermission {
+                    BottomSheetItemView(icon: AmityIcon.createPostMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
+                        .onTapGesture {
+                            showCreateBottomSheet.toggle()
+                            host.controller?.dismiss(animated: false)
+                            let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostComposerPage(context: context, community: viewModel.community)
+                        }
+
+                    BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
+                        .onTapGesture {
+                            showCreateBottomSheet.toggle()
+                            host.controller?.dismiss(animated: false)
+
+                            showPollSelectionView.toggle()
+                        }
+
+                    BottomSheetItemView(icon: AmityIcon.createLivestreamMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.liveStreamLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
+                        .onTapGesture {
+                            showCreateBottomSheet.toggle()
+                            host.controller?.dismiss(animated: false)
+
+                            let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToLivestreamPostComposerPage(context: context, community: viewModel.community)
+                        }
+                }
+
                 // Story
                 if viewModel.hasStoryManagePermission {
                     BottomSheetItemView(icon: AmityIcon.createStoryMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.createStoryBottomSheetTitle.localizedString)
@@ -348,15 +350,17 @@ extension AmityCommunityProfilePage {
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToCreateStoryPage(context: context, community: viewModel.community)
                         }
                 }
-                
-                BottomSheetItemView(icon: AmityIcon.createClipMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.postMenuTypeClip.localizedString, iconSize: CGSize(width: 20, height: 20))
-                    .onTapGesture {
-                        showCreateBottomSheet.toggle()
-                        host.controller?.dismiss(animated: false)
-                        let context = AmityCommunityProfilePageBehavior.Context(page: self)
-                        AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToClipComposerPage(context: context, community: viewModel.community)
-                    }
-                
+
+                if viewModel.hasCreatePostPermission {
+                    BottomSheetItemView(icon: AmityIcon.createClipMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.postMenuTypeClip.localizedString, iconSize: CGSize(width: 20, height: 20))
+                        .onTapGesture {
+                            showCreateBottomSheet.toggle()
+                            host.controller?.dismiss(animated: false)
+                            let context = AmityCommunityProfilePageBehavior.Context(page: self)
+                            AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToClipComposerPage(context: context, community: viewModel.community)
+                        }
+                }
+
                 if viewModel.hasCreateEventPermission {
                     BottomSheetItemView(icon: AmityIcon.createEventMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.postMenuTypeEvent.localizedString, iconSize: CGSize(width: 20, height: 20))
                         .onTapGesture {
@@ -382,7 +386,7 @@ extension AmityCommunityProfilePage {
             })
             .environmentObject(viewConfig)
         })
-        .isHidden(!viewModel.hasCreatePostPermission)
+        .isHidden(!(viewModel.hasCreatePostPermission || viewModel.hasStoryManagePermission))
         
     }
     

@@ -311,7 +311,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				55E455FA8FC5B249CCE590CD /* SharedFrameworks */,
+				E22A068239158B1A30741992 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -388,7 +388,7 @@
 			mainGroup = B78DA46C24BED7D300EE902B;
 			packageReferences = (
 				92DBE89F2ACA98BB007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				EB40B152ABBAD90637F9C57D /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				DA389FE87A2DF8A40BDBCDFB /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			productRefGroup = B78DA47624BED7D300EE902B /* Products */;
 			projectDirPath = "";
@@ -895,7 +895,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		EB40B152ABBAD90637F9C57D /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		DA389FE87A2DF8A40BDBCDFB /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
@@ -921,15 +921,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		55E455FA8FC5B249CCE590CD /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = EB40B152ABBAD90637F9C57D /* XCLocalSwiftPackageReference "SharedFrameworks" */;
-			productName = SharedFrameworks;
-		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		E22A068239158B1A30741992 /* SharedFrameworks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DA389FE87A2DF8A40BDBCDFB /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

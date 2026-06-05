@@ -25,6 +25,7 @@ class LiveStreamAlert: ObservableObject {
         case streamEndedDueToMaxDuration(action: AlertAction)
         case streamDiscard(action: AlertAction)
         case disableCoHostProductTag(action: AlertAction)
+        case coHostProductTagRevoked(action: AlertAction)
         case productTaggingDisabled(action: AlertAction)
         case productTaggingUnavailableWhileStreaming(action: AlertAction)
         case streamError
@@ -48,6 +49,8 @@ class LiveStreamAlert: ObservableObject {
                 AmityLocalizedStringSet.Social.liveStreamAlertDiscardStreamTitle.localizedString
             case .disableCoHostProductTag:
                 AmityLocalizedStringSet.Social.productTagDisableCoHostTitle.localizedString
+            case .coHostProductTagRevoked:
+                AmityLocalizedStringSet.Social.productTagUnavailableTitle.localizedString
             case .productTaggingDisabled:
                 AmityLocalizedStringSet.Social.productTagUnavailableTitle.localizedString
             case .productTaggingUnavailableWhileStreaming:
@@ -77,6 +80,8 @@ class LiveStreamAlert: ObservableObject {
                 AmityLocalizedStringSet.Social.liveStreamAlertDiscardStreamMessage.localizedString
             case .disableCoHostProductTag:
                 AmityLocalizedStringSet.Social.productTagDisableCoHostMessage.localizedString
+            case .coHostProductTagRevoked:
+                AmityLocalizedStringSet.Social.productTagCoHostRevokedMessage.localizedString
             case .productTaggingDisabled:
                 AmityLocalizedStringSet.Social.productTagUnavailableWhileStreamingMessage.localizedString
             case .productTaggingUnavailableWhileStreaming:
@@ -132,6 +137,8 @@ class LiveStreamAlert: ObservableObject {
             case .streamEndedDueToMaxDuration(let action):
                 return .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString), action: action)
             case .productTaggingUnavailableWhileStreaming(let action):
+                return .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString), action: action)
+            case .coHostProductTagRevoked(let action):
                 return .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString), action: action)
             default:
                 return nil

@@ -236,6 +236,18 @@ public struct AmityPollPostComposerPage: AmityPageView {
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .showToast(isPresented: $isToastVisible, style: .warning, message: pollPostErrorMessage, bottomPadding: 24)
+        .onChange(of: editorViewModel.reachMentionLimit) { reached in
+            if reached {
+                let alert = UIAlertController(
+                    title: AmityLocalizedStringSet.Social.reachMentionLimitTitle.localizedString,
+                    message: AmityLocalizedStringSet.Social.reachMentionLimitMessage.localizedString,
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: AmityLocalizedStringSet.Chat.okButton.localizedString, style: .cancel))
+                host.controller?.present(alert, animated: true)
+                editorViewModel.reachMentionLimit = false
+            }
+        }
     }
     
     @ViewBuilder

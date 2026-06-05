@@ -147,6 +147,8 @@
 
 "reach_mention_limit_title" = "Unable to mention user";
 "chat_reach_mention_limit_Message" = "You have reached maximum 30 mentioned users in a chat.";
+"social_reach_mention_limit_title" = "Too many users mentioned";
+"social_reach_mention_limit_message" = "You can only mention up to 30 users.";
 "ads_sponsored_label" = "Sponsored";
 "community_setup_alert_title" = "Leave without finishing?";
 "community_setup_alert_message" = "Your progress won’t be saved and your community won’t be created.";
@@ -845,7 +847,7 @@
 "amity_social_banned_title" = "You've been banned.";
 "amity_social_banned_message" = "Based on your previous activities, your account has been banned from all feeds.";
 "amity_social_error_post_text_exceed_error_message" = "Your post wasn't posted because it exceeds the %d characters limit";
-"amity_social_error_post_ban_word_error_message" = "Your post wasn't posted because it contains a blocked word.";
+"amity_social_error_post_ban_word_error_message" = "Your post wasn't posted as it contains an inappropriate word.";
 "amity_social_error_post_link_not_allowed_error_message" = "Your post wasn't posted because it contains a link that's not allowed.";
 
 // Social - User Profile
@@ -1286,3 +1288,10 @@
 
 
 "amity_social_button_accept_invite" = "Accept";
+"product_tag_cohost_revoked_message" = "You can no longer manage tagged products in this live stream. Any tagged products have been removed and won't be shown to viewers.";
+
+// Visitor Usage Limit
+"amity_social_visitor_limit_title" = "You've reached your daily limit.";
+"amity_social_visitor_limit_subtitle" = "Create an account or sign in to keep exploring the community.";
+"amity_social_visitor_limit_sign_in" = "Sign in";
+"amity_social_visitor_limit_toast" = "Create an account or sign in to continue.";

@@ -19,10 +19,7 @@ open class AmitySocialHomeTopNavigationComponentBehavior {
     
     public init() {}
     
-    private func goToCommunitySetupPage() {
-        
-    }
-    
+    @available(*, deprecated, message: "Use `goToCommunitySetupPage(context:)` from `AmityMyCommunitiesComponentBehavior` instead.")
     open func goToCreateCommunityPage(context: AmitySocialHomeTopNavigationComponentBehavior.Context) {
         let page = AmityCommunitySetupPage(mode: .create)
         let vc = AmitySwiftUIHostingController(rootView: page)

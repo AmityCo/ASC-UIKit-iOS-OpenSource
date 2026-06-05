@@ -77,7 +77,7 @@ struct NotificationTrayItemView: View {
             Color(
                 item.isSeen
                 ? viewConfig.theme.backgroundColor
-                : viewConfig.theme.primaryColor.blend(.shade4)))
+                : viewConfig.theme.primaryColor.blend(.shade3)))
     }
 }
 

@@ -45,8 +45,8 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
             contentView
             
             // Error View
-            PostDetailEmptyStateView(action: { host.controller?.dismiss(animated: true) })
-                .visibleWhen(!viewModel.isLoading && (viewModel.room?.status == .ended || viewModel.room?.status == .recorded || viewModel.room?.status == .terminated) && displayErrorIfEnded)
+            PostDetailEmptyStateView(action: { host.controller?.dismissOrPop() })
+                .visibleWhen(!viewModel.isLoading && (viewModel.loadingFailed || ((viewModel.room?.status == .ended || viewModel.room?.status == .recorded || viewModel.room?.status == .terminated) && displayErrorIfEnded)))
         }
         .onAppear {
             Task {

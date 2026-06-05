@@ -256,6 +256,7 @@ public class CommunityProfileViewModel: ObservableObject {
             self.joinStatus = .requested
         case .success:
             self.joinStatus = .joined
+            self.refreshFeed()
         default:
             break
         }

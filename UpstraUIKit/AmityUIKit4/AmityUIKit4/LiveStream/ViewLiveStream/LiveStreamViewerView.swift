@@ -200,6 +200,8 @@ struct LiveStreamViewerView: View {
                     
                     if viewModel.post.feedType == .reviewing {
                         inPostReviewComposeBar
+                    } else if AmityUIKitManagerInternal.shared.isGuestUser {
+                        liveChatComposeBar
                     } else if viewModel.post.targetCommunity?.isJoined == false {
                         joinCommunityComposeBar
                     } else {

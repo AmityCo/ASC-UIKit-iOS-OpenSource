@@ -155,20 +155,17 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                             {
                                 do {
                                     try await invitation.reject()
-                                    if community.isPublic {
-                                        communityProifleViewModel?.refreshFeed()
-                                    } else {
-                                        host.controller?.navigationController?.popViewController(
-                                            animated: true)
-                                    }
+                                    // Stay on the community profile page for both public and private communities.
+                                    // Clear the invitation banner and reset join status so the [Join] button appears.
+                                    communityProifleViewModel?.pendingCommunityInvitation = nil
+                                    communityProifleViewModel?.joinStatus = .notJoined
                                     Toast.showToast(
                                         style: .success, message: AmityLocalizedStringSet.Social.communityInvitationDeclined.localizedString)
                                 } catch {
                                     if error.isAmityErrorCode(.business) {
-                                        if community.isPublic == false {
-                                            host.controller?.navigationController?
-                                                .popViewController(animated: true)
-                                        }
+                                        // Invitation already expired — clear the banner and stay on the page
+                                        communityProifleViewModel?.pendingCommunityInvitation = nil
+                                        communityProifleViewModel?.joinStatus = .notJoined
                                         Toast.showToast(
                                             style: .warning,
                                             message: AmityLocalizedStringSet.Social.communityInvitationExpired.localizedString)

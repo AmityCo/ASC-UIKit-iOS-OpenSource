@@ -18,7 +18,7 @@ public struct AmityUserRelationshipPage: AmityPageView {
     @State private var tabs: [String] = [AmityLocalizedStringSet.Social.userFollowingButton.localizedString, "Followers"]
     private let userId: String
     @StateObject private var viewModel: AmityUserRelationshipPageViewModel
-    @State private var showBottomSheet: (isShown: Bool, userId: String) = (false, "")
+    @State private var showBottomSheet: (isShown: Bool, userId: String, displayName: String) = (false, "", "")
     @State private var isSelectedUserReported: Bool = false
     
     public var id: PageId {
@@ -54,6 +54,7 @@ public struct AmityUserRelationshipPage: AmityPageView {
                 goToUserProfilePage(user.userId)
             }, menuButtonAction: { user in
                 showBottomSheet.userId = user.userId
+                showBottomSheet.displayName = user.displayName ?? ""
                 showBottomSheet.isShown.toggle()
             })
             .isHidden(tabIndex != 0)
@@ -62,6 +63,7 @@ public struct AmityUserRelationshipPage: AmityPageView {
                 goToUserProfilePage(user.userId)
             }, menuButtonAction: { user in
                 showBottomSheet.userId = user.userId
+                showBottomSheet.displayName = user.displayName ?? ""
                 showBottomSheet.isShown.toggle()
             })
             .isHidden(tabIndex != 1)
@@ -131,7 +133,7 @@ public struct AmityUserRelationshipPage: AmityPageView {
                     
                     AmityUserAction.perform(host: host) {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            showAlert(title: AmityLocalizedStringSet.Social.userBlockTitle.localizedString, message: String(format: AmityLocalizedStringSet.Social.userBlockMessageFormat.localizedString, viewModel.user?.displayName ?? ""), btnTitle: AmityLocalizedStringSet.Social.block.localizedString, btnAction: {
+                            showAlert(title: AmityLocalizedStringSet.Social.userBlockTitle.localizedString, message: String(format: AmityLocalizedStringSet.Social.userBlockMessageFormat.localizedString, showBottomSheet.displayName), btnTitle: AmityLocalizedStringSet.Social.block.localizedString, btnAction: {
                                 Task { @MainActor in
                                     do {
                                         try await viewModel.block(userId: showBottomSheet.userId)
