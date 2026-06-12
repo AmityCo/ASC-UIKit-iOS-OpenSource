@@ -191,7 +191,9 @@ public enum ElementId: String {
     case postCreationButton = "post_creation_button"
     case newsFeedButton = "newsfeed_button"
     case exploreButton = "explore_button"
-    case clipsButton = "clipsfeed_button"
+    case clipsFeedButton = "clipsfeed_button"
+    case clipsButton = "clips_button"
+    case eventsButton = "events_button"
     case myCommunitiesButton = "my_communities_button"
     
     // EmptyNewsFeed
@@ -246,6 +248,8 @@ public enum ElementId: String {
     case createStoryButton = "create_story_button"
     case createPollButton = "create_poll_button"
     case createLivestreamButton = "create_livestream_button"
+    case createClipButton = "create_clip_button"
+    case createEventButton = "create_event_button"
     
     // PostTargetSelectionPage
     case myTimelineAvatar = "my_timeline_avatar"

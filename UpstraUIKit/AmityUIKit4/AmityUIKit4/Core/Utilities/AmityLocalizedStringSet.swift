@@ -1054,6 +1054,8 @@ public struct AmityLocalizedStringSet {
         // Community Member Management - Toast
         static let communityProfileUpdateFailedToast = "community_profile_update_failed_toast"
         static let communityMemberRemovedToast = "community_member_removed_toast"
+        static let communityMemberRemoveLoadingToast = "community_member_remove_loading_toast"
+        static let communityMemberAddLoadingToast = "community_member_add_loading_toast"
         static let communityMemberReportedToast = "community_member_reported_toast"
         static let communityMemberUnreportedToast = "community_member_unreported_toast"
         static let communityMemberReportFailedToast = "community_member_report_failed_toast"

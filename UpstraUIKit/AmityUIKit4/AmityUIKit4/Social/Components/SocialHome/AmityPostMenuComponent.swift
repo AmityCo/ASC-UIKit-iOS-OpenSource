@@ -87,6 +87,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createPostButton))
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createPostButton)
                 case .story:
                     let createStoryButton = viewConfig.getConfig(elementId: .createStoryButton, key: "image", of: String.self) ?? ""
@@ -95,7 +96,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
-                        .isHidden(!allowAllUserToCreateStory)
+                        .isHidden(!allowAllUserToCreateStory || viewConfig.isHidden(elementId: .createStoryButton))
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createStoryButton)
                 case .poll:
                     let icon = AmityIcon.createPollMenuIcon
@@ -103,25 +104,28 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createPollButton))
                 case .liveStream:
                     let icon = AmityIcon.createLivestreamMenuIcon
                     getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeLiveStream.localizedString)
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createLivestreamButton))
                 case .clip:
                     let icon = AmityIcon.createClipMenuIcon
                     getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeClip.localizedString, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createClipButton))
                 case .event:
                     let icon = AmityIcon.createEventMenuIcon
                     getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeEvent.localizedString, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
-                        .isHidden(!viewModel.hasCreateEventPermission)
+                        .isHidden(!viewModel.hasCreateEventPermission || viewConfig.isHidden(elementId: .createEventButton))
                 }
             }
         }

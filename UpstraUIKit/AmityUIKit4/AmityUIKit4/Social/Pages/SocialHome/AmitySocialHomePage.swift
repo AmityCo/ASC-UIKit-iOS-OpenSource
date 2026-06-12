@@ -47,8 +47,7 @@ public struct AmitySocialHomePage: AmityPageView {
             
             SocialHomePageTabView($viewModel.selectedTab, onSelection: { tab in
                 if tab == .clips {
-                    let feedPage = AmityClipFeedPage(provider: GlobalFeedClipService()) { action in
-                        
+                    let clipFeedAction: (ClipFeedAction) -> Void = { action in
                         switch action {
                         case .exploreCommunity:
                             self.host.controller?.navigationController?.popViewController(animated: true)
@@ -57,17 +56,16 @@ public struct AmitySocialHomePage: AmityPageView {
                             }
                         case .createCommunity:
                             self.host.controller?.navigationController?.popViewController(animated: false)
-                            
+
                             let page = AmityCommunitySetupPage(mode: .create)
                             let vc = AmitySwiftUIHostingController(rootView: page)
                             host.controller?.navigationController?.pushViewController(vc, animation: .presentation)
                         default:
                             break
                         }
-                        
                     }
-                    let vc = AmitySwiftUIHostingController(rootView: feedPage)
-                    host.controller?.navigationController?.pushViewController(vc, animated: true)
+                    let context = AmitySocialHomePageBehavior.Context(page: self, clipFeedAction: clipFeedAction)
+                    AmityUIKitManagerInternal.shared.behavior.socialHomePageBehavior?.goToClipFeedPage(context: context)
                 }
             })
             .frame(height: 62)

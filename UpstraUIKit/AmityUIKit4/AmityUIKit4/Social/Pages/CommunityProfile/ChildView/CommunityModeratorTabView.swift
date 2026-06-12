@@ -45,6 +45,9 @@ struct CommunityModeratorTabView: View {
                     }
                 }
             }
+            .onAppear {
+                viewModel.getModerators()
+            }
         }
         .environmentObject(viewConfig)
     }
@@ -65,11 +68,12 @@ class CommunityModeratorTabViewModel: ObservableObject {
         getModerators()
     }
     
-    private func getModerators() {
+    func getModerators() {
         memberCollection = nil
         cancellable = nil
         memberCollection = community.membership.getMembers(filter: .member, roles: [AmityCommunityRole.communityModerator.rawValue], sortBy: .lastCreated)
         cancellable = memberCollection?.$snapshots
+            .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] members in
                 self?.communityMembers = members
             })

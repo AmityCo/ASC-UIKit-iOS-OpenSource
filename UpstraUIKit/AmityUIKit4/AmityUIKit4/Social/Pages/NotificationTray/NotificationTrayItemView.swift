@@ -73,11 +73,25 @@ struct NotificationTrayItemView: View {
                 .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
         }
         .padding(16)
-        .background(
-            Color(
-                item.isSeen
-                ? viewConfig.theme.backgroundColor
-                : viewConfig.theme.primaryColor.blend(.shade3)))
+        .background(unreadRowBackground)
+    }
+
+    /// Background tint for the row. Read rows use the theme background.
+    /// Unread rows use a theme-aware highlight:
+    ///   - Light mode keeps the legacy `primaryColor.blend(.shade3)` (a light blue) so
+    ///     the visual is unchanged.
+    ///   - Dark mode uses `primaryColor` at low opacity instead — `.blend(.shade3)` only
+    ///     increases lightness, producing a near-white background that makes the row
+    ///     text unreadable on dark themes (PDT-3250).
+    @ViewBuilder
+    private var unreadRowBackground: some View {
+        if item.isSeen {
+            Color(viewConfig.theme.backgroundColor)
+        } else if viewConfig.currentStyle == .dark {
+            Color(viewConfig.theme.primaryColor).opacity(0.15)
+        } else {
+            Color(viewConfig.theme.primaryColor.blend(.shade3))
+        }
     }
 }
 

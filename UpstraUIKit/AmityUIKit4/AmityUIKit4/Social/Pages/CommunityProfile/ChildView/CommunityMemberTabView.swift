@@ -14,19 +14,21 @@ struct CommunityMemberTabView: View {
     @StateObject private var viewModel: CommunityMemberTabViewModel
     private let onTapAction: (AmityCommunityMember) -> Void
     private let onMenuAction: (AmityCommunityMember) -> Void
-    
-    init(viewConfig: AmityViewConfigController, community: AmityCommunity, onTapAction: @escaping (AmityCommunityMember) -> Void, onMenuAction: @escaping (AmityCommunityMember) -> Void) {
+    @Binding private var refreshTrigger: Int
+
+    init(viewConfig: AmityViewConfigController, community: AmityCommunity, refreshTrigger: Binding<Int> = .constant(0), onTapAction: @escaping (AmityCommunityMember) -> Void, onMenuAction: @escaping (AmityCommunityMember) -> Void) {
         self.viewConfig = viewConfig
         self._viewModel = StateObject(wrappedValue: CommunityMemberTabViewModel(community: community))
+        self._refreshTrigger = refreshTrigger
         self.onTapAction = onTapAction
         self.onMenuAction = onMenuAction
     }
-    
+
     var body: some View {
         VStack(spacing: 12) {
             searchMemberView
                 .padding([.leading, .trailing], 16)
-            
+
             ScrollView {
                 LazyVStack(spacing: 16) {
                     if viewModel.loadingStatus == .loading && viewModel.communityMembers.isEmpty {
@@ -50,6 +52,11 @@ struct CommunityMemberTabView: View {
             }
         }
         .environmentObject(viewConfig)
+        .onChange(of: refreshTrigger) { _ in
+            Task {
+                viewModel.searchMembers(viewModel.searchKeyword, isRefresh: true)
+            }
+        }
     }
     
     private var searchMemberView: some View {
@@ -83,6 +90,8 @@ class CommunityMemberTabViewModel: ObservableObject {
     private let community: AmityCommunity
     private var memberCollection: AmityCollection<AmityCommunityMember>?
     
+    var token: AmityNotificationToken?
+    
     init(community: AmityCommunity) {
         self.community = community
         
@@ -94,21 +103,21 @@ class CommunityMemberTabViewModel: ObservableObject {
             })
     }
     
-    private func searchMembers(_ keyword: String) {
+    func searchMembers(_ keyword: String, isRefresh: Bool = false) {
         memberCollection = nil
         cancellable = nil
-        
+
         if keyword.isEmpty {
             memberCollection = community.membership.getMembers(filter: .member, roles: [], sortBy: .displayName)
         } else {
             memberCollection = community.membership.searchMembers(keyword: keyword, filter: [.member], roles: [], sortBy: .displayName)
         }
         
-        cancellable = memberCollection?.$snapshots
-            .sink(receiveValue: { [weak self] members in
-                self?.communityMembers = members
-            })
-        
+        token = memberCollection?.observe { collection, error in
+            guard collection.dataStatus == .fresh else { return }
+            self.communityMembers = collection.snapshots
+        }
+
         loadingStatusCancellable = memberCollection?.$loadingStatus
             .sink(receiveValue: { [weak self] status in
                 self?.loadingStatus = status

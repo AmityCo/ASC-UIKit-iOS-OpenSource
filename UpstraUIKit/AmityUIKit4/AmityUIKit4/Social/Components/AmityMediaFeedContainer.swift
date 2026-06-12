@@ -60,7 +60,8 @@ struct AmityMediaFeedContainer: View {
                     ChipTabButton(title: AmityLocalizedStringSet.Social.socialHomeClipsTab.localizedString, selected: currentTab == .clips) {
                         currentTab = .clips
                     }
-                    
+                    .isHidden(isClipsChipHidden)
+
                     Spacer()
                 }
                 .padding(.top, 14)
@@ -105,6 +106,13 @@ struct AmityMediaFeedContainer: View {
         }
     }
     
+    /// The Clips chip in this container is scoped under the user_video_feed / community_video_feed component.
+    private var isClipsChipHidden: Bool {
+        let componentId: ComponentId = type == .user ? .userVideoFeed : .communityVideoFeed
+        let configId = "\(pageId?.rawValue ?? "*")/\(componentId.rawValue)/\(ElementId.clipsButton.rawValue)"
+        return AmityUIKitConfigController.shared.isExcluded(configId: configId)
+    }
+
     func handleDataChanges(tab: MediaFeedTab) {
         switch tab {
         case .photos:

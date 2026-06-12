@@ -21,6 +21,8 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     
     /// Members need to be invited if network setting is invitation mode
     @State private var isMembershipInvitationEnabled: Bool = false
+    @State private var hasEditMemberPermission: Bool = false
+    @State private var refreshTrigger = 0
     
     public var id: PageId {
         .communityMembershipPage
@@ -34,7 +36,6 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             self._isMembershipInvitationEnabled = State(initialValue: setting == .invitation)
         }
     }
-    
     
     public var body: some View {
         VStack(spacing: 12) {
@@ -56,7 +57,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             .padding([.leading, .trailing], 16)
             
             TabView(selection: $tabIndex) {
-                CommunityMemberTabView(viewConfig: viewConfig, community: community, onTapAction: { member in
+                CommunityMemberTabView(viewConfig: viewConfig, community: community, refreshTrigger: $refreshTrigger, onTapAction: { member in
                     goToUserProfilePage(member.userId)
                 }, onMenuAction: { member in
                     viewModel.communityMember = member
@@ -79,6 +80,11 @@ public struct AmityCommunityMembershipPage: AmityPageView {
         }
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
+            
+            let communityId = community.communityId
+            Task {
+                self.hasEditMemberPermission = await CommunityPermissionChecker.hasEditCommunityUserPermission(communityId: communityId)
+            }
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
@@ -93,8 +99,9 @@ public struct AmityCommunityMembershipPage: AmityPageView {
                 .scaledToFit()
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .frame(width: 22, height: 20)
+                .isHidden(!hasEditMemberPermission)
                 .onTapGesture {
-                    if isMembershipInvitationEnabled {
+                    if isMembershipInvitationEnabled && hasEditMemberPermission {
                         goToInviteMemberPage()
                     } else {
                         goToAddUserPage()
@@ -106,8 +113,17 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     @ViewBuilder
     func getBottomSheetView() -> some View {
         if let member = viewModel.communityMember {
-            CommunityMembershipBottomSheetView(showBottomSheet: $viewModel.showBottomSheet, community: community, communityMember: member)
-                .environmentObject(viewConfig)
+            CommunityMembershipBottomSheetView(showBottomSheet: $viewModel.showBottomSheet, community: community, communityMember: member, onMemberRemoved: {
+                
+                Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.communityMemberRemoveLoadingToast.localizedString)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                    refreshTrigger += 1
+
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberRemovedToast.localizedString)
+                }
+            })
+            .environmentObject(viewConfig)
         }
     }
     
@@ -116,7 +132,15 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             Task { @MainActor in
                 do {
                     let _ = try await community.membership.addMembers(users.map {$0.userId})
-                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMembershipAddSuccess.localizedString)
+                    
+                    Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.communityMemberAddLoadingToast.localizedString)
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
+                        refreshTrigger += 1
+
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMembershipAddSuccess.localizedString)
+                    }
+                    
                 } catch {
                     Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityMembershipAddFailed.localizedString)
                 }

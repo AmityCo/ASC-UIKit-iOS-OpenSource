@@ -410,16 +410,18 @@ public struct AmityUserProfilePage: AmityPageView {
                             AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToPostComposerPage(context: context)
                         }
                     }
-                
+                    .isHidden(viewConfig.isHidden(elementId: .createPostButton))
+
                 BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollLabel.localizedString)
                     .onTapGesture {
                         postCreationBottomSheet.toggle()
-                        
+
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                             showPollSelectionView.toggle()
                         }
                     }
-                
+                    .isHidden(viewConfig.isHidden(elementId: .createPollButton))
+
                 BottomSheetItemView(icon: AmityIcon.createLivestreamMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.liveStreamLabel.localizedString)
                     .onTapGesture {
                         postCreationBottomSheet.toggle()
@@ -428,16 +430,18 @@ public struct AmityUserProfilePage: AmityPageView {
                             AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToLivestreamPostComposerPage(context: context)
                         }
                     }
-                
+                    .isHidden(viewConfig.isHidden(elementId: .createLivestreamButton))
+
                 BottomSheetItemView(icon: AmityIcon.createClipMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.postMenuTypeClip.localizedString, iconSize: CGSize(width: 20, height: 20))
                     .onTapGesture {
                         postCreationBottomSheet.toggle()
-                        
+
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             let context = AmityUserProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.userProfilePageBehavior?.goToClipComposerPage(context: context)
                         }
                     }
+                    .isHidden(viewConfig.isHidden(elementId: .createClipButton))
             }
             .padding(.bottom, 32)
         }

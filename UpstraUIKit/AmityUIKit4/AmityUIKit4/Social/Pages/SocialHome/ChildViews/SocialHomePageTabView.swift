@@ -93,10 +93,14 @@ struct SocialHomePageTabView: View {
                     return nil
                 }
                 
-                if viewConfig.isHidden(elementId: .clipsButton) && item.tab == .clips {
+                if viewConfig.isHidden(elementId: .clipsFeedButton) && item.tab == .clips {
                     return nil
                 }
-                
+
+                if viewConfig.isHidden(elementId: .eventsButton) && item.tab == .events {
+                    return nil
+                }
+
                 return item
             })
         }
@@ -111,7 +115,7 @@ struct SocialHomePageTabView: View {
             let t = viewConfig.forElement(.exploreButton).text
             return (t?.isEmpty == false) ? t! : AmityLocalizedStringSet.Social.socialHomeExploreTab.localizedString
         case .clips:
-            let t = viewConfig.forElement(.clipsButton).text
+            let t = viewConfig.forElement(.clipsFeedButton).text
             return (t?.isEmpty == false) ? t! : AmityLocalizedStringSet.Social.socialHomeClipsTab.localizedString
         case .myCommunities:
             let t = viewConfig.forElement(.myCommunitiesButton).text

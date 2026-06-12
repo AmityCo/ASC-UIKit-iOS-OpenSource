@@ -32,7 +32,7 @@ public struct AmityInvitationSection: AmityComponentView {
             
             ForEach(Array(viewModel.invitations), id: \.invitationId) { invitation in
                 NotificationTrayInvitationItemView(invitation: invitation)
-                    .background(Color(invitation.isSeen() ? viewConfig.theme.backgroundColor : viewConfig.theme.primaryColor.blend(.shade3)))
+                    .background(unreadBackground(isSeen: invitation.isSeen()))
                     .onTapGesture {
                         invitation.markAsSeen()
                         goToCommunityProfilePage(communityId: invitation.targetId)
@@ -45,6 +45,24 @@ public struct AmityInvitationSection: AmityComponentView {
         let page = AmityCommunityProfilePage(communityId: communityId)
         let vc = AmitySwiftUIHostingController(rootView: page)
         host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
+
+    /// Background tint for the invitation row. Read rows use the theme background.
+    /// Unread rows use a theme-aware highlight:
+    ///   - Light mode keeps the legacy `primaryColor.blend(.shade3)` (a light blue) so
+    ///     the visual is unchanged.
+    ///   - Dark mode uses `primaryColor` at low opacity instead — `.blend(.shade3)` only
+    ///     increases lightness, producing a near-white background that makes the row
+    ///     text unreadable on dark themes (PDT-3250).
+    @ViewBuilder
+    private func unreadBackground(isSeen: Bool) -> some View {
+        if isSeen {
+            Color(viewConfig.theme.backgroundColor)
+        } else if viewConfig.currentStyle == .dark {
+            Color(viewConfig.theme.primaryColor).opacity(0.15)
+        } else {
+            Color(viewConfig.theme.primaryColor.blend(.shade3))
+        }
     }
 }
 

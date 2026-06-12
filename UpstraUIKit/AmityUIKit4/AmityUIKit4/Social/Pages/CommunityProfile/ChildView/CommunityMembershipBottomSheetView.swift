@@ -12,10 +12,12 @@ struct CommunityMembershipBottomSheetView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     @Binding private var showBottomSheet: Bool
     @StateObject private var viewModel: CommunityMembershipBottomSheetViewModel
-    
-    init(showBottomSheet: Binding<Bool>, community: AmityCommunity, communityMember: AmityCommunityMember) {
+    private let onMemberRemoved: (() -> Void)?
+
+    init(showBottomSheet: Binding<Bool>, community: AmityCommunity, communityMember: AmityCommunityMember, onMemberRemoved: (() -> Void)? = nil) {
         self._showBottomSheet = showBottomSheet
         self._viewModel = StateObject(wrappedValue: CommunityMembershipBottomSheetViewModel(community, communityMember))
+        self.onMemberRemoved = onMemberRemoved
     }
     
     var body: some View {
@@ -80,7 +82,7 @@ struct CommunityMembershipBottomSheetView: View {
                             showBottomSheet.toggle()
                             do {
                                 try await viewModel.removeMember()
-                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberRemovedToast.localizedString)
+                                onMemberRemoved?()
                             } catch {
                                 Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityMemberRemoveFailedToast.localizedString)
                             }
@@ -132,15 +134,15 @@ class CommunityMembershipBottomSheetViewModel: ObservableObject {
     }
     
    func checkPermisisonAndSetupData() {
-       Task {
+       Task { @MainActor in
            await hasEditCommunityPermisison()
-           await setupData()
+           setupData()
            self.isReportedByMe = try await isReportedByMe()
        }
     }
     
-    private func setupData() async {
-        let isModerator = await community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
+    private func setupData() {
+        let isModerator = community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
         self.shouldShowModeratorItems = hasEditCommunityPermisison || isModerator
     }
     

@@ -321,6 +321,7 @@ extension AmityCommunityProfilePage {
                             let context = AmityCommunityProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToPostComposerPage(context: context, community: viewModel.community)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createPostButton))
 
                     BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
                         .onTapGesture {
@@ -329,6 +330,7 @@ extension AmityCommunityProfilePage {
 
                             showPollSelectionView.toggle()
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createPollButton))
 
                     BottomSheetItemView(icon: AmityIcon.createLivestreamMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.liveStreamLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
                         .onTapGesture {
@@ -338,6 +340,7 @@ extension AmityCommunityProfilePage {
                             let context = AmityCommunityProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToLivestreamPostComposerPage(context: context, community: viewModel.community)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createLivestreamButton))
                 }
 
                 // Story
@@ -349,6 +352,7 @@ extension AmityCommunityProfilePage {
                             let context = AmityCommunityProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToCreateStoryPage(context: context, community: viewModel.community)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createStoryButton))
                 }
 
                 if viewModel.hasCreatePostPermission {
@@ -359,6 +363,7 @@ extension AmityCommunityProfilePage {
                             let context = AmityCommunityProfilePageBehavior.Context(page: self)
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToClipComposerPage(context: context, community: viewModel.community)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createClipButton))
                 }
 
                 if viewModel.hasCreateEventPermission {
@@ -369,6 +374,7 @@ extension AmityCommunityProfilePage {
                             let context = AmityCommunityProfilePageBehavior.Context(page: self, community: viewModel.community?.object)
                             AmityUIKitManagerInternal.shared.behavior.communityProfilePageBehavior?.goToEventSetupPage(context: context)
                         }
+                        .isHidden(viewConfig.isHidden(elementId: .createEventButton))
                 }
             }
             .padding(.bottom, 32)

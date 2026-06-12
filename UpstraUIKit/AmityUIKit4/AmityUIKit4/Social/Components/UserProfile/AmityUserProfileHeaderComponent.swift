@@ -216,7 +216,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
     @ViewBuilder
     private var followButton: some View {
         let followUserIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .followUserButton, key: "image", of: String.self) ?? "")
-        let followUserText = viewConfig.getConfig(elementId: .followUserButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString
+        let followUserText = viewConfig.getConfig(elementId: .followUserButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.userFollowButton.localizedString
         getRelationshipButton(followUserIcon, followUserText, Color(viewConfig.theme.primaryColor))
             .onTapGesture {
                 ImpactFeedbackGenerator.impactFeedback(style: .medium)

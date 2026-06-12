@@ -1070,6 +1070,10 @@
 // Community Member Management
 "community_profile_update_failed_toast" = "Failed to update community";
 "community_member_removed_toast" = "Member removed from this community.";
+
+"community_member_remove_loading_toast" = "Removing member...";
+"community_member_add_loading_toast" = "Adding members...";
+
 "community_member_reported_toast" = "Member reported.";
 "community_member_unreported_toast" = "Member unreported.";
 "community_member_report_failed_toast" = "Failed to report member. Please try again.";
