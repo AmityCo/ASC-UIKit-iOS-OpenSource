@@ -80,7 +80,7 @@ class AmityEventFeedViewModel: ObservableObject {
             return
         }
         
-        Task {
+        Task { @MainActor in
             self.hasCreatePermission = await AmityUIKit4Manager.client.hasPermission(.createEvent)
         }
     }

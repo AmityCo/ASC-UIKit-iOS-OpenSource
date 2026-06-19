@@ -288,7 +288,7 @@ struct ReactionUser {
         self.userId = reaction.creator?.userId ?? ""
         self.uniqueId = userId + reaction.reactionId
         self.displayName = reaction.creator?.displayName ?? ""
-        self.avatarURL = reaction.creator?.avatar?.fileURL ?? ""
+        self.avatarURL = reaction.creator?.resolvedAvatarURL?.absoluteString ?? ""
         self.reactionName = reaction.reactionName
         self.type = type
         self.isBrand = reaction.creator?.isBrand ?? false

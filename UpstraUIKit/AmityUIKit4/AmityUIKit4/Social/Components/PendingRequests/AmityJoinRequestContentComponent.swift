@@ -122,7 +122,7 @@ public struct AmityJoinRequestContentComponent: AmityComponentView {
     private func getUserCell(_ joinRequest: AmityJoinRequest) -> some View {
         HStack {
             let displayName = joinRequest.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
-            let avatarURL = joinRequest.user?.avatar?.fileURL ?? ""
+            let avatarURL = joinRequest.user?.resolvedAvatarURL?.absoluteString ?? ""
             let isBrandUser = joinRequest.user?.isBrand ?? false
             AmityUserProfileImageView(displayName: displayName, avatarURL: URL(string: avatarURL))
                 .frame(width: 32, height: 32)

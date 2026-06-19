@@ -50,6 +50,8 @@ struct PollTypeSelectionView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 64)
         }
+        .background(Color(viewConfig.theme.backgroundColor))
+        .updateTheme(with: viewConfig)
     }
     
     struct OptionView : View {
@@ -99,7 +101,7 @@ struct PollTypeSelectionView: View {
                 .cornerRadius(8)
             }
             .buttonStyle(.plain)
-            .border(radius: 8, borderColor: isSelected ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.secondaryColor.blend(.shade4)), borderWidth: 2)
+            .border(radius: 8, borderColor: isSelected ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.baseColor.blend(.shade4)), borderWidth: 2)
         }
     }
 }

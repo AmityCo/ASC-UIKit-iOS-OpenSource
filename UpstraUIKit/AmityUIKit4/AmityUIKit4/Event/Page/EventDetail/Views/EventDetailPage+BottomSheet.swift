@@ -54,6 +54,7 @@ extension AmityEventDetailPage {
             }
             
         })
+        .background(Color(viewConfig.theme.backgroundColor))
         .environmentObject(viewConfig)
     }
     

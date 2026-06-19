@@ -915,7 +915,7 @@ struct LiveStreamConferenceView: View {
             } else if viewModel.createdRoom?.targetType == "user", let user = viewModel.createdRoom?.creator {
                 AmityUserProfileImageView(
                     displayName: user.displayName ?? "",
-                    avatarURL: URL(string: user.avatar?.mediumFileURL ?? "")
+                    avatarURL: user.resolvedAvatarURL(size: .medium)
                 )
                 .frame(width: 32, height: 32)
                 .clipShape(Circle())

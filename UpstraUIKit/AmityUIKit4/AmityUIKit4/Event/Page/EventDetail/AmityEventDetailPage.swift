@@ -76,7 +76,7 @@ public struct AmityEventDetailPage: AmityPageView {
                 
                 Spacer()
             }
-            .bottomSheet(isShowing: $showMenuBottomSheet, height: .contentSize) {
+            .bottomSheet(isShowing: $showMenuBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                 menuOptionSheet
             }
             
@@ -236,7 +236,7 @@ public struct AmityEventDetailPage: AmityPageView {
         .bottomSheet(isShowing: $showCreateBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             createPostOptionSheet
         }
-        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, sheetContent: {
+        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
             pollTypeSelectionSheet
         })
     }

@@ -445,7 +445,7 @@ public struct AmityUserProfilePage: AmityPageView {
             }
             .padding(.bottom, 32)
         }
-        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, sheetContent: {
+        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
             PollTypeSelectionView(onNextAction: { pollType in
                 
                 showPollSelectionView = false
@@ -456,6 +456,7 @@ public struct AmityUserProfilePage: AmityPageView {
                 }
 
             })
+            .background(Color(viewConfig.theme.backgroundColor))
             .environmentObject(viewConfig)
         })
     }

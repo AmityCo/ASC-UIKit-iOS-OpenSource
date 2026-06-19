@@ -359,6 +359,7 @@
 				"Core/Extensions/AmityCommunityNotificaitonSettings+Extension.swift",
 				"Core/Extensions/AmityInvitation+Extension.swift",
 				"Core/Extensions/AmityMediaSize+Extension.swift",
+				"Core/Extensions/AmityUser+AvatarResolution.swift",
 				"Core/Extensions/Array+Extension.swift",
 				"Core/Extensions/Codable+Extension.swift",
 				"Core/Extensions/Date+Extension.swift",
@@ -691,8 +692,6 @@
 				Social/Pages/UserProfile/AmityBlockedUsersPageViewModel.swift,
 				Social/Pages/UserProfile/AmityEditUserProfilePage.swift,
 				Social/Pages/UserProfile/AmityEditUserProfilePageViewModel.swift,
-				Social/Pages/VisitorUsageLimit/AmityVisitorUsageLimitObserver.swift,
-				Social/Pages/VisitorUsageLimit/AmityVisitorUsageLimitPage.swift,
 				Social/Pages/UserProfile/AmityUserPendingFollowRequestsPage.swift,
 				Social/Pages/UserProfile/AmityUserPendingFollowRequestsPageViewModel.swift,
 				Social/Pages/UserProfile/AmityUserProfilePage.swift,
@@ -700,6 +699,8 @@
 				Social/Pages/UserProfile/AmityUserRelationshipPage.swift,
 				Social/Pages/UserProfile/AmityUserRelationshipPageViewModel.swift,
 				Social/Pages/UserProfile/ChildView/UserRelationshipTabView.swift,
+				Social/Pages/VisitorUsageLimit/AmityVisitorUsageLimitObserver.swift,
+				Social/Pages/VisitorUsageLimit/AmityVisitorUsageLimitPage.swift,
 				Story/Behaviours/AmityCommentTrayComponentBehavior.swift,
 				Story/Behaviours/AmityCreateStoryPageBehaviour.swift,
 				Story/Behaviours/AmityDraftStoryPageBehaviour.swift,
@@ -874,7 +875,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				B4D4E3415B849D9C65368D73 /* SharedFrameworks */,
+				A4375EFE88E9F0C525E3604E /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -926,7 +927,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				F658AE8F0818840818C2B090 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				51E65040728EE5406CE52920 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1268,16 +1269,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		F658AE8F0818840818C2B090 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		51E65040728EE5406CE52920 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B4D4E3415B849D9C65368D73 /* SharedFrameworks */ = {
+		A4375EFE88E9F0C525E3604E /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = F658AE8F0818840818C2B090 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 51E65040728EE5406CE52920 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

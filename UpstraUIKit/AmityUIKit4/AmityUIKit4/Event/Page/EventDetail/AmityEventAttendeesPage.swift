@@ -61,7 +61,7 @@ public struct AmityEventAttendeesPage: AmityPageView {
                     let displayName = user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString
                     
                     ZStack(alignment: .bottomTrailing) {
-                        AmityUserProfileImageView(displayName: displayName, avatarURL: URL(string: user.avatar?.fileURL ?? ""))
+                        AmityUserProfileImageView(displayName: displayName, avatarURL: user.resolvedAvatarURL)
                             .frame(width: 40, height: 40)
                             .clipShape(Circle())
                         

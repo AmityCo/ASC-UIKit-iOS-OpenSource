@@ -21,7 +21,7 @@ public struct AmityCommentTrayComponent: AmityComponentView {
     @StateObject private var commentComposerViewModel: CommentComposerViewModel
     @StateObject private var commentBottomSheetViewModel: CommentBottomSheetViewModel
     
-    private let avatarURL: URL? = URL(string: AmityUIKitManagerInternal.shared.client.user?.snapshot?.avatar?.fileURL ?? "")
+    private let avatarURL: URL? = AmityUIKitManagerInternal.shared.client.user?.snapshot?.resolvedAvatarURL
     @StateObject private var viewConfig: AmityViewConfigController
     @Environment(\.colorScheme) private var colorScheme
     

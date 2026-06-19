@@ -51,7 +51,7 @@ struct AmityAddCalendarEventSheetView: View {
             .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig))
             .padding(.vertical, 16)
             .padding(.horizontal, 16)
-
         }
+        .background(Color(viewConfig.theme.backgroundColor))
     }
 }

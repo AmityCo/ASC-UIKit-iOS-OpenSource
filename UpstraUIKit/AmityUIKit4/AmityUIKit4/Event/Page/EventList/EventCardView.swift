@@ -96,7 +96,6 @@ struct EventCardView: View {
             eventInfo
                 .padding(.top, 12)
         }
-        .background(Color.white)
         .cornerRadius(8)
     }
     
@@ -113,7 +112,6 @@ struct EventCardView: View {
                 .padding(12)
         }
         .frame(width: 250)
-        .background(Color.white)
         .cornerRadius(8)
         .border(radius: 8, borderColor: Color(viewConfig.theme.baseColorShade4), borderWidth: 1)
     }
@@ -133,7 +131,7 @@ struct EventCardView: View {
             
             Spacer(minLength: 1)
         }
-        .background(Color.white)
+        .contentShape(Rectangle())
     }
     
     var avatarPlaceHolderView: some View {
@@ -252,7 +250,6 @@ struct EventCardSkeletonView: View {
             .padding(.vertical, 16)
         }
         .frame(width: 250)
-        .background(Color.white)
         .cornerRadius(8)
         .border(radius: 8, borderColor: Color(viewConfig.theme.baseColorShade4), borderWidth: 1)
     }

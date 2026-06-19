@@ -361,7 +361,7 @@ struct LiveStreamViewerView: View {
                                     } else if room.targetType == "user", let user = room.creator {
                                         AmityUserProfileImageView(
                                             displayName: user.displayName ?? "",
-                                            avatarURL: URL(string: user.avatar?.mediumFileURL ?? "")
+                                            avatarURL: user.resolvedAvatarURL(size: .medium)
                                         )
                                         .frame(width: 32, height: 32)
                                         .clipShape(Circle())

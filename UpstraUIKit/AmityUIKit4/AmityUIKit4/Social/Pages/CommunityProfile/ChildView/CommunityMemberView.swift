@@ -25,7 +25,7 @@ struct CommunityMemberView: View {
     var body: some View {
         HStack(spacing: 12) {
             ZStack(alignment: .bottomTrailing) {
-                AmityUserProfileImageView(displayName: communityMember.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: communityMember.user?.avatar?.largeFileURL ?? ""))
+                AmityUserProfileImageView(displayName: communityMember.user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: communityMember.user?.resolvedAvatarURL(size: .large))
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
                 

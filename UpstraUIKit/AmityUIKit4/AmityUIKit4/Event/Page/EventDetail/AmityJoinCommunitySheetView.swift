@@ -59,6 +59,7 @@ struct AmityJoinCommunitySheetView: View {
             .padding(.vertical, 16)
             .padding(.horizontal, 16)
         }
+        .background(Color(viewConfig.theme.backgroundColor))
     }
     
     var avatar: some View {
@@ -86,7 +87,7 @@ struct AmityJoinCommunitySheetView: View {
     }
     
     var userAvatarPlaceholder: some View {
-        AmityUserProfileImageView(displayName: user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: user?.avatar?.fileURL ?? ""))
+        AmityUserProfileImageView(displayName: user?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: user?.resolvedAvatarURL)
             .frame(width: 52, height: 52)
             .clipShape(Circle())
             .border(radius: 40, borderColor: Color(viewConfig.theme.backgroundColor), borderWidth: 4)

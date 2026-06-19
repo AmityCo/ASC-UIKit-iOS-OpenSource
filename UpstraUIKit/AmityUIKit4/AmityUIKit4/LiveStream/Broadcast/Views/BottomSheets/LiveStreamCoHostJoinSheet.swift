@@ -28,7 +28,7 @@ struct LiveStreamCoHostJoinSheet: View {
             // Profile images section
             HStack(spacing: -5) {
                 // Host profile image
-                AmityUserProfileImageView(displayName: viewModel.coHostInvitation?.inviterUser?.displayName ?? AmityLocalizedStringSet.Social.livestreamHost.localizedString, avatarURL: URL(string: viewModel.coHostInvitation?.inviterUser?.avatar?.fileURL ?? ""))
+                AmityUserProfileImageView(displayName: viewModel.coHostInvitation?.inviterUser?.displayName ?? AmityLocalizedStringSet.Social.livestreamHost.localizedString, avatarURL: viewModel.coHostInvitation?.inviterUser?.resolvedAvatarURL)
                     .frame(width: 80, height: 80)
                     .clipShape(Circle())
                     .overlay(
@@ -43,7 +43,7 @@ struct LiveStreamCoHostJoinSheet: View {
                             ), alignment: .bottom)
 
                 // Co-host profile image
-                AmityUserProfileImageView(displayName: viewModel.coHostInvitation?.invitedUser?.displayName ?? AmityUIKitManagerInternal.shared.client.user?.snapshot?.displayName ?? AmityLocalizedStringSet.Social.livestreamCoHost.localizedString, avatarURL: URL(string: viewModel.coHostInvitation?.invitedUser?.avatar?.fileURL ?? ""))
+                AmityUserProfileImageView(displayName: viewModel.coHostInvitation?.invitedUser?.displayName ?? AmityUIKitManagerInternal.shared.client.user?.snapshot?.displayName ?? AmityLocalizedStringSet.Social.livestreamCoHost.localizedString, avatarURL: viewModel.coHostInvitation?.invitedUser?.resolvedAvatarURL)
                     .frame(width: 80, height: 80)
                     .clipShape(Circle())
                     .overlay(

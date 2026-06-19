@@ -124,7 +124,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                     .padding(.top, 44)
                 Spacer()
             }
-            .bottomSheet(isShowing: $showMenuBottomSheet, height: .contentSize, sheetContent: {
+            .bottomSheet(isShowing: $showMenuBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
                 VStack(spacing: 0) {
                     
                     if let community = viewModel.community, community.isJoined {
@@ -304,7 +304,7 @@ extension AmityCommunityProfilePage {
                     .resizable()
                     .renderingMode(.template)
                     .frame(width: 32, height: 32)
-                    .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                    .foregroundColor(Color(viewConfig.defaultLightTheme.backgroundColor))
             }
             
         })
@@ -379,7 +379,7 @@ extension AmityCommunityProfilePage {
             }
             .padding(.bottom, 32)
         }
-        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, sheetContent: {
+        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
             PollTypeSelectionView(onNextAction: { pollType in
                 
                 showPollSelectionView = false
@@ -390,6 +390,7 @@ extension AmityCommunityProfilePage {
                 }
 
             })
+            .background(Color(viewConfig.theme.backgroundColor))
             .environmentObject(viewConfig)
         })
         .isHidden(!(viewModel.hasCreatePostPermission || viewModel.hasStoryManagePermission))

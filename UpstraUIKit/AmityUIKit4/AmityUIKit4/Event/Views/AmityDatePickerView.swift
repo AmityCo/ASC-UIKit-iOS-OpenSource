@@ -65,7 +65,7 @@ struct AmityDatePickerView: View {
             }
             .datePickerStyle(.graphical)
             .frame(minHeight: 430)
-            .preferredColorScheme(.light)
+            .preferredColorScheme(viewConfig.currentStyle == .dark ? .dark : .light)
             
             Spacer()
         }

@@ -170,7 +170,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         
                         if isEventHost || isModerator {
                             let icon = isEventHost ? AmityIcon.eventHostBadge.imageResource : viewConfig.getImage(elementId: .moderatorBadge, placeholder: "moderatorBadgeIcon")
-                            let title = isEventHost ? AmityLocalizedStringSet.Social.livestreamHost.localizedString : viewConfig.getText(elementId: .moderatorBadge) ?? ""
+                            let title = isEventHost ? AmityLocalizedStringSet.Social.livestreamHost.localizedString : viewConfig.getText(elementId: .moderatorBadge) ?? AmityLocalizedStringSet.General.moderator.localizedString
                             let isBadgeHidden = viewConfig.isHidden(elementId: .moderatorBadge)
                             
                             PostAuthorBadge(badgeType: isEventHost ? .host : .moderator, icon: icon, title: title)

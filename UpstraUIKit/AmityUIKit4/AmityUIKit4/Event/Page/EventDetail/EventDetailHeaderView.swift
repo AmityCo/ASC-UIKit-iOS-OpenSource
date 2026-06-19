@@ -43,9 +43,11 @@ struct EventDetailHeaderView: View {
                         
                         if !community.isPublic {
                             Image(AmityIcon.lockBlackIcon.imageResource)
+                                .renderingMode(.template)
                                 .resizable()
                                 .frame(width: 16, height: 16)
                                 .padding(.horizontal, 2)
+                                .foregroundColor(Color(viewConfig.theme.baseColor))
                         }
                         
                         Text(community.displayName)
@@ -107,9 +109,11 @@ struct EventDetailHeaderView: View {
                     
                     // Location Icon Card
                     Image(event.type == .inPerson ? AmityIcon.eventLocationIcon.imageResource : AmityIcon.externalPlatformIcon.imageResource)
+                        .renderingMode(.template)
                         .frame(width: 20, height: 20)
                         .padding(10)
                         .border(radius: 8, borderColor: Color(viewConfig.theme.baseColorShade4), borderWidth: 1)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                     
                     // Event Type Details
                     InfoLabelView(title: AmityLocalizedStringSet.Social.eventDetailHeaderEventType.localizedString, info: event.type == .inPerson ? AmityLocalizedStringSet.Social.eventDetailHeaderInPerson.localizedString : AmityLocalizedStringSet.Social.eventDetailHeaderVirtual.localizedString)
@@ -121,9 +125,11 @@ struct EventDetailHeaderView: View {
                 if attendeeCount > 0 {
                     HStack(alignment: .center, spacing: 12) {
                         Image(AmityIcon.eventAttendeeIcon.imageResource)
+                            .renderingMode(.template)
                             .frame(width: 20, height: 20)
                             .padding(10)
                             .border(radius: 8, borderColor: Color(viewConfig.theme.baseColorShade4), borderWidth: 1)
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
                         
                         InfoLabelView(title: AmityLocalizedStringSet.Social.eventDetailHeaderAttendees.localizedString, info: "\(event.rsvpCount.formattedCountString)")
                         
@@ -141,8 +147,7 @@ struct EventDetailHeaderView: View {
                 // Hosted By Section
                 HStack(alignment: .center, spacing: 12) {
                     
-                    let avatarUrl = event.creator?.avatar?.fileURL ?? ""
-                    AmityUserProfileImageView(displayName: event.creator?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: avatarUrl))
+                    AmityUserProfileImageView(displayName: event.creator?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: event.creator?.resolvedAvatarURL)
                         .frame(width: 40, height: 40)
                         .clipShape(Circle())
                     
@@ -173,7 +178,7 @@ struct EventDetailHeaderView: View {
             .padding(.top, 16)
             .padding(.bottom, 4)
         }
-        .bottomSheet(isShowing: $showAddToCalendarSheet, height: .contentSize) {
+        .bottomSheet(isShowing: $showAddToCalendarSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             VStack(spacing: 0) {
                 AmityAddCalendarEventSheetView(action: {
                     viewModel.addEventToCalendar(event: event) { isSuccess in
@@ -185,7 +190,7 @@ struct EventDetailHeaderView: View {
                 .padding(.bottom, 32)
             }
         }
-        .bottomSheet(isShowing: $showJoinAndAddToCalendarSheet, height: .contentSize) {
+        .bottomSheet(isShowing: $showJoinAndAddToCalendarSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             VStack(spacing: 0) {
                 let isJoinApprovalRequired = viewModel.community?.requiresJoinApproval ?? false
 
@@ -197,7 +202,7 @@ struct EventDetailHeaderView: View {
                 .padding(.bottom, 32)
             }
         }
-        .bottomSheet(isShowing: $showRSVPOptionSheet, height: .contentSize) {
+        .bottomSheet(isShowing: $showRSVPOptionSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             rsvpOptionSheet
                 .padding(.bottom, 64)
         }

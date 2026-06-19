@@ -20,7 +20,7 @@ struct UserCellView: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            AmityUserProfileImageView(displayName: user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: URL(string: user.avatar?.fileURL ?? ""))
+            AmityUserProfileImageView(displayName: user.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, avatarURL: user.resolvedAvatarURL)
                 .frame(size: CGSize(width: 40, height: 40))
                 .clipShape(Circle())
             

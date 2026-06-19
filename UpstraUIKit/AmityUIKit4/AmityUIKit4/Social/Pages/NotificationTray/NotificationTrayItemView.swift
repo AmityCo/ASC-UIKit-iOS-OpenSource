@@ -107,7 +107,7 @@ struct NotificationTrayInvitationItemView: View {
             let inviter = invitation.inviterUser
             AmityUserProfileImageView(
                 displayName: inviter?.displayName ?? "",
-                avatarURL: URL(string: inviter?.avatar?.mediumFileURL ?? "")
+                avatarURL: inviter?.resolvedAvatarURL(size: .medium)
             )
             .frame(width: 32, height: 32)
             .clipShape(Circle())

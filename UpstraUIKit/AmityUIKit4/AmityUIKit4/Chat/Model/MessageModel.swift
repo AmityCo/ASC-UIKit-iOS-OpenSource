@@ -45,7 +45,7 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         self.reactionCount = message.reactionCount
         self.parentId = message.parentId
         self.displayName = message.user?.displayName ?? ""
-        self.avatarURL = URL(string: message.user?.avatar?.fileURL ?? "")
+        self.avatarURL = message.user?.resolvedAvatarURL
         self.isEdited = message.isEdited
         self.createdAt = message.createdAt
         self.user = message.user

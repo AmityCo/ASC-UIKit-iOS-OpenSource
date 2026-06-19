@@ -87,7 +87,7 @@ public struct AmityStoryModel: Identifiable, Equatable, Hashable {
         videoResolution = story.availableResolution()
         
         creatorName = story.creator?.displayName ?? ""
-        creatorAvatarURLStr = story.creator?.avatar?.fileURL ?? ""
+        creatorAvatarURLStr = story.creator?.resolvedAvatarURL?.absoluteString ?? ""
         if let url = story.getImageInfo()?.fileURL {
             if syncState == .syncing || syncState == .error {
                 imageURL = URL(string: url)

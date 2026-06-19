@@ -45,7 +45,7 @@ public struct AmityPollTargetSelectionPage: AmityPageView {
             }, contentType: .post)
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
-        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, sheetContent: {
+        .bottomSheet(isShowing: $showPollSelectionView, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
             PollTypeSelectionView(onNextAction: { pollType in
                 
                 showPollSelectionView = false
@@ -60,6 +60,7 @@ public struct AmityPollTargetSelectionPage: AmityPageView {
                     }
                 }
             })
+            .background(Color(viewConfig.theme.backgroundColor))
             .environmentObject(viewConfig)
         })
         .updateTheme(with: viewConfig)

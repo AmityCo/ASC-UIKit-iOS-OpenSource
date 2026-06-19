@@ -190,7 +190,7 @@ public class AmityPostModel: Identifiable {
         childrenPosts = post.childrenPosts
         parentPostId = post.parentPostId
         postedUser = Author(
-            avatarURL: post.postedUser?.avatar?.fileURL,
+            avatarURL: post.postedUser?.resolvedAvatarURL?.absoluteString,
             displayName: post.postedUser?.displayName ?? AmityLocalizedStringSet.General.anonymous.localizedString, isGlobalBan: post.postedUser?.isGlobalBanned ?? false, isBrand: post.postedUser?.isBrand ?? false)
         isFromBrand = post.postedUser?.isBrand ?? false
         timestamp = post.createdAt.relativeTime
