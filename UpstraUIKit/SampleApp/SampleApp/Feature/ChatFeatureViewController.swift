@@ -9,6 +9,7 @@
 import UIKit
 import AmityUIKit
 import AmitySDK
+import Combine
 
 class ChatFeatureSetting {
     
@@ -19,6 +20,10 @@ class ChatFeatureSetting {
 }
 
 class ChatFeatureViewController: UIViewController {
+    
+    private let repository = AmityChannelRepository(client: AmityUIKitManager.client)
+    private var cancellable: AnyCancellable?
+    private var collection: AmityCollection<AmityChannel>?
     
     enum FeatureList: CaseIterable {
         case chatHome
@@ -42,6 +47,7 @@ class ChatFeatureViewController: UIViewController {
     }
     
     @IBOutlet private var tableView: UITableView!
+    private var unreadCountLabel: UILabel!
     
     private var channelObject: AmityObject<AmityChannel>?
     private var channelRepository: AmityChannelRepository?
@@ -54,6 +60,42 @@ class ChatFeatureViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableFooterView = UIView()
+        
+        setupUnreadCountLabel()
+        queryChannels()
+        
+        cancellable = repository.getTotalChannelsUnread().sink { [weak self] unread in
+            DispatchQueue.main.async {
+                self?.unreadCountLabel.text = "Unread Count: \(unread.unreadCount)"
+            }
+        }
+    }
+    
+    private func setupUnreadCountLabel() {
+        unreadCountLabel = UILabel()
+        unreadCountLabel.text = "Unread Count: 0"
+        unreadCountLabel.textAlignment = .center
+        unreadCountLabel.font = UIFont.systemFont(ofSize: 18, weight: .medium)
+        unreadCountLabel.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.1)
+        unreadCountLabel.layer.cornerRadius = 8
+        unreadCountLabel.clipsToBounds = true
+        unreadCountLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.addSubview(unreadCountLabel)
+        
+        NSLayoutConstraint.activate([
+            unreadCountLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            unreadCountLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            unreadCountLabel.widthAnchor.constraint(equalToConstant: 200),
+            unreadCountLabel.heightAnchor.constraint(equalToConstant: 44)
+        ])
+    }
+    
+    private func queryChannels() {
+        let query = AmityChannelQuery()
+        query.filter = .userIsMember
+        
+        collection = repository.getChannels(with: query)
     }
     
     private func presentSpecificChatDialogue() {
