@@ -44,6 +44,7 @@ public struct ExpandableText: View {
     internal var moreButtonFont: Font?
     internal var moreButtonColor: Color = .accentColor
     internal var attributedColor: UIColor = UIColor.systemBlue
+    internal var highlightsBgColor: UIColor = UIColor.systemBlue
     internal var backgroundColor: Color = .white
     internal var hashtagColor: UIColor = UIColor.systemBlue
     internal var expandAnimation: Animation = .default
@@ -60,13 +61,23 @@ public struct ExpandableText: View {
     internal var defaultAction: (() -> Void)?
     internal var highlights: String?
     internal var links: [AmityLink] = []
+    internal var fadeTruncatedText: Bool
     
     /**
      Initializes a new `ExpandableText` instance with the specified text string, trimmed of any leading or trailing whitespace and newline characters.
      - Parameter text: The initial text string to display in the `ExpandableText` view.
      - Returns: A new `ExpandableText` instance with the specified text string and trimming applied.
      */
-    public init(_ text: String, defaultAction: (() -> Void)? = nil, metadata: [String: Any]? = nil, mentionees: [AmityMentionees]? = nil, productTags: [AmityProductTagModel]? = [], highlightedText: String? = nil, links: [AmityLink] = [], onTapMentionee: ((String) -> Void)? = nil, onTapHashtag: ((String) -> Void)? = nil, onTapProductTag: ((String) -> Void)? = nil) {
+    public init(_ text: String, defaultAction: (() -> Void)? = nil,
+                metadata: [String: Any]? = nil,
+                mentionees: [AmityMentionees]? = nil,
+                productTags: [AmityProductTagModel]? = [],
+                highlightedText: String? = nil,
+                links: [AmityLink] = [],
+                fadeTruncatedText: Bool = true,
+                onTapMentionee: ((String) -> Void)? = nil,
+                onTapHashtag: ((String) -> Void)? = nil,
+                onTapProductTag: ((String) -> Void)? = nil) {
         self.text = text.trimmingCharacters(in: .newlines)
         self.defaultAction = defaultAction
         self.metadata = metadata
@@ -77,12 +88,19 @@ public struct ExpandableText: View {
         self.onTapProductTag = onTapProductTag
         self.highlights = highlightedText
         self.links = links
+        self.fadeTruncatedText = fadeTruncatedText
+        //default color
+        self.highlightsBgColor = hashtagColor.withAlphaComponent(0.1)
     }
     
     public var body: some View {
         content
             .lineLimit(isExpanded ? nil : lineLimit)
-            .applyingTruncationMask(size: moreTextSize, enabled: shouldShowMoreButton)
+            .applyingTruncationMask(
+                size: moreTextSize,
+                enabled: shouldShowMoreButton,
+                fadeTruncatedText: fadeTruncatedText
+            )
             .readSize { size in
                 truncatedSize = size
                 isTruncated = truncatedSize != intrinsicSize
@@ -124,7 +142,13 @@ public struct ExpandableText: View {
                         .contentShape(Rectangle())
                         .highPriorityGesture(
                             TapGesture().onEnded {
-                                isExpanded.toggle()
+                                // Defer to defaultAction when provided so the outer
+                                // view's expand state stays in sync with a More tap.
+                                if let defaultAction {
+                                    defaultAction()
+                                } else {
+                                    isExpanded.toggle()
+                                }
                             }
                         )
                 }
@@ -133,9 +157,30 @@ public struct ExpandableText: View {
     
     @ViewBuilder
     private var content: some View {
+        
         if #available(iOS 15, *) {
-            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines, metadata: metadata ?? [:], mentionees: mentionees ?? [], productTags: productTags ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color, links: links)
-            let text = getAttributedText(text: text, metadata: metadata ?? [:], mentionees: mentionees ?? [], productTags: productTags ?? [], font: .systemFont(ofSize: 14, weight: .bold), attributedColor: attributedColor, hashtagColor: hashtagColor, highlights: highlights, color: color, links: links)
+            let trimmedText = getAttributedText(text: textTrimmingDoubleNewlines,
+                                                metadata: metadata ?? [:],
+                                                mentionees: mentionees ?? [],
+                                                productTags: productTags ?? [],
+                                                font: .systemFont(ofSize: 14, weight: .bold),
+                                                attributedColor: attributedColor,
+                                                hashtagColor: hashtagColor,
+                                                highlights: highlights,
+                                                highlightsBgColor: highlightsBgColor,
+                                                color: color,
+                                                links: links)
+            let text = getAttributedText(text: text,
+                                         metadata: metadata ?? [:],
+                                         mentionees: mentionees ?? [],
+                                         productTags: productTags ?? [],
+                                         font: .systemFont(ofSize: 14, weight: .bold),
+                                         attributedColor: attributedColor,
+                                         hashtagColor: hashtagColor,
+                                         highlights: highlights,
+                                         highlightsBgColor: highlightsBgColor,
+                                         color: color,
+                                         links: links)
             
             Text(trimMultipleNewlinesWhenTruncated
                  ? (shouldShowMoreButton ? trimmedText : text)
@@ -194,7 +239,17 @@ public struct ExpandableText: View {
 
 extension ExpandableText {
     @available(iOS 15, *)
-    private func getAttributedText(text: String, metadata: [String: Any], mentionees: [AmityMentionees], productTags: [AmityProductTagModel], font: UIFont, attributedColor: UIColor, hashtagColor: UIColor, highlights: String?, color: Color, links: [AmityLink] = []) -> AttributedString {
+    private func getAttributedText(text: String,
+                                   metadata: [String: Any],
+                                   mentionees: [AmityMentionees],
+                                   productTags: [AmityProductTagModel],
+                                   font: UIFont,
+                                   attributedColor: UIColor,
+                                   hashtagColor: UIColor,
+                                   highlights: String?,
+                                   highlightsBgColor: UIColor,
+                                   color: Color,
+                                   links: [AmityLink] = []) -> AttributedString {
         
         let highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: attributedColor, .font: AmityTextStyle.bodyBold(.clear).getFont()]
         
@@ -246,11 +301,29 @@ extension ExpandableText {
                 return (hashtag.text, NSRange(location: hashtag.index, length: hashtag.length + 1))
             }
             
-            let searchHighlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: hashtagColor, .font: AmityTextStyle.custom(15, .bold, .clear).getUIFont(), .backgroundColor: hashtagColor.withAlphaComponent(0.1)]
-            highlightedText = TextHighlighter.highlightTexts(texts: textToHighlight, in: highlightedText, attributes: searchHighlightAttributes)
+            let searchHighlightAttributes: [NSAttributedString.Key: Any] = [
+                .foregroundColor: hashtagColor,
+                .font: AmityTextStyle.custom(14, .semibold, .clear).getUIFont(),
+                .backgroundColor: highlightsBgColor]
+            
+            highlightedText = TextHighlighter.highlightTexts(texts: textToHighlight,
+                                                             in: highlightedText,
+                                                             attributes: searchHighlightAttributes)
         } else if let searchKeyword = highlights, !searchKeyword.isEmpty {
-            let searchHighlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: hashtagColor, .font: AmityTextStyle.custom(15, .bold, .clear).getUIFont(), .backgroundColor: hashtagColor.withAlphaComponent(0.1)]
-            highlightedText = TextHighlighter.highlightKeyword(keyword: searchKeyword, in: highlightedText, attributes: searchHighlightAttributes)
+            let searchHighlightAttributes: [NSAttributedString.Key: Any] = [
+                    .foregroundColor: UIColor(color),
+                    .font: AmityTextStyle.custom(14, .semibold, .clear).getUIFont(),
+                    .backgroundColor: highlightsBgColor
+            ]
+            
+            let hashtagSearchHighlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: hashtagColor,
+                .font: AmityTextStyle.custom(14, .semibold, .clear).getUIFont(),
+                .backgroundColor: highlightsBgColor]
+            
+            let hashtagRanges: [NSRange] = AmityMetadataMapper.hashtags(fromMetadata: metadata).map {
+                NSRange(location: $0.index, length: $0.length + 1)
+            }
+            highlightedText = TextHighlighter.highlightKeyword(keyword: searchKeyword, in: highlightedText, contentText: contentText, attributes: searchHighlightAttributes, hashtagAttributes: hashtagSearchHighlightAttributes, hashtagRanges: hashtagRanges)
         }
         
         return highlightedText

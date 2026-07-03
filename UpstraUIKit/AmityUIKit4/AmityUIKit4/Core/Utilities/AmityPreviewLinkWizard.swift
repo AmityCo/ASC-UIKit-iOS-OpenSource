@@ -74,12 +74,12 @@ public class AmityPreviewLinkWizard {
         guard let regex = try? NSRegularExpression(pattern: AmityPreviewLinkWizard.pattern) else {
             return []
         }
-        
+
         let nsString = text as NSString
         let matches = regex.matches(in: text, range: NSRange(location: 0, length: nsString.length))
-        
+
         if matches.isEmpty { return [] }
-        
+
         var links = [String]()
         matches.forEach {
             let url = nsString.substring(with: $0.range)
@@ -87,9 +87,9 @@ public class AmityPreviewLinkWizard {
                 links.append(url)
             }
         }
-        
+
         linkCache[text] = links
-        
+
         return links
     }
     

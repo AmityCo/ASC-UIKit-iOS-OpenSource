@@ -15,18 +15,26 @@ struct CommunityListItemView: View {
     var community: AmityCommunityModel
     var shouldOverlayImage: Bool = false
     var showJoinButton = true
-    
+
+    @State private var isImageLoaded = false
+
     var body: some View {
         HStack {
-            AsyncImage(placeholder: AmityIcon.communityThumbnail.imageResource, url: URL(string: community.avatarURL), contentMode: .fill)
+            AsyncImage(placeholderView: {
+                ZStack {
+                    Color(viewConfig.theme.baseColorShade3)
+                        .applyDefaultThumbnailGradient(isVisible: true)
+                    
+                    Image(AmityIcon.communityThumbnailIcon.imageResource)
+                }
+            }, url: URL(string: community.avatarURL), contentMode: .fill)
+                .onLoaded { isImageLoaded = $0 }
                 .accessibilityLabel(AccessibilityID.Social.Explore.communityImage)
                 .frame(width: 80, height: 80)
                 .clipped()
                 .cornerRadius(8, corners: .allCorners)
-                .overlay(
-                    LinearGradient(colors: [Color.black.opacity(0.4), Color.black.opacity(0)], startPoint: .bottom, endPoint: .top)
-                        .cornerRadius(8, corners: .allCorners).opacity(shouldOverlayImage ? 1 : 0)
-                    , alignment: .center)
+                .applyDefaultThumbnailGradient(isVisible: shouldOverlayImage && isImageLoaded)
+
             
             CommunityInfoView(community: community, showJoinButton: showJoinButton)
                 .padding(.horizontal, 8)
@@ -274,9 +282,9 @@ struct CommunityJoinButton: View {
 
 
 class CommunityInfoViewModel: ObservableObject {
-    
+
     let repository = AmityCommunityRepository()
-    
+
     func leaveCommunity(communityId: String) async throws {
         try await repository.leaveCommunity(withId: communityId)
     }

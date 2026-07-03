@@ -36,7 +36,6 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
     private let maxCharacterCount = 180
     private let result: (String) -> Void
     @StateObject private var networkMonitor = NetworkMonitor()
-    @State private var isConnected: Bool = false
     @State private var isKeyboardOnScreen = false
     private let fileRepositoryManager = FileRepositoryManager()
     
@@ -118,6 +117,8 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
                 // Alt text field
                 TextEditor(text: $altText)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                    .transparentBackground()
+                    .background(Color.clear)
                     .padding(.horizontal, 8)
                     .overlay(
                         Group {
@@ -146,8 +147,6 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
             .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         }
         .onChange(of: networkMonitor.isConnected) { isConnected in
-            Log.add(event: .info, "NetworkConnect: \(isConnected ? "Connected" : "Disconnected")") // l10n:ok debug log not user-facing
-            self.isConnected = isConnected
             if !isConnected {
                 Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.noInternetConnection.localizedString, bottomPadding: isKeyboardOnScreen ? 150 : 0)
             }
@@ -161,18 +160,13 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
     
     private func shouldDisableDoneButton() -> Bool {
         if isEditMode {
-            return altText == currentAltText || !isConnected
+            return altText == currentAltText || !networkMonitor.isConnected
         } else {
-            return altText.isEmpty || !isConnected
+            return altText.isEmpty || !networkMonitor.isConnected
         }
     }
     
     private func checkValidation(altText: String) async throws {
-        guard isConnected else {
-            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.noInternetConnection.localizedString)
-            return
-        }
-        
         let urls = detectLinks(in: altText)
     
         if !altText.isEmpty {

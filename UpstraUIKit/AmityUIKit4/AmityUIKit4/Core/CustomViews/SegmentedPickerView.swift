@@ -44,7 +44,7 @@ struct SegmentedPickerView: View {
                 HStack {
                     ForEach(Array(titles.enumerated()), id: \.element) { i, element in
                         Text("\(element)")
-                            .applyTextStyle(.body(Color(UIColor(hex: "#898E9E"))))
+                            .applyTextStyle(.body(Color(AmityUIKitConfigController.shared.getTheme().baseColorShade2)))
                             .frame(maxWidth: .infinity)
                             .onTapGesture {
                                 withAnimation(.easeInOut(duration: 0.1)) { currentIndex = i }

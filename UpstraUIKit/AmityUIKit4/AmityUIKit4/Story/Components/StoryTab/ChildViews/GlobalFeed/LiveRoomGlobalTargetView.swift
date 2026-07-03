@@ -23,6 +23,7 @@ struct LiveRoomGlobalTargetView: View {
     
     var body: some View {
         getStoryView(avatar: getAvatar(),
+                     placeholderView: getPlaceHolderView(),
                      cornerAvatar: getCornerAvatar(),
                      name: getName())
         .onAppear {
@@ -30,18 +31,19 @@ struct LiveRoomGlobalTargetView: View {
         }
     }
     
-    private func getStoryView(avatar: (URL?, ImageResource),
+    private func getStoryView(avatar: URL?,
+                              placeholderView: some View,
                               cornerAvatar: (URL?, String),
                               name: String) -> some View {
         return VStack {
             ZStack {
                 Circle()
                     .stroke(lineWidth: 2.0)
-                    .fill(Color(hex: "#FF305A"))
+                    .fill(Color(AmityFixedColor.shared.live))
                     .frame(width: 64, height: 64)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.storyRingView)
                 
-                AsyncImage(placeholder: avatar.1, url: avatar.0)
+                AsyncImage(placeholderView: { placeholderView }, url: avatar)
                     .frame(width: 56, height: 56)
                     .clipShape(Circle())
                     .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.avatarImageView)
@@ -50,7 +52,7 @@ struct LiveRoomGlobalTargetView: View {
                     .frame(width: 22.0, height: 22.0)
                     .clipShape(Circle())
                     .padding(.all, 2)
-                    .background(Color.white)
+                    .background(Color(viewConfig.theme.backgroundColor))
                     .clipShape(Circle())
                     .offset(x: 22, y: 22)
             }
@@ -79,19 +81,31 @@ struct LiveRoomGlobalTargetView: View {
             .applyTextStyle(.custom(10, .semibold, .white))
             .padding(.horizontal, 4)
             .padding(.vertical, 2)
-            .background(Color(hex: "#FF305A"))
+            .background(Color(AmityFixedColor.shared.live))
             .cornerRadius(4, corners: .allCorners)
             .padding(.all, 2)
             .background(Color.white)
             .cornerRadius(4, corners: .allCorners)
     }
     
-    private func getAvatar() -> (url: URL?, placeholder: ImageResource) {
+    private func getAvatar() -> URL? {
         let fileURL = viewModel.event?.coverImage?.mediumFileURL ?? post.targetCommunity?.avatar?.mediumFileURL
         let avatarURL = URL(string: (fileURL ?? ""))
-        let placeholder = viewModel.event != nil ? AmityIcon.eventImagePlaceholder.imageResource : AmityIcon.defaultCommunity.imageResource
-                            
-        return (avatarURL, placeholder)
+     
+        return avatarURL
+    }
+    
+    @ViewBuilder
+    private func getPlaceHolderView() -> some View {
+        if viewModel.event != nil {
+            Image(AmityIcon.eventImagePlaceholder.imageResource)
+                       .resizable()
+                       .aspectRatio(contentMode: .fill)
+                       .frame(width: 56, height: 56)
+                       .clipped()
+        } else {
+            defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 56)
+        }
     }
     
     private func getCornerAvatar() -> (url: URL?, displayName: String) {

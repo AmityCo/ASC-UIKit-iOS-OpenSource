@@ -15,7 +15,8 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: AmityPendingPostContentComponentViewModel
     @State private var showBottomSheet: Bool = false
-    
+    @Environment(\.colorScheme) private var colorScheme
+
     public var pageId: PageId?
     private let post: AmityPostModel
     
@@ -195,7 +196,7 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .backgroundColor(Color(viewConfig.theme.backgroundColor))
                     .attributedColor(viewConfig.theme.highlightColor)
-                    .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                    .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                     .expandAnimation(.easeOut(duration: 0.25))
                     .lineSpacing(5)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -292,8 +293,8 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                         .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .attributedColor(viewConfig.theme.primaryColor)
-                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                        .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                         .expandAnimation(.easeOut(duration: 0.25))
                         .lineSpacing(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -334,8 +335,8 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                         .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .attributedColor(viewConfig.theme.primaryColor)
-                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                        .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                         .expandAnimation(.easeOut(duration: 0.25))
                         .lineSpacing(5)
                         .frame(maxWidth: .infinity, alignment: .leading)

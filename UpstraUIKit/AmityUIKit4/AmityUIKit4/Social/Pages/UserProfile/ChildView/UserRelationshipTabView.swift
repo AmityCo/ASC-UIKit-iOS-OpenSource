@@ -73,7 +73,7 @@ struct UserRelationshipTabView: View {
                     }
                 } else {
                     ForEach(Array(viewModel.users.enumerated()), id: \.element.userId) { index, user in
-                        UserCellView(user: user, menuButtonAction: menuButtonAction)
+                        UserCellView(user: user, menuButtonAction: user.userId == AmityUIKitManagerInternal.shared.currentUserId ? nil : menuButtonAction)
                             .padding([.leading, .trailing], 16)
                             .onTapGesture {
                                 onTapAction(user)

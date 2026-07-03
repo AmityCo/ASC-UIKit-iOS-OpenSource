@@ -49,8 +49,8 @@
 "deleted_reply_comment_message" = "This reply has been deleted";
 "edit_comment_bottom_sheet_title" = "Edit comment";
 "delete_comment_bottom_sheet_title" = "Delete comment";
-"report_comment_bottom_sheet_title" = "Report comment.";
-"unreport_comment_bottom_sheet_title" = "Unreport comment.";
+"report_comment_bottom_sheet_title" = "Report comment";
+"unreport_comment_bottom_sheet_title" = "Unreport comment";
 "comment_reported_message" = "Comment reported.";
 "comment_unreported_message" = "Comment unreported.";
 "report_reply_bottom_sheet_title" = "Report reply";
@@ -76,46 +76,52 @@
 "comment_edit_error" = "Failed to edit comment. Please try again.";
 
 // Toast
-"chat_toast_loading" = "Loading chat...";
-"chat_toast_copied" = "Copied";
-"chat_toast_delete_error" = "Unable to delete message. Please try again.";
-"chat_toast_link_not_allow" = "Your message wasn’t sent as it contained a link that’s not allowed.";
-"chat_toast_banned_word" = "Your message wasn’t sent as it contained a blocked word.";
-"chat_toast_report_message" = "Message reported.";
-"chat_toast_un_report_message" = "Message unreported.";
-"chat_toast_report_message_error" = "This message failed to be reported. Please try again.";
-"chat_toast_un_report_message_error" = "This message failed to be unreported. Please try again.";
+"amity_chat_toast_copied" = "Copied.";
+"amity_chat_toast_delete_error" = "Couldn’t delete message. Please try again.";
+"amity_chat_toast_link_not_allow" = "Your message wasn't sent as it contained a link that's not allowed.";
+"amity_chat_toast_banned_word" = "Your message wasn't sent as it contained a blocked word.";
+"amity_chat_toast_message_reported" = "Message reported.";
+"amity_chat_toast_un_report_message" = "Message unreported.";
+"amity_chat_toast_message_reported_error" = "Failed to report message. Please try again.";
+"amity_chat_toast_un_report_message_error" = "Failed to unreport message. Please try again.";
+"amity_chat_toast_reply_parent_deleted" = "The message is no longer available.";
+"amity_chat_reply_parent_unavailable" = "Message unavailable";
 
 // Button
-"chat_deleted_message_text" = "This message was deleted";
 
-"chat_button_reply" = "Reply";
-"chat_button_copy" = "Copy";
-"chat_button_delete" = "Delete";
-"chat_button_report" = "Report";
-"chat_button_un_report" = "Unreport";
-"chat_button_ok" = "OK";
+"amity_chat_option_report" = "Report";
+"amity_chat_option_unreport" = "Unreport";
+"amity_chat_button_ok" = "OK";
+"amity_chat_button_done" = "Done";
 
 // Error
-"chat_error_loading_chat_title" = "Couldn't Load Chat";
-"chat_error_banned_chat_title" = "You are banned from chat";
-"chat_error_banned_chat_sub_title" = "You won’t be able to participate in this chat until you’ve been unbanned.";
+"amity_chat_label_banned_from_chat" = "You've been banned";
+"amity_chat_error_banned_chat_sub_title" = "Based on your previous activities, you have been banned from this group.";
 
-"chat_char_limit_alert_title" = "Unable to send message";
-"chat_char_limit_alert_message" = "Your message is too long. Please shorten your message and try again.";
-"chat_delete_alert_title" = "Delete this message?";
-"chat_delete_alert_message" = "This message will also be removed from your friend’s devices.";
-"chat_delete_action_sheet_title" = "Your message wasn’t sent.";
+"amity_chat_char_limit_alert_title" = "Unable to send message";
+"amity_chat_char_limit_alert_message" = "Your message is too long. Please shorten your message and try again.";
+"amity_chat_delete_alert_title" = "Delete this message?";
+"amity_chat_delete_alert_message" = "This message will also be removed from your friend's devices.";
+"amity_chat_delete_action_sheet_title" = "Your message wasn't sent.";
+"amity_chat_deleted_user" = "Deleted user";
+"amity_chat_member_you_suffix" = "(You)";
 
-"chat_user_is_muted" = "You’ve been muted by the channel moderator.";
-"chat_channel_is_muted" = "This channel has been set to read-only by the channel moderator.";
+// Reaction display labels — resolved via AmityStringProvider.chat.resolveChatReactionDisplayName.
+// Mirrors the social pattern (amity_social_reaction_*) but kept under the chat namespace so chat
+// surfaces (e.g. ChatMessageActionOverlayView tooltip) can be retranslated independently.
+"amity_chat_reaction_label_like" = "like";
+"amity_chat_reaction_label_love" = "love";
+"amity_chat_reaction_label_fire" = "fire";
+"amity_chat_reaction_label_happy" = "happy";
+"amity_chat_reaction_label_sad" = "sad";
 
-"chat_sending_status" = "sending...";
+"amity_chat_user_is_muted" = "You've been muted. You won't be able to send messages.";
+"amity_chat_group_permission_only_moderators_banner" = "Members that are not moderators can read but not send any messages.";
+
+"amity_chat_sending_status" = "Sending...";
 "network_connectivity_status" = "Waiting for network...";
 
-"chat_mention_everyone" = "Notify everyone";
-"chat_reply_preview" = "Replying to %@";
-"chat_member_count" = "%@ members";
+"amity_chat_mention_everyone" = "Notify everyone";
 
  // Social
 "social_label_find_community_or_create_your_own" = "Find community or create your own ";
@@ -228,7 +234,7 @@
 "community_member_count_plural" = "%@ members";
 
 "explore_categories_see_more" = "See More";
-"expandable_text_see_more" = "...See more";
+"expandable_text_see_more" = "... See more";
  "explore_trending_now_component_title" = "Trending Now";
  "amity_social_label_recommended_for_you" = "Recommended for you";
 
@@ -559,7 +565,7 @@
 "event_info_event_address" = "Event address";
 "event_info_address_copied" = "Address copied.";
 "event_info_copy" = "Copy";
-"event_info_link_copied" = "Link copied";
+"event_info_link_copied" = "Link copied.";
 "event_info_stream_status_live" = "Live";
 "event_info_stream_status_recorded" = "Recorded";
 "event_info_stream_status_upcoming_live" = "Upcoming Live";
@@ -614,6 +620,8 @@
 "event_detail_page_event_deleted" = "Event deleted.";
 "event_detail_page_delete_failed" = "Failed to delete event. Please try again.";
 "event_detail_page_setup_livestream" = "Set up live stream";
+"event_detail_copy_event_link" = "Copy event link";
+"event_detail_failed_to_copy_link" = "Failed to copy link";
 
 // Event Setup Page
 "event_setup_event_name_title" = "Event name";
@@ -756,7 +764,7 @@
 "amity_common_required_indicator" = " *";
 
 // MARK: - Chat
-"amity_chat_edit_message" = "Edit Message";
+"amity_chat_edit_message" = "Edit message";
 
 // MARK: - Social
 "amity_social_my_communities" = "My Communities";
@@ -917,7 +925,7 @@
 "amity_social_video_not_available" = "Video not available.";
 
 // Social Home Tab Titles
-"social_home_newsfeed_tab" = "Newsfeed";
+"social_home_newsfeed_tab" = "Following";
 "social_home_explore_tab" = "Explore";
 "social_home_my_communities_tab" = "My Communities";
 "social_home_communities_tab" = "Communities";
@@ -943,7 +951,7 @@
 "post_view_replies_plural" = "View %@ replies";
 
 // Navigation / Tab labels
-"social_home_my_event_tab" = "My Event";
+"social_home_my_event_tab" = "My event";
 "social_search_posts_tab" = "Posts";
 "social_search_users_tab" = "Users";
 "social_community_nav_title" = "Community";
@@ -1277,7 +1285,6 @@
 "comment_report_failed_toast" = "Failed to report comment. Please try again.";
 "comment_unreport_failed_toast" = "Failed to unreport comment. Please try again.";
 "community_member_ban_failed_toast" = "Failed to ban member. Please try again.";
-"chat_toast_report_message_failed" = "Failed to report message. Please try again.";
 "reply_report_failed_toast" = "Failed to report reply. Please try again.";
 "reply_unreport_failed_toast" = "Failed to unreport reply. Please try again.";
 
@@ -1292,6 +1299,301 @@
 
 
 "amity_social_button_accept_invite" = "Accept";
+
+// MARK: - Chat v4 (merged from feat/chat-v4)
+
+"amity_chat_see_more" = "See more";
+"general_camera" = "Camera";
+"message_media" = "Media";
+"amity_chat_message_failed_to_send" = "Failed to send message.";
+"amity_chat_home_title" = "Chat";
+"amity_chat_archived" = "Archived";
+"amity_chat_waiting_for_network" = "Waiting for network...";
+"amity_chat_timestamp_now" = "now";
+"amity_chat_tab_all" = "All";
+"amity_chat_tab_direct" = "Direct";
+"amity_chat_tab_groups" = "Groups";
+"amity_chat_search_placeholder" = "Search";
+"amity_chat_create_group_title" = "New Group";
+"amity_chat_create_group_button" = "Create";
+"amity_chat_create_group_public_title" = "Public";
+"amity_chat_create_group_public_subtitle" = "Anyone can find the group through search and join the conversation.";
+"amity_chat_create_group_error" = "Failed to create group chat. Please try again.";
+"amity_chat_reply_photo_label" = "Photo";
+"amity_chat_reply_video_label" = "Video";
+"amity_chat_block_confirm_title" = "Block user?";
+"amity_chat_block_confirm_message" = "%@ won't be able to send you the message. They won't be notified that you've blocked them.";
+"amity_chat_block_confirm_label" = "Block";
+"amity_chat_unblock_confirm_title" = "Unblock user?";
+"amity_chat_unblock_confirm_message" = "%@ will now be able to send you the message. They won't be notified that you've unblocked them.";
+"amity_chat_unblock_confirm_label" = "Unblock";
+"chat_notification_pref_title" = "Notifications";
+"amity_chat_save_video_success" = "Saved video.";
+"amity_chat_action_save" = "Save";
+"amity_chat_jump_to_message_unavailable" = "Message unavailable";
+"amity_chat_group_member_list_tab_title" = "Members";
+"amity_chat_group_member_list_promote_title" = "Moderator promotion";
+"amity_chat_group_member_list_promote_message" = "Are you sure you want to promote this member to Moderator? They will gain access to all moderator features.";
+"amity_chat_group_member_list_promote_confirm" = "Promote";
+"amity_chat_group_member_list_demote_title" = "Moderator demotion";
+"amity_chat_group_member_list_demote_message" = "Are you sure you want to demote this Moderator? They will lose access to all moderator features.";
+"amity_chat_group_member_list_demote_confirm" = "Demote";
+"amity_chat_group_member_list_remove_title" = "Confirm removal";
+"amity_chat_group_member_list_remove_message" = "Are you sure you want to remove this member from the group? They will be aware of their removal.";
+"amity_chat_group_member_list_remove_confirm" = "Remove";
+"amity_chat_group_member_list_ban_message" = "Are you sure you want to ban this user? They will be removed from the group and won't be able to find it or rejoin unless they are unbanned.";
+"amity_chat_group_member_list_ban_confirm" = "Ban";
+"amity_chat_group_member_list_toast_promoted" = "Member promoted.";
+"amity_chat_group_member_list_toast_demoted" = "Member demoted.";
+"amity_chat_group_member_list_toast_banned" = "User banned.";
+"amity_chat_group_leave_confirm_title" = "Leave group";
+"amity_chat_group_leave_confirm_label" = "Leave";
+"amity_chat_group_setting_leave_failed" = "Failed to leave group";
+"amity_chat_group_settings_section" = "Group settings";
+"amity_chat_group_profile" = "Group profile";
+"chat_group_setting_tile_notifications" = "Group notifications";
+"amity_chat_group_member_permissions" = "Member permissions";
+"chat_group_setting_tile_all_members" = "All members";
+"amity_chat_group_banned_members" = "Banned users";
+"amity_chat_group_leave" = "Leave group";
+"amity_chat_group_notification_default_label" = "Default";
+"amity_chat_group_notification_silent_label" = "Silent";
+"amity_chat_group_notification_subscribe_label" = "Subscribe";
+"amity_chat_edit_group_profile_navbar_title" = "Group profile";
+"amity_chat_group_edit_profile_save" = "Save";
+"chat_edit_group_profile_name_label" = "Group name";
+"amity_chat_edit_group_profile_name_placeholder" = "Please enter a group name";
+"amity_chat_media_camera" = "Camera";
+"amity_chat_media_photo" = "Photo";
+"amity_chat_group_edit_notification_save" = "Save";
+"amity_chat_group_notification_save_success" = "Group notification updated.";
+"amity_chat_group_notification_save_error" = "Failed to update group notification. Please try again.";
+"amity_chat_group_notification_default_title" = "Default mode";
+"amity_chat_group_notification_default_desc" = "By default, members in this community will receive notifications, but they can choose to turn them off.";
+"amity_chat_group_notification_silent_title" = "Silent mode";
+"amity_chat_group_notification_silent_desc" = "No notifications for everyone in this channel. Members can't turn on notifications in the channel.";
+"amity_chat_group_notification_subscribe_title" = "Subscribe mode";
+"amity_chat_group_notification_subscribe_desc" = "All members have the option to receive notifications, but they need to enable them. By default, notifications are turned off for each member.";
+"amity_chat_group_member_permissions_navbar_title" = "Member permissions";
+"amity_chat_group_edit_permission_save" = "Save";
+"amity_chat_edit_group_perm_toast_success" = "Member permissions updated.";
+"amity_chat_edit_group_perm_toast_failed" = "Failed to update member permissions. Please try again.";
+"amity_chat_group_edit_permissions_everyone_title" = "Everyone";
+"amity_chat_group_edit_permissions_everyone_description" = "Everyone can send a message in the group.";
+"amity_chat_group_edit_permissions_moderators_only_title" = "Only moderators";
+"amity_chat_group_edit_permissions_moderators_only_description" = "Members who are not moderators can read messages but cannot send any messages.";
+"amity_chat_add_group_member_toast_failed" = "Failed to add members. Please try again.";
+"chat_add_group_member_search_placeholder" = "Search";
+"chat_add_group_member_empty" = "No users found";
+"amity_chat_banned_member_list_navbar_title" = "Banned users";
+"user_unban_confirm_description" = "Are you sure you want to unban this user? They will be able to rejoin the group again.";
+"user_unban_button" = "Unban";
+"amity_chat_archived_navbar_title" = "Archived chats";
+"amity_chat_archived_empty_title" = "No archive chat";
+"amity_chat_archived_badge_label" = "Archived";
+"amity_chat_archive" = "Archive";
+"amity_chat_unarchive" = "Unarchive";
+"amity_chat_archived_toast" = "Chat archived.";
+"amity_chat_unarchived_toast" = "Chat unarchived.";
+"amity_chat_archive_error_toast" = "Failed to archive chat. Please try again";
+"amity_chat_unarchive_error_toast" = "Failed to unarchive chat. Please try again";
+"amity_chat_archive_limit_title" = "Too many chats archived";
+"amity_chat_archive_limit_message" = "You can archive a maximum of 100 chat lists.";
+"amity_chat_message_deleted" = "This message was deleted";
+"amity_chat_message_photo" = "Send a photo";
+"amity_chat_message_video" = "Send a video";
+"amity_chat_message_no_preview" = "No preview supported for this message type";
+"amity_chat_message_no_content" = "No message content";
+"user_profile_unknown_name" = "Unknown";
+"amity_chat_search_tab_chats" = "Chats";
+"amity_chat_search_tab_messages" = "Messages";
+"chat_create_conversation_search_placeholder" = "Search";
+"chat_create_conversation_empty" = "No users found";
+"amity_chat_select_group_member_done" = "Done";
+"chat_select_group_member_search_placeholder" = "Search";
+"amity_chat_group_notif_pref_navbar_title" = "Notifications";
+"amity_chat_group_notif_pref_save" = "Save";
+"amity_chat_group_notifications_disabled" = "Group notifications have been disabled by moderator.";
+"amity_chat_group_notification_preference_title" = "Allow notifications";
+"amity_chat_group_notification_preference_description" = "Turn on to receive push notifications from this group.";
+"amity_chat_group_member_action_unmute" = "Unmute user";
+"amity_chat_group_member_action_mute" = "Mute user";
+"chat_group_member_action_unreport" = "Unreport member";
+"amity_chat_edit_message_preview_title" = "Edit Message";
+"amity_chat_composer_camera_denied_title" = "Camera access denied";
+"amity_chat_composer_camera_denied_message" = "Please enable Camera access in Settings to take photos or videos.";
+"amity_chat_composer_camera_denied_open_settings" = "Open Settings";
+"chat_dm_action_report_user" = "Report user";
+"amity_chat_action_unblock_user" = "Unblock user";
+"amity_chat_action_block_user" = "Block user";
+"amity_chat_bubble_link_preview_no_data" = "No display data";
+"amity_chat_reply_you_to_deleted" = "You replied to deleted message";
+"amity_chat_reply_to_deleted" = "Replied to deleted message";
+"amity_chat_reply_you" = "You replied";
+"amity_chat_reply_to_you" = "Replied to you";
+"amity_chat_reply_to_themself" = "Replied to themself";
+"amity_chat_reply_you_to_yourself" = "You replied to yourself";
+"amity_chat_reply_you_to_name" = "You replied to %@";
+"amity_chat_reply_name_to_you" = "%@ replied to you";
+"amity_chat_reply_name_to_themself" = "%@ replied to themself";
+"amity_chat_reply_name_to_name" = "%@ replied to %@";
+"amity_chat_unknown_user" = "Unknown";
+
+// MARK: - Chat v4 Flutter parity — missing keys
+
+// chat.status.*
+"amity_chat_create_group_success" = "Group chat created.";
+"amity_chat_leave_without_finishing_title" = "Leave without finishing?";
+"amity_chat_leave_without_finishing_message" = "Your progress won't be saved and your group won't be created.";
+"amity_chat_member_limit_reached_title" = "Member limit reached";
+"amity_chat_member_limit_reached_message" = "You've reached the maximum number of members allowed in this group.";
+"amity_chat_notifications_disabled" = "You have disabled notifications for chat";
+"amity_chat_message_replied_message" = "Replied message";
+"amity_chat_message_replying_yourself" = "yourself";
+"amity_chat_message_resend" = "Resend";
+"amity_chat_notification_turn_off_error" = "Failed to turn off notifications.";
+"amity_chat_notification_turn_on_error" = "Failed to turn on notifications.";
+"amity_chat_permission_camera_detail" = "Please allow camera access in Settings.";
+"amity_chat_permission_camera_title" = "Camera access required";
+"amity_chat_permission_microphone_detail" = "Please allow microphone access in Settings.";
+"amity_chat_permission_microphone_title" = "Microphone access required";
+"chat_select_member_error" = "Please select at least one user";
+
+// chat.input.*
+"amity_chat_input_message_placeholder" = "Type a message…";
+
+// chat.modal.dialog.*
+"amity_chat_group_leave_confirm_message" = "If you leave this group, you will no longer see new activities or participate in this group.";
+
+// chat.toast.*
+"amity_chat_toast_group_chat_left" = "Group chat left.";
+"amity_chat_toast_member_added" = "Member added.";
+"amity_chat_toast_members_added" = "Members added.";
+"amity_chat_toast_members_add_error" = "Failed to add members. Please try again.";
+"amity_chat_toast_permission_denied" = "Permission denied.";
+
+// general.status.*
+"general_error_message" = "An error occurred";
+"general_error_title" = "Error";
+"general_notifications_lowercase" = "notifications";
+
+// MARK: - Chat v4 DLS key renames (added missing keys)
+
+"amity_chat_add_member_title" = "Add member";
+"amity_chat_banned_members_empty" = "Nothing here to see yet";
+"amity_chat_status_edited" = "Edited";
+"amity_chat_preview_not_available" = "Preview not available";
+"amity_chat_option_copy" = "Copy";
+"amity_chat_option_delete" = "Delete";
+"amity_chat_option_edit" = "Edit";
+"amity_chat_option_reply" = "Reply";
+"amity_chat_create_conversation_title" = "New conversation";
+"amity_chat_group_members_label" = "All members";
+"amity_chat_group_name_label" = "Group name";
+"amity_chat_group_name_optional" = "(Optional)";
+"amity_chat_group_name_placeholder" = "Name your group";
+"amity_chat_privacy_label" = "Privacy";
+"amity_chat_privacy_warning" = "Ensure the correct privacy setting is chosen for your group, as it can't be changed later.";
+"amity_chat_preview_deleted" = "This message was deleted";
+"amity_chat_action_unreport_user" = "Unreport member";
+"amity_chat_blocked_message" = "You can't send messages to this person.";
+"amity_chat_block_failed" = "Failed to block user. Please try again.";
+"amity_chat_unblock_failed" = "Failed to unblock user. Please try again.";
+"amity_chat_group_notifications" = "Group notifications";
+"amity_chat_group_edit_permissions_messaging_title" = "Messaging";
+"amity_chat_home_empty_title" = "No conversation yet";
+"amity_chat_load_error" = "Couldn't load chat";
+"amity_chat_member_action_demote" = "Demote from moderator";
+"amity_chat_member_action_promote" = "Promote to moderator";
+"amity_chat_member_action_remove" = "Remove from group";
+"amity_chat_action_report_user" = "Report member";
+"amity_chat_no_members_found" = "No members found";
+"amity_chat_mute_confirm_label" = "Mute";
+"amity_chat_mute_confirm_message" = "Are you sure you want to mute this user? They will no longer be able to send messages.";
+"amity_chat_mute_confirm_title" = "Confirm mute";
+"amity_chat_member_list_title" = "All members";
+"amity_chat_group_members" = "Member";
+"amity_chat_unmute_confirm_label" = "Unmute";
+"amity_chat_unmute_confirm_message" = "Are you sure you want to unmute this user? They can now send messages.";
+"amity_chat_unmute_confirm_title" = "Confirm unmute";
+"amity_chat_cancel" = "Cancel";
+"amity_chat_action_mute" = "Notification turned off";
+"amity_chat_action_unmute" = "Notification turned on";
+"amity_group_notification_silent" = "Silent mode";
+"amity_group_notification_subscribe" = "Subscribe mode";
+"amity_chat_your_preferences_section" = "Your preferences";
+"amity_chat_notifications_title" = "Notifications";
+"amity_chat_notifications_off" = "Off";
+"amity_chat_notifications_on" = "On";
+"amity_chat_create_direct" = "Direct chat";
+"amity_chat_create_group" = "Group chat";
+"amity_chat_group_member_count" = "%@ members";
+"amity_chat_editing_message" = "Editing message";
+"amity_chat_preview_sent_photo" = "Sent a photo";
+"amity_chat_preview_sent_video" = "Sent a video";
+"amity_chat_home_empty_description" = "Let's create chat to get started.";
+"amity_chat_preview_no_message" = "No message yet";
+"amity_chat_replying_to" = "Replying to %@";
+"amity_chat_save_video_failed" = "Failed to save video";
+"amity_chat_search_no_results" = "No results found";
+"amity_chat_no_users_found" = "No users found";
+"amity_chat_select_members_title" = "New group";
+"amity_chat_next" = "Next";
+"amity_chat_loading_label" = "Loading chat...";
+"amity_chat_success_member_added" = "Member added.";
+"amity_chat_member_action_unban" = "Unban user";
+"amity_chat_unban_confirm_title" = "Confirm unban";
+"amity_chat_ban_confirm_title" = "Confirm ban";
+"amity_chat_member_tab_moderators" = "Moderators";
+
+"amity_chat_action_unmute_failed" = "Failed to turn on notification. Please try again.";
+"amity_chat_action_mute_failed" = "Failed to turn off notification. Please try again.";
+"amity_chat_action_report_user_success" = "Member reported.";
+"amity_chat_action_unreport_user_success" = "Member unreported.";
+"amity_chat_block_success" = "User blocked.";
+"amity_chat_unblock_success" = "User unblocked.";
+"amity_chat_reach_mention_limit_message" = "You can only mention up to 30 mentions per message.";
+"amity_chat_add_member_button" = "Add member";
+"amity_chat_add_member_chip" = "Add";
+"amity_chat_composer_placeholder" = "Write a message";
+"amity_chat_create_new_chat" = "Create new chat";
+"amity_chat_action_turn_off_notification" = "Turn off notification";
+"amity_chat_action_turn_on_notification" = "Turn on notification";
+"amity_chat_action_ban_member_failed" = "Failed to ban user. Please try again.";
+"amity_chat_action_demote_member_failed" = "Failed to demote member. Please try again.";
+"amity_chat_action_leave_group_failed" = "Failed to leave group chat. Please try again.";
+"amity_chat_action_mute_user_failed" = "Failed to mute user. Please try again.";
+"amity_chat_action_promote_member_failed" = "Failed to promote member. Please try again.";
+"amity_chat_action_remove_member_failed" = "Failed to remove member. Please try again.";
+"amity_chat_action_report_user_failed" = "Failed to report member. Please try again.";
+"amity_chat_action_unban_user_failed" = "Failed to unban user. Please try again.";
+"amity_chat_action_unmute_user_failed" = "Failed to unmute user. Please try again.";
+"amity_chat_action_unreport_user_failed" = "Failed to unreport member. Please try again.";
+"amity_chat_group_leave_last_mod_message" = "You must promote another member to moderator before leaving.";
+"amity_chat_group_leave_last_mod_title" = "You're the last moderator";
+"amity_chat_group_promote_member" = "Promote member";
+"amity_chat_action_mute_user" = "User muted.";
+"amity_chat_action_unmute_user" = "User unmuted.";
+"amity_chat_group_edit_profile_failed" = "Failed to update group profile. Please try again.";
+"amity_chat_group_edit_profile_upload_failed_title" = "Inappropriate Content";
+"amity_chat_group_edit_profile_upload_failed_message" = "Inappropriate image. Please choose a different image to upload.";
+"amity_chat_group_edit_profile" = "Group profile updated.";
+"amity_chat_user_action_ban" = "Ban user";
+"amity_chat_preview_message" = "Sent a message";
+"amity_chat_reach_mention_limit_title" = "Too many users mentioned";
+"amity_chat_save_photo_failed" = "Failed to save photo. Please try again.";
+"amity_chat_save_photo_success" = "Saved photo.";
+"amity_chat_search_min_chars" = "Start your search by typing at least 3 letters";
+"amity_chat_action_remove_member" = "Member removed.";
+"amity_chat_action_unban_user" = "User unbanned.";
+"amity_chat_unban_confirm_message" = "Are you sure you want to unban this user? They will be able to rejoin the group again.";
+"amity_chat_create_group_private_title" = "Private";
+"amity_chat_create_group_private_subtitle" = "Group is hidden from search and only accessible by invitation from moderators.";
+"amity_chat_group_name_required" = "(Required)";
+"amity_chat_upload_failed_title" = "Upload failed";
+"amity_chat_upload_failed_message" = "Please try again.";
+"amity_chat_create_group_member_you" = "You";
+"amity_chat_create_group_member_add" = "Add";
 "product_tag_cohost_revoked_message" = "You can no longer manage tagged products in this live stream. Any tagged products have been removed and won't be shown to viewers.";
 
 // Visitor Usage Limit
@@ -1299,3 +1601,8 @@
 "amity_social_visitor_limit_subtitle" = "Create an account or sign in to keep exploring the community.";
 "amity_social_visitor_limit_sign_in" = "Sign in";
 "amity_social_visitor_limit_toast" = "Create an account or sign in to continue.";
+
+// For You Feed
+"social_home_for_you_tab" = "For you";
+"amity_social_feed_caught_up_title" = "You're all caught up";
+"amity_social_feed_caught_up_cta" = "View Following";

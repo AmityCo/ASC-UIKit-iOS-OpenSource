@@ -8,24 +8,25 @@
 import SwiftUI
 
 struct AmityUserProfileImageView: View {
-    
+
     @EnvironmentObject private var viewConfig: AmityViewConfigController
-    
+    @Environment(\.colorScheme) private var colorScheme
+
     let displayName: String
     let avatarURL: URL?
     var onLoaded: ((Bool) -> Void)?
-    
+
     init(displayName: String, avatarURL: URL?) {
         let name = "\(displayName.trimmingCharacters(in: .whitespacesAndNewlines).first ?? " ")"
         self.displayName = name.uppercased()
         self.avatarURL = avatarURL
     }
-    
+
     var body: some View {
         ZStack {
             GeometryReader { geometry in
                 Circle()
-                    .fill(Color(viewConfig.theme.primaryColor.blend(.shade2)))
+                    .fill(Color(colorScheme == .dark ? viewConfig.theme.primaryColor.blend(.shade1) : viewConfig.theme.primaryColor.blend(.shade2)))
                     .overlay (
                         Text(displayName)
                             .applyTextStyle(.custom(geometry.size.height * 0.55, .regular, .white))
@@ -33,6 +34,7 @@ struct AmityUserProfileImageView: View {
                 
                 AsyncImage(url: avatarURL)
                     .onLoaded(onLoaded)
+                    .clipShape(Circle())
             }
         }
     }

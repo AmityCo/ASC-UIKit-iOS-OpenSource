@@ -22,8 +22,9 @@ struct NotificationTraySectionTitle: View {
 }
 
 struct NotificationTrayItemView: View {
-    
+
     @EnvironmentObject var viewConfig: AmityViewConfigController
+    @Environment(\.colorScheme) private var colorScheme
     let item: NotificationItem
     
     var body: some View {
@@ -76,21 +77,16 @@ struct NotificationTrayItemView: View {
         .background(unreadRowBackground)
     }
 
-    /// Background tint for the row. Read rows use the theme background.
-    /// Unread rows use a theme-aware highlight:
-    ///   - Light mode keeps the legacy `primaryColor.blend(.shade3)` (a light blue) so
-    ///     the visual is unchanged.
-    ///   - Dark mode uses `primaryColor` at low opacity instead — `.blend(.shade3)` only
-    ///     increases lightness, producing a near-white background that makes the row
-    ///     text unreadable on dark themes (PDT-3250).
     @ViewBuilder
     private var unreadRowBackground: some View {
         if item.isSeen {
             Color(viewConfig.theme.backgroundColor)
-        } else if viewConfig.currentStyle == .dark {
-            Color(viewConfig.theme.primaryColor).opacity(0.15)
         } else {
-            Color(viewConfig.theme.primaryColor.blend(.shade3))
+            Color(colorScheme == .dark
+                  //Figma display 0.3 but QA, designer would like set this on ios 0.2
+                  ? viewConfig.theme.primaryColor.withAlphaComponent(0.2)
+                  : viewConfig.theme.primaryColor.blend(.shade3).withAlphaComponent(0.3))
+                
         }
     }
 }

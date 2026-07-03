@@ -258,9 +258,9 @@ public struct AmityCommunityProfilePage: AmityPageView {
                             .renderingMode(.template)
                             .scaledToFit()
                             .frame(width: 20, height: 20)
-                            .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                            .foregroundColor(Color(AmityFixedColor.shared.white))
                         Text(AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString)
-                            .applyTextStyle(.bodyBold(Color(viewConfig.theme.backgroundColor)))
+                            .applyTextStyle(.bodyBold(Color(AmityFixedColor.shared.white)))
                     }
                     .padding(.vertical, 10)
                     .frame(maxWidth: .infinity)
@@ -304,7 +304,7 @@ extension AmityCommunityProfilePage {
                     .resizable()
                     .renderingMode(.template)
                     .frame(width: 32, height: 32)
-                    .foregroundColor(Color(viewConfig.defaultLightTheme.backgroundColor))
+                    .foregroundColor(Color(AmityFixedColor.shared.white))
             }
             
         })
@@ -453,22 +453,24 @@ extension AmityCommunityProfilePage {
             
             Spacer()
             
-            let menuIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .menuButton, key: "image", of: String.self) ?? "")
-            Image(menuIcon)
-                .renderingMode(.template)
-                .scaledToFit()
-                .frame(width: 24, height: 24)
-                .foregroundColor(Color(viewConfig.theme.backgroundColor))
-                .background(
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.baseColor.withAlphaComponent(0.5)))
-                        .clipShape(RoundedCorner())
-                        .padding(.all, -4)
-                    
-                )
-                .onTapGesture {
-                    showMenuBottomSheet.toggle()
-                }
+            if canViewCommunitySettings() || canShareCommunityProfileLink() {
+                let menuIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .menuButton, key: "image", of: String.self) ?? "")
+                Image(menuIcon)
+                    .renderingMode(.template)
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                    .background(
+                        Rectangle()
+                            .fill(Color(viewConfig.theme.baseColor.withAlphaComponent(0.5)))
+                            .clipShape(RoundedCorner())
+                            .padding(.all, -4)
+
+                    )
+                    .onTapGesture {
+                        showMenuBottomSheet.toggle()
+                    }
+            }
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)

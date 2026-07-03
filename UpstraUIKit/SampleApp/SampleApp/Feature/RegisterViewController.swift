@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import AmityUIKit
 import AmitySDK
 import SwiftUI
 import AmityUIKit4

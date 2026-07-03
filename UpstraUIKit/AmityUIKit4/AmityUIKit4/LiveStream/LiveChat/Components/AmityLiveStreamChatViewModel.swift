@@ -76,7 +76,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         case muted
         // It is read-only state when the streamer set live channel to read-only mode
         case readOnly
-        // Disable the input field and reaction button if the user is not a member of community
+        // Show input field , reaction but disable for user is not a member of community (visitor, non-member)
         case disabled
     }
     
@@ -89,8 +89,8 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     
     private func calculateComposeBarState() -> ComposeBarState {
         // Priority 1: disabled state (highest priority)
-        if !isCommunityMember {
-            return .disabled
+        if !isCommunityMember { // visitor , non-member
+            return !isChannelEnabled ? .readOnly : .disabled
         }
         
         // Priority 2: readOnly state based on channel enabled
@@ -139,6 +139,11 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         } else {
             setupComposeBarState()
 //            subscribeLiveStreamChatModeration(stream)
+            
+            if AmityUIKitManagerInternal.shared.isGuestUser {
+                self.observeChannel(channel)
+            }
+            
             joinChannel(channel) {
                 self.observeChannelMembership(channel)
                 self.subscribeChannel(channel)

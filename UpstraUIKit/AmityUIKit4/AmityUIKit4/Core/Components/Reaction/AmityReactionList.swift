@@ -18,8 +18,6 @@ public struct AmityReactionList: AmityComponentView {
         case none
     }
     
-    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
-    
     public var pageId: PageId?
     public var id: ComponentId {
         return .reactionList
@@ -34,24 +32,27 @@ public struct AmityReactionList: AmityComponentView {
     
     @Environment(\.presentationMode) var dismissScreen
     private let type: ReactionListType
-    
+    private let currentUserReactions: [String]
+
     public init(referenceId: String, referenceType: AmityReactionReferenceType, pageId: PageId? = nil) {
         self.pageId = pageId
         self.type = .none
+        self.currentUserReactions = []
         self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: referenceId, referenceType: referenceType))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
         self._tabBarItems = State(wrappedValue: setupTabItems(reactions: [:], reactionCount: 0))
-        
+
         // Resolve reaction info to create tabs
         viewModel.resolveReactionInfo { reactions, totalCount in
             self._tabBarItems = State(wrappedValue: setupTabItems(reactions: reactions, reactionCount: totalCount))
         }
     }
-    
+
     /// Convenience initializer
     init(message: AmityMessage, pageId: PageId? = nil) {
         self.pageId = pageId
         self.type = .message
+        self.currentUserReactions = message.myReactions
         self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: message.messageId, referenceType: .message))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
         self._tabBarItems = State(wrappedValue: setupTabItems(reactions: message.reactions as? [String: Int] ?? [:], reactionCount: message.reactionCount))
@@ -61,16 +62,18 @@ public struct AmityReactionList: AmityComponentView {
     init(comment: AmityComment, pageId: PageId? = nil) {
         self.pageId = pageId
         self.type = .comment
+        self.currentUserReactions = []
         self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: comment.commentId, referenceType: .comment))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
         let model = AmityCommentModel(comment: comment)
         self._tabBarItems = State(wrappedValue: setupTabItems(reactions: comment.reactions as? [String: Int] ?? [:], reactionCount: model.reactionsCount))
     }
-    
+
     /// Convenience initializer
     public init(post: AmityPost, pageId: PageId? = nil) {
         self.pageId = pageId
         self.type = .post
+        self.currentUserReactions = []
         self._viewModel = StateObject(wrappedValue: AmityReactionListViewModel(referenceId: post.postId, referenceType: .post))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .reactionList))
         let model = AmityPostModel(post: post)
@@ -87,7 +90,7 @@ public struct AmityReactionList: AmityComponentView {
             
             // Reaction user list swipable pages
             Pager(page: page, data: tabBarItems, id: \.id) { tabItem in
-                ReactionListContent(viewModel: ReactionLoader(referenceId: viewModel.referenceId, referenceType: viewModel.referenceType, reactionName: getReactionType(for: tabItem.index), type: type))
+                ReactionListContent(viewModel: ReactionLoader(referenceId: viewModel.referenceId, referenceType: viewModel.referenceType, reactionName: getReactionType(for: tabItem.index), type: type, currentUserReactions: currentUserReactions), parentViewModel: viewModel)
             }
             .onPageWillChange({ pageIndex in
                 currentTab = pageIndex
@@ -101,8 +104,33 @@ public struct AmityReactionList: AmityComponentView {
         })
         .onChange(of: viewModel.reactionInfo, perform: { value in
             updateReactionsCount(reactions: value)
+            resetToAllTabIfActiveIsEmpty()
         })
         .updateTheme(with: viewConfig)
+    }
+
+    private func resetToAllTabIfActiveIsEmpty() {
+        if viewModel.reactionTotalCount == 0 {
+            let allTitle = AmityLocalizedStringSet.Reaction.allTab.localizedString
+            let onlyAllTab = ReactionTabItem(index: 0, name: allTitle, image: nil, count: 0)
+            if tabBarItems.count != 1 || !tabBarItems[0].isAllReactionTab() {
+                tabBarItems = [onlyAllTab]
+            }
+            currentTab = 0
+            return
+        }
+
+        guard currentTab >= 0, currentTab < tabBarItems.count else {
+            if !tabBarItems.isEmpty { currentTab = 0 }
+            return
+        }
+        let active = tabBarItems[currentTab]
+        guard !active.isAllReactionTab(), active.count == 0 else { return }
+        if let allIndex = tabBarItems.firstIndex(where: { $0.isAllReactionTab() }) {
+            currentTab = allIndex
+        } else {
+            currentTab = 0
+        }
     }
     
     func getReactionType(for tabIndex: Int) -> String? {

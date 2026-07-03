@@ -53,13 +53,17 @@ struct PrivacyRadioButtonView: View {
                     .clear
                     .overlay(
                         Circle()
-                            .stroke(lineWidth: 2.0)
-                            .fill(isSelected ? .blue : .gray)
+                            .stroke(lineWidth: 1.0)
+                            .fill(Color(viewConfig.theme.baseColorShade3))
                             .frame(width: 18, height: 18)
                             .overlay(
                                 Circle()
-                                    .fill(.blue)
-                                    .frame(width: 9, height: 9)
+                                    .fill(Color(viewConfig.theme.primaryColor))
+                                    .overlay(
+                                        Circle()
+                                            .fill(Color(viewConfig.theme.backgroundColor))
+                                            .frame(width: 8, height: 8)
+                                    )
                                     .isHidden(!isSelected)
                             )
                             .padding([.bottom, .leading], 15)

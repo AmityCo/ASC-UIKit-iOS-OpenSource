@@ -15,7 +15,9 @@ class AmityReactionListViewModel: ObservableObject {
     // Query state when reaction user list is queried for the first time.
     @Published var reactionInfo: [String: Int] = [:]
     var reactionTotalCount: Int = 0
-    
+
+    @Published var isParentDeleted: Bool = false
+
     private let chatManager = ChatManager()
     private let commentManager = CommentManager()
 
@@ -55,12 +57,22 @@ class AmityReactionListViewModel: ObservableObject {
             // Observe for changes in reactions
             parentObjectToken = chatManager.getMessage(messageId: referenceId).observe({ [weak self] liveObject, error in
                 guard let self, liveObject.dataStatus == .fresh, let message = liveObject.snapshot else { return }
+                if message.isDeleted {
+                    self.isParentDeleted = true
+                    handleReactionChanges(reactionCount: 0, reactionInfo: [:])
+                    return
+                }
                 handleReactionChanges(reactionCount: message.reactionCount, reactionInfo: message.reactions as? [String: Int] ?? [:])
             })
             
         case .comment:
             parentObjectToken = commentManager.getComment(commentId: referenceId).observe({ [weak self] liveObject, error in
                 guard let self, liveObject.dataStatus == .fresh, let comment = liveObject.snapshot else { return }
+                if comment.isDeleted {
+                    self.isParentDeleted = true
+                    handleReactionChanges(reactionCount: 0, reactionInfo: [:])
+                    return
+                }
                 handleReactionChanges(reactionCount: comment.reactionsCount, reactionInfo: comment.reactions as? [String: Int] ?? [:])
             })
         default:

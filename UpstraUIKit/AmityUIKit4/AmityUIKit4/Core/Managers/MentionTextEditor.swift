@@ -40,7 +40,7 @@ class MentionTextEditor {
     // Attributes used for non-highlighted text
     var typingAttributes: [NSAttributedString.Key: Any] = [
         .font: UIFont.systemFont(ofSize: 15),
-        .foregroundColor: UIColor(hex: "#000000")]
+        .foregroundColor: AmityFixedColor.shared.black]
     
     func processUserInput(in textInput: UITextInput, range: NSRange, replacementText: String, currentText: String) -> Bool {
         

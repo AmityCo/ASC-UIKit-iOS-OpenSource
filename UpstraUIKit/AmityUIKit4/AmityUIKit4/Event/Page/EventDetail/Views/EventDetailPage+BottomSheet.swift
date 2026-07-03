@@ -61,7 +61,7 @@ extension AmityEventDetailPage {
     var menuOptionSheet: some View {
         VStack(spacing: 0) {
             
-            if viewModel.isEventHost || viewModel.hasUpdatePermission {
+            if viewModel.isEventHost {
                 BottomSheetItemView(icon: AmityIcon.editCommentIcon.imageResource, text: AmityLocalizedStringSet.Social.eventDetailPageEditEvent.localizedString)
                     .onTapGesture {
                         // Dismiss
@@ -85,7 +85,7 @@ extension AmityEventDetailPage {
             
             let isEventEnded = viewModel.event?.status == .ended
             let canAddToCalendar = !isEventEnded && (viewModel.isEventHost || viewModel.rsvpButtonState == .going)
-            
+
             // Only for upcoming & happening event
             if canAddToCalendar {
                 BottomSheetItemView(icon: AmityIcon.addToCalendarButtonIcon.imageResource, text: AmityLocalizedStringSet.Social.eventDetailHeaderAddToCalendar.localizedString)
@@ -97,8 +97,40 @@ extension AmityEventDetailPage {
                         }
                     }
             }
-            
-            if viewModel.hasDeletePermission {
+
+            if viewModel.canShareEventLink {
+                let copyLinkConfig = viewConfig.forElement(.copyLink)
+                let shareLinkConfig = viewConfig.forElement(.shareLink)
+
+                BottomSheetItemView(icon: AmityIcon.copyLinkIcon.imageResource, text: copyLinkConfig.text ?? AmityLocalizedStringSet.Social.eventDetailCopyEventLink.localizedString)
+                    .onTapGesture {
+                        showMenuBottomSheet.toggle()
+
+                        guard let link = viewModel.generateEventShareableLink() else {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.eventDetailFailedToCopyLink.localizedString)
+                            }
+                            return
+                        }
+
+                        UIPasteboard.general.string = link
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventInfoLinkCopied.localizedString)
+                        }
+                    }
+
+                BottomSheetItemView(icon: AmityIcon.shareToIcon.imageResource, text: shareLinkConfig.text ?? AmityLocalizedStringSet.Social.socialShareTo.localizedString)
+                    .onTapGesture {
+                        showMenuBottomSheet.toggle()
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            showShareActivitySheet.toggle()
+                        }
+                    }
+            }
+
+            if viewModel.isEventHost || viewModel.hasDeletePermission {
                 BottomSheetItemView(icon: AmityIcon.trashBinIcon.imageResource, text: AmityLocalizedStringSet.Social.eventDetailPageDeleteEvent.localizedString, isDestructive: true)
                     .onTapGesture {
                         // Dismiss
@@ -131,11 +163,16 @@ extension AmityEventDetailPage {
     }
     
     func shouldShowEventMenuOption() -> Bool {
-        // For Host or permission holder (moderator)
-        let isHostOrModerator = viewModel.isEventHost || viewModel.hasCreatePermission || viewModel.hasUpdatePermission || viewModel.hasDeletePermission
-        if isHostOrModerator { return true }
-        
-        // For Member
+        // Host can edit, delete, add to calendar, share
+        if viewModel.isEventHost { return true }
+
+        // Moderator can delete
+        if viewModel.hasDeletePermission { return true }
+
+        // Any user (member / non-member / visitor) can copy or share when sharing is enabled
+        if viewModel.canShareEventLink { return true }
+
+        // Attending members can still add the event to their calendar
         let isEventEnded = viewModel.event?.status == .ended
         let isAttendingEvent = viewModel.rsvpButtonState == .going
         return !isEventEnded && isAttendingEvent

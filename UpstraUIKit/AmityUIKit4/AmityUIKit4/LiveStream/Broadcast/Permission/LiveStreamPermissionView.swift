@@ -54,7 +54,7 @@ struct LiveStreamPermissionView: View {
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                 }
-                .background(Color.blue)
+                .background(Color(AmityUIKitConfigController.shared.getTheme().primaryColor))
                 .cornerRadius(8)
                 .padding(.top, 24)
                 

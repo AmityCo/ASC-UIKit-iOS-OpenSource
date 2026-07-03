@@ -55,7 +55,9 @@ public struct AmityAllCategoriesPage: AmityPageView {
     func getListItem(item: CommunityCategoryModel) -> some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
-                AsyncImage(placeholder: AmityIcon.communityCategoryPlaceholder.imageResource, url: item.avatarURL)
+                AsyncImage(
+                    placeholderView: { categoryPlaceholderView(viewConfig: viewConfig, size: 40) },
+                    url: item.avatarURL)
                     .frame(width: 40, height: 40)
                     .clipped()
                     .clipShape(Circle())

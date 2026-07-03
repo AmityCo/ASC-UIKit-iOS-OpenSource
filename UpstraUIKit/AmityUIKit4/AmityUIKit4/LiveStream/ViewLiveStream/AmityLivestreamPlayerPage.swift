@@ -31,6 +31,12 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
         self._viewModel = StateObject(wrappedValue: AmityLiveStreamPlayerPageViewModel(roomId: roomId))
     }
     
+    public init(roomId: String, displayErrorIfEnded: Bool = false, isCohostInvited: Bool) {
+        self.displayErrorIfEnded = displayErrorIfEnded
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .livestreamPlayerPage))
+        self._viewModel = StateObject(wrappedValue: AmityLiveStreamPlayerPageViewModel(roomId: roomId, isCohostInvited: isCohostInvited))
+    }
+    
     public init(postModel: AmityPostModel) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .livestreamPlayerPage))
         self._viewModel = StateObject(wrappedValue: AmityLiveStreamPlayerPageViewModel(post: postModel))

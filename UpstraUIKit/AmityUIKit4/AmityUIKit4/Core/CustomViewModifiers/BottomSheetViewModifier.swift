@@ -24,7 +24,7 @@ struct BottomSheetModifier<SheetContent>: ViewModifier where SheetContent: View 
     @State private var backgroundOpacity: CGFloat = 0.4
     @State private var sheetViewHeight: CGFloat = 0.0
     
-    init(isShowing: Binding<Bool>, height: BottomSheetHeight, backgroundColor: Color = .white, sheetContent: @escaping () -> SheetContent) {
+    init(isShowing: Binding<Bool>, height: BottomSheetHeight, backgroundColor: Color = Color(AmityUIKitConfigController.shared.getTheme().backgroundColor), sheetContent: @escaping () -> SheetContent) {
         self._isShowing = isShowing
         self.height = height
         self.backgroundColor = backgroundColor
@@ -47,6 +47,7 @@ struct BottomSheetModifier<SheetContent>: ViewModifier where SheetContent: View 
             .onChange(of: showContentView) { value in
                 if showContentView == false {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        guard showContentView == false else { return }
                         withoutAnimation {
                             isSheetPresented = false
                             isShowing = false
@@ -139,7 +140,7 @@ struct BottomSheetModifier<SheetContent>: ViewModifier where SheetContent: View 
 
 
 extension View {
-    func bottomSheet<SheetContent: View>(isShowing: Binding<Bool>, height: BottomSheetHeight, backgroundColor: Color = .white, sheetContent: @escaping () -> SheetContent) -> some View {
+    func bottomSheet<SheetContent: View>(isShowing: Binding<Bool>, height: BottomSheetHeight, backgroundColor: Color = Color(AmityUIKitConfigController.shared.getTheme().backgroundColor), sheetContent: @escaping () -> SheetContent) -> some View {
         return self.modifier(BottomSheetModifier(isShowing: isShowing, height: height, backgroundColor: backgroundColor, sheetContent: sheetContent))
     }
 }

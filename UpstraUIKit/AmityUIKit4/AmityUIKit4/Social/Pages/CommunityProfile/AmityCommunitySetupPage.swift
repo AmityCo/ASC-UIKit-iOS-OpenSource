@@ -64,8 +64,13 @@ public struct AmityCommunitySetupPage: AmityPageView {
     @State private var categoryText: String = ""
     
     /// Add Member data
-    @State private var selectedMembers: [AddMemberModel] = [AddMemberModel(type: .create)]
+    @State private var selectedMembers: [AddMemberModel] = []
     @State private var enableTouchEvent: Bool = true
+
+    private var currentUserModel: AmityUserModel? {
+        guard let user = AmityUIKitManagerInternal.shared.client.user?.snapshot else { return nil }
+        return AmityUserModel(user: user)
+    }
     
     /// Track data changes in editMode & create mode
     @State private var isExistingDataChanged: Bool = false
@@ -487,38 +492,45 @@ public struct AmityCommunitySetupPage: AmityPageView {
             }
             
             LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible()), count: 4),
+                columns: Array(repeating: GridItem(.flexible(maximum: 82), spacing: 4, alignment: .top), count: 4),
+                alignment: .leading,
+                spacing: 12,
                 content: {
+                    AddNewMemberView(
+                        elementId: .communityAddMemberButton,
+                        fallbackTitle: AmityLocalizedStringSet.Social.communitySetupAddMemberButton.localizedString
+                    )
+                    .onTapGesture {
+                        let selectedUsers = selectedMembers.compactMap { $0.user }
+
+                        let context = AmityCommunitySetupPageBehavior.Context(
+                            page: self, selectedUsers: selectedUsers,
+                            onUserAddedAction: { users in
+                                self.selectedMembers = users
+                                    .filter { !$0.isCurrentUser }
+                                    .map { AddMemberModel(user: $0, type: .user) }
+                            })
+                        AmityUIKitManagerInternal.shared.behavior
+                            .communitySetupPageBehavior?.goToAddMemberPage(context)
+                    }
+
+                    if let currentUser = currentUserModel {
+                        SelectedMemberView(
+                            member: AddMemberModel(user: currentUser, type: .user),
+                            onRemove: {}
+                        )
+                    }
+
                     ForEach(Array(selectedMembers.enumerated()), id: \.element.id) {
                         index, member in
-                        switch member.type {
-                            
-                        case .user:
-                            SelectedMemberView(member: member) {
-                                selectedMembers.remove(at: index)
-                            }
-                        case .create:
-                            AddNewMemberView(elementId: .communityAddMemberButton)
-                            .onTapGesture {
-                                let selectedUsers = selectedMembers.compactMap { $0.user }
-                                
-                                let context = AmityCommunitySetupPageBehavior.Context(
-                                    page: self, selectedUsers: selectedUsers,
-                                    onUserAddedAction: { users in
-                                        self.selectedMembers = users.map({ user in
-                                            AddMemberModel(user: user, type: .user)
-                                        })
-                                        self.selectedMembers.append(.init(user: nil, type: .create))
-                                    })
-                                AmityUIKitManagerInternal.shared.behavior
-                                    .communitySetupPageBehavior?.goToAddMemberPage(context)
-                            }
+                        SelectedMemberView(member: member) {
+                            selectedMembers.remove(at: index)
                         }
                     }
                 })
         }
     }
-    
+
     private func getInviteMemberView(_ geometry: GeometryProxy) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             HStack {
@@ -540,35 +552,40 @@ public struct AmityCommunitySetupPage: AmityPageView {
             }
             
             LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible()), count: 4),
+                columns: Array(repeating: GridItem(.flexible(maximum: 82), spacing: 4, alignment: .top), count: 4),
+                alignment: .leading,
+                spacing: 12,
                 content: {
+                    AddNewMemberView(
+                        elementId: .communityInviteMemberButton,
+                        fallbackTitle: AmityLocalizedStringSet.Social.communityInviteMemberButton.localizedString
+                    )
+                    .onTapGesture {
+                        let selectedUsers = selectedMembers.compactMap { $0.user }
+
+                        let context = AmityCommunitySetupPageBehavior.Context(
+                            page: self, selectedUsers: selectedUsers,
+                            onMemberInvitedAction: { users in
+                                self.selectedMembers = users
+                                    .filter { !$0.isCurrentUser }
+                                    .map { AddMemberModel(user: $0, type: .user) }
+                                self.host.controller?.presentedViewController?.dismiss(animated: true)
+                            })
+                        AmityUIKitManagerInternal.shared.behavior
+                            .communitySetupPageBehavior?.goToInviteMemberPage(context)
+                    }
+
+                    if let currentUser = currentUserModel {
+                        SelectedMemberView(
+                            member: AddMemberModel(user: currentUser, type: .user),
+                            onRemove: {}
+                        )
+                    }
+
                     ForEach(Array(selectedMembers.enumerated()), id: \.element.id) {
                         index, member in
-                        switch member.type {
-                            
-                        case .user:
-                            SelectedMemberView(member: member) {
-                                selectedMembers.remove(at: index)
-                            }
-                        case .create:
-                            AddNewMemberView(elementId: .communityInviteMemberButton)
-                            .onTapGesture {
-                                let selectedUsers = selectedMembers.compactMap { $0.user }
-                                
-                                let context = AmityCommunitySetupPageBehavior.Context(
-                                    page: self, selectedUsers: selectedUsers,
-                                    onMemberInvitedAction: { users in
-                                        self.selectedMembers.removeAll()
-                                        self.selectedMembers.append(.init(user: nil, type: .create))
-                                        self.selectedMembers.append(
-                                            contentsOf: users.map({ user in
-                                                AddMemberModel(user: user, type: .user)
-                                            }))
-                                        self.host.controller?.presentedViewController?.dismiss(animated: true)
-                                    })
-                                AmityUIKitManagerInternal.shared.behavior
-                                    .communitySetupPageBehavior?.goToInviteMemberPage(context)
-                            }
+                        SelectedMemberView(member: member) {
+                            selectedMembers.remove(at: index)
                         }
                     }
                 })
@@ -735,7 +752,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
         }
         
         if case .create = pageMode {
-            isExistingDataChanged = draft.hasChanges(with: CommunityDraft()) || imagePickerViewModel.selectedImage != nil || selectedMembers.count > 1
+            isExistingDataChanged = draft.hasChanges(with: CommunityDraft()) || imagePickerViewModel.selectedImage != nil || !selectedMembers.isEmpty
         }
     }
     
@@ -882,15 +899,17 @@ public struct AmityCommunitySetupPage: AmityPageView {
     
     // View showing invited/added members in a circular avatar.
     struct SelectedMemberView: View {
-        
+
         @EnvironmentObject var viewConfig: AmityViewConfigController
-        
+
         let member: AddMemberModel
         let onRemove: () -> Void
-        
+
+        private var isCurrentUser: Bool { member.user?.isCurrentUser ?? false }
+
         var body: some View {
             VStack(spacing: 8) {
-                ZStack(alignment: .topTrailing) {
+                ZStack(alignment: isCurrentUser ? .bottomTrailing : .topTrailing) {
                     AmityUserProfileImageView(displayName: member.user?.displayName
                         ?? AmityLocalizedStringSet.General.anonymous
                             .localizedString,
@@ -898,24 +917,42 @@ public struct AmityCommunitySetupPage: AmityPageView {
                     )
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
-                    
-                    Circle()
-                        .fill(.black.opacity(0.3))
-                        .frame(width: 18, height: 18)
-                        .overlay(
-                            Image(AmityIcon.closeIcon.imageResource)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 18, height: 18)
-                        )
-                        .offset(x: 2, y: -3)
-                        .onTapGesture {
-                            onRemove()
-                        }
+
+                    if isCurrentUser {
+                        Color(viewConfig.theme.primaryColor.blend(.shade3))
+                            .frame(width: 18, height: 18)
+                            .clipShape(Circle())
+                            .overlay(
+                                Image(AmityIcon.moderatorBadgeIcon.getImageResource())
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 16, height: 16)
+                            )
+                    } else {
+                        Circle()
+                            .fill(.black.opacity(0.3))
+                            .frame(width: 18, height: 18)
+                            .overlay(
+                                Image(AmityIcon.closeIcon.imageResource)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 18, height: 18)
+                            )
+                            .offset(x: 2, y: -3)
+                            .onTapGesture {
+                                onRemove()
+                            }
+                    }
                 }
-                
-                let isBrandUser = member.user?.isBrand ?? false
-                UserDisplayNameLabel(name: member.user?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString, isBrand: isBrandUser, textStyle: .caption(Color(viewConfig.theme.baseColor)), spacing: 1)
+
+                if isCurrentUser {
+                    Text(AmityLocalizedStringSet.Chat.CreateGroup.memberYouLabel.localizedString)
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                        .lineLimit(1)
+                } else {
+                    let isBrandUser = member.user?.isBrand ?? false
+                    UserDisplayNameLabel(name: member.user?.displayName ?? AmityLocalizedStringSet.General.unknown.localizedString, isBrand: isBrandUser, textStyle: .caption(Color(viewConfig.theme.baseColor)), spacing: 1)
+                }
             }
             .frame(width: 64, height: 68)
         }
@@ -923,9 +960,10 @@ public struct AmityCommunitySetupPage: AmityPageView {
     
     struct AddNewMemberView: View {
         @EnvironmentObject var viewConfig: AmityViewConfigController
-        
+
         let elementId: ElementId
-        
+        let fallbackTitle: String
+
         var body: some View {
             VStack(spacing: 8) {
                 Circle()
@@ -945,9 +983,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
                             AccessibilityID.Social.CommunitySetup
                                 .communityAddMemberButton)
                     )
-                
-                let title =
-                viewConfig.getText(elementId: elementId) ?? ""
+
+                let title = viewConfig.getText(elementId: elementId) ?? fallbackTitle
                 Text(title)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                     .lineLimit(1)

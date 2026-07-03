@@ -54,6 +54,13 @@ public extension ExpandableText {
         return copy
     }
     
+    
+    func hightlightBgColor(_ color: UIColor) -> Self {
+        var copy = self
+        copy.highlightsBgColor = color
+        return copy
+    }
+    
     /**
      Sets the color for the attributed string in the `ExpandableText` instance.
      - Parameter color: The color to use for attributed string. Defaults to `UIColor.systemBlue`

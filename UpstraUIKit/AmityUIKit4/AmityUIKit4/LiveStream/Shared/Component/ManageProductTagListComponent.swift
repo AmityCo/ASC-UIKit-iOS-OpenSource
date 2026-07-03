@@ -231,14 +231,14 @@ struct ManageProductTagListComponent: AmityComponentView {
                             onAddProducts()
                         }) {
                             Text(AmityLocalizedStringSet.Social.addProducts.localizedString)
-                                .applyTextStyle(.bodyBold(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.baseColor) : Color(hex: "#40434E")))
+                                .applyTextStyle(.bodyBold(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.baseColor) : Color(viewConfig.defaultDarkTheme.baseColorShade3)))
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
                                 .background(Color(viewConfig.defaultDarkTheme.backgroundColor))
                                 .cornerRadius(8)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .stroke(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.secondaryColor.blend(.shade3)) : Color(hex: "#292B32"), lineWidth: 1)
+                                        .stroke(viewModel.canAddMore() ? Color(viewConfig.defaultDarkTheme.secondaryColor.blend(.shade3)) : Color(viewConfig.defaultDarkTheme.secondaryColor), lineWidth: 1)
                                 )
                         }
                         .disabled(!viewModel.canAddMore())

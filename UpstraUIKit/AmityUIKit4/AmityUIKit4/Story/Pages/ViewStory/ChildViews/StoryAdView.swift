@@ -97,7 +97,9 @@ struct StoryAdView<Content: View>: View {
                 /// Avatar and name view
                 VStack(alignment: .center) {
                     HStack {
-                        AsyncImage(placeholder: AmityIcon.adAvatarPlaceholder.getImageResource(), url: URL(string: ad.advertiser?.avatar?.largeFileURL ?? ""))
+                        AsyncImage(
+                            placeholderView: { adAvatarPlaceholderView(viewConfig: viewConfig, size: 45) },
+                            url: URL(string: ad.advertiser?.avatar?.largeFileURL ?? ""))
                             .frame(width: 45, height: 45)
                             .clipShape(Circle())
                             .padding(.leading, 16)

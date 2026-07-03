@@ -126,7 +126,7 @@ public struct AmityCreateClipPostPage: AmityPageView {
             
             Circle()
                 .trim(from: 0, to: viewModel.videoCaptureProgress)
-                .stroke(Color(hex: "#FF305A"), style: StrokeStyle(lineWidth: 7, lineCap: .square))
+                .stroke(Color(AmityFixedColor.shared.live), style: StrokeStyle(lineWidth: 7, lineCap: .square))
                 .rotationEffect(.degrees(-90))
                 .frame(width: 66, height: 66)
                 .visibleWhen(viewModel.isCapturingVideo)
@@ -191,7 +191,7 @@ public struct AmityCreateClipPostPage: AmityPageView {
                     .applyTextStyle(.bodyBold(.white))
                     .padding(.vertical, 4)
                     .padding(.horizontal, 8)
-                    .background(Color(hex: "#FF305A"))
+                    .background(Color(AmityFixedColor.shared.live))
                     .cornerRadius(4, corners: .allCorners)
                     .visibleWhen(viewModel.isCapturingVideo)
                 

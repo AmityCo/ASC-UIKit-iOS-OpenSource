@@ -67,7 +67,7 @@ struct ManageProductTagElement: AmityElementView {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(hex: "#292B32"), lineWidth: 1)
+                            .stroke(Color(viewConfig.defaultDarkTheme.secondaryColor), lineWidth: 1)
                     )
                     .onTapGesture {
                         if !isInactive {
@@ -89,7 +89,7 @@ struct ManageProductTagElement: AmityElementView {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(hex: "#292B32"), lineWidth: 1)
+                            .stroke(Color(viewConfig.defaultDarkTheme.secondaryColor), lineWidth: 1)
                     )
                     .onTapGesture {
                         if !isInactive {
@@ -167,7 +167,7 @@ struct ManageProductTagElement: AmityElementView {
                             .background(Color.clear)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 6)
-                                    .stroke(Color(hex: "898E9E"), lineWidth: 1)
+                                    .stroke(Color(viewConfig.defaultLightTheme.baseColorShade2), lineWidth: 1)
                             )
                     }
                     .padding(.horizontal, 8)

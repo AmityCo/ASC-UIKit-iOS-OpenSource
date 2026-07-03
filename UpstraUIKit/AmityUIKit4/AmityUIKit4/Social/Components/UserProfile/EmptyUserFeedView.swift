@@ -13,6 +13,19 @@ enum EmptyUserFeedViewState {
 
 enum EmptyUserFeedViewType {
     case post, image, video, clip
+    
+    var description: String {
+        switch self {
+        case .post:
+            AmityLocalizedStringSet.Social.communityEmptyFeedNoPosts.localizedString
+        case .image:
+            AmityLocalizedStringSet.Social.communityEmptyFeedNoPhotos.localizedString
+        case .video:
+            AmityLocalizedStringSet.Social.communityEmptyFeedNoVideos.localizedString
+        case .clip:
+            AmityLocalizedStringSet.Social.communityEmptyFeedNoClips.localizedString
+        }
+    }
 }
 
 struct EmptyUserFeedView: View {
@@ -57,7 +70,7 @@ struct EmptyUserFeedView: View {
         switch feedState {
         case .empty:
             icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: emptyFeedId, key: "image", of: String.self) ?? "")
-            title = viewConfig.getConfig(elementId: emptyFeedId, key: "text", of: String.self) ?? ""
+            title = viewConfig.getConfig(elementId: emptyFeedId, key: "text", of: String.self) ?? feedType.description
             description = ""
             
             if feedType == .clip {

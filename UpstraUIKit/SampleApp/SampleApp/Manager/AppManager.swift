@@ -7,193 +7,158 @@
 //
 
 import AmitySDK
-import AmityUIKit
-#if canImport(AmityUIKit4)
 import AmityUIKit4
-#endif
 import SwiftUI
 import UIKit
 
 class AppManager {
-    
+
     static let shared = AppManager()
     private init() {}
-    
+
     private enum UserDefaultsKey {
         static let userId = "userId"
         static let userIds = "userIds"
         static let deviceToken = "deviceToken"
     }
-    
+
     private var isUserRegistered: Bool {
         guard let userId = UserDefaults.standard.value(forKey: UserDefaultsKey.userId) as? String else { return false }
         // Visitors are not auto-restored on relaunch — they must re-enter via the register screen.
         return !userId.hasPrefix("visitor")
     }
-    
+
     // MARK: - AmityUIKit setup
-    
+
     func setupAmityUIKit() {
-        // setup api key
         let endpointConfig = EndpointManager.shared.currentEndpointConfig
-        AmityUIKitManager.setup(apiKey: endpointConfig.apiKey, endpoint: AmityEndpoint(httpUrl: endpointConfig.httpEndpoint, mqttHost: endpointConfig.mqttEndpoint, uploadUrl: endpointConfig.uploadURL))
-        
-        // setup event handlers and page settings
-        AmityUIKitManager.set(eventHandler: CustomEventHandler())
-        AmityUIKitManager.set(channelEventHandler: CustomChannelEventHandler())
-        AmityUIKitManager.feedUISettings.eventHandler = CustomFeedEventHandler()
-        AmityUIKitManager.feedUISettings.setPostSharingSettings(settings: AmityPostSharingSettings())
-        
-        // setup default theme
-        if let preset = Preset(rawValue: UserDefaults.standard.theme ?? 0) {
-            AmityUIKitManager.set(theme: preset.theme)
+
+        AmityUIKit4Manager.setup(
+            apiKey: endpointConfig.apiKey,
+            endpoint: AmityEndpoint(httpUrl: endpointConfig.httpEndpoint, mqttHost: endpointConfig.mqttEndpoint, uploadUrl: endpointConfig.uploadURL)
+        )
+
+        if let filePath = Bundle.main.path(forResource: "AmityUIKitConfig", ofType: "json") {
+            AmityUIKit4Manager.setConfigFile(filePath)
         }
-        
+
+        AmityUIKit4Manager.setCustomAssetBundle(bundle: .main)
+
+        AmityUIKit4Manager.behaviour.globalBehavior = CustomV4GlobalBehavior()
+
         // If a non-visitor user has logged in previously, register them automatically.
         // Visitors are intentionally NOT auto-restored — they must re-enter via the register screen.
         if isUserRegistered, let currentUserId = UserDefaults.standard.value(forKey: UserDefaultsKey.userId) as? String {
             register(withUserId: currentUserId)
         }
-        
-        // Share client to the new UIKit
-        #if canImport(AmityUIKit4)
-        RemoteConfig.setup(apiKey: endpointConfig.apiKey, httpEndpoint: endpointConfig.httpEndpoint)
-                
-        AmityUIKit4Manager.setup(client: AmityUIKitManager.client)
-        
-        // load config file from sample app side
-        if let filePath = Bundle.main.path(forResource: "AmityUIKitConfig", ofType: "json") {
-            AmityUIKit4Manager.setConfigFile(filePath)
-        }
-        
-        AmityUIKit4Manager.setCustomAssetBundle(bundle: .main)
-        
-        let livestreamBehavior = CustomV4LivestreamBehavior()
-        AmityUIKit4Manager.behaviour.livestreamBehavior = livestreamBehavior
-
-        AmityUIKit4Manager.behaviour.globalBehavior = CustomV4GlobalBehavior()
-        #endif
-
-        // Disable swipe to back gesture behavior
-        // AmityUIKit4Manager.behaviour.swipeToBackGestureBehaviour = nil
     }
-    
+
     func register(withUserId userId: String) {
         AmityUIKit4Manager.registerDevice(withUserId: userId, displayName: nil, sessionHandler: SampleSessionHandler()) { [weak self] success, error in
-            print("[Sample App] register device with userId '\(userId)' \(success ? "successfully" : "failed") \(error)")
+            print("[Sample App] register device with userId '\(userId)' \(success ? "successfully" : "failed") \(String(describing: error))")
             if let error = error {
-                AmityHUD.show(.error(message: "Could not register user: \(error.localizedDescription)"))
+                Toast.showToast(style: .warning, message: "Could not register user: \(error.localizedDescription)")
                 return
             }
-            
+
             self?.registerDevicePushNotification()
         }
         UserDefaults.standard.setValue(userId, forKey: UserDefaultsKey.userId)
-        
+
         UIApplication.shared.windows.first?.rootViewController = TabbarViewController()
         UIApplication.shared.windows.first?.makeKeyAndVisible()
-        
     }
-    
+
     func registerVisitor(authSignature: String?, authSignatureExpiryAt: Date?) {
         Task { @MainActor in
             do {
                 try await AmityUIKit4Manager.registerDeviceAsVisitor(authSignature: authSignature, authSignatureExpiresAt: authSignatureExpiryAt, sessionHandler: SampleSessionHandler())
-                
-                let guestUserId = AmityUIKitManager.client.currentUserId
+
+                let guestUserId = AmityUIKit4Manager.client.currentUserId
                 print("UIKit Guest User Id: \(String(describing: guestUserId))")
-                
+
                 UserDefaults.standard.setValue(guestUserId, forKey: UserDefaultsKey.userId)
                 UIApplication.shared.windows.first?.rootViewController = TabbarViewController()
                 UIApplication.shared.windows.first?.makeKeyAndVisible()
             } catch {
                 print("Could not register user \(error.localizedDescription)")
-                AmityHUD.show(.error(message: "Could not register user: \(error.localizedDescription)"))
+                Toast.showToast(style: .warning, message: "Could not register user: \(error.localizedDescription)")
             }
         }
     }
-    
+
     private func registerDevicePushNotification() {
-        
         guard let deviceToken = UserDefaults.standard.value(forKey: UserDefaultsKey.deviceToken) as? String else { return }
-        
-        AmityUIKitManager.registerDeviceForPushNotification(deviceToken) { success, error in
+
+        AmityUIKit4Manager.registerDeviceForPushNotification(deviceToken) { success, error in
             if success {
-                AmityHUD.show(.success(message: "Successfully registered push notification for device \(deviceToken)"))
+                Toast.showToast(style: .success, message: "Successfully registered push notification for device \(deviceToken)")
             } else {
-                AmityHUD.show(.error(message: "Failed to register push notification. Error: \(error?.localizedDescription ?? "")"))
+                Toast.showToast(style: .warning, message: "Failed to register push notification. Error: \(error?.localizedDescription ?? "")")
             }
         }
     }
-    
+
     func unregister() {
-        // 1. unregister push notification
-        AmityUIKitManager.unregisterDevicePushNotification() { success, error in
+        AmityUIKit4Manager.unregisterDevicePushNotification { success, error in
             if let error = error {
-                AmityHUD.show(.error(message: "Unregister failed with error \(error.localizedDescription)"))
+                Toast.showToast(style: .warning, message: "Unregister failed with error \(error.localizedDescription)")
             }
-            
-            // 2. unregister user
-            //    wether it success or failed, we execute unregister to not breaking logout flow.
-            AmityUIKitManager.unregisterDevice()
+
+            AmityUIKit4Manager.unregisterDevice()
             UserDefaults.standard.setValue(nil, forKey: UserDefaultsKey.deviceToken)
             UserDefaults.standard.setValue(nil, forKey: UserDefaultsKey.userId)
-            
+
             UIApplication.shared.windows.first?.rootViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RegisterNavigationController")
             UIApplication.shared.windows.first?.makeKeyAndVisible()
-            UIApplication.shared.applicationIconBadgeNumber = 0  // reset badge counter
+            UIApplication.shared.applicationIconBadgeNumber = 0
         }
     }
-    
+
     func unregisterDevicePushNotification(completion: AmityRequestCompletion?) {
-        AmityUIKitManager.unregisterDevicePushNotification(completion: completion)
+        AmityUIKit4Manager.unregisterDevicePushNotification(completion: completion)
     }
-    
+
     func registerDeviceToken(_ token: Data) {
-        // Revoke old device token
-        AmityUIKitManager.unregisterDevicePushNotification()
-        
-        // Transform deviceToken into a raw string, before sending to AmitySDK server.
+        AmityUIKit4Manager.unregisterDevicePushNotification()
+
         let tokenParts: [String] = token.map { data in String(format: "%02.2hhx", data) }
         let tokenString: String = tokenParts.joined()
-        
+
         UserDefaults.standard.setValue(tokenString, forKey: UserDefaultsKey.deviceToken)
-        AmityUIKitManager.registerDeviceForPushNotification(tokenString)
+        AmityUIKit4Manager.registerDeviceForPushNotification(tokenString)
     }
-    
+
     // MARK: - Login user list
-    
+
     func getUsers() -> [String] {
         return UserDefaults.standard.value(forKey: UserDefaultsKey.userIds) as? [String] ?? []
     }
-    
+
     func updateUsers(withUserIds userIds: [String]) {
         UserDefaults.standard.set(userIds, forKey: UserDefaultsKey.userIds)
     }
-    
+
     // MARK: - Helpers
-    
+
     func getDeviceToken() -> String {
         return UserDefaults.standard.value(forKey: UserDefaultsKey.deviceToken) as? String ?? ""
     }
-    
+
     func startingPage() -> UIViewController {
         if isUserRegistered {
             return TabbarViewController()
         } else {
             return UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RegisterNavigationController")
         }
-
     }
 }
 
 
-#if canImport(AmityUIKit4)
-
 class CustomV4GlobalBehavior: AmityGlobalBehavior {
 
     override func handleVisitorUsageLimitSignIn() {
-        Toast.showToast(style: .warning, message: "Create an account or sign in to continue.")
+        Toast.showToast(style: .info, message: "Create an account or sign in to continue.")
         // Tear down the visitor session and route the user to the starting page
         // (RegisterNavigationController). `AppManager.unregister()` already does
         // logout, clears UserDefaults, and swaps the rootViewController.
@@ -201,30 +166,8 @@ class CustomV4GlobalBehavior: AmityGlobalBehavior {
     }
 }
 
-class CustomV4LivestreamBehavior: AmityLivestreamBehavior {
-    
-    override func createRecordedPlayer(stream: AmityStream, client: AmityClient) -> any View {
-        #if canImport(AmityUIKitLiveStream)
-        return AmityUIKit4.RecordedStreamPlayerView(livestream: stream, client: client)
-        #else
-        print("AmityUIKit4 supports playing recorded stream from the same framework")
-        return AmityUIKit4.RecordedStreamPlayerView(livestream: stream, client: client)
-        #endif
-    }
-    
-    override func createLivestreamPlayer(stream: AmityStream, client: AmityClient, isPlaying: Bool) -> any View {
-        #if canImport(AmityUIKitLiveStream)
-        return EmptyView()
-        #else
-        print("AmityUIKit4 supports watching live stream from the same framework")
-        return AmityUIKit4.LivestreamPlayerView(stream: stream, client: client, isPlaying: isPlaying)
-        #endif
-    }
-}
-#endif
-
 extension DateFormatter {
-    
+
     // Note:
     // Our backend supports ISO8601 / RFC3309 Format but ios date formatter does not support it out of the box.
     //
@@ -235,12 +178,12 @@ extension DateFormatter {
     // so we use two date formatters to support both usecases.
     static func ascDateFromISO8601String(_ dateString: String?) -> Date? {
         guard let dateInput = dateString else { return nil }
-        
+
         // Note: Most of the dates in backend contains fractional seconds
         let date = ascISO8601FractionalSecondsFormatter.date(from: dateInput) ?? ascISO8601RFC3309Formatter.date(from: dateInput)
         return date
     }
-    
+
     /// Supports date with fractional seconds like "2023-02-07T22:06:04.830Z".
     /// For date format like "2024-06-16T20:51:21Z", this will return nil
     static var ascISO8601FractionalSecondsFormatter: ISO8601DateFormatter = {
@@ -248,7 +191,7 @@ extension DateFormatter {
         dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return dateFormatter
     }()
-    
+
     /// Supports date without fractional seconds like "2024-06-16T20:51:21Z"
     /// For date format like "2023-02-07T22:06:04.830Z", this will return nil.
     static var ascISO8601RFC3309Formatter: ISO8601DateFormatter = {

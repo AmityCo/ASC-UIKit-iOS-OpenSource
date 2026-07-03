@@ -14,7 +14,7 @@ struct AmityUserAction {
             if let guestUserBehavior = AmityUIKit4Manager.behaviour.globalBehavior {
                 guestUserBehavior.handleGuestUserAction(context: .init(host: host))
             } else {
-                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.errorGuestUser.localizedString)
+                Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.errorGuestUser.localizedString)
             }
         } else {
             action()

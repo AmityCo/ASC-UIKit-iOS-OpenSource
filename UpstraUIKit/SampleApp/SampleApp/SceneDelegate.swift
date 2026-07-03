@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import AmityUIKit
 
 @available(iOS 13.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
@@ -53,36 +52,4 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        
-        // Handler of opening external url from web browsing session.
-        if userActivity.activityType == NSUserActivityTypeBrowsingWeb, let url = userActivity.webpageURL {
-            // Parse url and be sure that it is a url of a post
-            let urlString = url.absoluteString //"https://Amity.co/post/124325135"
-            if urlString.contains("post/") {
-                if let range = urlString.range(of: "post/") {
-                    // Detect id of the post
-                    let postId = String(urlString[range.upperBound...])
-                    
-                    // Open post details page
-                    openPost(withId: postId, scene: scene)
-                }
-            }
-        }
-    }
-}
-
-@available(iOS 13.0, *)
-extension SceneDelegate {
-    func openPost(withId postId: String, scene: UIScene) {
-        guard let _ = (scene as? UIWindowScene), let windowScene = scene as? UIWindowScene else { return }
-        AmityUIKitManager.registerDevice(withUserId: "victimIOS", displayName: "victimIOS".uppercased(), sessionHandler: SampleSessionHandler())
-        let window = UIWindow(windowScene: windowScene)
-        let postDetailViewController = AmityPostDetailViewController.make(withPostId: "c1bb8697c88a01f6423765984a3e47ac")
-            
-        window.rootViewController = postDetailViewController
-        self.window = window
-        window.makeKeyAndVisible()
-        
-    }
 }

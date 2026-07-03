@@ -142,7 +142,7 @@ public struct AmityEventSetupPage: AmityPageView {
                                 Color.black
                                     .opacity(0.25)
                                 
-                                Image(AmityIcon.cameraAttatchmentIcon.imageResource)
+                                Image(AmityIcon.cameraIcon.imageResource)
                                     .renderingMode(.template)
                                     .resizable()
                                     .scaledToFill()
@@ -153,6 +153,7 @@ public struct AmityEventSetupPage: AmityPageView {
                         .clipped()
                         .frame(height: 210)
                         .contentShape(Rectangle())
+                        .background(Color.white)
                         .onTapGesture {
                             hideKeyboard()
                             

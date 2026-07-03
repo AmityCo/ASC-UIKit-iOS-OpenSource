@@ -79,11 +79,11 @@ struct InfoTextField: View {
     private let descriptionTextAccessibilityId: String?
     private let charCountTextAccessibilityId: String?
     
-    private var alertColor: UIColor = UIColor(hex: "#FA4D30")
-    private var dividerColor: UIColor = UIColor(hex: "#EBECEF")
+    private var alertColor: UIColor = AmityUIKitConfigController.shared.getTheme().alertColor
+    private var dividerColor: UIColor = AmityUIKitConfigController.shared.getTheme().baseColorShade4
     private var titleTextColor: UIColor?
-    private var infoTextColor: UIColor = UIColor(hex: "#898E9E")
-    private var textFieldTextColor: UIColor = UIColor(hex: "#000000")
+    private var infoTextColor: UIColor = AmityUIKitConfigController.shared.getTheme().baseColorShade2
+    private var textFieldTextColor: UIColor = AmityFixedColor.shared.black
     
     init(data: Binding<InfoTextFieldModel>,
          text: Binding<String>,

@@ -101,6 +101,8 @@ public struct AmityPollPostComposerPage: AmityPageView {
                             .applyTextStyle(.body(Color(viewConfig.theme.primaryColor)))
                     }
                     .buttonStyle(.plain)
+                    .lineLimit(1)
+                    .frame(minWidth: 40)
                     .disabled(!isInputValid)
                 }
                 
@@ -253,8 +255,8 @@ public struct AmityPollPostComposerPage: AmityPageView {
     @ViewBuilder
     var loadingIndicator: some View {
         VStack {
-            Color.white.opacity(0.3)
-            
+            Color(viewConfig.theme.backgroundColor).opacity(0.3)
+
             ToastView(message: AmityLocalizedStringSet.Social.pollCreatePostingToast.localizedString, style: .loading)
                 .padding(.bottom, 24)
         }

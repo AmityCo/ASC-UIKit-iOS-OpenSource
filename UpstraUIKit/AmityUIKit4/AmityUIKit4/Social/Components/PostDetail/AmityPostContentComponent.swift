@@ -44,7 +44,8 @@ public struct AmityPostContentComponent: AmityComponentView {
     @State private var showEditAlert: Bool = false
     @State private var showShareSheet: Bool = false
     @State private var showShareBottomSheet: Bool = false
-    
+    @Environment(\.colorScheme) private var colorScheme
+
     private let style: AmityPostContentComponentStyle
     private let category: AmityPostCategory
     private let hideMenuButton: Bool
@@ -61,7 +62,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         self.pageId = pageId
         self.category = category
         self.context = nil
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, loadComments: false))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, loadComments: false, existingPost: post))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
 
@@ -76,7 +77,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         self.pageId = pageId
         self.category = context.category
         self.context = context
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, loadComments: false))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, loadComments: false, existingPost: post))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
     
@@ -113,12 +114,12 @@ public struct AmityPostContentComponent: AmityComponentView {
             let isBadgeVisible = category == .announcement || category == .global || category == .pinAndAnnouncement
             HStack {
                 Text(AmityLocalizedStringSet.Social.featuredPostBadge.localizedString)
-                    .applyTextStyle(.captionBold(Color(viewConfig.defaultLightTheme.baseColor)))
+                    .applyTextStyle(.captionBold(Color(viewConfig.theme.secondaryColor)))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
                 
             }
-            .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
+            .background(Color(viewConfig.theme.baseColorShade4))
             .cornerRadius(5, corners: [.topRight, .bottomRight])
             .padding(.top, 8)
             .padding(.bottom, 2)
@@ -235,10 +236,9 @@ public struct AmityPostContentComponent: AmityComponentView {
                             case .reportPost:
                                 // Dismiss toggle
                                 showBottomSheet.toggle()
-                                
-                                let hasJoinedCommunity = post.targetCommunity?.isJoined ?? false
-                                if !hasJoinedCommunity {
-                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+
+                                if let community = post.targetCommunity, !community.isJoined {
+                                    Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                                     return
                                 }
                                 
@@ -355,8 +355,20 @@ public struct AmityPostContentComponent: AmityComponentView {
                 
                 // Post text content
                 if !post.text.isEmpty {
-                    let tapActionContext = AmityPostContentComponent.Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
-                    ExpandableText(post.text, defaultAction: {onTapAction?(tapActionContext)}, metadata: post.metadata, mentionees: post.mentionees, productTags: post.textProductTags, highlightedText: context?.searchKeyword, links: post.links, onTapMentionee: { userId in
+                    let tapActionContext = AmityPostContentComponent.Context(
+                        category: category,
+                        shouldHideTarget: hideTarget,
+                        shouldHideMenuButton: hideMenuButton)
+                    
+                    ExpandableText(post.text,
+                                   defaultAction: {onTapAction?(tapActionContext)},
+                                   metadata: post.metadata,
+                                   mentionees: post.mentionees,
+                                   productTags: post.textProductTags,
+                                   highlightedText: context?.searchKeyword,
+                                   links: post.links,
+                                   fadeTruncatedText: false,
+                                   onTapMentionee: { userId in
                         goToUserProfilePage(userId)
                     }, onTapHashtag: { hashtag in
                         // \u{200E} make the hashtag text left to right in all languages
@@ -368,9 +380,10 @@ public struct AmityPostContentComponent: AmityComponentView {
                     .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                     .font(AmityTextStyle.body(.clear).getFont())
                     .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .attributedColor(viewConfig.theme.primaryColor)
-                    .hashtagColor(viewConfig.theme.primaryColor)
-                    .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                    .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                    .hightlightBgColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme).withAlphaComponent(0.1))
+                    .hashtagColor(UIColor.defaultHashtagColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                    .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                     .expandAnimation(.easeOut(duration: 0.25))
                     .lineSpacing(5)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -406,13 +419,13 @@ public struct AmityPostContentComponent: AmityComponentView {
                 }
                 
                 if !description.isEmpty {
-                    ExpandableText(description)
+                    ExpandableText(description, fadeTruncatedText: false)
                         .lineLimit(8)
                         .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .attributedColor(viewConfig.theme.primaryColor)
-                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                        .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                         .expandAnimation(.easeOut(duration: 0.25))
                         .lineSpacing(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -448,13 +461,13 @@ public struct AmityPostContentComponent: AmityComponentView {
                 }
                 
                 if !description.isEmpty {
-                    ExpandableText(description)
+                    ExpandableText(description, fadeTruncatedText: false)
                         .lineLimit(8)
                         .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .attributedColor(viewConfig.theme.primaryColor)
-                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                        .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                         .expandAnimation(.easeOut(duration: 0.25))
                         .lineSpacing(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -558,7 +571,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
                         
                         if !shouldAllowInteraction {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+                            Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                             return
                         }
                         
@@ -581,7 +594,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
                         
                         if !shouldAllowInteraction {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+                            Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                             return
                         }
                         
@@ -601,7 +614,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         let shouldAllowInteraction = self.post.targetCommunity?.isJoined ?? true
                         
                         if !shouldAllowInteraction {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+                            Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                             return
                         }
                         
@@ -886,11 +899,11 @@ struct PostAuthorBadge: View {
                 .frame(width: 12, height: 12)
                 .padding(.leading, 6)
             Text(title)
-                .applyTextStyle(.captionSmall(badgeType == .moderator ? Color(viewConfig.theme.primaryColor) : Color(hex: "4B1BD0")))
+                .applyTextStyle(.captionSmall(badgeType == .moderator ? Color(viewConfig.theme.primaryColor) : Color(AmityFixedColor.shared.eventHost)))
                 .padding(.trailing, 6)
         }
         .frame(height: 20)
-        .background(badgeType == .moderator ? Color(viewConfig.theme.primaryColor.blend(.shade3)) : Color(hex: "#EAE2FF"))
+        .background(badgeType == .moderator ? Color(viewConfig.theme.primaryColor.blend(.shade3)) : Color(AmityFixedColor.shared.eventHostBg))
         .clipShape(RoundedCorner(radius: 10))
     }
 }

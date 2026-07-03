@@ -87,6 +87,17 @@
 "chat_toast_report_message_error" = "รายงานข้อความไม่สำเร็จ กรุณาลองอีกครั้ง";
 "chat_toast_un_report_message_error" = "ยกเลิกรายงานข้อความไม่สำเร็จ กรุณาลองอีกครั้ง";
 
+// Toast (amity_chat v4 keys)
+"amity_chat_toast_copied" = "คัดลอกแล้ว";
+"amity_chat_toast_delete_error" = "ไม่สามารถลบข้อความได้ กรุณาลองอีกครั้ง";
+"amity_chat_toast_link_not_allow" = "ข้อความของคุณไม่ถูกส่งเพราะมีลิงก์ที่ไม่อนุญาต";
+"amity_chat_toast_banned_word" = "ข้อความของคุณไม่ถูกส่งเพราะมีคำที่ถูกบล็อก";
+"amity_chat_toast_message_reported" = "รายงานข้อความแล้ว";
+"amity_chat_toast_un_report_message" = "ยกเลิกรายงานข้อความแล้ว";
+"amity_chat_toast_message_reported_error" = "รายงานข้อความไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_toast_un_report_message_error" = "ยกเลิกรายงานข้อความไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_toast_reply_parent_deleted" = "ข้อความนี้ไม่มีอยู่แล้ว";
+
 // Button
 "chat_deleted_message_text" = "ข้อความนี้ถูกลบแล้ว";
 
@@ -97,13 +108,41 @@
 "chat_button_un_report" = "ยกเลิกรายงาน";
 "chat_button_ok" = "ตกลง";
 
+"amity_chat_option_report" = "รายงาน";
+"amity_chat_option_unreport" = "ยกเลิกรายงาน";
+"amity_chat_button_ok" = "ตกลง";
+"amity_chat_button_done" = "เสร็จสิ้น";
+
 // Error
 "chat_error_loading_chat_title" = "ไม่สามารถโหลดแชทได้";
-"chat_error_banned_chat_title" = "คุณถูกแบนจากแชท";
+"amity_chat_label_banned_from_chat" = "คุณถูกแบนจากแชท";
 "chat_error_banned_chat_sub_title" = "คุณไม่สามารถเข้าร่วมแชทนี้ได้จนกว่าจะถูกปลดแบน";
+"amity_chat_error_banned_chat_sub_title" = "จากกิจกรรมก่อนหน้า คุณถูกแบนจากกลุ่มนี้";
 
 "chat_char_limit_alert_title" = "ไม่สามารถส่งข้อความได้";
 "chat_char_limit_alert_message" = "ข้อความของคุณยาวเกินไป กรุณาย่อข้อความแล้วลองอีกครั้ง";
+"amity_chat_char_limit_alert_title" = "ไม่สามารถส่งข้อความได้";
+"amity_chat_char_limit_alert_message" = "ข้อความของคุณยาวเกินไป กรุณาย่อข้อความแล้วลองอีกครั้ง";
+"amity_chat_delete_alert_title" = "ลบข้อความนี้?";
+"amity_chat_delete_alert_message" = "ข้อความนี้จะถูกลบจากอุปกรณ์ของเพื่อนคุณด้วย";
+"amity_chat_delete_action_sheet_title" = "ข้อความของคุณไม่ถูกส่ง";
+"amity_chat_deleted_user" = "ผู้ใช้ที่ถูกลบ";
+"amity_chat_member_you_suffix" = "(คุณ)";
+
+// Reaction display labels — chat-scoped (mirrors amity_social_reaction_*).
+// Resolved via AmityStringProvider.chat.resolveChatReactionDisplayName.
+"amity_chat_reaction_label_like" = "ถูกใจ";
+"amity_chat_reaction_label_love" = "รัก";
+"amity_chat_reaction_label_fire" = "ไฟ";
+"amity_chat_reaction_label_happy" = "มีความสุข";
+"amity_chat_reaction_label_sad" = "เศร้า";
+
+"amity_chat_user_is_muted" = "คุณถูกปิดเสียง คุณจะไม่สามารถส่งข้อความได้";
+"amity_chat_group_permission_only_moderators_banner" = "สมาชิกที่ไม่ใช่ผู้ดูแลสามารถอ่านได้แต่ไม่สามารถส่งข้อความใดๆ ได้";
+
+"amity_chat_sending_status" = "กำลังส่ง...";
+
+"amity_chat_mention_everyone" = "แจ้งเตือนทุกคน";
 "chat_delete_alert_title" = "ลบข้อความนี้?";
 "chat_delete_alert_message" = "ข้อความนี้จะถูกลบจากอุปกรณ์ของเพื่อนคุณด้วย";
 "chat_delete_action_sheet_title" = "ข้อความของคุณไม่ถูกส่ง";
@@ -227,7 +266,7 @@
 "community_member_count_plural" = "%@ สมาชิก";
 
 "explore_categories_see_more" = "ดูเพิ่มเติม";
-"expandable_text_see_more" = "...ดูเพิ่มเติม";
+"expandable_text_see_more" = "... ดูเพิ่มเติม";
 "explore_trending_now_component_title" = "กำลังมาแรง";
 "amity_social_label_recommended_for_you" = "แนะนำสำหรับคุณ";
 
@@ -911,7 +950,7 @@
 "amity_social_video_not_available" = "ไม่สามารถแสดงวิดีโอได้";
 
 // Social Home Tab Titles
-"social_home_newsfeed_tab" = "นิวส์ฟีด";
+"social_home_newsfeed_tab" = "กำลังติดตาม";
 "social_home_explore_tab" = "สำรวจ";
 "social_home_my_communities_tab" = "ชุมชนของฉัน";
 "social_home_communities_tab" = "ชุมชน";
@@ -1289,8 +1328,308 @@
 "community_add_member_failed_toast" = "ไม่สามารถเพิ่มสมาชิกในชุมชนนี้ได้ กรุณาลองใหม่อีกครั้ง";
 "amity_social_upload_image_failed" = "ไม่สามารถอัปโหลดรูปภาพได้ กรุณาลองใหม่อีกครั้ง";
 
+// MARK: - Chat v4 (merged from feat/chat-v4)
+
+"amity_chat_see_more" = "ดูเพิ่มเติม";
+"general_camera" = "กล้อง";
+"message_media" = "สื่อ";
+"amity_chat_message_failed_to_send" = "ส่งข้อความไม่สำเร็จ";
+"amity_chat_home_title" = "แชท";
+"amity_chat_archived" = "ถูกเก็บ";
+"amity_chat_waiting_for_network" = "กำลังรอเครือข่าย...";
+"amity_chat_home_notifications_off_banner" = "การแจ้งเตือนถูกปิดอยู่";
+"amity_chat_timestamp_now" = "ตอนนี้";
+"amity_chat_tab_all" = "ทั้งหมด";
+"amity_chat_tab_direct" = "ส่วนตัว";
+"amity_chat_tab_groups" = "กลุ่ม";
+"amity_chat_search_placeholder" = "ค้นหา";
+"amity_chat_create_group_title" = "กลุ่มใหม่";
+"amity_chat_create_group_button" = "สร้าง";
+"amity_chat_create_group_public_title" = "สาธารณะ";
+"amity_chat_create_group_public_subtitle" = "ทุกคนสามารถค้นหากลุ่มผ่านการค้นหาและเข้าร่วมการสนทนาได้";
+"amity_chat_create_group_error" = "สร้างแชทกลุ่มไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_reply_photo_label" = "รูปภาพ";
+"amity_chat_reply_video_label" = "วิดีโอ";
+"amity_chat_block_confirm_title" = "บล็อกผู้ใช้?";
+"amity_chat_block_confirm_message" = "%@ จะไม่สามารถส่งข้อความถึงคุณได้ พวกเขาจะไม่ได้รับการแจ้งเตือนว่าคุณบล็อกพวกเขา";
+"amity_chat_block_confirm_label" = "บล็อก";
+"amity_chat_unblock_confirm_title" = "ปลดบล็อกผู้ใช้?";
+"amity_chat_unblock_confirm_message" = "%@ จะสามารถส่งข้อความถึงคุณได้แล้ว พวกเขาจะไม่ได้รับการแจ้งเตือนว่าคุณปลดบล็อกพวกเขา";
+"amity_chat_unblock_confirm_label" = "ปลดบล็อก";
+"chat_notification_pref_title" = "การแจ้งเตือน";
+"amity_chat_save_video_success" = "บันทึกวิดีโอแล้ว";
+"amity_chat_action_save" = "บันทึก";
+"amity_chat_jump_to_message_unavailable" = "ข้อความไม่พร้อมใช้งาน";
+"amity_chat_group_member_list_tab_title" = "สมาชิก";
+"amity_chat_group_member_list_promote_title" = "เลื่อนตำแหน่งผู้ดูแล";
+"amity_chat_group_member_list_promote_message" = "คุณแน่ใจหรือไม่ว่าต้องการเลื่อนตำแหน่งสมาชิกนี้เป็นผู้ดูแล? พวกเขาจะได้รับสิทธิ์เข้าถึงฟีเจอร์ผู้ดูแลทั้งหมด";
+"amity_chat_group_member_list_promote_confirm" = "เลื่อนตำแหน่ง";
+"amity_chat_group_member_list_demote_title" = "ลดตำแหน่งผู้ดูแล";
+"amity_chat_group_member_list_demote_message" = "คุณแน่ใจหรือไม่ว่าต้องการลดตำแหน่งผู้ดูแลนี้? พวกเขาจะสูญเสียสิทธิ์เข้าถึงฟีเจอร์ผู้ดูแลทั้งหมด";
+"amity_chat_group_member_list_demote_confirm" = "ลดตำแหน่ง";
+"amity_chat_group_member_list_remove_title" = "ยืนยันการนำออก";
+"amity_chat_group_member_list_remove_message" = "คุณแน่ใจหรือไม่ว่าต้องการนำสมาชิกนี้ออกจากกลุ่ม? พวกเขาจะทราบว่าถูกนำออก";
+"amity_chat_group_member_list_remove_confirm" = "นำออก";
+"amity_chat_group_member_list_ban_message" = "คุณแน่ใจหรือไม่ว่าต้องการแบนผู้ใช้นี้? พวกเขาจะถูกนำออกจากกลุ่มและไม่สามารถค้นหาหรือเข้าร่วมใหม่ได้จนกว่าจะถูกปลดแบน";
+"amity_chat_group_member_list_ban_confirm" = "แบน";
+"amity_chat_group_member_list_toast_promoted" = "เลื่อนตำแหน่งสมาชิกแล้ว";
+"amity_chat_group_member_list_toast_demoted" = "ลดตำแหน่งสมาชิกแล้ว";
+"amity_chat_group_member_list_toast_banned" = "แบนผู้ใช้แล้ว";
+"amity_chat_group_leave_confirm_title" = "ออกจากกลุ่ม";
+"amity_chat_group_leave_confirm_label" = "ออก";
+"amity_chat_group_setting_leave_failed" = "ออกจากกลุ่มไม่สำเร็จ";
+"amity_chat_group_settings_section" = "การตั้งค่ากลุ่ม";
+"amity_chat_group_profile" = "โปรไฟล์กลุ่ม";
+"chat_group_setting_tile_notifications" = "การแจ้งเตือนกลุ่ม";
+"amity_chat_group_member_permissions" = "สิทธิ์สมาชิก";
+"chat_group_setting_tile_all_members" = "สมาชิกทั้งหมด";
+"amity_chat_group_banned_members" = "ผู้ใช้ที่ถูกแบน";
+"amity_chat_group_leave" = "ออกจากกลุ่ม";
+"amity_chat_group_notification_default_label" = "ค่าเริ่มต้น";
+"amity_chat_group_notification_silent_label" = "เงียบ";
+"amity_chat_group_notification_subscribe_label" = "สมัครรับ";
+"amity_chat_edit_group_profile_navbar_title" = "โปรไฟล์กลุ่ม";
+"amity_chat_group_edit_profile_save" = "บันทึก";
+"chat_edit_group_profile_name_label" = "ชื่อกลุ่ม";
+"amity_chat_edit_group_profile_name_placeholder" = "กรุณากรอกชื่อกลุ่ม";
+"amity_chat_media_camera" = "กล้อง";
+"amity_chat_media_photo" = "รูปภาพ";
+"amity_chat_group_edit_notification_save" = "บันทึก";
+"amity_chat_group_notification_save_success" = "อัปเดตการแจ้งเตือนกลุ่มแล้ว";
+"amity_chat_group_notification_save_error" = "อัปเดตการแจ้งเตือนกลุ่มไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_group_notification_default_title" = "โหมดค่าเริ่มต้น";
+"amity_chat_group_notification_default_desc" = "ตามค่าเริ่มต้น สมาชิกในชุมชนนี้จะได้รับการแจ้งเตือน แต่สามารถเลือกปิดได้";
+"amity_chat_group_notification_silent_title" = "โหมดเงียบ";
+"amity_chat_group_notification_silent_desc" = "ไม่มีการแจ้งเตือนสำหรับทุกคนในช่องนี้ สมาชิกไม่สามารถเปิดการแจ้งเตือนในช่องนี้ได้";
+"amity_chat_group_notification_subscribe_title" = "โหมดสมัครรับ";
+"amity_chat_group_notification_subscribe_desc" = "สมาชิกทุกคนมีตัวเลือกในการรับการแจ้งเตือน แต่ต้องเปิดใช้งานเอง ตามค่าเริ่มต้น การแจ้งเตือนจะปิดสำหรับสมาชิกแต่ละคน";
+"amity_chat_group_member_permissions_navbar_title" = "สิทธิ์สมาชิก";
+"amity_chat_group_edit_permission_save" = "บันทึก";
+"amity_chat_edit_group_perm_toast_success" = "อัปเดตสิทธิ์สมาชิกแล้ว";
+"amity_chat_edit_group_perm_toast_failed" = "อัปเดตสิทธิ์สมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_group_edit_permissions_everyone_title" = "ทุกคน";
+"amity_chat_group_edit_permissions_everyone_description" = "ทุกคนสามารถส่งข้อความในกลุ่มได้";
+"amity_chat_group_edit_permissions_moderators_only_title" = "ผู้ดูแลเท่านั้น";
+"amity_chat_group_edit_permissions_moderators_only_description" = "สมาชิกที่ไม่ใช่ผู้ดูแลสามารถอ่านข้อความได้แต่ไม่สามารถส่งข้อความได้";
+"amity_chat_add_group_member_toast_failed" = "เพิ่มสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง";
+"chat_add_group_member_search_placeholder" = "ค้นหา";
+"chat_add_group_member_empty" = "ไม่พบผู้ใช้";
+"amity_chat_banned_member_list_navbar_title" = "ผู้ใช้ที่ถูกแบน";
+"user_unban_confirm_description" = "คุณแน่ใจหรือไม่ว่าต้องการปลดแบนผู้ใช้นี้? พวกเขาจะสามารถเข้าร่วมกลุ่มใหม่ได้";
+"user_unban_button" = "ปลดแบน";
+"amity_chat_archived_navbar_title" = "แชทที่เก็บถาวร";
+"amity_chat_archived_empty_title" = "ไม่มีแชทที่เก็บถาวร";
+"amity_chat_archived_badge_label" = "เก็บถาวร";
+"amity_chat_archive" = "เก็บถาวร";
+"amity_chat_unarchive" = "ยกเลิกเก็บถาวร";
+"amity_chat_archived_toast" = "เก็บถาวรแชทแล้ว";
+"amity_chat_unarchived_toast" = "ยกเลิกเก็บถาวรแชทแล้ว";
+"amity_chat_archive_error_toast" = "เก็บถาวรแชทไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_unarchive_error_toast" = "ยกเลิกเก็บถาวรแชทไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_archive_limit_title" = "เก็บถาวรแชทมากเกินไป";
+"amity_chat_archive_limit_message" = "คุณสามารถเก็บถาวรแชทได้สูงสุด 100 รายการ";
+"amity_chat_message_deleted" = "ข้อความนี้ถูกลบแล้ว";
+"amity_chat_message_photo" = "ส่งรูปภาพ";
+"amity_chat_message_video" = "ส่งวิดีโอ";
+"amity_chat_message_no_preview" = "ไม่รองรับการแสดงตัวอย่างสำหรับข้อความประเภทนี้";
+"amity_chat_message_no_content" = "ไม่มีเนื้อหาข้อความ";
+"user_profile_unknown_name" = "ไม่ทราบ";
+"amity_chat_search_tab_chats" = "แชท";
+"amity_chat_search_tab_messages" = "ข้อความ";
+"chat_create_conversation_search_placeholder" = "ค้นหา";
+"chat_create_conversation_empty" = "ไม่พบผู้ใช้";
+"amity_chat_select_group_member_done" = "เสร็จสิ้น";
+"chat_select_group_member_search_placeholder" = "ค้นหา";
+"amity_chat_group_notif_pref_navbar_title" = "การแจ้งเตือน";
+"amity_chat_group_notif_pref_save" = "บันทึก";
+"amity_chat_group_notifications_disabled" = "การแจ้งเตือนกลุ่มถูกปิดโดยผู้ดูแล";
+"amity_chat_group_notification_preference_title" = "อนุญาตการแจ้งเตือน";
+"amity_chat_group_notification_preference_description" = "เปิดเพื่อรับการแจ้งเตือนแบบพุชจากกลุ่มนี้";
+"amity_chat_group_member_action_unmute" = "เปิดเสียงผู้ใช้";
+"amity_chat_group_member_action_mute" = "ปิดเสียงผู้ใช้";
+"chat_group_member_action_unreport" = "ยกเลิกรายงานผู้ใช้";
+"amity_chat_edit_message_preview_title" = "แก้ไขข้อความ";
+"amity_chat_composer_camera_denied_title" = "ไม่อนุญาตการเข้าถึงกล้อง";
+"amity_chat_composer_camera_denied_message" = "กรุณาเปิดใช้งานการเข้าถึงกล้องในการตั้งค่าเพื่อถ่ายรูปหรือวิดีโอ";
+"amity_chat_composer_camera_denied_open_settings" = "เปิดการตั้งค่า";
+"chat_dm_action_report_user" = "รายงานผู้ใช้";
+"amity_chat_action_unblock_user" = "ปลดบล็อกผู้ใช้";
+"amity_chat_action_block_user" = "บล็อกผู้ใช้";
+"amity_chat_bubble_link_preview_no_data" = "ไม่มีข้อมูลแสดง";
+"amity_chat_reply_you_to_deleted" = "คุณตอบกลับข้อความที่ถูกลบ";
+"amity_chat_reply_to_deleted" = "ตอบกลับข้อความที่ถูกลบ";
+"amity_chat_reply_you" = "คุณตอบกลับ";
+"amity_chat_reply_to_you" = "ตอบกลับคุณ";
+"amity_chat_reply_to_themself" = "ตอบกลับตัวเอง";
+"amity_chat_reply_you_to_yourself" = "คุณตอบกลับตัวเอง";
+"amity_chat_reply_you_to_name" = "คุณตอบกลับ %@";
+"amity_chat_reply_name_to_you" = "%@ ตอบกลับคุณ";
+"amity_chat_reply_name_to_themself" = "%@ ตอบกลับตัวเอง";
+"amity_chat_reply_name_to_name" = "%@ ตอบกลับ %@";
+"amity_chat_unknown_user" = "ไม่ทราบ";
+
+// MARK: - Chat v4 Flutter parity — missing keys
+
+// chat.status.*
+"amity_chat_create_group_success" = "สร้างแชทกลุ่มแล้ว";
+"amity_chat_leave_without_finishing_title" = "ออกโดยไม่สร้างเสร็จ?";
+"amity_chat_leave_without_finishing_message" = "ความคืบหน้าจะไม่ถูกบันทึกและกลุ่มจะไม่ถูกสร้าง";
+"amity_chat_member_limit_reached_title" = "ถึงขีดจำกัดสมาชิกแล้ว";
+"amity_chat_member_limit_reached_message" = "คุณถึงจำนวนสมาชิกสูงสุดที่อนุญาตในกลุ่มนี้แล้ว";
+"amity_chat_notifications_disabled" = "คุณได้ปิดการแจ้งเตือนสำหรับแชท";
+"amity_chat_message_replied_message" = "ตอบกลับข้อความ";
+"amity_chat_message_replying_yourself" = "ตัวเอง";
+"amity_chat_message_resend" = "ส่งใหม่";
+"amity_chat_notification_turn_off_error" = "ปิดการแจ้งเตือนไม่สำเร็จ";
+"amity_chat_notification_turn_on_error" = "เปิดการแจ้งเตือนไม่สำเร็จ";
+"amity_chat_permission_camera_detail" = "กรุณาอนุญาตการเข้าถึงกล้องในการตั้งค่า";
+"amity_chat_permission_camera_title" = "ต้องการสิทธิ์เข้าถึงกล้อง";
+"amity_chat_permission_microphone_detail" = "กรุณาอนุญาตการเข้าถึงไมโครโฟนในการตั้งค่า";
+"amity_chat_permission_microphone_title" = "ต้องการสิทธิ์เข้าถึงไมโครโฟน";
+"chat_select_member_error" = "กรุณาเลือกผู้ใช้อย่างน้อยหนึ่งคน";
+
+// chat.input.*
+"amity_chat_input_message_placeholder" = "พิมพ์ข้อความ…";
+
+// chat.modal.dialog.*
+"amity_chat_group_leave_confirm_message" = "หากคุณออกจากกลุ่มนี้ คุณจะไม่เห็นกิจกรรมใหม่หรือมีส่วนร่วมในกลุ่มนี้อีกต่อไป";
+
+// chat.toast.*
+"amity_chat_toast_group_chat_left" = "ออกจากแชทกลุ่มแล้ว";
+"amity_chat_toast_member_added" = "เพิ่มสมาชิกแล้ว";
+"amity_chat_toast_members_added" = "เพิ่มสมาชิกแล้ว";
+"amity_chat_toast_members_add_error" = "เพิ่มสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_toast_permission_denied" = "ไม่ได้รับอนุญาต";
+
+// general.status.*
+"general_error_message" = "เกิดข้อผิดพลาด";
+"general_error_title" = "ข้อผิดพลาด";
+"general_notifications_lowercase" = "การแจ้งเตือน";
+
+// MARK: - Chat v4 DLS key renames (added missing keys)
+
+"amity_chat_add_member_title" = "เพิ่มสมาชิก";
+"amity_chat_banned_members_empty" = "ยังไม่มีอะไรให้ดู";
+"amity_chat_status_edited" = "แก้ไขแล้ว";
+"amity_chat_preview_not_available" = "ไม่สามารถแสดงตัวอย่างได้";
+"amity_chat_option_copy" = "คัดลอก";
+"amity_chat_option_delete" = "ลบ";
+"amity_chat_option_edit" = "แก้ไข";
+"amity_chat_option_reply" = "ตอบกลับ";
+"amity_chat_create_conversation_title" = "สนทนาใหม่";
+"amity_chat_group_members_label" = "สมาชิกทั้งหมด";
+"amity_chat_group_name_label" = "ชื่อกลุ่ม";
+"amity_chat_group_name_optional" = "(ไม่บังคับ)";
+"amity_chat_group_name_placeholder" = "ตั้งชื่อกลุ่มของคุณ";
+"amity_chat_privacy_label" = "ความเป็นส่วนตัว";
+"amity_chat_privacy_warning" = "ตรวจสอบให้แน่ใจว่าเลือกการตั้งค่าความเป็นส่วนตัวที่ถูกต้องสำหรับกลุ่มของคุณ เนื่องจากไม่สามารถเปลี่ยนแปลงได้ในภายหลัง";
+"amity_chat_preview_deleted" = "ข้อความนี้ถูกลบแล้ว";
+"amity_chat_action_unreport_user" = "ยกเลิกรายงานผู้ใช้";
+"amity_chat_blocked_message" = "คุณไม่สามารถส่งข้อความถึงบุคคลนี้ได้";
+"amity_chat_block_failed" = "บล็อกผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_unblock_failed" = "ปลดบล็อกผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_group_notifications" = "การแจ้งเตือนกลุ่ม";
+"amity_chat_group_edit_permissions_messaging_title" = "การส่งข้อความ";
+"amity_chat_home_empty_title" = "ยังไม่มีการสนทนา";
+"amity_chat_load_error" = "ไม่สามารถโหลดแชทได้";
+"amity_chat_member_action_demote" = "ลดตำแหน่งจากผู้ดูแล";
+"amity_chat_member_action_promote" = "เลื่อนตำแหน่งเป็นผู้ดูแล";
+"amity_chat_member_action_remove" = "นำออกจากกลุ่ม";
+"amity_chat_action_report_user" = "รายงานผู้ใช้";
+"amity_chat_no_members_found" = "ไม่พบสมาชิก";
+"amity_chat_mute_confirm_label" = "ปิดเสียง";
+"amity_chat_mute_confirm_message" = "คุณแน่ใจหรือไม่ว่าต้องการปิดเสียงผู้ใช้นี้? พวกเขาจะไม่สามารถส่งข้อความได้อีก";
+"amity_chat_mute_confirm_title" = "ยืนยันการปิดเสียง";
+"amity_chat_member_list_title" = "สมาชิกทั้งหมด";
+"amity_chat_group_members" = "สมาชิก";
+"amity_chat_unmute_confirm_label" = "เปิดเสียง";
+"amity_chat_unmute_confirm_message" = "คุณแน่ใจหรือไม่ว่าต้องการเปิดเสียงผู้ใช้นี้? พวกเขาจะสามารถส่งข้อความได้";
+"amity_chat_unmute_confirm_title" = "ยืนยันการเปิดเสียง";
+"amity_chat_cancel" = "ยกเลิก";
+"amity_chat_action_mute" = "ปิดการแจ้งเตือนแล้ว";
+"amity_chat_action_unmute" = "เปิดการแจ้งเตือนแล้ว";
+"amity_group_notification_silent" = "โหมดเงียบ";
+"amity_group_notification_subscribe" = "โหมดสมัครรับ";
+"amity_chat_your_preferences_section" = "การตั้งค่าของคุณ";
+"amity_chat_notifications_title" = "การแจ้งเตือน";
+"amity_chat_notifications_off" = "ปิด";
+"amity_chat_notifications_on" = "เปิด";
+"amity_chat_create_direct" = "แชทส่วนตัว";
+"amity_chat_create_group" = "แชทกลุ่ม";
+"amity_chat_group_member_count" = "%@ สมาชิก";
+"amity_chat_editing_message" = "กำลังแก้ไขข้อความ";
+"amity_chat_preview_sent_photo" = "ส่งรูปภาพ";
+"amity_chat_preview_sent_video" = "ส่งวิดีโอ";
+"amity_chat_home_empty_description" = "มาสร้างแชทเพื่อเริ่มต้นกันเถอะ";
+"amity_chat_preview_no_message" = "ยังไม่มีข้อความ";
+"amity_chat_replying_to" = "กำลังตอบกลับ %@";
+"amity_chat_save_video_failed" = "บันทึกวิดีโอไม่สำเร็จ";
+"amity_chat_search_no_results" = "ไม่พบผลลัพธ์";
+"amity_chat_no_users_found" = "ไม่พบผู้ใช้";
+"amity_chat_select_members_title" = "กลุ่มใหม่";
+"amity_chat_next" = "ถัดไป";
+"amity_chat_loading_label" = "กำลังโหลดแชท...";
+"amity_chat_success_member_added" = "เพิ่มสมาชิกแล้ว";
+"amity_chat_member_action_unban" = "ปลดแบนผู้ใช้";
+"amity_chat_unban_confirm_title" = "ยืนยันการปลดแบน";
+"amity_chat_ban_confirm_title" = "ยืนยันการแบน";
+"amity_chat_member_tab_moderators" = "ผู้ดูแล";
+
+"amity_chat_action_unmute_failed" = "เปิดการแจ้งเตือนไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_mute_failed" = "ปิดการแจ้งเตือนไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_report_user_success" = "รายงานผู้ใช้แล้ว";
+"amity_chat_action_unreport_user_success" = "ยกเลิกรายงานผู้ใช้แล้ว";
+"amity_chat_block_success" = "บล็อกผู้ใช้แล้ว";
+"amity_chat_unblock_success" = "ปลดบล็อกผู้ใช้แล้ว";
+"amity_chat_reach_mention_limit_message" = "คุณสามารถกล่าวถึงได้สูงสุด 30 คนต่อข้อความ";
+"amity_chat_add_member_button" = "เพิ่มสมาชิก";
+"amity_chat_add_member_chip" = "เพิ่ม";
+"amity_chat_composer_placeholder" = "เขียนข้อความ";
+"amity_chat_create_new_chat" = "สร้างแชทใหม่";
+"amity_chat_action_turn_off_notification" = "ปิดการแจ้งเตือน";
+"amity_chat_action_turn_on_notification" = "เปิดการแจ้งเตือน";
+"amity_chat_action_ban_member_failed" = "แบนผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_demote_member_failed" = "ลดตำแหน่งสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_leave_group_failed" = "ออกจากแชทกลุ่มไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_mute_user_failed" = "ปิดเสียงผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_promote_member_failed" = "เลื่อนตำแหน่งสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_remove_member_failed" = "นำสมาชิกออกไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_report_user_failed" = "รายงานผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_unban_user_failed" = "ปลดแบนผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_unmute_user_failed" = "เปิดเสียงผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_action_unreport_user_failed" = "ยกเลิกรายงานผู้ใช้ไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_group_leave_last_mod_message" = "คุณต้องเลื่อนตำแหน่งสมาชิกคนอื่นเป็นผู้ดูแลก่อนออก";
+"amity_chat_group_leave_last_mod_title" = "คุณเป็นผู้ดูแลคนสุดท้าย";
+"amity_chat_group_promote_member" = "เลื่อนตำแหน่งสมาชิก";
+"amity_chat_action_mute_user" = "ปิดเสียงผู้ใช้แล้ว";
+"amity_chat_action_unmute_user" = "เปิดเสียงผู้ใช้แล้ว";
+"amity_chat_group_edit_profile_failed" = "อัปเดตโปรไฟล์กลุ่มไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_group_edit_profile_upload_failed_title" = "เนื้อหาไม่เหมาะสม";
+"amity_chat_group_edit_profile_upload_failed_message" = "รูปภาพไม่เหมาะสม กรุณาเลือกรูปภาพอื่นเพื่ออัปโหลด";
+"amity_chat_group_edit_profile" = "อัปเดตโปรไฟล์กลุ่มแล้ว";
+"amity_chat_user_action_ban" = "แบนผู้ใช้";
+"amity_chat_preview_message" = "ส่งข้อความ";
+"amity_chat_reach_mention_limit_title" = "กล่าวถึงผู้ใช้มากเกินไป";
+"amity_chat_save_photo_failed" = "บันทึกรูปภาพไม่สำเร็จ กรุณาลองอีกครั้ง";
+"amity_chat_save_photo_success" = "บันทึกรูปภาพแล้ว";
+"amity_chat_search_min_chars" = "เริ่มค้นหาโดยพิมพ์อย่างน้อย 3 ตัวอักษร";
+"amity_chat_action_remove_member" = "นำสมาชิกออกแล้ว";
+"amity_chat_action_unban_user" = "ปลดแบนผู้ใช้แล้ว";
+"amity_chat_unban_confirm_message" = "คุณแน่ใจหรือไม่ว่าต้องการปลดแบนผู้ใช้นี้? พวกเขาจะสามารถเข้าร่วมกลุ่มใหม่ได้";
+"amity_chat_create_group_private_title" = "ส่วนตัว";
+"amity_chat_create_group_private_subtitle" = "กลุ่มถูกซ่อนจากการค้นหาและเข้าถึงได้เฉพาะจากคำเชิญของผู้ดูแลเท่านั้น";
+"amity_chat_group_name_required" = "(จำเป็น)";
+"amity_chat_upload_failed_title" = "อัปโหลดไม่สำเร็จ";
+"amity_chat_upload_failed_message" = "กรุณาลองอีกครั้ง";
+"amity_chat_create_group_member_you" = "คุณ";
+"amity_chat_create_group_member_add" = "เพิ่ม";
 // Visitor Usage Limit
 "amity_social_visitor_limit_title" = "คุณใช้งานถึงขีดจำกัดรายวันแล้ว";
 "amity_social_visitor_limit_subtitle" = "สร้างบัญชีหรือเข้าสู่ระบบเพื่อสำรวจชุมชนต่อ";
 "amity_social_visitor_limit_sign_in" = "เข้าสู่ระบบ";
 "amity_social_visitor_limit_toast" = "สร้างบัญชีหรือเข้าสู่ระบบเพื่อใช้งานต่อ";
+
+// For You Feed
+"social_home_for_you_tab" = "สำหรับคุณ";
+"amity_social_feed_caught_up_title" = "คุณดูครบหมดแล้ว";
+"amity_social_feed_caught_up_cta" = "ดูกำลังติดตาม";

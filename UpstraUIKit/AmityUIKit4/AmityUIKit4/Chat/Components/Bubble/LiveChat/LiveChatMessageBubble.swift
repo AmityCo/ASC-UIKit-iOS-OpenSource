@@ -31,25 +31,23 @@ struct LiveChatMessageBubble: ViewModifier {
                     VStack(alignment: .leading, spacing: 2) {
                         if let repliedMessage = viewModel.repliedMessage {
                             Text(repliedMessage.displayName)
-                                .font(.system(size: 13, weight: .bold))
+                                .applyTextStyle(.captionBold(Color(viewConfig.theme.baseInverseColor)))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(Color(viewConfig.theme.baseInverseColor))
                                 .lineLimit(1)
-                            
+
                             Text(repliedMessage.text)
-                                .font(.system(size: 13))
+                                .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
                                 .lineLimit(1)
                                 .accessibilityIdentifier(message.isOwner ? AccessibilityID.Chat.MessageList.senderReplyText : AccessibilityID.Chat.MessageList.receiverReplyText)
                         } else {
                             Text("")
-                                .font(.system(size: 13, weight: .bold))
+                                .applyTextStyle(.captionBold(.clear))
                                 .frame(width: 100, alignment: .leading)
                                 .shimmerEffect(cornerRadius: 16, color: viewConfig.theme.baseInverseColor)
 
                             Text("")
-                                .font(.system(size: 13))
+                                .applyTextStyle(.caption(.clear))
                                 .frame(width: 150, alignment: .leading)
                                 .shimmerEffect(cornerRadius: 16, color: viewConfig.theme.baseInverseColor)
                         }
@@ -61,7 +59,7 @@ struct LiveChatMessageBubble: ViewModifier {
                     .accessibilityIdentifier(message.isOwner ? AccessibilityID.Chat.MessageList.senderReplyTextView : AccessibilityID.Chat.MessageList.receiverReplyTextView)
                     
                     content
-                        .font(.system(size: 15))
+                        .font(AmityTextStyle.body(.clear).getFont())
                         .padding(.horizontal, 10)
                         .padding(.vertical, 8)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -69,19 +67,19 @@ struct LiveChatMessageBubble: ViewModifier {
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                 }
                 .clipShape(RoundedCorner(radius: 11, corners: .allCorners))
-                
+
             } else if message.isDeleted {
                 content
-                    .font(.system(size: 13))
+                    .font(AmityTextStyle.caption(.clear).getFont())
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
                     .background(Color(viewConfig.theme.baseColorShade4))
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .clipShape(RoundedCorner(radius: 11, corners: .allCorners))
-            
+
             } else {
                 content
-                    .font(.system(size: 15))
+                    .font(AmityTextStyle.body(.clear).getFont())
                     .padding(.horizontal, 10)
                     .padding(.vertical, 8)
                     .background(Color(viewConfig.theme.baseColorShade4))

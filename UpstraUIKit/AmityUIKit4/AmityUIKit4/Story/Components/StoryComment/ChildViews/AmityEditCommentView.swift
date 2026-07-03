@@ -72,25 +72,25 @@ public struct AmityEditCommentView: View {
                             .stroke(Color(viewConfig.theme.baseColorShade3), lineWidth: 1)
                     )
 
+                    let isSaveEnabled = !(text.isEmpty || comment.text == text)
+                    let isDarkMode = viewConfig.currentStyle == .dark
                     Button {
                         var editedComment = comment
                         editedComment.text = text
                         editedComment.metadata = mentionData.metadata
                         editedComment.mentioneeBuilder = mentionData.mentionee
-                        
+
                         hideKeyboard()
                         saveAction(editedComment)
                     } label: {
                         Text(AmityLocalizedStringSet.Social.saveButton.localizedString)
                             .applyTextStyle(.captionBold(.white))
                             .padding(EdgeInsets(top: 6, leading: 12, bottom: 6, trailing: 12))
+                            .opacity(isSaveEnabled ? 1 : (isDarkMode ? 0.3 : 1))
                     }
-                    .background(Color(viewConfig.theme.highlightColor))
-                    .overlay(
-                        text.isEmpty || text == comment.text ? Color.white.opacity(0.5) : nil
-                    )
+                    .background(Color(viewConfig.theme.primaryColor).opacity(isSaveEnabled ? 1 : 0.3))
                     .clipShape(RoundedCorner(radius: 4))
-                    .disabled(text.isEmpty || comment.text == text)
+                    .disabled(!isSaveEnabled)
                 }
                 .padding(.top, bottomPadding)
             }

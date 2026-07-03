@@ -81,7 +81,14 @@ struct RecommendedCommunityView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            AsyncImage(placeholder: AmityIcon.communityPlaceholder.imageResource, url: URL(string: community.mediumAvatarURL), contentMode: .fill)
+            AsyncImage(placeholderView: {
+                ZStack {
+                    Color(viewConfig.theme.baseColorShade3)
+                    Image(AmityIcon.communityPeopleIcon.imageResource)
+                }
+                
+            },
+                       url: URL(string: community.mediumAvatarURL), contentMode: .fill)
                 .frame(height: 125)
             
             CommunityInfoView(community: community)

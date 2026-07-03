@@ -52,6 +52,7 @@ public struct AmityPostComposerPage: AmityPageView {
     @State private var areAttachmentsReady: Bool = true
     @State private var keyboardHeight: CGFloat = .zero
     private let options: AmityPostComposerOptions
+    private let clipCaptionMaxCount = 2200
     // Track original media file IDs for comparison when post is updated
     @State private var originalMediaFileIds: [String] = []
     
@@ -166,6 +167,7 @@ public struct AmityPostComposerPage: AmityPageView {
                     .scrollEnabled(false)
                     .maxHashtagCount(30)
                     .enableProductMention(viewModel.isProductCatalogueEnabled)
+                    .characterLimit(viewModel.isInClipComposerMode ? clipCaptionMaxCount : 0)
                     .padding(EdgeInsets(top: 10, leading: 16, bottom: 10, trailing: 16))
                     .onChange(of: viewModel.postText) { _ in
                         guard textEditorViewModel.textView.isFirstResponder,
@@ -417,22 +419,22 @@ public struct AmityPostComposerPage: AmityPageView {
                 ZStack(alignment: .topTrailing) {
                     // Tag icon button
                     Circle()
-                        .fill(Color(viewConfig.theme.baseColorShade4))
+                        .fill(Color(viewConfig.theme.backgroundShade1Color))
                         .frame(width: 40, height: 40)
                         .shadow(color: Color.black.opacity(0.18), radius: 4, x: 0, y: 4)
                         .overlay(
-                            Image(AmityIcon.tagIcon.imageResource)
+                            Image(AmityIcon.LiveStream.emptyProductTaggingIcon.imageResource)
                                 .renderingMode(.template)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 20, height: 20)
+                                .frame(width: 32, height: 28)
                                 .foregroundColor(Color(viewConfig.theme.baseColor))
                         )
 
                     // Badge with count
                     Text("\(productTagCount)")
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(viewConfig.theme.backgroundShade1Color))
                         .frame(minWidth: 16, minHeight: 16)
                         .circularBackground(radius: 20, color: Color(viewConfig.theme.baseColor))
                         .offset(x: 4, y: -4)

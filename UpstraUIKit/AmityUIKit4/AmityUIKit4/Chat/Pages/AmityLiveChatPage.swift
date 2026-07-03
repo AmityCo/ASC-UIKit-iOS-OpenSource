@@ -17,11 +17,17 @@ public struct AmityLiveChatPage: AmityPageView {
     
     @StateObject var viewModel: AmityLiveChatPageViewModel
     @StateObject var messageViewModel: AmityMessageListViewModel
-    
+    @StateObject private var viewConfig: AmityViewConfigController
+
+    @StateObject private var hostWrapper = AmitySwiftUIHostWrapper()
+
     public init(channelId: String) {
         let viewModel = AmityLiveChatPageViewModel(channelId: channelId)
         self._viewModel = StateObject(wrappedValue: viewModel)
         self._messageViewModel = StateObject(wrappedValue: viewModel.messageList)
+        self._viewConfig = StateObject(
+            wrappedValue: AmityViewConfigController(pageId: .liveChatPage)
+        )
     }
     
     public var body: some View {
@@ -48,6 +54,9 @@ public struct AmityLiveChatPage: AmityPageView {
                     .opacity(messageViewModel.initialQueryState == .loading ? 1 : 0)
             }
         }
+        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .environmentObject(hostWrapper)
+        .environmentObject(viewConfig)
     }
     
     @ViewBuilder

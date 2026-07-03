@@ -37,20 +37,22 @@ struct AmityPrimaryButtonStyle: ButtonStyle {
     }
     
     func makeBody(configuration: Configuration) -> some View {
-        let enabledStateColor = backgroundColor ?? viewConfig.theme.primaryColor
-        let disabledStateColor = backgroundColor?.withAlphaComponent(0.3) ?? viewConfig.theme.primaryColor.blend(.shade3)
         
+        let buttonColor = backgroundColor ?? viewConfig.theme.primaryColor
+        let isDark = viewConfig.currentStyle == .dark
+
         buttonContent(configuration: configuration)
-            .background(Color(isEnabled ? enabledStateColor : disabledStateColor))
+            .opacity(isEnabled ? 1 : (isDark ? 0.3 : 1))
+            .background(Color(buttonColor).opacity(isEnabled ? 1 : 0.3))
             .cornerRadius(radius)
     }
-    
+
     @ViewBuilder
     func buttonContent(configuration: Configuration) -> some View {
         switch size {
         case .compact:
             configuration.label
-                .modifier(AmityTextViewModifier(textStyle: .bodyBold( configuration.isPressed ? Color.white.opacity(0.5) : Color.white)))
+                .modifier(AmityTextViewModifier(textStyle: .bodyBold( configuration.isPressed ? Color(AmityFixedColor.shared.white).opacity(0.5) : Color(AmityFixedColor.shared.white))))
                 .padding(.vertical, vPadding)
                 .padding(.horizontal, hPadding)
         case .expanded:
@@ -58,7 +60,7 @@ struct AmityPrimaryButtonStyle: ButtonStyle {
                 Spacer()
                 
                 configuration.label
-                    .modifier(AmityTextViewModifier(textStyle: .bodyBold( configuration.isPressed ? Color.white.opacity(0.5) : Color.white)))
+                    .modifier(AmityTextViewModifier(textStyle: .bodyBold( configuration.isPressed ? Color(AmityFixedColor.shared.white).opacity(0.5) : Color(AmityFixedColor.shared.white))))
                     .padding(.vertical, vPadding)
                     .padding(.horizontal, hPadding)
                 
@@ -164,8 +166,11 @@ struct AmityDropDownButtonStyle: ButtonStyle {
     }
     
     func makeBody(configuration: Configuration) -> some View {
+        let isDark = viewConfig.currentStyle == .dark
         buttonContent(configuration: configuration)
-            .background(Color(isDisabled ? viewConfig.theme.baseColorShade4.blend(.shade3) : viewConfig.theme.baseColorShade4))
+            // disabled: bg always fades to 0.3; label fades only in dark
+            .opacity(isDisabled ? (isDark ? 0.3 : 1) : 1)
+            .background(Color(viewConfig.theme.baseColorShade4).opacity(isDisabled ? 0.3 : 1))
             .disabled(isDisabled)
             .cornerRadius(radius)
     }
@@ -245,8 +250,11 @@ struct AmitySelectionButtonStyle: ButtonStyle {
     }
     
     func makeBody(configuration: Configuration) -> some View {
+        let isDark = viewConfig.currentStyle == .dark
         buttonContent(configuration: configuration)
-            .background(Color(isDisabled ? viewConfig.theme.baseColorShade4.blend(.shade3) : viewConfig.theme.baseColorShade4))
+            // disabled: bg always fades to 0.3; label fades only in dark
+            .opacity(isDisabled ? (isDark ? 0.3 : 1) : 1)
+            .background(Color(viewConfig.theme.baseColorShade4).opacity(isDisabled ? 0.3 : 1))
             .disabled(isDisabled)
             .cornerRadius(radius)
     }

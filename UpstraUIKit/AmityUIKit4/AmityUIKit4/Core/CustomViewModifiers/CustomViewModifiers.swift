@@ -435,7 +435,7 @@ struct CaptureWindowFrameModifier: ViewModifier {
     func body(content: Content) -> some View {
         content.overlay(
             WindowFrameCaptureView(onFrame: onFrame)
-                .frame(width: 0, height: 0), alignment: .topLeading
+                .allowsHitTesting(false)
         )
     }
 }

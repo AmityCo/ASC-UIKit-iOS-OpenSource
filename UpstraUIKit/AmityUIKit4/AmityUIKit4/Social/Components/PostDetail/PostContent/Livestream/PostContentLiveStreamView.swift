@@ -139,7 +139,7 @@ struct PostContentLiveStreamView: View {
                                 .applyTextStyle(.captionBold(.white))
                                 .padding(.vertical, 4)
                                 .padding(.horizontal, 8)
-                                .background(post.livestreamState == .live ? Color(UIColor(hex: "FF305A")) : Color.black.opacity(0.5))
+                                .background(post.livestreamState == .live ? Color(AmityFixedColor.shared.live) : Color.black.opacity(0.5))
                                 .blurBackground(style: .regular)
                                 .cornerRadius(4, corners: .allCorners)
                                 .padding(12)
@@ -265,15 +265,17 @@ struct PostContentLiveStreamView: View {
 
 struct BlurView: UIViewRepresentable {
     let style: UIBlurEffect.Style
-    
+
     func makeUIView(context: Context) -> UIVisualEffectView {
         let blurEffect = UIBlurEffect(style: style)
         let blurView = UIVisualEffectView(effect: blurEffect)
+        blurView.overrideUserInterfaceStyle = .light
         return blurView
     }
-    
+
     func updateUIView(_ uiView: UIVisualEffectView, context: Context) {
         uiView.effect = UIBlurEffect(style: style)
+        uiView.overrideUserInterfaceStyle = .light
     }
 }
 

@@ -34,6 +34,7 @@ class MessageReactionConfiguration {
             reactionsMap[name] = reactionType
         }
         
+        
         allReactions = reactionList
         availableReactions = reactionsMap
     }

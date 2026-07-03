@@ -36,6 +36,8 @@ public struct AmityMyCommunitiesComponent: AmityComponentView {
                         .clipped()
                         .overlay(
                             Image(AmityIcon.plusIcon.imageResource)
+                                .renderingMode(.template)
+                                .foregroundColor(Color(viewConfig.theme.baseColor))
                         )
                     
                     Text(AmityLocalizedStringSet.Social.communitySetupCreateButton.localizedString)

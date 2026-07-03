@@ -11,7 +11,8 @@ public enum AmitySocialHomePageTab: String, CaseIterable, Identifiable {
     public var id: String {
         rawValue
     }
-    
+
+    case forYou = "ForYou"
     case newsFeed = "NewsFeed"
     case clips = "Clips"
     case explore = "Explore"
@@ -24,37 +25,43 @@ struct SocialHomePageTabView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     @State private var tabItems: [TabItem]
     @Binding var selectedTab: AmitySocialHomePageTab
-    
+
+    let isForYouEnabled: Bool
     let onSelection: (AmitySocialHomePageTab) -> Void
-    
-    init(_ selectedTab: Binding<AmitySocialHomePageTab>, onSelection: @escaping (AmitySocialHomePageTab) -> Void) {
+
+    init(_ selectedTab: Binding<AmitySocialHomePageTab>, isForYouEnabled: Bool, onSelection: @escaping (AmitySocialHomePageTab) -> Void) {
         self._selectedTab = selectedTab
+        self.isForYouEnabled = isForYouEnabled
         self.onSelection = onSelection
-        
+
+        self._tabItems = State(initialValue: Self.makeTabItems(selectedTab: selectedTab.wrappedValue, isForYouEnabled: isForYouEnabled))
+    }
+
+    static func makeTabItems(selectedTab: AmitySocialHomePageTab, isForYouEnabled: Bool) -> [TabItem] {
         let clipViewAccess = AmityUIKitConfigController.shared.featureFlag?.post.clip.canViewTab ?? .signedInUserOnly
-        
+
         var items: [TabItem] = []
         if AmityUIKitManagerInternal.shared.isGuestUser {
-            items.append(TabItem(tab: .communities, selected: selectedTab.wrappedValue == .communities)) // myCommunities
-            items.append(TabItem(tab: .events, selected: selectedTab.wrappedValue == .events)) // Events
+            items.append(TabItem(tab: .communities, selected: selectedTab == .communities)) // myCommunities
+            items.append(TabItem(tab: .events, selected: selectedTab == .events)) // Events
 
             if clipViewAccess == .all {
-                items.append(TabItem(tab: .clips, selected: selectedTab.wrappedValue == .clips))
+                items.append(TabItem(tab: .clips, selected: selectedTab == .clips))
             }
         } else {
-            items = [
-                AmitySocialHomePageTab.newsFeed,
-                AmitySocialHomePageTab.communities,
-                AmitySocialHomePageTab.events,
-                AmitySocialHomePageTab.clips
-            ].map { tab in
-                TabItem(tab: tab, selected: tab == selectedTab.wrappedValue)
+            var tabs: [AmitySocialHomePageTab] = []
+            if isForYouEnabled {
+                tabs.append(.forYou)
+            }
+            tabs.append(contentsOf: [.newsFeed, .communities, .events, .clips])
+
+            items = tabs.map { tab in
+                TabItem(tab: tab, selected: tab == selectedTab)
             }
         }
-        
-        self._tabItems = State(initialValue: items)
+        return items
     }
-    
+
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
@@ -62,7 +69,7 @@ struct SocialHomePageTabView: View {
                     TabButtonView(title: getTitle(tab: item.tab), selected: item.selected)
                         .onTapGesture {
                             onSelection(item.tab)
-                            
+
                             if item.tab != .clips {
                                 selectedTab = item.tab
                             }
@@ -78,36 +85,51 @@ struct SocialHomePageTabView: View {
                 tabItems[index].selected = item.tab == value
             }
         }
+        .onChange(of: isForYouEnabled) { newValue in
+            tabItems = Self.makeTabItems(selectedTab: selectedTab, isForYouEnabled: newValue)
+            applyConfigFilter()
+        }
         .onAppear {
-            /// Filter out tabs if element is excluded in config
-            tabItems = tabItems.compactMap({ item in
-                if viewConfig.isHidden(elementId: .newsFeedButton) && item.tab == .newsFeed {
-                    return nil
-                }
-                
-                if viewConfig.isHidden(elementId: .exploreButton) && item.tab == .explore {
-                    return nil
-                }
-                
-                if viewConfig.isHidden(elementId: .myCommunitiesButton) && item.tab == .myCommunities {
-                    return nil
-                }
-                
-                if viewConfig.isHidden(elementId: .clipsFeedButton) && item.tab == .clips {
-                    return nil
-                }
-
-                if viewConfig.isHidden(elementId: .eventsButton) && item.tab == .events {
-                    return nil
-                }
-
-                return item
-            })
+            applyConfigFilter()
         }
     }
-    
+
+    /// Filter out tabs whose element is excluded via config.
+    private func applyConfigFilter() {
+        tabItems = tabItems.compactMap({ item in
+            if viewConfig.isHidden(elementId: .newsFeedButton) && item.tab == .newsFeed {
+                return nil
+            }
+            
+            if viewConfig.isHidden(elementId: .exploreButton) && item.tab == .explore {
+                return nil
+            }
+            
+            if viewConfig.isHidden(elementId: .myCommunitiesButton) && item.tab == .myCommunities {
+                return nil
+            }
+            
+            if viewConfig.isHidden(elementId: .clipsFeedButton) && item.tab == .clips {
+                return nil
+            }
+
+            if viewConfig.isHidden(elementId: .clipsFeedButton) && item.tab == .clips {
+                return nil
+            }
+            
+            if viewConfig.isHidden(elementId: .eventsButton) && item.tab == .events {
+                return nil
+            }
+
+            return item
+        })
+    }
+
     private func getTitle(tab: AmitySocialHomePageTab) -> String {
         switch tab {
+        case .forYou:
+            let t = viewConfig.forElement(.forYouButton).text
+            return (t?.isEmpty == false) ? t! : AmityLocalizedStringSet.Social.socialHomeForYouTab.localizedString
         case .newsFeed:
             let t = viewConfig.forElement(.newsFeedButton).text
             return (t?.isEmpty == false) ? t! : AmityLocalizedStringSet.Social.socialHomeNewsfeedTab.localizedString
@@ -126,9 +148,10 @@ struct SocialHomePageTabView: View {
             return AmityLocalizedStringSet.Social.socialHomeEventsTab.localizedString
         }
     }
-    
+
     private func getAccessibilityID(tab: AmitySocialHomePageTab) -> String {
         switch tab {
+        case .forYou: AccessibilityID.Social.SocialHomePage.forYouButton
         case .newsFeed: AccessibilityID.Social.SocialHomePage.newsFeedButton
         case .explore: AccessibilityID.Social.SocialHomePage.exploreButton
         case .myCommunities: AccessibilityID.Social.SocialHomePage.myCommunitiesButton
@@ -138,12 +161,12 @@ struct SocialHomePageTabView: View {
             "events_button"
         }
     }
-    
-    private struct TabItem: Identifiable {
+
+    struct TabItem: Identifiable {
         var id: String {
             tab.rawValue
         }
-        
+
         var tab: AmitySocialHomePageTab
         var selected: Bool
     }
@@ -152,17 +175,17 @@ struct SocialHomePageTabView: View {
 
 private struct TabButtonView: View {
     @EnvironmentObject var viewConfig: AmityViewConfigController
-    
+
     private let selected: Bool
     private let title: String
-    
+
     @State private var buttonWidth: CGFloat = 0
-    
+
     init(title: String, selected: Bool) {
         self.title = title
         self.selected = selected
     }
-    
+
     var body: some View {
         HStack {
             Text(title)
@@ -180,7 +203,6 @@ private struct TabButtonView: View {
         .onAppear {
             buttonWidth = title.size(usingFont: .systemFont(ofSize: 17, weight: .semibold)).width + 25
         }
-        
+
     }
 }
-

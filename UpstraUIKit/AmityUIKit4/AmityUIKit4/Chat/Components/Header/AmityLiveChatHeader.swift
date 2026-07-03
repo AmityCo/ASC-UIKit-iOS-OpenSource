@@ -32,8 +32,7 @@ public struct AmityLiveChatHeader: AmityComponentView {
                 
                 VStack(alignment: .leading, spacing: 0) {
                     Text(viewModel.displayName)
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.baseInverseColor))
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.baseInverseColor)))
                         .lineLimit(1)
                         .accessibilityIdentifier(AccessibilityID.Chat.LiveChatHeader.headerTitle)
                     
@@ -104,8 +103,7 @@ public extension AmityLiveChatHeader {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                 
                 Text(AmityLocalizedStringSet.Chat.memberCount.localized(arguments: memberCount.formattedCountString))
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .font(.system(size: 13))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                     .padding(.leading, 4)
                 
                 Spacer()
@@ -137,8 +135,7 @@ public extension AmityLiveChatHeader {
                     .scaleEffect(0.8)
                 
                 Text(AmityLocalizedStringSet.Chat.connectivityStatusWaiting.localizedString)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .font(.system(size: 13))
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
                     .padding(.leading, 4)
                 
                 Spacer()

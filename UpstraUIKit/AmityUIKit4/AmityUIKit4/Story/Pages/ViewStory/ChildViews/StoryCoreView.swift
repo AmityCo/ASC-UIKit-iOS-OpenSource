@@ -279,7 +279,10 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     func getMetadataView(targetName: String, avatar: URL?, isVerified: Bool, story: AmityStoryModel) -> some View {
         HStack {
             ZStack(alignment: .bottomTrailing) {
-                AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: avatar)
+                AsyncImage(
+                    placeholderView: { defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 45) },
+                    url: avatar
+                )
                     .frame(width: 45, height: 45)
                     .clipShape(Circle())
                     .padding(.leading, 16)
@@ -348,11 +351,10 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     func getMuteButton() -> some View {
         let muteIcon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "mute_icon", of: String.self) ?? "")
         let unmuteIcon = AmityIcon.getImageResource(named: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "unmute_icon", of: String.self) ?? "")
-        let color = Color(UIColor(hex: getConfig(pageId: .storyPage, elementId: .muteUnmuteButtonElement, key: "background_color", of: String.self) ?? ""))
         return Image(muteVideo ? muteIcon
               : unmuteIcon)
         .frame(width: 32, height: 32)
-        .background(color)
+        .background(Color(AmityFixedColor.shared.speakerButtonBackground))
         .clipShape(.circle)
         .onTapGesture {
             muteVideo.toggle()
@@ -375,7 +377,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.hyperlinkTextView)
         }
         .frame(height: 40)
-        .background(Color(UIColor(hex: "#EBECEF")).opacity(0.8))
+        .background(Color(viewConfig.defaultLightTheme.baseColorShade4).opacity(0.8))
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .padding(EdgeInsets(top: 0, leading: 24, bottom: 62, trailing: 24))
         .onTapGesture {
@@ -454,7 +456,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             
             Spacer()
             
-            let commentBtnBgColor = Color(UIColor(hex: viewConfig.getConfig(elementId: .storyCommentButtonElement, key: "background_color", of: String.self) ?? "#FFFFFF"))
+            let commentBtnBgColor = Color(viewConfig.defaultLightTheme.baseColor)
             HStack(spacing: 0) {
                 let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .storyCommentButtonElement, key: "comment_icon", of: String.self) ?? "")
                 Image(icon)
@@ -481,7 +483,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             .isHidden(viewConfig.isHidden(elementId: .storyCommentButtonElement))
             
             let isCommunityMember = story.storyTarget?.community?.isJoined ?? true
-            let reactionBtnBgColor = Color(UIColor(hex: viewConfig.getConfig(elementId: .storyReactionButtonElement, key: "background_color", of: String.self) ?? ""))
+            let reactionBtnBgColor = Color(viewConfig.defaultLightTheme.baseColor)
             HStack(spacing: 0) {
                 let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .storyReactionButtonElement, key: "reaction_icon", of: String.self) ?? "")
                 let likedIcon = AmityIcon.likeReactionIcon.getImageResource()
@@ -506,7 +508,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
 
                 AmityUserAction.perform(host: host) {
                     guard isCommunityMember else {
-                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+                        Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                         return
                     }
                     
@@ -605,7 +607,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             })
         }
         .frame(height: 44)
-        .background(Color.red)
+        .background(Color(viewConfig.theme.alertColor))
         .padding(.bottom, 37)
     }
     

@@ -8,7 +8,6 @@
 
 import UIKit
 import AmitySDK
-import AmityUIKit
 #if DISTRIBUTION
 import Firebase
 #endif
@@ -57,27 +56,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     }
 
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        
-        // Handler of opening external url from web browsing session.
-        if userActivity.activityType == NSUserActivityTypeBrowsingWeb, let url = userActivity.webpageURL {
-
-            let urlString = url.absoluteString //"https://Amity.co/post/124325135"
-            // Parse url and be sure that it is a url of a post
-            if urlString.contains("post/") {
-                if let range = urlString.range(of: "post/") {
-                    // Detect id of the post
-                    let postId = String(urlString[range.upperBound...])
-                    
-                    // Open post details page
-                    openPost(withId: postId)
-                }
-            }
-        }
-        
-        return true
-    }
-    
     // MARK: Push Notification
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
@@ -108,21 +86,6 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
     
 }
-
-// MARK:- Helper methods
-extension AppDelegate {
-    
-    private func openPost(withId postId: String) {
-        window = UIWindow()
-        AmityUIKitManager.registerDevice(withUserId: "victimIOS", displayName: "victimIOS".uppercased(), sessionHandler: SampleSessionHandler())
-        
-        let postDetailViewController = AmityPostDetailViewController.make(withPostId: "c1bb8697c88a01f6423765984a3e47ac")
-        window?.rootViewController = postDetailViewController
-        window?.makeKeyAndVisible()
-    }
-    
-}
-
 
 class SampleSessionHandler: SessionHandler {
     

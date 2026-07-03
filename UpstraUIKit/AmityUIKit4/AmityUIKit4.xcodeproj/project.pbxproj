@@ -72,16 +72,28 @@
 				AmityUIKitConfig.json,
 				Assets.xcassets,
 				Chat/Behaviours/ChatBehavior.swift,
+				Chat/Components/Bubble/AmityChatMessageQuickReaction.swift,
+				Chat/Components/Bubble/AmityChatMessageReactionPreview.swift,
+				Chat/Components/Bubble/AmityChatMessageReceiverView.swift,
+				Chat/Components/Bubble/AmityChatMessageSenderView.swift,
 				Chat/Components/Bubble/AmityLiveChatMessageReactionPreview.swift,
 				Chat/Components/Bubble/AmityMessageAction.swift,
+				Chat/Components/Bubble/ChatMessageBubble.swift,
+				Chat/Components/Bubble/ChatMessageBubbleView.swift,
+				Chat/Components/Bubble/ChatMessageBubbleViewModel.swift,
 				Chat/Components/Bubble/LiveChat/AmityLiveChatMessageReceiverView.swift,
 				Chat/Components/Bubble/LiveChat/AmityLiveChatMessageSenderView.swift,
 				Chat/Components/Bubble/LiveChat/LiveChatMessageBubble.swift,
 				Chat/Components/Bubble/LiveChat/LiveChatMessageBubbleView.swift,
 				Chat/Components/Bubble/LiveChat/Reaction/AmityLiveChatMessageQuickReaction.swift,
 				Chat/Components/Bubble/LiveChat/Reaction/AmityLiveChatMessageReactionPicker.swift,
+				Chat/Components/Bubble/MediaBubbleView.swift,
 				Chat/Components/Bubble/MessageAvatarView.swift,
+				Chat/Components/Bubble/MessageLinkPreviewView.swift,
 				Chat/Components/Bubble/MessageStatusView.swift,
+				Chat/Components/Bubble/OverflowDetectingText.swift,
+				Chat/Components/Bubble/VideoMessagePlayerView.swift,
+				Chat/Components/Composer/AmityChatMessageComposeBar.swift,
 				Chat/Components/Composer/AmityLiveChatMessageComposeBar.swift,
 				Chat/Components/Composer/AmityMentionUserListView.swift,
 				Chat/Components/Composer/AmityMessageComposerViewModel.swift,
@@ -89,18 +101,51 @@
 				Chat/Components/Composer/AmityTextMessageReplyPreview.swift,
 				Chat/Components/Composer/Elements/AmityMessageTextEditorView.swift,
 				Chat/Components/Composer/Elements/ExpandableTextEditorView.swift,
+				Chat/Components/Composer/MessageCameraPickerView.swift,
+				Chat/Components/Composer/MessageFilePickerView.swift,
+				Chat/Components/ConversationChatUserAction/AmityConversationChatUserActionComponent.swift,
 				Chat/Components/EmptyStates/AmityEmptyStateView.swift,
+				Chat/Components/GroupMemberAction/AmityGroupMemberActionComponent.swift,
 				Chat/Components/Header/AmityLiveChatHeader.swift,
 				Chat/Components/Header/AmityLiveChatHeaderViewModel.swift,
+				Chat/Components/MessageList/AmityChatMessageListComponent.swift,
+				Chat/Components/MessageList/AmityChatMessageListViewModel.swift,
 				Chat/Components/MessageList/AmityLiveChatMessageList.swift,
 				Chat/Components/MessageList/AmityMessageListViewModel.swift,
+				Chat/Components/MessageList/ChatScrollCoordinator.swift,
 				Chat/Components/MessageList/MessageCache.swift,
+				Chat/Components/MessageOverlay/ChatMessageActionOverlayView.swift,
+				Chat/Components/MessageOverlay/ChatMessageActionView.swift,
 				Chat/Elements/ChatElement.swift,
 				Chat/Managers/ChannelManager.swift,
 				Chat/Managers/ChatManager.swift,
+				Chat/Managers/MessageMediaSaver.swift,
 				Chat/Model/MessageModel.swift,
+				Chat/Pages/AddGroupMember/AmityAddGroupMemberPage.swift,
+				Chat/Pages/AmityChatRoomViewModel.swift,
 				Chat/Pages/AmityLiveChatPage.swift,
 				Chat/Pages/AmityLiveChatPageViewModel.swift,
+				Chat/Pages/ArchivedChat/AmityArchivedChatPage.swift,
+				Chat/Pages/ArchivedChat/AmityArchivedChatViewModel.swift,
+				Chat/Pages/BannedGroupMember/AmityBannedGroupMemberListPage.swift,
+				Chat/Pages/ChatHome/AmityChatHomePage.swift,
+				Chat/Pages/ChatHome/AmityChatHomeViewModel.swift,
+				Chat/Pages/ChatHome/AmityChatListComponent.swift,
+				Chat/Pages/ChatHome/AmityChatListItemView.swift,
+				Chat/Pages/CreateConversation/AmityCreateConversationPage.swift,
+				Chat/Pages/CreateGroupChat/AmityCreateGroupChatPage.swift,
+				Chat/Pages/CreateGroupChat/AmitySelectGroupMemberPage.swift,
+				Chat/Pages/DirectChat/AmityChatPage.swift,
+				Chat/Pages/EditGroupMemberPermission/AmityEditGroupMemberPermissionsPage.swift,
+				Chat/Pages/EditGroupNotification/AmityEditGroupNotificationPage.swift,
+				Chat/Pages/EditGroupProfile/AmityEditGroupProfilePage.swift,
+				Chat/Pages/FullTextMessage/AmityChatFullTextPage.swift,
+				Chat/Pages/GroupChat/AmityGroupChatPage.swift,
+				Chat/Pages/GroupMemberList/AmityGroupMemberListPage.swift,
+				Chat/Pages/GroupNotificationPreference/AmityGroupNotificationPreferencePage.swift,
+				Chat/Pages/GroupSetting/AmityGroupSettingPage.swift,
+				Chat/Pages/SearchChannel/AmitySearchChannelPage.swift,
+				Chat/Pages/SearchChannel/AmitySearchChannelViewModel.swift,
 				Clip/Page/Capture/AmityCreateClipPostPage.swift,
 				Clip/Page/Capture/AmityCreateClipPostPageViewModel.swift,
 				Clip/Page/ClipPostAlert.swift,
@@ -377,6 +422,7 @@
 				"Core/Extensions/UIImage+Extension.swift",
 				"Core/Extensions/UINavigationController+Extension.swift",
 				"Core/Extensions/UIViewController+Extension.swift",
+				"Core/Extensions/View+Extension.swift",
 				Core/Localization/AmityStringProvider.swift,
 				Core/Localization/QALocaleVerification.swift,
 				Core/Managers/CommentManager.swift,
@@ -598,6 +644,9 @@
 				Social/Components/SocialHome/Explore/Pages/CommunitiesByCategory/AmityCommunitiesByCategoryPage.swift,
 				Social/Components/SocialHome/Explore/Pages/CommunitiesByCategory/Views/CommunityListItemView.swift,
 				Social/Components/SocialHome/Explore/Pages/CommunitiesByCategory/Views/CommunityListView.swift,
+				Social/Components/SocialHome/ForYouFeed/AmityFeedCaughtUpComponent.swift,
+				Social/Components/SocialHome/ForYouFeed/AmityForYouFeedComponent.swift,
+				Social/Components/SocialHome/ForYouFeed/ForYouFeedViewModel.swift,
 				Social/Components/SocialHome/MyCommunities/AmityMyCommunitiesComponent.swift,
 				Social/Components/SocialHome/NewsFeed/AmityEmptyNewsFeedComponent.swift,
 				Social/Components/SocialHome/NewsFeed/AmityGlobalFeedComponent.swift,
@@ -687,6 +736,8 @@
 				Social/Pages/SocialHome/AmityGlobalBannedPage.swift,
 				Social/Pages/SocialHome/AmitySocialHomePage.swift,
 				Social/Pages/SocialHome/ChildViews/SocialHomeContainerView.swift,
+				Social/Pages/SocialHome/ChildViews/SocialHomeFeedSkeletonView.swift,
+				Social/Pages/SocialHome/ChildViews/SocialHomePageTabSkeletonView.swift,
 				Social/Pages/SocialHome/ChildViews/SocialHomePageTabView.swift,
 				Social/Pages/UserProfile/AmityBlockedUsersPage.swift,
 				Social/Pages/UserProfile/AmityBlockedUsersPageViewModel.swift,
@@ -875,7 +926,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				A4375EFE88E9F0C525E3604E /* SharedFrameworks */,
+				A0EBD24CC3B327DE6DCC7A73 /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -927,7 +978,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				51E65040728EE5406CE52920 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				645A78D6A3740A9BF76E4230 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1269,16 +1320,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		51E65040728EE5406CE52920 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		645A78D6A3740A9BF76E4230 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A4375EFE88E9F0C525E3604E /* SharedFrameworks */ = {
+		A0EBD24CC3B327DE6DCC7A73 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 51E65040728EE5406CE52920 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 645A78D6A3740A9BF76E4230 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

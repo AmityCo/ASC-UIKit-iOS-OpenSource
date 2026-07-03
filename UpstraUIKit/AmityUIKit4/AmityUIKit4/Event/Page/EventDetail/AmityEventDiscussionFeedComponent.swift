@@ -73,7 +73,7 @@ struct AmityEventDiscussionFeedComponent: View {
         HStack {
             Spacer()
             
-            AmityEmptyStateView(configuration: .init(image: AmityIcon.communityProfileEmptyPostIcon.rawValue, title: AmityLocalizedStringSet.Social.eventDiscussionFeedNoPostsYet.localizedString, subtitle: nil, iconSize: .init(width: 60, height: 60), renderingMode: .original, imageBottomPadding: 12, tapAction: nil))
+            AmityEmptyStateView(configuration: .init(image: AmityIcon.communityProfileEmptyPostIcon.rawValue, title: AmityLocalizedStringSet.Social.eventDiscussionFeedNoPostsYet.localizedString, subtitle: nil, iconSize: .init(width: 60, height: 60), renderingMode: .template, iconTintColor: viewConfig.theme.baseColorShade4, imageBottomPadding: 12, tapAction: nil))
             
             Spacer()
         }

@@ -22,7 +22,8 @@ struct AmityCommentAdComponent: View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 0) {
                 
-                AsyncImage(placeholder: AmityIcon.adAvatarPlaceholder.imageResource, url: URL(string: ad.advertiser?.avatar?.fileURL ?? ""))
+                AsyncImage(placeholderView: { adAvatarPlaceholderView(viewConfig: viewConfig, size: 32) },
+                           url: URL(string: ad.advertiser?.avatar?.fileURL ?? ""))
                     .frame(width: 32, height: 32)
                     .clipShape(.circle)
                     .padding(EdgeInsets(top: 0, leading: 12, bottom: 0, trailing: 8))

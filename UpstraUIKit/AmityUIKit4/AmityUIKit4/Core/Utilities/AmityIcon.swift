@@ -19,7 +19,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case statusSuccessIcon = "statusSuccessIcon"
     case statusWarningIcon = "statusWarningIcon"
     case statusLoadingIcon = "statusLoadingIcon"
-    case toastStatusWarningIcon = "toastStatusWarningIcon"
+    case statusInfoIcon = "statusInfoIcon"
     case defaultCommunityAvatar = "defaultCommunityAvatar"
     case flagIcon = "flagIcon"
     case unflagIcon = "unflagIcon"
@@ -44,7 +44,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case hyperLinkIcon = "hyperLinkIcon"
     case hyperLinkBlueIcon = "hyperLinkBlueIcon"
     case trashBinRedIcon = "trashBinRedIcon"
-    case likeReactionIcon = "likeReactionIcon"
+    case likeReactionIcon = "socialReactionLike"
     
     // AmityViewStoryPage Icons
     case verifiedWhiteBadge = "verifiedWhiteBadge"
@@ -80,6 +80,7 @@ enum AmityIcon: String, ImageResourceProvider {
         case membersCount = "membersCountIcon"
         
         case emptyStateMessage = "emptyStateMessage"
+        case bannedFromChatIcon = "chatGroupBanned"
         case greyRetryIcon = "greyRetryIcon"
         case chatAvatarProfilePlaceholder = "chatAvatarProfilePlaceholder"
         case mentionAll = "mentionAll"
@@ -96,12 +97,112 @@ enum AmityIcon: String, ImageResourceProvider {
         case mutedIcon = "mutedIcon"
         case unknownReaction = "reactionUnknown"
         case sendActionIcon = "sendActionIcon"
+
+        // Chat v4
+        case videoPlayButtonIcon = "chatVideoPlayButton"
+        case videoReplyPlayIcon = "chatVideoReplyPlay"
+        case openMediaSectionIcon = "chatOpenMediaSection"
+        case closeMediaSectionIcon = "chatCloseMediaSection"
+        case sendDisabledIcon = "sendIconDisable"
+        case editMessageIcon = "chatEditMessageIcon"
+        case saveImageIcon = "chatSaveImageIcon"
+        case previewDeletedMessageIcon = "chatPreviewDeletedMessage"
+        case previewImageMessageIcon = "chatPreviewImageMessage"
+        case previewVideoMessageIcon = "chatPreviewVideoMessage"
+        case imagePlaceholderIcon = "chatImagePlaceholder"
+        case deletedUserAvatarIcon = "chatDeletedUserAvatar"
+        case roomMentionIcon = "chatRoomMention"
+        case seeMoreArrowIcon = "chatSeeMoreArrow"
+        case mediaMessageErrorIcon = "chatMediaMessageError"
+
+        // Headers / nav
+        case backButtonIcon = "chatBackButton"
+        case circularBackButtonIcon = "chatCircularBackButton"
+        case ellipsisIcon = "chatEllipsis"
+        case closeButtonIcon = "chatCloseButton"
+        case navSearchIcon = "chatNavSearch"
+        case searchButtonIcon = "chatSearchButton"
+        case grayCloseIcon = "chatGrayClose"
+
+        // Mute / flag / block
+        case muteIcon = "chatMute"
+        case unmuteIcon = "chatUnmute"
+        case flagIcon = "chatFlag"
+        case unflagIcon = "chatUnflag"
+        case blockUserIcon = "chatBlockUser"
+        case manageBlockedIcon = "chatManageBlocked"
+
+        // Avatar placeholders
+        case userAvatarPlaceholderIcon = "chatUserAvatarPlaceholder"
+        case groupAvatarPlaceholderIcon = "chatGroupAvatarPlaceholder"
+        case privateChannelIcon = "chatPrivateChannelIcon"
+
+        // Camera
+        case cameraIcon = "chatCamera"
+        case cameraButtonIcon = "chatCameraButton"
+
+        // Group / members
+        case createGroupIcon = "chatCreateGroup"
+        case createGroupPrivateIcon = "chatCreateGroupPrivate"
+        case createGroupPublicIcon = "chatCreateGroupPublic"
+        case imageButtonIcon = "chatImageButton"
+        case addMemberIcon = "chatAddMember"
+        case addImageIcon = "chatAddImage"
+        case plusIcon = "chatPlus"
+        case groupMembersIcon = "chatGroupMembers"
+        case mutedMemberIcon = "chatMutedMember"
+        case threeDotVerticalIcon = "chatThreeDotVertical"
+        case searchUserIcon = "chatSearchUser"
+        case searchNotFoundIcon = "chatSearchNotFound"
+
+        // Archived / home / search
+        case archivedMenuIcon = "chatArchivedMenu"
+        case archivedEmptyIcon = "chatArchivedEmpty"
+        case homeOptionIcon = "chatHomeOption"
+        case createButtonIcon = "chatCreateButton"
+        case chatCreationButton = "chatCreationButton"
+        case emptyStateIcon = "chatEmptyState"
+        case startSearchIcon = "chatStartSearch"
+        case searchErrorIcon = "chatSearchError"
+        // Arrows / misc
+        case downArrowIcon = "chatDownArrow"
+        case rightArrowIcon = "chatRightArrow"
+        case checkmarkIcon = "chatCheckmark"
+        case linkBlueIcon = "chatLinkBlue"
+
+        // Bubble actions / message screen
+        case banMemberButtonIcon = "chatBanMemberButton"
+        case moderatorBadgeIcon = "chatModeratorBadge"
+        case deletedMessageIcon = "chatDeletedMessageIcon"
+        case errorMessageIcon = "chatErrorMessage"
+        case muteMemberButtonIcon = "chatMuteMemberButton"
+        case unmuteMemberButtonIcon = "chatUnmuteMemberButton"
+        case messageCopyIcon = "chatMessageCopy"
+        case linkPreviewErrorIcon = "chatLinkPreviewError"
+        case promoteMemberButtonIcon = "chatPromoteMemberButton"
+        case removeMemberButtonIcon = "chatRemoveMemberButton"
+        case replyButtonIcon = "chatReplyMessage"
+        case replyMessageActionIcon = "chatReplyButton"
+        case reportMessageErrorIcon = "chatReportMessageError"
+        case reportUserButtonIcon = "chatReportUserButton"
+        case unreportUserButtonIcon = "chatUnreportUserButton"
+
+        // Group settings
+        case editMemberPermissionIcon = "chatEditMemberPermission"
+        case editGroupNotificationIcon = "chatEditGroupNotification"
+        case editGroupProfileIcon = "chatEditGroupProfile"
+        case groupMemberListButtonIcon = "chatGroupMemberListButton"
+        case bannedMemberNotFoundIcon = "chatBannedMemberNotFound"
+        case channelArchiveIcon = "chatChannelArchive"
+        case channelUnarchiveIcon = "chatChannelUnarchive"
+        case archiveBadgeIcon = "chatArchiveBadge"
     }
     
     // MARK: Social
     case searchIcon = "searchIcon"
     case plusIcon = "plusIcon"
     case emptyNewsFeedIcon = "emptyNewsFeedIcon"
+    case endOfFeedCheckIcon = "endOfFeedCheckIcon"
     case exploreIcon = "exploreIcon"
     case arrowIcon = "arrowIcon"
     case likeActionIcon = "likeActionIcon"
@@ -147,6 +248,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case communityCategoryPlaceholder = "categoriesPlaceholder"
     case communityPlaceholder = "communityPlaceholder"
     case communityThumbnail = "communityThumbnail"
+    case communityThumbnailIcon = "communityThumbnailIcon"
     case emptyStateExplore = "emptyStateExplore"
     case communityNotFoundIcon = "communityNotFoundIcon"
     case pendingInvitationIcon = "pendingInvitationIcon"

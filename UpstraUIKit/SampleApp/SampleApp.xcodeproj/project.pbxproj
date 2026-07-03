@@ -9,31 +9,17 @@
 /* Begin PBXBuildFile section */
 		682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; };
 		682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		68A9574A2F9F1ECF00A502C9 /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68A957492F9F1ECF00A502C9 /* AmityUIKitLiveStream.framework */; };
-		68A9574B2F9F1ECF00A502C9 /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68A957492F9F1ECF00A502C9 /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; };
 		68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		92DBE8CB2ACA98CF007D873C /* AmitySDK.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D45D45B726204253008F7C2C /* AmitySDK.xcframework */; };
-		92DBE8CC2ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */; };
-		92DBE8CE2ACA98CF007D873C /* MobileVLCKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */; };
-		92DBE8CF2ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */; };
 		92DBE8D02ACA98CF007D873C /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */; };
-		92DBE8D22ACA98CF007D873C /* AmityUIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; };
 		92DBE8DF2ACA98CF007D873C /* AmitySDK.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D45D45B726204253008F7C2C /* AmitySDK.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92DBE8E02ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92DBE8E22ACA98CF007D873C /* MobileVLCKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92DBE8E32ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		92DBE8E52ACA98CF007D873C /* AmityUIKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B78DA49024BED7DA00EE902B /* SampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA48F24BED7DA00EE902B /* SampleAppTests.swift */; };
 		B78DA49B24BED7DA00EE902B /* SampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */; };
-		D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; };
-		D478D16A26240A5E006EA140 /* AmityUIKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = D478D153262409E5006EA140 /* AmityUIKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		ED32E6F92EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */; };
 		ED32E6FA2EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		ED32E6FB2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; };
 		ED32E6FC2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		EDFF40202F869BF900984A8B /* AmityUIKitLiveStream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3B26DDDFCC0054088B /* AmityUIKitLiveStream.framework */; };
-		EDFF40212F869BF900984A8B /* AmityUIKitLiveStream.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A0BD0B3B26DDDFCC0054088B /* AmityUIKitLiveStream.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,13 +48,8 @@
 			files = (
 				92DBE8DF2ACA98CF007D873C /* AmitySDK.xcframework in Embed Frameworks */,
 				ED32E6FC2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Embed Frameworks */,
-				92DBE8E02ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Embed Frameworks */,
-				92DBE8E22ACA98CF007D873C /* MobileVLCKit.xcframework in Embed Frameworks */,
 				ED32E6FA2EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Embed Frameworks */,
-				EDFF40212F869BF900984A8B /* AmityUIKitLiveStream.framework in Embed Frameworks */,
 				682C761D2B331DAE00018F80 /* AmityUIKit4.framework in Embed Frameworks */,
-				92DBE8E32ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Embed Frameworks */,
-				92DBE8E52ACA98CF007D873C /* AmityUIKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -79,9 +60,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				68A9574B2F9F1ECF00A502C9 /* AmityUIKitLiveStream.framework in Embed Frameworks */,
 				68F5D9FF2B481E4700A9FA0D /* AmityUIKit4.framework in Embed Frameworks */,
-				D478D16A26240A5E006EA140 /* AmityUIKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -94,13 +73,13 @@
 		684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		684AE1402B0C9B4E00FD7270 /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		688F8617299E409B000FE6E7 /* SharedFrameworks */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = SharedFrameworks; path = ../SharedFrameworks; sourceTree = "<group>"; };
-		68A957492F9F1ECF00A502C9 /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		68D870F92F35D4380071D3E3 /* AmityUIKitConfig.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = AmityUIKitConfig.json; sourceTree = "<group>"; };
 		68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Eko Corporation Company Limited"; lastKnownFileType = wrapper.xcframework; name = RealmSwift.xcframework; path = ../Shared/RealmSwift.xcframework; sourceTree = "<group>"; };
 		68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit4.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		92DBE8E92ACA98CF007D873C /* SampleAppDistribution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleAppDistribution.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A0BD0B3B26DDDFCC0054088B /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKitLiveStream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityLiveVideoBroadcastKit.xcframework; path = ../Shared/AmityLiveVideoBroadcastKit.xcframework; sourceTree = "<group>"; };
+		A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityVideoPlayerKit.xcframework; path = ../Shared/AmityVideoPlayerKit.xcframework; sourceTree = "<group>"; };
+		A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = ../Shared/MobileVLCKit.xcframework; sourceTree = "<group>"; };
 		B78DA47524BED7D300EE902B /* SampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B78DA48B24BED7DA00EE902B /* SampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B78DA48F24BED7DA00EE902B /* SampleAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppTests.swift; sourceTree = "<group>"; };
@@ -109,9 +88,6 @@
 		B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppUITests.swift; sourceTree = "<group>"; };
 		B78DA49C24BED7DA00EE902B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D45B3A93264A840300F6FF52 /* Realm.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Amity Technologies (Thailand) Co., Ltd."; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = ../Shared/Realm.xcframework; sourceTree = "<group>"; };
-		D478D153262409E5006EA140 /* AmityUIKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = AmityUIKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		ED6B548E2F84DBF100E0A555 /* AmityUIKitLiveStream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AmityUIKitLiveStream.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/UpstraUIKit-gswkxqfquohuvsbjrpagulvboqvr/Build/Products/Debug-iphonesimulator/AmityUIKitLiveStream.framework"; sourceTree = "<group>"; };
-		ED6BDC7A2F8511E300E0A555 /* AmityUIKitLiveStream.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityUIKitLiveStream.xcframework; path = ../Shared/AmityUIKitLiveStream.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -155,13 +131,8 @@
 			files = (
 				ED32E6F92EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Frameworks */,
 				92DBE8CB2ACA98CF007D873C /* AmitySDK.xcframework in Frameworks */,
-				EDFF40202F869BF900984A8B /* AmityUIKitLiveStream.framework in Frameworks */,
-				92DBE8CC2ACA98CF007D873C /* AmityLiveVideoBroadcastKit.xcframework in Frameworks */,
-				92DBE8CE2ACA98CF007D873C /* MobileVLCKit.xcframework in Frameworks */,
-				92DBE8CF2ACA98CF007D873C /* AmityVideoPlayerKit.xcframework in Frameworks */,
 				92DBE8D02ACA98CF007D873C /* FirebaseCrashlytics in Frameworks */,
 				682C761C2B331DAE00018F80 /* AmityUIKit4.framework in Frameworks */,
-				92DBE8D22ACA98CF007D873C /* AmityUIKit.framework in Frameworks */,
 				ED32E6FB2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -170,9 +141,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				68A9574A2F9F1ECF00A502C9 /* AmityUIKitLiveStream.framework in Frameworks */,
 				68F5D9FE2B481E4700A9FA0D /* AmityUIKit4.framework in Frameworks */,
-				D478D16926240A5E006EA140 /* AmityUIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,19 +215,16 @@
 		B78DA4A824BED83100EE902B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				68A957492F9F1ECF00A502C9 /* AmityUIKitLiveStream.framework */,
-				ED6BDC7A2F8511E300E0A555 /* AmityUIKitLiveStream.xcframework */,
-				ED6B548E2F84DBF100E0A555 /* AmityUIKitLiveStream.framework */,
 				68F5D9FD2B481E4700A9FA0D /* AmityUIKit4.framework */,
 				684AE1402B0C9B4E00FD7270 /* AmityUIKit4.framework */,
 				684AE13D2B0C9B4700FD7270 /* AmityUIKit4.framework */,
 				684AE1302B0C8CB900FD7270 /* AmityUIKit4.framework */,
 				684AE12D2B0C841400FD7270 /* AmityUIKit4.framework */,
 				68EF84A629B077E700C7EDEC /* RealmSwift.xcframework */,
-				A0BD0B4726DDE0E30054088B /* AmityUIKitLiveStream.framework */,
-				A0BD0B3B26DDDFCC0054088B /* AmityUIKitLiveStream.framework */,
+				A0BD0B3E26DDE0020054088B /* AmityLiveVideoBroadcastKit.xcframework */,
+				A0BD0B3F26DDE0020054088B /* AmityVideoPlayerKit.xcframework */,
+				A0BD0B4026DDE0020054088B /* MobileVLCKit.xcframework */,
 				D45B3A93264A840300F6FF52 /* Realm.xcframework */,
-				D478D153262409E5006EA140 /* AmityUIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -311,7 +277,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				EE268CE30FA21AC4B6DF37BA /* SharedFrameworks */,
+				8338B0CFB38442BD03008FD1 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -388,7 +354,7 @@
 			mainGroup = B78DA46C24BED7D300EE902B;
 			packageReferences = (
 				92DBE89F2ACA98BB007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				12261447B1D8A6B7FBD22573 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				E0FB771191FF6CB8BD3110EA /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			productRefGroup = B78DA47624BED7D300EE902B /* Products */;
 			projectDirPath = "";
@@ -895,7 +861,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		12261447B1D8A6B7FBD22573 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		E0FB771191FF6CB8BD3110EA /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
@@ -921,15 +887,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8338B0CFB38442BD03008FD1 /* SharedFrameworks */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E0FB771191FF6CB8BD3110EA /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			productName = SharedFrameworks;
+		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 92DBE8A42ACA98CF007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
-		};
-		EE268CE30FA21AC4B6DF37BA /* SharedFrameworks */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 12261447B1D8A6B7FBD22573 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
-			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

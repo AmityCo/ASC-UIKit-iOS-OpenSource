@@ -37,9 +37,9 @@ extension DataListViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
 
         switch DataList.allCases[indexPath.row] {
-        case .post:
-            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "UserPostsFeedViewController") as! GlobalPostsFeedViewController
-            navigationController?.pushViewController(vc, animated: true)
+        case .post: break
+//            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "UserPostsFeedViewController") as! GlobalPostsFeedViewController
+//            navigationController?.pushViewController(vc, animated: true)
         }
     }
 }

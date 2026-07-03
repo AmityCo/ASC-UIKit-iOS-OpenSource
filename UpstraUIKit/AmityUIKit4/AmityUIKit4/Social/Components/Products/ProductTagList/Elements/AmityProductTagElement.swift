@@ -173,7 +173,6 @@ struct AmityProductTagElement: AmityElementView {
                     
                     Spacer()
                     
-                    // View Button (v2) - shown in livestream mode
                     if renderMode == .livestream {
                         Text(AmityLocalizedStringSet.General.view.localizedString)
                             .applyTextStyle(.captionBold(.white))

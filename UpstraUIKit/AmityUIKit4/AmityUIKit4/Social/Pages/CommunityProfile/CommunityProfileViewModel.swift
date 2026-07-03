@@ -35,6 +35,7 @@ public class CommunityProfileViewModel: ObservableObject {
     @Published var pendingPostCount: Int = 0
     @Published var joinRequestCount: Int = 0
     @Published var shouldShowPendingBanner: Bool = false
+    private var userPendingPostCount: Int = 0
     
     @Published var startedScrollingToBottom: Bool = false
     @Published var showErrorState = false
@@ -111,7 +112,8 @@ public class CommunityProfileViewModel: ObservableObject {
                 self.joinStatus = .joined
             }
             self.pendingPostCount = community.pendingPostCount
-            
+            self.updatePendingBannerState()
+
             // Community observer is triggered multiple times. We want to fetch
             // these data one time only otherwise we hit rate limit error
             self.firstLoadTask.perform {
@@ -155,7 +157,8 @@ public class CommunityProfileViewModel: ObservableObject {
                 return
             }
             
-            self?.shouldShowPendingBanner = collection.snapshots.count != 0
+            self?.userPendingPostCount = collection.snapshots.count
+            self?.updatePendingBannerState()
         }
     }
     
@@ -286,7 +289,14 @@ public class CommunityProfileViewModel: ObservableObject {
     }
     
     func updatePendingBannerState() {
-        self.shouldShowPendingBanner = joinRequestCount > 0 || pendingPostCount > 0
+        guard let community else {
+            self.shouldShowPendingBanner = false
+            return
+        }
+        let relevantPostCount = community.hasModeratorRole ? pendingPostCount : userPendingPostCount
+        let postsContribute = community.isPostReviewEnabled && relevantPostCount > 0
+        let requestsContribute = community.hasModeratorRole && community.requiresJoinApproval && joinRequestCount > 0
+        self.shouldShowPendingBanner = postsContribute || requestsContribute
     }
     
     func fetchMyJoinRequest() {

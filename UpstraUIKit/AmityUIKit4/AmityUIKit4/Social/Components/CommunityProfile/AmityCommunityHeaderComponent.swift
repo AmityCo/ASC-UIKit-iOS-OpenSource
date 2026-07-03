@@ -102,7 +102,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                     .padding(.leading, 4)
                 
                 Rectangle().frame(width: 1, height: 20)
-                    .foregroundColor(Color(UIColor(hex: "#E5E5E5", alpha: 1)))
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                     .padding(.horizontal, 16)
                 
                 HStack(spacing: 0) {
@@ -179,10 +179,10 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                         .renderingMode(.template)
                         .scaledToFit()
                         .frame(width: 20, height: 20)
-                        .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                        .foregroundColor(Color(AmityFixedColor.shared.white))
                     
                     Text(AmityLocalizedStringSet.Social.communityPageJoinTitle.localizedString)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.backgroundColor)))
+                        .applyTextStyle(.bodyBold(Color(AmityFixedColor.shared.white)))
                 }
                 .padding(.vertical, 10)
                 .frame(maxWidth: .infinity)
@@ -218,15 +218,17 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
         let shouldDefinitelyHideBanner = viewConfig.isHidden(elementId: .communityPendingPost) || viewModel.joinStatus != .joined
         
         if community.hasModeratorRole {
-            let totalCount = viewModel.pendingPostCount + viewModel.joinRequestCount
+            let postsCount = community.isPostReviewEnabled ? viewModel.pendingPostCount : 0
+            let requestsCount = community.requiresJoinApproval ? viewModel.joinRequestCount : 0
+            let totalCount = postsCount + requestsCount
             let pendingRequestTitle = totalCount == 1
                 ? AmityLocalizedStringSet.Social.communityPendingRequestSingular.localizedString
                 :                 AmityLocalizedStringSet.Social.communityPendingRequestPageTitle.localizedString
             BannerView(title: pendingRequestTitle, message: getTextForPendingRequestBanner())
                 .isHidden(!viewModel.shouldShowPendingBanner || shouldDefinitelyHideBanner)
                 .onTapGesture {
-                    let selectedTab: AmityPendingRequestPageTab = (viewModel.pendingPostCount == 0 && viewModel.joinRequestCount > 0) ? .joinRequests : .pendingPosts
-                    
+                    let selectedTab: AmityPendingRequestPageTab = (postsCount == 0 && requestsCount > 0) ? .joinRequests : .pendingPosts
+
                     onPendingRequestBannerTap?(selectedTab)
                 }
         } else {
@@ -266,23 +268,26 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
     
     private func getTextForPendingRequestBanner() -> String {
         var values: [String] = []
-        
-        let postWord = WordsGrammar(count: viewModel.pendingPostCount, set: .post)
-        let requestWord = viewModel.joinRequestCount == 1
+
+        let postsCount = community.isPostReviewEnabled ? viewModel.pendingPostCount : 0
+        let requestsCount = community.requiresJoinApproval ? viewModel.joinRequestCount : 0
+
+        let postWord = WordsGrammar(count: postsCount, set: .post)
+        let requestWord = requestsCount == 1
             ? AmityLocalizedStringSet.Social.communityJoinRequestSingular.localizedString
             : AmityLocalizedStringSet.Social.communityJoinRequestPlural.localizedString
-                
-        if viewModel.pendingPostCount > 0 {
-            let countValue = viewModel.pendingPostCount > 10 ? "10+" : "\(viewModel.pendingPostCount)"
+
+        if postsCount > 0 {
+            let countValue = postsCount > 10 ? "10+" : "\(postsCount)"
             values.append("\(countValue) \(postWord.value)")
         }
-        
-        if viewModel.joinRequestCount > 0 {
-            let countValue = viewModel.joinRequestCount > 10 ? "10+" : "\(viewModel.joinRequestCount)"
+
+        if requestsCount > 0 {
+            let countValue = requestsCount > 10 ? "10+" : "\(requestsCount)"
             values.append("\(countValue) \(requestWord)")
         }
-        
-        let totalRequestCount = viewModel.pendingPostCount + viewModel.joinRequestCount
+
+        let totalRequestCount = postsCount + requestsCount
         let combinedWords = values.joined(separator: " and ")
         let approvalFormat = totalRequestCount == 1
             ? AmityLocalizedStringSet.Social.communityPendingRequiresApproval.localizedString

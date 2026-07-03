@@ -293,7 +293,7 @@ struct MediaAttachmentView: View {
                 Circle()
                     .trim(from: 0.0, to: progress)
                     .stroke(
-                        .blue,
+                        Color(AmityUIKitConfigController.shared.getTheme().primaryColor),
                         lineWidth: 3.0
                     )
                     .rotationEffect(.degrees(-90))

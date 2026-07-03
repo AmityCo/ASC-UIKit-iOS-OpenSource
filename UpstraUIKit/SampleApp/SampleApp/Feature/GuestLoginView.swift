@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import AmityUIKit
 import AmityUIKit4
 
 struct GuestLoginView: View {
@@ -25,10 +24,10 @@ struct GuestLoginView: View {
             
             GroupBox {
                 if #available(iOS 16.0, *) {
-                    LabeledContent("Device Id:", value: AmityUIKitManager.client.getVisitorDeviceId())
+                    LabeledContent("Device Id:", value: AmityUIKit4Manager.client.getVisitorDeviceId())
                         .lineLimit(1)
                 } else {
-                    Text("Device Id: \(AmityUIKitManager.client.getVisitorDeviceId())")
+                    Text("Device Id: \(AmityUIKit4Manager.client.getVisitorDeviceId())")
                         .lineLimit(1)
                 }
             }
@@ -108,19 +107,17 @@ struct GuestLoginView: View {
     }
     
     func onCopyDeviceIdTap() {
-        let deviceId = AmityUIKitManager.client.getVisitorDeviceId()
+        let deviceId = AmityUIKit4Manager.client.getVisitorDeviceId()
         UIPasteboard.general.string = deviceId
         
         guard !deviceId.isEmpty else { return }
-        
-        #if canImport(AmityUIKit4)
+
         Toast.showToast(style: .warning, message: "Device Id Copied")
-        #endif
     }
     
     @MainActor
     func fetchAuthSignature(expiryTimestamp: Date) async throws -> String {
-        let deviceId = AmityUIKitManager.client.getVisitorDeviceId()
+        let deviceId = AmityUIKit4Manager.client.getVisitorDeviceId()
         
         let dateStr = DateFormatter.ascISO8601FractionalSecondsFormatter.string(from: expiryTimestamp)
         authSignatureExpiry = dateStr

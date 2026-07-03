@@ -61,6 +61,10 @@ open class AmityUIKitBehaviour {
     
     public var globalBehavior: AmityGlobalBehavior? = AmityGlobalBehavior()
     
+    // MARK: - Chat
+    public var chatPageBehavior: AmityChatPageBehavior? = AmityChatPageBehavior()
+    public var messageBubbleBehavior: AmityMessageBubbleBehavior? = AmityMessageBubbleBehavior()
+    
     public var eventTargetSelectionPageBehavior: AmityEventTargetSelectionPageBehavior?
     public var eventDetailPageBehavior: AmityEventDetailPageBehavior?
     public var exploreEventFeedComponentBehavior: AmityExploreEventFeedComponentBehavior?
@@ -100,11 +104,11 @@ open class AmityGlobalBehavior {
     public init() { }
     
     open func handleGuestUserAction(context: Context?) {
-        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.errorGuestUser.localizedString)
+        Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.errorGuestUser.localizedString)
     }
     
     open func handleNonMemberAction(context: Context?) {
-        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+        Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
     }
     
     open func handleNonFollowerAction(context: Context?) {
@@ -138,6 +142,6 @@ open class AmityGlobalBehavior {
     }
 
     open func handleVisitorUsageLimitSignIn() {
-        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.visitorUsageLimitToast.localizedString)
+        Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.visitorUsageLimitToast.localizedString)
     }
 }

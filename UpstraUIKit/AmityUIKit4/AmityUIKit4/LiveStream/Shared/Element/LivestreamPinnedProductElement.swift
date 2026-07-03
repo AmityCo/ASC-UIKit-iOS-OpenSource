@@ -167,7 +167,7 @@ struct LivestreamPinnedProductElement: AmityElementView {
                                         .frame(width: 28, height: 28)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 6)
-                                                .stroke(Color(hex: "A5A9B5"), lineWidth: 1)
+                                                .stroke(Color(viewConfig.defaultDarkTheme.baseColorShade1), lineWidth: 1)
                                         )
                                 }
                             } else if !isInactive && canManageProduct {

@@ -20,24 +20,15 @@ struct AmityProgressBarElement: AmityElementView {
     @ObservedObject var progressBarViewModel: AmityProgressBarElementViewModel
     
     var body: some View {
-        AmityView(configId: configId, 
-                  config: { configDict -> (progressColor: Color, backgroundColor: Color) in
-            let progressColor = Color(UIColor(hex: configDict["progress_color"] as? String ?? "#FFFFFF"))
-            let backgroundColor = Color(UIColor(hex: configDict["background_color"] as? String ?? "#FFFFFF"))
-            
-            return (progressColor, backgroundColor)
-        }) { config in
-            
-            Capsule()
-                .fill(config.backgroundColor.opacity(0.4))
-                .overlay (
-                    Capsule()
-                        .fill(config.progressColor)
-                        .frame(width: progressBarViewModel.progress)
-                    
-                    ,alignment: .leading
-                )
-        }
+        let white = Color(AmityFixedColor.shared.white)
+        Capsule()
+            .fill(white.opacity(0.4))
+            .overlay(
+                Capsule()
+                    .fill(white)
+                    .frame(width: progressBarViewModel.progress)
+                , alignment: .leading
+            )
     }
     
 }

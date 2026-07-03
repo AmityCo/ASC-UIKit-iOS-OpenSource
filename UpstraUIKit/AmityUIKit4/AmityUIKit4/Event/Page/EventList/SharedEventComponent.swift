@@ -9,14 +9,17 @@ import SwiftUI
 
 struct EventComponentEmptyState: View {
 
+    @StateObject private var viewConfig = AmityViewConfigController(pageId: nil)
+
     var body: some View {
         HStack {
             Spacer()
 
-            AmityEmptyStateView(configuration: .init(image: AmityIcon.eventEmptyStateIcon.rawValue, title: AmityLocalizedStringSet.Social.eventEmptyStateNoEvents.localizedString, subtitle: nil, iconSize: .init(width: 60, height: 60), renderingMode: .original, imageBottomPadding: 12, tapAction: nil))
+            AmityEmptyStateView(configuration: .init(image: AmityIcon.eventEmptyStateIcon.rawValue, title: AmityLocalizedStringSet.Social.eventEmptyStateNoEvents.localizedString, subtitle: nil, iconSize: .init(width: 60, height: 60), renderingMode: .template, iconTintColor: viewConfig.theme.baseColorShade4, imageBottomPadding: 12, tapAction: nil))
 
             Spacer()
         }
+        .updateTheme(with: viewConfig)
     }
 }
 

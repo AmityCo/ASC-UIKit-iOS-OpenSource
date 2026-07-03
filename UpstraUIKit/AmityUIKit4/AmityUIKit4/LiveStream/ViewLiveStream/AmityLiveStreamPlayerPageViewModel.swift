@@ -58,7 +58,6 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
     @Published var pinnedProductId: String? = nil
     var previousProductCount: Int = 0
     
-    
     public init(post: AmityPostModel) {
         self.post = post
         self.room = post.room
@@ -71,7 +70,7 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
         }
     }
     
-    public init(roomId: String) {
+    public init(roomId: String, isCohostInvited: Bool = false) {
         self.isLoading = true
         roomNotification = roomManager.getRoom(roomId: roomId)
             .observeOnce({ [weak self] object, error in
@@ -109,12 +108,13 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                             Task.runOnMainActor {
                                 let invitation = await room.getInvitation()
                                 self.coHostInvitation = invitation
-                                if let invitation {
-                                    if invitation.status == .pending {
-                                        self.showInvitedAsCoHostSheet = true
-                                    } else {
-                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, bottomPadding: 60)
-                                    }
+                                if let invitation, invitation.status == .pending  {
+                                    self.showInvitedAsCoHostSheet = true
+                                } else if let invitation, invitation.status == .canceled ||  invitation.status == .rejected {
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, bottomPadding: 60)
+                                }
+                              else if isCohostInvited, invitation == nil {
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, bottomPadding: 60)
                                 }
                             }
                         }

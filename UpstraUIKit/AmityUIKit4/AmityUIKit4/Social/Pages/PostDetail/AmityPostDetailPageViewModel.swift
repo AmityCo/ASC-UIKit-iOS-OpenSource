@@ -12,6 +12,7 @@ class AmityPostDetailPageViewModel: ObservableObject {
     private var postId: String = ""
     private var cancellable: AnyCancellable?
     private let postManager = PostManager()
+    private var didReportMeaningfulView = false
     
     @Published var post: AmityPostModel?
     @Published var isPostDeleted = false
@@ -80,6 +81,11 @@ class AmityPostDetailPageViewModel: ObservableObject {
                     Task { @MainActor in
                         self.hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
                     }
+                }
+
+                if !self.didReportMeaningfulView, !self.isPostDeleted {
+                    self.didReportMeaningfulView = true
+                    self.post?.analytic.markAsMeaningfullyViewed()
                 }
             }
         })

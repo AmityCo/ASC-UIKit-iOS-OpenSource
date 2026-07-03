@@ -192,6 +192,7 @@ public struct AmityDraftClipPage: AmityPageView {
                             .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                         
                         Image(AmityIcon.rightArrowIcon.imageResource)
+                            .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 22, height: 22)

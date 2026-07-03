@@ -18,7 +18,7 @@ class TextHighlighter {
     public static let productTagURL: String = "https://www.amity.co/producttag/"
     
     // Helper Method
-    public static func getAttributedText(from message: MessageModel, highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemBlue, .font: UIFont.systemFont(ofSize: 15)]) -> AttributedString {
+    public static func getAttributedText(from message: MessageModel, highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemBlue, .font: UIFont.systemFont(ofSize: 15)], linkAttributes: [NSAttributedString.Key: Any]? = nil) -> AttributedString {
         let messageText = message.text
         
         var highlightedText = AttributedString(messageText)
@@ -31,7 +31,8 @@ class TextHighlighter {
         // If links is present, highlight links
         let links = detectLinks(in: messageText)
         if !links.isEmpty {
-            highlightedText = highlightLinks(links: links, in: highlightedText)
+            let resolvedLinkAttributes = linkAttributes ?? highlightAttributes
+            highlightedText = highlightLinks(links: links, in: highlightedText, attributes: resolvedLinkAttributes)
         }
         
         return highlightedText
@@ -128,36 +129,56 @@ class TextHighlighter {
     
     public static func highlightLinks(links: [String], in string: AttributedString, attributes: [NSAttributedString.Key: Any] = [.underlineStyle: Text.LineStyle(pattern: .solid), .foregroundColor : UIColor.systemBlue], linkURLMap: [String: String] = [:]) -> AttributedString {
         var finalStr = string
-        
+
+        // `links` may contain the same URL multiple times when a post repeats a link.
+        // `range(of:)` always returns the first occurrence, so we track where the previous
+        // match for each link text ended and search only the remaining text after it. This
+        // ensures every occurrence gets highlighted, not just the first one.
+        var searchStart: [String: AttributedString.Index] = [:]
+
         for link in links {
-            let linkRange = finalStr.range(of: link) // Get attributed link here.
-            
+            let lowerBound = searchStart[link] ?? finalStr.startIndex
+            guard lowerBound < finalStr.endIndex,
+                  let linkRange = finalStr[lowerBound..<finalStr.endIndex].range(of: link) else { continue } // Get attributed link here.
+
+            // Advance the cursor so the next identical link maps to the following occurrence.
+            searchStart[link] = linkRange.upperBound
+
             // Use URL from linkURLMap if available, otherwise use the link text itself
             var finalLink = linkURLMap[link] ?? link
             if !finalLink.hasPrefix("http") && !finalLink.hasPrefix("https://") {
                 finalLink = "https://" + finalLink
             }
-            
-            if let linkRange {
-                finalStr[linkRange].link = URL(string: finalLink)
-                finalStr[linkRange].underlineStyle = attributes[.underlineStyle] as? Text.LineStyle
-                finalStr[linkRange].foregroundColor = attributes[.foregroundColor] as? UIColor
-                finalStr[linkRange].font = attributes[.font] as? UIFont
-            }
+
+            finalStr[linkRange].link = URL(string: finalLink)
+            finalStr[linkRange].underlineStyle = attributes[.underlineStyle] as? Text.LineStyle
+            finalStr[linkRange].foregroundColor = attributes[.foregroundColor] as? UIColor
+            finalStr[linkRange].font = attributes[.font] as? UIFont
         }
-        
+
         return finalStr
     }
     
-    public static func highlightKeyword(keyword: String, in string: AttributedString, attributes: [NSAttributedString.Key: Any]) -> AttributedString {
-        
+    public static func highlightKeyword(keyword: String, in string: AttributedString, contentText: String, attributes: [NSAttributedString.Key: Any], hashtagAttributes: [NSAttributedString.Key: Any]? = nil, hashtagRanges: [NSRange] = []) -> AttributedString {
+
         var finalStr = string
-        
-        if let keywordRange = finalStr.range(of: keyword, options: [.caseInsensitive]) {
-            finalStr[keywordRange].font = attributes[.font] as? UIFont
-            finalStr[keywordRange].foregroundColor = attributes[.foregroundColor] as? UIColor
+        let nsContent = contentText as NSString
+        let pattern = NSRegularExpression.escapedPattern(for: keyword)
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
+            return finalStr
         }
-        
+        let matches = regex.matches(in: contentText, options: [], range: NSRange(location: 0, length: nsContent.length))
+
+        for match in matches {
+            let matchRange = match.range
+            let isInHashtag = hashtagRanges.contains { NSIntersectionRange($0, matchRange).length > 0 }
+            let attrs = (isInHashtag ? hashtagAttributes : attributes) ?? attributes
+            guard let range = Range(matchRange, in: finalStr) else { continue }
+            finalStr[range].font = attrs[.font] as? UIFont
+            finalStr[range].foregroundColor = attrs[.foregroundColor] as? UIColor
+            finalStr[range].backgroundColor = attrs[.backgroundColor] as? UIColor
+        }
+
         return finalStr
     }
         

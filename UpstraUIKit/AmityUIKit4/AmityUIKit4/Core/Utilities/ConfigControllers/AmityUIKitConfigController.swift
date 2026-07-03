@@ -167,19 +167,59 @@ class AmityUIKitConfigController {
         let style: AmityThemeStyle = configStyle == .system ? (systemStyle == .light ? .light : .dark) : (configStyle == .light ? .light : .dark)
         return style
     }
+
+    // MARK: - Chat feature flag accessors
+
+    func enabledChannelTypes() -> [AmityChatChannelTypeFlag] {
+        let raw = featureFlag?.chat.enabledChannelTypes ?? []
+        let known = raw.compactMap { AmityChatChannelTypeFlag(rawValue: $0) }
+        return known.isEmpty ? [.conversation, .community] : known
+    }
+
+    func isChatUserActionEnabled(_ name: String) -> Bool {
+        guard let actions = featureFlag?.chat.conversationChatUserActions else {
+            return true
+        }
+        if let entry = actions.first(where: { $0.name == name }) {
+            return entry.enabled
+        }
+        return false
+    }
+
+    func hasAnyEnabledChatUserAction() -> Bool {
+        guard let actions = featureFlag?.chat.conversationChatUserActions else {
+            return true
+        }
+        let supported: Set<String> = ["mute", "report", "block"]
+        return actions.contains(where: { supported.contains($0.name) && $0.enabled })
+    }
 }
 
 struct AmityFeatureFlag: Codable {
     let post: PostFeatures
-    
+    let chat: ChatFeatures
+
     enum CodingKeys: String, CodingKey {
         case post
+        case chat
     }
-    
+
+    init(post: PostFeatures = PostFeatures(),
+         chat: ChatFeatures = ChatFeatures()) {
+        self.post = post
+        self.chat = chat
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.post = try container.decodeIfPresent(PostFeatures.self, forKey: .post) ?? PostFeatures()
+        self.chat = try container.decodeIfPresent(ChatFeatures.self, forKey: .chat) ?? ChatFeatures()
+    }
+
     static func decode(from dictionary: [String: Any]) throws -> AmityFeatureFlag {
         // Convert dictionary to JSON Data
         let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: [])
-        
+
         // Decode using JSONDecoder
         let decoder = JSONDecoder()
         return try decoder.decode(AmityFeatureFlag.self, from: jsonData)
@@ -188,9 +228,18 @@ struct AmityFeatureFlag: Codable {
 
 struct PostFeatures: Codable {
     let clip: ClipFeatures
-    
+
     enum CodingKeys: String, CodingKey {
         case clip
+    }
+
+    init(clip: ClipFeatures = ClipFeatures()) {
+        self.clip = clip
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.clip = try container.decodeIfPresent(ClipFeatures.self, forKey: .clip) ?? ClipFeatures()
     }
 }
 
@@ -222,4 +271,40 @@ enum AccessLevel: String, Codable, CaseIterable {
     case all = "all"
     case signedInUserOnly = "signed_in_user_only"
     case none = "none"
+}
+
+// MARK: - Chat features
+
+struct ChatFeatures: Codable {
+    let enabledChannelTypes: [String]
+    let conversationChatUserActions: [AmityChatUserActionFlag]?
+
+    enum CodingKeys: String, CodingKey {
+        case enabledChannelTypes = "enabled_channel_types"
+        case conversationChatUserActions = "conversation_chat_user_actions"
+    }
+
+    init(enabledChannelTypes: [String] = [],
+         conversationChatUserActions: [AmityChatUserActionFlag]? = nil) {
+        self.enabledChannelTypes = enabledChannelTypes
+        self.conversationChatUserActions = conversationChatUserActions
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.enabledChannelTypes =
+            try container.decodeIfPresent([String].self, forKey: .enabledChannelTypes) ?? []
+        self.conversationChatUserActions =
+            try container.decodeIfPresent([AmityChatUserActionFlag].self, forKey: .conversationChatUserActions)
+    }
+}
+
+struct AmityChatUserActionFlag: Codable {
+    let name: String
+    let enabled: Bool
+}
+
+enum AmityChatChannelTypeFlag: String {
+    case conversation
+    case community
 }

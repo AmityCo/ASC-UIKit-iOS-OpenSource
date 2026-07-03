@@ -26,7 +26,7 @@ struct SettingRadioButtonView: View {
             
             Circle()
                 .stroke(lineWidth: 1.0)
-                .fill(.gray)
+                .fill(Color(viewConfig.theme.baseColorShade3))
                 .overlay(
                     Circle()
                         .fill(Color(viewConfig.theme.primaryColor))

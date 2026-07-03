@@ -13,6 +13,7 @@ public enum ToastStyle {
     case success
     case warning
     case loading
+    case info
 }
 
 public struct ToastView: View {
@@ -51,7 +52,7 @@ public struct ToastView: View {
                 .padding(.trailing, 8)
             Spacer()
         }
-        .background(Color(UIColor(hex: "#292B32")))
+        .background(Color(AmityFixedColor.shared.toastBackground))
         .cornerRadius(6.0)
         .padding([.leading, .trailing], 16)
     }
@@ -61,7 +62,9 @@ public struct ToastView: View {
         case .success:
             return AmityIcon.statusSuccessIcon.getImageResource()
         case .warning:
-            return AmityIcon.toastStatusWarningIcon.getImageResource()
+            return AmityIcon.statusWarningIcon.getImageResource()
+        case .info:
+            return AmityIcon.statusInfoIcon.getImageResource()
         case .loading:
             return AmityIcon.statusLoadingIcon.getImageResource()
         }

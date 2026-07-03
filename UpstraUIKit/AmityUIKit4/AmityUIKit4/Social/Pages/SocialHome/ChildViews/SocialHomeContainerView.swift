@@ -13,16 +13,22 @@ struct SocialHomeContainerView: View {
     @State private var page: Page = .first()
     @State private var tabs: [AmitySocialHomePageTab]
     private let pageId: PageId?
-    
-    init(_ selectedTab: Binding<AmitySocialHomePageTab>, pageId: PageId?) {
+    private let onForYouDisabled: (() -> Void)?
+    private let onSwitchToFollowing: (() -> Void)?
+
+    init(_ selectedTab: Binding<AmitySocialHomePageTab>, pageId: PageId?, onForYouDisabled: (() -> Void)? = nil, onSwitchToFollowing: (() -> Void)? = nil) {
         self._selectedTab = selectedTab
         self.pageId = pageId
+        self.onForYouDisabled = onForYouDisabled
+        self.onSwitchToFollowing = onSwitchToFollowing
         self.tabs = [selectedTab.wrappedValue]
     }
-    
+
     var body: some View {
         Pager(page: page, data: tabs) { tab in
             switch tab {
+            case .forYou:
+                AmityForYouFeedComponent(pageId: pageId, onFeatureDisabled: onForYouDisabled, onSwitchToFollowingRequested: onSwitchToFollowing)
             case .newsFeed:
                 AmityNewsFeedComponent(pageId: pageId)
             case .explore:

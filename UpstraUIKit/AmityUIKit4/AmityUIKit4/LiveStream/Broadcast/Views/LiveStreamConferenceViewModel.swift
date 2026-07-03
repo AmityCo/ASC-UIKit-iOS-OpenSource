@@ -168,6 +168,9 @@ class LiveStreamConferenceViewModel: ObservableObject {
     // cancellables
     var disposeBag = Set<AnyCancellable>()
     
+    @Published var hasSomeArchiveProduct = false
+    private var knownArchivedProductIds = Set<String>()
+    
     init(targetId: String, targetType: AmityPostTargetType, participantRole: LiveStreamParticipantRole = .host, broadcasterViewModel: LiveStreamBroadcasterViewModel = LiveStreamBroadcasterViewModel()) {
         self.targetId = targetId
         self.targetType = targetType
@@ -370,7 +373,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
                     Log.add(event: .info, "Retrieved live chat channel: \(channel.channelId)")
                     // If live chat is enabled, we will mute the channel since the beginning of live stream
                     if isLiveChatDisabled {
-                        try await channelManager.muteChannel(channelId: channel.channelId)
+                        try await channelManager.muteChannel(channelId: channel.channelId, mutePeriod: 600)
                     }
                     
                     self.liveStreamChatViewModel = AmityLiveStreamChatViewModel(room: updatedRoom, participantRole: .host)
@@ -559,7 +562,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 // Update invited co-host waiting status if invitation is rejected and co-host left from back-stage or stage
                 if event.type == .invitationRejected {
                     self?.invitedCoHost = (false, nil, false)
-                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamCoHostDeclinedToast.localizedString, bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostDeclinedToast.localizedString, bottomPadding: 60)
                 } else if event.type == .invitationAccepted {
                     self?.invitedCoHost.invitationAccepted = true
                     Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostAcceptedToast.localizedString, bottomPadding: 60)
@@ -911,17 +914,10 @@ extension LiveStreamConferenceViewModel {
                 let productTag = AmityMediaProductTag(productId: product.productId)
                 return productTag
             }
-            let sentCount = productTagsArray.count
-            
             let updatedPost = try await postManager.updateProductTags(postId: postId, productTags: productTagsArray)
             
             // Sync local state with backend response
             await syncProductTagsFromPost(updatedPost)
-            
-            // Show warning if some tagged products are no longer available
-            if sentCount > 0 && taggedProducts.count != sentCount {
-                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postComposerProductsUnavailableToast.localizedString, bottomPadding: 60)
-            }
         } catch {
         }
     }
@@ -956,12 +952,20 @@ extension LiveStreamConferenceViewModel {
                 updatedProducts.append(product)
             }
         }
-                
+        
+        // Check archive products
+        let archivedIds = Set(updatedProducts.filter { $0.status != .active }.map { $0.productId })
+        let newlyArchived = archivedIds.subtracting(knownArchivedProductIds)
+        if !newlyArchived.isEmpty {
+            hasSomeArchiveProduct = true
+        }
+        knownArchivedProductIds = archivedIds
+        
+        // Update products
         taggedProducts = updatedProducts
         
         // Update pinned product ID from post
         pinnedProductId = post.pinnedProductId
-        
     }
 }
 

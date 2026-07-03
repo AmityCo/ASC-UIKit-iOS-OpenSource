@@ -86,7 +86,10 @@ open class AmityNotificationTrayPageBehavior {
     }
     
     open func goToLiveStreamPage(context: AmityNotificationTrayPageBehavior.Context) {
-        let livestreamPlayerPage = AmityLivestreamPlayerPage(roomId: context.roomId ?? "", displayErrorIfEnded: true)
+        let livestreamPlayerPage = AmityLivestreamPlayerPage(roomId: context.roomId ?? "",
+                                                             displayErrorIfEnded: true,
+                                                             isCohostInvited: true
+        )
         let hostController = AmitySwiftUIHostingNavigationController(rootView: livestreamPlayerPage)
         hostController.isNavigationBarHidden = true
         hostController.modalPresentationStyle = .overFullScreen

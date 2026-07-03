@@ -10,54 +10,91 @@ import SwiftUI
 public typealias DefaultTapAction = (() -> Void)
 
 struct AmityTextMessageReplyPreview: View {
-    
+
     let message: MessageModel
+    let isParentUnavailable: Bool
     let closeAction: DefaultTapAction
-    
+
     @EnvironmentObject var viewConfig: AmityViewConfigController
-    
-    init(message: MessageModel, closeAction: @escaping DefaultTapAction) {
+
+    init(message: MessageModel, isParentUnavailable: Bool = false, closeAction: @escaping DefaultTapAction) {
         self.message = message
+        self.isParentUnavailable = isParentUnavailable
         self.closeAction = closeAction
     }
-    
+
     var body: some View {
-        
+
         HStack(spacing: 0) {
-            AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: message.avatarURL)
-                .frame(width: 32, height: 32)
-                .clipShape(Circle())
-                .padding(.leading, 16)
-                .accessibilityIdentifier(AccessibilityID.Chat.ReplyPanel.userAvatar)
-            
             VStack(alignment: .leading, spacing: 4) {
-                Text(AmityLocalizedStringSet.Chat.replyMessagePreview.localized(arguments: message.displayName))
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color(viewConfig.theme.baseInverseColor))
+                Text(AmityLocalizedStringSet.Chat.replyMessagePreview.localized(arguments: replyTargetName))
+                    .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                     .accessibilityIdentifier(AccessibilityID.Chat.ReplyPanel.userDisplayName)
                     .lineLimit(1)
-                
-                Text(message.text)
-                    .font(.system(size: 13, weight: .regular))
+
+                Text(previewText)
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .lineLimit(1)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
             }
-            .padding(.horizontal, 12)
-            
+            .padding(.leading, 16)
+            .padding(.trailing, 12)
+
             Spacer()
-            
-            Button(action: {
-                closeAction()
-            }, label: {
+
+            if !isParentUnavailable {
+                if message.type == .image, let url = message.imageURL {
+                    AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: url)
+                        .frame(width: 38, height: 38)
+                        .cornerRadius(4)
+                        .padding(.trailing, 8)
+                } else if message.type == .video, let url = message.videoThumbnailURL {
+                    ZStack {
+                        AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: url)
+                            .frame(width: 38, height: 38)
+                            .cornerRadius(4)
+                        Color.black.opacity(0.4)
+                            .frame(width: 38, height: 38)
+                            .cornerRadius(4)
+                        Image(AmityIcon.Chat.videoPlayButtonIcon.imageResource)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 14, height: 14)
+                    }
+                    .padding(.trailing, 8)
+                }
+            }
+
+            Button(action: closeAction, label: {
                 Image(AmityIcon.Chat.closeReply.imageResource)
+                    .frame(width: 20, height: 20)
             })
             .padding(.trailing, 12)
             .accessibilityIdentifier(AccessibilityID.Chat.ReplyPanel.close_button)
         }
-        
+
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(minHeight: 62)
-        .background(Color(viewConfig.theme.baseColorShade4)) // Light: F5F5F5
+        .background(Color(viewConfig.theme.baseColorShade4))
+    }
+
+    private var replyTargetName: String {
+        message.isOwner
+            ? AmityLocalizedStringSet.Chat.Bubble.replyingYourself.localizedString
+            : message.displayName
+    }
+
+    private var previewText: String {
+        if isParentUnavailable {
+            return AmityLocalizedStringSet.Chat.ParentPreview.unavailable.localizedString
+        }
+        switch message.type {
+        case .image:
+            return AmityLocalizedStringSet.Chat.ParentPreview.photo.localizedString
+        case .video:
+            return AmityLocalizedStringSet.Chat.ParentPreview.video.localizedString
+        default:
+            return message.text
+        }
     }
 }
 

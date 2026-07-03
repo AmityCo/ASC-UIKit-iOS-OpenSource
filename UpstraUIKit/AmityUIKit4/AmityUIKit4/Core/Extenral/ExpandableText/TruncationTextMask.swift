@@ -11,6 +11,7 @@ private struct TruncationTextMask: ViewModifier {
 
     let size: CGSize
     let enabled: Bool
+    let fadeTruncatedText: Bool
     
     @Environment(\.layoutDirection) private var layoutDirection
 
@@ -23,15 +24,17 @@ private struct TruncationTextMask: ViewModifier {
                         HStack(spacing: 0) {
                             Rectangle()
                             HStack(spacing: 0) {
-                                LinearGradient(
-                                    gradient: Gradient(stops: [
-                                        Gradient.Stop(color: .black, location: 0),
-                                        Gradient.Stop(color: .clear, location: 0.9)
-                                    ]),
-                                    startPoint: layoutDirection == .rightToLeft ? .trailing : .leading,
-                                    endPoint: layoutDirection == .rightToLeft ? .leading : .trailing
-                                )
-                                .frame(width: size.width, height: size.height)
+                                if fadeTruncatedText {
+                                    LinearGradient(
+                                        gradient: Gradient(stops: [
+                                            Gradient.Stop(color: .black, location: 0),
+                                            Gradient.Stop(color: .clear, location: 0.9)
+                                        ]),
+                                        startPoint: layoutDirection == .rightToLeft ? .trailing : .leading,
+                                        endPoint: layoutDirection == .rightToLeft ? .leading : .trailing
+                                    )
+                                    .frame(width: size.width, height: size.height)
+                                }
 
                                 Rectangle()
                                     .foregroundColor(.clear)
@@ -47,8 +50,14 @@ private struct TruncationTextMask: ViewModifier {
     }
 }
 
+
+
 internal extension View {
-    func applyingTruncationMask(size: CGSize, enabled: Bool) -> some View {
-        modifier(TruncationTextMask(size: size, enabled: enabled))
+    func applyingTruncationMask(size: CGSize,
+                                enabled: Bool,
+                                fadeTruncatedText: Bool) -> some View {
+        modifier(TruncationTextMask(size: size,
+                                    enabled: enabled,
+                                    fadeTruncatedText: fadeTruncatedText))
     }
 }

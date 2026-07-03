@@ -17,6 +17,7 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
     
     @ObservedObject private var viewModel: AmityLiveStreamChatViewModel
     @StateObject private var viewConfig: AmityViewConfigController
+    @EnvironmentObject public var host: AmitySwiftUIHostWrapper
     
     private var placeholder: String {
         AmityLocalizedStringSet.Social.livestreamChatPlaceholder.localizedString
@@ -53,7 +54,17 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                     .isHidden(!viewModel.isProductTagEnabled || (viewModel.participantRole != .host && !(viewModel.participantRole == .coHost && viewModel.canCoHostManageProduct) && viewModel.productCount == 0))
                 
                 inputView
-                    .allowsHitTesting(!AmityUIKitManagerInternal.shared.isGuestUser)
+                    .allowsHitTesting(!shouldDisableInteraction)
+                    .overlay(
+                            Group {
+                                if shouldDisableInteraction {
+                                    Color.clear
+                                        .contentShape(Rectangle())
+                                        .onTapGesture { handleDisabledInteractionTap() }
+                                }
+                            }
+                        )
+                
                 rightButton
 
             case .muted:
@@ -94,7 +105,8 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                     .frame(width: 32, height: 32)
                     .padding(.bottom, 8)
             }
-        } else if viewModel.isStreamer && viewModel.participantRole != .viewer {
+        }
+        else if viewModel.isStreamer && viewModel.participantRole != .viewer {
             // Only host can invite co-host
             if viewModel.participantRole == .host {
                 Button {
@@ -128,15 +140,21 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                     .frame(width: 30, height: 30)
                     .circularBackground(radius: 40, color: Color(viewConfig.defaultDarkTheme.baseColorShade4))
             }
-        } else {
+        }
+        else {
             Image(AmityIcon.Reaction.like.imageResource)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 30, height: 30)
                 .padding(.bottom, 8)
                 .onTapGesture {
-                    let like = AmityLiveReactionModel(reactionName: "like", referenceId: viewModel.room.post?.postId ?? "", streamId: viewModel.room.roomId)
-                    viewModel.liveReactionViewModel.addReaction(like)
+                   
+                    if shouldDisableInteraction {
+                        handleDisabledInteractionTap()
+                    } else {
+                        let like = AmityLiveReactionModel(reactionName: "like", referenceId: viewModel.room.post?.postId ?? "", streamId: viewModel.room.roomId)
+                        viewModel.liveReactionViewModel.addReaction(like)
+                    }
                 }
                 .onLongPressGesture {
                     ImpactFeedbackGenerator.impactFeedback(style: .medium)
@@ -187,5 +205,19 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                 .applyTextStyle(.body(Color(viewConfig.theme.secondaryColor.blend(.shade2))))
         }
         .padding(.bottom, 12)
+    }
+    
+    private var shouldDisableInteraction: Bool {
+        !viewModel.isCommunityMember && (viewModel.composeBarState == .readOnly || viewModel.composeBarState == .disabled)
+    }
+    
+    private func handleDisabledInteractionTap() {
+        AmityUserAction.perform(host: host) {
+            if AmityUIKitManagerInternal.shared.isGuestUser {
+                AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleGuestUserAction(context: .init(host: host))
+            } else if !viewModel.isCommunityMember {
+                AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+            }
+        }
     }
 }

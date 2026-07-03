@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "chatUserAvatarPlaceholder.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

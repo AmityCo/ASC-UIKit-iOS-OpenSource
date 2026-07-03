@@ -10,7 +10,6 @@ import SwiftUI
 struct PollTypeSelectionView: View {
     
     @EnvironmentObject var viewConfig: AmityViewConfigController
-    
     @State private var selectedPollType: AmityPollType = .text
     var onNextAction: (AmityPollType) -> Void
     
@@ -57,7 +56,7 @@ struct PollTypeSelectionView: View {
     struct OptionView : View {
         
         private let optionWidth: Double = UIScreen.main.bounds.width > 320 ? 165 : 112
-        
+        @Environment(\.colorScheme) private var colorScheme
         @EnvironmentObject private var viewConfig: AmityViewConfigController
         
         let type: AmityPollType
@@ -87,7 +86,7 @@ struct PollTypeSelectionView: View {
                             .padding(.vertical, style: .spacing4XL)
                     }
                     .frame(maxWidth: .infinity)
-                    .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
+                    .background(bgIconColor())
                     
                     Text(type == .text ? AmityLocalizedStringSet.Social.pollTypeTextOnly.localizedString : AmityLocalizedStringSet.Social.pollTypeImage.localizedString)
                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
@@ -101,7 +100,31 @@ struct PollTypeSelectionView: View {
                 .cornerRadius(8)
             }
             .buttonStyle(.plain)
-            .border(radius: 8, borderColor: isSelected ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.baseColor.blend(.shade4)), borderWidth: 2)
+            .border(radius: 8, borderColor: borderColor(), borderWidth: 2)
+        }
+        
+        private func bgIconColor() -> Color {
+            if colorScheme == .dark {
+                return isSelected
+                ? Color(viewConfig.theme.primaryColor.blend(.shade3))
+                    : Color(viewConfig.theme.baseColorShade4)
+            } else {
+                return isSelected
+                    ? Color(viewConfig.theme.primaryColor.blend(.shade3))
+                    : Color(viewConfig.theme.baseColorShade4)
+            }
+        }
+        
+        private func borderColor() -> Color {
+            if colorScheme == .dark {
+                return isSelected
+                    ? Color(viewConfig.theme.primaryColor)
+                    : Color(viewConfig.theme.baseColorShade4)
+            } else {
+                return isSelected
+                    ? Color(viewConfig.theme.primaryColor)
+                    : Color(viewConfig.theme.baseColor.blend(.shade4))
+            }
         }
     }
 }

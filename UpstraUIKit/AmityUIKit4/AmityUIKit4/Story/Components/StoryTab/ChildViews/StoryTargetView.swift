@@ -14,13 +14,15 @@ struct StoryTargetView<Content: View>: View {
     @ObservedObject private var storyTarget: AmityStoryTargetModel
     private let storyTargetName: String
     private let hideLockIcon: Bool
+    private let hideRingWhenEmpty: Bool
     private let radius: CGFloat
-    
-    init(radius: CGFloat, componentId: ComponentId, storyTarget: AmityStoryTargetModel, storyTargetName: String? = nil, hideLockIcon: Bool, @ViewBuilder cornerImage: @escaping () -> Content) {
+
+    init(radius: CGFloat, componentId: ComponentId, storyTarget: AmityStoryTargetModel, storyTargetName: String? = nil, hideLockIcon: Bool, hideRingWhenEmpty: Bool = false, @ViewBuilder cornerImage: @escaping () -> Content) {
         self.radius = radius
         self.componentId = componentId
         self.storyTarget = storyTarget
         self.hideLockIcon = hideLockIcon
+        self.hideRingWhenEmpty = hideRingWhenEmpty
         self.cornerImage = cornerImage
         
         if let storyTargetName {
@@ -45,17 +47,25 @@ struct StoryTargetView<Content: View>: View {
                 AmityStoryRingElement(componentId: componentId, showRing: showRing, animateRing: animateRing, showErrorRing: showErrorRing)
                     .frame(width: radius, height: radius)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.storyRingView)
+                    .isHidden(hideRingWhenEmpty && storyTarget.itemCount == 0)
                 
-                AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: avatar)
-                    .frame(width: radius - 6, height: radius - 6)
-                    .clipShape(Circle())
-                    .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.avatarImageView)
+                AsyncImage(placeholderView: { defaultCommunityPlaceholderView(viewConfig: viewConfig, size: radius - 6) },
+                           url: avatar)
+                .frame(width: radius - 6, height: radius - 6)
+                .clipShape(Circle())
+                .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.avatarImageView)
                 
                 if showErrorRing {
-                    Image(AmityIcon.errorStoryIcon.getImageResource())
-                        .resizable()
-                        .frame(width: 22.0, height: 22.0)
-                        .offset(x: 22, y: 22)
+                    ZStack {
+                        Circle()
+                            .fill(Color(viewConfig.theme.backgroundColor))
+                            .frame(width: 22.0, height: 22.0)
+                        
+                        Image(AmityIcon.errorStoryIcon.getImageResource())
+                            .resizable()
+                            .frame(width: 19.0, height: 19.0)
+                    }
+                    .offset(x: 22, y: 22)
                 } else {
                     cornerImage()
                         .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.createStoryButton)

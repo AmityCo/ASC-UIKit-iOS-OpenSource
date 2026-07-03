@@ -56,10 +56,18 @@ struct PostBottomSheetView: View {
                 return Alert(title: Text(AmityLocalizedStringSet.Social.deletePostTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.deletePostMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
                     Task { @MainActor in
                         isShown.toggle()
+
+                        guard NetworkMonitor.shared.isConnected else {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postDeleteError.localizedString)
+                            }
+                            return
+                        }
+
                         NotificationCenter.default.post(name: .didPostLocallyDeleted, object: nil, userInfo: ["postId" : post.postId])
 
                         action?(.deletePost)
-                        
+
                         do {
                             try await viewModel.deletePost(id: post.postId)
                             

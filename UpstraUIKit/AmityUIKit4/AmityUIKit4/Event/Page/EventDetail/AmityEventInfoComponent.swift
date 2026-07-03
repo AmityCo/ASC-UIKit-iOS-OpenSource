@@ -11,7 +11,8 @@ import SwiftUI
 struct AmityEventInfoComponent: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @ObservedObject var viewModel: AmityEventDetailPageViewModel
-        
+    @Environment(\.colorScheme) private var colorScheme
+
     init(viewModel: AmityEventDetailPageViewModel) {
         self.viewModel = viewModel
     }
@@ -100,8 +101,8 @@ struct AmityEventInfoComponent: View {
                 .moreButtonText(AmityLocalizedStringSet.Social.eventInfoSeeMore.localizedString)
                 .font(AmityTextStyle.body(.clear).getFont())
                 .foregroundColor(Color(viewConfig.theme.baseColor))
-                .attributedColor(viewConfig.theme.primaryColor)
-                .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                 .expandAnimation(.easeOut(duration: 0.25))
                 .lineSpacing(5)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -119,8 +120,8 @@ struct AmityEventInfoComponent: View {
                     .moreButtonText(AmityLocalizedStringSet.Social.eventInfoSeeMore.localizedString)
                     .font(AmityTextStyle.body(.clear).getFont())
                     .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .attributedColor(viewConfig.theme.primaryColor)
-                    .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                    .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                    .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                     .expandAnimation(.easeOut(duration: 0.25))
                     .lineSpacing(5)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -133,6 +134,8 @@ struct AmityEventInfoComponent: View {
                 } label: {
                     HStack {
                         Image(AmityIcon.copyTextIcon.imageResource)
+                            .renderingMode(.template)
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
 
                         Text(AmityLocalizedStringSet.Social.eventInfoCopy.localizedString)
                     }
@@ -165,7 +168,7 @@ struct AmityEventInfoComponent: View {
                                     .applyTextStyle(.captionBold(.white))
                                     .padding(.vertical, 4)
                                     .padding(.horizontal, 8)
-                                    .background(stream?.status == .live ? Color(UIColor(hex: "FF305A")) : Color.black.opacity(0.5))
+                                    .background(stream?.status == .live ? Color(AmityFixedColor.shared.live) : Color.black.opacity(0.5))
                                     .blurBackground(style: .regular)
                                     .cornerRadius(4, corners: .allCorners)
                                     .padding(12)
@@ -208,8 +211,8 @@ struct AmityEventInfoComponent: View {
                         .moreButtonText(AmityLocalizedStringSet.Social.eventInfoSeeMore.localizedString)
                         .font(AmityTextStyle.body(.clear).getFont())
                         .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .attributedColor(viewConfig.theme.primaryColor)
-                        .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                        .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                        .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                         .expandAnimation(.easeOut(duration: 0.25))
                         .lineSpacing(5)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -222,6 +225,8 @@ struct AmityEventInfoComponent: View {
                     } label: {
                         HStack {
                             Image(AmityIcon.copyTextIcon.imageResource)
+                                .renderingMode(.template)
+                                .foregroundColor(Color(viewConfig.theme.baseColor))
 
                             Text(AmityLocalizedStringSet.Social.eventInfoCopy.localizedString)
                         }

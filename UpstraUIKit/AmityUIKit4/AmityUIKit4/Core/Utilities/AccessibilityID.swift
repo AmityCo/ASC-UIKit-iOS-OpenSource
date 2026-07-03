@@ -200,6 +200,8 @@ struct AccessibilityID {
             static let globalSearchButton = "global_search_button"
             static let postCreationButton = "post_creation_button"
             static let newsFeedButton = "newsfeed_button"
+            static let forYouButton = "for_you_button"
+            static let followingButton = "following_button"
             static let exploreButton = "explore_button"
             static let clipsButton = "clips_button"
             static let myCommunitiesButton = "my_communities_button"

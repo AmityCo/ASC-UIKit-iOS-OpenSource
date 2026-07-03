@@ -24,22 +24,16 @@ struct AmityCreateNewStoryButtonElement: AmityElementView {
     
     var body: some View {
         AmityView(configId: configId,
-                  config: { configDict -> (backgroundColor: Color, createStoryIcon: ImageResource) in
-            
-            let backgroundColor = Color(UIColor(hex: configDict["background_color"] as? String ?? "#000000"))
-            
-            let createStoryIcon = AmityIcon.getImageResource(named: configDict["create_new_story_icon"] as? String ?? "createStoryIcon")
-            
-            return (backgroundColor, createStoryIcon)
-            
-        }) { config in
-            
+                  config: { configDict -> ImageResource in
+            AmityIcon.getImageResource(named: configDict["create_new_story_icon"] as? String ?? "createStoryIcon")
+        }) { createStoryIcon in
+
             GeometryReader { geometry in
                 ZStack {
                     Circle()
-                        .fill(config.backgroundColor)
-                    
-                    Image(config.createStoryIcon)
+                        .fill(Color(AmityUIKitConfigController.shared.getTheme().backgroundColor))
+
+                    Image(createStoryIcon)
                         .resizable()
                         .frame(width: geometry.size.width - 3, height: geometry.size.height - 3)
                 }

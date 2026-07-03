@@ -49,12 +49,20 @@ struct CommentBottomSheetView: View {
                 return Alert(title: Text(alertTitle), message: Text(alertMessage), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
                     Task { @MainActor in
                         viewModel.sheetState.isShown.toggle()
+
+                        guard NetworkMonitor.shared.isConnected else {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Comment.commentDeleteError.localizedString)
+                            }
+                            return
+                        }
+
                         if let comment = viewModel.sheetState.comment {
                             do {
                                 try await viewModel.deleteComment(id: comment.commentId)
                                 viewModel.sheetState.comment = nil
                             } catch {
-                                Toast.showToast(style: .warning, message: error.localizedDescription)
+                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Comment.commentDeleteError.localizedString)
                             }
                         }
                     }

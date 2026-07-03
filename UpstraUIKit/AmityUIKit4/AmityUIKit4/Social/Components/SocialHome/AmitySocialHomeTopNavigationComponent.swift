@@ -132,10 +132,12 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                 let icon = AmityIcon.getImageResource(named: viewConfig.forElement(elementId).icon ?? "")
                 VStack {
                     Image(icon)
+                        .renderingMode(.template)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
                         .frame(size: CGSize(width: 21.0, height: 16.0))
                 }
                 .frame(size: CGSize(width: 32.0, height: 32.0))
-                .background(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
+                .background(Color(viewConfig.theme.baseColorShade4))
                 .clipShape(Circle())
                 .accessibilityIdentifier(getAccessibilityID(elementId: elementId))
             }

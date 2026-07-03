@@ -109,9 +109,8 @@ public struct AmityLiveChatMessageList: AmityComponentView {
                             .frame(width: 20, height: 20)
                             .padding(.horizontal, 16)
                         Text(messageListViewModel.muteState.localizedString)
+                            .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade1)))
                             .padding(.trailing, 16)
-                            .font(.system(size: 15))
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade1))
                     }
                     
                 }

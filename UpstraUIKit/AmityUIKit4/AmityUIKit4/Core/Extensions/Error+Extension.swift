@@ -17,6 +17,7 @@ enum AmityError: Int, Error {
     case userNotFound = 40000001
     case unableToLeaveCommunity = 400317
     case globalBannedUser = 400312
+    case inappropriateImage = 400314
     
     init?(error: Error?) {
         guard let errorCode = error?._code,
@@ -26,3 +27,15 @@ enum AmityError: Int, Error {
         self = _error
     }
 }
+
+extension Error {
+    var isInappropriateImageUpload: Bool {
+        (self as NSError).code == AmityError.inappropriateImage.rawValue
+    }
+
+    /// True when a media upload was cancelled (SDK normalizes it to `URLError.cancelled`).
+    var isUploadCancelled: Bool {
+        (self as NSError).code == NSURLErrorCancelled
+    }
+}
+

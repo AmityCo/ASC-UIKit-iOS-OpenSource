@@ -24,11 +24,28 @@ public class AmityMessageListViewModel: ObservableObject {
     @Published var initialQueryState: QueryState = .loading
     @Published var muteState: MuteState = .none
     @Published var pagination: ScrollViewPagination = ScrollViewPagination()
+    
+    /// Set this to scroll to a specific message and trigger a bounce animation.
+    @Published var jumpToMessageId: String? = nil
+    /// The message ID currently bouncing (cleared after animation).
+    @Published var bouncingMessageId: String? = nil
+
+    private var pendingAroundMessageId: String?
+
+    private var jumpTimeoutTask: Task<Void, Never>?
         
     // Current toast state
     @Published var toastState: ToastState?
     
-    var selectedMessage: MessageModel?
+    @Published var pendingDeleteMessageId: String? = nil
+
+    /// Set to a message ID to present the report sheet.
+    @Published var pendingReportMessageId: String? = nil
+
+    /// Set to true to present the reaction list sheet.
+    @Published var showingReactionSheet: Bool = false
+
+    @Published var selectedMessage: MessageModel?
     
     var hasModeratorPermission = false
     var delegate: AmityClientDelegate?
@@ -59,8 +76,9 @@ public class AmityMessageListViewModel: ObservableObject {
     
     private var messageCollection: AmityCollection<AmityMessage>?
     
-    public init(subChannelId: String) {
+    public init(subChannelId: String, aroundMessageId: String? = nil) {
         self.subChannelId = subChannelId
+        self.pendingAroundMessageId = aroundMessageId
         
         Task {
             self.hasModeratorPermission = await ChatPermissionChecker.hasModeratorPermission(for: subChannelId)
@@ -69,9 +87,14 @@ public class AmityMessageListViewModel: ObservableObject {
         self.delegate = AmityUIKit4Manager.client.delegate
     }
     
-    var messageAction: AmityMessageAction = .init()
+    @Published var messageAction: AmityMessageAction = .init()
     
     var token: AmityNotificationToken?
+
+    deinit {
+        token?.invalidate()
+        jumpTimeoutTask?.cancel()
+    }
     
     public func queryMessages() {
         
@@ -85,8 +108,16 @@ public class AmityMessageListViewModel: ObservableObject {
         pagination.reset()
         
         initialQueryState = .loading
-        let options = AmityMessageQueryOptions(subChannelId: subChannelId, sortOption: .lastCreated)
-        
+        let options = AmityMessageQueryOptions(
+            subChannelId: subChannelId,
+            aroundMessageId: pendingAroundMessageId,
+            sortOption: .lastCreated
+        )
+
+        if pendingAroundMessageId != nil {
+            startJumpTimeout()
+        }
+
         messageCollection = chatManager.queryMessages(options: options)
         
         token?.invalidate()
@@ -118,29 +149,70 @@ public class AmityMessageListViewModel: ObservableObject {
                     return
                 } else if currentMember.isMuted {
                     muteState = .user
+                } else {
+                    muteState = .none
                 }
+            } else {
+                muteState = .none
             }
             
-            if collection.dataStatus == .fresh {
+            // Show as soon as the LiveCollection has local cache — don't wait for .fresh (no loading flash for cached chats).
+            if !collection.snapshots.isEmpty || collection.dataStatus == .local || collection.dataStatus == .fresh {
                 self.initialQueryState = .success
-            
-                let messages = collection.snapshots
-                /// Need to modify.
-                var messageModels = [MessageModel]()
-                for message in messages {
-                    let messageModel = MessageModel(message: message, hasModeratorPermission: hasModeratorPermission)
-                    messageModels.append(messageModel)
-                }
-                messageModels.reverse()
-                
-                self.messages = messageModels
-                
-                if messages.count > self.pagination.currentItemsCount && self.pagination.isInProgress {
-                    self.pagination.end(anchor: nil)
-                }
+            }
+
+            let messages = collection.snapshots
+            var messageModels = [MessageModel]()
+            for message in messages {
+                let messageModel = MessageModel(message: message, hasModeratorPermission: hasModeratorPermission)
+                messageModels.append(messageModel)
+            }
+            messageModels.reverse()
+
+            self.messages = messageModels
+
+            if collection.snapshots.count > self.pagination.currentItemsCount && self.pagination.isInProgress {
+                self.pagination.end(anchor: nil)
+            }
+
+            if let target = self.pendingAroundMessageId,
+               messageModels.contains(where: { $0.id == target }) {
+                self.pendingAroundMessageId = nil
+                self.cancelJumpTimeout()
+                self.jumpToMessageId = target
             }
             self.updateQueryState(loadingStatus: collection.loadingStatus)
         })
+    }
+
+    public func jumpTo(messageId: String) {
+        if messages.contains(where: { $0.id == messageId }) {
+            jumpToMessageId = messageId
+            return
+        }
+        pendingAroundMessageId = messageId
+        queryMessages()
+    }
+
+    // MARK: - Jump timeout
+
+    private func startJumpTimeout() {
+        jumpTimeoutTask?.cancel()
+        jumpTimeoutTask = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            guard !Task.isCancelled, let self else { return }
+            guard self.pendingAroundMessageId != nil else { return }
+            self.pendingAroundMessageId = nil
+            self.toastState = .init(
+                style: .warning,
+                message: AmityLocalizedStringSet.Chat.JumpToMessage.unavailable.localizedString
+            )
+        }
+    }
+
+    private func cancelJumpTimeout() {
+        jumpTimeoutTask?.cancel()
+        jumpTimeoutTask = nil
     }
     
     public func loadMoreMessages() {
@@ -192,6 +264,22 @@ public class AmityMessageListViewModel: ObservableObject {
                 
                 updateLocalMessageModel(messageId: messageId, isReported: true)
                 
+                toastState = .init(style: .success, message: AmityLocalizedStringSet.Chat.toastReportMessage.localizedString)
+            } catch {
+                toastState = .init(style: .warning, message: AmityLocalizedStringSet.Chat.toastReportMessageError.localizedString)
+            }
+        }
+    }
+
+    @MainActor
+    public func reportMessage(messageId: String, reason: AmityContentFlagReason) {
+        Task {
+            do {
+                try await chatManager.flagMessage(messageId: messageId, reason: reason)
+
+                MessageCache.shared.setFlagStatus(messageId: messageId, value: true)
+                updateLocalMessageModel(messageId: messageId, isReported: true)
+
                 toastState = .init(style: .success, message: AmityLocalizedStringSet.Chat.toastReportMessage.localizedString)
             } catch {
                 toastState = .init(style: .warning, message: AmityLocalizedStringSet.Chat.toastReportMessageError.localizedString)

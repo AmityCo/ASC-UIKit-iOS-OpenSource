@@ -21,6 +21,8 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
     @State private var showMediaViewer: Bool = false
     @State private var showBottomSheet: Bool = false
     @State private var canLoadProfileAvatar: Bool = false
+    @Environment(\.colorScheme) private var colorScheme
+
     private let user: AmityUserModel
     
     private var isOwnProfile: Bool {
@@ -45,7 +47,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .attributedColor(viewConfig.theme.primaryColor)
-                .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme) ))
                 .expandAnimation(.easeOut(duration: 0.25))
                 .font(AmityTextStyle.body(.clear).getFont())
                 .lineLimit(4)

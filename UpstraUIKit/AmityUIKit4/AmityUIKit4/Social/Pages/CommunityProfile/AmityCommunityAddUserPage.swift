@@ -210,7 +210,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 ZStack {
                     Circle()
                         .stroke(lineWidth: 2.0)
-                        .fill(.gray)
+                        .fill(Color(viewConfig.theme.baseColorShade3))
                         .frame(width: 16, height: 16)
                         .isHidden(isSelected)
                     
@@ -235,18 +235,13 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .frame(height: 1)
             
             Rectangle()
-                .fill(.blue)
+                .fill(Color(viewConfig.theme.primaryColor).opacity(selectedUsers.isEmpty ? 0.3 : 1))
                 .frame(height: 40)
                 .cornerRadius(4)
                 .overlay (
-                    ZStack {
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
-                            .isHidden(!selectedUsers.isEmpty, remove: true)
-                        
-                        Text(AmityLocalizedStringSet.Social.addMember.localizedString)
-                            .applyTextStyle(.bodyBold(.white))
-                    }
+                    Text(AmityLocalizedStringSet.Social.addMember.localizedString)
+                        .applyTextStyle(.bodyBold(.white))
+                        .opacity(selectedUsers.isEmpty ? (viewConfig.currentStyle == .dark ? 0.3 : 1) : 1)
                 )
                 .onTapGesture {
                     guard !selectedUsers.isEmpty else { return }

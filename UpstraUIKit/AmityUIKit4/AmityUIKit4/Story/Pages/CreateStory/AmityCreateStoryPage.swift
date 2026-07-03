@@ -79,9 +79,9 @@ public struct AmityCreateStoryPage: AmityPageView {
                     
                     if cameraMode == .videoWithMic && videoCaptureButtonSelected {
                         Text("\(formatDuration(videoCaputreDuration))")
-                            .applyTextStyle(.bodyBold(.white))
+                            .applyTextStyle(.bodyBold(Color(AmityFixedColor.shared.white)))
                             .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
-                            .background(Color.red)
+                            .background(Color(AmityFixedColor.shared.live))
                             .cornerRadius(4)
                             .frame(width: 60, height: 26)
                             .offset(y: 23)
@@ -155,7 +155,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                 
                 SegmentedPickerView(titles: segmentedPickerTitles, currentIndex: $selectedPickerIndex)
                     .frame(width: 244, height: 44)
-                    .background(Color(UIColor(hex: "#292B32")))
+                    .background(Color(AmityUIKitConfigController.shared.getTheme().baseColor))
                     .clipShape(RoundedRectangle(cornerRadius: 24.0))
                     .padding([.bottom, .top], 16)
                 
@@ -211,7 +211,7 @@ public struct AmityCreateStoryPage: AmityPageView {
                 Circle()
                     .trim(from: 0, to: videoCaptureProgress)
                     .stroke(
-                        Color.red,
+                        Color(AmityFixedColor.shared.live),
                         style: StrokeStyle(
                             lineWidth: 7.0,
                             lineCap: .square

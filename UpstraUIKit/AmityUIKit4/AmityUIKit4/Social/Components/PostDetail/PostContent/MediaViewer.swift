@@ -39,6 +39,17 @@ struct MediaViewer: View {
     private let post: AmityPostModel?
     private let showViewParentPost: Bool
     private let pageId: PageId?
+
+    private let onDelete: (() -> Void)?
+    private let saveImageURL: URL?
+
+    @State private var bottomBarToastMessage: String = ""
+    @State private var bottomBarToastStyle: ToastStyle = .success
+    @State private var bottomBarShowToast: Bool = false
+
+    private var showBottomActionBar: Bool {
+        onDelete != nil || saveImageURL != nil
+    }
     
     private var canEditAltText: Bool {
         guard let post else { return false }
@@ -73,10 +84,12 @@ struct MediaViewer: View {
         self.post = post
         self.showViewParentPost = showViewParentPost
         self.pageId = pageId
+        self.onDelete = nil
+        self.saveImageURL = nil
         self._viewModel = StateObject(wrappedValue: MediaViewerViewModel(post: post))
     }
-    
-    init(url: URL?, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, pageId: PageId? = nil) {
+
+    init(url: URL?, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, pageId: PageId? = nil, saveImageURL: URL? = nil, onDelete: (() -> Void)? = nil) {
         self._page = State(initialValue: Page.withIndex(0))
         self._pageIndex = State(initialValue: 1)
         let imageData = AmityImageData()
@@ -87,6 +100,8 @@ struct MediaViewer: View {
         self.post = nil
         self.showViewParentPost = true
         self.pageId = pageId
+        self.onDelete = onDelete
+        self.saveImageURL = saveImageURL ?? url
         self._viewModel = StateObject(wrappedValue: MediaViewerViewModel(post: nil))
     }
     
@@ -349,6 +364,63 @@ struct MediaViewer: View {
             component
                 .environmentObject(host)
                 .halfSheetPresentation()
+        }
+        .overlay(bottomActionBar, alignment: .bottom)
+        .showToast(isPresented: $bottomBarShowToast, style: bottomBarToastStyle, message: bottomBarToastMessage, bottomPadding: 80)
+    }
+
+    @ViewBuilder
+    private var bottomActionBar: some View {
+        if showBottomActionBar {
+            HStack {
+                if onDelete != nil {
+                    Button {
+                        closeAction?()
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                            onDelete?()
+                        }
+                    } label: {
+                        Image(AmityIcon.trashBinWhiteIcon.imageResource)
+                            .renderingMode(.template)
+                            .resizable()
+                            .foregroundColor(.white)
+                            .scaledToFit()
+                            .frame(width: 22, height: 22)
+                            .padding(12)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                Spacer()
+
+                if saveImageURL != nil {
+                    Button(action: saveBottomBarImage) {
+                        Image(AmityIcon.Chat.saveImageIcon.imageResource)
+                            .renderingMode(.template)
+                            .resizable()
+                            .foregroundColor(.white)
+                            .scaledToFit()
+                            .frame(width: 22, height: 22)
+                            .padding(12)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 12)
+        }
+    }
+
+    private func saveBottomBarImage() {
+        guard let url = saveImageURL else { return }
+        MessageMediaSaver.saveImage(from: url) { success in
+            bottomBarToastStyle = success ? .success : .warning
+            bottomBarToastMessage = success
+                ? AmityLocalizedStringSet.Chat.SaveMedia.imageSuccess.localizedString
+                : AmityLocalizedStringSet.Chat.SaveMedia.imageFailed.localizedString
+            bottomBarShowToast = true
         }
     }
     

@@ -3,6 +3,16 @@
     {
       "filename" : "Checkmark.svg",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "Checkmark-Dark.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

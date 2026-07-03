@@ -6,37 +6,26 @@
 //  Copyright © 2563 Amity. All rights reserved.
 //
 
-import AmityUIKit
 import UIKit
 import SwiftUI
 import AmityUIKit4
 
 class FeatureViewController: UIViewController {
-    
+
     enum FeatureList: CaseIterable {
-        case chatFeature
-        case community
         case data
-        case chatUIKit
+        case chatV4
         case socialUIKit
-        case socialUIKitV4Comaptible
         case userProfile
         case syncNetworkConfig
-        
         var text: String {
             switch self {
-            case .chatFeature:
-                return "Chat"
-            case .community:
-                return "Community"
             case .data:
                 return "Data"
-            case .chatUIKit:
-                return "Chat UIKit 4"
+            case .chatV4:
+                return "Chat v4"
             case .socialUIKit:
                 return "Social UIKit 4"
-            case .socialUIKitV4Comaptible:
-                return "Social UIKit 4 Compatible"
             case .userProfile:
                 return "User Profile"
             case .syncNetworkConfig:
@@ -77,40 +66,19 @@ extension FeatureViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         
         switch FeatureList.allCases[indexPath.row] {
-        case .chatFeature:
-            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ChatFeatureViewController")
-            vc.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(vc, animated: true)
-        case .community:
-            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "CommunityFeatureViewController")
-            vc.hidesBottomBarWhenPushed = true
-            navigationController?.pushViewController(vc, animated: true)
         case .data:
             let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "DataListViewController")
             vc.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(vc, animated: true)
-        case .chatUIKit:
-            let view = LiveChatListView()
-            let hostingController = AmitySwiftUIHostingController(rootView: view)
-
-            //            if #available(iOS 15.0, *) {
-            //                if let sheet = hostingController.sheetPresentationController {
-            //                    sheet.detents = [.large()]
-            //                    sheet.prefersGrabberVisible = true
-            //                }
-            //            }
-            //            navigationController?.present(hostingController, animated: true)
-            navigationController?.pushViewController(hostingController, animated: true)
+        case .chatV4:
+            let vc = ChatV4FeatureViewController()
+            vc.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(vc, animated: true)
         case .socialUIKit:
             let pageView = AmitySocialHomePage(showBackButton: true)
             let hostingController = AmitySwiftUIHostingController(rootView: pageView)
             hostingController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(hostingController, animated: true)
-        case .socialUIKitV4Comaptible:
-            let homepage = AmitySocialV4Compatible.make()
-            let navigationController = UINavigationController(rootViewController: homepage)
-            navigationController.modalPresentationStyle = .fullScreen
-            present(navigationController, animated: true, completion: nil)
         case .userProfile:
             let profilePage = AmityUserProfilePage(userId: AmityUIKit4Manager.client.currentUserId ?? "")
             let host = AmitySwiftUIHostingController(rootView: profilePage)
@@ -144,6 +112,55 @@ extension FeatureViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CellID", for: indexPath)
         cell.textLabel?.text = FeatureList.allCases[indexPath.row].text
         return cell
+    }
+}
+
+// "Chat v4" group: hosts the v4 chat entries — LiveChat and ChatHomePage.
+final class ChatV4FeatureViewController: UITableViewController {
+
+    enum FeatureList: CaseIterable {
+        case liveChat
+        case chatHomePage
+
+        var text: String {
+            switch self {
+            case .liveChat:
+                return "Live Chat"
+            case .chatHomePage:
+                return "Chat Home Page"
+            }
+        }
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = "Chat v4"
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "CellID")
+        tableView.tableFooterView = UIView()
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return FeatureList.allCases.count
+    }
+
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CellID", for: indexPath)
+        cell.textLabel?.text = FeatureList.allCases[indexPath.row].text
+        return cell
+    }
+
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        switch FeatureList.allCases[indexPath.row] {
+        case .liveChat:
+            let hostingController = AmitySwiftUIHostingController(rootView: LiveChatListView())
+            navigationController?.pushViewController(hostingController, animated: true)
+        case .chatHomePage:
+            let page = AmityChatHomePage()
+            let hostingController = AmitySwiftUIHostingController(rootView: page)
+            hostingController.hidesBottomBarWhenPushed = true
+            navigationController?.pushViewController(hostingController, animated: true)
+        }
     }
 }
 

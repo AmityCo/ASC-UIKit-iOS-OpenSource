@@ -14,7 +14,11 @@ class FeedManager {
     func getGlobalFeedPosts() -> AmityCollection<AmityPost> {
         feedRepository.getGlobalFeed()
     }
-    
+
+    func getForYouFeedPosts() -> AmityCollection<AmityPost> {
+        feedRepository.getForYouFeed()
+    }
+
     func getGlobalFeedPosts(dataTypes: Set<String>) -> AmityCollection<AmityPost> {
         feedRepository.getGlobalFeed(dataTypes: dataTypes)
     }

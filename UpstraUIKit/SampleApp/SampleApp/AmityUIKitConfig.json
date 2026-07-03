@@ -17,7 +17,7 @@
         },
         "dark": {
             "primary_color": "#1054DE",
-            "secondary_color": "#292B32",
+            "secondary_color": "#EBECEF",
             "base_color": "#EBECEF",
             "base_shade1_color": "#A5A9B5",
             "base_shade2_color": "#6E7487",
@@ -27,7 +27,7 @@
             "background_color": "#191919",
             "base_inverse_color": "#FFFFFF",
             "background_shade1_color": "#40434E",
-            "highlight_color": "#1054DE"
+            "highlight_color": "#4A82F2"
         }
     },
     "excludes": [],
@@ -37,23 +37,31 @@
                 "can_create": "all",
                 "can_view_tab": "all"
             }
+        },
+        "chat": {
+            "enabled_channel_types": ["conversation", "community"],
+            "conversation_chat_user_actions": [
+                { "name": "mute",   "enabled": true },
+                { "name": "report", "enabled": true },
+                { "name": "block",  "enabled": true }
+            ]
         }
     },
     "message_reactions": [
         {
-            "name": "heart",
-            "image": "messageReactionHeart"
-        },
-        {
             "name": "like",
             "image": "messageReactionLike"
+        },
+        {
+            "name": "love",
+            "image": "messageReactionHeart"
         },
         {
             "name": "fire",
             "image": "messageReactionFire"
         },
         {
-            "name": "grinning",
+            "name": "happy",
             "image": "messageReactionGrinning"
         },
         {
@@ -114,31 +122,23 @@
         },
         "create_story_page/*/*": {},
         "create_story_page/*/back_button": {
-            "back_icon": "backArrowIcon",
-            "background_color": "#000000"
+            "back_icon": "backArrowIcon"
         },
         "create_story_page/*/aspect_ratio_button": {
-            "aspect_ratio_icon": "aspectRatioIcon",
-            "background_color": "#000000"
+            "aspect_ratio_icon": "aspectRatioIcon"
         },
         "create_story_page/*/story_hyperlink_button": {
-            "hyperlink_button_icon": "hyperLinkIcon",
-            "background_color": "#000000"
+            "hyperlink_button_icon": "hyperLinkIcon"
         },
         "create_story_page/*/hyper_link": {
-            "hyper_link_icon": "hyperLinkBlueIcon",
-            "background_color": "#EBECEF"
+            "hyper_link_icon": "hyperLinkBlueIcon"
         },
         "create_story_page/*/share_story_button": {
             "share_icon": "nextIcon",
-            "background_color": "#FFFFFF",
             "hide_avatar": false
         },
         "story_page/*/*": {},
-        "story_page/*/progress_bar": {
-            "progress_color": "#FFFFFF",
-            "background_color": "#FFFFFF"
-        },
+        "story_page/*/progress_bar": {},
         "story_page/*/overflow_menu": {
             "overflow_menu_icon": "threeDotIcon"
         },
@@ -149,32 +149,26 @@
             "impression_icon": "eyeIcon"
         },
         "story_page/*/story_comment_button": {
-            "comment_icon": "storyCommentIcon",
-            "background_color": "#292B32"
+            "comment_icon": "storyCommentIcon"
         },
         "story_page/*/story_reaction_button": {
-            "reaction_icon": "storyLikeIcon",
-            "background_color": "#292B32"
+            "reaction_icon": "storyLikeIcon"
         },
         "story_page/*/create_new_story_button": {
-            "create_new_story_icon": "plus.png",
-            "background_color": "#1243EE"
+            "create_new_story_icon": "plus.png"
         },
         "story_page/*/speaker_button": {
             "mute_icon": "muteIcon",
-            "unmute_icon": "unmuteIcon",
-            "background_color": "#6A6A6B"
+            "unmute_icon": "unmuteIcon"
         },
         "*/edit_comment_component/*": {},
         "*/edit_comment_component/cancel_button": {
             "cancel_icon": "",
-            "cancel_button_text": "cancel",
-            "background_color": "#1243EE"
+            "cancel_button_text": "cancel"
         },
         "*/edit_comment_component/save_button": {
             "save_icon": "",
-            "save_button_text": "Save",
-            "background_color": "#1243EE"
+            "save_button_text": "Save"
         },
         "*/hyper_link_config_component/*": {
             "component_theme": {
@@ -186,8 +180,7 @@
         },
         "*/hyper_link_config_component/done_button": {
             "done_icon": "",
-            "done_button_text": "Done",
-            "background_color": "#1243EE"
+            "done_button_text": "Done"
         },
         "*/hyper_link_config_component/cancel_button": {
             "cancel_icon": "",
@@ -195,16 +188,9 @@
         },
         "*/comment_tray_component/*": {},
         "*/story_tab_component/*": {},
-        "*/story_tab_component/story_ring": {
-            "progress_color": [
-                "#339AF9",
-                "#78FA58"
-            ],
-            "background_color": "#EBECEF"
-        },
+        "*/story_tab_component/story_ring": {},
         "*/story_tab_component/create_new_story_button": {
-            "create_new_story_icon": "createStoryIcon",
-            "background_color": "#FFFFFF"
+            "create_new_story_icon": "createStoryIcon"
         },
         "*/*/close_button": {
             "close_icon": "closeIcon"

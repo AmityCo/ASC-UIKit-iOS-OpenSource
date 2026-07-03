@@ -6,30 +6,23 @@
 //  Copyright © 2563 Amity. All rights reserved.
 //
 
-import AmityUIKit
 import UIKit
 
 class TabbarViewController: UITabBarController {
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         setupViewControllers()
         registerForPushNotifications()
     }
-    
+
     private func setupViewControllers() {
         let feature = UINavigationController(rootViewController: UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "FeatureViewController"))
         feature.tabBarItem.title = "Feature"
         feature.tabBarItem.image = UIImage(systemName: "app")
-        
-        let setting = UINavigationController(rootViewController: UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SettingViewController"))
-        setting.tabBarItem.title = "Setting"
-        setting.tabBarItem.image = UIImage(systemName: "gearshape")
-        
-        viewControllers = [ feature,
-                            setting,
-                           /* UINavigationController(rootViewController: AmityCommunityHomePageViewController.make()) */]
+
+        viewControllers = [feature]
     }
     
     private func registerForPushNotifications() {

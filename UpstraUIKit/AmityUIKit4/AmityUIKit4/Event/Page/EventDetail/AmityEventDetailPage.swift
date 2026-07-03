@@ -24,6 +24,7 @@ public struct AmityEventDetailPage: AmityPageView {
     @State private var isHeaderCollapsed = false
     @State var showCreateBottomSheet: Bool = false
     @State var showPollSelectionView: Bool = false
+    @State var showShareActivitySheet: Bool = false
     
     @StateObject var alertHandler = EventDetailPageAlert()
     
@@ -113,6 +114,11 @@ public struct AmityEventDetailPage: AmityPageView {
                 Alert(title: Text(alertHandler.alertState.title), message: Text(alertHandler.alertState.message), primaryButton: alertHandler.alertState.primaryButton, secondaryButton: alertHandler.alertState.secondaryButton)
             }
         })
+        .sheet(isPresented: $showShareActivitySheet) {
+            if let link = viewModel.generateEventShareableLink() {
+                ShareActivitySheetView(link: link)
+            }
+        }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .edgesIgnoringSafeArea(.top)
@@ -170,10 +176,10 @@ public struct AmityEventDetailPage: AmityPageView {
                 .renderingMode(.template)
                 .scaledToFit()
                 .frame(width: 24, height: 24)
-                .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                .foregroundColor(Color.white)
                 .background(
                     Rectangle()
-                        .fill(Color(viewConfig.theme.baseColor.withAlphaComponent(0.5)))
+                        .fill(Color.black.opacity(0.5))
                         .clipShape(RoundedCorner())
                         .padding(.all, -4)
                     
@@ -227,7 +233,7 @@ public struct AmityEventDetailPage: AmityPageView {
                     .resizable()
                     .renderingMode(.template)
                     .frame(width: 32, height: 32)
-                    .foregroundColor(Color(viewConfig.theme.backgroundColor))
+                    .foregroundColor(Color(AmityFixedColor.shared.white))
             }
         })
         .buttonStyle(BorderlessButtonStyle())
@@ -246,10 +252,10 @@ public struct AmityEventDetailPage: AmityPageView {
             .renderingMode(.template)
             .scaledToFit()
             .frame(width: 24, height: 24)
-            .foregroundColor(Color(viewConfig.theme.backgroundColor))
+            .foregroundColor(Color.white)
             .background(
                 Rectangle()
-                    .fill(Color(viewConfig.theme.baseColor.withAlphaComponent(0.5)))
+                    .fill(Color.black.opacity(0.5))
                     .clipShape(RoundedCorner())
                     .padding(.all, -4)
                 

@@ -203,6 +203,8 @@ private struct ViewerRow: View {
                 HStack(spacing: 6) {
                     Text(viewer.displayName)
                         .applyTextStyle(.bodyBold(.white))
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                     
                     // Brand badge
                     if viewer.isBrand {

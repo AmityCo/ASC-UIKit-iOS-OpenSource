@@ -22,7 +22,7 @@ struct HostBadgeView: View {
         }
         .padding(.vertical, 2)
         .padding(.horizontal, 4)
-        .background(Color(UIColor(hex: "#FF305A")))
+        .background(Color(AmityFixedColor.shared.live))
         .cornerRadius(4.0, corners: .allCorners)
     }
 }
@@ -35,14 +35,14 @@ struct CoHostBadgeView: View {
             Image(AmityIcon.Chat.membersCount.imageResource)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 12, height: 9)
+                .frame(width: 12, height: 12)
 
             Text(AmityLocalizedStringSet.Social.livestreamCoHost.localizedString)
                 .applyTextStyle(.captionSmall(.white))
         }
         .padding(.vertical, 2)
         .padding(.horizontal, 4)
-        .background(Color(UIColor(hex: "#FF305A")))
+        .background(Color(AmityFixedColor.shared.live))
         .cornerRadius(4.0, corners: .allCorners)
     }
 }

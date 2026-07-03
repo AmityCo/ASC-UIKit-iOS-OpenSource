@@ -46,32 +46,10 @@ CONFIGURATIONS = [
     shared_pkg_relative:  '../SharedFrameworks'
   },
   {
-    project_path:         'UpstraUIKit/AmityUIKit.xcodeproj',
-    target_name:          'AmityUIKit',
-    frameworks_to_remove: %w[
-      AmitySDK.xcframework
-    ],
-    shared_pkg_relative:  'SharedFrameworks'
-  },
-  {
-    project_path:         'UpstraUIKit/AmityUIKitLiveStream/AmityUIKitLiveStream.xcodeproj',
-    target_name:          'AmityUIKitLiveStream',
-    frameworks_to_remove: %w[
-      AmityLiveVideoBroadcastKit.xcframework
-      AmitySDK.xcframework
-      AmityVideoPlayerKit.xcframework
-      MobileVLCKit.xcframework
-    ],
-    shared_pkg_relative:  '../SharedFrameworks'
-  },
-  {
     project_path:         'UpstraUIKit/SampleApp/SampleApp.xcodeproj',
     target_name:          'SampleApp',
     frameworks_to_remove: %w[
       AmitySDK.xcframework
-      AmityLiveVideoBroadcastKit.xcframework
-      AmityVideoPlayerKit.xcframework
-      MobileVLCKit.xcframework
       AmityLiveKit.xcframework
       LiveKitWebRTC.xcframework
     ],

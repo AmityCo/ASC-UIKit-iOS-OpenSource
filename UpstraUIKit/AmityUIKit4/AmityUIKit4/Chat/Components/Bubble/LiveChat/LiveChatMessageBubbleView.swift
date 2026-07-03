@@ -38,8 +38,7 @@ struct LiveChatMessageBubbleView<Content: View>: View {
             VStack(alignment: .leading, spacing: 4) {
                 // User Info
                 Text(message.displayName)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade1)))
                     .accessibilityIdentifier(message.isOwner ? AccessibilityID.Chat.MessageList.bubbleSenderDisplayName : AccessibilityID.Chat.MessageList.bubbleReceiverDisplayName)
                 
                 HStack(alignment: .bottom, spacing: 0) {
@@ -166,7 +165,8 @@ class LiveChatMessageBubbleViewModel: ObservableObject {
     
     var currentPosition: CGPoint = CGPoint(x: 0, y: 0)
     var currentFrame: CGRect = CGRect(x: 0, y: 0, width: 0, height: 0)
-    
+    var errorIconFrame: CGRect = .zero
+
     init(message: MessageModel) {
         self.message = message
         

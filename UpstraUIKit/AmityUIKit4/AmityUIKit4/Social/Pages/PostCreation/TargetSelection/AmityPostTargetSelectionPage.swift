@@ -72,7 +72,10 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
         var body: some View {
             VStack(spacing: 10) {
                 HStack(spacing: 0) {
-                    AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: mytimelineAvatarURL)
+                    AsyncImage(
+                        placeholderView: { defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 40) },
+                        url: mytimelineAvatarURL
+                            )
                         .frame(width: 40, height: 40)
                         .clipShape(Circle())
                         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 12))

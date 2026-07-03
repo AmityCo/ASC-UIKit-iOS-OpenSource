@@ -221,6 +221,20 @@ class AmityEventDetailPageViewModel: ObservableObject {
         return false
     }
     
+    // MARK: Shareable Link
+    var canShareEventLink: Bool {
+        guard let event else { return false }
+        guard event.isOriginPublic else { return false }
+        guard event.status != .cancelled else { return false }
+        return AmityUIKitManagerInternal.shared.canShareLink(for: .event)
+    }
+
+    func generateEventShareableLink() -> String? {
+        guard let event else { return nil }
+        let link = AmityUIKitManagerInternal.shared.generateShareableLink(for: .event, id: event.eventId)
+        return link.isEmpty ? nil : link
+    }
+
     func addEventToCalendar(event: AmityEvent, onCompletion: @escaping (_ isSuccess: Bool) -> Void) {
         let manager = calendarManager
         manager.requestPermission { isPermissionGranted in

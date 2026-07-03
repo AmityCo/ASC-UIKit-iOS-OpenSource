@@ -27,39 +27,29 @@ struct AmityStoryRingElement: AmityElementView {
     private let animationInterval: TimeInterval = 0.0001
     
     var body: some View {
-        AmityView(configId: configId,
-                  config: { configDict -> (progressColor: [Color], backgroundColor: Color) in
-            
-            let progressColor = (configDict["progress_color"] as? [String] ?? ["#339AF9", "#78FA58"]).map({ hex in
-                Color(UIColor(hex: hex))
-            })
-            let backgroundColor = Color(UIColor(hex: configDict["background_color"] as? String ?? "#EBECEF"))
-            
-            return (progressColor, backgroundColor)
-            
-        }) { config in
-            
-            Circle()
-                .stroke(lineWidth: 2.0)
-                .fill(
-                    LinearGradient(colors: getRingColor(progressColor: config.progressColor, backgroundColor: [config.backgroundColor])
-                                   , startPoint: .top, endPoint: .bottom)
-                )
-                .overlay(
-                    VStack {
-                        if animateRing && !showErrorRing {
-                            Circle()
-                                .trim(from: startProgress, to: stopProgress)
-                                .stroke(
-                                    config.backgroundColor,
-                                    lineWidth: 2.0
-                                )
-                                .rotationEffect(.degrees(-90))
-                        }
-                        
+        let progressColor = AmityFixedColor.shared.storyRingProgress.map { Color($0) }
+        let backgroundColor = Color(AmityUIKitConfigController.shared.getTheme().baseColorShade4)
+
+        Circle()
+            .stroke(lineWidth: 2.0)
+            .fill(
+                LinearGradient(colors: getRingColor(progressColor: progressColor, backgroundColor: [backgroundColor])
+                               , startPoint: .top, endPoint: .bottom)
+            )
+            .overlay(
+                VStack {
+                    if animateRing && !showErrorRing {
+                        Circle()
+                            .trim(from: startProgress, to: stopProgress)
+                            .stroke(
+                                backgroundColor,
+                                lineWidth: 2.0
+                            )
+                            .rotationEffect(.degrees(-90))
                     }
-                )
-        }
+
+                }
+            )
         .onChange(of: animateRing) { showAnimation in
             if showAnimation && !showErrorRing {
                 animationTimer = Timer.scheduledTimer(withTimeInterval: animationInterval, repeats: true) { timer in
@@ -87,7 +77,7 @@ struct AmityStoryRingElement: AmityElementView {
     
     private func getRingColor(progressColor: [Color], backgroundColor: [Color]) -> [Color] {
         if showErrorRing {
-            return [Color(UIColor(hex: "#FA4D30"))]
+            return [Color(AmityUIKitConfigController.shared.getTheme().alertColor)]
         } else if showRing {
             return progressColor
         } else {

@@ -21,15 +21,14 @@ struct ClipFeedItemOverlayView: View {
     
     @EnvironmentObject var viewConfig: AmityViewConfigController
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
+    @Environment(\.colorScheme) private var colorScheme
     
     let post: AmityPostModel
     let isInteractionEnabled: Bool
     @StateObject var playerController: AmityMediaPlayerController
     @StateObject var viewModel: ClipFeedOverlayViewModel
     let onTapAction: ((ClipFeedAction) -> Void)?
-    
-    @State private var expandableTextHeight: CGFloat = 0.0
-    
+
     init(post: AmityPostModel, playerController: AmityMediaPlayerController, isInteractionEnabled: Bool, onTapAction: ((ClipFeedAction) -> Void)?) {
         self.post = post
         self.isInteractionEnabled = isInteractionEnabled
@@ -129,7 +128,7 @@ struct ClipFeedItemOverlayView: View {
                                                 /// This event is observed in PostFeedViewModel
                                                 NotificationCenter.default.post(name: .didPostReacted, object: post.object)
                                             } else {
-                                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+                                                Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                                             }
                                         }
                                     }, longPressAction: {
@@ -338,22 +337,15 @@ extension ClipFeedItemOverlayView {
     var postContent: some View {
         if !post.text.isEmpty {
             if isPostContentExpanded {
-                let scrollableThreshold = UIScreen.main.bounds.height * 0.4
-                let shouldMakeContentScrollable = expandableTextHeight >= scrollableThreshold
-
-                if shouldMakeContentScrollable {
-                    ScrollView(.vertical, showsIndicators: false) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Spacer(minLength: 0)
-                            
-                            postExpandableContent
-                        }
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Spacer(minLength: 0)
+                        postExpandableContent
                     }
-                    .frame(height: UIScreen.main.bounds.height * 0.4)
-                } else {
-                    postExpandableContent
+                    .frame(minHeight: UIScreen.main.bounds.height * 0.4, alignment: .bottom)
                 }
-                
+                .frame(height: UIScreen.main.bounds.height * 0.4)
+
                 Button {
                     togglePostContentExpantion()
                 } label: {
@@ -434,7 +426,7 @@ extension ClipFeedItemOverlayView {
         .font(AmityTextStyle.body(.clear).getFont())
         .foregroundColor(Color.white)
         .attributedColor(UIColor.white)
-        .hashtagColor(viewConfig.theme.primaryColor)
+        .hashtagColor(UIColor.defaultHashtagColor(viewConfig: viewConfig, colorScheme: colorScheme))
         .moreButtonColor(Color.white)
         .moreButtonFont(AmityTextStyle.bodyBold(.white).getFont())
         .expandAnimation(.easeOut(duration: 0.25))
@@ -442,9 +434,6 @@ extension ClipFeedItemOverlayView {
         .frame(maxWidth: .infinity, alignment: .leading)
         .onTapGesture {
             togglePostContentExpantion()
-        }
-        .readSize { size in
-            expandableTextHeight = size.height
         }
     }
     

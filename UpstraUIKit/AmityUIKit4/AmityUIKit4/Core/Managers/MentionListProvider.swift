@@ -37,6 +37,7 @@ class MentionListProvider {
     
     // If sdk is searching for provided display name
     public var mentionList: [AmityMentionUserModel] = []
+    private var currentSearchText: String = ""
     
     // Callback
     public var didGetMentionList: (([AmityMentionUserModel]) -> Void)?
@@ -111,10 +112,11 @@ class MentionListProvider {
     
     func reset() {
         mentionList = []
-        
+        currentSearchText = ""
+
         mentionListToken?.invalidate()
         mentionListToken = nil
-        
+
         channelMembersCollection = nil
         usersCollection = nil
         communityMembersCollection = nil
@@ -133,10 +135,12 @@ class MentionListProvider {
     }
     
     private func searchChannelMembers(with displayName: String) {
+        self.currentSearchText = displayName
+
         let builder = AmityChannelMembershipFilterBuilder()
         builder.add(filter: .member)
         builder.add(filter: .mute)
-        
+
         // Invalidate existing token
         mentionListToken = nil
         mentionListToken?.invalidate()
@@ -180,7 +184,7 @@ class MentionListProvider {
                     updatedList.append(AmityMentionUserModel(user: user))
                     
                 } else if T.self == AmityChannelMember.self {
-                    guard let memberObject = object as? AmityChannelMember, let user = memberObject.user else { continue }
+                    guard let memberObject = object as? AmityChannelMember, let user = memberObject.user, user.isGlobalBanned == false else { continue }
                     updatedList.append(AmityMentionUserModel(user: user))
                     
                 } else {
@@ -191,7 +195,7 @@ class MentionListProvider {
             
             // Incase of message, if @all mention is allowed, append it to the top
             if case .message = mentionType {
-                if self.canMentionAll {
+                if self.canMentionAll && self.currentSearchText.isEmpty {
                     updatedList.insert(AmityMentionUserModel.channelMention, at: 0)
                 }
             }

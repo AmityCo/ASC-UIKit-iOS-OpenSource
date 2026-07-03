@@ -13,6 +13,7 @@ struct CommunityCellView: View {
     private let community: AmityCommunityModel
     private let pageId: PageId?
     private let componentId: ComponentId?
+    @State private var isImageLoaded = false
     
     init(community: AmityCommunityModel, pageId: PageId? = nil, componentId: ComponentId? = nil) {
         self.community = community
@@ -28,12 +29,23 @@ struct CommunityCellView: View {
     private func getCommunityView(_ model: AmityCommunityModel) -> some View {
         
         HStack(spacing: 16) {
-            AsyncImage(placeholder: AmityIcon.communityThumbnail.imageResource, url: URL(string: model.avatarURL))
+            AsyncImage(placeholderView: {
+                ZStack {
+                    Color(viewConfig.theme.baseColorShade3)
+                        .applyDefaultThumbnailGradient(isVisible: true)
+                    
+                    Image(AmityIcon.communityThumbnailIcon.imageResource)
+                }
+
+            },
+                url: URL(string: model.avatarURL))
+                .onLoaded { isImageLoaded = $0 }
                 .frame(size: CGSize(width: 80, height: 80))
                 .clipped()
                 .cornerRadius(4, corners: .allCorners)
                 .isHidden(viewConfig.isHidden(elementId: .communityAvatar))
                 .accessibilityIdentifier(AccessibilityID.Social.MyCommunities.communityAvatar)
+                .applyDefaultThumbnailGradient(isVisible: isImageLoaded)
             
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 2) {

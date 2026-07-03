@@ -143,9 +143,11 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
     private func getItemView(image: ImageResource, title: String, imageSize: CGSize = CGSize(width: 20, height: 20)) -> some View {
         HStack(spacing: 10) {
             Image(image)
+                .renderingMode(.template)
                 .resizable()
                 .scaledToFill()
                 .frame(width: imageSize.width, height: imageSize.height)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
             
             Text(title)
                 .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))

@@ -12,10 +12,12 @@ class LiveStreamViewerViewModel: ObservableObject {
     
     let roomManager = RoomManager()
     let postManager = PostManager()
-    
+    let eventManager = EventManager()
+
     var roomToken: AmityNotificationToken?
     var postToken: AmityNotificationToken?
     var postObserveOnceToken: AmityNotificationToken?
+    private var gatingEventToken: AmityNotificationToken?
     private var chatViewModelCancellable: AnyCancellable?
     
     // Room Presense state
@@ -30,9 +32,11 @@ class LiveStreamViewerViewModel: ObservableObject {
     
     @Published var isLoaded = false
     @Published var room: AmityRoom?
+    @Published var coHostUser: AmityUser?
     @Published var isStreamTerminated = false
     @Published var isPostDeleted = false
     @Published var isBannedFromStream = false
+    @Published var chatGatingCommunityIsJoined: Bool?
     @Published var liveStreamChatViewModel: AmityLiveStreamChatViewModel? {
         didSet {
             setupChatViewModelObservation()
@@ -60,10 +64,13 @@ class LiveStreamViewerViewModel: ObservableObject {
         
         subscribeRoomEventAndObserve(roomId: post.room?.roomId ?? "")
         subscribePostEventAndObserve(postId: post.postId)
-        
+
+        resolveChatGatingCommunity()
+
         // Create live stream chat view model
         guard let room = post.room else { return }
         self.room = room
+        self.coHostUser = room.participants.first(where: { $0.type == "coHost" })?.user
         self.presenceRepository = AmityRoomPresenceRepository(roomId: room.roomId)
         observeWatchingCount()
         
@@ -91,6 +98,27 @@ class LiveStreamViewerViewModel: ObservableObject {
             async let _: Void? = self.presenceRepository?.startHeartbeat()
             Log.add(event: .info, "Started presence heartbeat for room id: \(self.room?.roomId ?? "nil")")
         }
+    }
+
+    private func resolveChatGatingCommunity() {
+        guard let eventId = resolveEventId(), !eventId.isEmpty else {
+            chatGatingCommunityIsJoined = nil
+            return
+        }
+
+        gatingEventToken?.invalidate()
+        gatingEventToken = nil
+        gatingEventToken = eventManager.getEvent(eventId: eventId).observeOnce { [weak self] liveObject, _ in
+            guard let self, let event = liveObject.snapshot else { return }
+            self.chatGatingCommunityIsJoined = event.targetCommunity?.isJoined
+            self.gatingEventToken?.invalidate()
+            self.gatingEventToken = nil
+        }
+    }
+
+    private func resolveEventId() -> String? {
+        if let id = post.eventId, !id.isEmpty { return id }
+        return nil
     }
     
     func stopPresenceHeartbeat() {
@@ -171,7 +199,8 @@ class LiveStreamViewerViewModel: ObservableObject {
             guard let self, let room = data.snapshot else { return }
             
             self.liveStreamChatViewModel?.refreshHostAndCoHostId(room: room)
-            
+            self.coHostUser = room.participants.first(where: { $0.type == "coHost" })?.user
+
             self.isLoaded = true
             
             if room.isBanned {
@@ -225,6 +254,8 @@ class LiveStreamViewerViewModel: ObservableObject {
         // Clean up chat view model
         liveStreamChatViewModel?.cleanup()
         liveStreamChatViewModel = nil
+
+        self.coHostUser = nil
         
         // Invalidate tokens
         self.roomToken?.invalidate()
@@ -232,7 +263,10 @@ class LiveStreamViewerViewModel: ObservableObject {
         
         self.postToken?.invalidate()
         self.postToken = nil
-        
+
+        self.gatingEventToken?.invalidate()
+        self.gatingEventToken = nil
+
         self.presenceTimer?.invalidate()
         self.presenceTimer = nil
         self.stopPresenceHeartbeat()

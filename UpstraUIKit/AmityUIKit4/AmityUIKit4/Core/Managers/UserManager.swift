@@ -17,6 +17,14 @@ class UserManager {
     func searchUsers(keyword: String) -> AmityCollection<AmityUser> {
         userRepostiory.searchUsers(keyword, sortBy: .displayName, matchType: .partial)
     }
+
+    func searchUsers(keyword: String, sortBy: AmityUserSortOption) -> AmityCollection<AmityUser> {
+        userRepostiory.searchUsers(keyword, sortBy: sortBy)
+    }
+
+    func getUsers(sortBy: AmityUserSortOption = .displayName) -> AmityCollection<AmityUser> {
+        userRepostiory.getUsers(sortBy)
+    }
     
     func editUser(user: UserModel) async throws {
         let builder = AmityUserUpdateOptions()

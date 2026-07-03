@@ -73,7 +73,7 @@ struct LiveStreamCoHostJoinSheet: View {
                         .applyTextStyle(.bodyBold(.white))
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(Color.blue)
+                        .background(Color(viewConfig.defaultDarkTheme.primaryColor))
                         .cornerRadius(8)
                 }
                 

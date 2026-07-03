@@ -147,7 +147,6 @@ public struct AmityUserRelationshipPage: AmityPageView {
                         }
                     }
                 }
-                .isHidden(userId != AmityUIKitManagerInternal.shared.currentUserId)
         }
         .padding(.bottom, 32)
     }

@@ -18,7 +18,9 @@ struct CategoryGridView: View {
     var body: some View {
         FlexibleView(data: categories, spacing: 8, alignment: .leading) { category in
             HStack(spacing: 5) {
-                AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: URL(string: category.avatarURL))
+                AsyncImage(placeholderView: {
+                    defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 28)
+                }, url: URL(string: category.avatarURL))
                     .frame(width: 28, height: 28)
                     .clipShape(Circle())
                 

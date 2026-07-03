@@ -25,6 +25,10 @@ public struct AmityLocalizedStringSet {
         static let off = "off"
         static let edit = "edit"
         static let done = "done"
+        static let camera = "general_camera"
+        static let errorMessage = "general_error_message"
+        static let errorTitle = "general_error_title"
+        static let notificationsLowercase = "general_notifications_lowercase"
         // Ad Info
         static let adAboutTitle = "amity_common_ad_about_title"
         static let adWhyTitle = "amity_common_ad_why_title"
@@ -119,55 +123,428 @@ public struct AmityLocalizedStringSet {
         static let postUnavailableToastMessage = "post_unavailable_toast_message"
         static let clipNoLongerAvailable = "social_label_this_clip_is_no_longer_available"
         static let commentEditError = "comment_edit_error"
+        static let commentDeleteError = "comment_delete_failed_toast"
     }
     
     public struct Chat {
         
         // Toast
-        static let toastLoading = "chat_toast_loading"
-        static let toastDeleteErrorMessage = "chat_toast_delete_error"
-        static let toastCopied = "chat_toast_copied"
-        static let toastLinkNotAllow = "chat_toast_link_not_allow"
-        static let toastBannedWord = "chat_toast_banned_word"
-        static let toastReportMessage = "chat_toast_report_message"
-        static let toastReportMessageError = "chat_toast_report_message_error"
-        static let toastUnReportMessage = "chat_toast_un_report_message"
-        static let toastUnReportMessageError = "chat_toast_un_report_message_error"
+        static let toastLoading = "amity_chat_loading_label"
+        static let toastDeleteErrorMessage = "amity_chat_toast_delete_error"
+        static let toastCopied = "amity_chat_toast_copied"
+        static let toastLinkNotAllow = "amity_chat_toast_link_not_allow"
+        static let toastBannedWord = "amity_chat_toast_banned_word"
+        static let toastReportMessage = "amity_chat_toast_message_reported"
+        static let toastReportMessageError = "amity_chat_toast_message_reported_error"
+        static let toastUnReportMessage = "amity_chat_toast_un_report_message"
+        static let toastUnReportMessageError = "amity_chat_toast_un_report_message_error"
+        static let toastReplyParentDeleted = "amity_chat_toast_reply_parent_deleted"
         // Button
-        static let deletedMessage = "chat_deleted_message_text"
-        
-        static let replyButton = "chat_button_reply"
-        static let copyButton = "chat_button_copy"
-        static let deleteButton = "chat_button_delete"
-        static let reportButton = "chat_button_report"
-        static let unReportButton = "chat_button_un_report"
-        static let okButton = "chat_button_ok"
-        
+        static let deletedMessage = "amity_chat_preview_deleted"
+        static let deletedUser = "amity_chat_deleted_user"
+        static let memberYouSuffix = "amity_chat_member_you_suffix"
+
+        public struct ReactionLabel {
+            static let like = "amity_chat_reaction_label_like"
+            static let love = "amity_chat_reaction_label_love"
+            static let fire = "amity_chat_reaction_label_fire"
+            static let happy = "amity_chat_reaction_label_happy"
+            static let sad = "amity_chat_reaction_label_sad"
+        }
+
+        static let editButton = "amity_chat_option_edit"
+        static let replyButton = "amity_chat_option_reply"
+        static let copyButton = "amity_chat_option_copy"
+        static let deleteButton = "amity_chat_option_delete"
+        static let reportButton = "amity_chat_option_report"
+        static let unReportButton = "amity_chat_option_unreport"
+        static let okButton = "amity_chat_button_ok"
+        static let doneButton = "amity_chat_button_done"
+        static let uploadFailedTitle = "amity_chat_upload_failed_title"
+        static let uploadFailedMessage = "amity_chat_upload_failed_message"
+        static let seeMore = "amity_chat_see_more"
+        static let camera = "amity_chat_media_camera"
+
+        // Composer media section
+        static let mediaButton = "message_media"
+        static let messagePlaceholder = "amity_chat_composer_placeholder"
+        static let sendButton = "amity_chat_button_message_send"
+
         // Error
-        static let errorLoadingChat = "chat_error_loading_chat_title"
-        static let errorBannedTitleChat = "chat_error_banned_chat_title"
-        static let errorBannedSubTitleInChat = "chat_error_banned_chat_sub_title"
-        
-        static let charLimitAlertTitle = "chat_char_limit_alert_title"
-        static let charLimitAlertMessage = "chat_char_limit_alert_message"
-        static let deleteAlertTitle = "chat_delete_alert_title"
-        static let deleteAlertMessage = "chat_delete_alert_message"
-       
-        static let deleteActionSheetTitle = "chat_delete_action_sheet_title"
-        
-        static let userIsMuted = "chat_user_is_muted"
-        static let channelIsMuted = "chat_channel_is_muted"
-        
-        static let statusSending = "chat_sending_status"
+        static let errorLoadingChat = "amity_chat_load_error"
+        static let errorBannedTitleChat = "amity_chat_label_banned_from_chat"
+        static let errorBannedSubTitleInChat = "amity_chat_error_banned_chat_sub_title"
+
+        static let charLimitAlertTitle = "amity_chat_char_limit_alert_title"
+        static let charLimitAlertMessage = "amity_chat_char_limit_alert_message"
+        static let deleteAlertTitle = "amity_chat_delete_alert_title"
+        static let deleteAlertMessage = "amity_chat_delete_alert_message"
+
+        static let deleteActionSheetTitle = "amity_chat_delete_action_sheet_title"
+
+        static let userIsMuted = "amity_chat_user_is_muted"
+        static let channelIsMuted = "amity_chat_group_permission_only_moderators_banner"
+
+        static let statusSending = "amity_chat_sending_status"
+        static let mediaFailedToSend = "amity_chat_message_failed_to_send"
         static let connectivityStatusWaiting = "network_connectivity_status"
+
+        static let mentionEveryone = "amity_chat_mention_everyone"
+        static let replyMessagePreview = "amity_chat_replying_to"
+        static let memberCount = "amity_chat_group_member_count"
+
+        static let reachMentionLimitTitle = "amity_chat_reach_mention_limit_title"
+        static let reachMentionLimitMessage = "amity_chat_reach_mention_limit_message"
+        static let notificationTurnOffError = "amity_chat_action_mute_failed"
+        static let notificationTurnOnError = "amity_chat_notification_turn_on_error"
+        static let modalEmptyDescription = "amity_chat_home_empty_description"
+
+        // MARK: - Chat home / search / create group (P0/P1/P2)
+        public struct Home {
+            static let title = "amity_chat_home_title"
+            static let menuArchived = "amity_chat_archived"
+            static let menuDirectChat = "amity_chat_create_direct"
+            static let menuGroupChat = "amity_chat_create_group"
+            static let waitingForNetwork = "amity_chat_waiting_for_network"
+            static let timestampNow = "amity_chat_timestamp_now"
+            static let tabAll = "amity_chat_tab_all"
+            static let tabDirect = "amity_chat_tab_direct"
+            static let tabGroups = "amity_chat_tab_groups"
+            static let createNew = "amity_chat_create_new_chat"
+            static let emptyTitle = "amity_chat_home_empty_title"
+            static let notificationsDisabled = "amity_chat_notifications_disabled"
+        }
+
+        public struct Search {
+            static let placeholder = "amity_chat_search_placeholder"
+            static let emptyTitle = "amity_chat_search_no_results"
+            static let tabChats = "amity_chat_search_tab_chats"
+            static let tabMessages = "amity_chat_search_tab_messages"
+            static let minimumChars = "amity_chat_search_min_chars"
+        }
+
+        public struct CreateGroup {
+            static let title = "amity_chat_create_group_title"
+            static let createButton = "amity_chat_create_group_button"
+            static let nameLabel = "amity_chat_group_name_label"
+            static let nameOptional = "amity_chat_group_name_optional"
+            static let namePlaceholder = "amity_chat_group_name_placeholder"
+            static let publicTitle = "amity_chat_create_group_public_title"
+            static let publicSubtitle = "amity_chat_create_group_public_subtitle"
+            static let createError = "amity_chat_create_group_error"
+            static let privacyTitle = "amity_chat_privacy_label"
+            static let privacyPublic = "amity_chat_create_group_public_title"
+            static let privacyPublicDesc = "amity_chat_create_group_public_subtitle"
+            static let privacyPrivate = "amity_chat_create_group_private_title"
+            static let privacyPrivateDesc = "amity_chat_create_group_private_subtitle"
+            static let privacyWarning = "amity_chat_privacy_warning"
+            static let memberLabel = "amity_chat_group_members"
+            static let createSuccess = "amity_chat_create_group_success"
+            static let leaveAlertTitle = "amity_chat_leave_without_finishing_title"
+            static let leaveAlertMessage = "amity_chat_leave_without_finishing_message"
+            static let memberYouLabel = "amity_chat_create_group_member_you"
+        }
+
+        public struct ParentPreview {
+            static let photo = "amity_chat_reply_photo_label"
+            static let video = "amity_chat_reply_video_label"
+            static let unavailable = "amity_chat_reply_parent_unavailable"
+        }
+
+        public struct DM {
+            static let blockUserTitle = "amity_chat_block_confirm_title"
+            static let blockUserMessage = "amity_chat_block_confirm_message"
+            static let blockUserConfirm = "amity_chat_block_confirm_label"
+            static let unblockUserTitle = "amity_chat_unblock_confirm_title"
+            static let unblockUserMessage = "amity_chat_unblock_confirm_message"
+            static let unblockUserConfirm = "amity_chat_unblock_confirm_label"
+            static let blockedBanner = "amity_chat_blocked_message"
+        }
+
+        public struct NotificationPreference {
+            static let title = "chat_notification_pref_title"
+        }
+
+        public struct SaveMedia {
+            static let imageSuccess = "amity_chat_save_photo_success"
+            static let imageFailed = "amity_chat_save_photo_failed"
+            static let videoSuccess = "amity_chat_save_video_success"
+            static let videoFailed = "amity_chat_save_video_failed"
+            static let saveImageAction = "amity_chat_action_save"
+            static let saveVideoAction = "amity_chat_action_save"
+        }
+
+        public struct JumpToMessage {
+            static let unavailable = "amity_chat_jump_to_message_unavailable"
+        }
+
+        public struct Bubble {
+            static let edited = "amity_chat_status_edited"
+            static let linkPreviewUnavailable = "amity_chat_preview_not_available"
+            static let linkPreviewNoData = "amity_chat_bubble_link_preview_no_data"
+            static let replyYouToDeleted = "amity_chat_reply_you_to_deleted"
+            static let replyToDeleted    = "amity_chat_reply_to_deleted"
+            // Private (1:1) — no names
+            static let replyYou               = "amity_chat_reply_you"
+            static let replyToYou             = "amity_chat_reply_to_you"
+            static let replyToThemself        = "amity_chat_reply_to_themself"
+            static let replyYouToYourself     = "amity_chat_reply_you_to_yourself"
+            // Group — with name placeholders (%@)
+            static let replyYouToName         = "amity_chat_reply_you_to_name"
+            static let replyNameToYou         = "amity_chat_reply_name_to_you"
+            static let replyNameToThemself    = "amity_chat_reply_name_to_themself"
+            static let replyNameToName        = "amity_chat_reply_name_to_name"
+            static let unknownUser            = "amity_chat_unknown_user"
+            static let repliedMessage         = "amity_chat_message_replied_message"
+            static let replyingYourself       = "amity_chat_message_replying_yourself"
+            static let resend                 = "amity_chat_message_resend"
+            static let editing                = "amity_chat_editing_message"
+        }
         
-        static let mentionEveryone = "chat_mention_everyone"
-        static let replyMessagePreview = "chat_reply_preview"
-        static let memberCount = "chat_member_count"
+        // MARK: - P4.27 full localization sweep
+
+        public struct GroupMemberList {
+            static let tabMembers = "amity_chat_group_member_list_tab_title"
+            static let tabModerators = "amity_chat_member_tab_moderators"
+            static let navbarTitle = "amity_chat_member_list_title"
+            static let searchPlaceholder = "amity_chat_search_placeholder"
+            static let moderatorBadge = "chat_group_member_list_moderator_badge"
+            static let empty = "amity_chat_no_members_found"
+            static let actionCompleted = "chat_group_member_list_action_completed"
+            static let actionFailed = "chat_group_member_list_action_failed"
+
+            // Confirmation dialogs
+            static let promoteTitle = "amity_chat_group_member_list_promote_title"
+            static let promoteMessage = "amity_chat_group_member_list_promote_message"
+            static let promoteConfirm = "amity_chat_group_member_list_promote_confirm"
+            static let demoteTitle = "amity_chat_group_member_list_demote_title"
+            static let demoteMessage = "amity_chat_group_member_list_demote_message"
+            static let demoteConfirm = "amity_chat_group_member_list_demote_confirm"
+            static let removeTitle = "amity_chat_group_member_list_remove_title"
+            static let removeMessage = "amity_chat_group_member_list_remove_message"
+            static let removeConfirm = "amity_chat_group_member_list_remove_confirm"
+            static let banTitle = "amity_chat_ban_confirm_title"
+            static let banMessage = "amity_chat_group_member_list_ban_message"
+            static let banConfirm = "amity_chat_group_member_list_ban_confirm"
+            static let muteTitle = "amity_chat_mute_confirm_title"
+            static let muteMessage = "amity_chat_mute_confirm_message"
+            static let muteConfirm = "amity_chat_mute_confirm_label"
+            static let unmuteTitle = "amity_chat_unmute_confirm_title"
+            static let unmuteMessage = "amity_chat_unmute_confirm_message"
+            static let unmuteConfirm = "amity_chat_unmute_confirm_label"
+            static let cancel = "amity_chat_cancel"
+
+            // Per-action toasts
+            static let toastPromoted = "amity_chat_group_member_list_toast_promoted"
+            static let toastPromoteError = "amity_chat_action_promote_member_failed"
+            static let toastDemoted = "amity_chat_group_member_list_toast_demoted"
+            static let toastDemoteError = "amity_chat_action_demote_member_failed"
+            static let toastRemoved = "amity_chat_action_remove_member"
+            static let toastRemoveError = "amity_chat_action_remove_member_failed"
+            static let toastBanned = "amity_chat_group_member_list_toast_banned"
+            static let toastBanError = "amity_chat_action_ban_member_failed"
+            static let toastMuted = "amity_chat_action_mute_user"
+            static let toastMuteError = "amity_chat_action_mute_user_failed"
+            static let toastUnmuted = "amity_chat_action_unmute_user"
+            static let toastUnmuteError = "amity_chat_action_unmute_user_failed"
+        }
+
+        public struct GroupSetting {
+            static let leaveTitle = "amity_chat_group_leave_confirm_title"
+            static let leaveConfirm = "amity_chat_group_leave_confirm_label"
+            static let leaveFailed = "amity_chat_action_leave_group_failed"
+            static let toastLeft = "amity_chat_toast_group_chat_left"
+            static let sectionGroup = "amity_chat_group_settings_section"
+            static let tileProfile = "amity_chat_group_profile"
+            static let tileNotifications = "chat_group_setting_tile_notifications"
+            static let tilePermissions = "amity_chat_group_member_permissions"
+            static let tileAllMembers = "amity_chat_group_members_label"
+            static let tileBanned = "amity_chat_group_banned_members"
+            static let sectionPreferences = "amity_chat_your_preferences_section"
+            static let tileMyNotifications = "amity_chat_notifications_title"
+            static let toggleOn = "amity_chat_notifications_on"
+            static let toggleOff = "amity_chat_notifications_off"
+            static let leaveButton = "amity_chat_group_leave"
+            static let notifModeDefault = "amity_chat_group_notification_default_label"
+            static let notifModeSilent = "amity_chat_group_notification_silent_label"
+            static let notifModeSubscribe = "amity_chat_group_notification_subscribe_label"
+            static let leaveGroupConfirm = "amity_chat_group_leave_confirm_message"
+            static let leaveLastModTitle = "amity_chat_group_leave_last_mod_title"
+            static let leaveLastModMessage = "amity_chat_group_leave_last_mod_message"
+            static let promoteMemberCTA = "amity_chat_group_promote_member"
+        }
+
+        public struct EditGroupProfile {
+            static let navbarTitle = "amity_chat_edit_group_profile_navbar_title"
+            static let save = "amity_chat_group_edit_profile_save"
+            static let toastSuccess = "amity_chat_group_edit_profile"
+            static let toastFailed = "amity_chat_group_edit_profile_failed"
+            static let nameLabel = "chat_edit_group_profile_name_label"
+            static let namePlaceholder = "amity_chat_edit_group_profile_name_placeholder"
+            static let avatarLibrary = "amity_chat_media_photo"
+            static let nameRequired = "amity_chat_group_name_required"
+            static let uploadFailedTitle = "amity_chat_group_edit_profile_upload_failed_title"
+            static let uploadFailedMessage = "amity_chat_group_edit_profile_upload_failed_message"
+        }
+
+        public struct EditGroupNotification {
+            static let navbarTitle = "amity_chat_group_notifications"
+            static let save = "amity_chat_group_edit_notification_save"
+            static let toastSuccess = "amity_chat_group_notification_save_success"
+            static let toastFailed = "amity_chat_group_notification_save_error"
+            static let modeDefaultTitle = "amity_chat_group_notification_default_title"
+            static let modeDefaultDescription = "amity_chat_group_notification_default_desc"
+            static let modeSilentTitle = "amity_chat_group_notification_silent_title"
+            static let modeSilentDescription = "amity_chat_group_notification_silent_desc"
+            static let modeSubscribeTitle = "amity_chat_group_notification_subscribe_title"
+            static let modeSubscribeDescription = "amity_chat_group_notification_subscribe_desc"
+        }
+
+        public struct EditGroupMemberPermission {
+            static let navbarTitle = "amity_chat_group_member_permissions_navbar_title"
+            static let save = "amity_chat_group_edit_permission_save"
+            static let toastSuccess = "amity_chat_edit_group_perm_toast_success"
+            static let toastFailed = "amity_chat_edit_group_perm_toast_failed"
+            static let sectionMessaging = "amity_chat_group_edit_permissions_messaging_title"
+            static let optionEveryoneTitle = "amity_chat_group_edit_permissions_everyone_title"
+            static let optionEveryoneDescription = "amity_chat_group_edit_permissions_everyone_description"
+            static let optionModeratorsTitle = "amity_chat_group_edit_permissions_moderators_only_title"
+            static let optionModeratorsDescription = "amity_chat_group_edit_permissions_moderators_only_description"
+        }
+
+        public struct AddGroupMember {
+            static let navbarTitle = "amity_chat_add_member_title"
+            static let submitButton = "amity_chat_add_member_button"
+            static let memberChip = "amity_chat_add_member_chip"
+            static let toastFailed = "amity_chat_add_group_member_toast_failed"
+            static let toastAdded = "amity_chat_toast_member_added"
+            static let toastAddedMultiple = "amity_chat_toast_members_added"
+            static let toastAddMultipleError = "amity_chat_toast_members_add_error"
+            static let searchPlaceholder = "amity_chat_search_placeholder"
+            static let empty = "chat_add_group_member_empty"
+        }
+
+        public struct BannedMembers {
+            static let navbarTitle = "amity_chat_banned_member_list_navbar_title"
+            static let searchPlaceholder = "amity_chat_search_placeholder"
+            static let empty = "amity_chat_banned_members_empty"
+            static let unbanSuccess = "amity_chat_action_unban_user"
+            static let unbanFailed = "amity_chat_action_unban_user_failed"
+            static let unbanUser = "amity_chat_member_action_unban"
+            static let unbanConfirmTitle = "amity_chat_unban_confirm_title"
+            static let unbanConfirmDescription = "amity_chat_unban_confirm_message"
+            static let unbanButton = "user_unban_button"
+        }
+
+        public struct Archived {
+            static let navbarTitle = "amity_chat_archived_navbar_title"
+            static let emptyTitle = "amity_chat_archived_empty_title"
+            static let label = "amity_chat_archived_badge_label"
+        }
         
-        static let reachMentionLimitTitle = "reach_mention_limit_title"
-        static let reachMentionLimitMessage = "chat_reach_mention_limit_Message"
+        public struct Archive {
+            static let archive = "amity_chat_archive"
+            static let unarchive = "amity_chat_unarchive"
+            static let toastArchived = "amity_chat_archived_toast"
+            static let toastUnarchived = "amity_chat_unarchived_toast"
+            static let toastArchiveError = "amity_chat_archive_error_toast"
+            static let toastUnarchiveError = "amity_chat_unarchive_error_toast"
+            static let limitTitle = "amity_chat_archive_limit_title"
+            static let limitMessage = "amity_chat_archive_limit_message"
+        }
+
+        // Channel preview placeholders
+        public struct Preview {
+            static let messageDeleted = "amity_chat_message_deleted"
+            static let messagePhoto = "amity_chat_reply_photo_label"
+            static let messagePhotoSent = "amity_chat_preview_sent_photo"
+            static let messageVideo = "amity_chat_reply_video_label"
+            static let messageVideoSent = "amity_chat_preview_sent_video"
+            static let messageGeneric = "amity_chat_preview_message"
+            static let messageNoPreview = "amity_chat_message_no_preview"
+            static let messageNoContent = "amity_chat_message_no_content"
+            static let noMessageYet = "amity_chat_preview_no_message"
+            static let unknownUser = "user_profile_unknown_name"
+            // New message banner
+            static let bannerPhoto = "amity_chat_message_photo"
+            static let bannerVideo = "amity_chat_message_video"
+        }
+
+        public struct CreateConversation {
+            static let navbarTitle = "amity_chat_create_conversation_title"
+            static let searchPlaceholder = "amity_chat_search_placeholder"
+            static let empty = "chat_create_conversation_empty"
+        }
+
+        public struct SelectGroupMember {
+            static let navbarTitle = "amity_chat_select_members_title"
+            static let next = "amity_chat_next"
+            static let done = "amity_chat_select_group_member_done"
+            static let searchPlaceholder = "amity_chat_search_placeholder"
+            static let empty = "amity_chat_no_users_found"
+            static let selectMemberError = "chat_select_member_error"
+            // Maximum-members reached alert
+            static let memberLimitAlertTitle = "amity_chat_member_limit_reached_title"
+            static let memberLimitAlertMessage = "amity_chat_member_limit_reached_message"
+        }
+
+        public struct GroupNotificationPreference {
+            static let navbarTitle = "amity_chat_group_notif_pref_navbar_title"
+            static let save = "amity_chat_group_notif_pref_save"
+            static let moderatorBanner = "amity_chat_group_notifications_disabled"
+            static let toggleTitle = "amity_chat_group_notification_preference_title"
+            static let toggleDescription = "amity_chat_group_notification_preference_description"
+        }
+
+        public struct GroupMemberAction {
+            static let demote = "amity_chat_member_action_demote"
+            static let promote = "amity_chat_member_action_promote"
+            static let unmute = "amity_chat_group_member_action_unmute"
+            static let mute = "amity_chat_group_member_action_mute"
+            static let report = "amity_chat_action_report_user"
+            static let unreport = "amity_chat_action_unreport_user"
+            static let remove = "amity_chat_member_action_remove"
+            static let ban = "amity_chat_user_action_ban"
+        }
+
+        public struct EditMessage {
+            static let previewTitle = "amity_chat_edit_message_preview_title"
+        }
+
+        public struct ComposerCamera {
+            static let deniedTitle = "amity_chat_composer_camera_denied_title"
+            static let deniedMessage = "amity_chat_composer_camera_denied_message"
+            static let openSettings = "amity_chat_composer_camera_denied_open_settings"
+            static let cameraTitle = "amity_chat_permission_camera_title"
+            static let cameraDetail = "amity_chat_permission_camera_detail"
+            static let microphoneTitle = "amity_chat_permission_microphone_title"
+            static let microphoneDetail = "amity_chat_permission_microphone_detail"
+            static let permissionDenied = "amity_chat_toast_permission_denied"
+        }
+
+        public struct DMAction {
+            static let turnOnNotifications = "amity_chat_action_turn_on_notification"
+            static let turnOffNotifications = "amity_chat_action_turn_off_notification"
+            static let unreportUser = "amity_chat_action_unreport_user"
+            static let reportUser = "amity_chat_action_report_user"
+            static let unblockUser = "amity_chat_action_unblock_user"
+            static let blockUser = "amity_chat_action_block_user"
+            static let toastNotificationsOn = "amity_chat_action_unmute"
+            static let toastNotificationsOff = "amity_chat_action_mute"
+            static let toastUnmuteFailed = "amity_chat_toast_unmute_failed"
+            static let toastMuteFailed = "amity_chat_toast_mute_failed"
+            static let toastUserBlocked = "amity_chat_block_success"
+            static let toastUserUnblocked = "amity_chat_unblock_success"
+            static let toastBlockFailed = "amity_chat_block_failed"
+            static let toastUnblockFailed = "amity_chat_unblock_failed"
+        }
         static let editMessage = "amity_chat_edit_message"
+
+        // Shared report-user toasts
+        static let toastUserReported = "amity_chat_action_report_user_success"
+        static let toastUserUnreported = "amity_chat_action_unreport_user_success"
+        static let toastReportUserFailed = "amity_chat_action_report_user_failed"
+        static let toastUnreportUserFailed = "amity_chat_action_unreport_user_failed"
     }
     
     public struct LiveChat {
@@ -679,6 +1056,8 @@ public struct AmityLocalizedStringSet {
         static let eventDetailPageEventDeleted = "event_detail_page_event_deleted"
         static let eventDetailPageDeleteFailed = "event_detail_page_delete_failed"
         static let eventDetailPageSetupLivestream = "event_detail_page_setup_livestream"
+        static let eventDetailCopyEventLink = "event_detail_copy_event_link"
+        static let eventDetailFailedToCopyLink = "event_detail_failed_to_copy_link"
 
         static let eventSetupEventNameTitle = "event_setup_event_name_title"
         static let eventSetupEventNamePlaceholder = "event_setup_event_name_placeholder"
@@ -799,11 +1178,17 @@ public struct AmityLocalizedStringSet {
         
         // Social Home Tab Titles
         static let socialHomeNewsfeedTab = "social_home_newsfeed_tab"
+        static let socialHomeForYouTab = "social_home_for_you_tab"
         static let socialHomeExploreTab = "social_home_explore_tab"
         static let socialHomeMyCommunitiesTab = "social_home_my_communities_tab"
         static let socialHomeCommunitiesTab = "social_home_communities_tab"
         static let socialHomeEventsTab = "social_home_events_tab"
         static let socialHomeClipsTab = "amity_social_tab_tab_clips"
+
+        // For You Feed — end-of-feed nudge
+        static let feedCaughtUpTitle = "amity_social_feed_caught_up_title"
+        static let feedCaughtUpCTA = "amity_social_feed_caught_up_cta"
+
         static let pendingPostsTitle = "amity_social_pending_posts_title"
         static let postAcceptedToast = "amity_social_post_accepted_toast"
         static let postDeclinedToast = "amity_social_post_declined_toast"

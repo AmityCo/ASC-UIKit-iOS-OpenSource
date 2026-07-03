@@ -35,9 +35,7 @@ public struct AmityLiveChatMessageReactionPreview: View {
                 
                 // Total reaction count
                 Text("\(message.reactionCount.formattedCountString)")
-                    .font(.system(size: 13))
-                    .fontWeight(.medium)
-                    .foregroundColor(message.myReactions.isEmpty ? Color(viewConfig.theme.baseInverseColor) : .white)
+                    .applyTextStyle(.custom(13, .medium, message.myReactions.isEmpty ? Color(viewConfig.theme.baseInverseColor) : .white))
                     .padding(.trailing, 8)
                     .padding(.leading, 2)
             }

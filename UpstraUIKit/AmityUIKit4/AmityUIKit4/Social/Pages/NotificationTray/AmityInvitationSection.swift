@@ -47,21 +47,14 @@ public struct AmityInvitationSection: AmityComponentView {
         host.controller?.navigationController?.pushViewController(vc, animated: true)
     }
 
-    /// Background tint for the invitation row. Read rows use the theme background.
-    /// Unread rows use a theme-aware highlight:
-    ///   - Light mode keeps the legacy `primaryColor.blend(.shade3)` (a light blue) so
-    ///     the visual is unchanged.
-    ///   - Dark mode uses `primaryColor` at low opacity instead — `.blend(.shade3)` only
-    ///     increases lightness, producing a near-white background that makes the row
-    ///     text unreadable on dark themes (PDT-3250).
     @ViewBuilder
     private func unreadBackground(isSeen: Bool) -> some View {
         if isSeen {
             Color(viewConfig.theme.backgroundColor)
         } else if viewConfig.currentStyle == .dark {
-            Color(viewConfig.theme.primaryColor).opacity(0.15)
+            Color(viewConfig.theme.primaryColor).opacity(0.2)
         } else {
-            Color(viewConfig.theme.primaryColor.blend(.shade3))
+            Color(viewConfig.theme.primaryColor.blend(.shade3)).opacity(0.3)
         }
     }
 }

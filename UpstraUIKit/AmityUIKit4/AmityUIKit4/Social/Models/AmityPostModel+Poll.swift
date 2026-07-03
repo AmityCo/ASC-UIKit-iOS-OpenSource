@@ -132,13 +132,13 @@ class PollStatus {
         var info: String {
             switch self {
             case .days(let remainingDays):
-                return "\(remainingDays)" + AmityLocalizedStringSet.Social.pollRemainingDaysLeft.localizedString
-                
+                return AmityLocalizedStringSet.Social.pollRemainingDaysLeft.localized(arguments: "\(remainingDays)")
+
             case .hours(let remainingHours):
-                return "\(remainingHours)" + AmityLocalizedStringSet.Social.pollRemainingHoursLeft.localizedString
-                
+                return AmityLocalizedStringSet.Social.pollRemainingHoursLeft.localized(arguments: "\(remainingHours)")
+
             case .minutes(let remainingMinutes):
-                return "\(remainingMinutes)" + AmityLocalizedStringSet.Social.pollRemainingMinutesLeft.localizedString
+                return AmityLocalizedStringSet.Social.pollRemainingMinutesLeft.localized(arguments: "\(remainingMinutes)")
             }
         }
     }

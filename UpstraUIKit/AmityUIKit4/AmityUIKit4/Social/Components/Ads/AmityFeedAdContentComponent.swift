@@ -38,7 +38,8 @@ struct AmityFeedAdContentComponent: View {
         HStack(alignment: .top, spacing: 0) {
             
             HStack(spacing: 0) {
-                AsyncImage(placeholder: AmityIcon.adAvatarPlaceholder.imageResource, url: URL(string: ad.advertiser?.avatar?.fileURL ?? ""))
+                AsyncImage(placeholderView: { adAvatarPlaceholderView(viewConfig: viewConfig, size: 32) },
+                           url: URL(string: ad.advertiser?.avatar?.fileURL ?? ""))
                     .frame(width: 32.0, height: 32.0)
                     .background(Color(viewConfig.theme.primaryColor.blend(.shade2)))
                     .clipShape(Circle())

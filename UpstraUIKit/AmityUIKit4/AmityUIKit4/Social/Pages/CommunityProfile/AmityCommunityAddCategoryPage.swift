@@ -110,18 +110,13 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
                 .frame(height: 1)
             
             Rectangle()
-                .fill(.blue)
+                .fill(Color(viewConfig.theme.primaryColor).opacity(selectedCategories.isEmpty ? 0.3 : 1))
                 .frame(height: 40)
                 .cornerRadius(4)
                 .overlay (
-                    ZStack {
-                        Rectangle()
-                            .fill(Color(viewConfig.theme.primaryColor.blend(.shade3)))
-                            .isHidden(!selectedCategories.isEmpty, remove: true)
-                        
-                        Text(AmityLocalizedStringSet.Social.addCategory.localizedString)
-                            .applyTextStyle(.bodyBold(.white))
-                    }
+                    Text(AmityLocalizedStringSet.Social.addCategory.localizedString)
+                        .applyTextStyle(.bodyBold(.white))
+                        .opacity(selectedCategories.isEmpty ? (viewConfig.currentStyle == .dark ? 0.3 : 1) : 1)
                 )
                 .onTapGesture {
                     guard !selectedCategories.isEmpty else { return }
@@ -137,7 +132,8 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
     private func getCategoryView(_ category: AmityCommunityCategoryModel, isSelected: Bool) -> some View {
         ZStack {
             HStack(spacing: 12) {
-                AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: URL(string: category.avatarURL))
+                AsyncImage(placeholderView: { defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 40) },
+                           url: URL(string: category.avatarURL))
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
                 
@@ -149,7 +145,7 @@ public struct AmityCommunityAddCategoryPage: AmityPageView {
                 ZStack {
                     Circle()
                         .stroke(lineWidth: 2.0)
-                        .fill(.gray)
+                        .fill(Color(viewConfig.theme.baseColorShade3))
                         .frame(width: 16, height: 16)
                         .isHidden(isSelected)
                     

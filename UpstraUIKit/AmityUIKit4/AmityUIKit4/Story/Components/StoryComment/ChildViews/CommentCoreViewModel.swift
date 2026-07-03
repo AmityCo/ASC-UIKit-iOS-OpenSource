@@ -68,7 +68,8 @@ class CommentCoreViewModel: ObservableObject {
          targetCommentParentId: String? = nil,
          rootCommentId: String? = nil,
          preloadRepliesOfComment: Bool = false,
-         loadComments: Bool = true
+         loadComments: Bool = true,
+         existingPost: AmityPost? = nil
     ) {
         self.referenceId = referenceId
         self.referenceType = referenceType
@@ -80,7 +81,10 @@ class CommentCoreViewModel: ObservableObject {
         self.preloadRepliesOfComment = preloadRepliesOfComment
 
         if referenceType == .post {
-            if let localPost = postManager.getPost(withId: referenceId).snapshot {
+            if let existingPost {
+                self.post = AmityPostModel(post: existingPost)
+                self.targetMembershipStatus = PostTargetMembershipStatus.determineStatus(isJoined: post?.targetCommunity?.isJoined)
+            } else if let localPost = postManager.getPost(withId: referenceId).snapshot {
                 self.post = AmityPostModel(post: localPost)
                 self.targetMembershipStatus = PostTargetMembershipStatus.determineStatus(isJoined: post?.targetCommunity?.isJoined)
             }
@@ -224,6 +228,9 @@ class CommentCoreViewModel: ObservableObject {
     
     @MainActor
     func editComment(comment: AmityCommentModel) async throws {
+        guard NetworkMonitor.shared.isConnected else {
+            throw NSError(domain: NSURLErrorDomain, code: NSURLErrorNotConnectedToInternet, userInfo: nil)
+        }
         let links = AmityPreviewLinkWizard.shared.buildLinks(from: comment.text)
         let metadata = comment.metadata ?? ["mentioned": []]
         let updateOptions = AmityCommentUpdateOptions(text: comment.text, metadata: metadata, mentioneesBuilder: comment.mentioneeBuilder, links: links.isEmpty ? [] : links)

@@ -28,7 +28,7 @@ struct LiveRoomCommunityTargetView: View {
             ZStack {
                 Circle()
                     .stroke(lineWidth: 2.0)
-                    .fill(Color(hex: "#FF305A"))
+                    .fill(Color(AmityFixedColor.shared.live))
                     .frame(width: 56, height: 56)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityStoryTabComponent.storyRingView)
                 
@@ -41,9 +41,9 @@ struct LiveRoomCommunityTargetView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 12, height: 6)
-                    .circularBackground(radius: 14, color: Color(hex: "#FF305A"))
+                    .circularBackground(radius: 14, color: Color(AmityFixedColor.shared.live))
                     .padding(.all, 2)
-                    .background(Color.white)
+                    .background(Color(viewConfig.theme.backgroundColor))
                     .clipShape(Circle())
                     .offset(x: 20, y: 20)
             }

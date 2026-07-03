@@ -160,6 +160,16 @@ public class AmityStringProvider: ObservableObject {
         }
         return resolved
     }
+
+    public func resolveChatReactionDisplayName(_ reactionName: String) -> String {
+        let key = "amity_chat_reaction_label_\(reactionName)"
+        let resolved = resolveRaw(key: key)
+        if resolved == key {
+            guard !reactionName.isEmpty else { return reactionName }
+            return reactionName.prefix(1).uppercased() + reactionName.dropFirst()
+        }
+        return resolved
+    }
 }
 
 // MARK: - Module Singletons

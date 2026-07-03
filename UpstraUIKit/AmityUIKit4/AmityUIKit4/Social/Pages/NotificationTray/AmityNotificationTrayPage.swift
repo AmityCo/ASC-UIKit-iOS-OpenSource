@@ -31,9 +31,10 @@ public struct AmityNotificationTrayPage: AmityPageView {
             ZStack {
                 ScrollView(.vertical, showsIndicators: false) {
                     LazyVStack(alignment: .leading, spacing: 0) {
-                        
-                        AmityInvitationSection(viewModel: invitaionSectionViewModel)
-                            .visibleWhen(invitaionSectionViewModel.loadingStatus != .loading && !viewModel.isLoading && !invitaionSectionViewModel.invitations.isEmpty)
+
+                        if invitaionSectionViewModel.loadingStatus != .loading && !viewModel.isLoading && !invitaionSectionViewModel.invitations.isEmpty {
+                            AmityInvitationSection(viewModel: invitaionSectionViewModel)
+                        }
                         
                         ForEach(viewModel.sections) { section in
                             NotificationTraySectionTitle(title: section.title)
@@ -101,7 +102,14 @@ public struct AmityNotificationTrayPage: AmityPageView {
             AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToEventDetailPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: nil, parentCommentId: nil, communityId: idInfo.communityId, userId: idInfo.userId, eventId: idInfo.eventId))
         case .invitation:
             guard item.targetType == .room else { return }
-            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToLiveStreamPage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: idInfo.postId, commentId: nil, parentCommentId: nil, communityId: nil, userId: nil, roomId: idInfo.roomId))
+            AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToLiveStreamPage(
+                context: AmityNotificationTrayPageBehavior.Context(page: self,
+                                                                   postId: idInfo.postId,
+                                                                   commentId: nil,
+                                                                   parentCommentId: nil,
+                                                                   communityId: nil,
+                                                                   userId: nil,
+                                                                   roomId: idInfo.roomId))
         case .user:
             AmityUIKit4Manager.behaviour.notificationTrayPageBehavior.goToEditProfilePage(context: AmityNotificationTrayPageBehavior.Context(page: self, postId: nil, commentId: nil, parentCommentId: nil, communityId: nil, userId: nil))
         }
@@ -111,8 +119,10 @@ public struct AmityNotificationTrayPage: AmityPageView {
     var emptyNotificationState: some View {
         VStack {
             Image(AmityIcon.emptyNotificationList.imageResource)
+                .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
+                .foregroundColor(Color(viewConfig.theme.baseColorShade3))
                 .frame(width: 60, height: 60)
             
             Text(AmityLocalizedStringSet.Social.notificationTrayEmptyStateTitle.localizedString)

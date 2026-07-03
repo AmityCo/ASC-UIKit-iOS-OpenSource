@@ -169,8 +169,13 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                         ModeratorBadgeView()
                     }
                     
-                    // Moderator only can see muted badge
-                    if isMuted && (viewModel.isModerator(userId: AmityUIKitManagerInternal.shared.currentUserId) || viewModel.isStreamer) {
+                    let currentUserId = AmityUIKitManagerInternal.shared.currentUserId
+                    let shouldShowMutedBadge = (isMuted && viewModel.isStreamer) ||
+                    (isMuted && (viewModel.isModerator(userId: currentUserId))) ||
+                    (isMuted && message.isOwner)
+                                
+                    // Streamer, Cohost, Moderator, Owner message only can see muted badge
+                    if shouldShowMutedBadge {
                         Image(AmityIcon.clipMuteIcon.imageResource)
                             .renderingMode(.template)
                             .resizable()
@@ -231,7 +236,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
             }
         }
         .padding(.all, 12)
-        .background(Color(UIColor(hex: "#636878")).opacity(0.3))
+        .background(Color(viewConfig.defaultDarkTheme.secondaryColorShade1).opacity(0.3))
         .cornerRadius(12)
     }
     

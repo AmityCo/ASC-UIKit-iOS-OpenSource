@@ -19,6 +19,7 @@ public struct AmityPostDetailPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var networkMonitor = NetworkMonitor()
     @State private var showBottomSheet: Bool = false
+    @State private var showShareSheet: Bool = false
     
     private var context: AmityPostContentComponent.Context?
     private var commentId: String?
@@ -167,6 +168,12 @@ public struct AmityPostDetailPage: AmityPageView {
                 AmityAdInfoView(advertiserName: ad.advertiser?.companyName ?? "-")
             }
         })
+        .sheet(isPresented: $showShareSheet) {
+            if let postId = viewModel.post?.postId {
+                let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .post, id: postId)
+                ShareActivitySheetView(link: shareLink)
+            }
+        }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .onChange(of: networkMonitor.isConnected) { isConnected in
@@ -229,10 +236,9 @@ public struct AmityPostDetailPage: AmityPageView {
                         case .reportPost:
                             // Dismiss toggle
                             showBottomSheet.toggle()
-                            
-                            let hasJoinedCommunity = viewModel.post?.targetCommunity?.isJoined ?? false
-                            if !hasJoinedCommunity {
-                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+
+                            if let community = viewModel.post?.targetCommunity, !community.isJoined {
+                                Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
                                 return
                             }
                             
@@ -249,7 +255,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                 self.host.controller?.present(vc, animated: true)
                             }
                         case .sharePost:
-                            break
+                            showShareSheet = true
                         }
                     }
                 }

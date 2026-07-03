@@ -168,7 +168,7 @@ struct EventCardView: View {
             .resizable()
             .frame(width: 16, height: 16)
             .padding(4)
-            .background(Color(hex: "#EAE2FF"))
+            .background(Color(AmityFixedColor.shared.eventHostBg))
             .clipped()
             .clipShape(Circle())
     }

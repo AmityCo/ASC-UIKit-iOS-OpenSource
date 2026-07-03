@@ -180,7 +180,9 @@ public struct AmityTextEditorView: View {
                                         LazyVStack {
                                             ForEach(Array(mentionedUsers.enumerated()), id: \.element.userId) { index, user in
                                                 HStack {
-                                                    AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: URL(string: user.avatarURL))
+                                                    AsyncImage(
+                                                        placeholderView: { defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 30) },
+                                                         url: URL(string: user.avatarURL))
                                                         .frame(width: 30, height: 30)
                                                         .clipShape(Circle())
                                                     
@@ -225,7 +227,7 @@ public struct AmityTextEditorView: View {
                     )
                 
                 Text(placeholder)
-                    .applyTextStyle(.body(Color(UIColor(hex: "#898E9E"))))
+                    .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
                     .padding(.leading, 5)
                     .allowsHitTesting(false)
                     .isHidden(hidePlaceholder)
@@ -328,7 +330,7 @@ public class AmityTextEditorViewModel: ObservableObject {
     // Attributes used for text while typing
     var typingAttributes: [NSAttributedString.Key: Any] = [
         .font: UIFont.systemFont(ofSize: 15),
-        .foregroundColor: UIColor(hex: "#ffffff")]
+        .foregroundColor: AmityFixedColor.shared.white]
 
     init(mentionManager: MentionManager, textStyle: AmityTextStyle? = nil) {
         self.mentionManager = mentionManager
@@ -336,7 +338,7 @@ public class AmityTextEditorViewModel: ObservableObject {
         if let textStyle {
             self.typingAttributes = [
                 .font: UIFont.systemFont(ofSize: textStyle.getStyle().fontSize, weight: textStyle.getStyle().weight.convertToUIFontWeight()),
-                .foregroundColor: UIColor(hex: "#ffffff")]
+                .foregroundColor: AmityFixedColor.shared.white]
 
             self.highlightAttributes = [
                 .font: UIFont.systemFont(ofSize: textStyle.getStyle().fontSize, weight: .bold),
@@ -592,8 +594,16 @@ extension AmityTextEditorViewModel {
 
         // Convert to window coordinates
         if let window = textView.window {
-            let rectInWindow = textView.convert(caretRect, to: window)
-            suggestionViewCursorRect = rectInWindow
+            let caretInWindow = textView.convert(caretRect, to: window)
+            let textViewInWindow = textView.convert(textView.bounds, to: window)
+            let anchorMinY = min(textViewInWindow.minY, caretInWindow.minY)
+            let anchorRect = CGRect(
+                x: caretInWindow.minX,
+                y: anchorMinY,
+                width: caretInWindow.width,
+                height: caretInWindow.maxY - anchorMinY
+            )
+            suggestionViewCursorRect = anchorRect
         }
     }
 
@@ -748,16 +758,28 @@ extension UITextView {
 }
 
 // MARK: - Suggestion Overlay Window
+private class SuggestionOverlayPassthroughView: UIView {
+    override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        let result = super.hitTest(point, with: event)
+        return result === self ? nil : result
+    }
+}
+
 class SuggestionOverlayWindow {
     static var shared: SuggestionOverlayWindow?
-    private static var containerView: UIView = UIView()
+    private static var containerView: UIView = SuggestionOverlayPassthroughView()
     private static var contentView: UIView = UIView()
-    private static let suggestionHeight: CGFloat = 185
+    private static var suggestionHeight: CGFloat = 112
+    private static var lastCursorRect: CGRect = .zero
     private static var keyboardHeight: CGFloat = 0
+    private static var heightCancellable: AnyCancellable?
 
     static func updateKeyboardHeight(_ height: CGFloat) {
         keyboardHeight = height
     }
+
+    private static let cursorGap: CGFloat = 22
+    private static var topReservedInset: CGFloat = 0
 
     private static func calculateYPosition(cursorRect: CGRect, screenBounds: CGRect) -> CGFloat {
         // Calculate visible area above keyboard
@@ -766,15 +788,15 @@ class SuggestionOverlayWindow {
         let spaceBelow = visibleHeight - cursorRect.maxY
 
         // Prefer showing below cursor, but if not enough space, show above
-        if spaceBelow >= suggestionHeight + 10 {
+        if spaceBelow >= suggestionHeight + cursorGap {
             // Enough space below cursor (position under)
-            return cursorRect.maxY + 10
-        } else if spaceAbove >= suggestionHeight + 10 {
+            return cursorRect.maxY + cursorGap
+        } else if spaceAbove >= suggestionHeight + cursorGap + topReservedInset {
             // Not enough space below, but enough above (position above cursor)
-            return cursorRect.minY - suggestionHeight - 10
+            return cursorRect.minY - topReservedInset - suggestionHeight - cursorGap
         } else {
             // Not enough space either way (position at top of visible area)
-            return max(10, visibleHeight - suggestionHeight - 10)
+            return max(cursorGap, visibleHeight - suggestionHeight - cursorGap)
         }
     }
 
@@ -790,6 +812,7 @@ class SuggestionOverlayWindow {
 
         let screenBounds = window.bounds
         let suggestionWidth: CGFloat = screenBounds.width
+        lastCursorRect = cursorRect
         let yPosition = calculateYPosition(cursorRect: cursorRect, screenBounds: screenBounds)
 
         let wrappedContent = AnyView(
@@ -809,14 +832,8 @@ class SuggestionOverlayWindow {
         )
         contentView = hostingController.view
 
-        // Container view to capture taps outside suggestion view
-        containerView = UIView(frame: screenBounds)
+        containerView = SuggestionOverlayPassthroughView(frame: screenBounds)
         containerView.addSubview(contentView)
-
-        // Set tap gesture to dismiss on outside tap
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismiss))
-        containerView.addGestureRecognizer(tapGesture)
-
         window.addSubview(containerView)
     }
 
@@ -825,10 +842,42 @@ class SuggestionOverlayWindow {
         guard let window = keyWindow else { return }
 
         let screenBounds = window.bounds
+        lastCursorRect = cursorRect
         contentView.frame.origin.y = calculateYPosition(cursorRect: cursorRect, screenBounds: screenBounds)
     }
 
+    static func updateHeight(_ height: CGFloat) {
+        guard contentView.superview != nil else { return }
+        suggestionHeight = height
+
+        let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
+        let screenBounds = keyWindow?.bounds ?? UIScreen.main.bounds
+
+        var frame = contentView.frame
+        frame.size.height = height
+        frame.origin.y = calculateYPosition(cursorRect: lastCursorRect, screenBounds: screenBounds)
+        contentView.frame = frame
+    }
+
+    static func observeHeight(_ publisher: AnyPublisher<CGFloat, Never>) {
+        heightCancellable = publisher
+            .receive(on: DispatchQueue.main)
+            .sink { height in
+                updateHeight(height)
+            }
+    }
+
+    static func setTopReservedInset(_ inset: CGFloat) {
+        guard topReservedInset != inset else { return }
+        topReservedInset = inset
+        if contentView.superview != nil {
+            updateHeight(suggestionHeight)
+        }
+    }
+
     @objc static func dismiss() {
+        heightCancellable?.cancel()
+        heightCancellable = nil
         containerView.removeFromSuperview()
     }
 }

@@ -115,7 +115,7 @@ struct AmityVisitorUsageLimitToastView: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color(UIColor(hex: "#292B32")))
+                .fill(Color(AmityFixedColor.shared.toastBackground))
                 .shadow(color: Color.black.opacity(0.08), radius: 1, x: 0, y: 0)
                 .shadow(color: Color(red: 96/255, green: 97/255, blue: 112/255).opacity(0.16), radius: 2, x: 0, y: 0.5)
         )

@@ -56,7 +56,7 @@ struct TabBarView: View {
                         .applyTextStyle(.titleBold(currentTab == tab ? Color(selectedTabColor) : .gray))
                     
                     if currentTab == tab {
-                        Color.blue
+                        Color(selectedTabColor)
                             .frame(height: 2)
                             .matchedGeometryEffect(id: "underline",
                                                    in: namespace,

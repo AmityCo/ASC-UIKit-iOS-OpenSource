@@ -63,7 +63,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                             }, label: {
                                 Image(AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .backButtonElement, key: "back_icon", of: String.self) ?? ""))
                                     .frame(width: 32, height: 32)
-                                    .background(Color(UIColor(hex: viewConfig.getConfig(elementId: .backButtonElement, key: "background_color", of: String.self) ?? "").withAlphaComponent(0.5)))
+                                    .background(Color.black.opacity(0.5))
                                     .clipShape(.circle)
                             })
                             .buttonStyle(.plain)
@@ -78,7 +78,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                                 } label: {
                                     Image(AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .aspectRatioButtonElement, key: "aspect_ratio_icon", of: String.self) ?? ""))
                                         .frame(width: 32, height: 32)
-                                        .background(Color(UIColor(hex: viewConfig.getConfig(elementId: .aspectRatioButtonElement, key: "background_color", of: String.self) ?? "").withAlphaComponent(0.5)))
+                                        .background(Color.black.opacity(0.5))
                                         .clipShape(.circle)
                                 }
                                 .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.aspectRatioButton)
@@ -94,7 +94,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                             } label: {
                                 Image(AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .hyperLinkButtonElement, key: "hyperlink_button_icon", of: String.self) ?? ""))
                                     .frame(width: 32, height: 32)
-                                    .background(Color(UIColor(hex: viewConfig.getConfig(elementId: .hyperLinkButtonElement, key: "background_color", of: String.self) ?? "").withAlphaComponent(0.5)))
+                                    .background(Color.black.opacity(0.5))
                                     .clipShape(.circle)
                             }
                             .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperLinkButton)
@@ -117,7 +117,7 @@ public struct AmityDraftStoryPage: AmityPageView {
                                     .accessibilityIdentifier(AccessibilityID.Story.AmityDraftStoryPage.hyperlinkTextView)
                             }
                             .frame(height: 40)
-                            .background(Color(UIColor(hex: viewConfig.getConfig(elementId: .hyperLinkElement, key: "background_color", of: String.self) ?? "")).opacity(0.8))
+                            .background(Color(viewConfig.defaultLightTheme.baseColorShade4).opacity(0.8))
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             .padding(EdgeInsets(top: 0, leading: 24, bottom: 32, trailing: 24))
                             .onTapGesture {
@@ -213,11 +213,15 @@ public struct AmityDraftStoryPage: AmityPageView {
     func getShareStoryButtonView() -> some View {
         let shareIcon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .shareStoryButtonElement, key: "share_icon", of: String.self) ?? "")
         let hideAvatar = viewConfig.getConfig(elementId: .shareStoryButtonElement, key: "hide_avatar", of: Bool.self) ?? false
-        let backgroundColor = Color(UIColor(hex: viewConfig.getConfig(elementId: .shareStoryButtonElement, key: "background_color", of: String.self) ?? ""))
+        let backgroundColor = Color(viewConfig.defaultLightTheme.backgroundColor)
         
         HStack(spacing: 8) {
             if !hideAvatar {
-                AsyncImage(placeholder: AmityIcon.defaultCommunity.getImageResource(), url: viewModel.avatar)
+                AsyncImage(
+                    placeholderView: {
+                        defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 32)
+                        }, url: viewModel.avatar
+                    )
                     .frame(width: 32, height: 32)
                     .clipShape(Circle())
                     .padding(.leading, 4)

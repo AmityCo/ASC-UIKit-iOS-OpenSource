@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 extension AmityMessageTextEditorView: AmityViewBuildable {
     
@@ -157,6 +158,7 @@ public struct AmityMessageTextEditorView: View {
                         hidePlaceholder = !text.isEmpty
                         
                         if characterLimit > 0, value.utf16Count > characterLimit {
+                            ImpactFeedbackGenerator.impactFeedback(style: .medium)
                             self.text = value.utf16Prefix(characterLimit)
                             self.viewModel.textView.text = text
                         }
@@ -342,6 +344,9 @@ public struct AmityMessageTextEditorView: View {
         suggestionVM.onClose = {
             viewModel.hideSuggestionView()
         }
+        suggestionVM.onLoadMoreUsers = { [weak viewModel] in
+            viewModel?.mentionManager.mentionProvider.loadMore()
+        }
         suggestionVM.onUserSelected = { user in
             // Handle mentioned user selection
             viewModel.selectMentionUser(user: user)
@@ -381,6 +386,16 @@ public struct AmityMessageTextEditorView: View {
             content: suggestionView,
             viewConfig: viewConfig
         )
+
+        let rowHeight: CGFloat = 56
+        let heightPublisher = suggestionVM.$users
+            .map { users -> CGFloat in
+                let rows = users.count == 1 ? 1 : 2
+                return CGFloat(rows) * rowHeight
+            }
+            .removeDuplicates()
+            .eraseToAnyPublisher()
+        SuggestionOverlayWindow.observeHeight(heightPublisher)
     }
 
 }

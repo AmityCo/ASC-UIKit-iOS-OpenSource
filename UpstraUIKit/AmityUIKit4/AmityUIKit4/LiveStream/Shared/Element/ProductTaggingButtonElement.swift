@@ -47,7 +47,7 @@ struct ProductTaggingButtonElement: AmityElementView {
                         .padding(.horizontal, 6)
                         .padding(.vertical, 1)
                         .frame(minWidth: 22)
-                        .background(Color(red: 250/255, green: 77/255, blue: 48/255)) // #FA4D30
+                        .background(Color(viewConfig.theme.alertColor))
                         .clipShape(Capsule())
                         .offset(x: 8, y: -8)
                 }

@@ -39,6 +39,7 @@ public typealias AmityCommentButtonAction = (AmityCommentButtonActionType) -> Vo
 
 public struct AmityCommentView: View {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
+    @Environment(\.colorScheme) private var colorScheme
     
     private let commentManager: CommentManager = CommentManager()
     
@@ -133,19 +134,24 @@ public struct AmityCommentView: View {
                                 .isHidden(!comment.isModerator)
                                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.badgeImageView)
                             
-                            ExpandableText(comment.text, metadata: comment.metadata, mentionees: comment.mentionees, links: comment.links, onTapMentionee: { userId in
+                            ExpandableText(comment.text,
+                                           metadata: comment.metadata,
+                                           mentionees: comment.mentionees,
+                                           links: comment.links,
+                                           fadeTruncatedText: false,
+                                           onTapMentionee: { userId in
                                 commentButtonAction(.userProfile(userId))
                             })
                             .lineLimit(seeMoreLineLimit)
                             .moreButtonText(AmityLocalizedStringSet.Social.expandableTextSeeMore.localizedString)
                             .font(AmityTextStyle.body(.clear).getFont())
                             .foregroundColor(Color(viewConfig.theme.baseColor))
-                            .attributedColor(viewConfig.theme.primaryColor)
-                            .hashtagColor(viewConfig.theme.primaryColor)
-                            .moreButtonColor(Color(viewConfig.theme.primaryColor))
+                            .attributedColor(UIColor.defaultAttributeColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                            .hashtagColor(UIColor.defaultHashtagColor(viewConfig: viewConfig, colorScheme: colorScheme))
+                            .moreButtonColor(Color(UIColor.defaultMoreButtonColor(viewConfig: viewConfig, colorScheme: colorScheme)))
                             .expandAnimation(.easeOut(duration: 0.25))
                             .lineSpacing(5)
-                            .foregroundColor(Color(red: 0.16, green: 0.17, blue: 0.20))
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
                             .padding([.leading, .bottom, .trailing], 12)
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentTextView)
                             .id(comment.text)
@@ -162,16 +168,14 @@ public struct AmityCommentView: View {
                                 .padding(.bottom, 5)
                         }
                         .isHidden(comment.syncState != .error)
-                        .actionSheet(isPresented: $showSheet) {
-                            ActionSheet(title: Text(AmityLocalizedStringSet.Comment.deleteCommentTitle.localizedString), buttons: [
-                                .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
-                                    Task {
-                                        try await commentManager.deleteComment(withId: comment.id)
-                                    }
-                                }),
-                                .cancel()
-                            ])
-                        }
+                        .modifier(DeleteCommentSheet(
+                            isPresented: $showSheet,
+                            onDelete: {
+                                Task {
+                                    try await commentManager.deleteComment(withId: comment.id)
+                                }
+                            }
+                        ))
                         
                         Spacer()
                     }
@@ -287,16 +291,17 @@ public struct AmityCommentView: View {
                                 AmitySocialReactionPickerOverlay.shared.addHoveredReactionDragEnded(at: point)
                             })
                             .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.reactionButton)
-                        
+                            .isHidden(comment.syncState == .error)
+
                         Button {
                             AmityUserAction.perform(host: host) {
-                                
+
                                 let targetMembershipStatus = commentCoreViewModel.targetMembershipStatus
                                 if targetMembershipStatus == .nonMember {
                                     AmityUIKit4Manager.behaviour.globalBehavior?.handleNonMemberAction(context: .init(host: host))
                                     return
                                 }
-                                
+
                                 commentButtonAction(.reply(comment, resolvedParentId: replyParentId))
                             }
                         } label: {
@@ -305,8 +310,8 @@ public struct AmityCommentView: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.replyButton)
-                        .isHidden(hideReplyButton)
-                        
+                        .isHidden(hideReplyButton || comment.syncState == .error)
+
                         Button {
                             commentButtonAction(.meatball(comment))
                         } label: {
@@ -314,7 +319,7 @@ public struct AmityCommentView: View {
                                 .frame(width: 20, height: 16)
                         }
                         .buttonStyle(.plain)
-                        .isHidden(hideMeatballButton)
+                        .isHidden(hideMeatballButton || comment.syncState == .error)
                         
                         Spacer()
                     }
@@ -331,6 +336,55 @@ public struct AmityCommentView: View {
         .padding(.top, 4)
         .padding(.bottom, showChildLine ? 0 : 4)
         .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentBubble.commentItem)
+    }
+    
+    struct DeleteCommentSheet: ViewModifier {
+        @Binding var isPresented: Bool
+        let onDelete: () -> Void
+
+        func body(content: Content) -> some View {
+            if #available(iOS 15, *) {
+                content.confirmationDialog(
+                    AmityLocalizedStringSet.Comment.deleteCommentTitle.localizedString,
+                    isPresented: $isPresented,
+                    titleVisibility: .visible
+                ) {
+                    Button(
+                        AmityLocalizedStringSet.General.delete.localizedString,
+                        role: .destructive,
+                        action: onDelete
+                    )
+
+                    if #available(iOS 26.0, *) {
+                        Button(
+                            AmityLocalizedStringSet.General.cancel.localizedString,
+                        ) {
+                            isPresented = false
+                        }
+                        
+                    } else {
+                        Button(
+                            AmityLocalizedStringSet.General.cancel.localizedString,
+                            role: .cancel
+                        ) { }
+                    }
+                }
+            } else {
+                // iOS 14 fallback
+                content.actionSheet(isPresented: $isPresented) {
+                    ActionSheet(
+                        title: Text(AmityLocalizedStringSet.Comment.deleteCommentTitle.localizedString),
+                        buttons: [
+                            .destructive(
+                                Text(AmityLocalizedStringSet.General.delete.localizedString),
+                                action: onDelete
+                            ),
+                            .cancel()
+                        ]
+                    )
+                }
+            }
+        }
     }
     
     

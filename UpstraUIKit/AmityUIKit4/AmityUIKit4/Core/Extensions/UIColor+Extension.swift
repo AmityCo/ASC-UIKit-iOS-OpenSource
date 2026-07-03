@@ -211,3 +211,29 @@ extension Color {
         self.init(.sRGB, red: Double(((rgbValue & 0xFF0000) >> 16)) / 255.0, green: Double((rgbValue & 0x00FF00) >> 8) / 255.0, blue: Double(rgbValue & 0x0000FF) / 255.0, opacity: 1.0)
     }
 }
+
+extension UIColor {
+    static func defaultHashtagColor(viewConfig: AmityViewConfigController, colorScheme: ColorScheme) -> UIColor {
+        if colorScheme == .dark {
+            viewConfig.theme.primaryColor.blend(.shade1)
+        } else {
+            viewConfig.theme.primaryColor
+        }
+    }
+    
+    static func defaultMoreButtonColor(viewConfig: AmityViewConfigController, colorScheme: ColorScheme) -> UIColor {
+        if colorScheme == .dark {
+            viewConfig.theme.primaryColor.blend(.shade1)
+        } else {
+            viewConfig.theme.primaryColor
+        }
+    }
+    
+    static func defaultAttributeColor(viewConfig: AmityViewConfigController, colorScheme: ColorScheme) -> UIColor {
+        if colorScheme == .dark {
+            viewConfig.theme.primaryColor.blend(.shade1)
+        } else {
+            viewConfig.theme.primaryColor
+        }
+    }
+}

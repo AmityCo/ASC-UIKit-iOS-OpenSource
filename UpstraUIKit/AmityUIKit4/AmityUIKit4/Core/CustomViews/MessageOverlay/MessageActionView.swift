@@ -26,8 +26,16 @@ struct MessageActionView: View {
     struct ActionButton: View {
         
         let title: String
-        let image: ImageResource
+        let image: ImageResource?
+        let systemIconName: String?
         let action: () -> Void
+
+        init(title: String, image: ImageResource? = nil, systemIconName: String? = nil, action: @escaping () -> Void) {
+            self.title = title
+            self.image = image
+            self.systemIconName = systemIconName
+            self.action = action
+        }
 
         var body: some View {
             Button(action: action) {
@@ -36,9 +44,15 @@ struct MessageActionView: View {
                     
                     Spacer()
                     
-                    Image(image)
-                        .renderingMode(.template)
-                        .frame(width: 20, height: 20)
+                    if let systemIconName = systemIconName {
+                        Image(systemName: systemIconName)
+                            .renderingMode(.template)
+                            .frame(width: 20, height: 20)
+                    } else if let image = image {
+                        Image(image)
+                            .renderingMode(.template)
+                            .frame(width: 20, height: 20)
+                    }
                 }
             }
             .padding(.horizontal, 22)
@@ -49,6 +63,18 @@ struct MessageActionView: View {
     
     var body: some View {
         VStack(spacing: 0) {
+            if message.isOwner && message.type == .text && message.syncState != .error {
+                ActionButton(title: AmityLocalizedStringSet.Chat.editButton.localizedString, systemIconName: "pencil") {
+                    messageAction.onEdit?(message)
+                    dismissAction()
+                }
+                .foregroundColor(Color(viewConfig.theme.baseInverseColor))
+                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.editButton.localizedString)
+
+                Divider()
+                    .frame(maxWidth: .infinity)
+            }
+
             ActionButton(title: AmityLocalizedStringSet.Chat.replyButton.localizedString, image: AmityIcon.Chat.replyIcon.imageResource) {
                 
                 let replyModel = message
@@ -70,6 +96,36 @@ struct MessageActionView: View {
             .foregroundColor(Color(viewConfig.theme.baseInverseColor))
             .accessibilityIdentifier(AmityLocalizedStringSet.Chat.copyButton.localizedString)
             
+            if message.type == .image,
+               messageAction.onSaveImage != nil,
+               message.syncState == .synced {
+
+                Divider()
+                    .frame(maxWidth: .infinity)
+
+                ActionButton(title: AmityLocalizedStringSet.Chat.SaveMedia.saveImageAction.localizedString, systemIconName: "square.and.arrow.down") {
+                    messageAction.onSaveImage?(message)
+                    dismissAction()
+                }
+                .foregroundColor(Color(viewConfig.theme.baseInverseColor))
+                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.SaveMedia.saveImageAction.localizedString)
+            }
+
+            if message.type == .video,
+               messageAction.onSaveVideo != nil,
+               message.syncState == .synced {
+
+                Divider()
+                    .frame(maxWidth: .infinity)
+
+                ActionButton(title: AmityLocalizedStringSet.Chat.SaveMedia.saveVideoAction.localizedString, systemIconName: "square.and.arrow.down") {
+                    messageAction.onSaveVideo?(message)
+                    dismissAction()
+                }
+                .foregroundColor(Color(viewConfig.theme.baseInverseColor))
+                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.SaveMedia.saveVideoAction.localizedString)
+            }
+
             if !message.isOwner {
                 let isFlaggedByOwner = message.isFlaggedByMe ?? viewModel.isReportedByMe
 

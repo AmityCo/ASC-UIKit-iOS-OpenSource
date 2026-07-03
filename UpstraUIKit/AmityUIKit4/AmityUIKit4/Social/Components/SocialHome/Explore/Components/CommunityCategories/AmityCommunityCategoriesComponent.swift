@@ -80,7 +80,9 @@ struct CategoryLabel: View {
             tapAction()
         }, label: {
             HStack(spacing: 0) {
-                AsyncImage(placeholder: AmityIcon.communityCategoryPlaceholder.imageResource, url: category.avatarURL)
+                AsyncImage(
+                    placeholderView: { categoryPlaceholderView(viewConfig: viewConfig, size: 28) },
+                    url: category.avatarURL)
                     .scaledToFill()
                     .clipped()
                     .frame(width: 28, height: 28)

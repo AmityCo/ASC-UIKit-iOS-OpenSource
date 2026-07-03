@@ -58,8 +58,8 @@ struct AmityTheme: Codable {
     let backgroundColor: UIColor?
     let backgroundShade1Color: UIColor?
     let highlightColor: UIColor?
-    
-    public init(primaryColor: UIColor, 
+
+    public init(primaryColor: UIColor,
                 secondaryColor: UIColor,
                 secondaryColorShade1: UIColor?,
                 baseColor: UIColor,
@@ -87,7 +87,7 @@ struct AmityTheme: Codable {
         self.backgroundShade1Color = backgroundShade1Color
         self.highlightColor = highlightColor
     }
-    
+
     enum CodingKeys: String, CodingKey {
         case primaryColor = "primary_color"
         case secondaryColor = "secondary_color"
@@ -103,7 +103,7 @@ struct AmityTheme: Codable {
         case backgroundShade1Color = "background_shade1_color"
         case highlightColor = "highlight_color"
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         primaryColor = try? container.decodeUIColor(forKey: .primaryColor)
@@ -120,7 +120,7 @@ struct AmityTheme: Codable {
         highlightColor = try? container.decodeUIColor(forKey: .highlightColor)
         secondaryColorShade1 = UIColor(hex: "636878")
     }
-    
+
     public func encode(to encoder: Encoder) throws {}
 }
 
@@ -140,3 +140,29 @@ struct AmityThemeColor {
     var highlightColor: UIColor
 }
 
+/// Fixed colors kept out of the JSON theme config. Mostly brand colors identical in light &
+/// dark; also a few internal theme-aware surfaces. Use directly instead of `viewConfig.theme`.
+class AmityFixedColor {
+    static let shared = AmityFixedColor()
+    private init() {}
+
+    let live = UIColor(hex: "#FF305A")
+    let eventHost = UIColor(hex: "#4B1BD0")
+    let eventHostBg = UIColor(hex: "#EAE2FF")
+    let storyRingProgress: [UIColor] = [UIColor(hex: "#339AF9"), UIColor(hex: "#78FA58")]
+    let speakerButtonBackground = UIColor(hex: "#6A6A6B")
+    let white = UIColor.white
+    let black = UIColor.black
+    let greyShade4 = UIColor(hex: "#EBECEF")
+    let greyShade1 = UIColor(hex: "#636878")
+
+    /// Toast background — dark surface in both modes so white toast text stays readable.
+    var toastBackground: UIColor {
+        AmityUIKitConfigController.shared.getCurrentThemeStyle() == .dark ? UIColor(hex: "#40434E") : UIColor(hex: "#292B32")
+    }
+
+    /// End-of-feed ("caught up") icon — grey shade 4 in light, grey shade 1 in dark.
+    var feedCaughtUpIcon: UIColor {
+        AmityUIKitConfigController.shared.getCurrentThemeStyle() == .dark ? greyShade1 : greyShade4
+    }
+}

@@ -93,7 +93,9 @@ class AmityNotificationTrayPageViewModel: ObservableObject {
 }
 
 struct NotificationSection: Identifiable {
-    let id: UUID = UUID()
+    var id: String {
+        return title
+    }
     let title: String
     let notifications: [NotificationItem]
 }

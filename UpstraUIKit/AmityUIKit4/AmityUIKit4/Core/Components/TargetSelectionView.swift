@@ -46,7 +46,11 @@ struct TargetSelectionView<Content: View>: View {
                         ForEach(Array(viewModel.communities.enumerated()), id: \.element.communityId) { index, community in
                             Section {
                                 HStack(spacing: 0) {
-                                    AsyncImage(placeholder: AmityIcon.defaultCommunityAvatar.getImageResource(), url: URL(string: community.avatarURL))
+                                    AsyncImage(
+                                        placeholderView: {
+                                            defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 40)
+                                        },
+                                        url: URL(string: community.avatarURL))
                                         .frame(width: 40, height: 40)
                                         .clipShape(Circle())
                                         .padding(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 12))
@@ -54,6 +58,8 @@ struct TargetSelectionView<Content: View>: View {
                                     if !community.isPublic {
                                         let lockIcon = AmityIcon.getImageResource(named: "lockBlackIcon")
                                         Image(lockIcon)
+                                            .renderingMode(.template)
+                                            .foregroundColor(Color(viewConfig.theme.baseColor))
                                             .frame(width: 20, height: 20)
                                             .offset(x: -2, y: -1)
                                             .isHidden(viewConfig.isHidden(elementId: .communityPrivateBadge))

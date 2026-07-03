@@ -158,7 +158,8 @@ struct PostContentPollView: View {
                     Group {
                         // Number of votes
                         let formattedVoteCount = viewModel.voteCountFormatter.string(from: NSNumber(value: poll.voteCount)) ?? ""
-                        Text(AmityLocalizedStringSet.Social.pollVoteCounts.localized(arguments: formattedVoteCount))
+                        let voteCountKey = poll.voteCount == 1 ? AmityLocalizedStringSet.Social.pollVoter : AmityLocalizedStringSet.Social.pollVoters
+                        Text(voteCountKey.localized(arguments: formattedVoteCount))
                             .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))
                         
                         Text("•")

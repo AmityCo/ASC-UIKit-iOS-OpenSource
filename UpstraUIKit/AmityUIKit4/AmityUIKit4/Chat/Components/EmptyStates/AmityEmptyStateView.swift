@@ -25,7 +25,7 @@ public struct AmityEmptyStateView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(size: configuration.iconSize)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .foregroundColor(Color(configuration.iconTintColor ?? viewConfig.theme.baseColorShade2))
                     .padding(.bottom, configuration.imageBottomPadding)
             }
             
@@ -58,8 +58,9 @@ public struct AmityEmptyStateView: View {
         public let tapAction: DefaultTapAction?
         public let iconSize: CGSize
         public let renderingMode: Image.TemplateRenderingMode
-        
-        public init(image: String?, title: String?, subtitle: String?, iconSize: CGSize = CGSize(width: 28, height: 24), renderingMode: Image.TemplateRenderingMode = .template,  imageBottomPadding: Double = 24, tapAction: DefaultTapAction?) {
+        public let iconTintColor: UIColor?
+
+        public init(image: String?, title: String?, subtitle: String?, iconSize: CGSize = CGSize(width: 28, height: 24), renderingMode: Image.TemplateRenderingMode = .template, iconTintColor: UIColor? = nil, imageBottomPadding: Double = 24, tapAction: DefaultTapAction?) {
             self.image = image
             self.title = title
             self.subtitle = subtitle
@@ -67,6 +68,7 @@ public struct AmityEmptyStateView: View {
             self.iconSize = iconSize
             self.imageBottomPadding = imageBottomPadding
             self.renderingMode = renderingMode
+            self.iconTintColor = iconTintColor
         }
         
         internal static let previewWithoutTitle = Configuration(image: AmityIcon.Chat.emptyStateMessage.rawValue, title: nil, subtitle: "Couldn't load chat", tapAction: nil)

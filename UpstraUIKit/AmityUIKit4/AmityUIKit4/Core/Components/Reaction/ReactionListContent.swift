@@ -10,12 +10,15 @@ import AmitySDK
 
 struct ReactionListContent: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+    @EnvironmentObject private var viewConfig: AmityViewConfigController
     @StateObject var viewModel: ReactionLoader
-    
+    @ObservedObject var parentViewModel: AmityReactionListViewModel
+
     @Environment(\.presentationMode) private var dismissScreen
     
-    init(viewModel: ReactionLoader) {
+    init(viewModel: ReactionLoader, parentViewModel: AmityReactionListViewModel) {
         self._viewModel = StateObject(wrappedValue: viewModel)
+        self.parentViewModel = parentViewModel
     }
     
     var body: some View {
@@ -37,6 +40,8 @@ struct ReactionListContent: View {
                                         return
                                     }
                                     
+                                    guard !parentViewModel.isParentDeleted else { return }
+
                                     viewModel.removeReaction(reactionName: user.reactionName)
                                     
                                     // Dismiss Screen
@@ -60,23 +65,81 @@ struct ReactionListContent: View {
                 }
             }
             .zIndex(1)
-            .opacity(viewModel.isEmptyStateVisible ? 0 : 1)
+            .opacity(showsEmptyState ? 0 : 1)
             
             // Shimmer loading state
-            if viewModel.initialQueryState == .loading {
+            if viewModel.initialQueryState == .loading && !parentViewModel.isParentDeleted {
                 loadingState
                     .zIndex(2)
             }
             
-            AmityEmptyStateView(configuration: viewModel.emptyStateConfiguration)
-                .zIndex(3)
-                .opacity(viewModel.isEmptyStateVisible ? 1 : 0)
+            Group {
+                if viewModel.type == .message,
+                   emptyStateImage == AmityIcon.emptyReaction.rawValue {
+                    reactionEmptyState
+                } else {
+                    AmityEmptyStateView(configuration: emptyStateConfigurationForDisplay)
+                }
+            }
+            .zIndex(3)
+            .opacity(showsEmptyState ? 1 : 0)
         }
         .onAppear(perform: {
             viewModel.getReactedUsers()
         })
+        .onChange(of: parentViewModel.isParentDeleted) { isDeleted in
+            if isDeleted {
+                viewModel.clearForParentDeletion()
+            }
+        }
+    }
+
+    // MARK: - Empty-state derivation
+
+    private var showsEmptyState: Bool {
+        parentViewModel.isParentDeleted || viewModel.isEmptyStateVisible
+    }
+
+    private var emptyStateImage: String? {
+        parentViewModel.isParentDeleted
+            ? AmityIcon.emptyReaction.rawValue
+            : viewModel.emptyStateConfiguration.image
+    }
+
+    private var emptyStateConfigurationForDisplay: AmityEmptyStateView.Configuration {
+        if parentViewModel.isParentDeleted {
+            return AmityEmptyStateView.Configuration(
+                image: AmityIcon.emptyReaction.rawValue,
+                title: AmityLocalizedStringSet.Reaction.noReactionTitle.localizedString,
+                subtitle: AmityLocalizedStringSet.Reaction.noReactionSubtitle.localizedString,
+                iconSize: CGSize(width: 60, height: 60),
+                tapAction: nil
+            )
+        }
+        return viewModel.emptyStateConfiguration
     }
     
+    private var reactionEmptyState: some View {
+        VStack(spacing: 0) {
+            Image(AmityIcon.loadImageResource(name: AmityIcon.emptyReaction.rawValue))
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 60, height: 60)
+                .foregroundColor(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
+                .padding(.bottom, 24)
+
+            Text(AmityLocalizedStringSet.Reaction.noReactionTitle.localizedString)
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
+
+            Text(AmityLocalizedStringSet.Reaction.noReactionSubtitle.localizedString)
+                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade3)))
+                .multilineTextAlignment(.center)
+                .padding(.top, 4)
+        }
+        .padding(.horizontal, 16)
+    }
+
     var loadingState: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
@@ -187,16 +250,18 @@ class ReactionLoader: ObservableObject {
     let referenceType: AmityReactionReferenceType
     let reactionType: String?
     let type: AmityReactionList.ReactionListType
+    let currentUserReactions: [String]
 
     var reactionCollectionToken: AmityNotificationToken?
-    
+
     @Published var emptyStateConfiguration = AmityEmptyStateView.Configuration(image: AmityIcon.Chat.greyRetryIcon.rawValue, title: AmityLocalizedStringSet.Reaction.unableToLoadTitle.localizedString, subtitle: nil, tapAction: nil)
-    
-    init(referenceId: String, referenceType: AmityReactionReferenceType, reactionName: String?, type: AmityReactionList.ReactionListType) {
+
+    init(referenceId: String, referenceType: AmityReactionReferenceType, reactionName: String?, type: AmityReactionList.ReactionListType, currentUserReactions: [String] = []) {
         self.referenceId = referenceId
         self.referenceType = referenceType
         self.reactionType = reactionName
         self.type = type
+        self.currentUserReactions = currentUserReactions
     }
     
     func getReactedUsers() {
@@ -228,8 +293,22 @@ class ReactionLoader: ObservableObject {
             
             // Map reactions
             let reactions = liveCollection.snapshots
-            self.reactedUsers = reactions.map { ReactionUser(reaction: $0, type: self.type) }
-            
+            let mapped = reactions.map { ReactionUser(reaction: $0, type: self.type) }
+
+            if self.type == .message {
+                let mine = mapped.filter { $0.isLoggedInUser }
+                let others = mapped.filter { !$0.isLoggedInUser }
+                if !mine.isEmpty {
+                    self.reactedUsers = mine + others
+                } else if let synthesized = self.synthesizedCurrentUserRow() {
+                    self.reactedUsers = [synthesized] + others
+                } else {
+                    self.reactedUsers = others
+                }
+            } else {
+                self.reactedUsers = mapped
+            }
+
             // Reacted Users
             if reactedUsers.isEmpty {
                 displayNoReactionEmptyState()
@@ -245,6 +324,15 @@ class ReactionLoader: ObservableObject {
     func loadMore() {
         guard let collection = reactionCollection, collection.hasNext else { return }
         collection.nextPage()
+    }
+
+    func clearForParentDeletion() {
+        reactionCollectionToken?.invalidate()
+        reactionCollectionToken = nil
+        reactionCollection = nil
+        reactedUsers = []
+        initialQueryState = .success
+        displayNoReactionEmptyState()
     }
 
     func removeReaction(reactionName: String) {
@@ -263,7 +351,13 @@ class ReactionLoader: ObservableObject {
     }
     
     func displayNoReactionEmptyState() {
-        let configuration = AmityEmptyStateView.Configuration(image: AmityIcon.emptyReaction.rawValue, title: AmityLocalizedStringSet.Reaction.noReactionTitle.localizedString, subtitle: AmityLocalizedStringSet.Reaction.noReactionSubtitle.localizedString, iconSize: CGSize(width: 32, height: 32), tapAction: nil)
+        let configuration = AmityEmptyStateView.Configuration(
+            image: AmityIcon.emptyReaction.rawValue,
+            title: AmityLocalizedStringSet.Reaction.noReactionTitle.localizedString,
+            subtitle: AmityLocalizedStringSet.Reaction.noReactionSubtitle.localizedString,
+            iconSize: CGSize(width: 60, height: 60),
+            tapAction: nil
+        )
         self.emptyStateConfiguration = configuration
         self.isEmptyStateVisible = true
     }
@@ -271,6 +365,25 @@ class ReactionLoader: ObservableObject {
     func resetState() {
         initialQueryState = .loading
         isEmptyStateVisible = false
+    }
+
+    private func synthesizedCurrentUserRow() -> ReactionUser? {
+        let pickedReaction: String?
+        if let active = reactionType {
+            pickedReaction = currentUserReactions.contains(active) ? active : nil
+        } else {
+            pickedReaction = currentUserReactions.first
+        }
+        guard let reactionName = pickedReaction else { return nil }
+        guard let user = AmityUIKit4Manager.client.user?.snapshot,
+              !user.userId.isEmpty else { return nil }
+
+        return ReactionUser(
+            userId: user.userId,
+            displayName: user.displayName ?? "",
+            avatarURL: user.avatar?.fileURL ?? "",
+            reactionName: reactionName
+        )
     }
 }
 
@@ -310,7 +423,9 @@ struct ReactionUser {
         self.reactionName = reactionName
         self.reactionImage = MessageReactionConfiguration.shared.getReaction(withName: reactionName).image
         self.type = .none
-        self.uniqueId = ""
+        self.uniqueId = userId.isEmpty
+            ? UUID().uuidString
+            : "\(userId)_\(reactionName)"
         self.isBrand = false
     }
     

@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import AmityUIKit
+
 extension UserDefaults {
     
     var theme: Int? {

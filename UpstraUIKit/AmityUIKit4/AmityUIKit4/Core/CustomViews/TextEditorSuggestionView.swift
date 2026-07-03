@@ -38,6 +38,7 @@ public class TextEditorSuggestionViewModel: ObservableObject {
     public var onClose: () -> Void = {}
     public var onUserSelected: (AmityMentionUserModel) -> Void = { _ in }
     public var onProductSelected: (AmityProduct) -> Void = { _ in }
+    public var onLoadMoreUsers: () -> Void = {}
 
     public init() {
         setupSearchObserver()
@@ -55,6 +56,7 @@ public class TextEditorSuggestionViewModel: ObservableObject {
     }
 
     public func loadMoreUsers() {
+        onLoadMoreUsers()
         guard let userCollection, userCollection.hasNext else { return }
         userCollection.nextPage()
     }
@@ -116,7 +118,7 @@ public struct TextEditorSuggestionView: View {
             }
         }
         .background(Color(viewConfig.theme.backgroundColor))
-        .cornerRadius(16, corners: [.topLeft, .topRight])
+        .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: -5)
         .overlay(
             Button(action: viewModel.onClose) {
@@ -132,7 +134,7 @@ public struct TextEditorSuggestionView: View {
                     .shadow(color: Color(red: 0.38, green: 0.38, blue: 0.44).opacity(0.16), radius: 8, x: 0, y: 8)
                     .overlay(Circle().stroke(Color(viewConfig.theme.baseColorShade4), lineWidth: 1))
             }
-            .offset(x: 4, y: -4), alignment: .topTrailing)
+            .offset(x: 4, y: -10), alignment: .topTrailing)
     }
 
     // MARK: - Header View
@@ -251,16 +253,32 @@ struct UserSuggestionRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            AmityUserProfileImageView(displayName: user.displayName,
-                                      avatarURL: URL(string: user.avatarURL))
-            .frame(width: 32, height: 32)
-            .clipShape(Circle())
+            if user.isChannelMention {
+                ZStack {
+                    Circle()
+                        .fill(Color(viewConfig.theme.primaryColor))
+                    Text("@")
+                        .applyTextStyle(.titleBold(.white))
+                }
+                .frame(width: 32, height: 32)
+            } else {
+                AmityUserProfileImageView(displayName: user.displayName,
+                                          avatarURL: URL(string: user.avatarURL))
+                .frame(width: 32, height: 32)
+                .clipShape(Circle())
+            }
 
             Text(user.displayName)
                 .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColor)))
                 .lineLimit(1)
 
             Spacer()
+
+            if user.isChannelMention {
+                Text(AmityLocalizedStringSet.Chat.mentionEveryone.localizedString)
+                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                    .lineLimit(1)
+            }
         }
         .padding(.all, 12)
         .contentShape(Rectangle())
