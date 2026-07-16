@@ -37,6 +37,7 @@ struct AmityPostMediaVideoPlayer: View {
     @StateObject private var playerController = AmityMediaPlayerController()
     @StateObject private var deletedStateViewModel: VideoPlayerDeletedStateViewModel
     @State private var sliderValue: Double = 0
+    @StateObject private var controls = PlayerControlsVisibility()
 
     private var isDeleted: Bool {
         deletedStateViewModel.isPostDeleted || deletedStateViewModel.isVideoDeleted(videoURL)
@@ -151,7 +152,7 @@ struct AmityPostMediaVideoPlayer: View {
             if let url = videoURL {
                 AmityMediaPlayer(url: url, controller: playerController)
                     .onTapGesture {
-                        playerController.togglePlayPause()
+                        controls.tapOverlay(isPlaying: playerController.isPlaying)
                     }
                     .onDisappear {
                         playerController.pause()
@@ -165,7 +166,10 @@ struct AmityPostMediaVideoPlayer: View {
                     )
             }
 
-            // Overlay controls
+            Color.black.opacity(controls.isVisible ? 0.5 : 0)
+                .ignoresSafeArea()
+                .allowsHitTesting(false)
+
             VStack(spacing: 0) {
                 topNavigationBar
                 Spacer()
@@ -173,12 +177,14 @@ struct AmityPostMediaVideoPlayer: View {
             }
             .padding(.top, 64)
             .padding(.bottom, 36)
+            .opacity(controls.isVisible ? 1 : 0)
+            .allowsHitTesting(controls.isVisible)
 
-            // Center play icon (shown only when paused)
-            centerPlayPauseButton
-                .opacity(playerController.isPlaying ? 0 : 1)
-                .animation(.easeInOut(duration: 0.2), value: playerController.isPlaying)
+            centerControls
+                .opacity(controls.isVisible ? 1 : 0)
+                .allowsHitTesting(controls.isVisible)
         }
+        .animation(.easeInOut(duration: 0.3), value: controls.isVisible)
     }
 
     // MARK: - Top Navigation Bar
@@ -232,19 +238,56 @@ struct AmityPostMediaVideoPlayer: View {
         )
     }
 
-    // MARK: - Center Play Icon
+    // MARK: - Center Play/Pause Button (reuses the shared PlayPauseButton)
     private var centerPlayPauseButton: some View {
-        ZStack {
-            Circle()
-                .fill(Color.white.opacity(0.9))
-                .frame(width: 40, height: 40)
-                .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 0.5)
-
-            Image(systemName: "play.fill")
-                .font(.system(size: 18, weight: .bold))
-                .foregroundColor(.black)
+        Button(action: { togglePlayPause() }) {
+            PlayPauseButton(isPlaying: playerController.isPlaying)
         }
-        .allowsHitTesting(false)
+        .buttonStyle(.plain)
+    }
+
+    private func togglePlayPause() {
+        playerController.togglePlayPause()
+        controls.show(autoHide: playerController.isPlaying)
+    }
+
+    // MARK: - Center Controls (skip back / play-pause / skip forward)
+    private var centerControls: some View {
+        HStack {
+            Button(action: { skipBackward() }) {
+                Image(AmityIcon.LiveStream.backward10s.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+            }
+            .buttonStyle(.plain)
+
+            Spacer()
+            
+            centerPlayPauseButton
+
+            Spacer()
+            Button(action: { skipForward() }) {
+                Image(AmityIcon.LiveStream.forward10s.imageResource)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.horizontal, 80)
+    }
+
+    private func skipBackward() {
+        playerController.skipBackward(10)
+        // Keep the overlay up / reset the auto-hide while the user is skipping.
+        controls.show(autoHide: playerController.isPlaying)
+    }
+
+    private func skipForward() {
+        playerController.skipForward(10)
+        // Keep the overlay up / reset the auto-hide while the user is skipping.
+        controls.show(autoHide: playerController.isPlaying)
     }
 
     // MARK: - Bottom Content Container
@@ -484,7 +527,7 @@ struct VideoProgressSlider: View {
                     .fill(Color.white)
                     .frame(width: 12, height: 12)
                     .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 0.5)
-                    .offset(x: max(0, min(CGFloat(progress) * geometry.size.width - 12, geometry.size.width - 24)))
+                    .offset(x: CGFloat(min(max(progress, 0), 1)) * (geometry.size.width - 12))
             }
             .contentShape(Rectangle())
             .frame(height: 20)

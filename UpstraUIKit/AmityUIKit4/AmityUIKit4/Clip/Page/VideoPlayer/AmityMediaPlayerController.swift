@@ -22,7 +22,9 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
     private(set) var player: AVPlayer?
     private(set) var playerLayer: AVPlayerLayer?
     private var timeObserver: Any?
-    
+    private var pendingSeekTarget: Double?
+    private var wasPlayingBeforeBackground = false
+
     func configure(playerLayer: AVPlayerLayer) {
         self.player = playerLayer.player
         self.playerLayer = playerLayer
@@ -57,8 +59,33 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
         
         player.currentItem?.addObserver(self, forKeyPath: "status", options: [.old, .new], context: nil)
         player.currentItem?.addObserver(self, forKeyPath: "duration", options: [.old, .new], context: nil)
+
+        player.addObserver(self, forKeyPath: "timeControlStatus", options: [.new], context: nil)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleWillResignActive),
+            name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
     }
-    
+
+    @objc private func handleWillResignActive() {
+        wasPlayingBeforeBackground = isPlaying
+    }
+
+    @objc private func handleDidBecomeActive() {
+        if wasPlayingBeforeBackground {
+            play()
+        }
+    }
+
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == "status" {
             if let playerItem = object as? AVPlayerItem {
@@ -83,6 +110,10 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
                 DispatchQueue.main.async {
                     self.duration = playerItem.duration.seconds
                 }
+            }
+        } else if keyPath == "timeControlStatus" {
+            DispatchQueue.main.async {
+                self.isPlaying = (self.player?.timeControlStatus != .paused)
             }
         }
     }
@@ -192,13 +223,33 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
     }
     
     func skipForward(_ seconds: Double = 10) {
-        let newTime = min(currentTime + seconds, duration)
-        seek(to: newTime)
+        guard duration.isFinite, duration > 0 else { return }
+        let base = pendingSeekTarget ?? currentTime
+        let raw = base + seconds
+        let target = min(raw, duration)
+        accumulatedSeek(to: target)
+        // Reached the final frame → end state (paused).
+        if raw >= duration { pause() }
     }
-    
+
     func skipBackward(_ seconds: Double = 10) {
-        let newTime = max(currentTime - seconds, 0)
-        seek(to: newTime)
+        let base = pendingSeekTarget ?? currentTime
+        let target = max(base - seconds, 0)
+        accumulatedSeek(to: target)
+    }
+
+    private func accumulatedSeek(to target: Double) {
+        pendingSeekTarget = target
+        currentTime = target
+        let cmTime = CMTime(seconds: target, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        player?.seek(to: cmTime, toleranceBefore: .zero, toleranceAfter: .zero) { [weak self] finished in
+            // Only clear once the final seek settles; superseded seeks (finished == false)
+            // keep the running target so the burst keeps accumulating.
+            guard finished else { return }
+            DispatchQueue.main.async {
+                self?.pendingSeekTarget = nil
+            }
+        }
     }
     
     func setVideoGravity(_ gravity: AVLayerVideoGravity) {
@@ -216,9 +267,10 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
         
         player?.currentItem?.removeObserver(self, forKeyPath: "status")
         player?.currentItem?.removeObserver(self, forKeyPath: "duration")
-        
+        player?.removeObserver(self, forKeyPath: "timeControlStatus")
+
         NotificationCenter.default.removeObserver(self)
-        
+
         // player?.replaceCurrentItem(with: nil)
         
         playerLayer?.removeFromSuperlayer()
@@ -243,7 +295,8 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
         
         player?.currentItem?.removeObserver(self, forKeyPath: "status")
         player?.currentItem?.removeObserver(self, forKeyPath: "duration")
-        
+        player?.removeObserver(self, forKeyPath: "timeControlStatus")
+
         NotificationCenter.default.removeObserver(self)
     }
 }

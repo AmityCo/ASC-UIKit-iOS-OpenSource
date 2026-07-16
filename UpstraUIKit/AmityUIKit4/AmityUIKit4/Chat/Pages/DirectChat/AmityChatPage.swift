@@ -351,7 +351,7 @@ public struct AmityChatPage: AmityPageView {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Button {
-                    host.controller?.navigationController?.popViewController(animated: true)
+                    host.controller?.dismissOrPop()
                 } label: {
                     Image(AmityIcon.Chat.backButtonIcon.imageResource)
                         .renderingMode(.template)

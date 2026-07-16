@@ -474,6 +474,7 @@
 				Core/Utilities/MessageReactionConfiguration.swift,
 				Core/Utilities/NetworkMonitor.swift,
 				Core/Utilities/PermissionChecker.swift,
+				Core/Utilities/PlayerControlsVisibility.swift,
 				Core/Utilities/Services/AmityFileService.swift,
 				Core/Utilities/Services/AmityMessageMediaService.swift,
 				Core/Utilities/SocialReactionConfiguration.swift,
@@ -926,7 +927,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				A0EBD24CC3B327DE6DCC7A73 /* SharedFrameworks */,
+				91452CF73A83715DDF3DB5CB /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -978,7 +979,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				645A78D6A3740A9BF76E4230 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				0135259912CCA985AB480156 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1320,16 +1321,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		645A78D6A3740A9BF76E4230 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		0135259912CCA985AB480156 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A0EBD24CC3B327DE6DCC7A73 /* SharedFrameworks */ = {
+		91452CF73A83715DDF3DB5CB /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 645A78D6A3740A9BF76E4230 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 0135259912CCA985AB480156 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

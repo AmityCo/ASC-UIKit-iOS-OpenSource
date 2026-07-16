@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 import AmitySDK
 #if DISTRIBUTION
 import Firebase
@@ -30,7 +31,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // on newer 13.0 version, the window setup finished on `SceneDelegate`
         } else {
             window = UIWindow()
-            window?.rootViewController = AppManager.shared.startingPage()
+            let initial: LoginFlowInitialDestination = AppManager.shared.isUserRegistered
+                ? .selectModule
+                : .environmentSetup
+            window?.rootViewController = UIHostingController(
+                rootView: LoginFlowCoordinator(initialDestination: initial)
+            )
             window?.makeKeyAndVisible()
         }
         

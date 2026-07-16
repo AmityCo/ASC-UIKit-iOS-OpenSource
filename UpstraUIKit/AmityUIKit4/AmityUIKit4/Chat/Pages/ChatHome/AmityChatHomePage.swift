@@ -20,7 +20,11 @@ public struct AmityChatHomePage: AmityPageView {
     @State private var toastStyle: ToastStyle = .success
     @State private var showArchiveLimitAlert = false
 
-    public init() {
+    private let onBack: (() -> Void)?
+    private let backButtonSize: CGFloat = 24
+
+    public init(onBack: (() -> Void)? = nil) {
+        self.onBack = onBack
         self._viewConfig = StateObject(
             wrappedValue: AmityViewConfigController(pageId: .socialHomePage)
         )
@@ -64,9 +68,22 @@ public struct AmityChatHomePage: AmityPageView {
 
     private var navigationBar: some View {
         HStack(spacing: 0) {
+            if let onBack {
+                Button(action: onBack) {
+                    Image(AmityIcon.Chat.backButtonIcon.imageResource)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .frame(width: backButtonSize, height: backButtonSize)
+                }
+                .buttonStyle(.plain)
+                .padding(.leading, 16)
+            }
+
             Text(AmityLocalizedStringSet.Chat.Home.title.localizedString)
                 .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
-                .padding(.leading, 16)
+                .padding(.leading, onBack == nil ? 16 : 8)
 
             Spacer()
 

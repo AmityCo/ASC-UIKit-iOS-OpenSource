@@ -46,7 +46,11 @@ struct AmityMediaPlayer: UIViewRepresentable {
         view.layer.addSublayer(playerLayer)
 
         controller.configure(playerLayer: playerLayer)
-        
+
+        DispatchQueue.main.async {
+            controller.play()
+        }
+
         return view
     }
     

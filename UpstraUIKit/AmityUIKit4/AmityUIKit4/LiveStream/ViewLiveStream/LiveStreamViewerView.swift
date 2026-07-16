@@ -15,8 +15,10 @@ struct LiveStreamViewerView: View {
     @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: .livestreamPlayerPage)
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @State private var showOverlay = false
-    @State private var playPauseOpacity = 0.0
+    @StateObject private var controls = PlayerControlsVisibility()
     @State private var isPlaying = true
+    @State private var isPlaybackActive = true
+    @State private var wasPlayingBeforeBackground = false
     @StateObject var networkMonitor = NetworkMonitor()
     @State var degreesRotating = 0.0
     
@@ -24,7 +26,6 @@ struct LiveStreamViewerView: View {
     @State private var showShareSheet = false
     @State private var isPinnedProductDismissed = false
     
-    private let debouncer = Debouncer(delay: 2)
     @ObservedObject var viewModel: LiveStreamViewerViewModel
     let liveChatFeedHeight = (UIScreen.main.bounds.height - 50) / 5
     
@@ -73,12 +74,12 @@ struct LiveStreamViewerView: View {
                 } else {
                     ZStack(alignment: .topTrailing) {
                         // Video player fills entire screen                        
-                        LiveStreamPlayerView(streamURL: URL(string: room.livePlaybackUrl ?? "")!, isPlaying: isPlaying)
+                        LiveStreamPlayerView(streamURL: URL(string: room.livePlaybackUrl ?? "")!, isPlaying: isPlaying, onPlayingChange: { isPlaybackActive = $0 })
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .clipped()
                             .dismissKeyboardOnDrag()
                             .onTapGesture {
-                                playPauseButtonAction()
+                                surfaceTapped()
                             }
                             .overlay(
                                 coHostNameOverlayIfNeed(room:room),
@@ -135,7 +136,7 @@ struct LiveStreamViewerView: View {
                         }
                         .padding(.top, 20)
                         
-                        playPauseButton
+                        centerPlayPauseButton
                     }
                     .ignoresSafeArea(.keyboard, edges: .all)
                 }
@@ -460,6 +461,18 @@ struct LiveStreamViewerView: View {
             bannedVC.modalPresentationStyle = .overFullScreen
             self.host.controller?.navigationController?.pushViewController(bannedVC, animated: false)
         }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+            wasPlayingBeforeBackground = isPlaying
+            if isPlaying {
+                isPlaying = false
+                viewModel.watchMinuteTracker.pauseTracking()
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            guard wasPlayingBeforeBackground else { return }
+            isPlaying = true
+            viewModel.watchMinuteTracker.resumeTracking()
+        }
         .environmentObject(viewConfig)
     }
     
@@ -676,44 +689,51 @@ struct LiveStreamViewerView: View {
         }
     }
 
-    private var playPauseButton: some View {
+    private var centerPlayPauseButton: some View {
         VStack {
             Spacer()
-            
-            HStack {
-                Spacer()
-                
-                Image(isPlaying ? AmityIcon.LiveStream.pauseIcon.imageResource : AmityIcon.LiveStream.playIcon.imageResource)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 40, height: 40)
-                   
-                Spacer()
+            Button(action: { togglePlayPause() }) {
+                PlayPauseButton(isPlaying: isPlaybackActive)
             }
-            
+            .buttonStyle(.plain)
             Spacer()
         }
-        .animation(.easeInOut(duration: 0.3), value: playPauseOpacity)
-        .opacity(playPauseOpacity)
-        .allowsHitTesting(false)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .animation(.easeInOut(duration: 0.3), value: controls.isVisible)
+        .opacity(controls.isVisible ? 1 : 0)
+        .allowsHitTesting(controls.isVisible)
     }
-    
-    func playPauseButtonAction() {
-        if playPauseOpacity == 1.0 {
-            isPlaying.toggle()
-            
-            // Pause/Resume watch time tracking accordingly
-            if isPlaying {
-                viewModel.watchMinuteTracker.resumeTracking()
-            } else {
-                viewModel.watchMinuteTracker.pauseTracking()
-            }
+
+    func surfaceTapped() {
+        controls.tapOverlay(isPlaying: isPlaying)
+    }
+
+    func togglePlayPause() {
+        isPlaying.toggle()
+        if isPlaying {
+            viewModel.watchMinuteTracker.resumeTracking()
+        } else {
+            viewModel.watchMinuteTracker.pauseTracking()
         }
-        
-        playPauseOpacity = 1.0
-        
-        debouncer.run {
-            playPauseOpacity = 0.0
-        }
+        controls.show(autoHide: isPlaying)
+    }
+}
+
+struct PlayPauseButton: View {
+    let isPlaying: Bool
+    var buttonSize: CGFloat = 64
+    var iconSize: CGFloat = 32
+
+    var body: some View {
+        Image(isPlaying
+            ? AmityIcon.LiveStream.pauseIcon.imageResource
+            : AmityIcon.LiveStream.playIcon.imageResource)
+            .resizable()
+            .scaledToFit()
+            .frame(width: iconSize, height: iconSize)
+            .offset(x: isPlaying ? 0 : 2)
+            .frame(width: buttonSize, height: buttonSize)
+            .background(Color.black.opacity(0.5))
+            .clipShape(Circle())
     }
 }

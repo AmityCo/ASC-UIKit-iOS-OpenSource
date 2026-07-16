@@ -8,129 +8,113 @@
 
 import AmitySDK
 
-enum EnvironmentType: String, Codable, CaseIterable {
-    case staging
-    case production
-    case eu
-    case us
-    case custom
-    
-    var title: String {
-        switch self {
-        case .staging:
-            return "Staging"
-        case .production:
-            return "Production"
-        case .eu:
-            return "EU"
-        case .us:
-            return "US"
-        case .custom:
-            return "Custom"
-        }
-    }
-}
-
-struct EndpointConfigModel: Codable {
+struct EndpointConfigModel: Codable, Equatable {
     let apiKey: String
     let httpEndpoint: String
-    let socketEndpoint: String
     let mqttEndpoint: String
     let uploadURL: String
 }
 
-struct EnvironmentSettingModel: Codable {
-    var configMap: [EnvironmentType: EndpointConfigModel]
-    var selectedEnv: EnvironmentType
-    
-    static var defaultSettings: EnvironmentSettingModel {
-        var configMap: [EnvironmentType : EndpointConfigModel] = [:]
-        for type in EnvironmentType.allCases {
-            configMap[type] = defaultConfig(for: type)
-        }
-        let configSetting = EnvironmentSettingModel(configMap: configMap, selectedEnv: .staging)
-        return configSetting
-    }
-    
-    static func defaultConfig(for environment: EnvironmentType) -> EndpointConfigModel {
-        return EndpointConfigModel(apiKey: "YOUR_API_KEY", httpEndpoint: AmityRegion.SG.httpUrl, socketEndpoint: "", mqttEndpoint: AmityRegion.SG.mqttHost, uploadURL: AmityRegion.SG.uploadUrl)
-    }
-}
-
 class EndpointManager {
-    
-    private enum UserDefaultsKey {
-        static let environments = "asc_sample_environments"
-    }
-    
+
     static let shared = EndpointManager()
-    
-    private var settings: EnvironmentSettingModel
-    
+
+    private enum UserDefaultsKey {
+        static let selectedRegion = "asc_sample_selected_region"
+        static let overrides = "asc_sample_endpoint_overrides"
+    }
+
+    private(set) var currentRegion: ApiRegion {
+        didSet {
+            UserDefaults.standard.setValue(currentRegion.rawValue, forKey: UserDefaultsKey.selectedRegion)
+        }
+    }
+
+    /// User-applied overrides keyed by region. Persisted across launches.
+    /// When an override exists for the current region, `currentEndpointConfig` returns it
+    /// in preference to the hardcoded `defaultConfig(for:)`.
+    private var overrides: [String: EndpointConfigModel] {
+        didSet {
+            if let data = try? JSONEncoder().encode(overrides) {
+                UserDefaults.standard.setValue(data, forKey: UserDefaultsKey.overrides)
+            }
+        }
+    }
+
     private init() {
-        settings = EndpointManager.fetchUserSettings()
+        if let raw = UserDefaults.standard.string(forKey: UserDefaultsKey.selectedRegion),
+           let restored = ApiRegion(rawValue: raw) {
+            currentRegion = restored
+        } else {
+            currentRegion = .staging
+        }
+
+        if let data = UserDefaults.standard.data(forKey: UserDefaultsKey.overrides),
+           let decoded = try? JSONDecoder().decode([String: EndpointConfigModel].self, from: data) {
+            overrides = decoded
+        } else {
+            overrides = [:]
+        }
     }
-    
-    // MARK: - Properties
-    
-    var currentEnvironment: EnvironmentType {
-        return settings.selectedEnv
+
+    func setCurrentRegion(_ region: ApiRegion) {
+        currentRegion = region
     }
+
+    /// Apply a user-edited override for `region`. Only `apiKey` and `uploadURL` are user-editable per the spec;
+    /// `httpEndpoint` and `mqttEndpoint` stay tied to the region's defaults.
+    func applyOverride(region: ApiRegion, apiKey: String, uploadURL: String) {
+        let regionDefault = EndpointManager.defaultConfig(for: region)
+        overrides[region.rawValue] = EndpointConfigModel(
+            apiKey: apiKey,
+            httpEndpoint: regionDefault.httpEndpoint,
+            mqttEndpoint: regionDefault.mqttEndpoint,
+            uploadURL: uploadURL
+        )
+    }
+
+    /// Drop the override for `region` — subsequent reads return the hardcoded default.
+    func clearOverride(for region: ApiRegion) {
+        overrides.removeValue(forKey: region.rawValue)
+    }
+
     var currentEndpointConfig: EndpointConfigModel {
-        return settings.configMap[currentEnvironment]!
-    }
-    
-    // MARK: - Methods
-    
-    func getEndpointConfig(for environment: EnvironmentType) -> EndpointConfigModel {
-        return settings.configMap[environment]!
-    }
-    
-    func update(environment: EnvironmentType, apiKey: String?, httpEndpoint: String?, socketEndpoint: String?, uploadURL: String?) {
-        guard let config = settings.configMap[environment] else {
-            return
+        if let override = overrides[currentRegion.rawValue] {
+            return override
         }
-        
-        // Create config with new values
-        let _apiKey = apiKey ?? config.apiKey
-        let _httpEndpoint = httpEndpoint ?? config.httpEndpoint
-        let _socketEndpoint = socketEndpoint ?? config.socketEndpoint
-        let _mqttEndpoint = config.mqttEndpoint
-        let _uploadURL = uploadURL ?? config.uploadURL
-        let newConfig = EndpointConfigModel(apiKey: _apiKey, httpEndpoint: _httpEndpoint, socketEndpoint: _socketEndpoint, mqttEndpoint: _mqttEndpoint, uploadURL: _uploadURL)
-        
-        // Update new config to current setting
-        settings.configMap[environment] = newConfig
-        settings.selectedEnv = environment
-        
-        // Save to user default
-        EndpointManager.saveUserSettings(settings)
-        
-        // Call app manager for setting up new environment settings
-        AppManager.shared.setupAmityUIKit()
+        return EndpointManager.defaultConfig(for: currentRegion)
     }
-    
-    func resetEnvironments() {
-        UserDefaults.standard.setValue(nil, forKey: UserDefaultsKey.environments)
-        
-        // Call app manager for setting up new environment settings
-        AppManager.shared.setupAmityUIKit()
-    }
-    
-    // MARK: - Helpers
-    
-    private static func fetchUserSettings() -> EnvironmentSettingModel {
-        if let data = UserDefaults.standard.data(forKey: UserDefaultsKey.environments),
-           let envSettings = try? JSONDecoder().decode(EnvironmentSettingModel.self, from: data) {
-            return envSettings
-        }
-        return .defaultSettings
-    }
-    
-    private static func saveUserSettings(_ settings: EnvironmentSettingModel) {
-        if let data = try? JSONEncoder().encode(settings) {
-            UserDefaults.standard.setValue(data, forKey: UserDefaultsKey.environments)
+
+    static func defaultConfig(for region: ApiRegion) -> EndpointConfigModel {
+        switch region {
+        case .staging:
+            return EndpointConfigModel(
+                apiKey: "YOUR_API_KEY",
+                httpEndpoint: AmityRegion.SG.httpUrl,
+                mqttEndpoint: AmityRegion.SG.mqttHost,
+                uploadURL: AmityRegion.SG.uploadUrl
+            )
+        case .sg:
+            return EndpointConfigModel(
+                apiKey: "YOUR_API_KEY",
+                httpEndpoint: AmityRegion.SG.httpUrl,
+                mqttEndpoint: AmityRegion.SG.mqttHost,
+                uploadURL: AmityRegion.SG.uploadUrl
+            )
+        case .eu:
+            return EndpointConfigModel(
+                apiKey: "YOUR_API_KEY",
+                httpEndpoint: AmityRegion.EU.httpUrl,
+                mqttEndpoint: AmityRegion.EU.mqttHost,
+                uploadURL: AmityRegion.EU.uploadUrl
+            )
+        case .us:
+            return EndpointConfigModel(
+                apiKey: "YOUR_API_KEY",
+                httpEndpoint: AmityRegion.US.httpUrl,
+                mqttEndpoint: AmityRegion.US.mqttHost,
+                uploadURL: AmityRegion.US.uploadUrl
+            )
         }
     }
-    
 }

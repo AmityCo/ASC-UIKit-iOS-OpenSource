@@ -371,6 +371,8 @@ enum AmityIcon: String, ImageResourceProvider {
         case livestreamAddThumbnailButtonIcon = "livestreamAddThumbnailButtonIcon"
         case playIcon = "ic_play"
         case pauseIcon = "ic_pause"
+        case backward10s = "ic_arrow_rotate_left_10_r"
+        case forward10s = "ic_arrow_rotate_right_10_r"
     }
     
     enum Reaction: String, ImageResourceProvider {

@@ -34,11 +34,22 @@ open class AmityEventDetailPageBehavior {
     open func goToLivestreamPostComposerPage(context: AmityEventDetailPageBehavior.Context) {
         let page = AmityCreateLivestreamPage(event: context.event)
         let vc = AmitySwiftUIHostingController(rootView: page)
-        
+
         let navController = UINavigationController(rootViewController: vc)
         navController.modalPresentationStyle = .fullScreen
         navController.navigationBar.isHidden = true
-        
+
+        context.page.host.controller?.present(navController, animated: true)
+    }
+
+    open func goToDiscussionLivestreamComposerPage(context: AmityEventDetailPageBehavior.Context) {
+        let page = AmityCreateLivestreamPage(targetId: context.event.discussionCommunityId, targetType: .community)
+        let vc = AmitySwiftUIHostingController(rootView: page)
+
+        let navController = UINavigationController(rootViewController: vc)
+        navController.modalPresentationStyle = .fullScreen
+        navController.navigationBar.isHidden = true
+
         context.page.host.controller?.present(navController, animated: true)
     }
 

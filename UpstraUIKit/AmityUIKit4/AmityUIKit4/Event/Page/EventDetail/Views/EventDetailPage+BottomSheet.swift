@@ -36,7 +36,7 @@ extension AmityEventDetailPage {
                     
                     guard let event = viewModel.event else { return }
                     
-                    AmityUIKitManagerInternal.shared.behavior.eventDetailPageBehavior?.goToLivestreamPostComposerPage(context: .init(page: self, event: event))
+                    AmityUIKitManagerInternal.shared.behavior.eventDetailPageBehavior?.goToDiscussionLivestreamComposerPage(context: .init(page: self, event: event))
                 }
         }
         .padding(.bottom, 32)
