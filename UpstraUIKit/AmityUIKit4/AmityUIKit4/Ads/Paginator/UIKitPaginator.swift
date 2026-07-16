@@ -8,6 +8,56 @@
 import Foundation
 import AmitySDK
 import Combine
+import SwiftUI
+
+// MARK: - Banner Ad Models
+// Defined here so every file that sees UIKitPaginator also sees these types.
+
+/// Represents a single banner-ad slot that will be rendered inside the feed.
+public struct BannerAdPlacement: Identifiable {
+    public let id: String
+    public let adUnitID: String
+    
+    public init(adUnitID: String) {
+        self.id = "banner-ad-\(UUID().uuidString)"
+        self.adUnitID = adUnitID
+    }
+}
+
+/// Controls how / whether banner ads are injected into the news feed.
+/// Configure from your host app **before** the feed loads.
+public class BannerAdFeedConfig {
+    public static let shared = BannerAdFeedConfig()
+    
+    /// Master switch – set to `true` to start injecting ads.
+    public var isEnabled: Bool = false
+    
+    /// The ad-unit ID forwarded to every `BannerAdPlacement`.
+    public var adUnitID: String = "ca-app-pub-3940256099942544/2934735716"
+    
+    /// Insert a banner ad after every *frequency* content posts.
+    public var frequency: Int = 5
+    
+    /// Maximum number of banner ads in the feed at any time.
+    public var maxAdsCount: Int = 3
+    
+    /// Height (points) for the ad row. Defaults to 250.
+    public var adHeight: CGFloat = 250
+    
+    /// Closure that returns the SwiftUI view for a given placement.
+    /// The host app **must** set this to supply the actual ad view.
+    ///
+    /// ```swift
+    /// BannerAdFeedConfig.shared.adViewBuilder = { placement in
+    ///     AnyView(BannerAdView(adUnitID: placement.adUnitID))
+    /// }
+    /// ```
+    public var adViewBuilder: ((BannerAdPlacement) -> AnyView)?
+    
+    private init() {}
+}
+
+// MARK: - Paginated Item
 
 enum PaginatedItemType {
     case content
@@ -18,6 +68,7 @@ class PaginatedItem<Content>: Identifiable, Equatable {
     enum ItemType {
         case content(_ value: Content)
         case ad(_ value: AmityAd)
+        case bannerAd(_ value: BannerAdPlacement)
     }
     
     var id: String

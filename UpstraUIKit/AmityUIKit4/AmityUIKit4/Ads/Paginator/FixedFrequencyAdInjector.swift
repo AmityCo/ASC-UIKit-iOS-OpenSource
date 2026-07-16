@@ -198,6 +198,8 @@ class FixedFrequencyAdsInjector {
                 Log.add(event: .info, "[\(index)] - 🐶 Ad \(ad.adId)")
             case .content(let value):
                 Log.add(event: .info, "[\(index)] - Content \(modelIdentifier(value))")
+            case .bannerAd(let placement):
+                Log.add(event: .info, "[\(index)] - 📢 BannerAd \(placement.id)")
             }
         }
     }

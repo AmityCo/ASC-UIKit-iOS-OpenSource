@@ -160,6 +160,8 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     StoryAdView(ad: ad, gestureView: getGestureView)
                 case .content(let storyModel):
                     getStoryView(storyModel)
+                case .bannerAd:
+                    EmptyView()
                 }
                 
                 HStack(spacing: 0) {
