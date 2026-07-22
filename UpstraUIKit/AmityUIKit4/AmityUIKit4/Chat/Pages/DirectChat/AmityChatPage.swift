@@ -351,7 +351,17 @@ public struct AmityChatPage: AmityPageView {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Button {
-                    host.controller?.dismissOrPop()
+                    // The chat room is PUSHED onto the nav stack by AmityChatHomePage,
+                    // so "back" must POP. dismissOrPop() checks presentingViewController
+                    // first and dismisses the whole modal (closing the UIKit) when the
+                    // nav stack itself was presented — the reported bug. Prefer popping
+                    // whenever we're not the root of the nav stack; fall back otherwise.
+                    if let nav = host.controller?.navigationController,
+                       nav.viewControllers.count > 1 {
+                        nav.popViewController(animated: true)
+                    } else {
+                        host.controller?.dismissOrPop()
+                    }
                 } label: {
                     Image(AmityIcon.Chat.backButtonIcon.imageResource)
                         .renderingMode(.template)
@@ -359,9 +369,16 @@ public struct AmityChatPage: AmityPageView {
                         .scaledToFit()
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .frame(width: 16, height: 16)
+                        // Expand the tappable region to the 44x44 minimum target so a
+                        // tap near the chevron can't fall through to the adjacent avatar.
+                        // contentShape makes the whole frame hit-testable (not just the
+                        // glyph), which also hardens routing when the page is embedded in
+                        // a custom container/nav wrapper.
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .padding(.trailing, 12)
+                .padding(.trailing, 0)
 
                 Button {
                     if let userId = pageViewModel.otherUserId {
