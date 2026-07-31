@@ -25,13 +25,13 @@ public class AmityMessageAction {
     var onSaveImage: MessageAction?
     var onSaveVideo: MessageAction?
     var onEdit: MessageAction?
-    var onSeeMore: ((String) -> Void)?
-    
+    var onSeeMore: ((MessageModel) -> Void)?
+
     // Internally used
     var showReaction: MessageAction?
-    var onSeeMoreReplied: ((String) -> Void)?
-    
-    public init(onCopy: MessageAction?, onReply: MessageAction?, onDelete: MessageAction?, onReport: MessageAction?, onUnReport: MessageAction?, onSaveImage: MessageAction? = nil, onSaveVideo: MessageAction? = nil, onSeeMore: ((String) -> Void)? = nil, onResend: MessageAction? = nil) {
+    var onSeeMoreReplied: ((MessageModel) -> Void)?
+
+    public init(onCopy: MessageAction?, onReply: MessageAction?, onDelete: MessageAction?, onReport: MessageAction?, onUnReport: MessageAction?, onSaveImage: MessageAction? = nil, onSaveVideo: MessageAction? = nil, onSeeMore: ((MessageModel) -> Void)? = nil, onResend: MessageAction? = nil) {
         self.onCopy = onCopy
         self.onReply = onReply
         self.onDelete = onDelete

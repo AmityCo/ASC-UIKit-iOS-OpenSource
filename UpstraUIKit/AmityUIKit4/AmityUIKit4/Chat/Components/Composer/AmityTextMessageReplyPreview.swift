@@ -44,29 +44,27 @@ struct AmityTextMessageReplyPreview: View {
             if !isParentUnavailable {
                 if message.type == .image, let url = message.imageURL {
                     AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: url)
-                        .frame(width: 38, height: 38)
+                        .frame(width: 32, height: 32)
                         .cornerRadius(4)
                         .padding(.trailing, 8)
                 } else if message.type == .video, let url = message.videoThumbnailURL {
                     ZStack {
                         AsyncImage(placeholder: AmityIcon.Chat.chatAvatarPlaceholder.imageResource, url: url)
-                            .frame(width: 38, height: 38)
+                            .frame(width: 32, height: 32)
                             .cornerRadius(4)
-                        Color.black.opacity(0.4)
-                            .frame(width: 38, height: 38)
-                            .cornerRadius(4)
-                        Image(AmityIcon.Chat.videoPlayButtonIcon.imageResource)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 14, height: 14)
+                        ChatVideoPlayDisc(viewConfig: viewConfig, diameter: 24, glyphSize: 16)
                     }
                     .padding(.trailing, 8)
                 }
             }
 
             Button(action: closeAction, label: {
-                Image(AmityIcon.Chat.closeReply.imageResource)
-                    .frame(width: 20, height: 20)
+                Image(AmityIcon.DesignSystem.crossR.imageResource)
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                    .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
             })
             .padding(.trailing, 12)
             .accessibilityIdentifier(AccessibilityID.Chat.ReplyPanel.close_button)
@@ -74,7 +72,7 @@ struct AmityTextMessageReplyPreview: View {
 
         .frame(maxWidth: .infinity, alignment: .leading)
         .frame(minHeight: 62)
-        .background(Color(viewConfig.theme.baseColorShade4))
+        .background(Color(viewConfig.color(.surfaceBannerSubdueGeneral)))
     }
 
     private var replyTargetName: String {

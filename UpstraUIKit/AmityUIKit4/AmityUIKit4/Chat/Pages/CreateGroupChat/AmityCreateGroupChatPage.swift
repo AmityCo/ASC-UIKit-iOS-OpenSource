@@ -59,6 +59,7 @@ public struct AmityCreateGroupChatPage: AmityPageView {
         VStack(spacing: 0) {
             // MARK: Nav bar
             navBar
+            AmityDivider(variant: .post, viewConfig: viewConfig)
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
@@ -88,7 +89,7 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                 .padding(.bottom, 32)
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
         .updateTheme(with: viewConfig)
         .sheet(isPresented: $showingAvatarPicker) {
@@ -110,9 +111,11 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                     }
                 } label: {
                     HStack(spacing: 12) {
-                        Image(AmityIcon.Chat.cameraButtonIcon.imageResource)
+                        Image(AmityIcon.DesignSystem.cameraR.imageResource)
+                            .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
                             .frame(width: 32, height: 32)
                         Text(AmityLocalizedStringSet.Chat.camera.localizedString)
                             .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
@@ -131,9 +134,11 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                     }
                 } label: {
                     HStack(spacing: 12) {
-                        Image(AmityIcon.Chat.imageButtonIcon.imageResource)
+                        Image(AmityIcon.DesignSystem.imageR.imageResource)
+                            .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
+                            .foregroundColor(Color(viewConfig.theme.baseColor))
                             .frame(width: 32, height: 32)
                         Text(AmityLocalizedStringSet.Chat.EditGroupProfile.avatarLibrary.localizedString)
                             .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
@@ -153,7 +158,7 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                     title: Text(AmityLocalizedStringSet.Chat.CreateGroup.leaveAlertTitle.localizedString),
                     message: Text(AmityLocalizedStringSet.Chat.CreateGroup.leaveAlertMessage.localizedString),
                     primaryButton: .destructive(Text(AmityLocalizedStringSet.General.leave.localizedString)) {
-                        host.controller?.navigationController?.dismiss(animated: true)
+                        host.controller?.navigationController?.popViewController(animated: true)
                     },
                     secondaryButton: .cancel(Text(AmityLocalizedStringSet.General.cancel.localizedString))
                 )
@@ -176,7 +181,7 @@ public struct AmityCreateGroupChatPage: AmityPageView {
     private var navBar: some View {
         ZStack {
             Text(AmityLocalizedStringSet.Chat.CreateGroup.title.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))
                 .frame(maxWidth: .infinity)
 
             HStack {
@@ -184,37 +189,35 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                     if hasUnsavedInput {
                         activeAlert = .leaveConfirm
                     } else {
-                        host.controller?.navigationController?.dismiss(animated: true)
+                        host.controller?.navigationController?.popViewController(animated: true)
                     }
                 } label: {
-                    Image(AmityIcon.Chat.closeButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .frame(width: 16, height: 16)
+                        .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
+                        .frame(width: 24, height: 24)
                         .frame(width: 32, height: 32)
                 }
                 .buttonStyle(.plain)
 
                 Spacer()
 
-                Button {
+                AmityButton(variant: .main,
+                            hierarchy: .primary,
+                            style: .ghost,
+                            mainSize: .sm,
+                            label: AmityLocalizedStringSet.Chat.CreateGroup.createButton.localizedString,
+                            isDisabled: isCreating || isUploadingAvatar,
+                            viewConfig: viewConfig) {
                     createGroup()
-                } label: {
-                    Text(AmityLocalizedStringSet.Chat.CreateGroup.createButton.localizedString)
-                        .applyTextStyle(.bodyBold(
-                            isUploadingAvatar
-                                ? Color(viewConfig.theme.highlightColor).opacity(0.5)
-                                : Color(viewConfig.theme.highlightColor)))
                 }
-                .buttonStyle(.plain)
-                .disabled(isCreating || isUploadingAvatar)
             }
         }
         .padding(.horizontal, 16)
         .frame(height: 44)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
     }
 
     // MARK: - Avatar picker
@@ -224,27 +227,30 @@ public struct AmityCreateGroupChatPage: AmityPageView {
             showImageSourceSheet = true
         } label: {
             ZStack {
+                // Background: selected photo, or the default group-channel avatar when none chosen.
                 RoundedRectangle(cornerRadius: 24)
-                    .fill(Color(viewConfig.theme.highlightColor).opacity(0.2))
+                    .fill(Color(viewConfig.color(.surfaceAvatarProfileDefault)))
                     .frame(width: 120, height: 120)
 
-                if selectedAvatar == nil {
-                    Image(AmityIcon.Chat.groupAvatarPlaceholderIcon.imageResource)
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.backgroundColor))
-                        .frame(width: 40, height: 40)
-                } else if let img = selectedAvatar {
+                if let img = selectedAvatar {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 120, height: 120)
                         .clipShape(RoundedRectangle(cornerRadius: 24))
+                } else {
+                    // Same default group-channel avatar glyph as the chat listing, sized to match the camera.
+                    Image(AmityIcon.DesignSystem.commentsAltS.imageResource)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(Color(viewConfig.color(.iconAvatarDefault)))
+                        .frame(width: 64, height: 64)
                 }
 
+                // Overlay + camera affordance — same in both states.
                 RoundedRectangle(cornerRadius: 24)
-                    .fill(Color.black.opacity(0.3))
+                    .fill(Color.black.opacity(0.5))
                     .frame(width: 120, height: 120)
 
                 if isUploadingAvatar {
@@ -252,12 +258,12 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                         .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         .scaleEffect(1.2)
                 } else {
-                    Image(AmityIcon.Chat.cameraIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.cameraR.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(.white)
-                        .frame(width: 48, height: 48)
+                        .foregroundColor(Color(viewConfig.color(.iconAvatarDefault)))
+                        .frame(width: 64, height: 64)
                 }
             }
         }
@@ -270,28 +276,24 @@ public struct AmityCreateGroupChatPage: AmityPageView {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 4) {
                 Text(AmityLocalizedStringSet.Chat.CreateGroup.nameLabel.localizedString)
-                    .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                    .applyTextStyle(.titleBold(Color(viewConfig.color(.textInputTextInputTitleDefault))))
                 Text(AmityLocalizedStringSet.Chat.CreateGroup.nameOptional.localizedString)
-                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade3)))
+                    .applyTextStyle(.caption(Color(viewConfig.color(.textInputTextInputIndicatorDefault))))
                 Spacer()
                 Text("\(groupName.count)/100")
-                    .applyTextStyle(.caption(
-                        groupName.count > 100
-                            ? Color.red
-                            : Color(viewConfig.theme.baseColorShade1)
-                    ))
+                    .applyTextStyle(.caption(Color(viewConfig.color(.textInputTextInputTextCountDefault))))
             }
 
             TextField(
                 AmityLocalizedStringSet.Chat.CreateGroup.namePlaceholder.localizedString,
                 text: $groupName
             )
-            .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+            .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
             .padding(.vertical, 8)
             .overlay(
                 Rectangle()
                     .frame(height: 1)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade3)),
+                    .foregroundColor(Color(viewConfig.color(.lineInputTextInputUnderlinedDefault))),
                 alignment: .bottom
             )
             .onChange(of: groupName) { newValue in
@@ -313,10 +315,10 @@ public struct AmityCreateGroupChatPage: AmityPageView {
     private var privacySection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(AmityLocalizedStringSet.Chat.CreateGroup.privacyTitle.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
 
             privacyRow(
-                icon: AmityIcon.Chat.createGroupPublicIcon.imageResource,
+                icon: .earthAfricaS,
                 title: AmityLocalizedStringSet.Chat.CreateGroup.privacyPublic.localizedString,
                 description: AmityLocalizedStringSet.Chat.CreateGroup.privacyPublicDesc.localizedString,
                 isSelected: isPublic
@@ -325,7 +327,7 @@ public struct AmityCreateGroupChatPage: AmityPageView {
             }
 
             privacyRow(
-                icon: AmityIcon.Chat.createGroupPrivateIcon.imageResource,
+                icon: .lockKeyholeR,
                 title: AmityLocalizedStringSet.Chat.CreateGroup.privacyPrivate.localizedString,
                 description: AmityLocalizedStringSet.Chat.CreateGroup.privacyPrivateDesc.localizedString,
                 isSelected: !isPublic
@@ -336,7 +338,7 @@ public struct AmityCreateGroupChatPage: AmityPageView {
     }
 
     private func privacyRow(
-        icon: ImageResource,
+        icon: AmityIcon.DesignSystem,
         title: String,
         description: String,
         isSelected: Bool,
@@ -346,40 +348,34 @@ public struct AmityCreateGroupChatPage: AmityPageView {
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(Color(viewConfig.theme.baseColorShade4))
+                        .fill(Color(viewConfig.color(.surfaceFeaturedIconTinted)))
                         .frame(width: 40, height: 40)
-                    Image(icon)
+                    Image(icon.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 22, height: 22)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(Color(viewConfig.color(.iconFeaturedIconTinted)))
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                     Text(description)
-                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                        .applyTextStyle(.caption(Color(viewConfig.color(.textListTextDescriptionDefaultDefault))))
                         .fixedSize(horizontal: false, vertical: true)
                 }
 
                 Spacer()
 
-                ZStack {
-                    Circle()
-                        .stroke(lineWidth: 2.0)
-                        .fill(.gray)
-                        .frame(width: 16, height: 16)
-                        .opacity(isSelected ? 0 : 1)
-                    
-                    Image(AmityIcon.pollRadioIcon.imageResource)
-                        .frame(width: 22, height: 22)
-                        .opacity(isSelected ? 1 : 0)
-                }
+                AmitySelection(variant: .radio,
+                               isSelected: isSelected,
+                               viewConfig: viewConfig) { _, _ in }
+                    .allowsHitTesting(false)
             }
+            .padding(.vertical, 16)
+            .contentShape(Rectangle())
         }
-        .padding(.vertical, 16)
         .buttonStyle(.plain)
     }
 
@@ -388,12 +384,12 @@ public struct AmityCreateGroupChatPage: AmityPageView {
     private var privacyWarningBanner: some View {
         HStack {
             Text(AmityLocalizedStringSet.Chat.CreateGroup.privacyWarning.localizedString)
-                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
-                .fixedSize(horizontal: false, vertical: true)
+                .applyTextStyle(.caption(Color(viewConfig.color(.textListTextDescriptionDefaultDefault))))
+                .lineLimit(2)
             Spacer()
         }
         .padding(16)
-        .background(Color(viewConfig.theme.backgroundShade1Color))
+        .background(Color(viewConfig.color(.surfaceListDefaultHover)))
     }
 
     // MARK: - Members section
@@ -401,51 +397,37 @@ public struct AmityCreateGroupChatPage: AmityPageView {
     private var membersSection: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(AmityLocalizedStringSet.Chat.CreateGroup.memberLabel.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textInputUserInputTitleDefault))))
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
 
             let columns = Array(repeating: GridItem(.flexible(), spacing: 19), count: 4)
             LazyVGrid(columns: columns, spacing: 16) {
                 VStack(spacing: 6) {
-                    ZStack {
-                        Circle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(width: 40, height: 40)
-                        Image(AmityIcon.Chat.plusIcon.imageResource)
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
-                            .frame(width: 18, height: 18)
+                    AmityButton(variant: .icon,
+                                hierarchy: .secondary,
+                                style: .filled,
+                                iconSize: .size40,
+                                icon: .plusR,
+                                viewConfig: viewConfig) {
+                        let addPage = AmitySelectGroupMemberPage(
+                            preselectedUsers: selectedUsers,
+                            onMembersSelected: { updatedUsers in
+                                selectedUsers = updatedUsers
+                            }
+                        )
+                        let vc: UIViewController = AmitySwiftUIHostingController(rootView: addPage)
+                        host.controller?.navigationController?.pushViewController(vc, animated: true)
                     }
                     Text(AmityLocalizedStringSet.Chat.AddGroupMember.memberChip.localizedString)
-                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.caption(Color(viewConfig.color(.textIconButtonLabelGeneral))))
                         .lineLimit(1)
-                }
-                .onTapGesture {
-                    let addPage = AmitySelectGroupMemberPage(
-                        preselectedUsers: selectedUsers,
-                        onMembersSelected: { updatedUsers in
-                            selectedUsers = updatedUsers
-                        }
-                    )
-                    let vc: UIViewController = AmitySwiftUIHostingController(rootView: addPage)
-                    host.controller?.navigationController?.pushViewController(vc, animated: true)
                 }
 
                 currentUserCell
 
                 ForEach(selectedUsers, id: \.userId) { user in
-                    let avatarURL: URL? = {
-                        guard let urlStr = user.getAvatarInfo()?.fileURL else { return nil }
-                        return URL(string: urlStr)
-                    }()
-                    removableMemberCell(
-                        displayName: user.displayName ?? user.userId,
-                        avatarURL: avatarURL,
-                        user: user
-                    )
+                    memberPreviewCell(user: user)
                 }
             }
             .padding(.horizontal, 16)
@@ -463,32 +445,37 @@ public struct AmityCreateGroupChatPage: AmityPageView {
 
         return VStack(spacing: 6) {
             ZStack(alignment: .bottomTrailing) {
-                AmityUserProfileImageView(displayName: displayName, avatarURL: avatarURL)
+                AmityChatUserProfileImageView(displayName: displayName, avatarURL: avatarURL)
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
 
-                Color(viewConfig.theme.primaryColor.blend(.shade3))
-                    .frame(width: 18, height: 18)
-                    .clipShape(Circle())
-                    .overlay(
-                        Image(AmityIcon.moderatorBadgeIcon.getImageResource())
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 16, height: 16)
+                AmityBadge(variant: .icon,
+                           icon: .shieldCheckS,
+                           size: .size16,
+                           preset: .userStatus(.moderator),
+                           viewConfig: viewConfig)
+                    .padding(1)
+                    .background(
+                        Color(viewConfig.color(.borderAvatarProfileDefault)).clipShape(Circle())
                     )
             }
 
             Text(AmityLocalizedStringSet.Chat.CreateGroup.memberYouLabel.localizedString)
-                .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.caption(Color(viewConfig.color(.textAvatarLabelDefault))))
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
         }
     }
 
-    private func removableMemberCell(displayName: String, avatarURL: URL?, user: AmityUser) -> some View {
-        VStack(spacing: 6) {
+    private func memberPreviewCell(user: AmityUser) -> some View {
+        let displayName = user.displayName ?? user.userId
+        let avatarURL: URL? = {
+            guard let urlStr = user.getAvatarInfo()?.fileURL else { return nil }
+            return URL(string: urlStr)
+        }()
+        return VStack(spacing: 6) {
             ZStack(alignment: .topTrailing) {
-                AmityUserProfileImageView(displayName: displayName, avatarURL: avatarURL)
+                AmityChatUserProfileImageView(displayName: displayName, avatarURL: avatarURL)
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
 
@@ -497,19 +484,21 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                 } label: {
                     ZStack {
                         Circle()
-                            .fill(Color.black.opacity(0.3))
-                            .frame(width: 18, height: 18)
-                        Image(systemName: "xmark")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundColor(.white)
+                            .fill(Color(viewConfig.color(.surfaceIconButtonTransparentPrimaryEnabled)))
+                            .frame(width: 16, height: 16)
+                        Image(AmityIcon.DesignSystem.crossR.imageResource)
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundColor(Color(viewConfig.color(.iconIconButtonTransparentPrimaryDefault)))
+                            .frame(width: 12, height: 12)
                     }
                 }
                 .buttonStyle(.plain)
-                .offset(x: 4, y: -1)
             }
 
             Text(displayName)
-                .applyTextStyle(.caption(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.caption(Color(viewConfig.color(.textAvatarLabelDefault))))
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
         }

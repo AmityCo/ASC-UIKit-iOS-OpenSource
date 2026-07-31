@@ -107,12 +107,11 @@ public struct AmityProductTagListComponent: AmityComponentView {
         self.sourceId = sourceId
         self.onClose = onClose
         self.onProductClick = onProductClick
-        self._viewConfig = StateObject(
-            wrappedValue: AmityViewConfigController(
-                pageId: pageId,
-                componentId: .productTagListBottomsheet
-            )
+        let resolvedConfig = AmityViewConfigController(
+            pageId: pageId,
+            componentId: .productTagListBottomsheet
         )
+        self._viewConfig = StateObject(wrappedValue: resolvedConfig)
     }
 
     // MARK: - Body

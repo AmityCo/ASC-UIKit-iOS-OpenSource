@@ -7,6 +7,19 @@ import SwiftUI
 import AmitySDK
 import Combine
 
+/// Which media viewer a bubble wants to present.
+///
+/// SwiftUI honours only ONE presentation modifier per view: chain two
+/// `.fullScreenCover`s on the same view and the later one silently takes the
+/// slot, so the earlier one never presents. Image and video therefore share a
+/// single `.fullScreenCover(item:)`. A message is only ever one or the other.
+enum ChatMediaViewerKind: String, Identifiable {
+    case image
+    case video
+
+    var id: String { rawValue }
+}
+
 struct ChatMessageBubbleView<Content: View>: View {
 
     @EnvironmentObject private var viewConfig: AmityViewConfigController
@@ -19,8 +32,7 @@ struct ChatMessageBubbleView<Content: View>: View {
     @StateObject var viewModel: ChatMessageBubbleViewModel
     @Namespace var overlayAnimationNamespace
     @State private var isPressed = false
-    @State private var showingRepliedImageViewer = false
-    @State private var showingRepliedVideoPlayer = false
+    @State private var repliedMediaViewer: ChatMediaViewerKind?
 
     init(message: MessageModel, messageAction: AmityMessageAction, @ViewBuilder content: @escaping () -> Content) {
         self.message = message
@@ -72,7 +84,7 @@ struct ChatMessageBubbleView<Content: View>: View {
                                     isBubbleEnabled: config.isBubbleEnabled(messageType: message.type),
                                     message: message,
                                     isPressed: isPressed,
-                                    onSeeMore: { messageAction.onSeeMore?(message.text) },
+                                    onSeeMore: { messageAction.onSeeMore?(message) },
                                     viewModel: viewModel
                                 ))
                                 .onLongPressGesture(minimumDuration: 0.3) {
@@ -100,19 +112,18 @@ struct ChatMessageBubbleView<Content: View>: View {
                             viewModel.currentFrame = rect
                         }
                     }
-                    // The (i) can be covered on cancelled media, so catch its tap on the
-                    // container, gated to the icon's frame. (Drag = iOS-14 tap location.)
-                    .simultaneousGesture(
-                        DragGesture(minimumDistance: 0, coordinateSpace: .global).onEnded { value in
-                            guard message.syncState == .error else { return }
-                            // a tap, not a scroll
-                            guard abs(value.translation.width) < 10,
-                                  abs(value.translation.height) < 10 else { return }
-                            // only when the touch is on the (i)
-                            guard viewModel.errorIconFrame.contains(value.location) else { return }
-                            messageAction.onFailedTap?(message)
-                        }
-                    )
+                    .applyIf(message.syncState == .error) { view in
+                        view.simultaneousGesture(
+                            DragGesture(minimumDistance: 0, coordinateSpace: .global).onEnded { value in
+                                // a tap, not a scroll
+                                guard abs(value.translation.width) < 10,
+                                      abs(value.translation.height) < 10 else { return }
+                                // only when the touch is on the (i)
+                                guard viewModel.errorIconFrame.contains(value.location) else { return }
+                                messageAction.onFailedTap?(message)
+                            }
+                        )
+                    }
                 }
                 .padding(.trailing, 16)
                 .padding(.top, 4)
@@ -136,7 +147,7 @@ struct ChatMessageBubbleView<Content: View>: View {
             VStack(alignment: .leading, spacing: 4) {
                 if message.isGroupChat && message.parentId == nil {
                     Text(message.displayName)
-                        .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade1)))
+                        .applyTextStyle(.captionBold(Color(viewConfig.color(.textChatBubbleInboundHeaderUserNameDefault))))
                         .accessibilityIdentifier(AccessibilityID.Chat.MessageList.bubbleReceiverDisplayName)
                 }
 
@@ -153,7 +164,7 @@ struct ChatMessageBubbleView<Content: View>: View {
                                     isBubbleEnabled: config.isBubbleEnabled(messageType: message.type),
                                     message: message,
                                     isPressed: isPressed,
-                                    onSeeMore: { messageAction.onSeeMore?(message.text) },
+                                    onSeeMore: { messageAction.onSeeMore?(message) },
                                     viewModel: viewModel
                                 ))
                                 .onLongPressGesture(minimumDuration: 0.3) {
@@ -210,13 +221,14 @@ struct ChatMessageBubbleView<Content: View>: View {
         VStack(alignment: isOwner ? .trailing : .leading, spacing: 4) {
             if let replied = viewModel.repliedMessage {
                 HStack(spacing: 4) {
-                    Image(AmityIcon.Chat.replyButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.shareLeftS.imageResource)
                         .renderingMode(.template)
                         .resizable()
+                        .scaledToFit()
                         .frame(width: 16, height: 12)
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                        .foregroundColor(Color(viewConfig.color(isOwner ? .iconChatBubbleOutboundHeaderRepliedToDefault : .iconChatBubbleInboundHeaderRepliedToDefault)))
                     Text(replyLabel(isOwner: isOwner))
-                        .applyTextStyle(.custom(12, .regular, Color(viewConfig.theme.baseColorShade1)))
+                        .applyTextStyle(.custom(12, .regular, Color(viewConfig.color(isOwner ? .textChatBubbleOutboundHeaderRepliedToDefault : .textChatBubbleInboundHeaderRepliedToDefault))))
                         .lineLimit(1)
                 }
 
@@ -230,22 +242,28 @@ struct ChatMessageBubbleView<Content: View>: View {
                     .shimmering()
             }
         }
-        .padding(.bottom, 4)
-        .fullScreenCover(isPresented: $showingRepliedImageViewer) {
-            if let parent = viewModel.repliedParent {
-                MediaViewer(
-                    url: parent.imageURL ?? parent.mediumFileURL,
-                    viewConfig: viewConfig,
-                    closeAction: { showingRepliedImageViewer = false },
-                    saveImageURL: parent.largeImageURL,
-                    onDelete: nil
-                )
-            }
-        }
-        .fullScreenCover(isPresented: $showingRepliedVideoPlayer) {
-            if let url = viewModel.repliedParent?.videoPlaybackURL {
-                VideoMessagePlayerView(videoURL: url)
-                    .ignoresSafeArea()
+        // One cover for both media kinds — see `ChatMediaViewerKind`.
+        .fullScreenCover(item: $repliedMediaViewer) { kind in
+            switch kind {
+            case .image:
+                if let parent = viewModel.repliedParent {
+                    MediaViewer(
+                        url: parent.imageURL ?? parent.mediumFileURL,
+                        viewConfig: viewConfig,
+                        closeAction: { repliedMediaViewer = nil },
+                        saveImageURL: parent.largeImageURL,
+                        onDelete: nil
+                    )
+                }
+            case .video:
+                if let url = viewModel.repliedParent?.videoPlaybackURL {
+                    VideoMessageFullScreenView(
+                        viewConfig: viewConfig,
+                        videoURL: url,
+                        downloadURL: viewModel.repliedParent?.videoDownloadURL,
+                        onClose: { repliedMediaViewer = nil }
+                    )
+                }
             }
         }
     }
@@ -254,13 +272,13 @@ struct ChatMessageBubbleView<Content: View>: View {
         guard let parent = viewModel.repliedParent, !parent.isDeleted else { return }
         switch parent.type {
         case .image:
-            showingRepliedImageViewer = true
+            repliedMediaViewer = .image
         case .video:
             guard parent.videoPlaybackURL != nil else { return }
-            showingRepliedVideoPlayer = true
+            repliedMediaViewer = .video
         default:
             guard !parent.text.isEmpty else { return }
-            (messageAction.onSeeMoreReplied ?? messageAction.onSeeMore)?(parent.text)
+            (messageAction.onSeeMoreReplied ?? messageAction.onSeeMore)?(parent)
         }
     }
 
@@ -349,33 +367,33 @@ struct ChatMessageBubbleView<Content: View>: View {
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color(viewConfig.theme.baseColorShade4), lineWidth: 1))
         } else if replied.type == .image, let url = replied.imageURL {
             ZStack {
-                AsyncImage(placeholderView: { Color(viewConfig.theme.baseColorShade4) }, url: url)
+                AsyncImage(placeholderView: { Color(viewConfig.color(.surfaceChatBubbleReplyMessageDefault)) }, url: url)
                     .scaledToFill().frame(width: 120, height: 120).clipped()
-                Color.white.opacity(0.6)
+                Color(viewConfig.color(.surfaceChatBubbleReplyOverlayDefault))
             }
             .frame(width: 120, height: 120)
             .clipShape(RoundedRectangle(cornerRadius: 20))
         } else if replied.type == .image {
             ZStack {
-                RoundedRectangle(cornerRadius: 20).fill(Color(viewConfig.theme.baseColorShade4))
-                Color.white.opacity(0.6)
+                RoundedRectangle(cornerRadius: 20).fill(Color(viewConfig.color(.surfaceChatBubbleReplyMessageDefault)))
+                Color(viewConfig.color(.surfaceChatBubbleReplyOverlayDefault))
             }
             .frame(width: 120, height: 120)
             .clipShape(RoundedRectangle(cornerRadius: 20))
         } else if replied.type == .video, let url = replied.videoThumbnailURL {
             ZStack {
-                AsyncImage(placeholderView: { Color(viewConfig.theme.baseColorShade4) }, url: url)
+                AsyncImage(placeholderView: { Color(viewConfig.color(.surfaceChatBubbleReplyMessageDefault)) }, url: url)
                     .scaledToFill().frame(width: 120, height: 120).clipped()
-                Image(AmityIcon.Chat.videoPlayButtonIcon.imageResource).resizable().frame(width: 40, height: 40)
-                Color.white.opacity(0.6)
+                ChatVideoPlayDisc(viewConfig: viewConfig)
+                Color(viewConfig.color(.surfaceChatBubbleReplyOverlayDefault))
             }
             .frame(width: 120, height: 120)
             .clipShape(RoundedRectangle(cornerRadius: 20))
         } else if replied.type == .video {
             ZStack {
-                RoundedRectangle(cornerRadius: 20).fill(Color(viewConfig.theme.baseColorShade4))
-                Image(AmityIcon.Chat.videoPlayButtonIcon.imageResource).resizable().frame(width: 40, height: 40)
-                Color.white.opacity(0.6)
+                RoundedRectangle(cornerRadius: 20).fill(Color(viewConfig.color(.surfaceChatBubbleReplyMessageDefault)))
+                ChatVideoPlayDisc(viewConfig: viewConfig)
+                Color(viewConfig.color(.surfaceChatBubbleReplyOverlayDefault))
             }
             .frame(width: 120, height: 120)
             .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -388,10 +406,10 @@ struct ChatMessageBubbleView<Content: View>: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
                 .background(
-                    RoundedRectangle(cornerRadius: 20).fill(Color(viewConfig.theme.baseColorShade4))
+                    RoundedRectangle(cornerRadius: 20).fill(Color(viewConfig.color(.surfaceChatBubbleReplyMessageDefault)))
                 )
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20).fill(Color.white.opacity(0.6))
+                    RoundedRectangle(cornerRadius: 20).fill(Color(viewConfig.color(.surfaceChatBubbleReplyOverlayDefault)))
                         .allowsHitTesting(false)
                 )
                 .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -406,7 +424,7 @@ struct ChatMessageBubbleView<Content: View>: View {
             Text(makeReplyAttributedText(safe))
         } else {
             Text(safe)
-                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.body(Color(viewConfig.color(.textChatBubbleInboundMessagesDefault))))
         }
     }
 
@@ -414,7 +432,7 @@ struct ChatMessageBubbleView<Content: View>: View {
     private func makeReplyAttributedText(_ text: String) -> AttributedString {
         var attributed = AttributedString(text)
         attributed.font = .system(size: 15, weight: .regular)
-        attributed.foregroundColor = Color(viewConfig.theme.baseColor)
+        attributed.foregroundColor = Color(viewConfig.color(.textChatBubbleInboundMessagesDefault))
 
         let links = AmityPreviewLinkWizard.shared.extractLinks(from: text)
         for link in links {

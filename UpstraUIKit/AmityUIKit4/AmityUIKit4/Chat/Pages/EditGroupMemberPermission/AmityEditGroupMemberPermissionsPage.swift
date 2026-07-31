@@ -39,9 +39,6 @@ public struct AmityEditGroupMemberPermissionsPage: AmityPageView {
     private let originalPermission: GroupMessagingPermission
     @StateObject private var viewConfig: AmityViewConfigController
     @State private var isSaving = false
-    @State private var toastMessage: String = ""
-    @State private var showToast: Bool = false
-    @State private var toastStyle: ToastStyle = .success
 
     public init(channelId: String, isMuted: Bool) {
         self.channelId = channelId
@@ -60,7 +57,7 @@ public struct AmityEditGroupMemberPermissionsPage: AmityPageView {
             ScrollView {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(AmityLocalizedStringSet.Chat.EditGroupMemberPermission.sectionMessaging.localizedString)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                         .padding(.bottom, 8)
 
                     ForEach(GroupMessagingPermission.allCases, id: \.rawValue) { perm in
@@ -70,25 +67,24 @@ public struct AmityEditGroupMemberPermissionsPage: AmityPageView {
                 .padding(16)
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
-        .showToast(isPresented: $showToast, style: toastStyle, message: toastMessage, bottomPadding: 80)
     }
 
     private var navBar: some View {
         ZStack {
             Text(AmityLocalizedStringSet.Chat.EditGroupMemberPermission.navbarTitle.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))
 
             HStack(spacing: 0) {
                 Button {
                     host.controller?.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image(AmityIcon.Chat.backButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
                         .frame(width: 24, height: 24)
                 }
                 .buttonStyle(.plain)
@@ -102,9 +98,9 @@ public struct AmityEditGroupMemberPermissionsPage: AmityPageView {
                         ProgressView().progressViewStyle(CircularProgressViewStyle()).scaleEffect(0.8)
                     } else {
                         Text(AmityLocalizedStringSet.Chat.EditGroupMemberPermission.save.localizedString)
-                            .applyTextStyle(.body(hasChanged
-                                             ? Color(viewConfig.theme.primaryColor)
-                                             : Color(viewConfig.theme.primaryColor.blend(.shade2))))
+                            .applyTextStyle(.body(Color(viewConfig.color(hasChanged
+                                             ? .textMainButtonDefaultGhostPrimaryEnabled
+                                             : .textMainButtonDefaultGhostPrimaryDisabled))))
                     }
                 }
                 .buttonStyle(.plain)
@@ -113,7 +109,7 @@ public struct AmityEditGroupMemberPermissionsPage: AmityPageView {
         }
         .padding(.horizontal, 16)
         .frame(height: 44)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
     }
 
     private func permissionOption(_ perm: GroupMessagingPermission) -> some View {
@@ -121,26 +117,20 @@ public struct AmityEditGroupMemberPermissionsPage: AmityPageView {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(perm.displayTitle)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                     Text(perm.displayDescription)
-                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                        .applyTextStyle(.caption(Color(viewConfig.color(.textListTextDescriptionDefaultDefault))))
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
-                ZStack {
-                    Circle()
-                        .stroke(lineWidth: 2.0)
-                        .fill(.gray)
-                        .frame(width: 16, height: 16)
-                        .opacity(selectedPermission == perm ? 0 : 1)
-                    
-                    Image(AmityIcon.pollRadioIcon.imageResource)
-                        .frame(width: 22, height: 22)
-                        .opacity(selectedPermission == perm ? 1 : 0)
-                }
-                .padding(.top, 2)
+                AmitySelection(variant: .radio,
+                               isSelected: selectedPermission == perm,
+                               viewConfig: viewConfig) { _, _ in }
+                    .allowsHitTesting(false)
+                    .padding(.top, 2)
             }
             .padding(.vertical, 8)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
@@ -157,16 +147,12 @@ public struct AmityEditGroupMemberPermissionsPage: AmityPageView {
             case .everyone:
                 try await channelManager.unmuteChannel(channelId: channelId)
             }
-            toastStyle = .success
-            toastMessage = AmityLocalizedStringSet.Chat.EditGroupMemberPermission.toastSuccess.localizedString
-            showToast = true
+            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Chat.EditGroupMemberPermission.toastSuccess.localizedString)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 host.controller?.navigationController?.popViewController(animated: true)
             }
         } catch {
-            toastStyle = .warning
-            toastMessage = AmityLocalizedStringSet.Chat.EditGroupMemberPermission.toastFailed.localizedString
-            showToast = true
+            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Chat.EditGroupMemberPermission.toastFailed.localizedString)
         }
     }
 }

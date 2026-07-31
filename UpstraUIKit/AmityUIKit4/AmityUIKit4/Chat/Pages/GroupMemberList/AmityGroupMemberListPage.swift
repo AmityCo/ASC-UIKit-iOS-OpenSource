@@ -210,15 +210,14 @@ public struct AmityGroupMemberListPage: AmityPageView {
                 .padding(.vertical, 8)
             memberList
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
         .updateTheme(with: viewConfig)
         .showToast(isPresented: $showToast, style: toastStyle, message: toastMessage, bottomPadding: 80)
-        .bottomSheet(isShowing: $viewModel.showActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+        .bottomSheet(isShowing: $viewModel.showActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.color(.surfaceSheetsBackgroundGeneral))) {
             Group {
                 if let member = viewModel.selectedMember {
                     let isFlaggedByMe = viewModel.flaggedByMeCache[member.userId] ?? false
-                    let _ = print("IsUserFlaggedByMe \(isFlaggedByMe)")
                     AmityGroupMemberActionComponent(
                         member: member,
                         isPresented: $viewModel.showActionSheet,
@@ -276,18 +275,18 @@ public struct AmityGroupMemberListPage: AmityPageView {
     private var navBar: some View {
         ZStack {
             Text(AmityLocalizedStringSet.Chat.GroupMemberList.navbarTitle.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))
 
             HStack {
                 Button {
                     host.controller?.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image(AmityIcon.Chat.backButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .frame(width: 17, height: 17)
+                        .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
+                        .frame(width: 24, height: 24)
                         .frame(width: 32, height: 32)
                 }
                 .buttonStyle(.plain)
@@ -300,11 +299,11 @@ public struct AmityGroupMemberListPage: AmityPageView {
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         host.controller?.navigationController?.pushViewController(vc, animated: true)
                     } label: {
-                        Image(AmityIcon.Chat.chatCreationButton.imageResource)
+                        Image(AmityIcon.DesignSystem.plusR.imageResource)
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
+                            .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
                             .frame(width: 20, height: 20)
                     }
                     .buttonStyle(.plain)
@@ -314,7 +313,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
         }
         .padding(.horizontal, 16)
         .frame(height: 44)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
     }
 
     // MARK: - Tab bar
@@ -328,10 +327,10 @@ public struct AmityGroupMemberListPage: AmityPageView {
             }
             .padding(.horizontal, 16)
             Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewConfig.color(.lineDividerPostDefault)))
                 .frame(height: 1)
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     private func tabButton(_ title: String, tab: AmityGroupMemberListViewModel.MemberTab) -> some View {
@@ -341,10 +340,12 @@ public struct AmityGroupMemberListPage: AmityPageView {
         } label: {
             VStack(spacing: 0) {
                 Text(title)
-                    .applyTextStyle(.titleBold(isSelected ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.baseColorShade2)))
+                    .applyTextStyle(.titleBold(isSelected
+                        ? Color(viewConfig.color(.textTabUnderlinedActive))
+                        : Color(viewConfig.color(.textTabUnderlinedDefault))))
                     .padding(.vertical, 12)
                 Rectangle()
-                    .fill(isSelected ? Color(viewConfig.theme.primaryColor) : Color.clear)
+                    .fill(isSelected ? Color(viewConfig.color(.lineTabUnderlinedActive)) : Color.clear)
                     .frame(height: 2)
             }
         }
@@ -356,23 +357,23 @@ public struct AmityGroupMemberListPage: AmityPageView {
 
     private var searchBar: some View {
         HStack(spacing: 8) {
-            Image(AmityIcon.Chat.searchButtonIcon.imageResource)
+            Image(AmityIcon.DesignSystem.searchR.imageResource)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                 .frame(width: 14, height: 14)
 
             TextField(AmityLocalizedStringSet.Chat.GroupMemberList.searchPlaceholder.localizedString, text: $viewModel.searchText)
-                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
 
             if !viewModel.searchText.isEmpty {
                 Button { viewModel.searchText = "" } label: {
-                    Image(AmityIcon.Chat.grayCloseIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.crossR.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                        .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                         .frame(width: 16, height: 16)
                 }
                 .buttonStyle(.plain)
@@ -380,7 +381,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(Color(viewConfig.theme.baseColorShade4))
+        .background(Color(viewConfig.color(.surfaceInputBoxedInputDefault)))
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
@@ -403,7 +404,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
                         }
                     }
                 }
-                .background(Color(viewConfig.theme.backgroundColor))
+                .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
             }
         }
     }
@@ -416,7 +417,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
 
         return HStack(spacing: 8) {
             ZStack(alignment: .bottomTrailing) {
-                AmityUserProfileImageView(displayName: displayName, avatarURL: {
+                AmityChatUserProfileImageView(displayName: displayName, avatarURL: {
                     if let urlStr = member.user?.getAvatarInfo()?.fileURL { return URL(string: urlStr) }
                     return nil
                 }())
@@ -424,26 +425,27 @@ public struct AmityGroupMemberListPage: AmityPageView {
                 .clipShape(Circle())
 
                 if isMemberModerator {
-                    Color(viewConfig.theme.primaryColor.blend(.shade3))
-                        .frame(width: 18, height: 18)
-                        .clipShape(Circle())
-                        .overlay(
-                            Image(AmityIcon.moderatorBadgeIcon.getImageResource())
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 16, height: 16)
+                    AmityBadge(variant: .icon,
+                               icon: .shieldCheckS,
+                               size: .size16,
+                               preset: .userStatus(.moderator),
+                               viewConfig: viewConfig)
+                        .padding(2)
+                        .background(
+                            Color(viewConfig.color(.borderAvatarIndicatorDefault))
+                                .clipShape(Circle())
                         )
                 }
             }
 
             HStack(spacing: 0) {
                 Text(displayName)
-                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                     .lineLimit(1)
                     .truncationMode(.tail)
                 if isCurrentUser {
                     Text(AmityLocalizedStringSet.Chat.memberYouSuffix.localizedString)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                         .fixedSize()
                         .padding(.leading, 4)
                 }
@@ -455,12 +457,13 @@ public struct AmityGroupMemberListPage: AmityPageView {
                         .fixedSize()
                         .padding(.leading, 4)
                 }
-                let _ = print("moderator \(viewModel.isModerator) muted \(member.isMuted)")
                 if viewModel.isModerator && member.isMuted {
-                    Image(AmityIcon.Chat.mutedMemberIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.volumeSlashR.imageResource)
+                        .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 18, height: 18)
+                        .foregroundColor(Color(viewConfig.color(.iconListDescriptionGeneral)))
+                        .frame(width: 16, height: 16)
                         .fixedSize()
                         .padding(.leading, 2)
                 }
@@ -472,11 +475,11 @@ public struct AmityGroupMemberListPage: AmityPageView {
                 Button {
                     selectMember(member)
                 } label: {
-                    Image(AmityIcon.Chat.ellipsisIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.ellipsisR.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .foregroundColor(Color(viewConfig.color(.iconListLeadingDefaultDefault)))
                         .frame(width: 16, height: 16)
                 }
                 .buttonStyle(.plain)
@@ -484,7 +487,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
         }
         .padding(.horizontal, 12)
         .frame(height: 56)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
         .contentShape(Rectangle())
         .onTapGesture {
             if !isCurrentUser {
@@ -636,8 +639,8 @@ public struct AmityGroupMemberListPage: AmityPageView {
             LazyVStack(spacing: 0) {
                 ForEach(0..<8, id: \.self) { _ in
                     HStack(spacing: 8) {
-                        Circle().fill(Color(viewConfig.theme.baseColorShade4)).frame(width: 40, height: 40)
-                        RoundedRectangle(cornerRadius: 4).fill(Color(viewConfig.theme.baseColorShade4)).frame(width: 160, height: 14)
+                        Circle().fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault))).frame(width: 40, height: 40)
+                        RoundedRectangle(cornerRadius: 4).fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault))).frame(width: 160, height: 14)
                         Spacer()
                     }
                     .padding(.horizontal, 12)
@@ -645,20 +648,20 @@ public struct AmityGroupMemberListPage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     private var emptyState: some View {
         VStack(spacing: 10) {
             Spacer()
-            Image(AmityIcon.Chat.searchNotFoundIcon.imageResource)
+            Image(AmityIcon.DesignSystem.searchCrossL.imageResource)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
+                .foregroundColor(Color(viewConfig.color(.iconEmptyStateIconDefault)))
                 .frame(width: 47, height: 47)
             Text(AmityLocalizedStringSet.Chat.GroupMemberList.empty.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textEmptyStateTitleDefault))))
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

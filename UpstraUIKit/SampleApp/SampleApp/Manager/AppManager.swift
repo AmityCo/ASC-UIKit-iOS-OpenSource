@@ -55,6 +55,8 @@ final class AppManager {
         if isUserRegistered, let currentUserId = UserDefaults.standard.value(forKey: UserDefaultsKey.userId) as? String {
             register(withUserId: currentUserId, displayName: nil)
         }
+        
+        registerPushNotification()
     }
 
     func applyEnvironment(region: ApiRegion, apiKey: String, uploadURL: String) {
@@ -253,6 +255,18 @@ final class AppManager {
     func getDeviceToken() -> String {
         UserDefaults.standard.value(forKey: UserDefaultsKey.deviceToken) as? String ?? ""
     }
+    
+    
+    // MARK: - Register Push Notification
+    func registerPushNotification() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            guard granted else { return }
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        }
+    }
+
 }
 
 /// UINavigationController that hosts a single module (Chat / Social). When the user taps the

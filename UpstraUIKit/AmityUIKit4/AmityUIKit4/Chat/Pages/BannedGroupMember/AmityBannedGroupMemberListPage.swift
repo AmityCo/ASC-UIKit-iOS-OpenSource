@@ -104,7 +104,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
             Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewConfig.color(.lineDividerPostDefault)))
                 .frame(height: 1)
 
             if viewModel.isLoading && viewModel.bannedMembers.isEmpty {
@@ -115,10 +115,10 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 memberList
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
         .updateTheme(with: viewConfig)
-        .bottomSheet(isShowing: $viewModel.showActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+        .bottomSheet(isShowing: $viewModel.showActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.color(.surfaceSheetsBackgroundGeneral))) {
             actionSheetContent
                 .environmentObject(host)
                 .padding(.bottom, 32)
@@ -133,12 +133,12 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
             Button {
                 host.controller?.navigationController?.popViewController(animated: true)
             } label: {
-                Image(AmityIcon.Chat.backButtonIcon.imageResource)
+                Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
-                    .frame(width: 17, height: 17)
+                    .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
+                    .frame(width: 24, height: 24)
                     .frame(width: 32, height: 32)
             }
             .buttonStyle(.plain)
@@ -146,7 +146,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
             Spacer()
 
             Text(AmityLocalizedStringSet.Chat.BannedMembers.navbarTitle.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))
 
             Spacer()
 
@@ -155,28 +155,28 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
         }
         .padding(.horizontal, 16)
         .frame(height: 44)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
     }
 
     // MARK: - Search Bar
 
     private var searchBar: some View {
         HStack(spacing: 8) {
-            Image(AmityIcon.Chat.searchButtonIcon.imageResource)
+            Image(AmityIcon.DesignSystem.searchR.imageResource)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                 .frame(width: 14, height: 14)
             TextField(AmityLocalizedStringSet.Chat.BannedMembers.searchPlaceholder.localizedString, text: $viewModel.searchText)
-                .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
             if !viewModel.searchText.isEmpty {
                 Button { viewModel.searchText = "" } label: {
-                    Image(AmityIcon.Chat.grayCloseIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.crossR.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                        .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                         .frame(width: 16, height: 16)
                 }
                 .buttonStyle(.plain)
@@ -184,7 +184,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 8)
-        .background(Color(viewConfig.theme.baseColorShade4))
+        .background(Color(viewConfig.color(.surfaceInputBoxedInputDefault)))
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
@@ -203,12 +203,12 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     private func memberRow(_ member: AmityChannelMember) -> some View {
         HStack(spacing: 8) {
-            AmityUserProfileImageView(
+            AmityChatUserProfileImageView(
                 displayName: member.user?.displayName ?? member.userId,
                 avatarURL: {
                     guard let s = member.user?.getAvatarInfo()?.fileURL else { return nil }
@@ -219,7 +219,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
             .padding(4)
 
             Text(member.user?.displayName ?? member.userId)
-                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                 .lineLimit(1)
 
             Spacer()
@@ -232,11 +232,11 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                         viewModel.showActionSheet = true
                     }
                 } label: {
-                    Image(AmityIcon.Chat.ellipsisIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.ellipsisR.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .foregroundColor(Color(viewConfig.color(.iconListLeadingDefaultDefault)))
                         .frame(width: 24, height: 24)
                 }
                 .buttonStyle(.plain)
@@ -247,7 +247,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
         }
         .padding(.horizontal, 12)
         .frame(height: 56)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     // MARK: - Unban Action Sheet (bottom sheet)
@@ -268,14 +268,14 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 presentUnbanConfirmation(for: member)
             } label: {
                 HStack(spacing: 12) {
-                    Image(AmityIcon.Chat.banMemberButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.banR.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .foregroundColor(Color(viewConfig.color(.iconListLeadingDefaultDefault)))
                         .frame(width: 24, height: 24)
                     Text(AmityLocalizedStringSet.Chat.BannedMembers.unbanUser.localizedString)
-                        .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -284,7 +284,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
             }
             .buttonStyle(.plain)
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
         .updateTheme(with: viewConfig)
     }
 
@@ -339,11 +339,11 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 ForEach(0..<10, id: \.self) { _ in
                     HStack(spacing: 8) {
                         Circle()
-                            .fill(Color(viewConfig.theme.baseColorShade4))
+                            .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
                             .frame(width: 40, height: 40)
                             .padding(4)
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(Color(viewConfig.theme.baseColorShade4))
+                            .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
                             .frame(width: 160, height: 10)
                         Spacer()
                     }
@@ -352,23 +352,29 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     // MARK: - Empty State
 
     private var emptyState: some View {
-        VStack(spacing: 8) {
+        VStack {
             Spacer()
-            Image(AmityIcon.Chat.bannedMemberNotFoundIcon.imageResource)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
-                .frame(width: 60, height: 60)
-            Text(AmityLocalizedStringSet.Chat.BannedMembers.empty.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
-                .multilineTextAlignment(.center)
+            if viewModel.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                AmityEmptyState(
+                    variant: .icon,
+                    image: AmityIcon.DesignSystem.listRadioL.imageResource,
+                    title: AmityLocalizedStringSet.Chat.BannedMembers.empty.localizedString,
+                    viewConfig: viewConfig
+                )
+            } else {
+                AmityEmptyState(
+                    variant: .icon,
+                    image: AmityIcon.DesignSystem.searchCrossL.imageResource,
+                    title: AmityLocalizedStringSet.Chat.Search.emptyTitle.localizedString,
+                    viewConfig: viewConfig
+                )
+            }
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

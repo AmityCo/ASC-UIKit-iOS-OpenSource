@@ -12,6 +12,7 @@ import AmitySDK
 enum VideoPlayerType {
     case video(AmityMedia)
     case livestream(AmityRoom)
+    case chat(url: URL)
 
     var isLivestream: Bool {
         if case .livestream = self { return true }
@@ -24,11 +25,13 @@ struct AmityPostMediaVideoPlayer: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
 
     var pageId: PageId? = nil
-    let post: AmityPostModel
+    let post: AmityPostModel?
     let playerType: VideoPlayerType
     let hideActionMenu: Bool
     var onClose: (() -> Void)? = nil
     var onTagProducts: (() -> Void)? = nil
+    var onDownload: (() -> Void)? = nil
+    var onDelete: (() -> Void)? = nil
     @Binding var liveProductTags: [AmityProductTagModel]
 
     @State private var showBottomSheet: Bool = false
@@ -55,6 +58,8 @@ struct AmityPostMediaVideoPlayer: View {
             return nil
         case .livestream(let room):
             return URL(string: room.recordedData.first?.playbackUrl ?? "")
+        case .chat(let url):
+            return url
         }
     }
 
@@ -65,16 +70,20 @@ struct AmityPostMediaVideoPlayer: View {
             return media.produtTags
         case .livestream:
             return liveProductTags
+        case .chat:
+            return []
         }
     }
 
-    init(pageId: PageId? = nil, post: AmityPostModel, playerType: VideoPlayerType, hideActionMenu: Bool = true, onClose: (() -> Void)? = nil, onTagProducts: (() -> Void)? = nil, liveProductTags: Binding<[AmityProductTagModel]> = .constant([])) {
+    init(pageId: PageId? = nil, post: AmityPostModel?, playerType: VideoPlayerType, hideActionMenu: Bool = true, onClose: (() -> Void)? = nil, onTagProducts: (() -> Void)? = nil, onDownload: (() -> Void)? = nil, onDelete: (() -> Void)? = nil, liveProductTags: Binding<[AmityProductTagModel]> = .constant([])) {
         self.pageId = pageId
         self.post = post
         self.hideActionMenu = hideActionMenu
         self.playerType = playerType
         self.onClose = onClose
         self.onTagProducts = onTagProducts
+        self.onDownload = onDownload
+        self.onDelete = onDelete
         self._liveProductTags = liveProductTags
         self._deletedStateViewModel = StateObject(wrappedValue: VideoPlayerDeletedStateViewModel(post: post))
     }
@@ -174,6 +183,9 @@ struct AmityPostMediaVideoPlayer: View {
                 topNavigationBar
                 Spacer()
                 bottomContentContainer
+                if onDownload != nil || onDelete != nil {
+                    mediaActionBar
+                }
             }
             .padding(.top, 64)
             .padding(.bottom, 36)
@@ -251,29 +263,39 @@ struct AmityPostMediaVideoPlayer: View {
         controls.show(autoHide: playerController.isPlaying)
     }
 
+    /// Skip ±10s controls are hidden for chat video messages.
+    private var hidesSkipControls: Bool {
+        if case .chat = playerType { return true }
+        return false
+    }
+
     // MARK: - Center Controls (skip back / play-pause / skip forward)
     private var centerControls: some View {
         HStack {
-            Button(action: { skipBackward() }) {
-                Image(AmityIcon.LiveStream.backward10s.imageResource)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
-            }
-            .buttonStyle(.plain)
+            if !hidesSkipControls {
+                Button(action: { skipBackward() }) {
+                    Image(AmityIcon.LiveStream.backward10s.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 32, height: 32)
+                }
+                .buttonStyle(.plain)
 
-            Spacer()
-            
+                Spacer()
+            }
+
             centerPlayPauseButton
 
-            Spacer()
-            Button(action: { skipForward() }) {
-                Image(AmityIcon.LiveStream.forward10s.imageResource)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
+            if !hidesSkipControls {
+                Spacer()
+                Button(action: { skipForward() }) {
+                    Image(AmityIcon.LiveStream.forward10s.imageResource)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 32, height: 32)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(.horizontal, 80)
     }
@@ -356,6 +378,50 @@ struct AmityPostMediaVideoPlayer: View {
         )
     }
 
+    // MARK: - Media Action Bar (download / delete)
+    private var mediaActionBar: some View {
+        HStack {
+            if onDelete != nil {
+                Button(action: handleDelete) {
+                    Image(AmityIcon.DesignSystem.trashR.imageResource)
+                        .renderingMode(.template)
+                        .resizable()
+                        .foregroundColor(.white)
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                        .padding(12)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+
+            Spacer()
+
+            if onDownload != nil {
+                Button(action: { onDownload?() }) {
+                    Image(AmityIcon.DesignSystem.arrowDownToBracketR.imageResource)
+                        .renderingMode(.template)
+                        .resizable()
+                        .foregroundColor(.white)
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
+                        .padding(12)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+    }
+
+    private func handleDelete() {
+        onClose?()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            onDelete?()
+        }
+    }
+
     // MARK: - Bottom Sheet Content
     @ViewBuilder
     private var bottomSheetView: some View {
@@ -419,7 +485,7 @@ struct AmityPostMediaVideoPlayer: View {
                 pageId: pageId,
                 productTags: productTags,
                 renderMode: playerType.isLivestream ? .livestream : .video,
-                sourceId: post.postId,
+                sourceId: post?.postId ?? "",
                 onClose: {
                     UIApplication.topViewController()?.dismiss(animated: true)
                 })
@@ -440,6 +506,7 @@ struct AmityPostMediaVideoPlayer: View {
     }
 
     private func goToPostDetailPage() {
+        guard let post else { return }
         playerController.pause()
         let postDetailPage = AmityPostDetailPage(post: post.object, context: nil)
         let controller = AmitySwiftUIHostingController(rootView: postDetailPage)

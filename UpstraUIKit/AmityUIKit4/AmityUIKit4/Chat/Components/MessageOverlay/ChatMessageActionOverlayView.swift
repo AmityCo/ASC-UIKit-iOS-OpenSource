@@ -103,7 +103,7 @@ struct ChatReactionPickerView: View {
                     let isSelected = reactionVM.message.myReactions.contains(where: { $0 == reaction.name })
 
                     ZStack {
-                        Color(viewConfig.theme.backgroundShade1Color)
+                        Color(viewConfig.color(.surfaceReactionsReactionPopoverReactionStateActive))
                             .frame(width: 42, height: 42)
                             .clipShape(Circle())
                             .opacity(isSelected ? 1 : 0)

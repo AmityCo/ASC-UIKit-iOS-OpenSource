@@ -11,12 +11,11 @@ import LinkPresentation
 enum MessageLinkDetector {
     static func firstURL(in text: String) -> URL? {
         guard !text.isEmpty else { return nil }
-        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else { return nil }
-        let range = NSRange(text.startIndex..<text.endIndex, in: text)
-        guard let match = detector.firstMatch(in: text, options: [], range: range) else { return nil }
-        guard var url = match.url else { return nil }
+        // Use the shared link detector so Chat and Social agree on what counts as a link.
+        guard let urlString = AmityPreviewLinkWizard.shared.detectLinks(text: text).first else { return nil }
+        guard var url = URL(string: urlString) else { return nil }
         if url.scheme == nil {
-            url = URL(string: "https://\(match.url?.absoluteString ?? "")") ?? url
+            url = URL(string: "https://\(urlString)") ?? url
         }
         return url
     }
@@ -78,34 +77,18 @@ struct MessageLinkPreviewView: View {
     private var previewWidth: CGFloat {
         UIScreen.main.bounds.width * 0.6
     }
-    private var imageWidth: CGFloat { previewWidth * 0.4 }
-    private let cardHeight: CGFloat = 96
+    private var imageWidth: CGFloat { previewWidth * 0.5 }
+    private var cardHeight: CGFloat { imageWidth }
     private let cornerRadius: CGFloat = 10
 
     // Colors
-    private var imageBackground: Color {
-        if isOwner {
-            return Color(viewConfig.theme.highlightColor).opacity(0.85)
-        } else {
-            return Color(viewConfig.theme.baseColorShade4)
-        }
-    }
-    private var textBackground: Color {
-        if isOwner {
-            return Color.white.opacity(0.15)
-        } else {
-            return Color.white
-        }
-    }
-    private var titleColor: Color {
-        isOwner ? .white : Color(viewConfig.theme.baseColor)
-    }
-    private var hostColor: Color {
-        isOwner ? .white : Color(viewConfig.theme.baseColor)
-    }
-    private var errorIconColor: Color {
-        isOwner ? Color.white.opacity(0.7) : Color(viewConfig.theme.baseColorShade3)
-    }
+    private var cardBackground: Color { Color(viewConfig.color(.surfaceCardPreviewLinkDefault)) }
+    private var unavailableBackground: Color { Color(viewConfig.color(.surfaceCardPreviewLinkUnavailable)) }
+    private var loadedImageBackground: Color { Color(viewConfig.color(.surfaceMediaImageLoaded)) }
+    private var brokenImageBackground: Color { Color(viewConfig.color(.surfaceMediaImageBroken)) }
+    private var titleColor: Color { Color(viewConfig.color(.textCardPreviewLinkTitleDefault)) }
+    private var hostColor: Color { Color(viewConfig.color(.textCardPreviewLinkDomainDefault)) }
+    private var errorIconColor: Color { Color(viewConfig.color(.iconMediaImageBroken)) }
 
     var body: some View {
         Group {
@@ -129,7 +112,7 @@ struct MessageLinkPreviewView: View {
     private var content: some View {
         HStack(spacing: 0) {
             imageSection
-            textSection(title: metadata?.title, host: displayHost(url))
+            textSection(title: metadata?.title, host: displayHost(url), background: cardBackground)
         }
     }
 
@@ -138,32 +121,37 @@ struct MessageLinkPreviewView: View {
             errorImageSection
             textSection(
                 title: AmityLocalizedStringSet.Chat.Bubble.linkPreviewUnavailable.localizedString,
-                host: AmityLocalizedStringSet.Chat.Bubble.linkPreviewNoData.localizedString
+                host: AmityLocalizedStringSet.Chat.Bubble.linkPreviewNoData.localizedString,
+                background: unavailableBackground
             )
         }
     }
 
     private var skeleton: some View {
         HStack(spacing: 0) {
-            Rectangle()
-                .fill(imageBackground)
-                .frame(width: imageWidth, height: cardHeight)
-                .shimmering()
+            // Image side: media-loading surface with the DS upload spinner (indeterminate).
             ZStack {
-                Rectangle().fill(textBackground)
+                Color(viewConfig.color(.surfaceMediaImageLoading))
+                AmityLoader(variant: .uploadSpinner, size: .medium, viewConfig: viewConfig)
+            }
+            .frame(width: imageWidth, height: cardHeight)
+
+            // Info side: preview-link skeleton surface with two placeholder bars.
+            ZStack {
+                Color(viewConfig.color(.surfaceCardPreviewLinkSkeleton))
                 VStack(alignment: .leading, spacing: 8) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(isOwner ? Color.white.opacity(0.3) : Color(viewConfig.theme.baseColorShade4))
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
                         .frame(width: 80, height: 8)
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(isOwner ? Color.white.opacity(0.3) : Color(viewConfig.theme.baseColorShade4))
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
                         .frame(width: 54, height: 8)
                 }
-                .padding(10)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(height: cardHeight)
-            .shimmering()
         }
     }
 
@@ -177,7 +165,7 @@ struct MessageLinkPreviewView: View {
                 .scaledToFill()
                 .frame(width: imageWidth, height: cardHeight)
                 .clipped()
-                .background(imageBackground)
+                .background(loadedImageBackground)
         } else {
             errorImageSection
         }
@@ -185,21 +173,21 @@ struct MessageLinkPreviewView: View {
 
     private var errorImageSection: some View {
         ZStack {
-            Rectangle().fill(imageBackground)
-            Image(AmityIcon.Chat.linkPreviewErrorIcon.imageResource)
+            Rectangle().fill(brokenImageBackground)
+            Image(AmityIcon.DesignSystem.imageSlashR.imageResource)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 18, height: 18)
+                .frame(width: 40, height: 40)
                 .foregroundColor(errorIconColor)
         }
         .frame(width: imageWidth, height: cardHeight)
     }
 
     @ViewBuilder
-    private func textSection(title: String?, host: String) -> some View {
+    private func textSection(title: String?, host: String, background: Color) -> some View {
         ZStack {
-            Rectangle().fill(textBackground)
+            Rectangle().fill(background)
             VStack(alignment: .leading, spacing: 2) {
                 if let title, !title.isEmpty {
                     Text(title)

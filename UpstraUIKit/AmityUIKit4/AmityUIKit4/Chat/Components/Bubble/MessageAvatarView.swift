@@ -16,21 +16,22 @@ struct MessageAvatarView: View {
 
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            AmityUserProfileImageView(displayName: message.displayName, avatarURL: message.avatarURL)
+            AmityChatUserProfileImageView(displayName: message.displayName, avatarURL: message.avatarURL)
                 .frame(width: 32, height: 32)
                 .clipShape(Circle())
 
             if message.isSenderModerator {
-                Color(viewConfig.theme.primaryColor.blend(.shade3))
-                    .frame(width: 16, height: 16)
-                    .clipShape(Circle())
-                    .overlay(
-                        Image(AmityIcon.moderatorBadgeIcon.getImageResource())
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 14, height: 14)
+                AmityBadge(variant: .icon,
+                           icon: .shieldCheckS,
+                           size: .size16,
+                           preset: .userStatus(.moderator),
+                           viewConfig: viewConfig)
+                    .padding(2)
+                    .background(
+                        Color(viewConfig.color(.borderAvatarIndicatorDefault))
+                            .clipShape(Circle())
                     )
-                    .offset(x: 4, y: 4)
+                    .offset(x: 6, y: 6)
             }
         }
     }

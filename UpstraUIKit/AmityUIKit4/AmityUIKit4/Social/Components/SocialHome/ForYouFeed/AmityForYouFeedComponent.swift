@@ -84,7 +84,7 @@ public struct AmityForYouFeedComponent: AmityComponentView {
                         case .content(let post):
                             VStack(spacing: 0) {
                                 AmityPostContentComponent(post: post.object, category: post.isPinned ? .global : .general, onTapAction: { tapContext in
-                                    handleTap(on: post, showPollResult: tapContext?.showPollResults ?? false)
+                                    handleTap(on: post, showPollResult: tapContext?.showPollResults ?? false, isClipTap: tapContext?.isClipPost ?? false)
                                 }, pageId: pageId)
                                 .contentShape(Rectangle())
                                 .background(GeometryReader { geometry in
@@ -157,8 +157,8 @@ public struct AmityForYouFeedComponent: AmityComponentView {
         .modifier(HiddenListSeparator())
     }
 
-    private func handleTap(on post: AmityPostModel, showPollResult: Bool) {
-        if post.dataTypeInternal == .clip {
+    private func handleTap(on post: AmityPostModel, showPollResult: Bool, isClipTap: Bool = false) {
+        if post.dataTypeInternal == .clip, isClipTap {
             if let media = post.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
                 let clipPost = ClipPost(id: post.postId, url: mediaURL, model: post)
                 let provider = GlobalFeedClipService(clipPost: clipPost)

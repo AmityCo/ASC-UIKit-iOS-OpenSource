@@ -56,7 +56,7 @@ public struct AmityExploreEventFeedComponent: AmityComponentView {
         }
         .onAppear {
             liveEventFeed.loadEvents(eventStatus: .live, originId: nil)
-            upcomingEventFeed.loadEvents(eventStatus: .scheduled, originId: nil, initialLimit: 5)
+            upcomingEventFeed.loadEvents(eventStatus: .scheduled, originId: nil, initialLimit: 5, excludeOwnEvents: true)
         }
     }
 }

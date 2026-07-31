@@ -76,18 +76,22 @@ extension ChatBubbleHelpers {
     func plainBubble(content: some View, isOwner: Bool) -> some View {
         let isEditedTextMessage = message.isEdited && !message.isDeleted && message.type == .text
         let bubbleColor: Color = isOwner
-            ? (isPressed ? Color(UIColor(hex: "#1A4499")) : Color(viewConfig.theme.highlightColor))
-            : (isPressed ? Color(UIColor(hex: "#A5A9B5")) : Color(viewConfig.theme.baseColorShade4))
+            ? (isPressed ? Color(viewConfig.color(.surfaceChatBubbleMessageOutboundPressed)) : Color(viewConfig.color(.surfaceChatBubbleMessageOutboundDefault)))
+            : (isPressed ? Color(viewConfig.color(.surfaceChatBubbleMessageInboundPressed)) : Color(viewConfig.color(.surfaceChatBubbleMessageInboundDefault)))
         let subtleColor: Color = isOwner
             ? Color(viewConfig.theme.primaryColor.blend(.shade2))
             : Color(viewConfig.theme.baseColorShade1)
+        let seeMoreColor: Color = isOwner
+            ? Color(viewConfig.color(.textChatBubbleOutboundSeeMoreDefault))
+            : Color(viewConfig.color(.textChatBubbleInboundSeeMoreDefault))
 
         PlainBubbleContainer(
             isEditedTextMessage: isEditedTextMessage,
             isOwner: isOwner,
             bubbleColor: bubbleColor,
             subtleColor: subtleColor,
-            textColor: isOwner ? .white : Color(viewConfig.theme.baseColor),
+            seeMoreColor: seeMoreColor,
+            textColor: isOwner ? Color(viewConfig.color(.textChatBubbleOutboundMessagesDefault)) : Color(viewConfig.color(.textChatBubbleInboundMessagesDefault)),
             editedText: AmityLocalizedStringSet.Chat.Bubble.edited.localizedString,
             seeMoreText: AmityLocalizedStringSet.Chat.seeMore.localizedString,
             onSeeMore: onSeeMore,
@@ -99,8 +103,8 @@ extension ChatBubbleHelpers {
     // MARK: Deleted bubble
     func deletedBubble(content: some View, isOwner: Bool) -> some View {
         let borderColor = isOwner
-            ? Color(viewConfig.theme.highlightColor)
-            : Color(viewConfig.theme.baseColorShade4)
+            ? Color(viewConfig.color(.borderChatBubbleOutboundDeleted))
+            : Color(viewConfig.color(.borderChatBubbleInboundDeleted))
         return content
             .font(AmityTextStyle.caption(.clear).getFont())
             .padding(.horizontal, 8)
@@ -121,6 +125,7 @@ private struct PlainBubbleContainer<C: View>: View {
     let isOwner: Bool
     let bubbleColor: Color
     let subtleColor: Color
+    let seeMoreColor: Color
     let textColor: Color
     let editedText: String
     let seeMoreText: String
@@ -153,17 +158,18 @@ private struct PlainBubbleContainer<C: View>: View {
                 Button(action: { onSeeMore?() }) {
                     HStack {
                         Text(seeMoreText)
-                            .applyTextStyle(.caption(subtleColor))
+                            .applyTextStyle(.caption(seeMoreColor))
                         Spacer()
                         Image(AmityIcon.Chat.seeMoreArrowIcon.imageResource)
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 16, height: 12)
-                            .foregroundColor(subtleColor)
+                            .foregroundColor(seeMoreColor)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }

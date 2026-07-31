@@ -179,6 +179,14 @@ public struct AmityLiveChatMessageList: AmityComponentView {
             messageListViewModel.reportMessage(messageId: message.id)
         },onUnReport: { message in
             messageListViewModel.unReportMessage(messageId: message.id)
+        }, onSaveVideo: { message in
+            guard let url = message.videoDownloadURL else { return }
+            MessageMediaSaver.saveVideo(from: url) { success in
+                let key = success
+                    ? AmityLocalizedStringSet.Chat.SaveMedia.videoSuccess
+                    : AmityLocalizedStringSet.Chat.SaveMedia.videoFailed
+                chatViewModel.showToastMessage(message: key.localizedString, style: success ? .success : .warning)
+            }
         })
         
         defaultActions.showReaction = { message in

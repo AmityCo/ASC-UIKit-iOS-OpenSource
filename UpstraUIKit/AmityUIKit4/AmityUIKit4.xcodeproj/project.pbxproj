@@ -92,7 +92,7 @@
 				Chat/Components/Bubble/MessageLinkPreviewView.swift,
 				Chat/Components/Bubble/MessageStatusView.swift,
 				Chat/Components/Bubble/OverflowDetectingText.swift,
-				Chat/Components/Bubble/VideoMessagePlayerView.swift,
+				Chat/Components/Bubble/VideoMessageFullScreenView.swift,
 				Chat/Components/Composer/AmityChatMessageComposeBar.swift,
 				Chat/Components/Composer/AmityLiveChatMessageComposeBar.swift,
 				Chat/Components/Composer/AmityMentionUserListView.swift,
@@ -116,6 +116,9 @@
 				Chat/Components/MessageList/MessageCache.swift,
 				Chat/Components/MessageOverlay/ChatMessageActionOverlayView.swift,
 				Chat/Components/MessageOverlay/ChatMessageActionView.swift,
+				Chat/Components/Reaction/ChatReactionListContent.swift,
+				Chat/Components/Reaction/ChatReactionListHeader.swift,
+				Chat/Elements/AmityChatUserProfileImageView.swift,
 				Chat/Elements/ChatElement.swift,
 				Chat/Managers/ChannelManager.swift,
 				Chat/Managers/ChatManager.swift,
@@ -132,6 +135,10 @@
 				Chat/Pages/ChatHome/AmityChatHomeViewModel.swift,
 				Chat/Pages/ChatHome/AmityChatListComponent.swift,
 				Chat/Pages/ChatHome/AmityChatListItemView.swift,
+				Chat/Pages/ContentReport/AmityChatContentReportInputPage.swift,
+				Chat/Pages/ContentReport/AmityChatContentReportPage.swift,
+				Chat/Pages/ContentReport/AmityChatContentReportPageViewModel.swift,
+				Chat/Pages/ContentReport/ChatContentReportSubmissionView.swift,
 				Chat/Pages/CreateConversation/AmityCreateConversationPage.swift,
 				Chat/Pages/CreateGroupChat/AmityCreateGroupChatPage.swift,
 				Chat/Pages/CreateGroupChat/AmitySelectGroupMemberPage.swift,
@@ -191,6 +198,7 @@
 				Core/CustomViews/ActivityIndicatorView.swift,
 				Core/CustomViews/AmityButtonStyle.swift,
 				Core/CustomViews/AmityNavigationBar.swift,
+				Core/CustomViews/AmityPopoverMenu.swift,
 				Core/CustomViews/AmityTextEditorView.swift,
 				Core/CustomViews/AsyncImage.swift,
 				Core/CustomViews/BottomSheetDragIndicator.swift,
@@ -210,6 +218,25 @@
 				Core/CustomViews/TextEditorSuggestionView.swift,
 				Core/CustomViews/Toast.swift,
 				Core/CustomViews/Toast.xib,
+				Core/DesignSystem/Atoms/AmityAvatar.swift,
+				Core/DesignSystem/Atoms/AmityBadge.swift,
+				Core/DesignSystem/Atoms/AmityBanner.swift,
+				Core/DesignSystem/Atoms/AmityButton.swift,
+				Core/DesignSystem/Atoms/AmityChip.swift,
+				Core/DesignSystem/Atoms/AmityDateTime.swift,
+				Core/DesignSystem/Atoms/AmityDivider.swift,
+				Core/DesignSystem/Atoms/AmityEmptyState.swift,
+				Core/DesignSystem/Atoms/AmityInput.swift,
+				Core/DesignSystem/Atoms/AmityList.swift,
+				Core/DesignSystem/Atoms/AmityLoader.swift,
+				Core/DesignSystem/Atoms/AmityPopover.swift,
+				Core/DesignSystem/Atoms/AmityProgress.swift,
+				Core/DesignSystem/Atoms/AmityReaction.swift,
+				Core/DesignSystem/Atoms/AmitySelection.swift,
+				Core/DesignSystem/Atoms/AmitySheet.swift,
+				Core/DesignSystem/Atoms/AmityTab.swift,
+				Core/DesignSystem/Atoms/AmityToast.swift,
+				Core/DesignSystem/Atoms/AmityToggle.swift,
 				Core/Extenral/BottomSheet/BottomSheet.swift,
 				Core/Extenral/BottomSheet/RoundedCorner.swift,
 				Core/Extenral/BottomSheet/ViewExtension.swift,
@@ -455,12 +482,15 @@
 				Core/Protocols/AmityViewIdentifiable.swift,
 				Core/UIElements/UserDisplayNameLabel.swift,
 				Core/Utilities/AccessibilityID.swift,
+				Core/Utilities/AmityDesignSystemIcon.generated.swift,
 				Core/Utilities/AmityFileCache.swift,
 				Core/Utilities/AmityIcon.swift,
 				Core/Utilities/AmityLocalizedStringSet.swift,
 				Core/Utilities/AmityPreviewLinkWizard.swift,
 				Core/Utilities/AmitySwiftUIHostWrapper.swift,
 				Core/Utilities/AmityUserAction.swift,
+				Core/Utilities/ConfigControllers/AmityColorTokenResolver.swift,
+				Core/Utilities/ConfigControllers/AmityColorTokens.generated.swift,
 				Core/Utilities/ConfigControllers/AmityTheme.swift,
 				Core/Utilities/ConfigControllers/AmityUIKitConfigController.swift,
 				Core/Utilities/ConfigControllers/AmityViewConfigController.swift,
@@ -708,6 +738,8 @@
 				Social/Pages/NotificationTray/AmityNotificationTrayPage.swift,
 				Social/Pages/NotificationTray/AmityNotificationTrayPageBehavior.swift,
 				Social/Pages/NotificationTray/AmityNotificationTrayPageViewModel.swift,
+				Social/Pages/NotificationTray/CoHostInviteNotiItem/CoHostInviteAvatarView.swift,
+				Social/Pages/NotificationTray/CoHostInviteNotiItem/CoHostInviteAvatarViewModel.swift,
 				Social/Pages/NotificationTray/NotificationParser.swift,
 				Social/Pages/NotificationTray/NotificationTrayItemView.swift,
 				Social/Pages/PollCreation/AmityPollPostComposerPage.swift,
@@ -927,7 +959,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				91452CF73A83715DDF3DB5CB /* SharedFrameworks */,
+				39D85ED22141DDFD6B8ED8CD /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -979,7 +1011,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				0135259912CCA985AB480156 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				D02F91C1F357807319E4D71E /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1321,16 +1353,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		0135259912CCA985AB480156 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		D02F91C1F357807319E4D71E /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		91452CF73A83715DDF3DB5CB /* SharedFrameworks */ = {
+		39D85ED22141DDFD6B8ED8CD /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 0135259912CCA985AB480156 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = D02F91C1F357807319E4D71E /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -525,8 +525,8 @@ public struct AmityLocalizedStringSet {
         public struct DMAction {
             static let turnOnNotifications = "amity_chat_action_turn_on_notification"
             static let turnOffNotifications = "amity_chat_action_turn_off_notification"
-            static let unreportUser = "amity_chat_action_unreport_user"
-            static let reportUser = "amity_chat_action_report_user"
+            static let unreportUser = "amity_chat_dm_action_unreport_user"
+            static let reportUser = "amity_chat_dm_action_report_user"
             static let unblockUser = "amity_chat_action_unblock_user"
             static let blockUser = "amity_chat_action_block_user"
             static let toastNotificationsOn = "amity_chat_action_unmute"
@@ -543,6 +543,9 @@ public struct AmityLocalizedStringSet {
         // Shared report-user toasts
         static let toastUserReported = "amity_chat_action_report_user_success"
         static let toastUserUnreported = "amity_chat_action_unreport_user_success"
+        // Direct chat report-user toasts ("User" wording; group list keeps "Member" above)
+        static let toastDirectUserReported = "user_reported_toast"
+        static let toastDirectUserUnreported = "user_unreported_toast"
         static let toastReportUserFailed = "amity_chat_action_report_user_failed"
         static let toastUnreportUserFailed = "amity_chat_action_unreport_user_failed"
     }

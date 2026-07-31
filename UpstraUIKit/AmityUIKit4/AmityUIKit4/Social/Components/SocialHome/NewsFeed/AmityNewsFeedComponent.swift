@@ -138,8 +138,8 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                             
                             VStack(spacing: 0){
                                 AmityPostContentComponent(post: post.object, category: post.isPinned ? .global : .general, onTapAction: { tapContext in
-                                    
-                                    if post.dataTypeInternal == .clip {
+
+                                    if post.dataTypeInternal == .clip, tapContext?.isClipPost == true {
                                         
                                         if let media = post.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
                                             let clipPost = ClipPost(id: post.postId, url: mediaURL, model: post)

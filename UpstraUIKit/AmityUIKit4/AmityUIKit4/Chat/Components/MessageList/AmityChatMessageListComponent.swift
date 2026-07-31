@@ -11,20 +11,12 @@ import UIKit
 
 private struct ChatDateSeparatorView: View {
     let label: String
-    let theme: AmityThemeColor
+    let viewConfig: AmityViewConfigController
 
     var body: some View {
         HStack {
             Spacer()
-            Text(label)
-                .applyTextStyle(.caption(Color(theme.baseColorShade1)))
-                .padding(.horizontal, 12)
-                .padding(.vertical, 4)
-                .background(
-                    Capsule()
-                        .fill(Color(theme.backgroundColor))
-                        .shadow(color: Color.black.opacity(0.08), radius: 2, x: 0, y: 1)
-                )
+            AmityDateTime(variant: .dateSeparator, text: label, viewConfig: viewConfig)
             Spacer()
         }
         .padding(.vertical, 8)
@@ -99,11 +91,11 @@ public struct AmityChatMessageListComponent: AmityComponentView {
 
             // Banned empty state
             AmityEmptyStateView(configuration: .init(
-                image: AmityIcon.Chat.bannedFromChatIcon.rawValue,
+                image: AmityIcon.DesignSystem.commentExclamationL.rawValue,
                 title: AmityLocalizedStringSet.Chat.errorBannedTitleChat.localizedString,
                 subtitle: AmityLocalizedStringSet.Chat.errorBannedSubTitleInChat.localizedString,
                 iconSize: CGSize(width: 60, height: 60),
-                iconTintColor: viewConfig.theme.baseColorShade4,
+                iconTintColor: viewConfig.color(.iconEmptyStateIconDefault),
                 tapAction: nil
             ))
             .opacity(vm.initialQueryState == .banned ? 1 : 0)
@@ -111,7 +103,11 @@ public struct AmityChatMessageListComponent: AmityComponentView {
         .onChange(of: vm.pendingReportMessageId) { msgId in
             guard let msgId = msgId else { return }
             vm.pendingReportMessageId = nil
-            let page = AmityContentReportPage(type: .message(id: msgId))
+            // Route the success toast through the chat's toast (above the compose
+            // bar divider), matching unreport — instead of the global window toast.
+            let page = AmityChatContentReportPage(type: .message(id: msgId), onSuccess: { message in
+                chatVM.showToastMessage(message: message, style: .success)
+            })
                 .environmentObject(viewConfig)
             let vc = AmitySwiftUIHostingNavigationController(rootView: page)
             vc.isNavigationBarHidden = true
@@ -132,7 +128,7 @@ public struct AmityChatMessageListComponent: AmityComponentView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .onChange(of: vm.showFailedActionSheet) { showing in
             guard showing else { return }
             presentFailedMessageActionSheet()
@@ -280,7 +276,7 @@ public struct AmityChatMessageListComponent: AmityComponentView {
            prev == nil || prev?.createdAt.flatMap({ createdAt.isSameDay(as: $0) }) != true {
             ChatDateSeparatorView(
                 label: createdAt.chatSeparatorLabel(),
-                theme: viewConfig.theme
+                viewConfig: viewConfig
             )
             .id("date_\(message.id)")
         }
@@ -316,15 +312,15 @@ public struct AmityChatMessageListComponent: AmityComponentView {
     private var muteBanner: some View {
         VStack(spacing: 0) {
             Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewConfig.color(.lineDividerPostDefault)))
                 .frame(height: 1)
             Text(vm.muteState.localizedString)
-                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                .applyTextStyle(.caption(Color(viewConfig.color(.textBannerSubdueSubheadGeneral))))
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .padding(.horizontal, 16)
-                .background(Color(viewConfig.theme.backgroundShade1Color))
+                .background(Color(viewConfig.color(.surfaceBannerSubdueGeneral)))
         }
         .opacity(vm.initialQueryState != .success ? 0 : 1)
         .isHidden(vm.muteState == .none || vm.hasModeratorPermission)
@@ -339,15 +335,17 @@ public struct AmityChatMessageListComponent: AmityComponentView {
         } label: {
             ZStack {
                 Circle()
-                    .fill(Color(viewConfig.theme.backgroundColor))
-                    .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+                    .fill(Color(viewConfig.color(.surfaceIconButtonFilledSecondaryEnabled)))
                     .frame(width: 40, height: 40)
-                Image(AmityIcon.Chat.downArrowIcon.imageResource)
+                    // Elevations/Chat/Elevation-02 — no semantic elevation token exists yet.
+                    .shadow(color: Color(red: 46/255, green: 46/255, blue: 46/255).opacity(0.1), radius: 1, x: 0, y: 1)
+                    .shadow(color: Color(red: 46/255, green: 46/255, blue: 46/255).opacity(0.1), radius: 1.5, x: 0, y: 1)
+                Image(AmityIcon.DesignSystem.chevronDown.imageResource)
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 14, height: 14)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(Color(viewConfig.color(.iconIconButtonFilledSecondaryDefault)))
             }
         }
         .buttonStyle(.plain)
@@ -359,7 +357,7 @@ public struct AmityChatMessageListComponent: AmityComponentView {
             newMessageBannerMessage = nil
         } label: {
             HStack(spacing: 10) {
-                AmityUserProfileImageView(displayName: banner.displayName, avatarURL: banner.avatarURL)
+                AmityChatUserProfileImageView(displayName: banner.displayName, avatarURL: banner.avatarURL)
                     .frame(width: 28, height: 28)
 
                 Text(banner.isDeleted
@@ -367,17 +365,17 @@ public struct AmityChatMessageListComponent: AmityComponentView {
                      : (banner.type == .image ? AmityLocalizedStringSet.Chat.Preview.bannerPhoto.localizedString
                         : (banner.type == .video ? AmityLocalizedStringSet.Chat.Preview.bannerVideo.localizedString
                            : banner.text)))
-                    .applyTextStyle(.custom(14, .regular, Color(viewConfig.theme.baseColor)))
+                    .applyTextStyle(.custom(14, .regular, Color(viewConfig.color(.textListTextDescriptionDefaultDefault))))
                     .lineLimit(1)
 
                 Spacer()
 
-                Image(AmityIcon.Chat.downArrowIcon.imageResource)
+                Image(AmityIcon.DesignSystem.chevronDown.imageResource)
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 12, height: 12)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+                    .foregroundColor(Color(viewConfig.color(.iconListDescriptionGeneral)))
                     .padding(.trailing, 10)
             }
             .padding(.leading, 8)
@@ -385,7 +383,7 @@ public struct AmityChatMessageListComponent: AmityComponentView {
             .frame(height: 44)
             .background(
                 RoundedRectangle(cornerRadius: 22)
-                    .fill(Color(viewConfig.theme.backgroundColor))
+                    .fill(Color(viewConfig.color(.surfaceListDefaultDefault)))
                     .shadow(color: Color.black.opacity(0.12), radius: 4, x: 0, y: 2)
             )
         }
@@ -395,8 +393,8 @@ public struct AmityChatMessageListComponent: AmityComponentView {
     // MARK: - Message actions
 
     private func setupMessageActions() {
-        let pushFullText: (String, String) -> Void = { text, title in
-            let page = AmityChatFullTextPage(fullText: text, displayName: title)
+        let pushFullText: (MessageModel, String) -> Void = { message, title in
+            let page = AmityChatFullTextPage(message: message, displayName: title)
                 .environmentObject(viewConfig)
                 .environmentObject(host)
             let vc: UIViewController = AmitySwiftUIHostingController(rootView: page)
@@ -458,7 +456,7 @@ public struct AmityChatMessageListComponent: AmityComponentView {
                 }
             },
             onSaveVideo: { msg in
-                guard let url = msg.videoPlaybackURL else { return }
+                guard let url = msg.videoDownloadURL else { return }
                 MessageMediaSaver.saveVideo(from: url) { success in
                     let key = success
                         ? AmityLocalizedStringSet.Chat.SaveMedia.videoSuccess

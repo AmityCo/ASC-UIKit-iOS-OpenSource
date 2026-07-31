@@ -157,7 +157,7 @@ public enum ComponentId: String {
     case myEventFeedComponent = "my_event_feed_component"
     case exploreEventFeedComponent = "explore_event_feed_component"
     
-    case productTagListBottomsheet = "product_tag_list"
+    case productTagListBottomsheet = "product_tag_list_bottomsheet"
     case productTagSelectionBottomsheet = "product_tag_selection_bottomsheet"
     
     case manageProductTagList = "manage_product_tag_list"

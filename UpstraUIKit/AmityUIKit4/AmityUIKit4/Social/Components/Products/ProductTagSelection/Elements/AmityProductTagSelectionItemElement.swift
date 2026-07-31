@@ -69,6 +69,8 @@ struct AmityProductTagSelectionItemElement: AmityElementView {
 
                 if isLivestream {
                     Image(isAlreadyTagged ? AmityIcon.checkboxIcon.getImageResource() :  AmityIcon.pollCheckboxIcon.getImageResource())
+                        .renderingMode(isAlreadyTagged ? .template : .original)
+                        .foregroundColor(isAlreadyTagged ? Color(viewConfig.theme.primaryColor.blend(.shade2)) : nil)
                         .opacity(!isDisabled ? 1 : 0.3)
                         .frame(width: 22, height: 22)
                         .isHidden(!isSelected)

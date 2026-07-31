@@ -106,7 +106,7 @@ public struct AmityGroupSettingPage: AmityPageView {
                 settingsList
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
         .showToast(isPresented: $showToast, style: .success, message: toastMessage, bottomPadding: 80)
         .onAppear { viewModel.loadChannelInfo() }
@@ -121,7 +121,16 @@ public struct AmityGroupSettingPage: AmityPageView {
                             do {
                                 try await viewModel.leaveChannel()
                                 let navVC = host.controller?.navigationController
-                                if navVC?.popToViewController(AmityChatHomePage.self, animated: true) == nil {
+                                // The setting page is always pushed on top of the group chat room
+                                // (AmityGroupChatPage). On leaving, skip past the room to land on
+                                // whatever presented it (the chat list) — independent of the host
+                                // page type, so wrapped hosts (e.g. SampleApp's HostedChatHomePage)
+                                // don't fall through to a single pop back to the chat room.
+                                if let stack = navVC?.viewControllers,
+                                   let roomIndex = stack.lastIndex(where: { $0 is AmitySwiftUIHostingController<AmityGroupChatPage> }),
+                                   roomIndex > 0 {
+                                    navVC?.popToViewController(stack[roomIndex - 1], animated: true)
+                                } else {
                                     navVC?.popViewController(animated: true)
                                 }
                                 Toast.showToast(style: .success, message: AmityLocalizedStringSet.Chat.GroupSetting.toastLeft.localizedString)
@@ -154,7 +163,7 @@ public struct AmityGroupSettingPage: AmityPageView {
     private var navBar: some View {
         ZStack {
             Text(viewModel.displayName)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))
                 .lineLimit(1)
                 .padding(.horizontal, 56)
                 .frame(maxWidth: .infinity)
@@ -163,12 +172,12 @@ public struct AmityGroupSettingPage: AmityPageView {
                 Button {
                     host.controller?.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image(AmityIcon.Chat.backButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .frame(width: 17, height: 17)
+                        .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
+                        .frame(width: 24, height: 24)
                         .frame(width: 32, height: 32)
                 }
                 .buttonStyle(.plain)
@@ -178,7 +187,7 @@ public struct AmityGroupSettingPage: AmityPageView {
         }
         .padding(.horizontal, 16)
         .frame(height: 44)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
     }
 
     // MARK: - Settings list
@@ -189,13 +198,13 @@ public struct AmityGroupSettingPage: AmityPageView {
                 AsyncImage(placeholderView: {
                     ZStack {
                         RoundedRectangle(cornerRadius: 24)
-                            .fill(Color(viewConfig.theme.primaryColor.blend(.shade2)))
-                        Image(AmityIcon.Chat.groupAvatarPlaceholderIcon.imageResource)
+                            .fill(Color(viewConfig.color(.surfaceAvatarProfileDefault)))
+                        Image(AmityIcon.DesignSystem.commentsAltS.imageResource)
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .foregroundColor(.white)
-                            .frame(width: 53, height: 48)
+                            .foregroundColor(Color(viewConfig.color(.iconAvatarDefault)))
+                            .frame(width: 48, height: 48)
                     }
                 }, url: viewModel.avatarURL)
                 .clipShape(RoundedRectangle(cornerRadius: 24))
@@ -205,49 +214,44 @@ public struct AmityGroupSettingPage: AmityPageView {
 
                 if viewModel.isModerator {
                     sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionGroup.localizedString)
-                    settingTile(icon: AmityIcon.Chat.editGroupProfileIcon.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileProfile.localizedString) {
+                    settingTile(icon: AmityIcon.DesignSystem.penS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileProfile.localizedString) {
                         guard let channel = viewModel.channel else { return }
-                        let onSaved: () -> Void = {
-                            host.controller?.navigationController?.popViewController(animated: true)
-                        }
-                        let page = AmityEditGroupProfilePage(channelId: channel.channelId, displayName: viewModel.displayName, avatarURL: viewModel.avatarURL, onSaved: onSaved)
+                        let page = AmityEditGroupProfilePage(channelId: channel.channelId, displayName: viewModel.displayName, avatarURL: viewModel.avatarURL)
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         host.controller?.navigationController?.pushViewController(vc, animated: true)
                     }
-                    settingTile(icon: AmityIcon.Chat.editGroupNotificationIcon.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileNotifications.localizedString, trailing: notificationModeLabel()) {
+                    settingTile(icon: AmityIcon.DesignSystem.bellS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileNotifications.localizedString, trailing: notificationModeLabel()) {
                         guard let channel = viewModel.channel else { return }
                         let page = AmityEditGroupNotificationPage(channelId: channel.channelId, currentMode: channel.notificationMode.rawValue)
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         host.controller?.navigationController?.pushViewController(vc, animated: true)
                     }
-                    settingTile(icon: AmityIcon.Chat.editMemberPermissionIcon.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tilePermissions.localizedString) {
+                    settingTile(icon: AmityIcon.DesignSystem.userLockS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tilePermissions.localizedString) {
                         guard let channel = viewModel.channel else { return }
                         let page = AmityEditGroupMemberPermissionsPage(channelId: channel.channelId, isMuted: channel.isMuted)
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         host.controller?.navigationController?.pushViewController(vc, animated: true)
                     }
-                    settingTile(icon: AmityIcon.Chat.groupMemberListButtonIcon.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileAllMembers.localizedString) {
+                    settingTile(icon: AmityIcon.DesignSystem.userGroupS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileAllMembers.localizedString) {
                         guard let channel = viewModel.channel else { return }
                         let page = AmityGroupMemberListPage(channelId: channel.channelId, isModerator: viewModel.isModerator)
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         host.controller?.navigationController?.pushViewController(vc, animated: true)
                     }
-                    settingTile(icon: AmityIcon.Chat.banMemberButtonIcon.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileBanned.localizedString) {
+                    settingTile(icon: AmityIcon.DesignSystem.banS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileBanned.localizedString) {
                         guard let channel = viewModel.channel else { return }
                         let page = AmityBannedGroupMemberListPage(channelId: channel.channelId, isModerator: viewModel.isModerator)
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         host.controller?.navigationController?.pushViewController(vc, animated: true)
                     }
 
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.baseColorShade4))
-                        .frame(height: 1)
+                    AmityDivider(variant: .post, viewConfig: viewConfig)
 
                     Spacer().frame(height: 24)
 
                     sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionPreferences.localizedString)
                     settingTile(
-                        icon: AmityIcon.Chat.editGroupNotificationIcon.imageResource,
+                        icon: AmityIcon.DesignSystem.bellS.imageResource,
                         title: AmityLocalizedStringSet.Chat.GroupSetting.tileMyNotifications.localizedString,
                         trailing: viewModel.isNotificationsEnabled ? AmityLocalizedStringSet.Chat.GroupSetting.toggleOn.localizedString : AmityLocalizedStringSet.Chat.GroupSetting.toggleOff.localizedString
                     ) {
@@ -269,27 +273,25 @@ public struct AmityGroupSettingPage: AmityPageView {
                         }
                     } label: {
                         Text(AmityLocalizedStringSet.Chat.GroupSetting.leaveButton.localizedString)
-                            .applyTextStyle(.custom(16, .semibold, Color(viewConfig.theme.alertColor)))
+                            .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDestructiveDefault))))
                     }
                     .buttonStyle(.plain)
                 } else {
                     sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionGroup.localizedString)
-                    settingTile(icon: AmityIcon.Chat.groupMemberListButtonIcon.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileAllMembers.localizedString) {
+                    settingTile(icon: AmityIcon.DesignSystem.userGroupS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileAllMembers.localizedString) {
                         guard let channel = viewModel.channel else { return }
                         let page = AmityGroupMemberListPage(channelId: channel.channelId, isModerator: viewModel.isModerator)
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         host.controller?.navigationController?.pushViewController(vc, animated: true)
                     }
 
-                    Rectangle()
-                        .fill(Color(viewConfig.theme.baseColorShade4))
-                        .frame(height: 1)
+                    AmityDivider(variant: .post, viewConfig: viewConfig)
 
                     Spacer().frame(height: 24)
 
                     sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionPreferences.localizedString)
                     settingTile(
-                        icon: AmityIcon.Chat.editGroupNotificationIcon.imageResource,
+                        icon: AmityIcon.DesignSystem.bellS.imageResource,
                         title: AmityLocalizedStringSet.Chat.GroupSetting.tileMyNotifications.localizedString,
                         trailing: viewModel.isNotificationsEnabled ? AmityLocalizedStringSet.Chat.GroupSetting.toggleOn.localizedString : AmityLocalizedStringSet.Chat.GroupSetting.toggleOff.localizedString
                     ) {
@@ -305,20 +307,20 @@ public struct AmityGroupSettingPage: AmityPageView {
                         activeAlert = .leaveConfirm
                     } label: {
                         Text(AmityLocalizedStringSet.Chat.GroupSetting.leaveButton.localizedString)
-                            .applyTextStyle(.custom(16, .semibold, Color(viewConfig.theme.alertColor)))
+                            .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDestructiveDefault))))
                     }
                     .buttonStyle(.plain)
                 }
             }
             .padding(16)
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
     }
 
     private func sectionHeader(_ title: String) -> some View {
         HStack {
             Text(title)
-                .applyTextStyle(.custom(17, .bold, Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
             Spacer()
         }
         .padding(.bottom, 4)
@@ -326,38 +328,38 @@ public struct AmityGroupSettingPage: AmityPageView {
 
     private func settingTile(icon: ImageResource, title: String, trailing: String = "", action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack(spacing: 12) {
+            HStack(spacing: 8) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 4)
-                        .fill(Color(viewConfig.theme.baseColorShade4))
-                        .frame(width: 24, height: 24)
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color(viewConfig.color(.surfaceFeaturedIconTinted)))
+                        .frame(width: 32, height: 32)
                     Image(icon)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .frame(width: 24, height: 24)
+                        .foregroundColor(Color(viewConfig.color(.iconFeaturedIconTinted)))
                 }
 
                 Text(title)
-                    .applyTextStyle(.custom(16, .regular, Color(viewConfig.theme.baseColor)))
+                    .applyTextStyle(.body(Color(viewConfig.color(.textListHeaderDefaultDefault))))
 
                 Spacer()
 
                 if !trailing.isEmpty {
                     Text(trailing)
-                        .applyTextStyle(.custom(14, .regular, Color(viewConfig.theme.baseColorShade1)))
+                        .applyTextStyle(.body(Color(viewConfig.color(.textListTrailingTextGeneral))))
                 }
 
-                Image(AmityIcon.Chat.rightArrowIcon.imageResource)
+                Image(AmityIcon.DesignSystem.chevronRight.imageResource)
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
-                    .frame(width: 16, height: 16)
+                    .foregroundColor(Color(viewConfig.color(.iconListLeadingDefaultDefault)))
+                    .frame(width: 24, height: 24)
             }
             .padding(.vertical, 16)
-            .background(Color(viewConfig.theme.backgroundColor))
+            .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
         }
         .buttonStyle(.plain)
     }

@@ -252,11 +252,13 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
                 self.mutedMembers = mutedMembers
             }
             
-            if !isStreamer {
+            // update ComposeBar State only for cohost, viewer
+            if participantRole != .host {
                 self.isChannelEnabled = !channel.isMuted
                 self.isUserMutedByModerator = isMuted(userId: AmityUIKitManagerInternal.shared.currentUserId)
                 self.updateComposeBarState()
             }
+         
         }
     }
     
@@ -331,10 +333,10 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
             metadata["moderators"] = [userId]
         }
         
-        if let mutedMembers = channel.metadata?["mutedMembers"] as? [String] {
-            metadata["mutedMembers"] = mutedMembers
-        }
-        
+        var mutedMembers = channel.metadata?["mutedMembers"] as? [String] ?? []
+        mutedMembers.removeAll { $0 == userId }
+        metadata["mutedMembers"] = mutedMembers
+
         builder.setMetadata(metadata)
         try await channelManager.addRole(channelId: channel.channelId, userId: userId, role: AmityChannelRole.channelModerator.rawValue)
         self.channel = try await channelManager.updateChannel(builder: builder)

@@ -20,14 +20,19 @@ class AmityEventFeedViewModel: ObservableObject {
     private var token: AmityNotificationToken?
     private var isFirstPageLoad = true
     
+    // PDT-4178 — the SDK query has no `excludeOwnEvents` option yet, so drop the logged in
+    // user's own events from the snapshots. Off by default; only Explore opts in.
+    private var excludeOwnEvents = false
+    
     @Published var hasCreatePermission = true
     
     // Fetch upcoming events. If initial limit > 0, then only first n events will be loaded in array. If initial limit is <= 0, we treat it as infinite scroll
-    func loadEvents(eventStatus: AmityEventStatus, originId: String?, originType: AmityEventOriginType = .community, onlyMyEvents: Bool = false, userId: String? = nil, initialLimit: Int = 0, orderBy: AmityEventOrderOption = .ascending) {
+    func loadEvents(eventStatus: AmityEventStatus, originId: String?, originType: AmityEventOriginType = .community, onlyMyEvents: Bool = false, userId: String? = nil, initialLimit: Int = 0, orderBy: AmityEventOrderOption = .ascending, excludeOwnEvents: Bool = false) {
         let queryOptions = AmityEventQueryOptions(originType: originType, originId: originId, status: eventStatus, userId: onlyMyEvents ? AmityUIKit4Manager.client.currentUserId : userId, onlyAttendee: onlyMyEvents ? true : false, orderBy: orderBy)
         
         guard queryState != .loading else { return }
         
+        self.excludeOwnEvents = excludeOwnEvents
         queryState = .loading
         
         collection = manager.getEvents(options: queryOptions)
@@ -48,14 +53,23 @@ class AmityEventFeedViewModel: ObservableObject {
                 return
             }
                         
+            let visibleEvents = self.excludingOwnEvents(liveCollection.snapshots)
+
             if isFirstPageLoad && initialLimit > 0 {
-                self.events = Array(liveCollection.snapshots.prefix(initialLimit))
+                self.events = Array(visibleEvents.prefix(initialLimit))
             } else {
-                self.events = liveCollection.snapshots
+                self.events = visibleEvents
             }
             
             self.queryState = .loaded
         }
+    }
+
+    /// Removes events created by the logged in user. No-op unless the caller passed
+    /// `excludeOwnEvents: true`, so every other event feed is unaffected.
+    private func excludingOwnEvents(_ events: [AmityEvent]) -> [AmityEvent] {
+        guard excludeOwnEvents, let currentUserId = AmityUIKit4Manager.client.currentUserId else { return events }
+        return events.filter { $0.userId != currentUserId }
     }
     
     func loadMoreEvents() {
@@ -69,8 +83,11 @@ class AmityEventFeedViewModel: ObservableObject {
     
     func canViewMoreEvents() -> Bool {
         guard let collection, !events.isEmpty else { return false }
-        
-        return events.count < collection.snapshots.count
+
+        // Compare like with like: both sides exclude own events when the caller opted in,
+        // so "View all" reflects whether more of *this* feed's events remain rather than
+        // being kept alive by own events that were filtered out of `events`.
+        return events.count < excludingOwnEvents(collection.snapshots).count
     }
     
     func checkEventPermission() {

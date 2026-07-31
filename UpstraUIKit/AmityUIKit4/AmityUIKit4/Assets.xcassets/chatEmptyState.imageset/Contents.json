@@ -3,6 +3,16 @@
     {
       "filename" : "chatEmptyState.svg",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "chatEmptyState-Dark.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "noti_live_badge.svg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

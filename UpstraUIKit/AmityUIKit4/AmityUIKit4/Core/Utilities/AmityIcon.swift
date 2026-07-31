@@ -343,6 +343,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case tagIcon = "tagIcon"
     case livestreamPostPlayerActionButton = "livestream_post_player_action_button"
     case postPlayerActionButton = "post_player_action_button"
+    case notiLiveBadge = "noti_live_badge"
     
     // Livestream icons
     enum LiveStream: String, ImageResourceProvider {

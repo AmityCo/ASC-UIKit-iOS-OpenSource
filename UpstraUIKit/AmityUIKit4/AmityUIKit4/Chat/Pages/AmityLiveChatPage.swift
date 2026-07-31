@@ -54,7 +54,7 @@ public struct AmityLiveChatPage: AmityPageView {
                     .opacity(messageViewModel.initialQueryState == .loading ? 1 : 0)
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .environmentObject(hostWrapper)
         .environmentObject(viewConfig)
     }

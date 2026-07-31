@@ -128,8 +128,8 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
     }
     
     func handlePostTap(model: AmityPostModel, context: AmityPostContentComponent.Context?) {
-        
-        if model.dataTypeInternal == .clip {
+
+        if model.dataTypeInternal == .clip, context?.isClipPost == true {
             // Extract media first
             if let media = model.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
                 

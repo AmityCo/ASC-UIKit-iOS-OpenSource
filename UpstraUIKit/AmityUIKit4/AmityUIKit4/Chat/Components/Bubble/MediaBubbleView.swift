@@ -5,35 +5,65 @@
 
 import SwiftUI
 import AmitySDK
+import ImageIO
+
+// MARK: - Video play disc
+
+/// The circular video "play" affordance shown over a video thumbnail: a
+/// `Surface/IconButton/Transparent/Primary/Enabled` disc holding the white
+/// `video-play-s` glyph. Sizes: 40/24 in a message bubble, 24/16 in the
+/// composer reply banner.
+struct ChatVideoPlayDisc: View {
+    let viewConfig: AmityViewConfigController
+    var diameter: CGFloat = 40
+    var glyphSize: CGFloat = 24
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color(viewConfig.color(.surfaceIconButtonTransparentPrimaryEnabled)))
+            Image(AmityIcon.DesignSystem.videoPlayS.imageResource)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: glyphSize, height: glyphSize)
+                .foregroundColor(Color(viewConfig.color(.iconIconButtonTransparentPrimaryDefault)))
+        }
+        .frame(width: diameter, height: diameter)
+    }
+}
 
 // MARK: - Upload spinner
 
 private struct MediaUploadingSpinner: View {
     /// 0...1 upload fraction. `nil` ⇒ indeterminate (spinning quarter-arc).
     var progress: Double? = nil
+    let viewConfig: AmityViewConfigController
 
     @State private var isAnimating = false
 
     var body: some View {
+        let trackColor = Color(viewConfig.color(.surfaceLoadersUploadControllerBackground))
+        let loaderColor = Color(viewConfig.color(.surfaceLoadersUploadControllerLoader))
         ZStack {
             Circle()
-                .stroke(Color.white.opacity(0.8), lineWidth: 2)
-                .frame(width: 38, height: 38)
+                .stroke(trackColor.opacity(0.8), lineWidth: 2)
+                .frame(width: 40, height: 40)
 
             if let progress {
                 // Determinate: arc fills from the top as the upload progresses.
                 Circle()
                     .trim(from: 0.0, to: CGFloat(max(0.02, min(progress, 1.0))))
-                    .stroke(Color.white, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                    .frame(width: 38, height: 38)
+                    .stroke(loaderColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                    .frame(width: 40, height: 40)
                     .rotationEffect(.degrees(-90))
                     .animation(.linear(duration: 0.2), value: progress)
             } else {
                 // Indeterminate: spinning quarter-arc.
                 Circle()
                     .trim(from: 0.0, to: 0.25)
-                    .stroke(Color.white, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-                    .frame(width: 38, height: 38)
+                    .stroke(loaderColor, style: StrokeStyle(lineWidth: 2, lineCap: .round))
+                    .frame(width: 40, height: 40)
                     .rotationEffect(.degrees(isAnimating ? 360 : 0))
             }
         }
@@ -54,26 +84,24 @@ private struct MediaUploadOverlay: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
 
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(viewConfig.theme.baseColor).opacity(0.4))
-
+        // Uploading media stays bright — no dim overlay. A 40pt ring with a 16pt
+        // cross-r cancel glyph inside; the whole ring is the cancel tap target.
+        Button(action: { onCancel?() }) {
             ZStack {
-                MediaUploadingSpinner(progress: progress)
+                MediaUploadingSpinner(progress: progress, viewConfig: viewConfig)
 
-                if let onCancel = onCancel {
-                    Button(action: onCancel) {
-                        Image(AmityIcon.Chat.closeButtonIcon.imageResource)
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(.white)
-                    }
-                    .buttonStyle(.plain)
-                }
+                Image(AmityIcon.DesignSystem.crossR.imageResource)
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 16, height: 16)
+                    .foregroundColor(Color(viewConfig.color(.iconLoadersUploadControllerDefault)))
             }
+            .frame(width: 40, height: 40)
+            .contentShape(Circle())
         }
+        .buttonStyle(.plain)
+        .disabled(onCancel == nil)
     }
 }
 
@@ -116,9 +144,43 @@ private enum MediaBubbleSizeCache {
     }
 }
 
+/// Pixel dimensions read straight out of the image container's metadata.
+///
+/// `CGImageSourceCopyPropertiesAtIndex` on a URL-backed source parses the header
+/// only, so this costs a few KB no matter how large the file is. Decoding the
+/// image just to read `UIImage.size` would materialise a full-resolution bitmap
+/// (`width * height * 4` bytes), which for a large pick can exhaust the app's
+/// memory budget on its own.
+private func imagePixelSize(atFileURL url: URL) -> CGSize? {
+    guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+          let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+          let width = properties[kCGImagePropertyPixelWidth] as? Double,
+          let height = properties[kCGImagePropertyPixelHeight] as? Double,
+          width > 0, height > 0
+    else { return nil }
+
+    // EXIF orientations 5–8 rotate by 90°, so the displayed axes are swapped.
+    if let orientation = properties[kCGImagePropertyOrientation] as? UInt32, orientation >= 5 {
+        return CGSize(width: height, height: width)
+    }
+    return CGSize(width: width, height: height)
+}
+
 private func resolveMediaBubbleSize(url: URL, onResolved: @escaping (CGSize) -> Void) {
     if let cached = MediaBubbleSizeCache.bubbleSize(for: url) {
         onResolved(cached)
+        return
+    }
+
+    // Local file — a message that is still uploading. Read the dimensions from the
+    // header instead of decoding, so bubble layout never depends on the full image.
+    if url.isFileURL {
+        DispatchQueue.global(qos: .userInitiated).async {
+            guard let pixelSize = imagePixelSize(atFileURL: url) else { return }
+            let size = flutterMediaBubbleSize(for: pixelSize)
+            MediaBubbleSizeCache.set(size, for: url)
+            DispatchQueue.main.async { onResolved(size) }
+        }
         return
     }
 
@@ -137,6 +199,88 @@ private func resolveMediaBubbleSize(url: URL, onResolved: @escaping (CGSize) -> 
             let size = flutterMediaBubbleSize(for: value.image.size)
             MediaBubbleSizeCache.set(size, for: url)
             DispatchQueue.main.async { onResolved(size) }
+        }
+    }
+}
+
+// MARK: - Local image thumbnail
+
+/// Bubble-sized thumbnails decoded straight from a local file URL.
+///
+/// Used for messages that are still uploading. Passing a large local file to
+/// Kingfisher instead is not viable: its processors operate on `Data`, so the whole
+/// file is read into memory before any downsampling happens, and without a processor
+/// it decodes at full native resolution. `CGImageSourceCreateThumbnailAtIndex` on a
+/// URL-backed source reads only the bytes it needs to produce the requested size.
+private enum LocalImageThumbnailLoader {
+
+    /// Matches `flutterMediaBubbleSize`'s largest edge.
+    static let maxBubbleDimension: CGFloat = 240
+
+    static var thumbnailPixelSize: CGFloat {
+        maxBubbleDimension * UIScreen.main.scale
+    }
+
+    private static let cache: NSCache<NSString, UIImage> = {
+        let cache = NSCache<NSString, UIImage>()
+        cache.countLimit = 40
+        return cache
+    }()
+
+    static func load(url: URL, maxPixelSize: CGFloat, completion: @escaping (UIImage?) -> Void) {
+        let key = "\(url.absoluteString)|\(Int(maxPixelSize))" as NSString
+
+        if let cached = cache.object(forKey: key) {
+            completion(cached)
+            return
+        }
+
+        DispatchQueue.global(qos: .userInitiated).async {
+            var thumbnail: UIImage?
+
+            if let source = CGImageSourceCreateWithURL(url as CFURL, nil) {
+                let options: [CFString: Any] = [
+                    kCGImageSourceCreateThumbnailFromImageAlways: true,
+                    kCGImageSourceCreateThumbnailWithTransform: true,
+                    kCGImageSourceShouldCacheImmediately: true,
+                    kCGImageSourceThumbnailMaxPixelSize: maxPixelSize
+                ]
+                if let cgImage = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) {
+                    thumbnail = UIImage(cgImage: cgImage)
+                }
+            }
+
+            if let thumbnail {
+                cache.setObject(thumbnail, forKey: key)
+            }
+            DispatchQueue.main.async { completion(thumbnail) }
+        }
+    }
+}
+
+private struct LocalImageThumbnailView: View {
+
+    let url: URL
+    let maxPixelSize: CGFloat
+    let placeholder: AnyView
+
+    @State private var thumbnail: UIImage?
+
+    var body: some View {
+        Group {
+            if let thumbnail {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                placeholder
+            }
+        }
+        .onAppear {
+            guard thumbnail == nil else { return }
+            LocalImageThumbnailLoader.load(url: url, maxPixelSize: maxPixelSize) { image in
+                thumbnail = image
+            }
         }
     }
 }
@@ -170,8 +314,7 @@ struct ImageBubbleView: View {
         VStack(alignment: .trailing, spacing: 4) {
             ZStack {
                 if let url {
-                    AsyncImage(placeholderView: { placeholder }, url: url)
-                        .scaledToFill()
+                    imageContent(url: url)
                         .frame(width: bubbleSize.width, height: bubbleSize.height)
                         .clipped()
                         .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -193,6 +336,23 @@ struct ImageBubbleView: View {
                 Text(AmityLocalizedStringSet.Chat.mediaFailedToSend.localizedString)
                     .applyTextStyle(.captionSmall(Color(UIColor(red: 0xFA/255.0, green: 0x4D/255.0, blue: 0x30/255.0, alpha: 1))))
             }
+        }
+    }
+
+    /// Local files are still uploading, so they come off disk as a bubble-sized
+    /// thumbnail. Remote URLs are already server-resized and keep the shared
+    /// `AsyncImage`/Kingfisher path (and its cache).
+    @ViewBuilder
+    private func imageContent(url: URL) -> some View {
+        if url.isFileURL {
+            LocalImageThumbnailView(
+                url: url,
+                maxPixelSize: LocalImageThumbnailLoader.thumbnailPixelSize,
+                placeholder: AnyView(placeholder)
+            )
+        } else {
+            AsyncImage(placeholderView: { placeholder }, url: url)
+                .scaledToFill()
         }
     }
 
@@ -265,16 +425,14 @@ struct VideoBubbleView: View {
 
                 if syncState == .synced {
                     Button(action: onPlay) {
-                        Image(AmityIcon.Chat.videoPlayButtonIcon.imageResource)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40)
+                        ChatVideoPlayDisc(viewConfig: viewConfig)
                     }
                     .buttonStyle(.plain)
                     .frame(width: 40, height: 40)
                 }
             }
             .frame(width: bubbleSize.width, height: bubbleSize.height)
+            .contentShape(Rectangle())
 
             if syncState == .error && !isCancelled {
                 Text(AmityLocalizedStringSet.Chat.mediaFailedToSend.localizedString)

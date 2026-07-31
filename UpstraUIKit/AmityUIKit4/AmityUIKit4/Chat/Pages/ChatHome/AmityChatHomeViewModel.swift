@@ -158,6 +158,7 @@ final class AmityChatHomeViewModel: ObservableObject {
     }
 
     func archiveChannel(_ channelId: String) async -> ArchiveResult {
+        guard NetworkMonitor.shared.isConnected else { return .error }
         do {
             try await channelManager.archiveChannel(channelId: channelId)
             return .success

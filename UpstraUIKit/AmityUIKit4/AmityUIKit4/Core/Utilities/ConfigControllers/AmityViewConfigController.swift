@@ -24,11 +24,58 @@ class AmityViewConfigController: NSObject, ObservableObject {
         
         self.theme = AmityUIKitConfigController.shared.getTheme(configId: configId)
         
-        self.defaultLightTheme = AmityThemeColor(primaryColor: lightTheme.primaryColor!, secondaryColor: lightTheme.secondaryColor!, secondaryColorShade1: lightTheme.secondaryColorShade1!, baseColor: lightTheme.baseColor!, baseColorShade1: lightTheme.baseColorShade1!, baseColorShade2: lightTheme.baseColorShade2!, baseColorShade3: lightTheme.baseColorShade3!, baseColorShade4: lightTheme.baseColorShade4!, alertColor: lightTheme.alertColor!, backgroundColor: lightTheme.backgroundColor!, baseInverseColor: lightTheme.baseInverseColor!, backgroundShade1Color: lightTheme.backgroundShade1Color!, highlightColor: lightTheme.highlightColor!)
-        
-        self.defaultDarkTheme = AmityThemeColor(primaryColor: darkTheme.primaryColor!, secondaryColor: darkTheme.secondaryColor!, secondaryColorShade1: darkTheme.secondaryColorShade1!, baseColor: darkTheme.baseColor!, baseColorShade1: darkTheme.baseColorShade1!, baseColorShade2: darkTheme.baseColorShade2!, baseColorShade3: darkTheme.baseColorShade3!, baseColorShade4: darkTheme.baseColorShade4!, alertColor: darkTheme.alertColor!, backgroundColor: darkTheme.backgroundColor!, baseInverseColor: darkTheme.baseInverseColor!, backgroundShade1Color: darkTheme.backgroundShade1Color!, highlightColor: darkTheme.highlightColor!)
+        self.defaultLightTheme = AmityViewConfigController.buildDefaultThemeColor(from: lightTheme)
+        self.defaultDarkTheme = AmityViewConfigController.buildDefaultThemeColor(from: darkTheme)
     }
     
+    private static func buildDefaultThemeColor(from theme: AmityTheme) -> AmityThemeColor {
+        AmityThemeColor(primaryColor: theme.primaryColor!,
+                        primaryColorShade1: theme.primaryColorShade1!,
+                        primaryColorShade2: theme.primaryColorShade2!,
+                        primaryColorShade3: theme.primaryColorShade3!,
+                        primaryColorShade4: theme.primaryColorShade4!,
+                        secondaryColor: theme.secondaryColor!,
+                        secondaryColorShade1: theme.secondaryColorShade1!,
+                        secondaryColorShade2: theme.secondaryColorShade2!,
+                        secondaryColorShade3: theme.secondaryColorShade3!,
+                        secondaryColorShade4: theme.secondaryColorShade4!,
+                        neutralGreyShade1Color: theme.neutralGreyShade1Color!,
+                        neutralGreyShade2Color: theme.neutralGreyShade2Color!,
+                        neutralGreyShade3Color: theme.neutralGreyShade3Color!,
+                        neutralGreyShade4Color: theme.neutralGreyShade4Color!,
+                        neutralGreyShade5Color: theme.neutralGreyShade5Color!,
+                        neutralGreyShade6Color: theme.neutralGreyShade6Color!,
+                        baseColor: theme.baseColor!,
+                        baseColorShade1: theme.baseColorShade1!,
+                        baseColorShade2: theme.baseColorShade2!,
+                        baseColorShade3: theme.baseColorShade3!,
+                        baseColorShade4: theme.baseColorShade4!,
+                        alertColor: theme.alertColor!,
+                        alertColorShade1: theme.alertColorShade1!,
+                        backgroundColor: theme.backgroundColor!,
+                        baseInverseColor: theme.baseInverseColor!,
+                        backgroundShade1Color: theme.backgroundShade1Color!,
+                        highlightColor: theme.highlightColor!,
+                        destructiveShade1Color: theme.destructiveShade1Color!,
+                        destructiveShade2Color: theme.destructiveShade2Color!,
+                        destructiveShade3Color: theme.destructiveShade3Color!,
+                        destructiveShade4Color: theme.destructiveShade4Color!,
+                        destructiveShade5Color: theme.destructiveShade5Color!,
+                        transparentBlackShade1Color: theme.transparentBlackShade1Color!,
+                        transparentBlackShade2Color: theme.transparentBlackShade2Color!,
+                        transparentBlackShade3Color: theme.transparentBlackShade3Color!,
+                        transparentBlackShade4Color: theme.transparentBlackShade4Color!,
+                        transparentBlackShade5Color: theme.transparentBlackShade5Color!,
+                        transparentWhiteShade1Color: theme.transparentWhiteShade1Color!,
+                        transparentWhiteShade2Color: theme.transparentWhiteShade2Color!,
+                        transparentWhiteShade3Color: theme.transparentWhiteShade3Color!,
+                        transparentWhiteShade4Color: theme.transparentWhiteShade4Color!,
+                        transparentWhiteShade5Color: theme.transparentWhiteShade5Color!,
+                        transparentWhiteShade6Color: theme.transparentWhiteShade6Color!,
+                        transparentWhiteShade7Color: theme.transparentWhiteShade7Color!,
+                        transparentRedShade1Color: theme.transparentRedShade1Color!)
+    }
+
     // MARK: Private functions
     private func constructConfigId(pageId: PageId?, componentId: ComponentId?, elementId: ElementId?) -> String {
         let pageId = pageId?.rawValue ?? "*"

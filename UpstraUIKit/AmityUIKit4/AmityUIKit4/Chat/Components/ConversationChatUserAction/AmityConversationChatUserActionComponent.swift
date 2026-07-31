@@ -52,8 +52,8 @@ public struct AmityConversationChatUserActionComponent: AmityComponentView {
             if config.isChatUserActionEnabled("mute") {
                 actionRow(
                     iconResource: isMuted
-                        ? AmityIcon.Chat.unmuteIcon.imageResource
-                        : AmityIcon.Chat.muteIcon.imageResource,
+                        ? AmityIcon.DesignSystem.bellS.imageResource
+                        : AmityIcon.DesignSystem.bellSlashR.imageResource,
                     title: isMuted
                         ? AmityLocalizedStringSet.Chat.DMAction.turnOnNotifications.localizedString
                         : AmityLocalizedStringSet.Chat.DMAction.turnOffNotifications.localizedString,
@@ -64,8 +64,8 @@ public struct AmityConversationChatUserActionComponent: AmityComponentView {
             if config.isChatUserActionEnabled("report") {
                 actionRow(
                     iconResource: isReportedByMe
-                        ? AmityIcon.Chat.unreportUserButtonIcon.imageResource
-                        : AmityIcon.Chat.reportUserButtonIcon.imageResource,
+                        ? AmityIcon.DesignSystem.flagSlashR.imageResource
+                        : AmityIcon.DesignSystem.flagR.imageResource,
                     title: isReportedByMe
                         ? AmityLocalizedStringSet.Chat.DMAction.unreportUser.localizedString
                         : AmityLocalizedStringSet.Chat.DMAction.reportUser.localizedString,
@@ -75,7 +75,7 @@ public struct AmityConversationChatUserActionComponent: AmityComponentView {
 
             if config.isChatUserActionEnabled("block") {
                 actionRow(
-                    iconResource: AmityIcon.Chat.blockUserIcon.imageResource,
+                    iconResource: AmityIcon.DesignSystem.userSlashR.imageResource,
                     title: isBlocked
                         ? AmityLocalizedStringSet.Chat.DMAction.unblockUser.localizedString
                         : AmityLocalizedStringSet.Chat.DMAction.blockUser.localizedString,
@@ -85,7 +85,7 @@ public struct AmityConversationChatUserActionComponent: AmityComponentView {
 
             Color.clear.frame(height: 16)
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
         .updateTheme(with: viewConfig)
     }
 
@@ -95,19 +95,21 @@ public struct AmityConversationChatUserActionComponent: AmityComponentView {
                            title: String,
                            action: @escaping () -> Void) -> some View {
         Button(action: action) {
-            HStack(spacing: 12) {
+            // Row geometry per Figma node 10848:54980: Lists row p-16, Heading-Content gap-8.
+            HStack(spacing: 8) {
                 Image(iconResource)
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 24, height: 24)
-                    .foregroundColor(Color(viewConfig.theme.baseColor))
+                    .foregroundColor(Color(viewConfig.color(.iconListLeadingDefaultDefault)))
                 Text(title)
-                    .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                 Spacer()
             }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
         }
         .buttonStyle(.plain)
     }

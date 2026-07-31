@@ -49,12 +49,14 @@ struct MessageStatusView<VM: MessageBubbleReportable>: View {
                 .frame(width: 20, height: 20)
                 .background(Circle().fill(Color(viewConfig.theme.baseColorShade4)))
         } else {
-            Image(AmityIcon.Chat.messageErrorIcon.imageResource)
+            Image(AmityIcon.DesignSystem.exclamationS.imageResource)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 16, height: 16)
-                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .foregroundColor(Color(viewConfig.color(.iconIconButtonTransparentPrimaryDefault)))
+                .frame(width: 24, height: 24)
+                .background(Circle().fill(Color(viewConfig.color(.surfaceIconButtonTransparentPrimaryEnabled))))
         }
     }
 
@@ -94,14 +96,14 @@ struct MessageStatusView<VM: MessageBubbleReportable>: View {
             }
 
             Text(dateFormat.string(from: message.createdAt ?? Date()))
-                .modifier(StatusStyle(viewConfig: viewConfig))
+                .modifier(StatusStyle(viewConfig: viewConfig, token: .textChatBubbleTimestampSentDefault))
                 .isHidden(message.syncState != .synced)
                 .accessibilityIdentifier(AccessibilityID.Chat.MessageList.bubbleTimestamp)
                 .padding(.trailing, 4)
-                
+
 
             Text(AmityLocalizedStringSet.Chat.statusSending.localizedString)
-                .modifier(StatusStyle(viewConfig: viewConfig))
+                .modifier(StatusStyle(viewConfig: viewConfig, token: .textTimestampDefault))
                 .isHidden(message.syncState != .syncing)
                 .accessibilityIdentifier(AccessibilityID.Chat.MessageList.bubbleSendingStatus)
         }
@@ -128,13 +130,14 @@ struct MessageStatusView<VM: MessageBubbleReportable>: View {
 extension MessageStatusView {
     
     struct StatusStyle: ViewModifier {
-        
+
         let viewConfig: AmityViewConfigController
-        
+        let token: AmityColorToken
+
         func body(content: Content) -> some View {
             content
                 .font(AmityTextStyle.captionSmall(.clear).getFont())
-                .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .foregroundColor(Color(viewConfig.color(token)))
                 .padding(.leading, 6)
                 .padding(.bottom, 8)
         }

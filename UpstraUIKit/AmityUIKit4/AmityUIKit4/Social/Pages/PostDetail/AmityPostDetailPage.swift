@@ -100,8 +100,8 @@ public struct AmityPostDetailPage: AmityPageView {
                             VStack(spacing: 4) {
                                 if let postModel = viewModel.post {
                                     AmityPostContentComponent(post: postModel.object, style: .detail, context: getPostComponentContext(), onTapAction: { tapContext in
-                                        
-                                        if postModel.dataTypeInternal == .clip {
+
+                                        if postModel.dataTypeInternal == .clip, tapContext?.isClipPost == true {
                                             if let media = postModel.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
                                                 let clipPost = ClipPost(id: postModel.postId, url: mediaURL, model: postModel)
                                                 let provider = SingleClipService(clipPost: clipPost)

@@ -67,6 +67,9 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
         chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission
     }
 
+    // Bottom-aligns the 32pt accessory buttons to the boxed input with an 8pt inset.
+    private let composerButtonBottomInset: CGFloat = 8
+
     public var body: some View {
         VStack(spacing: 0) {
 
@@ -90,13 +93,21 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
             }
 
             Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewConfig.color(.lineDividerPostDefault)))
                 .frame(height: 1)
 
-            HStack(alignment: .bottom) {
+            HStack(alignment: .bottom, spacing: 12) {
 
                 if !isEditing {
-                    Button {
+                    AmityButton(
+                        variant: .icon,
+                        hierarchy: .secondary,
+                        style: .filled,
+                        iconSize: .size32,
+                        icon: showMediaSection ? .crossR : .plusR,
+                        isDisabled: chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission,
+                        viewConfig: viewConfig
+                    ) {
                         if showMediaSection {
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 showMediaSection = false
@@ -107,18 +118,8 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
                                 showMediaSection = true
                             }
                         }
-                    } label: {
-                        Image(showMediaSection
-                                ? AmityIcon.Chat.closeMediaSectionIcon.imageResource
-                                : AmityIcon.Chat.openMediaSectionIcon.imageResource)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 32, height: 32)
-                            .padding(.bottom, 6)
-                            .padding(.trailing, 12)
                     }
-                    .buttonStyle(.plain)
-                    .disabled(chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission)
+                    .padding(.bottom, composerButtonBottomInset)
                 }
 
                 AmityMessageTextEditorView(textEditorViewModel, text: $input, mentionData: $mentionData, mentionedUsers: $mentionedUsers, textViewHeight: 34)
@@ -126,8 +127,8 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
                     .placeholder(config.text.placeholder)
                     .padding([.horizontal], 12)
                     .padding([.vertical], 6)
-                    .background(RoundedRectangle(cornerRadius: 20)
-                        .fill(Color(viewConfig.theme.baseColorShade4))
+                    .background(RoundedRectangle(cornerRadius: 24)
+                        .fill(Color(viewConfig.color(.surfaceInputBoxedInputDefault)))
                     )
                     .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.textField)
                     .disabled(chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission)
@@ -140,67 +141,65 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
                     }
 
                 if !showMediaSection && !showingMediaPicker && !showingCameraPicker && !isSendingMedia {
-                Button(action: {
-                    guard !isMuteBlocked else { return }
-                    let currentAction = viewModel.action
-                    let currentInput = input
+                    let isSendBlocked = input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isReplyParentDeleted || isMuteBlocked
+                    AmityButton(
+                        variant: .icon,
+                        hierarchy: isSendBlocked ? .secondary : .primary,
+                        style: .filled,
+                        iconSize: .size32,
+                        icon: .arrowUpR,
+                        isDisabled: isSendBlocked,
+                        viewConfig: viewConfig
+                    ) {
+                        guard !isMuteBlocked else { return }
+                        let currentAction = viewModel.action
+                        let currentInput = input
 
-                    if currentInput.count > config.messageLimit {
-                        activeAlert = .longMessage
-                    } else {
-                        Task {
-                            do {
-                                switch currentAction {
-                                case .default:
-                                    try await viewModel.createTextMessage(text: currentInput, mentionData: mentionData)
-                                    mentionData = MentionData()
-                                case .edit:
-                                    try await viewModel.updateTextMessage(text: currentInput, mentionData: mentionData)
-                                    mentionData = MentionData()
-                                case .reply:
-                                    try await viewModel.createReplyMessage(text: currentInput, mentionData: mentionData)
-                                    mentionData = MentionData()
-                                    await MainActor.run {
-                                        textEditorViewModel.textView.resignFirstResponder()
+                        if currentInput.count > config.messageLimit {
+                            activeAlert = .longMessage
+                        } else {
+                            Task {
+                                do {
+                                    switch currentAction {
+                                    case .default:
+                                        try await viewModel.createTextMessage(text: currentInput, mentionData: mentionData)
+                                        mentionData = MentionData()
+                                    case .edit:
+                                        try await viewModel.updateTextMessage(text: currentInput, mentionData: mentionData)
+                                        mentionData = MentionData()
+                                    case .reply:
+                                        try await viewModel.createReplyMessage(text: currentInput, mentionData: mentionData)
+                                        mentionData = MentionData()
+                                        await MainActor.run {
+                                            textEditorViewModel.textView.resignFirstResponder()
+                                        }
                                     }
+                                } catch {
+                                    let errorMessage: String
+                                    if error.isAmityErrorCode(.banWordFound) {
+                                        errorMessage = AmityLocalizedStringSet.Chat.toastBannedWord.localizedString
+                                    } else if error.isAmityErrorCode(.linkNotAllowed) {
+                                        errorMessage = AmityLocalizedStringSet.Chat.toastLinkNotAllow.localizedString
+                                    } else if case .reply = currentAction, error.isAmityErrorCode(.itemNotFound) {
+                                        errorMessage = AmityLocalizedStringSet.Chat.toastReplyParentDeleted.localizedString
+                                    } else {
+                                        errorMessage = error.localizedDescription
+                                    }
+                                    chatPageViewModel.showToastMessage(message: errorMessage, style: .warning)
                                 }
-                            } catch {
-                                let errorMessage: String
-                                if error.isAmityErrorCode(.banWordFound) {
-                                    errorMessage = AmityLocalizedStringSet.Chat.toastBannedWord.localizedString
-                                } else if error.isAmityErrorCode(.linkNotAllowed) {
-                                    errorMessage = AmityLocalizedStringSet.Chat.toastLinkNotAllow.localizedString
-                                } else if case .reply = currentAction, error.isAmityErrorCode(.itemNotFound) {
-                                    errorMessage = AmityLocalizedStringSet.Chat.toastReplyParentDeleted.localizedString
-                                } else {
-                                    errorMessage = error.localizedDescription
-                                }
-                                chatPageViewModel.showToastMessage(message: errorMessage, style: .warning)
                             }
+                            input = ""
+                            textEditorViewModel.reset()
+                            draftBeforeEdit = nil
                         }
-                        input = ""
-                        textEditorViewModel.reset()
-                        draftBeforeEdit = nil
                     }
-                }, label: {
-                    let isInputEmpty = input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                    let isBlocked = isInputEmpty || isReplyParentDeleted || isMuteBlocked
-                    Image(isBlocked
-                          ? AmityIcon.Chat.sendDisabledIcon.imageResource
-                          : config.image.sendButton)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 32, height: 32)
-                        .padding(.leading, 12)
-                        .padding(.bottom, 6)
-                })
-                .accessibilityIdentifier(AccessibilityID.Chat.MessageComposer.sendButton)
-                .disabled(input.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isReplyParentDeleted || isMuteBlocked)
+                    .accessibilityIdentifier(AccessibilityID.Chat.MessageComposer.sendButton)
+                    .padding(.bottom, composerButtonBottomInset)
                 }
             }
             .padding(.vertical, 8)
-            .padding(.horizontal, 12)
-            .background(Color(viewConfig.theme.backgroundColor))
+            .padding(.horizontal, 16)
+            .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
             .onChange(of: isGroupChat ? textEditorViewModel.reachMentionLimit : false) { isReached in
                 if isReached {
                     activeAlert = .mentionLimit
@@ -353,7 +352,7 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
     private var mediaSection: some View {
         HStack(spacing: 72) {
             mediaButton(
-                image: AmityIcon.Chat.cameraButtonIcon.imageResource,
+                image: AmityIcon.DesignSystem.cameraR.imageResource,
                 label: AmityLocalizedStringSet.Chat.camera.localizedString
             ) {
                 showMediaSection = false
@@ -366,7 +365,7 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
                 }
             }
             mediaButton(
-                image: AmityIcon.Chat.imageButtonIcon.imageResource,
+                image: AmityIcon.DesignSystem.imageR.imageResource,
                 label: AmityLocalizedStringSet.Chat.mediaButton.localizedString
             ) {
                 showMediaSection = false
@@ -375,7 +374,7 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
         }
         .frame(maxWidth: .infinity)
         .padding(24)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
     }
 
     @ViewBuilder
@@ -383,11 +382,13 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
         Button(action: action) {
             VStack(spacing: 6) {
                 Image(image)
+                    .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 40, height: 40)
+                    .foregroundColor(Color(viewConfig.color(.iconListLeadingDefaultDefault)))
                 Text(label)
-                    .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                    .applyTextStyle(.caption(Color(viewConfig.color(.textListTextDescriptionDefaultDefault))))
             }
         }
         .buttonStyle(.plain)
@@ -402,7 +403,6 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
 
         var messageLimit = 10000
         var text: TextConfig = .init(config: [:])
-        var image: ImageConfig = .init(config: [:])
 
         init(pageId: PageId?, componentId: ComponentId?) {
             self.pageId = pageId
@@ -410,16 +410,8 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
             self.elementId = nil
 
             let mainConfig = AmityUIKitConfigController.shared.getConfig(configId: configId)
-            self.image = ImageConfig(config: getElementConfig(elementId: .sendButton))
             self.text = TextConfig(config: mainConfig)
             self.messageLimit = mainConfig["message_limit"] as? Int ?? 10000
-        }
-
-        struct ImageConfig {
-            let sendButton: ImageResource
-            init(config: [String: Any]) {
-                self.sendButton = AmityIcon.getImageResource(named: config["send_icon"] as? String ?? "sendIconEnable")
-            }
         }
 
         struct TextConfig {

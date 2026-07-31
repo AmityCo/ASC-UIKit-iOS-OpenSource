@@ -10,7 +10,6 @@ import SwiftUI
 struct AmityUserProfileImageView: View {
 
     @EnvironmentObject private var viewConfig: AmityViewConfigController
-    @Environment(\.colorScheme) private var colorScheme
 
     let displayName: String
     let avatarURL: URL?
@@ -26,10 +25,10 @@ struct AmityUserProfileImageView: View {
         ZStack {
             GeometryReader { geometry in
                 Circle()
-                    .fill(Color(colorScheme == .dark ? viewConfig.theme.primaryColor.blend(.shade1) : viewConfig.theme.primaryColor.blend(.shade2)))
+                    .fill(Color(viewConfig.theme.primaryColor.blend(.shade1)))
                     .overlay (
                         Text(displayName)
-                            .applyTextStyle(.custom(geometry.size.height * 0.55, .regular, .white))
+                            .applyTextStyle(.custom(geometry.size.height * 0.55, .regular, Color(viewConfig.color(.textAvatarAtomicGeneral))))
                     )
                 
                 AsyncImage(url: avatarURL)

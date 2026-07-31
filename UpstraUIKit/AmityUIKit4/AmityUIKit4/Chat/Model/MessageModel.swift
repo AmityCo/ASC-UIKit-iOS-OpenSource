@@ -185,13 +185,17 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
 
     public var videoPlaybackURL: URL? {
         guard let info = message?.getVideoInfo() else { return nil }
-        let preferred: [AmityVideoResolution] = [.res_1080p, .res_720p, .res_480p, .res_360p]
+        return URL(string: info.fileURL)
+    }
+    public var videoDownloadURL: URL? {
+        guard let info = message?.getVideoInfo() else { return nil }
+        let preferred: [AmityVideoResolution] = [.res_1080p, .res_720p, .res_480p, .res_360p, .original]
         for res in preferred {
             if let urlStr = info.getVideo(resolution: res), let url = URL(string: urlStr) {
                 return url
             }
         }
-        return URL(string: info.fileURL)
+        return nil
     }
     
     public init(message: AmityMessage, hasModeratorPermission: Bool = false, isGroupChat: Bool = false, isSenderModerator: Bool = false) {

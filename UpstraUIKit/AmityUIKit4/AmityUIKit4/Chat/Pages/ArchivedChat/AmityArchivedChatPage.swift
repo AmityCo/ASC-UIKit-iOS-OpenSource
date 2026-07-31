@@ -28,10 +28,6 @@ public struct AmityArchivedChatPage: AmityPageView {
             // MARK: Nav bar
             navBar
 
-            Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
-                .frame(height: 1)
-
             // MARK: Content
             if viewModel.isLoading {
                 skeletonList
@@ -41,9 +37,9 @@ public struct AmityArchivedChatPage: AmityPageView {
                 channelList
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
-        .showToast(isPresented: $showToast, style: toastStyle, message: toastMessage, bottomPadding: 80)
+        .showToast(isPresented: $showToast, style: toastStyle, message: toastMessage, bottomPadding: 40)
     }
 
     // MARK: - Nav bar
@@ -51,17 +47,17 @@ public struct AmityArchivedChatPage: AmityPageView {
     private var navBar: some View {
         ZStack {
             Text(AmityLocalizedStringSet.Chat.Archived.navbarTitle.localizedString)
-                .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))
 
             HStack(spacing: 0) {
                 Button {
                     host.controller?.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image(AmityIcon.Chat.backButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
                         .frame(width: 24, height: 24)
                 }
                 .buttonStyle(.plain)
@@ -71,7 +67,7 @@ public struct AmityArchivedChatPage: AmityPageView {
         }
         .padding(.horizontal, 16)
         .frame(height: 44)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
     }
 
     // MARK: - Channel list
@@ -81,9 +77,9 @@ public struct AmityArchivedChatPage: AmityPageView {
             LazyVStack(spacing: 0) {
                 ForEach(viewModel.channels, id: \.channelId) { channel in
                     ChatListSwipeAction(
-                        icon: AmityIcon.Chat.channelUnarchiveIcon.imageResource,
+                        icon: AmityIcon.DesignSystem.unarchiveR,
                         label: AmityLocalizedStringSet.Chat.Archive.unarchive.localizedString,
-                        theme: viewConfig.theme,
+                        viewConfig: viewConfig,
                         action: {
                             Task {
                                 let success = await viewModel.unarchiveChannel(channel.channelId)
@@ -98,7 +94,7 @@ public struct AmityArchivedChatPage: AmityPageView {
                             }
                         }
                     ) {
-                        AmityChatListItemView(channel: channel, theme: viewConfig.theme)
+                        AmityChatListItemView(channel: channel, viewConfig: viewConfig)
                             .contentShape(Rectangle())
                             .onTapGesture { navigate(to: channel) }
                     }
@@ -111,7 +107,7 @@ public struct AmityArchivedChatPage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     // MARK: - Skeleton
@@ -124,23 +120,23 @@ public struct AmityArchivedChatPage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListSkeletonSkeleton)))
     }
 
     private var skeletonRow: some View {
         HStack(spacing: 12) {
             Circle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
-                .frame(width: 48, height: 48)
+                .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
+                .frame(width: 40, height: 40)
 
-            VStack(alignment: .leading, spacing: 8) {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(width: 140, height: 14)
+            VStack(alignment: .leading, spacing: 12) {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
+                    .frame(width: 140, height: 10)
 
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(viewConfig.theme.baseColorShade4))
-                    .frame(width: 200, height: 12)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
+                    .frame(width: 200, height: 10)
             }
 
             Spacer()
@@ -152,23 +148,18 @@ public struct AmityArchivedChatPage: AmityPageView {
     // MARK: - Empty state
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
+        VStack {
             Spacer()
-
-            Image(AmityIcon.Chat.archivedEmptyIcon.imageResource)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColorShade3))
-                .frame(width: 48, height: 48)
-
-            Text(AmityLocalizedStringSet.Chat.Archived.emptyTitle.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
-
+            AmityEmptyState(
+                variant: .icon,
+                image: AmityIcon.DesignSystem.inboxL.imageResource,
+                title: AmityLocalizedStringSet.Chat.Archived.emptyTitle.localizedString,
+                viewConfig: viewConfig
+            )
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
     }
 
     // MARK: - Navigation

@@ -77,9 +77,7 @@ final class AmityChatPageViewModel: ObservableObject {
                     if let name = user.displayName, !name.isEmpty {
                         self.displayName = name
                     }
-                    if let urlStr = user.getAvatarInfo()?.fileURL {
-                        self.avatarURL = URL(string: urlStr)
-                    }
+                    self.avatarURL = user.resolvedAvatarURL
                 }
             }
             self.isLoadingHeader = false
@@ -106,9 +104,7 @@ final class AmityChatPageViewModel: ObservableObject {
             if let name = user.displayName, !name.isEmpty {
                 self.displayName = name
             }
-            if let urlStr = user.getAvatarInfo()?.fileURL {
-                self.avatarURL = URL(string: urlStr)
-            }
+            self.avatarURL = user.resolvedAvatarURL
         }
     }
 
@@ -207,29 +203,31 @@ public struct AmityChatPage: AmityPageView {
             ZStack {
                 VStack(spacing: 0) {
                     AmityChatMessageListComponent(viewModel: liveChatViewModel, pageId: .chatPage)
+                        // Anchored to the message list so the toast sits just above the
+                        // compose bar divider (independent of the compose bar's height).
+                        .showToast(isPresented: $liveChatViewModel.showToast,
+                                   style: liveChatViewModel.toastMessage.style,
+                                   message: liveChatViewModel.toastMessage.message,
+                                   bottomPadding: 8)
+
+                    // Loading toast sits 16pt above the compose bar divider (Figma 12041:242294)
+                    if messageViewModel.initialQueryState == .loading {
+                        ToastView(message: AmityLocalizedStringSet.Chat.toastLoading.localizedString, style: .loading)
+                            .padding(.bottom, 16)
+                    }
 
                     if pageViewModel.isBlocked {
                         blockedBar
                     } else {
                         AmityChatMessageComposeBar(viewModel: liveChatViewModel)
-                            .isHidden(messageViewModel.initialQueryState != .success
+                            // Visible during initial load too (Figma 12041:242294); hidden only on error/banned or when muted without permission.
+                            .isHidden((messageViewModel.initialQueryState != .success && messageViewModel.initialQueryState != .loading)
                                       || (messageViewModel.muteState != .none && !messageViewModel.hasModeratorPermission))
                     }
                 }
-                .showToast(isPresented: $liveChatViewModel.showToast,
-                           style: liveChatViewModel.toastMessage.style,
-                           message: liveChatViewModel.toastMessage.message,
-                           bottomPadding: 80)
-
-                VStack {
-                    Spacer()
-                    ToastView(message: AmityLocalizedStringSet.Chat.toastLoading.localizedString, style: .loading)
-                        .padding(.bottom, 24)
-                }
-                .opacity(messageViewModel.initialQueryState == .loading ? 1 : 0)
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
         .updateTheme(with: viewConfig)
         .onAppear {
@@ -238,7 +236,7 @@ public struct AmityChatPage: AmityPageView {
         .onChange(of: pageViewModel.displayName) { name in
             liveChatViewModel.channelDisplayName = name
         }
-        .bottomSheet(isShowing: $showActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+        .bottomSheet(isShowing: $showActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.color(.surfaceSheetsBackgroundGeneral))) {
             AmityConversationChatUserActionComponent(
                 isMuted: pageViewModel.isMuted,
                 isReportedByMe: pageViewModel.isReportedByMe,
@@ -272,7 +270,7 @@ public struct AmityChatPage: AmityPageView {
                         Task {
                             do {
                                 try await pageViewModel.unreportUser()
-                                liveChatViewModel.showToastMessage(message: AmityLocalizedStringSet.Chat.toastUserUnreported.localizedString, style: .success)
+                                liveChatViewModel.showToastMessage(message: AmityLocalizedStringSet.Chat.toastDirectUserUnreported.localizedString, style: .success)
                             } catch {
                                 liveChatViewModel.showToastMessage(message: AmityLocalizedStringSet.Chat.toastUnreportUserFailed.localizedString, style: .warning)
                             }
@@ -281,7 +279,7 @@ public struct AmityChatPage: AmityPageView {
                         Task {
                             do {
                                 try await pageViewModel.reportUser()
-                                liveChatViewModel.showToastMessage(message: AmityLocalizedStringSet.Chat.toastUserReported.localizedString, style: .success)
+                                liveChatViewModel.showToastMessage(message: AmityLocalizedStringSet.Chat.toastDirectUserReported.localizedString, style: .success)
                             } catch {
                                 liveChatViewModel.showToastMessage(message: AmityLocalizedStringSet.Chat.toastReportUserFailed.localizedString, style: .warning)
                             }
@@ -347,21 +345,47 @@ public struct AmityChatPage: AmityPageView {
 
     // MARK: - DM Header
 
+    // Header skeleton stays until BOTH the channel/user info and the initial
+    // messages have loaded. isLoadingHeader alone resolves from local cache almost
+    // instantly, so on its own the skeleton would vanish before messages arrive.
+    private var isHeaderLoading: Bool {
+        pageViewModel.isLoadingHeader || messageViewModel.initialQueryState == .loading
+    }
+
     private var dmHeader: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Button {
-                    host.controller?.dismissOrPop()
+                    // The chat room is PUSHED onto the nav stack by AmityChatHomePage,
+                    // so "back" must POP. dismissOrPop() checks presentingViewController
+                    // first and dismisses the whole modal (closing the UIKit) when the
+                    // nav stack itself was presented — the reported bug. Prefer popping
+                    // whenever we're not the root of the nav stack; fall back otherwise.
+                    if let nav = host.controller?.navigationController,
+                       nav.viewControllers.count > 1 {
+                        nav.popViewController(animated: true)
+                    } else {
+                        host.controller?.dismissOrPop()
+                    }
                 } label: {
-                    Image(AmityIcon.Chat.backButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
-                        .frame(width: 16, height: 16)
+                        .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
+                        .frame(width: 24, height: 24)  // Figma 10848:54642: chevron glyph 24pt
+                        // Expand the tappable region to the 44x44 HIG minimum without
+                        // moving the glyph or eating into the avatar: the frame grows
+                        // 10pt on each side of the 24pt glyph, so negative padding pulls
+                        // that growth back — leading -10 keeps the chevron 16pt from the
+                        // edge, trailing (12 - 10 = +2) preserves the original 12pt visual
+                        // gap to the avatar. contentShape makes the whole frame tappable.
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .padding(.trailing, 12)
+                .padding(.leading, -10)
+                .padding(.trailing, 2)
 
                 Button {
                     if let userId = pageViewModel.otherUserId {
@@ -373,11 +397,19 @@ public struct AmityChatPage: AmityPageView {
                         AmityUIKit4Manager.behaviour.chatPageBehavior?.onAvatarTap(context: ctx)
                     }
                 } label: {
-                    if pageViewModel.isOtherUserDeleted {
+                    if isHeaderLoading {
+                        // Skeleton avatar while channel/user info loads (Figma 12041:242294)
+                        Circle()
+                            .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
+                            .frame(width: 40, height: 40)
+                            .shimmering()
+                    } else if pageViewModel.isOtherUserDeleted {
                         ZStack {
+                            // Token-less composite: DS has no surface token for the deleted-user
+                            // avatar disc — keep the legacy theme fills (matches Task 2 / ChatListItemView).
                             Circle()
                                 .fill(Color(viewConfig.theme.secondaryColor.blend(.shade2)))
-                            Image(AmityIcon.Chat.deletedUserAvatarIcon.imageResource)
+                            Image(AmityIcon.DesignSystem.userS.imageResource)
                                 .renderingMode(.template)
                                 .resizable()
                                 .scaledToFit()
@@ -387,21 +419,23 @@ public struct AmityChatPage: AmityPageView {
                         .frame(width: 40, height: 40)
                         .clipShape(Circle())
                     } else {
-                        AmityUserProfileImageView(displayName: pageViewModel.displayName, avatarURL: pageViewModel.avatarURL)
+                        AmityChatUserProfileImageView(displayName: pageViewModel.displayName, avatarURL: pageViewModel.avatarURL)
                             .frame(width: 40, height: 40)
                     }
                 }
                 .buttonStyle(.plain)
-                .padding(.trailing, 10)
+                .padding(.trailing, 12)  // 12pt gap avatar → name
 
                 VStack(alignment: .leading, spacing: 2) {
-                    if pageViewModel.isLoadingHeader {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(Color(viewConfig.theme.baseColorShade4))
-                            .frame(width: 120, height: 14)
+                    if isHeaderLoading {
+                        // Skeleton title bar (Figma 12041:242294 → 140×10, fully rounded)
+                        Capsule()
+                            .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
+                            .frame(width: 140, height: 10)
+                            .shimmering()
                     } else {
                         Text(pageViewModel.displayName)
-                            .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                            .applyTextStyle(.bodyBold(Color(viewConfig.color(.textBannerDefaultHeaderGeneral))))
                             .lineLimit(1)
                     }
 
@@ -411,7 +445,7 @@ public struct AmityChatPage: AmityPageView {
                                 .progressViewStyle(CircularProgressViewStyle())
                                 .scaleEffect(0.7)
                             Text(AmityLocalizedStringSet.Chat.Home.waitingForNetwork.localizedString)
-                                .applyTextStyle(.custom(12, .regular, Color(viewConfig.theme.baseColorShade1)))
+                                .applyTextStyle(.custom(12, .regular, Color(viewConfig.color(.textListSubheadDefaultDefault))))
                         }
                     }
                 }
@@ -422,22 +456,23 @@ public struct AmityChatPage: AmityPageView {
                     Button {
                         showActionSheet = true
                     } label: {
-                        Image(AmityIcon.Chat.threeDotVerticalIcon.imageResource)
+                        Image(AmityIcon.DesignSystem.ellipsisVR.imageResource)
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .foregroundColor(Color(viewConfig.theme.baseColor))
-                            .frame(width: 24, height: 24)
+                            .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
+                            .frame(width: 24, height: 24)  // 24pt glyph in a 32pt icon-button box
                     }
                     .buttonStyle(.plain)
+                    .frame(width: 32, height: 32)  // overflow meatball 32pt box
                 }
             }
             .padding(.horizontal, 16)
-            .frame(height: 56)
-            .background(Color(viewConfig.theme.backgroundColor))
+            .frame(height: 64)
+            .background(Color(viewConfig.color(.surfaceBannerDefaultGeneral)))
 
             Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewConfig.color(.lineDividerPostDefault)))
                 .frame(height: 1)
         }
     }
@@ -448,11 +483,11 @@ public struct AmityChatPage: AmityPageView {
         HStack {
             Spacer()
             Text(AmityLocalizedStringSet.Chat.DM.blockedBanner.localizedString)
-                .applyTextStyle(.custom(14, .regular, Color(viewConfig.theme.baseColorShade1)))
+                .applyTextStyle(.custom(14, .regular, Color(viewConfig.color(.textBannerSubdueSubheadGeneral))))
             Spacer()
         }
         .frame(height: 42)
-        .background(Color(viewConfig.theme.baseColorShade4))
+        .background(Color(viewConfig.color(.surfaceBannerSubdueGeneral)))
     }
 
     // MARK: - Navigation

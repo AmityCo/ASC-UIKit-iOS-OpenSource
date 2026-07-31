@@ -35,6 +35,7 @@ final class AmityArchivedChatViewModel: ObservableObject {
     }
 
     func unarchiveChannel(_ channelId: String) async -> Bool {
+        guard NetworkMonitor.shared.isConnected else { return false }
         do {
             try await channelManager.unarchiveChannel(channelId: channelId)
             channels.removeAll { $0.channelId == channelId }

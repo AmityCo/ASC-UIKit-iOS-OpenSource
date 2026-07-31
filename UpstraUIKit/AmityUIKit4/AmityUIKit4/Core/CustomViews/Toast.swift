@@ -151,6 +151,13 @@ public class Toast: UIViewController {
     }
     
     public static func showToast(style: ToastStyle, message: String, bottomPadding: CGFloat = 30, autoHide: Bool = true) {
+    
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async {
+                showToast(style: style, message: message, bottomPadding: bottomPadding, autoHide: autoHide)
+            }
+            return
+        }
         let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
         guard let window = keyWindow else { return }
         
@@ -179,6 +186,10 @@ public class Toast: UIViewController {
     }
     
     public static func hideToastIfPresented(immediately: Bool = false) {
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async { hideToastIfPresented(immediately: immediately) }
+            return
+        }
         let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
         guard let window = keyWindow else { return }
         

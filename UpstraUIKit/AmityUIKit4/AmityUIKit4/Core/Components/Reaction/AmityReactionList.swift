@@ -83,20 +83,33 @@ public struct AmityReactionList: AmityComponentView {
     public var body: some View {
         VStack {
             BottomSheetDragIndicator()
-                .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade3))
-            
-            // Header Tabs
-            ReactionListHeader(currentTab: $currentTab, tabBarItems: $tabBarItems)
-            
+                .foregroundColor(type == .message
+                                 ? Color(viewConfig.color(.surfaceSheetsHandleDefault))
+                                 : Color(viewConfig.defaultLightTheme.baseColorShade3))
+
+            // Header Tabs — Chat (.message) uses the design-system clone; Social/Story
+            // keep the original views so their behavior is unaffected.
+            if type == .message {
+                ChatReactionListHeader(currentTab: $currentTab, tabBarItems: $tabBarItems)
+            } else {
+                ReactionListHeader(currentTab: $currentTab, tabBarItems: $tabBarItems)
+            }
+
             // Reaction user list swipable pages
             Pager(page: page, data: tabBarItems, id: \.id) { tabItem in
-                ReactionListContent(viewModel: ReactionLoader(referenceId: viewModel.referenceId, referenceType: viewModel.referenceType, reactionName: getReactionType(for: tabItem.index), type: type, currentUserReactions: currentUserReactions), parentViewModel: viewModel)
+                if type == .message {
+                    ChatReactionListContent(viewModel: ReactionLoader(referenceId: viewModel.referenceId, referenceType: viewModel.referenceType, reactionName: getReactionType(for: tabItem.index), type: type, currentUserReactions: currentUserReactions), parentViewModel: viewModel)
+                } else {
+                    ReactionListContent(viewModel: ReactionLoader(referenceId: viewModel.referenceId, referenceType: viewModel.referenceType, reactionName: getReactionType(for: tabItem.index), type: type, currentUserReactions: currentUserReactions), parentViewModel: viewModel)
+                }
             }
             .onPageWillChange({ pageIndex in
                 currentTab = pageIndex
             })
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background((type == .message
+                     ? Color(viewConfig.color(.surfaceSheetsBackgroundGeneral))
+                     : Color(viewConfig.theme.backgroundColor)).ignoresSafeArea())
         .onChange(of: currentTab, perform: { value in
             if page.index != currentTab {
                 page.update(.new(index: value))

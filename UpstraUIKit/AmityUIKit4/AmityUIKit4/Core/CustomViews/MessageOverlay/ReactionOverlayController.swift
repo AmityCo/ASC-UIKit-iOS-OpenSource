@@ -118,7 +118,11 @@ public class ReactionOverlayController {
         reactionVC.view.backgroundColor = .clear
         reactionVC.view.alpha = 0
         let reactionSize = reactionVC.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        let reactionX = clampedX(from: messageFrame.origin.x, width: reactionSize.width)
+        // Own (outgoing) messages are right-aligned, so anchor the overlay to the
+        // bubble's right edge; incoming messages anchor to the left edge.
+        let reactionX = message.isOwner
+            ? clampedX(from: messageFrame.maxX - reactionSize.width, width: reactionSize.width)
+            : clampedX(from: messageFrame.origin.x, width: reactionSize.width)
         let reactionFinalY = max(
             window.safeAreaInsets.top + 4,
             messageFrame.origin.y - reactionSize.height - gap
@@ -139,7 +143,9 @@ public class ReactionOverlayController {
             withHorizontalFittingPriority: .required,
             verticalFittingPriority: .fittingSizeLevel
         ).height
-        let actionX = clampedX(from: messageFrame.origin.x, width: actionWidth)
+        let actionX = message.isOwner
+            ? clampedX(from: messageFrame.maxX - actionWidth, width: actionWidth)
+            : clampedX(from: messageFrame.origin.x, width: actionWidth)
         let bottomLimit = screenBounds.height - window.safeAreaInsets.bottom - 8
         let topLimit = window.safeAreaInsets.top + 4
         let aboveReactionY = reactionFinalY - actionHeight - gap

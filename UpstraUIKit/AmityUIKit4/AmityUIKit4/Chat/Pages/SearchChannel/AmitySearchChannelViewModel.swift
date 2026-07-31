@@ -191,6 +191,7 @@ final class AmitySearchChannelViewModel: ObservableObject {
     // MARK: - Archive/Unarchive
 
     func archiveChannel(_ channelId: String) async -> ArchiveResult {
+        guard NetworkMonitor.shared.isConnected else { return .error }
         do {
             try await channelManager.archiveChannel(channelId: channelId)
             return .success
@@ -203,6 +204,7 @@ final class AmitySearchChannelViewModel: ObservableObject {
     }
 
     func unarchiveChannel(_ channelId: String) async -> Bool {
+        guard NetworkMonitor.shared.isConnected else { return false }
         do {
             try await channelManager.unarchiveChannel(channelId: channelId)
             return true

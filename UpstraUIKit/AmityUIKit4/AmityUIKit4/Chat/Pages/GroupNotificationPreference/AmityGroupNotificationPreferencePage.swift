@@ -88,7 +88,7 @@ public struct AmityGroupNotificationPreferencePage: AmityPageView {
                 content
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
         .showToast(isPresented: $showToast, style: toastStyle, message: toastMessage, bottomPadding: 80)
         .onAppear { viewModel.loadSettings() }
@@ -97,17 +97,17 @@ public struct AmityGroupNotificationPreferencePage: AmityPageView {
     private var navBar: some View {
         ZStack {
             Text(AmityLocalizedStringSet.Chat.GroupNotificationPreference.navbarTitle.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))
 
             HStack(spacing: 0) {
                 Button {
                     host.controller?.navigationController?.popViewController(animated: true)
                 } label: {
-                    Image(AmityIcon.Chat.backButtonIcon.imageResource)
+                    Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                        .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
                         .frame(width: 24, height: 24)
                 }
                 .buttonStyle(.plain)
@@ -117,7 +117,7 @@ public struct AmityGroupNotificationPreferencePage: AmityPageView {
         }
         .padding(.horizontal, 16)
         .frame(height: 44)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
     }
 
     private var content: some View {
@@ -125,42 +125,42 @@ public struct AmityGroupNotificationPreferencePage: AmityPageView {
             if isSilentByModerator {
                 HStack {
                     Text(AmityLocalizedStringSet.Chat.GroupNotificationPreference.moderatorBanner.localizedString)
-                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade3)))
+                        .applyTextStyle(.caption(Color(viewConfig.color(.textBannerSubdueSubheadGeneral))))
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer()
                 }
                 .padding(16)
-                .background(Color(viewConfig.theme.backgroundShade1Color))
+                .background(Color(viewConfig.color(.surfaceBannerSubdueGeneral)))
             }
 
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(AmityLocalizedStringSet.Chat.GroupNotificationPreference.toggleTitle.localizedString)
-                        .applyTextStyle(.bodyBold(isSilentByModerator
-                                         ? Color(viewConfig.theme.baseColorShade3)
-                                         : Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.bodyBold(Color(viewConfig.color(isSilentByModerator
+                                         ? .textListHeaderDefaultDisabled
+                                         : .textListHeaderDefaultDefault))))
                     Text(AmityLocalizedStringSet.Chat.GroupNotificationPreference.toggleDescription.localizedString)
-                        .applyTextStyle(.caption(isSilentByModerator
-                                         ? Color(viewConfig.theme.baseColorShade3)
-                                         : Color(viewConfig.theme.baseColorShade1)))
+                        .applyTextStyle(.caption(Color(viewConfig.color(isSilentByModerator
+                                         ? .textListTextDescriptionDefaultDisabled
+                                         : .textListTextDescriptionDefaultDefault))))
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer()
-                Toggle("", isOn: $viewModel.isEnabled)
-                    .labelsHidden()
-                    .disabled(isSilentByModerator || viewModel.isSaving)
-                    .toggleStyle(SwitchToggleStyle(tint: Color(viewConfig.theme.primaryColor)))
-                    .onChange(of: viewModel.isEnabled) { newValue in
-                        Task {
-                            do {
-                                try await viewModel.savePreference()                                
-                            } catch {
-                                viewModel.isEnabled = !newValue
-                            }
+                AmityToggle(isOn: viewModel.isEnabled,
+                            isDisabled: isSilentByModerator || viewModel.isSaving,
+                            viewConfig: viewConfig) { newValue in
+                    viewModel.isEnabled = newValue
+                    Task {
+                        do {
+                            try await viewModel.savePreference()
+                        } catch {
+                            viewModel.isEnabled = !newValue
                         }
                     }
+                }
             }
             .padding(16)
+            .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
 
             Spacer()
         }

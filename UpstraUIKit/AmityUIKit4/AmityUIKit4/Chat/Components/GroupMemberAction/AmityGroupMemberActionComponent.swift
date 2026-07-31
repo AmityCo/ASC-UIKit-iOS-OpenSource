@@ -68,9 +68,8 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                     if isMemberModerator {
                         if onDemote != nil {
                             actionRow(
-                                icon: AmityIcon.Chat.promoteMemberButtonIcon.imageResource,
-                                label: AmityLocalizedStringSet.Chat.GroupMemberAction.demote.localizedString,
-                                color: Color(viewConfig.theme.baseColor)
+                                icon: AmityIcon.DesignSystem.userShieldR.imageResource,
+                                label: AmityLocalizedStringSet.Chat.GroupMemberAction.demote.localizedString
                             ) {
                                 onDemote?()
                             }
@@ -78,9 +77,8 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                     } else {
                         if onPromote != nil {
                             actionRow(
-                                icon: AmityIcon.Chat.promoteMemberButtonIcon.imageResource,
-                                label: AmityLocalizedStringSet.Chat.GroupMemberAction.promote.localizedString,
-                                color: Color(viewConfig.theme.baseColor)
+                                icon: AmityIcon.DesignSystem.userShieldR.imageResource,
+                                label: AmityLocalizedStringSet.Chat.GroupMemberAction.promote.localizedString
                             ) {
                                 onPromote?()
                             }
@@ -91,9 +89,8 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                         if member.isMuted {
                             if onUnmute != nil {
                                 actionRow(
-                                    icon: AmityIcon.Chat.unmuteMemberButtonIcon.imageResource,
-                                    label: AmityLocalizedStringSet.Chat.GroupMemberAction.unmute.localizedString,
-                                    color: Color(viewConfig.theme.baseColor)
+                                    icon: AmityIcon.DesignSystem.volumeR.imageResource,
+                                    label: AmityLocalizedStringSet.Chat.GroupMemberAction.unmute.localizedString
                                 ) {
                                     onUnmute?()
                                 }
@@ -101,9 +98,8 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                         } else {
                             if onMute != nil {
                                 actionRow(
-                                    icon: AmityIcon.Chat.muteMemberButtonIcon.imageResource,
-                                    label: AmityLocalizedStringSet.Chat.GroupMemberAction.mute.localizedString,
-                                    color: Color(viewConfig.theme.baseColor)
+                                    icon: AmityIcon.DesignSystem.volumeSlashR.imageResource,
+                                    label: AmityLocalizedStringSet.Chat.GroupMemberAction.mute.localizedString
                                 ) {
                                     onMute?()
                                 }
@@ -115,12 +111,11 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                 if onReport != nil {
                     actionRow(
                         icon: isFlaggedByMe
-                            ? AmityIcon.Chat.unreportUserButtonIcon.imageResource
-                            : AmityIcon.Chat.reportUserButtonIcon.imageResource,
+                            ? AmityIcon.DesignSystem.flagSlashR.imageResource
+                            : AmityIcon.DesignSystem.flagR.imageResource,
                         label: isFlaggedByMe
                             ? AmityLocalizedStringSet.Chat.GroupMemberAction.unreport.localizedString
-                            : AmityLocalizedStringSet.Chat.GroupMemberAction.report.localizedString,
-                        color: Color(viewConfig.theme.baseColor)
+                            : AmityLocalizedStringSet.Chat.GroupMemberAction.report.localizedString
                     ) {
                         onReport?()
                     }
@@ -129,9 +124,8 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                 if isCurrentUserModerator {
                     if onBan != nil {
                         actionRow(
-                            icon: AmityIcon.Chat.banMemberButtonIcon.imageResource,
-                            label: AmityLocalizedStringSet.Chat.GroupMemberAction.ban.localizedString,
-                            color: Color(viewConfig.theme.baseColor)
+                            icon: AmityIcon.DesignSystem.banR.imageResource,
+                            label: AmityLocalizedStringSet.Chat.GroupMemberAction.ban.localizedString
                         ) {
                             onBan?()
                         }
@@ -139,9 +133,9 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
 
                     if onRemove != nil {
                         actionRow(
-                            icon: AmityIcon.Chat.removeMemberButtonIcon.imageResource,
+                            icon: AmityIcon.DesignSystem.trashR.imageResource,
                             label: AmityLocalizedStringSet.Chat.GroupMemberAction.remove.localizedString,
-                            color: Color(viewConfig.theme.alertColor)
+                            isDestructive: true
                         ) {
                             onRemove?()
                         }
@@ -149,11 +143,11 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
         .updateTheme(with: viewConfig)
     }
 
-    private func actionRow(icon: ImageResource, label: String, color: Color, action: @escaping () -> Void) -> some View {
+    private func actionRow(icon: ImageResource, label: String, isDestructive: Bool = false, action: @escaping () -> Void) -> some View {
         Button {
             isPresented = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
@@ -166,9 +160,9 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 24, height: 24)
-                    .foregroundColor(color)
+                    .foregroundColor(Color(viewConfig.color(isDestructive ? .iconListLeadingDestructiveDefault : .iconListLeadingDefaultDefault)))
                 Text(label)
-                    .applyTextStyle(.bodyBold(color))
+                    .applyTextStyle(.bodyBold(Color(viewConfig.color(isDestructive ? .textListHeaderDestructiveDefault : .textListHeaderDefaultDefault))))
                 Spacer()
             }
             .padding(.horizontal, 20)

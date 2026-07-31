@@ -19,8 +19,7 @@ public struct AmityChatMessageSenderView: AmityElementView {
     let uploadProgress: Double?
 
     @EnvironmentObject private var viewConfig: AmityViewConfigController
-    @State private var showingVideoPlayer = false
-    @State private var showingImageViewer = false
+    @State private var mediaViewer: ChatMediaViewerKind?
 
     public init(message: MessageModel, messageAction: AmityMessageAction, uploadProgress: Double? = nil, pageId: PageId? = .chatPage, componentId: ComponentId? = .messageList) {
         self.message = message
@@ -35,9 +34,10 @@ public struct AmityChatMessageSenderView: AmityElementView {
             VStack(alignment: .leading, spacing: 4) {
                 if message.type == .image {
                     ImageBubbleView(url: message.mediumFileURL, syncState: message.syncState, progress: uploadProgress, isCancelled: message.isUploadCancelled, onCancel: { messageAction.onCancelUpload?(message) })
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             if message.syncState == .synced {
-                                showingImageViewer = true
+                                mediaViewer = .image
                             }
                         }
                 } else if message.type == .video {
@@ -48,7 +48,7 @@ public struct AmityChatMessageSenderView: AmityElementView {
                         isCancelled: message.isUploadCancelled,
                         onCancel: { messageAction.onCancelUpload?(message) }
                     ) {
-                        showingVideoPlayer = true
+                        mediaViewer = .video
                     }
                 } else {
                     textContent
@@ -62,27 +62,36 @@ public struct AmityChatMessageSenderView: AmityElementView {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showingVideoPlayer) {
-            if let url = message.videoPlaybackURL {
-                VideoMessagePlayerView(videoURL: url)
-                    .ignoresSafeArea()
+        // One cover for both media kinds — see `ChatMediaViewerKind`.
+        .fullScreenCover(item: $mediaViewer) { kind in
+            switch kind {
+            case .video:
+                if let url = message.videoPlaybackURL {
+                    VideoMessageFullScreenView(
+                        viewConfig: viewConfig,
+                        videoURL: url,
+                        downloadURL: message.videoDownloadURL,
+                        onClose: { mediaViewer = nil },
+                        onDelete: { messageAction.onDelete?(message) }
+                    )
+                }
+            case .image:
+                MediaViewer(
+                    url: message.imageURL ?? message.mediumFileURL,
+                    viewConfig: viewConfig,
+                    closeAction: { mediaViewer = nil },
+                    saveImageURL: message.largeImageURL,
+                    onDelete: { messageAction.onDelete?(message) }
+                )
             }
-        }
-        .fullScreenCover(isPresented: $showingImageViewer) {
-            MediaViewer(
-                url: message.imageURL ?? message.mediumFileURL,
-                viewConfig: viewConfig,
-                closeAction: { showingImageViewer = false },
-                saveImageURL: message.largeImageURL,
-                onDelete: { messageAction.onDelete?(message) }
-            )
         }
     }
 
     @ViewBuilder
     var textContent: some View {
-        let hasLinks = MessageLinkDetector.firstURL(in: message.text) != nil
-        let maxLines = hasLinks ? 5 : 10
+        // Cap at 10 lines before "see more" for all messages, including text
+        // containing long links.
+        let maxLines = 10
 
         if #available(iOS 15, *) {
             let bodyBoldFont = AmityTextStyle.bodyBold(.clear).getUIFont()

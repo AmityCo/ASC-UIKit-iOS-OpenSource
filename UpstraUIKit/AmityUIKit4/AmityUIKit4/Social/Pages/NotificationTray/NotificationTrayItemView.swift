@@ -9,10 +9,10 @@ import AmitySDK
 import SwiftUI
 
 struct NotificationTraySectionTitle: View {
-    
+
     let title: String
     @EnvironmentObject var viewConfig: AmityViewConfigController
-    
+
     var body: some View {
         Text(title)
             .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade2)))
@@ -32,6 +32,7 @@ struct NotificationTrayItemView: View {
             
             switch item.trayItemCategory {
             case .eventReminder, .eventStarted:
+                
                 let eventUrl = item.event?.coverImage?.mediumFileURL ?? ""
                 AsyncImage(placeholder: AmityIcon.eventImagePlaceholder.imageResource, url: URL(string: eventUrl), contentMode: .fill)
                     .frame(width: 32, height: 32)
@@ -47,6 +48,22 @@ struct NotificationTrayItemView: View {
                         .foregroundColor(.white)
                         .frame(width: 12, height: 12)
                 }
+                
+            case .eventCreated:
+                EventCommunityAvatarView(
+                    communityId: item.targetId,
+                    fallbackAvatarURL: item.event?.targetCommunity?.avatar?.fileURL,
+                    size: 32
+                )
+
+            case .inviteRoomCoHost:
+                CoHostInviteAvatarView(
+                    displayName: item.users.first?.displayName ?? "",
+                    avatarURL: URL(string: item.users.first?.avatarURL ?? ""),
+                    roomId: item.targetId,
+                    size: 32
+                )
+
             default:
                 AmityUserProfileImageView(
                     displayName: item.users.first?.displayName ?? "",
@@ -56,18 +73,23 @@ struct NotificationTrayItemView: View {
                 .clipShape(Circle())
             }
             
-            // "Hasan John mentioned you in a poll on their feed"
-            if #available(iOS 15, *) {
-                // Work with attributed text here
-                Text(item.getHighlightedText())
-                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
-                    .padding(.leading, 12)
-            } else {
-                Text(item.text)
-                    .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
-                    .padding(.leading, 12)
+            VStack(alignment: .leading, spacing: 4) {
+                // "Hasan John mentioned you in a poll on their feed"
+                if #available(iOS 15, *) {
+                    // Work with attributed text here
+                    Text(item.getHighlightedText())
+                        .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                } else {
+                    Text(item.text)
+                        .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                }
+
+                if item.trayItemCategory == .eventCreated, let event = item.event {
+                    eventContextRow(event: event)
+                }
             }
-            
+            .padding(.leading, 12)
+
             Spacer(minLength: 12)
             
             Text(item.timestamp.relativeTime)
@@ -86,11 +108,86 @@ struct NotificationTrayItemView: View {
                   //Figma display 0.3 but QA, designer would like set this on ios 0.2
                   ? viewConfig.theme.primaryColor.withAlphaComponent(0.2)
                   : viewConfig.theme.primaryColor.blend(.shade3).withAlphaComponent(0.3))
-                
+
+        }
+    }
+   
+}
+
+// MARK: - Event Creation
+extension NotificationTrayItemView {
+    
+    @ViewBuilder
+    private func eventContextRow(event: AmityEvent) -> some View {
+        HStack(spacing: 4) {
+            if !event.type.title.isEmpty {
+                eventTypeBadge(type: event.type)
+            }
+
+            Text(Formatters.eventDateOnlyFormatter.string(from: event.startTime))
+                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
+                .lineLimit(1)
+
+            Text(Formatters.eventTimeFormatter.string(from: event.startTime))
+                .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
+                .lineLimit(1)
+        }
+    }
+
+    @ViewBuilder
+    private func eventTypeBadge(type: AmityEventType) -> some View {
+        Text(type.title)
+            .applyTextStyle(.captionBold(.white))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                Capsule()
+                    .fill(Color.black.opacity(0.5))
+            )
+            .frame(height: 22)
+    }
+
+}
+
+// MARK: - Event Community Avatar
+class EventCommunityAvatarViewModel: ObservableObject {
+
+    @Published var avatarURL: String?
+    @Published var displayName: String = ""
+
+    private let communityManager = CommunityManager()
+    private var token: AmityNotificationToken?
+
+    func observeIfNeeded(communityId: String) {
+        guard token == nil, !communityId.isEmpty else { return }
+        token = communityManager.getCommunity(withId: communityId).observe { [weak self] liveObject, _ in
+            guard let self, let community = liveObject.snapshot else { return }
+            self.avatarURL = community.avatar?.fileURL
+            self.displayName = community.displayName
         }
     }
 }
 
+struct EventCommunityAvatarView: View {
+
+    @EnvironmentObject var viewConfig: AmityViewConfigController
+    @StateObject private var viewModel = EventCommunityAvatarViewModel()
+
+    let communityId: String
+    let fallbackAvatarURL: String?
+    let size: CGFloat
+
+    var body: some View {
+        AsyncImage(placeholderView: { defaultCommunityPlaceholderView(viewConfig: viewConfig, size: size) },
+                   url: URL(string: viewModel.avatarURL ?? fallbackAvatarURL ?? ""),
+                   contentMode: .fill)
+            .frame(width: size, height: size)
+            .clipShape(Circle())
+            .onAppear { viewModel.observeIfNeeded(communityId: communityId) }
+    }
+}
+
+// MARK: - Inviataion Item
 struct NotificationTrayInvitationItemView: View {
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
     @EnvironmentObject var viewConfig: AmityViewConfigController

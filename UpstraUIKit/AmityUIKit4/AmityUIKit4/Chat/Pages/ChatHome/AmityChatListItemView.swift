@@ -15,20 +15,20 @@ struct AmityChatListItemView: View {
     let isArchived: Bool
     let searchMessage: AmityMessage?
 
-    let theme: AmityThemeColor
+    let viewConfig: AmityViewConfigController
 
     init(
         channel: AmityChannel,
         searchQuery: String = "",
         isArchived: Bool = false,
         searchMessage: AmityMessage? = nil,
-        theme: AmityThemeColor
+        viewConfig: AmityViewConfigController
     ) {
         self.channel = channel
         self.searchQuery = searchQuery
         self.isArchived = isArchived
         self.searchMessage = searchMessage
-        self.theme = theme
+        self.viewConfig = viewConfig
     }
 
     // MARK: - Body
@@ -49,7 +49,7 @@ struct AmityChatListItemView: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .frame(height: 82, alignment: .top)
-        .background(Color(theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     // MARK: - Name row
@@ -66,27 +66,25 @@ struct AmityChatListItemView: View {
                         highlightedNameText(displayName, query: searchQuery)
                     } else {
                         Text(displayName)
-                            .applyTextStyle(.bodyBold(Color(theme.baseColor)))
+                            .applyTextStyle(.titleBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                     }
                 }
                 .lineLimit(1)
 
                 Text("(\(formattedCompactCount(channel.memberCount)))")
-                    .applyTextStyle(.caption(Color(theme.baseColorShade2)))
+                    .applyTextStyle(.caption(Color(viewConfig.color(.textListSubheadDefaultDefault))))
                     .lineLimit(1)
                     .fixedSize()
             }
         } else {
-            let nameColor: Color = isOtherUserDeleted
-                ? Color(theme.baseColorShade2)
-                : Color(theme.baseColor)
+            let nameColor = Color(viewConfig.color(.textListHeaderDefaultDefault))
             HStack(spacing: 4) {
                 Group {
                     if highlightName, hasWordBoundaryMatch(in: displayName, query: searchQuery) {
                         highlightedNameText(displayName, query: searchQuery)
                     } else {
                         Text(displayName)
-                            .applyTextStyle(.bodyBold(nameColor))
+                            .applyTextStyle(.titleBold(nameColor))
                     }
                 }
                 .lineLimit(1)
@@ -106,7 +104,7 @@ struct AmityChatListItemView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 18, height: 18)
-                    .foregroundColor(Color(theme.baseColorShade2))
+                    .foregroundColor(Color(viewConfig.color(.iconListDescriptionGeneral)))
             }
 
             let highlightPreview = !searchQuery.isEmpty
@@ -118,7 +116,7 @@ struct AmityChatListItemView: View {
                     highlightedPreviewText(preview.text, query: searchQuery)
                 } else {
                     Text(preview.text)
-                        .applyTextStyle(.body(Color(theme.baseColorShade2)))
+                        .applyTextStyle(.body(Color(viewConfig.color(.textListTextDescriptionDefaultDefault))))
                 }
             }
             .lineLimit(2)
@@ -135,7 +133,7 @@ struct AmityChatListItemView: View {
     private var rightColumn: some View {
         VStack(alignment: .trailing, spacing: 10) {
             Text(formattedDate(channel.lastActivity ?? channel.updatedAt ?? Date()))
-                .applyTextStyle(.caption(Color(theme.baseColorShade2)))
+                .applyTextStyle(.caption(Color(viewConfig.color(.textListTrailingSubtextDefault))))
                 .lineLimit(1)
                 .fixedSize()
 
@@ -161,7 +159,7 @@ struct AmityChatListItemView: View {
             if channel.channelType == .conversation {
                 let currentUserId = AmityUIKit4Manager.client.currentUserId ?? ""
                 let other = channel.previewMembers.first(where: { $0.userId != currentUserId })
-                if let urlStr = other?.user?.getAvatarInfo()?.fileURL { return URL(string: urlStr) }
+                if let url = other?.user?.resolvedAvatarURL { return url }
             }
             if let urlStr = channel.getAvatarInfo()?.fileURL { return URL(string: urlStr) }
             return nil
@@ -171,13 +169,13 @@ struct AmityChatListItemView: View {
             if isOtherUserDeleted {
                 ZStack {
                     Circle()
-                        .fill(Color(theme.secondaryColor.blend(.shade2)))
-                    Image(AmityIcon.Chat.deletedUserAvatarIcon.imageResource)
+                        .fill(Color(viewConfig.color(.surfaceAvatarProfileDefault)))
+                    Image(AmityIcon.DesignSystem.userS.imageResource)
                         .renderingMode(.template)
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(Color(theme.backgroundColor))
-                        .frame(width: 15, height: 16)
+                        .foregroundColor(Color(viewConfig.color(.iconAvatarDefault)))
+                        .frame(width: 24, height: 24)
                 }
                 .clipShape(Circle())
             } else {
@@ -186,10 +184,10 @@ struct AmityChatListItemView: View {
                         resolvedDisplayName.trimmingCharacters(in: .whitespacesAndNewlines).first ?? " "
                     ).uppercased()
                     Circle()
-                        .fill(Color(theme.primaryColor.blend(.shade2)))
+                        .fill(Color(viewConfig.color(.surfaceAvatarProfileDefault)))
                         .overlay(
                             Text(initial)
-                                .applyTextStyle(.custom(40 * 0.55, .regular, .white))
+                                .applyTextStyle(.custom(40 * 0.55, .regular, Color(viewConfig.color(.textAvatarAtomicGeneral))))
                         )
                     AsyncImage(placeholderView: { Color.clear }, url: resolvedURL)
                         .clipShape(Circle())
@@ -200,12 +198,14 @@ struct AmityChatListItemView: View {
             ZStack(alignment: .bottomTrailing) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(theme.primaryColor.blend(.shade2)))
+                        .fill(Color(viewConfig.color(.surfaceAvatarProfileDefault)))
                         .overlay(
-                            Image(AmityIcon.Chat.groupAvatarPlaceholderIcon.imageResource)
+                            Image(AmityIcon.DesignSystem.commentsAltS.imageResource)
+                                .renderingMode(.template)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 16, height: 16)
+                                .frame(width: 28, height: 28)
+                                .foregroundColor(Color(viewConfig.color(.iconAvatarDefault)))
                         )
                     AsyncImage(placeholderView: { Color.clear }, url: resolvedURL)
                         .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -221,57 +221,52 @@ struct AmityChatListItemView: View {
     }
 
     private var privateBadge: some View {
-        ZStack {
-            Circle().fill(Color(theme.primaryColor.blend(.shade2)))
-            Circle().stroke(Color(theme.backgroundColor), lineWidth: 1)
-            Image(AmityIcon.Chat.privateChannelIcon.imageResource)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 8, height: 8)
-                .foregroundColor(Color(theme.backgroundColor))
-        }
-        .frame(width: 16, height: 16)
+        AmityBadge(variant: .icon,
+                   icon: .lockKeyholeS,
+                   shape: .round,
+                   size: .size16,
+                   preset: .chat(.private),
+                   viewConfig: viewConfig)
+            .overlay(Circle().stroke(Color(viewConfig.color(.borderAvatarProfileDefault)), lineWidth: 1))
     }
 
     // MARK: - Badges
 
     private var archivedBadge: some View {
-        HStack(spacing: 1) {
-            Image(AmityIcon.Chat.archiveBadgeIcon.imageResource)
+        HStack(spacing: 2) {
+            Image(AmityIcon.DesignSystem.archiveR.imageResource)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 12, height: 12)
-                .foregroundColor(Color(theme.baseColorShade1))
+                .foregroundColor(Color(viewConfig.color(.iconBadgeSemanticBadgeChatArchivedDefault)))
             Text(AmityLocalizedStringSet.Chat.Archived.label.localizedString)
-                .applyTextStyle(.custom(11, .regular, Color(theme.baseColorShade1)))
+                .applyTextStyle(.custom(10, .regular, Color(viewConfig.color(.textBadgeSemanticBadgeChatArchivedDefault))))
         }
-        .padding(EdgeInsets(top: 3.5, leading: 4, bottom: 3.5, trailing: 6))
+        .padding(.leading, 4)
+        .padding(.trailing, 6)
+        .frame(height: 16)
         .background(
-            Capsule().fill(Color(theme.baseColorShade4))
+            Capsule().fill(Color(viewConfig.color(.surfaceBadgeSemanticBadgeChatArchived)))
         )
     }
 
     private var mentionIndicator: some View {
-        ZStack {
-            Circle().fill(Color(theme.primaryColor.blend(.shade3)))
-            Image(AmityIcon.Chat.roomMentionIcon.imageResource)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 14, height: 14)
-                .foregroundColor(Color(theme.primaryColor))
-        }
-        .frame(width: 24, height: 24)
+        AmityBadge(variant: .icon,
+                   icon: .atR,
+                   shape: .round,
+                   size: .size24,
+                   preset: .chat(.mention),
+                   viewConfig: viewConfig)
     }
 
     private var unreadBadge: some View {
-        Text(channel.unreadCount > 99 ? "99+" : "\(channel.unreadCount)")
-            .applyTextStyle(.custom(12, .bold, .white))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 1)
-            .background(RoundedRectangle(cornerRadius: 12).fill(Color(theme.alertColor)))
+        AmityBadge(variant: .label,
+                   label: channel.unreadCount > 99 ? "99+" : "\(channel.unreadCount)",
+                   shape: .round,
+                   size: .size20,
+                   preset: .general(.notification),
+                   viewConfig: viewConfig)
     }
 
     // MARK: - Resolved display name
@@ -319,7 +314,7 @@ struct AmityChatListItemView: View {
         if isDeleted {
             return (
                 AmityLocalizedStringSet.Chat.Preview.messageDeleted.localizedString,
-                AmityIcon.Chat.previewDeletedMessageIcon.imageResource
+                AmityIcon.DesignSystem.trashS.imageResource
             )
         }
         switch dataType {
@@ -328,10 +323,10 @@ struct AmityChatListItemView: View {
             return (text, nil)
         case .image:
             let key = AmityLocalizedStringSet.Chat.Preview.bannerPhoto
-            return (key.localizedString, AmityIcon.Chat.previewImageMessageIcon.imageResource)
+            return (key.localizedString, AmityIcon.DesignSystem.imageS.imageResource)
         case .video:
             let key = AmityLocalizedStringSet.Chat.Preview.bannerVideo
-            return (key.localizedString, AmityIcon.Chat.previewVideoMessageIcon.imageResource)
+            return (key.localizedString, AmityIcon.DesignSystem.circlePlayS.imageResource)
         case .file, .audio:
             return (AmityLocalizedStringSet.Chat.Preview.messageNoPreview.localizedString, nil)
         case .custom:
@@ -432,11 +427,11 @@ struct AmityChatListItemView: View {
         let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
         let queryLen = trimmedQuery.count
         let matches = findWordBoundaryMatches(in: text, query: trimmedQuery)
-        let nameFont = Font.system(size: 15, weight: .semibold)
+        let nameFont = Font.system(size: 17, weight: .semibold)
         guard !matches.isEmpty else {
             return Text(text)
                 .font(nameFont)
-                .foregroundColor(Color(theme.baseColor))
+                .foregroundColor(Color(viewConfig.color(.textListHeaderDefaultDefault)))
         }
 
         var result = Text("")
@@ -447,20 +442,20 @@ struct AmityChatListItemView: View {
                 let chunk = String(text[cursor..<matchStart])
                 result = result + Text(chunk)
                     .font(nameFont)
-                    .foregroundColor(Color(theme.baseColor))
+                    .foregroundColor(Color(viewConfig.color(.textListHeaderDefaultDefault)))
             }
             let matchEnd = text.index(matchStart, offsetBy: queryLen, limitedBy: text.endIndex) ?? text.endIndex
             let matchedChunk = String(text[matchStart..<matchEnd])
             result = result + Text(matchedChunk)
                 .font(nameFont)
-                .foregroundColor(Color(theme.primaryColor))
+                .foregroundColor(Color(viewConfig.color(.textListHeaderDefaultHighlight)))
             cursor = matchEnd
         }
         if cursor < text.endIndex {
             let chunk = String(text[cursor..<text.endIndex])
             result = result + Text(chunk)
                 .font(nameFont)
-                .foregroundColor(Color(theme.baseColor))
+                .foregroundColor(Color(viewConfig.color(.textListHeaderDefaultDefault)))
         }
         return result
     }
@@ -480,7 +475,7 @@ struct AmityChatListItemView: View {
         guard !matches.isEmpty else {
             return Text(truncated)
                 .font(bodyFont)
-                .foregroundColor(Color(theme.baseColorShade2))
+                .foregroundColor(Color(viewConfig.color(.textListTextDescriptionDefaultDefault)))
         }
 
         var result = Text("")
@@ -490,25 +485,25 @@ struct AmityChatListItemView: View {
                 let chunk = String(truncated[cursor..<matchStart])
                 result = result + Text(chunk)
                     .font(bodyFont)
-                    .foregroundColor(Color(theme.baseColorShade2))
+                    .foregroundColor(Color(viewConfig.color(.textListTextDescriptionDefaultDefault)))
             }
             let matchEnd = truncated.index(matchStart, offsetBy: queryLen, limitedBy: truncated.endIndex) ?? truncated.endIndex
             let matchedChunk = String(truncated[matchStart..<matchEnd])
             result = result + Text(matchedChunk)
                 .font(bodyBoldFont)
-                .foregroundColor(Color(theme.baseColor))
+                .foregroundColor(Color(viewConfig.color(.textListTextDescriptionDefaultHighlight)))
             cursor = matchEnd
         }
         if cursor < truncated.endIndex {
             let chunk = String(truncated[cursor..<truncated.endIndex])
             result = result + Text(chunk)
                 .font(bodyFont)
-                .foregroundColor(Color(theme.baseColorShade2))
+                .foregroundColor(Color(viewConfig.color(.textListTextDescriptionDefaultDefault)))
         }
         if text.count > maxChars {
             result = result + Text("...")
                 .font(bodyFont)
-                .foregroundColor(Color(theme.baseColorShade2))
+                .foregroundColor(Color(viewConfig.color(.textListTextDescriptionDefaultDefault)))
         }
         return result
     }

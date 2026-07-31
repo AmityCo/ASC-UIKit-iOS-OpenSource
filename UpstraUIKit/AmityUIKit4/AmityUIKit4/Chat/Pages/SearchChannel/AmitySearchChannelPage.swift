@@ -29,17 +29,17 @@ public struct AmitySearchChannelPage: AmityPageView {
             searchBar
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
-                .background(Color(viewConfig.theme.backgroundColor))
+                .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
 
             tabBar
 
             Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewConfig.color(.lineDividerPostDefault)))
                 .frame(height: 1)
 
             content
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
         .navigationBarHidden(true)
         .showToast(isPresented: $showToast, style: toastStyle, message: toastMessage, bottomPadding: 80)
         .alert(isPresented: $showArchiveLimitAlert) {
@@ -56,46 +56,46 @@ public struct AmitySearchChannelPage: AmityPageView {
     private var searchBar: some View {
         HStack(spacing: 10) {
             HStack(spacing: 8) {
-                Image(AmityIcon.Chat.navSearchIcon.imageResource)
+                Image(AmityIcon.DesignSystem.searchR.imageResource)
                     .renderingMode(.template)
                     .resizable()
                     .scaledToFit()
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                    .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                     .frame(width: 20, height: 20)
 
                 Group {
                     if #available(iOS 15.0, *) {
                         TextField(AmityLocalizedStringSet.Chat.Search.placeholder.localizedString, text: $viewModel.searchKeyword)
-                            .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                            .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
                             .submitLabel(.search)
                     } else {
                         TextField(AmityLocalizedStringSet.Chat.Search.placeholder.localizedString, text: $viewModel.searchKeyword)
-                            .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                            .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
                     }
                 }
 
                 if !viewModel.searchKeyword.isEmpty {
                     Button { viewModel.searchKeyword = "" } label: {
-                        Image(AmityIcon.Chat.grayCloseIcon.imageResource)
+                        Image(AmityIcon.DesignSystem.clearR.imageResource)
                             .renderingMode(.template)
                             .resizable()
                             .scaledToFit()
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
-                            .frame(width: 16, height: 16)
+                            .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
+                            .frame(width: 20, height: 20)
                     }
                     .buttonStyle(.plain)
                 }
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
-            .background(Color(viewConfig.theme.baseColorShade4))
+            .background(Color(viewConfig.color(.surfaceInputBoxedInputDefault)))
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
             Button {
                 host.controller?.dismiss(animated: true)
             } label: {
                 Text(AmityLocalizedStringSet.General.cancel.localizedString)
-                    .applyTextStyle(.body(Color(viewConfig.theme.primaryColor)))
+                    .applyTextStyle(.body(Color(viewConfig.color(.textMainButtonDefaultGhostPrimaryEnabled))))
             }
             .buttonStyle(.plain)
         }
@@ -111,7 +111,7 @@ public struct AmitySearchChannelPage: AmityPageView {
             Spacer()
         }
         .padding(.horizontal, 16)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     private func tabButton(_ tab: AmitySearchChannelViewModel.SearchTab) -> some View {
@@ -122,12 +122,12 @@ public struct AmitySearchChannelPage: AmityPageView {
             VStack(spacing: 0) {
                 Text(tab.title)
                     .applyTextStyle(.titleBold(isSelected
-                        ? Color(viewConfig.theme.primaryColor)
-                        : Color(viewConfig.theme.baseColorShade2)))
+                        ? Color(viewConfig.color(.textTabUnderlinedActive))
+                        : Color(viewConfig.color(.textTabUnderlinedDefault))))
                     .padding(.vertical, 12)
 
                 Rectangle()
-                    .fill(isSelected ? Color(viewConfig.theme.primaryColor) : Color.clear)
+                    .fill(isSelected ? Color(viewConfig.color(.lineTabUnderlinedActive)) : Color.clear)
                     .frame(height: 2)
             }
         }
@@ -167,16 +167,16 @@ public struct AmitySearchChannelPage: AmityPageView {
                     let channel = viewModel.channels[index]
                     let isArchived = viewModel.archivedChannelIds.contains(channel.channelId)
                     ChatListSwipeAction(
-                        icon: isArchived ? AmityIcon.Chat.channelUnarchiveIcon.imageResource : AmityIcon.Chat.channelArchiveIcon.imageResource,
+                        icon: isArchived ? AmityIcon.DesignSystem.unarchiveR : AmityIcon.DesignSystem.archiveR,
                         label: isArchived ? AmityLocalizedStringSet.Chat.Archive.unarchive.localizedString : AmityLocalizedStringSet.Chat.Archive.archive.localizedString,
-                        theme: viewConfig.theme,
+                        viewConfig: viewConfig,
                         action: { handleArchiveAction(channelId: channel.channelId, isArchived: isArchived) }
                     ) {
                         AmityChatListItemView(
                             channel: channel,
                             searchQuery: viewModel.searchKeyword,
                             isArchived: isArchived,
-                            theme: viewConfig.theme
+                            viewConfig: viewConfig
                         )
                         .contentShape(Rectangle())
                         .onTapGesture { navigateToChannel(channel) }
@@ -194,7 +194,7 @@ public struct AmitySearchChannelPage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     // MARK: - Message results
@@ -207,9 +207,9 @@ public struct AmitySearchChannelPage: AmityPageView {
                     let isArchived = viewModel.archivedChannelIds.contains(message.channelId)
 
                     ChatListSwipeAction(
-                        icon: isArchived ? AmityIcon.Chat.channelUnarchiveIcon.imageResource : AmityIcon.Chat.channelArchiveIcon.imageResource,
+                        icon: isArchived ? AmityIcon.DesignSystem.unarchiveR : AmityIcon.DesignSystem.archiveR,
                         label: isArchived ? AmityLocalizedStringSet.Chat.Archive.unarchive.localizedString : AmityLocalizedStringSet.Chat.Archive.archive.localizedString,
-                        theme: viewConfig.theme,
+                        viewConfig: viewConfig,
                         action: { handleArchiveAction(channelId: message.channelId, isArchived: isArchived) }
                     ) {
                         if let ch = viewModel.messageChannelMap[message.channelId] {
@@ -218,7 +218,7 @@ public struct AmitySearchChannelPage: AmityPageView {
                                 searchQuery: viewModel.searchKeyword,
                                 isArchived: isArchived,
                                 searchMessage: message,
-                                theme: viewConfig.theme
+                                viewConfig: viewConfig
                             )
                             .contentShape(Rectangle())
                             .onTapGesture { navigateToMessage(message) }
@@ -237,23 +237,20 @@ public struct AmitySearchChannelPage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     // MARK: - Minimum chars view
 
     private var minimumCharsView: some View {
-        VStack(spacing: 16) {
+        VStack {
             Spacer()
-            Image(AmityIcon.Chat.startSearchIcon.imageResource)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
-                .frame(width: 60, height: 60)
-            Text(AmityLocalizedStringSet.Chat.Search.minimumChars.localizedString)
-                .applyTextStyle(.title(Color(viewConfig.theme.baseColorShade3)))
-                .multilineTextAlignment(.center)
+            AmityEmptyState(
+                variant: .icon,
+                image: AmityIcon.DesignSystem.searchL.imageResource,
+                title: AmityLocalizedStringSet.Chat.Search.minimumChars.localizedString,
+                viewConfig: viewConfig
+            )
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -262,16 +259,14 @@ public struct AmitySearchChannelPage: AmityPageView {
     // MARK: - No results
 
     private var noResultsView: some View {
-        VStack(spacing: 16) {
+        VStack {
             Spacer().frame(height: 114)
-            Image(AmityIcon.Chat.searchErrorIcon.imageResource)
-                .renderingMode(.template)
-                .resizable()
-                .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.secondaryColor.blend(.shade4)))
-                .frame(width: 60, height: 60)
-            Text(AmityLocalizedStringSet.Chat.Search.emptyTitle.localizedString)
-                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
+            AmityEmptyState(
+                variant: .icon,
+                image: AmityIcon.DesignSystem.searchCrossL.imageResource,
+                title: AmityLocalizedStringSet.Chat.Search.emptyTitle.localizedString,
+                viewConfig: viewConfig
+            )
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -287,7 +282,7 @@ public struct AmitySearchChannelPage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListSkeletonSkeleton)))
     }
 
     private var searchSkeletonRows: some View {
@@ -299,16 +294,16 @@ public struct AmitySearchChannelPage: AmityPageView {
     private var searchSkeletonRow: some View {
         HStack(spacing: 12) {
             Circle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
                 .frame(width: 48, height: 48)
 
             VStack(alignment: .leading, spacing: 8) {
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
                     .frame(width: 140, height: 14)
 
                 RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
                     .frame(width: 200, height: 12)
             }
             Spacer()

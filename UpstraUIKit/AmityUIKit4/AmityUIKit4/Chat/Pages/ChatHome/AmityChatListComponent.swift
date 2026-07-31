@@ -9,36 +9,30 @@ import AmitySDK
 // MARK: - Swipe-to-action wrapper
 
 struct ChatListSwipeAction<Content: View>: View {
-    let icon: ImageResource
+    let icon: AmityIcon.DesignSystem
     let label: String
-    let theme: AmityThemeColor
+    let viewConfig: AmityViewConfigController
     let action: () -> Void
     @ViewBuilder let content: () -> Content
-    
+
     @State private var offset: CGFloat = 0
-    
+
     private let threshold: CGFloat = 100
-    private let actionWidth: CGFloat = 80
-    
+
     var body: some View {
         ZStack(alignment: .trailing) {
-            HStack(spacing: 4) {
+            HStack(spacing: 0) {
                 Spacer()
-                VStack(spacing: 4) {
-                    Image(icon)
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 28, height: 28)
-                        .foregroundColor(.white)
-                    Text(label)
-                        .applyTextStyle(.captionBold(.white))
-                }
-                .frame(width: actionWidth)
+                AmityButton(variant: .square,
+                            hierarchy: .secondary,
+                            label: label,
+                            icon: icon,
+                            viewConfig: viewConfig,
+                            onClick: action)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(theme.baseColorShade2))
-            
+            .background(Color(viewConfig.color(.surfaceSquareButtonDefaultSecondaryDefault)))
+
             content()
                 .offset(x: offset)
                 .gesture(
@@ -67,7 +61,7 @@ struct AmityChatListComponent: View {
     let channels: [AmityChannel]
     let isLoading: Bool
     let tab: ChatHomeTab
-    let theme: AmityThemeColor
+    let viewConfig: AmityViewConfigController
     let isPushNotificationEnabled: Bool
     let onChannelTap: (AmityChannel) -> Void
     let onLoadMore: () -> Void
@@ -97,19 +91,20 @@ struct AmityChatListComponent: View {
     // MARK: - Push notifications disabled banner
 
     private var pushNotificationsBanner: some View {
-        HStack(spacing: 4) {
-            Image(AmityIcon.Chat.muteIcon.imageResource)
+        HStack(spacing: 2) {
+            Image(AmityIcon.DesignSystem.bellSlashR.imageResource)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 12, height: 12)
-                .foregroundColor(Color(theme.baseColorShade1))
+                .frame(width: 18, height: 18)
+                .foregroundColor(Color(viewConfig.color(.iconBannerSubdueDescriptionGeneral)))
             Text(AmityLocalizedStringSet.Chat.Home.notificationsDisabled.localizedString)
-                .applyTextStyle(.caption(Color(theme.baseColorShade1)))
+                .applyTextStyle(.caption(Color(viewConfig.color(.textBannerSubdueTextDescriptionGeneral))))
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
-        .background(Color(theme.baseColorShade4))
+        .padding(.horizontal, 16)
+        .background(Color(viewConfig.color(.surfaceBannerSubdueGeneral)))
     }
 
     // MARK: - Channel list
@@ -119,12 +114,12 @@ struct AmityChatListComponent: View {
             LazyVStack(spacing: 0) {
                 ForEach(channels, id: \.channelId) { channel in
                     ChatListSwipeAction(
-                        icon: AmityIcon.Chat.channelArchiveIcon.imageResource,
+                        icon: .archiveR,
                         label: AmityLocalizedStringSet.Chat.Archive.archive.localizedString,
-                        theme: theme,
+                        viewConfig: viewConfig,
                         action: { onArchive?(channel.channelId) }
                     ) {
-                        AmityChatListItemView(channel: channel, theme: theme)
+                        AmityChatListItemView(channel: channel, viewConfig: viewConfig)
                             .contentShape(Rectangle())
                             .onTapGesture { onChannelTap(channel) }
                     }
@@ -138,7 +133,7 @@ struct AmityChatListComponent: View {
             }
             .animation(.default, value: channels.map(\.channelId))
         }
-        .background(Color(theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
     }
 
     // MARK: - Skeleton
@@ -146,35 +141,36 @@ struct AmityChatListComponent: View {
     private var skeletonList: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
-                ForEach(0..<8, id: \.self) { _ in
+                ForEach(0..<9, id: \.self) { _ in
                     skeletonRow
                 }
             }
         }
-        .background(Color(theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfaceListSkeletonSkeleton)))
     }
 
     private var skeletonRow: some View {
         HStack(spacing: 12) {
             Circle()
-                .fill(Color(theme.baseColorShade4))
-                .frame(width: 48, height: 48)
+                .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
+                .frame(width: 40, height: 40)
                 .shimmering()
 
-            VStack(alignment: .leading, spacing: 8) {
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(theme.baseColorShade4))
-                    .frame(width: 140, height: 14)
+            VStack(alignment: .leading, spacing: 12) {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
+                    .frame(width: 140, height: 10)
                     .shimmering()
 
-                RoundedRectangle(cornerRadius: 4)
-                    .fill(Color(theme.baseColorShade4))
-                    .frame(width: 200, height: 12)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(viewConfig.color(.surfaceSkeletonEffectDefault)))
+                    .frame(width: 200, height: 10)
                     .shimmering()
             }
 
             Spacer()
         }
+        // 40 pt avatar + 12 pt top/bottom padding = 64 pt row (Figma node 12041:242258).
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
     }
@@ -182,44 +178,24 @@ struct AmityChatListComponent: View {
     // MARK: - Empty state
 
     private var emptyState: some View {
-        VStack(spacing: 0) {
+        VStack {
             Spacer()
 
-            Image(AmityIcon.Chat.emptyStateIcon.imageResource)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 160, height: 140)
-
-            Spacer().frame(height: 16)
-
-            Text(AmityLocalizedStringSet.Chat.Home.emptyTitle.localizedString)
-                .applyTextStyle(.titleBold(Color(theme.baseColorShade3)))
-
-            Text(AmityLocalizedStringSet.Chat.modalEmptyDescription.localizedString)
-                .applyTextStyle(.caption(Color(theme.baseColorShade3)))
-
-            Spacer().frame(height: 16)
-
-            Button {
-                onCreateChat?()
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "plus")
-                        .font(AmityTextStyle.custom(14, .bold, .clear).getFont())
-                        .foregroundColor(.white)
-                    Text(AmityLocalizedStringSet.Chat.Home.createNew.localizedString)
-                        .applyTextStyle(.bodyBold(.white))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(Color(theme.primaryColor))
-                .cornerRadius(8)
-            }
-            .buttonStyle(.plain)
+            AmityEmptyState(
+                variant: .illustration,
+                image: AmityIcon.Chat.emptyStateIcon.imageResource,
+                title: AmityLocalizedStringSet.Chat.Home.emptyTitle.localizedString,
+                description: AmityLocalizedStringSet.Chat.modalEmptyDescription.localizedString,
+                primaryAction: AmityEmptyStateAction(
+                    label: AmityLocalizedStringSet.Chat.Home.createNew.localizedString,
+                    icon: .plusR
+                ) { onCreateChat?() },
+                viewConfig: viewConfig
+            )
 
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
     }
 }

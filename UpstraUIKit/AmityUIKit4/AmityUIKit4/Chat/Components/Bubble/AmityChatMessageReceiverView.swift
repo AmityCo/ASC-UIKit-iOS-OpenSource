@@ -16,8 +16,7 @@ public struct AmityChatMessageReceiverView: AmityElementView {
     let messageAction: AmityMessageAction
 
     @EnvironmentObject private var viewConfig: AmityViewConfigController
-    @State private var showingVideoPlayer = false
-    @State private var showingImageViewer = false
+    @State private var mediaViewer: ChatMediaViewerKind?
 
     public init(message: MessageModel, messageAction: AmityMessageAction, pageId: PageId? = .chatPage, componentId: ComponentId? = .messageList) {
         self.message = message
@@ -31,9 +30,10 @@ public struct AmityChatMessageReceiverView: AmityElementView {
             VStack(alignment: .leading, spacing: 4) {
                 if message.type == .image {
                     ImageBubbleView(url: message.mediumFileURL, syncState: message.syncState)
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             if message.syncState == .synced {
-                                showingImageViewer = true
+                                mediaViewer = .image
                             }
                         }
                 } else if message.type == .video {
@@ -41,7 +41,7 @@ public struct AmityChatMessageReceiverView: AmityElementView {
                         thumbnailURL: message.videoThumbnailURL,
                         syncState: message.syncState
                     ) {
-                        showingVideoPlayer = true
+                        mediaViewer = .video
                     }
                 } else {
                     textContent
@@ -55,35 +55,43 @@ public struct AmityChatMessageReceiverView: AmityElementView {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showingVideoPlayer) {
-            if let url = message.videoPlaybackURL {
-                VideoMessagePlayerView(videoURL: url)
-                    .ignoresSafeArea()
+        // One cover for both media kinds — see `ChatMediaViewerKind`.
+        .fullScreenCover(item: $mediaViewer) { kind in
+            switch kind {
+            case .video:
+                if let url = message.videoPlaybackURL {
+                    VideoMessageFullScreenView(
+                        viewConfig: viewConfig,
+                        videoURL: url,
+                        downloadURL: message.videoDownloadURL,
+                        onClose: { mediaViewer = nil }
+                    )
+                }
+            case .image:
+                MediaViewer(
+                    url: message.imageURL ?? message.mediumFileURL,
+                    viewConfig: viewConfig,
+                    closeAction: { mediaViewer = nil },
+                    saveImageURL: message.largeImageURL
+                )
             }
-        }
-        .fullScreenCover(isPresented: $showingImageViewer) {
-            MediaViewer(
-                url: message.imageURL ?? message.mediumFileURL,
-                viewConfig: viewConfig,
-                closeAction: { showingImageViewer = false },
-                saveImageURL: message.largeImageURL
-            )
         }
     }
 
     @ViewBuilder
     var textContent: some View {
-        let hasLinks = MessageLinkDetector.firstURL(in: message.text) != nil
-        let maxLines = hasLinks ? 5 : 10
+        // Cap at 10 lines before "see more" for all messages, including text
+        // containing long links.
+        let maxLines = 10
 
         if #available(iOS 15, *) {
             let bodyBoldFont = AmityTextStyle.bodyBold(.clear).getUIFont()
             let mentionAttrs: [NSAttributedString.Key: Any] = [
-                .foregroundColor: viewConfig.theme.highlightColor,
+                .foregroundColor: viewConfig.color(.textChatBubbleInboundMentionedDefault),
                 .font: bodyBoldFont
             ]
             let linkAttrs: [NSAttributedString.Key: Any] = [
-                .foregroundColor: viewConfig.theme.highlightColor,
+                .foregroundColor: viewConfig.color(.textChatBubbleInboundLinkDefault),
                 .underlineStyle: Text.LineStyle(pattern: .solid)
             ]
             let attributedText = TextHighlighter.getAttributedText(from: message, highlightAttributes: mentionAttrs, linkAttributes: linkAttrs)

@@ -65,7 +65,7 @@ public struct AmityUserFeedComponent: AmityComponentView {
                         AmityPostContentComponent(post: post, onTapAction: { context in
                             
                             let model = AmityPostModel(post: post)
-                            if model.dataTypeInternal == .clip {
+                            if model.dataTypeInternal == .clip, context?.isClipPost == true {
                                 
                                 if let media = model.medias.first, let mediaURL = URL(string: media.clip?.fileURL ?? "") {
                                     let clipPost = ClipPost(id: model.postId, url: mediaURL, model: model)

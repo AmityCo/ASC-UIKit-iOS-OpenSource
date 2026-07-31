@@ -43,9 +43,7 @@ private struct AdAvatarPlaceholder: View {
         }()
 
         ZStack {
-            Color(colorScheme == .dark
-                  ? viewConfig.theme.primaryColor.blend(.shade1)
-                  : viewConfig.theme.primaryColor.blend(.shade2))
+            Color(viewConfig.theme.primaryColor.blend(.shade1))
             Image(AmityIcon.adAvatarPlaceholder.imageResource)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
@@ -70,10 +68,7 @@ private struct DefaultCommunityPlaceholder: View {
 
     var body: some View {
         ZStack {
-            Color(colorScheme == .dark
-                  ? viewConfig.theme.primaryColor.blend(.shade1)
-                  : viewConfig.theme.primaryColor.blend(.shade2))
-                .frame(width: size, height: size)
+            Color(viewConfig.theme.primaryColor.blend(.shade1))
 
             Image(AmityIcon.defaultCommunity.imageResource)
                 .resizable()
@@ -98,9 +93,7 @@ private struct CategoryPlaceholder: View {
 
     var body: some View {
         ZStack {
-            Color(colorScheme == .dark
-                  ? viewConfig.theme.primaryColor.blend(.shade1)
-                  : viewConfig.theme.primaryColor.blend(.shade2))
+            Color(viewConfig.theme.primaryColor.blend(.shade1))
                 .frame(width: size, height: size)
 
             Image(AmityIcon.communityCategoryPlaceholder.imageResource)

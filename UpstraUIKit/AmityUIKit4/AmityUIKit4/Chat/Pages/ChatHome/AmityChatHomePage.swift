@@ -6,6 +6,12 @@
 import SwiftUI
 import AmitySDK
 
+/// The nav-bar popover menus hosted by the Chat Home page.
+private enum ChatNavMenu: Hashable {
+    case create
+    case overflow
+}
+
 public struct AmityChatHomePage: AmityPageView {
     @EnvironmentObject public var host: AmitySwiftUIHostWrapper
 
@@ -14,7 +20,7 @@ public struct AmityChatHomePage: AmityPageView {
     @StateObject private var viewModel = AmityChatHomeViewModel()
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var networkMonitor = NetworkMonitor()
-    @State private var showCreateMenu = false
+    @State private var activeNavMenu: ChatNavMenu?
     @State private var toastMessage: String = ""
     @State private var showToast: Bool = false
     @State private var toastStyle: ToastStyle = .success
@@ -40,7 +46,7 @@ public struct AmityChatHomePage: AmityPageView {
                 pillTabRow
                     .padding(.horizontal, 8)
                     .padding(.vertical, 8)
-                    .background(Color(viewConfig.theme.backgroundColor))
+                    .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
             }
 
             // MARK: Channel list
@@ -51,10 +57,11 @@ public struct AmityChatHomePage: AmityPageView {
                 }
             }
         }
-        .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)).ignoresSafeArea())
+        .popoverMenu(active: $activeNavMenu, viewConfig: viewConfig, items: navPopoverItems)
         .updateTheme(with: viewConfig)
         .navigationBarHidden(true)
-        .showToast(isPresented: $showToast, style: toastStyle, message: toastMessage, bottomPadding: 80)
+        .showToast(isPresented: $showToast, style: toastStyle, message: toastMessage, bottomPadding: 40)
         .alert(isPresented: $showArchiveLimitAlert) {
             Alert(
                 title: Text(AmityLocalizedStringSet.Chat.Archive.limitTitle.localizedString),
@@ -82,7 +89,7 @@ public struct AmityChatHomePage: AmityPageView {
             }
 
             Text(AmityLocalizedStringSet.Chat.Home.title.localizedString)
-                .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
+                .applyTextStyle(.headline(Color(viewConfig.color(.textListHeaderDefaultDefault))))
                 .padding(.leading, onBack == nil ? 16 : 8)
 
             Spacer()
@@ -93,44 +100,43 @@ public struct AmityChatHomePage: AmityPageView {
                         .progressViewStyle(CircularProgressViewStyle())
                         .scaleEffect(0.7)
                     Text(AmityLocalizedStringSet.Chat.Home.waitingForNetwork.localizedString)
-                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                        .applyTextStyle(.caption(Color(viewConfig.color(.textListTextDescriptionDefaultDefault))))
                 }
             }
 
             Spacer()
 
-            circleIconButton(image: AmityIcon.Chat.searchButtonIcon.imageResource) {
+            AmityButton(
+                variant: .icon,
+                hierarchy: .secondary,
+                style: .filled,
+                iconSize: .size32,
+                icon: .searchR,
+                viewConfig: viewConfig
+            ) {
                 let nav = AmitySwiftUIHostingNavigationController(rootView: AmitySearchChannelPage())
                 nav.isNavigationBarHidden = true
                 nav.modalPresentationStyle = .fullScreen
                 nav.modalTransitionStyle = .coverVertical
                 host.controller?.present(nav, animated: true)
             }
+            .padding(.trailing, 8)
 
             createChannelButton
 
-            Menu {
-                Button {
-                    let page = AmityArchivedChatPage()
-                    let vc = AmitySwiftUIHostingController(rootView: page)
-                    host.controller?.navigationController?.pushViewController(vc, animated: true)
-                } label: {
-                    Label {
-                        Text(AmityLocalizedStringSet.Chat.Home.menuArchived.localizedString)
-                    } icon: {
-                        Image(AmityIcon.Chat.archivedMenuIcon.imageResource)
-                            .renderingMode(.template)
-                    }
-                }
+            Button {
+                withAnimation(.easeOut(duration: 0.15)) { activeNavMenu = .overflow }
             } label: {
-                Image(AmityIcon.Chat.homeOptionIcon.imageResource)
+                circleIcon(image: AmityIcon.DesignSystem.ellipsisVR.imageResource)
                     .padding(.trailing, 8)
             }
+            .buttonStyle(.plain)
+            .popoverAnchor(ChatNavMenu.overflow)
 
             Spacer().frame(width: 8)
         }
         .frame(height: 44)
-        .background(Color(viewConfig.theme.backgroundColor))
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
     }
 
     // MARK: - Pill tab row
@@ -145,36 +151,16 @@ public struct AmityChatHomePage: AmityPageView {
     }
 
     private func pillTabButton(_ tab: ChatHomeTab) -> some View {
-        let isSelected = viewModel.selectedTab == tab
-
-        return Button {
+        AmityTab(
+            variant: .pill,
+            label: tab.title,
+            selected: viewModel.selectedTab == tab,
+            viewConfig: viewConfig
+        ) {
             withAnimation(.easeInOut(duration: 0.2)) {
                 viewModel.selectedTab = tab
             }
-        } label: {
-            Text(tab.title)
-                .applyTextStyle(isSelected
-                    ? .bodyBold(.white)
-                    : .body(Color(viewConfig.theme.baseColorShade1)))
-                .padding(.horizontal, 14)
-                .padding(.vertical, 7)
-                .background(
-                    Capsule()
-                        .fill(isSelected
-                              ? Color(viewConfig.theme.highlightColor)
-                              : Color.clear)
-                )
-                .overlay(
-                    Capsule()
-                        .stroke(
-                            isSelected
-                                ? Color.clear
-                                : Color(viewConfig.theme.baseColorShade4),
-                            lineWidth: 1
-                        )
-                )
         }
-        .buttonStyle(.plain)
     }
 
     // MARK: - Tab content
@@ -192,7 +178,7 @@ public struct AmityChatHomePage: AmityPageView {
             channels: channels,
             isLoading: viewModel.isLoading,
             tab: tab,
-            theme: viewConfig.theme,
+            viewConfig: viewConfig,
             isPushNotificationEnabled: viewModel.isPushNotificationEnabled,
             onChannelTap: { channel in
                 navigate(to: channel)
@@ -251,27 +237,14 @@ public struct AmityChatHomePage: AmityPageView {
         let enabled = AmityUIKitConfigController.shared.enabledChannelTypes()
 
         if enabled.count > 1 {
-            Menu {
-                Button(action: presentCreateConversation) {
-                    Label {
-                        Text(AmityLocalizedStringSet.Chat.Home.menuDirectChat.localizedString)
-                    } icon: {
-                        Image(AmityIcon.Chat.createButtonIcon.imageResource)
-                            .renderingMode(.template)
-                    }
-                }
-                Button(action: presentCreateGroup) {
-                    Label {
-                        Text(AmityLocalizedStringSet.Chat.Home.menuGroupChat.localizedString)
-                    } icon: {
-                        Image(AmityIcon.Chat.createGroupIcon.imageResource)
-                            .renderingMode(.template)
-                    }
-                }
+            Button {
+                withAnimation(.easeOut(duration: 0.15)) { activeNavMenu = .create }
             } label: {
-                circleIcon(image: AmityIcon.Chat.chatCreationButton.imageResource)
+                circleIcon(image: AmityIcon.DesignSystem.plusR.imageResource)
                     .padding(.trailing, 8)
             }
+            .buttonStyle(.plain)
+            .popoverAnchor(ChatNavMenu.create)
         } else if let only = enabled.first {
             Button {
                 switch only {
@@ -279,7 +252,7 @@ public struct AmityChatHomePage: AmityPageView {
                 case .community:    presentCreateGroup()
                 }
             } label: {
-                circleIcon(image: AmityIcon.Chat.chatCreationButton.imageResource)
+                circleIcon(image: AmityIcon.DesignSystem.plusR.imageResource)
                     .padding(.trailing, 8)
             }
             .buttonStyle(.plain)
@@ -304,28 +277,52 @@ public struct AmityChatHomePage: AmityPageView {
         host.controller?.present(nav, animated: true)
     }
 
-    // MARK: - Helpers
-
-    private func circleIconButton(image: ImageResource, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            circleIcon(image: image)
-        }
-        .buttonStyle(.plain)
-        .padding(.trailing, 8)
+    private func presentArchived() {
+        let page = AmityArchivedChatPage()
+        let vc = AmitySwiftUIHostingController(rootView: page)
+        host.controller?.navigationController?.pushViewController(vc, animated: true)
     }
+
+    // MARK: - Nav popover items
+
+    private var navPopoverItems: [ChatNavMenu: [AmityPopoverMenuItem]] {
+        [
+            .create: [
+                AmityPopoverMenuItem(
+                    icon: AmityIcon.DesignSystem.userPlusR.imageResource,
+                    title: AmityLocalizedStringSet.Chat.Home.menuDirectChat.localizedString,
+                    action: presentCreateConversation
+                ),
+                AmityPopoverMenuItem(
+                    icon: AmityIcon.DesignSystem.userGroupR.imageResource,
+                    title: AmityLocalizedStringSet.Chat.Home.menuGroupChat.localizedString,
+                    action: presentCreateGroup
+                )
+            ],
+            .overflow: [
+                AmityPopoverMenuItem(
+                    icon: AmityIcon.DesignSystem.archiveR.imageResource,
+                    title: AmityLocalizedStringSet.Chat.Home.menuArchived.localizedString,
+                    action: presentArchived
+                )
+            ]
+        ]
+    }
+
+    // MARK: - Helpers
 
     private func circleIcon(image: ImageResource) -> some View {
         ZStack {
             Circle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(viewConfig.color(.surfaceIconButtonFilledSecondaryEnabled)))
                 .frame(width: 32, height: 32)
 
             Image(image)
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 20, height: 20)
-                .foregroundColor(Color(viewConfig.theme.baseColor))
+                .frame(width: 24, height: 24)
+                .foregroundColor(Color(viewConfig.color(.iconIconButtonFilledSecondaryDefault)))
         }
     }
 }

@@ -109,6 +109,13 @@ struct LiveStreamConferenceView: View {
                     .bottomSheet(isShowing: $showCoHostMenuActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.defaultDarkTheme.backgroundColor)) {
                         coHostMenuActionSheet
                     }
+                    .onChange(of: showCoHostMenuActionSheet) { isShowing in
+                        if isShowing {
+                            Task {
+                                await viewModel.checkProductCatalogueSettings()
+                            }
+                        }
+                    }
                     .onChange(of: showProductTagSheet) { isShowing in
                         if isShowing {
                             Task {
