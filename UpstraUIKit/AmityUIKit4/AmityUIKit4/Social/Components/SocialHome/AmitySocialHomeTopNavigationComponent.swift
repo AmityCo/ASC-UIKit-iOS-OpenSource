@@ -166,7 +166,7 @@ class SocialHomePageNavigationViewModel: ObservableObject {
     private let invitationManager = InvitationManager()
     private var invitaionsToken: AmityNotificationToken?
     
-    let timerInterval: TimeInterval = 60
+    let timerInterval: TimeInterval = 61
     
     @Published var hasUnseenNotification = false
     @Published var hasInvitations = false
@@ -177,8 +177,7 @@ class SocialHomePageNavigationViewModel: ObservableObject {
             self.checkNotificationStatus()
             
             // Schedule it
-            let jitter = Double.random(in: 0...1)
-            timer = Timer.scheduledTimer(withTimeInterval: timerInterval + jitter, repeats: true, block: { [weak self] timer in
+            timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true, block: { [weak self] timer in
                 self?.checkNotificationStatus()
             })
         }
