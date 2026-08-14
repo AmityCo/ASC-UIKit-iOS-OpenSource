@@ -417,10 +417,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
 
         return HStack(spacing: 8) {
             ZStack(alignment: .bottomTrailing) {
-                AmityChatUserProfileImageView(displayName: displayName, avatarURL: {
-                    if let urlStr = member.user?.getAvatarInfo()?.fileURL { return URL(string: urlStr) }
-                    return nil
-                }())
+                AmityChatUserProfileImageView(displayName: displayName, avatarURL: member.user?.resolvedAvatarURL)
                 .frame(width: 40, height: 40)
                 .clipShape(Circle())
 

@@ -21,7 +21,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
     
     /// Members need to be invited if network setting is invitation mode
     @State private var isMembershipInvitationEnabled: Bool = false
-    @State private var hasEditMemberPermission: Bool = false
+    @State private var hasAddMemberPermission: Bool = false
     @State private var refreshTrigger = 0
     
     public var id: PageId {
@@ -83,7 +83,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
             
             let communityId = community.communityId
             Task {
-                self.hasEditMemberPermission = await CommunityPermissionChecker.hasEditCommunityUserPermission(communityId: communityId)
+                self.hasAddMemberPermission = await CommunityPermissionChecker.hasAddCommunityUserPermission(communityId: communityId)
             }
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
@@ -99,9 +99,9 @@ public struct AmityCommunityMembershipPage: AmityPageView {
                 .scaledToFit()
                 .foregroundColor(Color(viewConfig.theme.baseColor))
                 .frame(width: 22, height: 20)
-                .isHidden(!hasEditMemberPermission)
+                .isHidden(!hasAddMemberPermission)
                 .onTapGesture {
-                    if isMembershipInvitationEnabled && hasEditMemberPermission {
+                    if isMembershipInvitationEnabled {
                         goToInviteMemberPage()
                     } else {
                         goToAddUserPage()

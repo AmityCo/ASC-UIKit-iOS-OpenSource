@@ -161,20 +161,6 @@ public struct AmityGroupChatPage: AmityPageView {
                 .buttonStyle(.plain)
 
                 Spacer()
-
-                // Trailing overflow meatball: ellipsis-v-r, 24pt glyph in a 32pt box.
-                Button {
-                    navigateToSettings()
-                } label: {
-                    Image(AmityIcon.DesignSystem.ellipsisVR.imageResource)
-                        .renderingMode(.template)
-                        .resizable()
-                        .scaledToFit()
-                        .foregroundColor(Color(viewConfig.color(.iconIconButtonGhostSecondaryDefault)))
-                        .frame(width: 24, height: 24)
-                }
-                .buttonStyle(.plain)
-                .frame(width: 32, height: 32)
             }
             .padding(.horizontal, 16)
             .frame(height: 64)

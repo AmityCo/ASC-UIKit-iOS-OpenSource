@@ -381,7 +381,7 @@ class ReactionLoader: ObservableObject {
         return ReactionUser(
             userId: user.userId,
             displayName: user.displayName ?? "",
-            avatarURL: user.avatar?.fileURL ?? "",
+            avatarURL: user.resolvedAvatarURL?.absoluteString ?? "",
             reactionName: reactionName
         )
     }

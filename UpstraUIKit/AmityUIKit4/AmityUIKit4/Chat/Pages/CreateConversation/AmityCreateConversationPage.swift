@@ -244,10 +244,7 @@ public struct AmityCreateConversationPage: AmityPageView {
 
     private func userRow(user: AmityUser) -> some View {
         HStack(spacing: 12) {
-            AmityChatUserProfileImageView(displayName: user.displayName ?? user.userId, avatarURL: {
-                guard let urlStr = user.getAvatarInfo()?.fileURL else { return nil }
-                return URL(string: urlStr)
-            }())
+            AmityChatUserProfileImageView(displayName: user.displayName ?? user.userId, avatarURL: user.resolvedAvatarURL)
             .frame(width: 44, height: 44)
 
             HStack(spacing: 0) {

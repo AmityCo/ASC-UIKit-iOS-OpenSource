@@ -54,8 +54,8 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
     private func setupData() {
         let isModerator = community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
         self.shouldShowEditProfile = hasEditCommunityPermission || isModerator
-        self.shouldShowPendingInvitations = isModerator
-        self.shouldShowNotifications = isSocialUserNotificationEnabled && isNotificationEnabled && isSocialNetworkEnabled
+        self.shouldShowPendingInvitations = hasEditCommunityPermission || isModerator
+        self.shouldShowNotifications = isSocialUserNotificationEnabled && isSocialNetworkEnabled
         self.shouldShowPostPermissions = hasEditCommunityPermission || isModerator
         self.shouldShowStoryComments = hasEditCommunityPermission || isModerator
         self.shouldShowCloseCommunity = hasDeleteCommunityPermission || isModerator

@@ -210,10 +210,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
         HStack(spacing: 8) {
             AmityChatUserProfileImageView(
                 displayName: member.user?.displayName ?? member.userId,
-                avatarURL: {
-                    guard let s = member.user?.getAvatarInfo()?.fileURL else { return nil }
-                    return URL(string: s)
-                }()
+                avatarURL: member.user?.resolvedAvatarURL
             )
             .frame(width: 40, height: 40)
             .padding(4)

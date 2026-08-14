@@ -188,6 +188,23 @@ struct NotificationItem: Identifiable {
         self.event = model.event
     }
     
+    /// The user whose avatar should be shown for this tray item.
+    ///
+    /// The displayed text is built from the template's `{{userId:...}}` placeholders,
+    /// so the *first named actor* is the first user-type placeholder in `data`.
+    /// `model.users` is a separate array that is NOT guaranteed to be in the same
+    /// order (and may include actors that aren't named first), so using
+    /// `users.first` can show a different user's avatar than the one named in the
+    /// text. Resolve by matching the placeholder's userId instead, falling back to
+    /// `users.first` only when no match is available.
+    var avatarUser: AmityUserModel? {
+        if let firstUserId = data.first(where: { $0.type == "user" })?.id,
+           let matched = users.first(where: { $0.userId == firstUserId }) {
+            return matched
+        }
+        return users.first
+    }
+
     @available(iOS 15, *)
     func getHighlightedText() -> AttributedString {
         var highlightValues = data.map { ($0.text, $0.range)}

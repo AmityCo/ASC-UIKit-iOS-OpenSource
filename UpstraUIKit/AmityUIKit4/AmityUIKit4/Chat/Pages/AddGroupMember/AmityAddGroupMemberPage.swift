@@ -129,10 +129,7 @@ public struct AmityAddGroupMemberPage: AmityPageView {
                         ZStack(alignment: .topTrailing) {
                             AmityChatUserProfileImageView(
                                 displayName: user.displayName ?? (user.userId ?? ""),
-                                avatarURL: {
-                                    guard let s = user.getAvatarInfo()?.fileURL else { return nil }
-                                    return URL(string: s)
-                                }()
+                                avatarURL: user.resolvedAvatarURL
                             )
                             .frame(width: 40, height: 40)
                             .clipShape(Circle())
@@ -216,10 +213,7 @@ public struct AmityAddGroupMemberPage: AmityPageView {
 
     private func userRow(user: AmityUser, isSelected: Bool) -> some View {
         HStack(spacing: 12) {
-            AmityChatUserProfileImageView(displayName: user.displayName ?? (user.userId ?? ""), avatarURL: {
-                guard let s = user.getAvatarInfo()?.fileURL else { return nil }
-                return URL(string: s)
-            }())
+            AmityChatUserProfileImageView(displayName: user.displayName ?? (user.userId ?? ""), avatarURL: user.resolvedAvatarURL)
             .frame(width: 40, height: 40)
             .clipShape(Circle())
 

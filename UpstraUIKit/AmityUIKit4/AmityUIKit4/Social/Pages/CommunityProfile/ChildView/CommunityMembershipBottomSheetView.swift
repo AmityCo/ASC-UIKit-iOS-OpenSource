@@ -75,7 +75,7 @@ struct CommunityMembershipBottomSheetView: View {
                 }
             
             
-            if viewModel.shouldShowModeratorItems {
+            if viewModel.shouldShowRemoveItem {
                 getItemView(AmityIcon.trashBinIcon.getImageResource(), text: AmityLocalizedStringSet.Social.communityRemoveMember.localizedString, isDestructive: true)
                     .onTapGesture {
                         Task { @MainActor in
@@ -120,12 +120,14 @@ struct CommunityMembershipBottomSheetView: View {
 class CommunityMembershipBottomSheetViewModel: ObservableObject {
     @Published var isReportedByMe: Bool = false
     @Published var shouldShowModeratorItems: Bool = true
+    @Published var shouldShowRemoveItem: Bool = true
     let isModerator: Bool
     
     private let community: AmityCommunity
     private let communityMember: AmityCommunityMember
     private let userManager = UserManager()
-    private var hasEditCommunityPermisison: Bool = false
+    private var canAssignRoles: Bool = false
+    private var canRemoveMembers: Bool = false
     
     init(_ community: AmityCommunity, _ communityMember: AmityCommunityMember) {
         self.community = community
@@ -135,7 +137,7 @@ class CommunityMembershipBottomSheetViewModel: ObservableObject {
     
    func checkPermisisonAndSetupData() {
        Task { @MainActor in
-           await hasEditCommunityPermisison()
+           await loadMemberPermissions()
            setupData()
            self.isReportedByMe = try await isReportedByMe()
        }
@@ -143,7 +145,8 @@ class CommunityMembershipBottomSheetViewModel: ObservableObject {
     
     private func setupData() {
         let isModerator = community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
-        self.shouldShowModeratorItems = hasEditCommunityPermisison || isModerator
+        self.shouldShowModeratorItems = canAssignRoles || isModerator
+        self.shouldShowRemoveItem = canRemoveMembers || isModerator
     }
     
     func promoteToModerator() async throws {
@@ -171,7 +174,8 @@ class CommunityMembershipBottomSheetViewModel: ObservableObject {
         try await community.membership.removeMembers([communityMember.userId])
     }
     
-    private func hasEditCommunityPermisison() async {
-        self.hasEditCommunityPermisison = await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: community.communityId)
+    private func loadMemberPermissions() async {
+        self.canAssignRoles = await CommunityPermissionChecker.hasEditCommunityUserPermission(communityId: community.communityId)
+        self.canRemoveMembers = await CommunityPermissionChecker.hasRemoveCommunityUserPermission(communityId: community.communityId)
     }
 }

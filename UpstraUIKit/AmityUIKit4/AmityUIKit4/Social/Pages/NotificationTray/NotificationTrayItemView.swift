@@ -58,16 +58,16 @@ struct NotificationTrayItemView: View {
 
             case .inviteRoomCoHost:
                 CoHostInviteAvatarView(
-                    displayName: item.users.first?.displayName ?? "",
-                    avatarURL: URL(string: item.users.first?.avatarURL ?? ""),
+                    displayName: item.avatarUser?.displayName ?? "",
+                    avatarURL: URL(string: item.avatarUser?.avatarURL ?? ""),
                     roomId: item.targetId,
                     size: 32
                 )
 
             default:
                 AmityUserProfileImageView(
-                    displayName: item.users.first?.displayName ?? "",
-                    avatarURL: URL(string: item.users.first?.avatarURL ?? "")
+                    displayName: item.avatarUser?.displayName ?? "",
+                    avatarURL: URL(string: item.avatarUser?.avatarURL ?? "")
                 )
                 .frame(width: 32, height: 32)
                 .clipShape(Circle())

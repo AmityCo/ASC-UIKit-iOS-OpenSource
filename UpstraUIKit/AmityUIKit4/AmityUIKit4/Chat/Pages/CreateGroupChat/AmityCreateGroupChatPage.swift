@@ -438,10 +438,7 @@ public struct AmityCreateGroupChatPage: AmityPageView {
     private var currentUserCell: some View {
         let currentUser = AmityUIKit4Manager.client.user?.snapshot
         let displayName = currentUser?.displayName ?? AmityUIKit4Manager.client.currentUserId ?? ""
-        let avatarURL: URL? = {
-            guard let urlStr = currentUser?.getAvatarInfo()?.fileURL else { return nil }
-            return URL(string: urlStr)
-        }()
+        let avatarURL: URL? = currentUser?.resolvedAvatarURL
 
         return VStack(spacing: 6) {
             ZStack(alignment: .bottomTrailing) {
@@ -469,10 +466,7 @@ public struct AmityCreateGroupChatPage: AmityPageView {
 
     private func memberPreviewCell(user: AmityUser) -> some View {
         let displayName = user.displayName ?? user.userId
-        let avatarURL: URL? = {
-            guard let urlStr = user.getAvatarInfo()?.fileURL else { return nil }
-            return URL(string: urlStr)
-        }()
+        let avatarURL: URL? = user.resolvedAvatarURL
         return VStack(spacing: 6) {
             ZStack(alignment: .topTrailing) {
                 AmityChatUserProfileImageView(displayName: displayName, avatarURL: avatarURL)

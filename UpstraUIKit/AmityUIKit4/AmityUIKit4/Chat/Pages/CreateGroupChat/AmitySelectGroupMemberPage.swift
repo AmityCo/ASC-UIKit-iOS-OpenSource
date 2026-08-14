@@ -230,10 +230,7 @@ public struct AmitySelectGroupMemberPage: AmityPageView {
     private func selectedMemberItem(user: AmityUser, isFirst: Bool, isLast: Bool) -> some View {
         VStack(spacing: 4) {
             ZStack(alignment: .topTrailing) {
-                AmityChatUserProfileImageView(displayName: user.displayName ?? user.userId, avatarURL: {
-                    guard let urlStr = user.getAvatarInfo()?.fileURL else { return nil }
-                    return URL(string: urlStr)
-                }())
+                AmityChatUserProfileImageView(displayName: user.displayName ?? user.userId, avatarURL: user.resolvedAvatarURL)
                 .frame(width: 40, height: 40)
 
                 Button {
@@ -321,10 +318,7 @@ public struct AmitySelectGroupMemberPage: AmityPageView {
 
     private func userRow(user: AmityUser, isSelected: Bool) -> some View {
         HStack(spacing: 12) {
-            AmityChatUserProfileImageView(displayName: user.displayName ?? user.userId, avatarURL: {
-                guard let urlStr = user.getAvatarInfo()?.fileURL else { return nil }
-                return URL(string: urlStr)
-            }())
+            AmityChatUserProfileImageView(displayName: user.displayName ?? user.userId, avatarURL: user.resolvedAvatarURL)
             .frame(width: 44, height: 44)
 
             HStack(spacing: 0) {

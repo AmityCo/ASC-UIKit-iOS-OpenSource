@@ -32,7 +32,15 @@ class CommunityPermissionChecker {
         await AmityUIKitManagerInternal.shared.client.hasPermission(.deleteCommunityComment, forCommunity: communityId)
     }
     
+    static func hasAddCommunityUserPermission(communityId: String) async -> Bool {
+        await AmityUIKitManagerInternal.shared.client.hasPermission(.addCommunityUser, forCommunity: communityId)
+    }
+
     static func hasEditCommunityUserPermission(communityId: String) async -> Bool {
         await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunityUser, forCommunity: communityId)
+    }
+
+    static func hasRemoveCommunityUserPermission(communityId: String) async -> Bool {
+        await AmityUIKitManagerInternal.shared.client.hasPermission(.removeCommunityUser, forCommunity: communityId)
     }
 }
