@@ -24,7 +24,6 @@ struct NotificationTraySectionTitle: View {
 struct NotificationTrayItemView: View {
 
     @EnvironmentObject var viewConfig: AmityViewConfigController
-    @Environment(\.colorScheme) private var colorScheme
     let item: NotificationItem
     
     var body: some View {
@@ -104,11 +103,7 @@ struct NotificationTrayItemView: View {
         if item.isSeen {
             Color(viewConfig.theme.backgroundColor)
         } else {
-            Color(colorScheme == .dark
-                  //Figma display 0.3 but QA, designer would like set this on ios 0.2
-                  ? viewConfig.theme.primaryColor.withAlphaComponent(0.2)
-                  : viewConfig.theme.primaryColor.blend(.shade3).withAlphaComponent(0.3))
-
+            Color(viewConfig.theme.primaryColor.withAlphaComponent(0.2))
         }
     }
    

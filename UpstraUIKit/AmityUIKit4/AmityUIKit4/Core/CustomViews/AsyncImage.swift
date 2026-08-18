@@ -14,7 +14,11 @@ struct AsyncImage: View {
     let contentMode: ContentMode
     let placeholderView: AnyView?
     var onLoaded: ((Bool) -> Void)?
-    
+
+    /// Non-Amity hosts especially customAvatarURL reject the Authorization header (S3 answers 400 InvalidArgument).
+    /// Set once on such a failure to retry the same URL unauthenticated.
+    @State private var skipAuthHeader = false
+
     init(placeholder: ImageResource? = nil, url: URL?, contentMode: ContentMode = .fill) {
         self.placeholder = placeholder
         self.url = url
@@ -29,9 +33,16 @@ struct AsyncImage: View {
         self.placeholderView = AnyView(placeholderView())
     }
     
+    /// Requests carry the Authorization header from `KingfisherManager.shared.defaultOptions` by
+    /// default. On the retry pass an empty request modifier replaces it, so no header is sent.
+    private var image: KFImage {
+        let image = KFImage.url(url)
+        return skipAuthHeader ? image.requestModifier { _ in } : image
+    }
+
     var body: some View {
         GeometryReader { proxy in
-            KFImage.url(url)
+            image
                 .placeholder {
                     if let placeholder {
                         Image(placeholder)
@@ -44,7 +55,13 @@ struct AsyncImage: View {
                 .onSuccess({ _ in
                     onLoaded?(true)
                 })
-                .onFailure({ _ in
+                .onFailure({ error in
+                    if !skipAuthHeader, error.isAuthHeaderRejection {
+                        Log.warn("AsyncImage host rejected auth header, retrying without it url=\(url?.absoluteString ?? "nil") code=\(error.errorCode)")
+                        skipAuthHeader = true
+                        return
+                    }
+                    Log.warn("AsyncImage failed url=\(url?.absoluteString ?? "nil") code=\(error.errorCode) \(error.localizedDescription)")
                     onLoaded?(false)
                 })
                 .resizable()
@@ -53,6 +70,7 @@ struct AsyncImage: View {
                 .modifier(ImageScaleMode(mode: contentMode))
                 .frame(width: proxy.size.width, height: proxy.size.height)
                 .clipped()
+                .id(skipAuthHeader)
         }
     }
 }
@@ -70,6 +88,17 @@ struct ImageScaleMode: ViewModifier {
                 .scaledToFill()
                 .clipped()
         }
+    }
+}
+
+private extension KingfisherError {
+
+    /// True when the response looks like the host refusing our Authorization header rather than
+    /// a genuine access failure. S3 returns 400 InvalidArgument; other CDNs use 401/403.
+    var isAuthHeaderRejection: Bool {
+        guard case .responseError(let reason) = self,
+              case .invalidHTTPStatusCode(let response) = reason else { return false }
+        return (400...403).contains(response.statusCode)
     }
 }
 

@@ -42,7 +42,7 @@ public struct AmityUpcomingEventsPage: AmityPageView {
             if allEventFeed.hasCreatePermission {
                 VStack(spacing: 0) {
                     TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
-                        .selectedTabColor(viewConfig.theme.highlightColor)
+                        .selectedTabColor(viewConfig.theme.primaryColor)
                         .onChange(of: tabIndex) { value in
                             
                         }

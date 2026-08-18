@@ -98,7 +98,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
                         }
                     } label: {
                         Text(AmityLocalizedStringSet.Social.createPostBottomSheetTitle.localizedString)
-                            .applyTextStyle(.body(Color(viewConfig.theme.primaryColor)))
+                            .applyTextStyle(.body(Color(viewConfig.theme.primaryColor.withAlphaComponent(isInputValid ? 1.0 : 0.3))))
                     }
                     .buttonStyle(.plain)
                     .lineLimit(1)

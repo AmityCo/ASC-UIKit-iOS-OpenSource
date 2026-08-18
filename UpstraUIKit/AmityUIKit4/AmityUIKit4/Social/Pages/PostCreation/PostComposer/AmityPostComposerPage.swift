@@ -473,8 +473,8 @@ public struct AmityPostComposerPage: AmityPageView {
             let hasChanges = viewModel.hasPostChanges(currentTitle: viewModel.postTitle, currentText: viewModel.postText, currentMedias: mediaAttatchmentViewModel.medias)
             let canEditPost = hasContent && hasChanges && !isLoading && mediaAttatchmentViewModel.areAttachmentsReady
             
-            let createButtonColor = canCreatePost ? Color(viewConfig.theme.primaryColor) : Color(viewConfig.theme.primaryColor.blend(.shade2))
-            let editButtonColor = canEditPost ? Color(viewConfig.theme.baseColor) : Color(viewConfig.theme.baseColor.blend(.shade2))
+            let createButtonColor = Color(viewConfig.theme.primaryColor.withAlphaComponent(canCreatePost ? 1.0 : 0.3))
+            let editButtonColor = Color(viewConfig.theme.primaryColor.withAlphaComponent(canEditPost ? 1.0 : 0.3))
                         
             Button(viewModel.isInCreateMode ? createPostButtonTitle : editPostButtonTitle) {
                 processPost()

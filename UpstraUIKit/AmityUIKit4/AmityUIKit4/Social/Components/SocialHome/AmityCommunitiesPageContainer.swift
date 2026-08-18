@@ -27,7 +27,7 @@ struct AmityCommunitiesPageContainer: View {
             VStack(spacing: 0) {
                 VStack(spacing: 0) {
                     TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
-                        .selectedTabColor(viewConfig.theme.highlightColor)
+                        .selectedTabColor(viewConfig.theme.primaryColor)
                         .onChange(of: tabIndex) { value in
                             
                         }

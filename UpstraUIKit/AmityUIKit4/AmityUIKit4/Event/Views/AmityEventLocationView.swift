@@ -70,7 +70,7 @@ struct AmityEventLocationView: View {
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Text(AmityLocalizedStringSet.General.done.localizedString)
-                        .applyTextStyle(.body(Color(isInputValid ? viewConfig.theme.primaryColor : viewConfig.theme.primaryColor.blend(.shade2))))
+                        .applyTextStyle(.body(Color(viewConfig.theme.primaryColor.withAlphaComponent(isInputValid ? 1.0 : 0.3))))
                 }
                 .disabled(!isInputValid)
                 .padding(.trailing, 8)

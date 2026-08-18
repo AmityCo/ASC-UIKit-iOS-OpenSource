@@ -30,7 +30,7 @@ struct TabItemView: View {
                 
                 // Underline
                 if currentTab == tabItem.index {
-                    Color(viewConfig.theme.highlightColor)
+                    Color(viewConfig.theme.primaryColor)
                         .frame(height: 2)
                         .matchedGeometryEffect(id: "underline",
                                                in: namespace,

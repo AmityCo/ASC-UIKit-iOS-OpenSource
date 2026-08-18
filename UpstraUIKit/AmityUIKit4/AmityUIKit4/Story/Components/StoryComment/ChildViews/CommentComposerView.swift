@@ -122,12 +122,9 @@ struct CommentComposerView: View {
                     hideKeyboard()
                 } label: {
                     Text(AmityLocalizedStringSet.General.post.localizedString)
-                        .overlay(
-                            Text(AmityLocalizedStringSet.General.post.localizedString)
-                                .foregroundColor(Color(viewConfig.theme.primaryColor))
-                                .opacity(viewModel.text.isEmpty ? 0.4 : 1.0)
-                        )
+                        .foregroundColor(Color(viewConfig.theme.primaryColor.withAlphaComponent(viewModel.text.isEmpty ? 0.3 : 1.0)))
                 }
+                .buttonStyle(.plain)
                 .padding(.trailing, 12)
                 .disabled(viewModel.text.isEmpty)
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.postButton)

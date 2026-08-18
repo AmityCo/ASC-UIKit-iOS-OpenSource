@@ -92,7 +92,7 @@ struct AmityProductTagSelectionHeaderElement: AmityElementView {
                         }
                     }) {
                         Text(config.doneButtonText)
-                            .applyTextStyle(.body(Color(isDoneEnabled ? viewConfig.theme.primaryColor : viewConfig.theme.primaryColor.blend(.shade2))))
+                            .applyTextStyle(.body(Color(viewConfig.theme.primaryColor.withAlphaComponent(isDoneEnabled ? 1.0 : 0.3))))
                     }
                     .disabled(!isDoneEnabled)
                     .padding(.trailing, 16)

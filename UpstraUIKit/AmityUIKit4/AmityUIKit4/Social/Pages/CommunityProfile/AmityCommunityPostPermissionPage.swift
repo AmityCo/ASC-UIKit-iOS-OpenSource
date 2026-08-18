@@ -76,7 +76,7 @@ public struct AmityCommunityPostPermissionPage: AmityPageView {
             
             Text(AmityLocalizedStringSet.Social.saveButton.localizedString)
                 .applyTextStyle(.title(Color(viewConfig.theme.primaryColor)))
-                .opacity(community.postSettings == viewModel.selectedSetting ? 0.35 : 1.0)
+                .opacity(community.postSettings == viewModel.selectedSetting ? 0.3 : 1.0)
                 .onTapGesture {
                     guard community.postSettings != viewModel.selectedSetting else { return }
                     Task { @MainActor in

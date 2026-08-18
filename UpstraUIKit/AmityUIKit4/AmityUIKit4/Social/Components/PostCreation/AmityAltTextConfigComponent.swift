@@ -100,7 +100,7 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
                     }
                 }
                 .disabled(shouldDisableDoneButton())
-                .foregroundColor(shouldDisableDoneButton() ? Color(viewConfig.theme.primaryColor.blend(.shade2)) : Color(viewConfig.theme.primaryColor))
+                .foregroundColor(Color(viewConfig.theme.primaryColor.withAlphaComponent(shouldDisableDoneButton() ? 0.3 : 1.0)))
             }
             
             VStack(spacing: 0) {

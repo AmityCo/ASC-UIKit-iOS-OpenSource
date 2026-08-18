@@ -37,7 +37,7 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
             
             VStack(spacing: 0) {
                 TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
-                    .selectedTabColor(viewConfig.theme.highlightColor)
+                    .selectedTabColor(viewConfig.theme.primaryColor)
                     .onChange(of: tabIndex) { value in
                         
                         switch value {
