@@ -81,6 +81,20 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
                                     .frame(height: 8)
                                     .opacity(postFeedViewModel.postItems.count - 1 == index ? 0 : 1)
                             }
+                        
+                        case .bannerAd(let placement):
+                            if let adView = BannerAdFeedConfig.shared.adViewBuilder?(placement) {
+                                VStack(spacing: 0) {
+                                    adView
+                                        .frame(height: BannerAdFeedConfig.shared.adHeight)
+                                        .frame(maxWidth: .infinity)
+                                    
+                                    Rectangle()
+                                        .fill(Color(viewConfig.theme.baseColorShade4))
+                                        .frame(height: 8)
+                                        .opacity(postFeedViewModel.postItems.count - 1 == index ? 0 : 1)
+                                }
+                            }
                             
                         case .content(let post):
                             

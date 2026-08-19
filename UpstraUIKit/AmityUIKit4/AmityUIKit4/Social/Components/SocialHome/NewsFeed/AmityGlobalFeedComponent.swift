@@ -41,6 +41,19 @@ public struct AmityGlobalFeedComponent: AmityComponentView {
                                 .fill(Color(viewConfig.theme.baseColorShade4))
                                 .frame(height: 8)
                         }
+                    
+                    case .bannerAd(let placement):
+                        if let adView = BannerAdFeedConfig.shared.adViewBuilder?(placement) {
+                            VStack(spacing: 0) {
+                                adView
+                                    .frame(height: BannerAdFeedConfig.shared.adHeight)
+                                    .frame(maxWidth: .infinity)
+                                
+                                Rectangle()
+                                    .fill(Color(viewConfig.theme.baseColorShade4))
+                                    .frame(height: 8)
+                            }
+                        }
                         
                     case .content(let post):
                         
