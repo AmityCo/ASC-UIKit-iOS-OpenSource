@@ -19,7 +19,8 @@ public struct AmityCommunityProfilePage: AmityPageView {
     @State private var headerComponentHeight: CGFloat = 0.0
     @State private var showStickyHeader = false
     @State private var showShareSheet = false
-    
+    @State private var hasEditCommunityPermission = false
+
     @StateObject var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: CommunityProfileViewModel
     @State private var showPollSelectionView = false
@@ -129,8 +130,9 @@ public struct AmityCommunityProfilePage: AmityPageView {
                     
                     if let community = viewModel.community, community.isJoined {
                         
-                        let optionTitle = community.hasModeratorRole ? AmityLocalizedStringSet.Social.communitySettingsOptionTitle.localizedString : AmityLocalizedStringSet.Social.communityInformationOptionTitle.localizedString
-                        let optionIcon = community.hasModeratorRole ? AmityIcon.settingIcon.imageResource : AmityIcon.communityInformationIcon.imageResource
+                        let canManageCommunity = community.hasModeratorRole || hasEditCommunityPermission
+                        let optionTitle = canManageCommunity ? AmityLocalizedStringSet.Social.communitySettingsOptionTitle.localizedString : AmityLocalizedStringSet.Social.communityInformationOptionTitle.localizedString
+                        let optionIcon = canManageCommunity ? AmityIcon.settingIcon.imageResource : AmityIcon.communityInformationIcon.imageResource
                         BottomSheetItemView(icon: optionIcon, text: optionTitle)
                             .onTapGesture {
                                 showMenuBottomSheet.toggle()
@@ -187,6 +189,10 @@ public struct AmityCommunityProfilePage: AmityPageView {
         }
         .onAppear {
             host.controller?.navigationController?.isNavigationBarHidden = true
+
+            Task { @MainActor in
+                hasEditCommunityPermission = await CommunityPermissionChecker.hasEditCommunityPermission(communityId: communityId)
+            }
         }
         .sheet(isPresented: $showShareSheet) {
             let profileLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .community, id: communityId)
@@ -554,7 +560,7 @@ extension AmityCommunityProfilePage {
         let isPrivateAndHidden = !community.isPublic && !community.isDiscoverable
         
         let canMemberShareLink = !isPrivateAndHidden
-        let canModeratorShareLink = isPrivateAndHidden && community.hasModeratorRole
+        let canModeratorShareLink = isPrivateAndHidden && (community.hasModeratorRole || hasEditCommunityPermission)
         
         return isShareableLinkConfigured && (canMemberShareLink || canModeratorShareLink)
     }

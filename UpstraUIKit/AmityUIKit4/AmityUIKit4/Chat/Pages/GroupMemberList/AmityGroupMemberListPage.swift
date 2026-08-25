@@ -18,6 +18,13 @@ final class AmityGroupMemberListViewModel: ObservableObject {
     @Published var isModerator: Bool = false
     @Published var flaggedByMeCache: [String: Bool] = [:]
     @Published var showActionSheet: Bool = false
+
+    @Published var canAddMember: Bool = false
+    @Published var canPromote: Bool = false
+    @Published var canMute: Bool = false
+    @Published var canBan: Bool = false
+    @Published var canRemove: Bool = false
+
     var selectedMember: AmityChannelMember?
 
     enum MemberTab { case members, moderators }
@@ -34,6 +41,19 @@ final class AmityGroupMemberListViewModel: ObservableObject {
         self.isModerator = isModerator
         loadMembers()
         observeSearch()
+        loadModerationPermissions()
+    }
+
+    private func loadModerationPermissions() {
+        Task {
+            async let addMember = ChatPermissionChecker.hasPermission(.addChannelUser, channelId: channelId)
+            async let mute = ChatPermissionChecker.hasPermission(.muteChannelUser, channelId: channelId)
+            async let ban = ChatPermissionChecker.hasPermission(.banChannelUser, channelId: channelId)
+            async let remove = ChatPermissionChecker.hasPermission(.removeChannelUser, channelId: channelId)
+            async let promote = ChatPermissionChecker.hasPermission(.editChannelUser, channelId: channelId)
+
+            (canAddMember, canMute, canBan, canRemove, canPromote) = await (addMember, mute, ban, remove, promote)
+        }
     }
 
     private func loadMembers() {
@@ -221,7 +241,10 @@ public struct AmityGroupMemberListPage: AmityPageView {
                     AmityGroupMemberActionComponent(
                         member: member,
                         isPresented: $viewModel.showActionSheet,
-                        isCurrentUserModerator: viewModel.isModerator,
+                        canPromote: viewModel.canPromote,
+                        canMute: viewModel.canMute,
+                        canBan: viewModel.canBan,
+                        canRemove: viewModel.canRemove,
                         isFlaggedByMe: isFlaggedByMe,
                         onPromote: {
                             scheduleAction(.promote(member))
@@ -293,7 +316,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
 
                 Spacer()
 
-                if viewModel.isModerator {
+                if viewModel.canAddMember {
                     Button {
                         let page = AmityAddGroupMemberPage(channelId: channelId)
                         let vc = AmitySwiftUIHostingController(rootView: page)

@@ -21,6 +21,11 @@ class PostFeedViewModel: ObservableObject {
     
     private var paginator: UIKitPaginator<AmityPost>?
     var seenPostIds: Set<String> = Set()
+
+    /// True while a refresh of an already-populated feed is in flight. Keeps the
+    /// current posts on screen until the new collection finishes loading, instead
+    /// of flashing the empty state / skeletons (see renderFeed).
+    private var isRefreshing = false
     
     // loadGlobalFeed can be called multiple times. We only want one subscriber at a time
     private var feedCancellable: AnyCancellable?
@@ -59,7 +64,9 @@ class PostFeedViewModel: ObservableObject {
         
         /// Clear stale feed error so the UI reflects the new collection state
         feedError = nil
-        
+
+        isRefreshing = !postItems.isEmpty
+
         let collection: AmityCollection<AmityPost>
         
         var paginatorCommunityId: String? = nil
@@ -86,7 +93,7 @@ class PostFeedViewModel: ObservableObject {
         feedCancellable = nil
         feedCancellable = paginator?.$snapshots.sink { [weak self] items in
             guard let self else { return }
-            
+
             self.feedPosts = items
             self.renderFeed()
         }
@@ -96,6 +103,12 @@ class PostFeedViewModel: ObservableObject {
             .sink(receiveValue: { [weak self] status in
                 guard let self else { return }
                 self.feedLoadingStatus = status
+                if status == .loaded, self.isRefreshing {
+                    /// Refresh finished — publish the new result now, including a
+                    /// genuinely empty feed that renderFeed withheld while refreshing
+                    self.isRefreshing = false
+                    self.renderFeed()
+                }
             })
         
         errorCancellable = nil
@@ -103,6 +116,14 @@ class PostFeedViewModel: ObservableObject {
             .sink(receiveValue: { [weak self] error in
                 guard let self else { return }
                 self.feedError = error
+
+                /// A failed refresh never reaches `.loaded`, which is what clears
+                /// isRefreshing — release it here so renderFeed doesn't keep
+                /// suppressing publishes and freeze live updates after an error.
+                /// No re-render: the stale posts stay on screen until real data.
+                if error != nil {
+                    self.isRefreshing = false
+                }
             })
         
         /// Observe didPostCreated event sent from AmityPostCreationPage
@@ -129,6 +150,24 @@ class PostFeedViewModel: ObservableObject {
         NotificationCenter.default.addObserver(self, selector: #selector(didLivestreamStatusUpdated(_:)), name: .didLivestreamStatusUpdated, object: nil)
     }
     
+    /// Refresh variant for `.refreshable`: keeps the caller suspended until the new
+    /// collection finishes loading, so the pull-to-refresh spinner stays extended
+    /// while data lands and collapses once, with the system animation, afterwards.
+    /// Returning early from `.refreshable` lets the collapse race the feed reload,
+    /// which snaps the list instead of animating it.
+    @available(iOS 15.0, *)
+    @MainActor
+    func loadFeedAwaitingCompletion(feedType: FeedType) async {
+        loadFeed(feedType: feedType)
+
+        let loaded = $feedLoadingStatus.filter { $0 == .loaded }.map { _ in () }
+        let errored = $feedError.compactMap { $0 }.map { _ in () }
+
+        for await _ in loaded.merge(with: errored).values {
+            break
+        }
+    }
+
     func loadMorePosts() {
         if let paginator, paginator.hasNextPage() {
             paginator.nextPage()
@@ -207,11 +246,13 @@ extension PostFeedViewModel {
         // reset state
         postCollection = nil
         pinnedPostCancellable = nil
-        globalPinnedPosts = []
-        globalPinnedPostsIds = []
-        
+
+        /// Pinned posts are fetched separately from the regular feed. Keep the
+        /// current pinned posts (and dropFirst the fresh collection's empty replay)
+        /// so a refresh doesn't briefly render the feed without its pinned posts
+        /// while the two requests race — the new snapshot overwrites them on arrival.
         pinnedPostCollection = postManager.getGlobalPinnedPost()
-        pinnedPostCancellable = pinnedPostCollection?.$snapshots.sink { [weak self] result in
+        pinnedPostCancellable = pinnedPostCollection?.$snapshots.dropFirst().sink { [weak self] result in
             guard let self else { return }
                         
             var pinnedPostIds = Set<String>()
@@ -249,7 +290,14 @@ extension PostFeedViewModel {
         // Rest of the global feed.
         let feedPosts = prepareFeedPosts()
         listItems.append(contentsOf: feedPosts)
-        
+
+        /// While a refresh is in flight, hold ALL publishes — not just empty ones.
+        /// Each publish reloads the List, and every reload while the pull-to-refresh
+        /// spinner is extended makes the refresh control re-negotiate its inset,
+        /// bouncing the list between held/collapsed offsets (visible jitter). The
+        /// loadingStatus sink clears the flag and re-renders once, on completion.
+        if isRefreshing { return }
+
         self.postItems = listItems
     }
     

@@ -21,7 +21,7 @@ class CommunityManager {
     }
     
     func getCommunities(filter: AmityCommunityQueryFilter) -> AmityCollection<AmityCommunity> {
-        let queryOptions = AmityCommunityQueryOptions(filter: filter, sortBy: .lastCreated, includeDeleted: false)
+        let queryOptions = AmityCommunityQueryOptions(filter: filter, sortBy: .displayName, includeDeleted: false)
         return communityRepository.getCommunities(with: queryOptions)
     }
     

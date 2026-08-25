@@ -76,7 +76,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                     // refresh global feed
                     // swiftUI cannot update properly if we use nested Observable Object
                     // that is the reason why postFeedViewModel is not moved into viewModel
-                    postFeedViewModel.loadFeed(feedType: .globalFeed)
+                    await postFeedViewModel.loadFeedAwaitingCompletion(feedType: .globalFeed)
                 }
         } else {
             getPostListView()

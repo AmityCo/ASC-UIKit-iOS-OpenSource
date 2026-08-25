@@ -16,9 +16,13 @@ public class StoryPermissionChecker {
 }
 
 class ChatPermissionChecker {
-    
+
     static func hasModeratorPermission(for channel: String) async -> Bool {
         await AmityUIKitManagerInternal.shared.client.hasPermission(.muteChannel, forChannel: channel)
+    }
+
+    static func hasPermission(_ permission: AmityPermission, channelId: String) async -> Bool {
+        await AmityUIKitManagerInternal.shared.client.hasPermission(permission, forChannel: channelId)
     }
 }
 
@@ -42,5 +46,9 @@ class CommunityPermissionChecker {
 
     static func hasRemoveCommunityUserPermission(communityId: String) async -> Bool {
         await AmityUIKitManagerInternal.shared.client.hasPermission(.removeCommunityUser, forCommunity: communityId)
+    }
+
+    static func hasEditCommunityPermission(communityId: String) async -> Bool {
+        await AmityUIKitManagerInternal.shared.client.hasPermission(.editCommunity, forCommunity: communityId)
     }
 }

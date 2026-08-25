@@ -18,7 +18,10 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
     @Binding private var isPresented: Bool
 
     private let member: AmityChannelMember
-    private let isCurrentUserModerator: Bool
+    private let canPromote: Bool
+    private let canMute: Bool
+    private let canBan: Bool
+    private let canRemove: Bool
     private let isFlaggedByMe: Bool
     private let onPromote: (() -> Void)?
     private let onDemote: (() -> Void)?
@@ -28,6 +31,42 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
     private let onBan: (() -> Void)?
     private let onReport: (() -> Void)?
 
+    public init(
+        member: AmityChannelMember,
+        isPresented: Binding<Bool>,
+        canPromote: Bool,
+        canMute: Bool,
+        canBan: Bool,
+        canRemove: Bool,
+        isFlaggedByMe: Bool = false,
+        pageId: PageId? = nil,
+        onPromote: (() -> Void)? = nil,
+        onDemote: (() -> Void)? = nil,
+        onMute: (() -> Void)? = nil,
+        onUnmute: (() -> Void)? = nil,
+        onRemove: (() -> Void)? = nil,
+        onBan: (() -> Void)? = nil,
+        onReport: (() -> Void)? = nil
+    ) {
+        self.member = member
+        self._isPresented = isPresented
+        self.canPromote = canPromote
+        self.canMute = canMute
+        self.canBan = canBan
+        self.canRemove = canRemove
+        self.isFlaggedByMe = isFlaggedByMe
+        self.pageId = pageId
+        self.onPromote = onPromote
+        self.onDemote = onDemote
+        self.onMute = onMute
+        self.onUnmute = onUnmute
+        self.onRemove = onRemove
+        self.onBan = onBan
+        self.onReport = onReport
+        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .groupMemberActionComponent))
+    }
+
+    @available(*, deprecated, message: "Use init(member:isPresented:canPromote:canMute:canBan:canRemove:...) — actions are now gated per permission, not by moderator role.")
     public init(
         member: AmityChannelMember,
         isPresented: Binding<Bool>,
@@ -42,19 +81,23 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
         onBan: (() -> Void)? = nil,
         onReport: (() -> Void)? = nil
     ) {
-        self.member = member
-        self._isPresented = isPresented
-        self.isCurrentUserModerator = isCurrentUserModerator
-        self.isFlaggedByMe = isFlaggedByMe
-        self.pageId = pageId
-        self.onPromote = onPromote
-        self.onDemote = onDemote
-        self.onMute = onMute
-        self.onUnmute = onUnmute
-        self.onRemove = onRemove
-        self.onBan = onBan
-        self.onReport = onReport
-        self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .groupMemberActionComponent))
+        self.init(
+            member: member,
+            isPresented: isPresented,
+            canPromote: isCurrentUserModerator,
+            canMute: isCurrentUserModerator,
+            canBan: isCurrentUserModerator,
+            canRemove: isCurrentUserModerator,
+            isFlaggedByMe: isFlaggedByMe,
+            pageId: pageId,
+            onPromote: onPromote,
+            onDemote: onDemote,
+            onMute: onMute,
+            onUnmute: onUnmute,
+            onRemove: onRemove,
+            onBan: onBan,
+            onReport: onReport
+        )
     }
 
     private var isMemberModerator: Bool {
@@ -64,7 +107,7 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
     public var body: some View {
         VStack(spacing: 0) {
             VStack(spacing: 0) {
-                if isCurrentUserModerator {
+                if canPromote {
                     if isMemberModerator {
                         if onDemote != nil {
                             actionRow(
@@ -84,25 +127,25 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                             }
                         }
                     }
+                }
 
-                    if !isMemberModerator {
-                        if member.isMuted {
-                            if onUnmute != nil {
-                                actionRow(
-                                    icon: AmityIcon.DesignSystem.volumeR.imageResource,
-                                    label: AmityLocalizedStringSet.Chat.GroupMemberAction.unmute.localizedString
-                                ) {
-                                    onUnmute?()
-                                }
+                if canMute && !isMemberModerator {
+                    if member.isMuted {
+                        if onUnmute != nil {
+                            actionRow(
+                                icon: AmityIcon.DesignSystem.volumeR.imageResource,
+                                label: AmityLocalizedStringSet.Chat.GroupMemberAction.unmute.localizedString
+                            ) {
+                                onUnmute?()
                             }
-                        } else {
-                            if onMute != nil {
-                                actionRow(
-                                    icon: AmityIcon.DesignSystem.volumeSlashR.imageResource,
-                                    label: AmityLocalizedStringSet.Chat.GroupMemberAction.mute.localizedString
-                                ) {
-                                    onMute?()
-                                }
+                        }
+                    } else {
+                        if onMute != nil {
+                            actionRow(
+                                icon: AmityIcon.DesignSystem.volumeSlashR.imageResource,
+                                label: AmityLocalizedStringSet.Chat.GroupMemberAction.mute.localizedString
+                            ) {
+                                onMute?()
                             }
                         }
                     }
@@ -121,24 +164,22 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                     }
                 }
 
-                if isCurrentUserModerator {
-                    if onBan != nil {
-                        actionRow(
-                            icon: AmityIcon.DesignSystem.banR.imageResource,
-                            label: AmityLocalizedStringSet.Chat.GroupMemberAction.ban.localizedString
-                        ) {
-                            onBan?()
-                        }
+                if canBan, onBan != nil {
+                    actionRow(
+                        icon: AmityIcon.DesignSystem.banR.imageResource,
+                        label: AmityLocalizedStringSet.Chat.GroupMemberAction.ban.localizedString
+                    ) {
+                        onBan?()
                     }
+                }
 
-                    if onRemove != nil {
-                        actionRow(
-                            icon: AmityIcon.DesignSystem.trashR.imageResource,
-                            label: AmityLocalizedStringSet.Chat.GroupMemberAction.remove.localizedString,
-                            isDestructive: true
-                        ) {
-                            onRemove?()
-                        }
+                if canRemove, onRemove != nil {
+                    actionRow(
+                        icon: AmityIcon.DesignSystem.trashR.imageResource,
+                        label: AmityLocalizedStringSet.Chat.GroupMemberAction.remove.localizedString,
+                        isDestructive: true
+                    ) {
+                        onRemove?()
                     }
                 }
             }

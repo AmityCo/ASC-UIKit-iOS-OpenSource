@@ -30,6 +30,9 @@ struct MediaViewer: View {
     @State private var showAltTextComponent: Bool = false
     @State private var hasNavigatedToPostDetail: Bool = false
     @State private var selectedProductTagMedia: AmityMedia?
+
+    /// skip AuthHeader for Non-Amity hosts (e.g. customer S3)
+    @State private var skipAuthHeader = false
     
     private let medias: [AmityMedia]
     private let closeAction: (() -> Void)?
@@ -159,8 +162,16 @@ struct MediaViewer: View {
                                         }, inProgress: {_ in
                                             emptyView
                                         },
-                                        failure: {_, _ in
+                                        failure: { error, _ in
                                             emptyView
+                                                .onAppear {
+                                                    if !skipAuthHeader {
+                                                        Log.warn("MediaViewer image load failed, retrying without auth header url=\(url.absoluteString) error=\(error)")
+                                                        skipAuthHeader = true
+                                                    } else {
+                                                        Log.warn("MediaViewer image load failed url=\(url.absoluteString) error=\(error)")
+                                                    }
+                                                }
                                         }, content: { image in
                                             image
                                                 .resizable()
@@ -178,7 +189,8 @@ struct MediaViewer: View {
                                                     alignment: .bottomTrailing
                                                 )
                                         })
-                                        .environment(\.urlImageOptions, URLImageOptions.amityOptions)
+                                        .environment(\.urlImageOptions, skipAuthHeader ? URLImageOptions.defaultImageOptions : URLImageOptions.amityOptions)
+                                        .id(skipAuthHeader)
                                         .adaptiveVerticalPadding(top: 35, bottom: 35)
                                     } else {
                                         // Add placeholder for missing image URLs - properly centered
