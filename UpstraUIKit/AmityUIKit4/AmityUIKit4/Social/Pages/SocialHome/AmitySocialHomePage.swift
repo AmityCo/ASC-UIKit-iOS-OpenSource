@@ -55,7 +55,8 @@ public struct AmitySocialHomePage: AmityPageView {
                             case .exploreCommunity:
                                 self.host.controller?.navigationController?.popViewController(animated: true)
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    self.viewModel.selectedTab = .explore
+                                    NotificationCenter.default.post(name: .showExploreCommunities, object: nil)
+                                    self.viewModel.selectedTab = .communities
                                 }
                             case .createCommunity:
                                 self.host.controller?.navigationController?.popViewController(animated: false)
@@ -85,6 +86,9 @@ public struct AmitySocialHomePage: AmityPageView {
                     viewModel.handleForYouDisabled()
                 }, onSwitchToFollowing: {
                     viewModel.selectedTab = .newsFeed
+                }, onExploreCommunities: {
+                    NotificationCenter.default.post(name: .showExploreCommunities, object: nil)
+                    viewModel.selectedTab = .communities
                 })
             }
         }

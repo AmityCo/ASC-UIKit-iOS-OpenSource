@@ -19,4 +19,5 @@ extension Notification.Name {
     static let configDidUpdate = Notification.Name("amityConfigDidUpdate")
     public static let forceRefreshNewsfeed = Notification.Name("forceRefreshNewsfeed")
     public static let refreshNewsfeedIfNeeded = Notification.Name("refreshNewsfeedIfNeeded")
+    static let showExploreCommunities = Notification.Name("amityShowExploreCommunities")
 }

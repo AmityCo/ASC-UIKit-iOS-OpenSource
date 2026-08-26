@@ -15,12 +15,14 @@ struct SocialHomeContainerView: View {
     private let pageId: PageId?
     private let onForYouDisabled: (() -> Void)?
     private let onSwitchToFollowing: (() -> Void)?
+    private let onExploreCommunities: (() -> Void)?
 
-    init(_ selectedTab: Binding<AmitySocialHomePageTab>, pageId: PageId?, onForYouDisabled: (() -> Void)? = nil, onSwitchToFollowing: (() -> Void)? = nil) {
+    init(_ selectedTab: Binding<AmitySocialHomePageTab>, pageId: PageId?, onForYouDisabled: (() -> Void)? = nil, onSwitchToFollowing: (() -> Void)? = nil, onExploreCommunities: (() -> Void)? = nil) {
         self._selectedTab = selectedTab
         self.pageId = pageId
         self.onForYouDisabled = onForYouDisabled
         self.onSwitchToFollowing = onSwitchToFollowing
+        self.onExploreCommunities = onExploreCommunities
         self.tabs = [selectedTab.wrappedValue]
     }
 
@@ -30,7 +32,7 @@ struct SocialHomeContainerView: View {
             case .forYou:
                 AmityForYouFeedComponent(pageId: pageId, onFeatureDisabled: onForYouDisabled, onSwitchToFollowingRequested: onSwitchToFollowing)
             case .newsFeed:
-                AmityNewsFeedComponent(pageId: pageId)
+                AmityNewsFeedComponent(pageId: pageId, onExploreCommunities: onExploreCommunities)
             case .explore:
                 AmityExplorePageContainer()
             case .myCommunities:

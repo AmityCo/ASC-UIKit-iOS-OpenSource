@@ -209,6 +209,7 @@ final class AmityUIKitManagerInternal: NSObject {
     private override init() {
         super.init()
         AmityLog.logLevel = .all
+        print("-- ** AmityUIKit Version: \(BuildInfo.version) Build: \(BuildInfo.gitHash) ** --")
         setupUIKitBehaviour()
     }
     

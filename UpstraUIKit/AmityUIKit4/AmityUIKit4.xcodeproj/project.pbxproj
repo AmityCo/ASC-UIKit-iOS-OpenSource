@@ -489,6 +489,7 @@
 				Core/Utilities/AmityPreviewLinkWizard.swift,
 				Core/Utilities/AmitySwiftUIHostWrapper.swift,
 				Core/Utilities/AmityUserAction.swift,
+				Core/Utilities/BuildInfo.swift,
 				Core/Utilities/ConfigControllers/AmityColorTokenResolver.swift,
 				Core/Utilities/ConfigControllers/AmityColorTokens.generated.swift,
 				Core/Utilities/ConfigControllers/AmityTheme.swift,
@@ -947,6 +948,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 684AE1052B0C5B0200FD7270 /* Build configuration list for PBXNativeTarget "AmityUIKit4" */;
 			buildPhases = (
+				68BBCC012EA7100000000002 /* Generate BuildInfo.swift */,
 				684AE0EC2B0C5B0200FD7270 /* Headers */,
 				684AE0ED2B0C5B0200FD7270 /* Sources */,
 				684AE0EE2B0C5B0200FD7270 /* Frameworks */,
@@ -959,7 +961,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				AB4ABC121A99F1595BFB6739 /* SharedFrameworks */,
+				4ABEDF010E13BF9E9C808414 /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -1011,7 +1013,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				136D25431C450EBF31F16764 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				E8A380A927896A60F56F6CCF /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1056,6 +1058,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Copy non-English lproj bundles into the framework output.\n# Xcode's File System Synchronized Group handles en.lproj automatically,\n# but additional lproj directories need explicit copying.\nLOCALIZATION_DIR=\"${SRCROOT}/AmityUIKit4/Core/Localization\"\nFRAMEWORK_DIR=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework\"\n\nfor LPROJ in \"${LOCALIZATION_DIR}\"/*.lproj; do\n  LANG=$(basename \"$LPROJ\")\n  if [ \"$LANG\" != \"en.lproj\" ] && [ \"$LANG\" != \"Base.lproj\" ]; then\n    mkdir -p \"${FRAMEWORK_DIR}/${LANG}\"\n    cp -R \"${LPROJ}/\"* \"${FRAMEWORK_DIR}/${LANG}/\"\n    echo \"Copied ${LANG} to framework bundle\"\n  fi\ndone\n";
+		};
+		68BBCC012EA7100000000002 /* Generate BuildInfo.swift */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate BuildInfo.swift";
+			outputPaths = (
+				"$(SRCROOT)/AmityUIKit4/Core/Utilities/BuildInfo.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Generates BuildInfo.swift with the UIKit version and the current git commit hash.\nGIT_HASH=$(git -C \"${SRCROOT}\" rev-parse --short HEAD 2>/dev/null)\nif [ -z \"${GIT_HASH}\" ]; then GIT_HASH=\"unknown\"; fi\n\nVERSION=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"${SRCROOT}/../UpstraUIKit/Info.plist\" 2>/dev/null)\nif [ -z \"${VERSION}\" ]; then VERSION=\"unknown\"; fi\n\nOUTPUT_FILE=\"${SRCROOT}/AmityUIKit4/Core/Utilities/BuildInfo.swift\"\nTMP_FILE=$(mktemp)\n\ncat > \"${TMP_FILE}\" << EOF\n// You can safely ignore the content of this file. All content is generated automatically from run script.\nenum BuildInfo {\n    static let version = \"${VERSION}\"\n    static let gitHash = \"${GIT_HASH}\"\n}\nEOF\n\n# Only overwrite when the content changed, so incremental builds do not recompile needlessly.\nif cmp -s \"${TMP_FILE}\" \"${OUTPUT_FILE}\"; then\n    rm -f \"${TMP_FILE}\"\nelse\n    mv \"${TMP_FILE}\" \"${OUTPUT_FILE}\"\n    chmod 644 \"${OUTPUT_FILE}\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1353,16 +1371,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		136D25431C450EBF31F16764 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		E8A380A927896A60F56F6CCF /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		AB4ABC121A99F1595BFB6739 /* SharedFrameworks */ = {
+		4ABEDF010E13BF9E9C808414 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 136D25431C450EBF31F16764 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = E8A380A927896A60F56F6CCF /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

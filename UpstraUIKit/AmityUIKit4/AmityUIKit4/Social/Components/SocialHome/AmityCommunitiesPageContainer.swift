@@ -48,6 +48,9 @@ struct AmityCommunitiesPageContainer: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .padding(.top, 8)
             }
+            .onReceive(NotificationCenter.default.publisher(for: .showExploreCommunities)) { _ in
+                tabIndex = 0
+            }
         }
     }
 }
