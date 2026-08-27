@@ -197,6 +197,7 @@
 				Core/CustomViewModifiers/ShakeEffect.swift,
 				Core/CustomViews/ActivityIndicatorView.swift,
 				Core/CustomViews/AmityButtonStyle.swift,
+				Core/CustomViews/AmityModeratorBadge.swift,
 				Core/CustomViews/AmityNavigationBar.swift,
 				Core/CustomViews/AmityPopoverMenu.swift,
 				Core/CustomViews/AmityTextEditorView.swift,
@@ -961,7 +962,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				4ABEDF010E13BF9E9C808414 /* SharedFrameworks */,
+				3EB34B4981A15B34C028950A /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -1013,7 +1014,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				E8A380A927896A60F56F6CCF /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				59ACBDCEC01E09F18904D49C /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1371,16 +1372,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		E8A380A927896A60F56F6CCF /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		59ACBDCEC01E09F18904D49C /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4ABEDF010E13BF9E9C808414 /* SharedFrameworks */ = {
+		3EB34B4981A15B34C028950A /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E8A380A927896A60F56F6CCF /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 59ACBDCEC01E09F18904D49C /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

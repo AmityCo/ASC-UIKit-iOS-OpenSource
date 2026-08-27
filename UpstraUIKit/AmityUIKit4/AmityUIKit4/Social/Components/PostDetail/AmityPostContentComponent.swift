@@ -893,18 +893,24 @@ struct PostAuthorBadge: View {
     let title: String
     
     var body: some View {
-        HStack(spacing: 3) {
-            Image(icon)
-                .resizable()
-                .frame(width: 12, height: 12)
-                .padding(.leading, 6)
-            Text(title)
-                .applyTextStyle(.captionSmall(badgeType == .moderator ? Color(viewConfig.theme.primaryColor) : Color(AmityFixedColor.shared.eventHost)))
-                .padding(.trailing, 6)
+        switch badgeType {
+        case .moderator:
+            // Shared moderator pill — single source of truth for the shield tint.
+            AmityModeratorLabelBadge(viewConfig: viewConfig, icon: icon, title: title)
+        case .host:
+            HStack(spacing: 3) {
+                Image(icon)
+                    .resizable()
+                    .frame(width: 12, height: 12)
+                    .padding(.leading, 6)
+                Text(title)
+                    .applyTextStyle(.captionSmall(Color(AmityFixedColor.shared.eventHost)))
+                    .padding(.trailing, 6)
+            }
+            .frame(height: 20)
+            .background(Color(AmityFixedColor.shared.eventHostBg))
+            .clipShape(RoundedCorner(radius: 10))
         }
-        .frame(height: 20)
-        .background(badgeType == .moderator ? Color(viewConfig.theme.primaryColor.blend(.shade3)) : Color(AmityFixedColor.shared.eventHostBg))
-        .clipShape(RoundedCorner(radius: 10))
     }
 }
 

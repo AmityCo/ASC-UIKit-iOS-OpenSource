@@ -393,19 +393,10 @@ extension ClipFeedItemOverlayView {
                 // Moderator Badge
                 if post.isModerator {
                     let elementConfig = viewConfig.forElement(.moderatorBadge, pageId: nil, componentId: .postContentComponent)
-                    HStack(spacing: 3) {
-                        Image(AmityIcon.getImageResource(named: elementConfig.icon ?? "moderatorBadgeIcon"))
-                            .resizable()
-                            .frame(width: 12, height: 12)
-                            .padding(.leading, 6)
-                        Text(elementConfig.text ?? AmityLocalizedStringSet.General.moderator.localizedString)
-                            .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
-                            .padding(.trailing, 6)
-                    }
-                    .frame(height: 20)
-                    .background(Color(viewConfig.theme.primaryColor.blend(.shade3)))
-                    .clipShape(RoundedCorner(radius: 10))
-                    .accessibilityIdentifier(AccessibilityID.Social.PostContent.moderatorBadge)
+                    AmityModeratorLabelBadge(viewConfig: viewConfig,
+                                             icon: AmityIcon.getImageResource(named: elementConfig.icon ?? "moderatorBadgeIcon"),
+                                             title: elementConfig.text)
+                        .accessibilityIdentifier(AccessibilityID.Social.PostContent.moderatorBadge)
                 }
             }
             

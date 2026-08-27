@@ -59,7 +59,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                 .overlay(
                     NotificationIndicator()
                         .offset(x: 13, y: -12)
-                        .visibleWhen(viewModel.hasUnseenNotification || viewModel.hasInvitations)
+                        .visibleWhen(viewModel.hasUnseenNotification)
                 )
                 .onAppear {
                     viewModel.observeNotificationStatus()
@@ -163,13 +163,10 @@ class SocialHomePageNavigationViewModel: ObservableObject {
     private let trayManager = NotificationTrayManager()
     private var timer: Timer?
     private var token: AmityNotificationToken?
-    private let invitationManager = InvitationManager()
-    private var invitaionsToken: AmityNotificationToken?
     
     let timerInterval: TimeInterval = 61
     
     @Published var hasUnseenNotification = false
-    @Published var hasInvitations = false
     
     func observeNotificationStatus() {
         if timer == nil {
@@ -184,53 +181,32 @@ class SocialHomePageNavigationViewModel: ObservableObject {
     }
     
     private func checkNotificationStatus() {
-        // Note:
-        // Live Object life cycle is tied to its token. If the token is invalidated or nil before the observer is notified, we will never get notification tray seen info.
-        // So even though the timer triggers every 1 seconds, we wait for the previous observer to be notified
-        // before sending the new request.
-        guard token == nil else { return }
-        
-        let cleanupToken = { [weak self] in
-            self?.token?.invalidate()
-            self?.token = nil
-        }
+        // Replace the previous cycle's observation rather than waiting for it to finish. The token
+        // is kept alive for the whole interval so every emission updates the dot, including the
+        // fresh value that arrives after an initial local one.
+        token?.invalidate()
         
         token = trayManager.getNotificationTraySeenInfo().observe { [weak self] liveObject, error in
             guard let self else { return }
             
-            if let _ = error {
-                cleanupToken()
+            // Seen state is unknown, so surface the dot rather than silently hiding it.
+            if error != nil {
+                self.hasUnseenNotification = true
                 return
             }
             
-            guard let snapshot = liveObject.snapshot else {
-                cleanupToken()
-                return
-            }
+            guard let snapshot = liveObject.snapshot else { return }
             
             self.hasUnseenNotification = !snapshot.isSeen
-
-            cleanupToken()
-        }
-        
-        invitaionsToken = invitationManager.getMyCommunityInvitations().observe { [weak self] collection, error in
-            guard let self else { return }
-            hasInvitations = collection.snapshots.contains { $0.isSeen() == false }
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            self.invitaionsToken?.invalidate()
-            self.invitaionsToken = nil
         }
     }
     
     func resetNotificationStatus() {
-        // Hacky way to merge invitaion status with notification status
-        hasInvitations = false
-        
         guard hasUnseenNotification else { return }
         
-        // To hide red dot once user opens up notification tray
+        // To hide red dot once user opens up notification tray.
+        // The tray page itself calls markTraySeen on appear, which also covers entry points
+        // that bypass this button, such as a deep link into AmityNotificationTrayPage.
         hasUnseenNotification = false
     }
 }

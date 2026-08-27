@@ -1610,3 +1610,6 @@
 // 1:1 chat action menu (distinct from group "member" wording)
 "amity_chat_dm_action_report_user" = "Report user";
 "amity_chat_dm_action_unreport_user" = "Unreport user";
+
+// Community invite member page action button
+"community_invite_member_button" = "Invite";

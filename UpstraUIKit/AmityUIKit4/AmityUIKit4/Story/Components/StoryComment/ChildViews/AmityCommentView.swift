@@ -390,18 +390,7 @@ public struct AmityCommentView: View {
     
     @ViewBuilder
     func getModeratorBadgeView() -> some View {
-        HStack(spacing: 3) {
-            Image(AmityIcon.moderatorBadgeIcon.getImageResource())
-                .resizable()
-                .frame(width: 12, height: 12)
-                .padding(.leading, 6)
-            Text(AmityLocalizedStringSet.General.moderator.localizedString)
-                .applyTextStyle(.captionSmall(Color(viewConfig.theme.primaryColor)))
-                .padding(.trailing, 6)
-        }
-        .frame(height: 20)
-        .background(Color(viewConfig.theme.primaryColor.blend(.shade3)))
-        .clipShape(RoundedCorner(radius: 10))
+        AmityModeratorLabelBadge(viewConfig: viewConfig)
     }
     
     @ViewBuilder

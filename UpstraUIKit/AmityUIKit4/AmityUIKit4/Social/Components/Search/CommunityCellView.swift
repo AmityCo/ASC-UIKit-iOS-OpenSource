@@ -31,8 +31,8 @@ struct CommunityCellView: View {
         HStack(spacing: 16) {
             AsyncImage(placeholderView: {
                 ZStack {
-                    Color(viewConfig.theme.baseColorShade3)
-                        .applyDefaultThumbnailGradient(isVisible: true)
+                    Color(viewConfig.theme.secondaryColorShade3)
+                        .applyDefaultThumbnailGradient(isVisible: false)
                     
                     Image(AmityIcon.communityThumbnailIcon.imageResource)
                 }

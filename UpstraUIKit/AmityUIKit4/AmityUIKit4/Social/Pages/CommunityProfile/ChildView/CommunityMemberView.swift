@@ -30,15 +30,7 @@ struct CommunityMemberView: View {
                     .clipShape(Circle())
                 
                 if isModerator {
-                    Color(viewConfig.theme.primaryColor.blend(.shade3))
-                        .frame(width: 18, height: 18)
-                        .clipShape(Circle())
-                        .overlay(
-                            Image(AmityIcon.moderatorBadgeIcon.getImageResource())
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 16, height: 16)
-                        )
+                    AmityModeratorAvatarBadge(viewConfig: viewConfig)
                 }
             }
             

@@ -22,11 +22,10 @@ struct CommunityListItemView: View {
         HStack {
             AsyncImage(placeholderView: {
                 ZStack {
-                    Color(viewConfig.theme.baseColorShade3)
-                        .applyDefaultThumbnailGradient(isVisible: true)
+                    Color(viewConfig.theme.secondaryColorShade3)
                     
                     Image(AmityIcon.communityThumbnailIcon.imageResource)
-                }
+                }.applyDefaultThumbnailGradient(isVisible: true)
             }, url: URL(string: community.avatarURL), contentMode: .fill)
                 .onLoaded { isImageLoaded = $0 }
                 .accessibilityLabel(AccessibilityID.Social.Explore.communityImage)

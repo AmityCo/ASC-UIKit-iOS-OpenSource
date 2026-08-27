@@ -83,7 +83,7 @@ struct RecommendedCommunityView: View {
         VStack(alignment: .leading, spacing: 0) {
             AsyncImage(placeholderView: {
                 ZStack {
-                    Color(viewConfig.theme.baseColorShade3)
+                    Color(viewConfig.theme.secondaryColorShade3)
                     Image(AmityIcon.communityPeopleIcon.imageResource)
                 }
                 

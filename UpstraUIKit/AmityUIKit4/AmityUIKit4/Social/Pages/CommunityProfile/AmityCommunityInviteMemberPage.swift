@@ -105,7 +105,7 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
             
             Spacer()
             
-            let title = viewConfig.getText(elementId: .title) ?? ""
+            let title = viewConfig.getText(elementId: .title) ?? AmityLocalizedStringSet.Social.communityInviteMemberTitle.localizedString
             Text(title)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
             
@@ -240,7 +240,7 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
                 .frame(height: 40)
                 .cornerRadius(4)
                 .overlay (
-                    Text(viewConfig.getText(elementId: .inviteButton) ?? "")
+                    Text(viewConfig.getText(elementId: .inviteButton) ?? AmityLocalizedStringSet.Social.communityInviteMemberButton.localizedString)
                         .applyTextStyle(.bodyBold(.white))
                         .opacity(selectedUsers.isEmpty ? (viewConfig.currentStyle == .dark ? 0.3 : 1) : 1)
                 )
