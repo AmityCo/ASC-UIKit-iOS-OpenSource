@@ -51,10 +51,8 @@ public struct AmityInvitationSection: AmityComponentView {
     private func unreadBackground(isSeen: Bool) -> some View {
         if isSeen {
             Color(viewConfig.theme.backgroundColor)
-        } else if viewConfig.currentStyle == .dark {
-            Color(viewConfig.theme.primaryColor).opacity(0.2)
         } else {
-            Color(viewConfig.theme.primaryColor.blend(.shade3)).opacity(0.3)
+            Color(viewConfig.theme.primaryColor.withAlphaComponent(0.2))
         }
     }
 }

@@ -38,7 +38,10 @@ struct EventCardView: View {
     let author: String
     let isBrand: Bool
     let isHost: Bool
-    
+    let largeInfoPadding: EdgeInsets
+
+    private static let defaultLargeInfoPadding = EdgeInsets(top: 12, leading: 0, bottom: 0, trailing: 0)
+
     init(
         style: EventCardStyle,
         imageURL: String? = nil,
@@ -56,9 +59,10 @@ struct EventCardView: View {
         self.author = author
         self.isBrand = isVerified
         self.isHost = false
+        self.largeInfoPadding = Self.defaultLargeInfoPadding
     }
-    
-    init(style: EventCardStyle, event: AmityEvent) {
+
+    init(style: EventCardStyle, event: AmityEvent, largeInfoPadding: EdgeInsets = Self.defaultLargeInfoPadding) {
         self.style = style
         self.title = event.title
         self.author = event.creator?.displayName ?? "-"
@@ -67,6 +71,7 @@ struct EventCardView: View {
         self.isBrand = event.creator?.isBrand ?? false
         self.imageURL = event.coverImage?.mediumFileURL
         self.isHost = event.creator?.userId == AmityUIKit4Manager.client.currentUserId
+        self.largeInfoPadding = largeInfoPadding
     }
     
     var body: some View {
@@ -94,7 +99,7 @@ struct EventCardView: View {
             }
             
             eventInfo
-                .padding(.top, 12)
+                .padding(largeInfoPadding)
         }
         .cornerRadius(8)
     }

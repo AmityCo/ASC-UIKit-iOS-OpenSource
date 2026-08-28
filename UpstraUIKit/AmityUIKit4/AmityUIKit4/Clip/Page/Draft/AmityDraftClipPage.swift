@@ -67,6 +67,13 @@ public struct AmityDraftClipPage: AmityPageView {
             }
             
             headerView
+
+            if alert.isPresented {
+                Color.black
+                    .opacity(0.5)
+                    .edgesIgnoringSafeArea(.all)
+                    .allowsHitTesting(false)
+            }
         }
         .alert(isPresented: $alert.isPresented) {
             if let dismissButton = alert.alertState.dismissButton {
@@ -158,7 +165,6 @@ public struct AmityDraftClipPage: AmityPageView {
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)
-        .opacity(alert.isPresented ? 0.7 : 1)
     }
     
     @ViewBuilder
@@ -207,7 +213,6 @@ public struct AmityDraftClipPage: AmityPageView {
                 }
                 .disabled(viewModel.isUploadingClip)
                 .visibleWhen(!viewModel.isUploadingClip)
-                .opacity(alert.isPresented ? 0.7 : 1)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 20)

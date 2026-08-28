@@ -57,6 +57,7 @@ extension AmityPostModel {
         case liveStream
         case clip
         case room
+        case event
         case unknown
     }
 }

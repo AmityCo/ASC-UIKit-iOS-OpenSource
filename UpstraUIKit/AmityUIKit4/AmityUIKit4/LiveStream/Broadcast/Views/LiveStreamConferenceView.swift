@@ -409,7 +409,7 @@ struct LiveStreamConferenceView: View {
                         }
                         
                         pendingPostReviewView
-                            .visibleWhen(viewModel.createdPost?.getFeedType() == .reviewing && viewModel.currentState != .started)
+                            .visibleWhen(viewModel.isPostPendingReview && viewModel.currentState != .started)
                         
                         liveStreamStartingState
                             .visibleWhen(viewModel.currentState == .started)
@@ -716,7 +716,8 @@ struct LiveStreamConferenceView: View {
                             .scaledToFit()
                             .frame(width: viewModel.createdEvent == nil ? 24 : 32, height: viewModel.createdEvent == nil ? 24 : 32)
                             .foregroundColor(Color.white)
-                            .circularBackground(radius: 32, color: viewModel.createdEvent == nil ? .black.opacity(0.5) : .clear)
+                            // Kept for the 32pt tap target; the close button carries no background.
+                            .circularBackground(radius: 32, color: .clear)
                             .padding(.bottom, 4)
                     }
                     
@@ -973,7 +974,7 @@ struct LiveStreamConferenceView: View {
             setupComposeBar
         } else {
             // Hide chat if it is on userfeed for now and post is in reviewing state
-            if viewModel.liveStreamChatViewModel?.isStreamer ?? false && (viewModel.createdRoom?.targetType != "community" || viewModel.createdPost?.getFeedType() == .reviewing) {
+            if viewModel.liveStreamChatViewModel?.isStreamer ?? false && (viewModel.createdRoom?.targetType != "community" || viewModel.isPostPendingReview) {
                 defaultComposeBar
             } else if let liveChatViewModel = viewModel.liveStreamChatViewModel {
                 AmityLiveStreamChatComposeBar(viewModel: liveChatViewModel)
@@ -1210,7 +1211,7 @@ struct LiveStreamConferenceView: View {
             // Show invite button if the user is main host who created the room
             // Only show when it is not user feed and post is not in reviewing state
             if viewModel.createdRoom?.creatorId == AmityUIKitManagerInternal.shared.currentUserId && viewModel.participantRole == .host &&
-                viewModel.createdRoom?.post?.targetUser == nil && viewModel.createdPost?.getFeedType() != .reviewing {
+                viewModel.createdRoom?.post?.targetUser == nil && !viewModel.isPostPendingReview {
                 Button {
                     showCoHostInviteSheet.toggle()
                 } label: {

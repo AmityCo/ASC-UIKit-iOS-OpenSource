@@ -29,8 +29,11 @@ class UserManager {
     func editUser(user: UserModel) async throws {
         let builder = AmityUserUpdateOptions()
         builder.setUserDescription(user.about)
-        builder.setDisplayName(user.displayName)
-        
+
+        if let displayName = user.displayName {
+            builder.setDisplayName(displayName)
+        }
+
         if let avatar = user.avatar {
             let imageData = try await fileRepository.uploadImage(avatar, progress: nil)
             builder.setAvatar(imageData)

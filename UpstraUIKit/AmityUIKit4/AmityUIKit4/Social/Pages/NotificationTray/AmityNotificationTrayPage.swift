@@ -122,7 +122,7 @@ public struct AmityNotificationTrayPage: AmityPageView {
                 .renderingMode(.template)
                 .resizable()
                 .scaledToFit()
-                .foregroundColor(Color(viewConfig.theme.baseColorShade3))
+                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
                 .frame(width: 60, height: 60)
             
             Text(AmityLocalizedStringSet.Social.notificationTrayEmptyStateTitle.localizedString)

@@ -32,8 +32,7 @@ struct BottomSheetRadioItemView: View {
                     .frame(width: 16, height: 16)
                     .opacity(isSelected ? 0 : 1)
                 
-                Image(AmityIcon.pollRadioIcon.imageResource)
-                    .frame(width: 22, height: 22)
+                AmityRadioSelectedIndicator(size: 22)
                     .opacity(isSelected ? 1 : 0)
             }
         }

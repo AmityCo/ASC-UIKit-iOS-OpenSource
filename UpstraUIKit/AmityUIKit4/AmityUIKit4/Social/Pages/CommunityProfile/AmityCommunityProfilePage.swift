@@ -274,7 +274,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                 .background(Color(viewConfig.theme.primaryColor))
                 .clipShape(RoundedCorner())
                 .padding(.all, 16)
-                .isHidden(viewModel.community?.isJoined ?? false)
+                .isHidden(viewModel.joinStatus != .notJoined)
 
                 AmityCommunityProfileTabComponent(currentTab: $viewModel.currentTab, pageId: .communityProfilePage)
                 

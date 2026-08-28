@@ -21,16 +21,19 @@ struct PostBottomSheetView: View {
     
     private let post: AmityPostModel
     private let action: ((PostAction) -> Void)?
-    
+
+    /// Padding for toasts this sheet raises itself. Set by the surface underneath, which is a feed
+    /// with nothing at the bottom, or post detail with its comment composer bar.
+    private let toastBottomPadding: CGFloat
+
     @Binding private var isShown: Bool
-    @State private var showConfirmationAlert: Bool = false
-    @State private var activeAlert: PostAction = .editPost
-    
+
     @StateObject private var viewModel: PostBottomSheetViewModel = PostBottomSheetViewModel()
     
-    init(isShown: Binding<Bool>, post: AmityPostModel, action: ((PostAction) -> Void)?) {
+    init(isShown: Binding<Bool>, post: AmityPostModel, toastBottomPadding: CGFloat = Toast.defaultBottomPadding, action: ((PostAction) -> Void)?) {
         self._isShown = isShown
         self.post = post
+        self.toastBottomPadding = toastBottomPadding
         self.action = action
     }
     
@@ -48,76 +51,84 @@ struct PostBottomSheetView: View {
             viewModel.updatePostFlaggedByMeState(id: post.postId)
             viewModel.checkDeletePermission(post: post)
         }
-        .alert(isPresented: $showConfirmationAlert, content: {
-            
-            switch activeAlert {
-                // We do not need alert for report post
-            case .editPost, .deletePost, .reportPost, .sharePost:
-                return Alert(title: Text(AmityLocalizedStringSet.Social.deletePostTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.deletePostMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.General.delete.localizedString), action: {
-                    Task { @MainActor in
-                        isShown.toggle()
-
-                        guard NetworkMonitor.shared.isConnected else {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postDeleteError.localizedString)
-                            }
-                            return
-                        }
-
-                        NotificationCenter.default.post(name: .didPostLocallyDeleted, object: nil, userInfo: ["postId" : post.postId])
-
-                        action?(.deletePost)
-
-                        do {
-                            try await viewModel.deletePost(id: post.postId)
-                            
-                            /// Send didPostDeleted event to remove created post added in global feed data source
-                            /// that is not from live collection
-                            /// This event is observed in PostFeedViewModel
-                            NotificationCenter.default.post(name: .didPostDeleted, object: nil, userInfo: ["postId" : post.postId])
-                            
-                            /// Delay showing toast as deleting post will effect post data source
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.postDeletedToastMessage.localizedString)
-                            }
-                        } catch let error {
-                            Log.add(event: .info, "Error deleting post \(error)")
-                            /// Delay showing toast as deleting post will effect post data source
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postDeleteError.localizedString)
-                            }
-                        }
-                    }
-                }))
-            case .closePoll:
-                return Alert(title: Text(AmityLocalizedStringSet.Social.pollCloseAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Social.pollCloseAlertDesc.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Social.pollCloseButton.localizedString), action: {
-                    Task { @MainActor in
-                        isShown.toggle()
-                        
-                        action?(.closePoll)
-                        
-                        if let pollId = post.poll?.id {
-                            do {
-                                let _ = try await viewModel.closePoll(id: pollId)
-                                
-                                /// Send didPollUpdated event to update global feed data source
-                                /// This event is observed in PostFeedViewModel and AmityPostDetailPageViewModel
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    NotificationCenter.default.post(name: .didPollUpdated, object: post.object)
-                                }
-                            } catch let error {
-                                /// Delay showing toast as deleting post will effect post data source
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.oopsSomethingWentWrong.localizedString)
-                                }
-                            }
-                        }
-                    }
-                }))
-            }
-        })
     }
-    
+
+    /// Closes the bottom sheet first, then presents the confirmation modal on the page
+    /// underneath it. The sheet is a `fullScreenCover`, so an alert raised from inside it
+    /// would otherwise stack on top of the still visible sheet.
+    private func presentConfirmationAlert(title: String, message: String, confirmTitle: String, onConfirm: @escaping () -> Void) {
+        isShown = false
+
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel))
+        alert.addAction(UIAlertAction(title: confirmTitle, style: .destructive) { _ in
+            onConfirm()
+        })
+
+        let sheetController = UIApplication.topViewController()
+        sheetController?.dismiss(animated: false) {
+            UIApplication.topViewController()?.present(alert, animated: true)
+        }
+    }
+
+    private func deletePost() {
+        Task { @MainActor in
+            guard NetworkMonitor.shared.isConnected else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postDeleteError.localizedString)
+                }
+                return
+            }
+
+            NotificationCenter.default.post(name: .didPostLocallyDeleted, object: nil, userInfo: ["postId" : post.postId])
+
+            action?(.deletePost)
+
+            do {
+                try await viewModel.deletePost(id: post.postId)
+
+                /// Send didPostDeleted event to remove created post added in global feed data source
+                /// that is not from live collection
+                /// This event is observed in PostFeedViewModel
+                NotificationCenter.default.post(name: .didPostDeleted, object: nil, userInfo: ["postId" : post.postId])
+
+                /// Delay showing toast as deleting post will effect post data source
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.postDeletedToastMessage.localizedString)
+                }
+            } catch let error {
+                Log.add(event: .info, "Error deleting post \(error)")
+                /// Delay showing toast as deleting post will effect post data source
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postDeleteError.localizedString)
+                }
+            }
+        }
+    }
+
+    private func closePoll() {
+        Task { @MainActor in
+            action?(.closePoll)
+
+            if let pollId = post.poll?.id {
+                do {
+                    let _ = try await viewModel.closePoll(id: pollId)
+
+                    /// Send didPollUpdated event to update global feed data source
+                    /// This event is observed in PostFeedViewModel and AmityPostDetailPageViewModel
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        NotificationCenter.default.post(name: .didPollUpdated, object: post.object)
+                    }
+                } catch let error {
+                    /// Delay showing toast as deleting post will effect post data source
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.oopsSomethingWentWrong.localizedString)
+                    }
+                }
+            }
+        }
+    }
+
     
     @ViewBuilder
     private var moderatorView: some View {
@@ -181,8 +192,12 @@ struct PostBottomSheetView: View {
     private var deleteSheetButton: some View {
         BottomSheetItemView(icon: AmityIcon.trashBinIcon.getImageResource(), text: AmityLocalizedStringSet.Social.deletePostBottomSheetTitle.localizedString, isDestructive: true)
             .onTapGesture {
-                activeAlert = .deletePost
-                showConfirmationAlert.toggle()
+                presentConfirmationAlert(
+                    title: AmityLocalizedStringSet.Social.deletePostTitle.localizedString,
+                    message: AmityLocalizedStringSet.Social.deletePostMessage.localizedString,
+                    confirmTitle: AmityLocalizedStringSet.General.delete.localizedString,
+                    onConfirm: deletePost
+                )
             }
     }
     
@@ -197,10 +212,10 @@ struct PostBottomSheetView: View {
                             isShown.toggle()
                             viewModel.updatePostFlaggedByMeState(id: post.postId)
                             
-                            Toast.showToast(style: .success, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postReportedMessage.localizedString)
+                            Toast.showToast(style: .success, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postReportedMessage.localizedString, bottomPadding: toastBottomPadding)
                         } catch {
                             isShown.toggle()
-                            Toast.showToast(style: .warning, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postFailedUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postFailedReportedMessage.localizedString)
+                            Toast.showToast(style: .warning, message: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.postFailedUnReportedMessage.localizedString : AmityLocalizedStringSet.Social.postFailedReportedMessage.localizedString, bottomPadding: toastBottomPadding)
                         }
                     }
                 } else {
@@ -212,8 +227,12 @@ struct PostBottomSheetView: View {
     private var closePollButton: some View {
         BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollCloseButton.localizedString)
             .onTapGesture {
-                activeAlert = .closePoll
-                showConfirmationAlert.toggle()
+                presentConfirmationAlert(
+                    title: AmityLocalizedStringSet.Social.pollCloseAlertTitle.localizedString,
+                    message: AmityLocalizedStringSet.Social.pollCloseAlertDesc.localizedString,
+                    confirmTitle: AmityLocalizedStringSet.Social.pollCloseButton.localizedString,
+                    onConfirm: closePoll
+                )
             }
     }
     

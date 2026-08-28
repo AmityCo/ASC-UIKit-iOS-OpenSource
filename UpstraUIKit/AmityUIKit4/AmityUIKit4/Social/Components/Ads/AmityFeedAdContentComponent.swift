@@ -125,20 +125,26 @@ struct AmityFeedAdContentComponent: View {
             }
             .padding(.horizontal, 16)
             
-            KFImage.url(URL(string: ad.image1_1?.largeFileURL ?? ""))
-                .placeholder({
-                    Image(AmityIcon.adAvatarPlaceholder.imageResource)
+            // Ad assets are not guaranteed to be square, so the 1:1 slot is
+            // rendered into a fixed square box and center cropped.
+            Color.clear
+                .overlay(
+                    KFImage.url(URL(string: ad.image1_1?.largeFileURL ?? ""))
+                        .placeholder({
+                            Image(AmityIcon.adAvatarPlaceholder.imageResource)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                        })
+                        .loadDiskFileSynchronously()
+                        .cacheMemoryOnly()
+                        .fade(duration: 0.25)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .background(Color.red.opacity(0.1))
-                        .cornerRadius(8)
-                        .padding(.vertical, 8)
-                })
-                .loadDiskFileSynchronously()
-                .cacheMemoryOnly()
-                .fade(duration: 0.25)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
+                        .aspectRatio(contentMode: .fill)
+                )
+                .compositingGroup()
+                .clipped()
+                .frame(maxWidth: .infinity)
+                .aspectRatio(1, contentMode: .fit)
                 .background(Color.red.opacity(0.1))
                 .cornerRadius(8)
                 .padding(.vertical, 8)

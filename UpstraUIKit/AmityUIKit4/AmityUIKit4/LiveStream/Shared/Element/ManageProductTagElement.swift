@@ -67,7 +67,7 @@ struct ManageProductTagElement: AmityElementView {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(viewConfig.defaultDarkTheme.secondaryColor), lineWidth: 1)
+                            .stroke(Color(viewConfig.defaultDarkTheme.baseColorShade4), lineWidth: 1)
                     )
                     .onTapGesture {
                         if !isInactive {
@@ -89,7 +89,7 @@ struct ManageProductTagElement: AmityElementView {
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color(viewConfig.defaultDarkTheme.secondaryColor), lineWidth: 1)
+                            .stroke(Color(viewConfig.defaultDarkTheme.baseColorShade4), lineWidth: 1)
                     )
                     .onTapGesture {
                         if !isInactive {
@@ -150,7 +150,7 @@ struct ManageProductTagElement: AmityElementView {
                 HStack(spacing: 0) {
                     if !isInactive, product.price != nil {
                         Text(formatPrice(product))
-                            .applyTextStyle(.body(Color(viewConfig.defaultDarkTheme.baseColorShade3)))
+                            .applyTextStyle(.body(Color(viewConfig.defaultDarkTheme.baseColorShade1)))
                             
                     }
                     

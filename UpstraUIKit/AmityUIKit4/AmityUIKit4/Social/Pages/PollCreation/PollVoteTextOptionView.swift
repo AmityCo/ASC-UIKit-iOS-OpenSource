@@ -36,9 +36,13 @@ struct PollVoteTextOptionView: View {
                         .frame(width: 16, height: 16)
                         .opacity(isSelected ? 0 : 1)
                     
-                    Image(allowMultiSelection ? AmityIcon.checkboxIcon.imageResource : AmityIcon.pollRadioIcon.imageResource)
-                        .frame(width: 22, height: 22)
-                        .opacity(isSelected ? 1 : 0)
+                    if allowMultiSelection {
+                        AmityCheckboxSelectedIndicator(size: 22)
+                            .opacity(isSelected ? 1 : 0)
+                    } else {
+                        AmityRadioSelectedIndicator(size: 22)
+                            .opacity(isSelected ? 1 : 0)
+                    }
                 }
                 .padding(.trailing, 12)
             }

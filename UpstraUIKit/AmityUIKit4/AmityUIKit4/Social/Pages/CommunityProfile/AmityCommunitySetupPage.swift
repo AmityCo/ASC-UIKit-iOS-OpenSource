@@ -130,12 +130,16 @@ public struct AmityCommunitySetupPage: AmityPageView {
                                         }
                                         
                                         Color.black
-                                            .opacity(0.25)
-                                        
-                                        Image(AmityIcon.cameraIcon.getImageResource())
+                                            .opacity(0.5)
+
+                                        // Always white — it sits on the fixed dark scrim,
+                                        // so baseInverseColor (black in light mode) is wrong here.
+                                        Image(AmityIcon.DesignSystem.cameraR.imageResource)
+                                            .renderingMode(.template)
                                             .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 32, height: 28)
+                                            .scaledToFit()
+                                            .foregroundColor(.white)
+                                            .frame(width: 32, height: 32)
                                     }
                                 )
                                 .clipped()
@@ -835,6 +839,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
             title: AmityLocalizedStringSet.General.cancel.localizedString,
             style: .cancel)
         var actions: [UIAlertAction] = []
+        var preferredAction: UIAlertAction?
         
         switch type {
         case .pendingJoinRequests:
@@ -856,7 +861,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
             
             let confirmAction = UIAlertAction(
                 title: AmityLocalizedStringSet.General.confirm.localizedString,
-                style: .destructive
+                style: .default
             ) { action in
                 completion()
             }
@@ -865,6 +870,7 @@ public struct AmityCommunitySetupPage: AmityPageView {
                 title: title, message: message, preferredStyle: .alert)
             actions.append(cancelAction)
             actions.append(confirmAction)
+            preferredAction = confirmAction
         case .discard:
             let title =
             pageMode == .create
@@ -894,6 +900,8 @@ public struct AmityCommunitySetupPage: AmityPageView {
         actions.forEach { action in
             alertController.addAction(action)
         }
+        // preferredAction must be set after the action is added to the controller
+        alertController.preferredAction = preferredAction
         host.controller?.present(alertController, animated: true)
     }
     

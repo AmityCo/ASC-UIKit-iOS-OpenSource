@@ -160,10 +160,18 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
             
             case .room:
                 roomPostContentTextView()
-                
+
                 PostContentLiveStreamView(post: post)
                     .padding([.leading, .trailing, .top], -16)
-                
+
+            case .event:
+                postContentTextView()
+
+                PostContentEventView(post: post) { event in
+                    let vc = AmitySwiftUIHostingController(rootView: AmityEventDetailPage(event: event))
+                    host.controller?.navigationController?.pushViewController(vc, animated: true)
+                }
+
             case .unknown:
                 EmptyView()
             }

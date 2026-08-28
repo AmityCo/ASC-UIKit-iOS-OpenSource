@@ -212,11 +212,11 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
     }
     
     private func handleDisabledInteractionTap() {
-        AmityUserAction.perform(host: host) {
+        AmityUserAction.perform(host: host, toastBottomPadding: Toast.bottomBarPadding) {
             if AmityUIKitManagerInternal.shared.isGuestUser {
-                AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleGuestUserAction(context: .init(host: host))
+                AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleGuestUserAction(context: .init(host: host, toastBottomPadding: Toast.bottomBarPadding))
             } else if !viewModel.isCommunityMember {
-                AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleNonMemberAction(context: .init(host: host))
+                AmityUIKitManagerInternal.shared.behavior.globalBehavior?.handleNonMemberAction(context: .init(host: host, toastBottomPadding: Toast.bottomBarPadding))
             }
         }
     }

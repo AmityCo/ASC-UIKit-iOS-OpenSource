@@ -163,7 +163,7 @@ struct LivestreamPinnedProductElement: AmityElementView {
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 20, height: 20)
-                                        .foregroundColor(Color(viewConfig.defaultDarkTheme.secondaryColor))
+                                        .foregroundColor(Color(viewConfig.defaultLightTheme.secondaryColor))
                                         .frame(width: 28, height: 28)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 6)
@@ -181,10 +181,10 @@ struct LivestreamPinnedProductElement: AmityElementView {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 20, height: 20)
-                                            .foregroundColor(Color(viewConfig.defaultDarkTheme.secondaryColor))
+                                            .foregroundColor(Color(viewConfig.defaultLightTheme.secondaryColor))
                                         
                                         Text(AmityLocalizedStringSet.Social.productTagUnpinButton.localizedString)
-                                            .applyTextStyle(.captionBold(Color(viewConfig.defaultDarkTheme.secondaryColor)))
+                                            .applyTextStyle(.captionBold(Color(viewConfig.defaultLightTheme.secondaryColor)))
                                     }
                                     .frame(height: 28)
                                     .padding(.horizontal, 8)

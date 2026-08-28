@@ -156,16 +156,14 @@ public struct AmityCommunityInvitationBanner: AmityComponentView {
                                 do {
                                     try await invitation.reject()
                                     // Stay on the community profile page for both public and private communities.
-                                    // Clear the invitation banner and reset join status so the [Join] button appears.
+                                    // Clearing the invitation banner brings back the [Join] button.
                                     communityProifleViewModel?.pendingCommunityInvitation = nil
-                                    communityProifleViewModel?.joinStatus = .notJoined
                                     Toast.showToast(
                                         style: .success, message: AmityLocalizedStringSet.Social.communityInvitationDeclined.localizedString)
                                 } catch {
                                     if error.isAmityErrorCode(.business) {
                                         // Invitation already expired — clear the banner and stay on the page
                                         communityProifleViewModel?.pendingCommunityInvitation = nil
-                                        communityProifleViewModel?.joinStatus = .notJoined
                                         Toast.showToast(
                                             style: .warning,
                                             message: AmityLocalizedStringSet.Social.communityInvitationExpired.localizedString)

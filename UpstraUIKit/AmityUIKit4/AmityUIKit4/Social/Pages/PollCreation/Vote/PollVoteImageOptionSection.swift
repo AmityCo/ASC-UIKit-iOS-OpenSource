@@ -128,11 +128,13 @@ struct PollVoteImageOptionView: View {
     var imageHeader: some View {
         VStack  {
             HStack {
-                Image(allowMultiSelection ? AmityIcon.pollCheckboxIcon.imageResource : AmityIcon.pollRadioIcon.imageResource)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-                    .opacity(isSelected && mode == .vote ? 1 : 0)
+                if allowMultiSelection {
+                    AmityCheckboxSelectedIndicator(size: 24)
+                        .opacity(isSelected && mode == .vote ? 1 : 0)
+                } else {
+                    AmityRadioSelectedIndicator(size: 24)
+                        .opacity(isSelected && mode == .vote ? 1 : 0)
+                }
                 
                 Spacer()
                 

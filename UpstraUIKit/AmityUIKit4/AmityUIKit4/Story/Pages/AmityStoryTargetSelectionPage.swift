@@ -24,7 +24,7 @@ public struct AmityStoryTargetSelectionPage: AmityPageIdentifiable, View {
     
     public var body: some View {
         VStack {
-            let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? ""
+            let title = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.socialShareTo.localizedString
             let closeButtonIcon = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
 
             AmityPostTargetSelectionPage.HeaderView(title: title, closeIcon: closeButtonIcon) {

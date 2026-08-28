@@ -101,9 +101,10 @@ public struct TextEditorSuggestionView: View {
             // Header with tabs and close button
             headerView
                 .isHidden(!viewModel.isProductMentionEnabled)
-            
+
             Divider()
                 .background(Color(viewConfig.theme.baseColorShade4))
+                .isHidden(!viewModel.isProductMentionEnabled)
             
             // Content based on selected tab
             ScrollView {

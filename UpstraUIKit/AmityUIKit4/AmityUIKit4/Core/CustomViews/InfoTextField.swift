@@ -130,12 +130,12 @@ struct InfoTextField: View {
                         .accessibilityIdentifier(charCountTextAccessibilityId ?? "charCountTextAccessibilityId")
                 }
             }
-            .padding(.bottom, 5)
-            
+            .padding(.bottom, 4)
+
             textField
                 .lineLimit(data.isExpandable ? data.expandedLineLimit : 1)
                 .textFieldStyle(PlainTextFieldStyle())
-                .frame(minHeight: 34)
+                .frame(minHeight: 20)
                 .onChange(of: text) { newText in
                     guard let limitedCharCount = data.maxCharCount else { return }
                     charCount = newText.utf16Count
@@ -154,14 +154,13 @@ struct InfoTextField: View {
                         text = text.utf16Prefix(limitedCharCount)
                     }
                 }
-                .padding(.vertical, 10)
+                .padding(.vertical, 16)
                 .accessibilityIdentifier(textFieldAccessibilityId ?? "textFieldAccessibilityId")
-            
+
             Rectangle()
                 .frame(height: 1)
                 .foregroundColor(Color(textFieldLineColor))
-                .padding(.top, 6)
-            
+
             if !(data.infoMessage ?? "").isEmpty || !(data.errorMessage ?? "").isEmpty && !isValid {
                 Text(isValid ? (data.infoMessage ?? "") : (data.errorMessage ?? data.infoMessage ?? ""))
                     .applyTextStyle(.caption(isValid ? Color(infoTextColor) : Color(alertColor)))

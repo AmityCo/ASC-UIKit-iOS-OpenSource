@@ -27,8 +27,10 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     @State private var showBottomSheet: Bool = false
     @State private var isAlertShown: Bool = false
     @StateObject private var page = Page.first()
+    @State private var canCreateStory: Bool = false
     @State private var hasStoryManagePermission: Bool = false
     @EnvironmentObject private var viewConfig: AmityViewConfigController
+    @Environment(\.colorScheme) private var colorScheme
     
     private var isActiveTarget: Bool {
         storyPageViewModel.activeStoryTarget == storyTarget
@@ -165,7 +167,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 HStack(spacing: 0) {
                     /// Show overflow menu if item is the story
                     /// Hide it if item is ads
-                    if case .content(_) = item.type {
+                    if case .content(let storyModel) = item.type {
                         Button {
                             showBottomSheet.toggle()
                         } label: {
@@ -174,7 +176,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                                 .frame(width: 24, height: 20)
                                 .padding(.trailing, 20)
                         }
-                        .isHidden(!hasStoryManagePermission, remove: false)
+                        .isHidden(!(storyModel.isCreator || hasStoryManagePermission), remove: false)
                         .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.meatballsButton)
                         .isHidden(viewConfig.isHidden(elementId: .overflowMenuElement), remove: false)
                     }
@@ -290,12 +292,12 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                 
                 AmityCreateNewStoryButtonElement(componentId: .storyTabComponent)
                     .frame(width: 16.0, height: 16.0)
-                    .isHidden(!hasStoryManagePermission)
+                    .isHidden(!canCreateStory)
                     .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.createStoryIcon)
                     .isHidden(viewConfig.isHidden(elementId: .createNewStoryButtonElement), remove: false)
             }
             .onTapGesture {
-                if hasStoryManagePermission {
+                if canCreateStory {
                     let context = AmityViewStoryPageBehaviour.Context(page: viewStoryPage, targetId: storyTarget.targetId, targetType: .community)
                     AmityUIKit4Manager.behaviour.viewStoryPageBehaviour?.goToCreateStoryPage(context: context)
                 }
@@ -486,9 +488,11 @@ struct StoryCoreView: View, AmityViewIdentifiable {
             let reactionBtnBgColor = Color(viewConfig.defaultLightTheme.baseColor)
             HStack(spacing: 0) {
                 let icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: .storyReactionButtonElement, key: "reaction_icon", of: String.self) ?? "")
-                let likedIcon = AmityIcon.likeReactionIcon.getImageResource()
+                let likedIcon = colorScheme == .dark ? AmityIcon.likeReactionIcon.getImageResource() : AmityIcon.likeReactionPlainIcon.getImageResource()
                 Image(story.isLiked ? likedIcon : icon)
-                    .frame(width: 20, height: 16)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 20, height: 20)
                     .padding(.leading, 10)
                     .padding(.trailing, 4)
                 Text(story.reactionCount.formattedCountString)
@@ -632,7 +636,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     func getCommentSheetView() -> some View {
         if #available(iOS 16.0, *) {
             getCommentSheetContentView()
-            .presentationDetents([.fraction(0.75)])
+            .modifier(CommentSheetDetents())
         } else {
             getCommentSheetContentView()
         }
@@ -670,8 +674,12 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         if let item = storyTarget.items.element(at: viewModel.storySegmentIndex),
                             case let .content(story) = item.type {
                             Task { @MainActor in
-                                try await viewModel.deleteStory(storyId: story.storyId, host)
-                                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Story.storyDeletedToastMessage.localizedString)
+                                do {
+                                    try await viewModel.deleteStory(storyId: story.storyId, host)
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Story.storyDeletedToastMessage.localizedString)
+                                } catch {
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Story.failedToDeleteStoryToastMessage.localizedString)
+                                }
                             }
                         }
                     }
@@ -691,18 +699,32 @@ struct StoryCoreView: View, AmityViewIdentifiable {
     }
     
     private func checkStoryPermission() {
-        // Check StoryManage Permission
         Task {
             let storyTargetId = storyTarget.targetId
             let hasPermission = await StoryPermissionChecker.checkUserHasManagePermission(communityId: storyTargetId)
             let allowAllUserCreation = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
-            
+
+            /// Managing someone else's story is gated on the Manage Story permission alone.
+            /// `allowAllUserToCreateStory` only grants creation, so it must not leak into this.
+            hasStoryManagePermission = hasPermission
+
             guard let community = storyTarget.storyTarget?.community else {
-                hasStoryManagePermission = false
+                canCreateStory = false
                 return
             }
-            
-            hasStoryManagePermission = (allowAllUserCreation || hasPermission) && community.isJoined
+
+            canCreateStory = (allowAllUserCreation || hasPermission) && community.isJoined
         }
+    }
+}
+
+/// A sheet opens at its smallest detent, so the selection is bound to open at
+/// `.large` while still allowing a drag down to 0.75.
+@available(iOS 16.0, *)
+private struct CommentSheetDetents: ViewModifier {
+    @State private var selection: PresentationDetent = .large
+
+    func body(content: Content) -> some View {
+        content.presentationDetents([.fraction(0.75), .large], selection: $selection)
     }
 }

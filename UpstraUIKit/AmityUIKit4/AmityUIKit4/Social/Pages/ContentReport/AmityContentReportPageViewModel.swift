@@ -42,12 +42,17 @@ class AmityContentReportPageViewModel: ObservableObject {
     private let chatManager = ChatManager()
     
     let type: ContentReportType
-   
+
+    /// Set by whoever opens the report page. The toast lands on the surface underneath once this
+    /// page is dismissed, so the padding belongs to that surface, not to this page.
+    let toastBottomPadding: CGFloat
+
     @Published var selectedReason: AmityContentFlagReason?
     @Published var submissionState: ContentReportSubmissionState = .none
-    
-    init(type: ContentReportType) {
+
+    init(type: ContentReportType, toastBottomPadding: CGFloat = Toast.defaultBottomPadding) {
         self.type = type
+        self.toastBottomPadding = toastBottomPadding
     }
     
     @MainActor
@@ -73,7 +78,7 @@ class AmityContentReportPageViewModel: ObservableObject {
                 self.submissionState = .error
                 
                 let errorMessage = AmityLocalizedStringSet.Social.reportReasonErrorToastMessage.localized(arguments: type.description)
-                Toast.showToast(style: .warning, message: errorMessage)
+                Toast.showToast(style: .warning, message: errorMessage, bottomPadding: toastBottomPadding)
             }
         }
     }

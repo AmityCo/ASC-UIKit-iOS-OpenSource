@@ -255,15 +255,22 @@ struct EventPlatformRadioButtonView: View {
             Spacer()
             
             ZStack {
+                // Unselected — Base
                 Circle()
-                    .stroke(lineWidth: 1)
-                    .fill(.gray)
+                    .stroke(Color(viewConfig.theme.baseColor), lineWidth: 1)
                     .frame(width: 20, height: 20)
                     .opacity(isSelected ? 0 : 1)
-                
-                Image(AmityIcon.pollRadioIcon.imageResource)
-                    .frame(width: 22, height: 22)
-                    .opacity(isSelected ? 1 : 0)
+
+                // Selected — Primary with white inner dot
+                ZStack {
+                    Circle()
+                        .fill(Color(viewConfig.theme.primaryColor))
+                    Circle()
+                        .fill(Color(AmityFixedColor.shared.white))
+                        .frame(width: 8, height: 8)
+                }
+                .frame(width: 20, height: 20)
+                .opacity(isSelected ? 1 : 0)
             }
         }
         .contentShape(Rectangle())

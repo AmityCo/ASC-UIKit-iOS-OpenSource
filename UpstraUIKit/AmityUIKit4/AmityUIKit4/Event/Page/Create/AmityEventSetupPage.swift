@@ -434,14 +434,11 @@ public struct AmityEventSetupPage: AmityPageView {
                 do {
                     if isInCreateMode {
                         let event = try await viewModel.createEvent(draft: draft, targetId: communityId)
-                        
-                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventSetupSuccessfullyCreated.localizedString, bottomPadding: 70)
-                        
                         AmityUIKit4Manager.behaviour.eventSetupPageBehavior?.goToEventDetailPage(context: .init(page: self, event: event))
                     } else {
                         try await viewModel.updateEvent(draft: draft)
                         
-                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventSetupSuccessfullyUpdated.localizedString, bottomPadding: 70)
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventSetupSuccessfullyUpdated.localizedString)
                         
                         dismissScreen()
                     }

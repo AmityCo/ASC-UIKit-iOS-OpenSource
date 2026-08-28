@@ -55,7 +55,6 @@ public struct AmityEditUserProfilePage: AmityPageView {
                     VStack(spacing: 24) {
                         userProifleAvatarView
                         
-                        let canEditDisplayName = AmityUIKitManagerInternal.shared.client.getCoreUserSettings()?.isAllowUpdateDisplayName ?? false
                         InfoTextField(data: $displayNameTextFieldModel, text: $displayNameText, isValid: $isTextVaild, titleTextAccessibilityId: AccessibilityID.Social.EditUserProfile.userDisplayNameTitle)
                             .alertColor(viewConfig.theme.alertColor)
                             .dividerColor(viewConfig.theme.baseColorShade4)
@@ -187,21 +186,21 @@ public struct AmityEditUserProfilePage: AmityPageView {
                 .frame(height: 1)
             
             Rectangle()
-                .fill(isExistingDataChanged ? .blue : Color(viewConfig.theme.baseColorShade4))
+                .fill(Color(isExistingDataChanged ? viewConfig.theme.primaryColor : viewConfig.theme.primaryColorShade3))
                 .frame(height: 40)
-                .cornerRadius(4)
+                .cornerRadius(8)
                 .overlay (
                     ZStack {
                         let updateButtonText = viewConfig.getConfig(elementId: .updateUserProfileButton, key: "text", of: String.self) ?? AmityLocalizedStringSet.Social.editUserSaveButton.localizedString
                         Text(updateButtonText)
-                            .applyTextStyle(.bodyBold(isExistingDataChanged ? .white : .gray))
+                            .applyTextStyle(.bodyBold(Color(AmityFixedColor.shared.white)))
                     }
                 )
                 .onTapGesture {
                     guard isExistingDataChanged else { return }
                     Task { @MainActor in
                         do {
-                            try await viewModel.updateUser(UserModel(displayName: displayNameText, about: aboutText, avatar: imagePickerViewModel.selectedImage))
+                            try await viewModel.updateUser(UserModel(displayName: canEditDisplayName ? displayNameText : nil, about: aboutText, avatar: imagePickerViewModel.selectedImage))
                             Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.userProfileEditSuccess.localizedString)
                             host.controller?.navigationController?.popViewController()
                         } catch {
@@ -218,13 +217,16 @@ public struct AmityEditUserProfilePage: AmityPageView {
         }
     }
     
+    private var canEditDisplayName: Bool {
+        AmityUIKitManagerInternal.shared.client.getCoreUserSettings()?.isAllowUpdateDisplayName ?? false
+    }
+
     private func validateDataChanged(){
-        
+
         let isImageChanged = imagePickerViewModel.selectedImage != nil
         let isAboutChanged = aboutText != viewModel.user?.about ?? ""
         var isDisplayNameChanged = false
-        
-        let canEditDisplayName = AmityUIKitManagerInternal.shared.client.getCoreUserSettings()?.isAllowUpdateDisplayName ?? false
+
         if canEditDisplayName {
             isDisplayNameChanged = !displayNameText.isEmpty && displayNameText != viewModel.user?.displayName ?? ""
         }

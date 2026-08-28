@@ -133,10 +133,10 @@
 "delete_post_title" = "Delete this post?";
 "delete_post_message" = "This post will be permanently deleted. You'll no longer see and find this post.";
 "post_reported_message" = "Post reported";
-"post_unreported_message" = "Post unreported";
+"post_unreported_message" = "Post unreported.";
 "post_failed_reported_message" = "Failed to report post. Please try again.";
 "post_failed_unreported_message" = "Failed to unreport post. Please try again.";
-"post_deleted_toast_message" = "Post deleted";
+"post_deleted_toast_message" = "Post deleted.";
 "post_detail_page_title" = "Post";
 "create_post_bottom_sheet_title" = "Post";
 "amity_social_button_story" = "Story";
@@ -273,7 +273,7 @@
 "poll_post_title" = "Post title";
 "poll_post_title_optional" = "(Optional)";
 "poll_post_title_textfield_placeholder" = "Give your poll a headline";
-"poll_question_textfield_placeholder" = "What's your poll question?";
+"poll_question_textfield_placeholder" = "What would you like to ask?";
 "poll_multiple_selection_title" = "Multiple selection";
 "poll_multiple_selection_desc" = "Let participants vote more than one option.";
 
@@ -482,8 +482,8 @@
 "live_chat_delete_message" = "Delete message";
 "live_chat_report_message" = "Report message";
 "live_chat_unreport_message" = "UnReport message";
-"live_chat_toast_report_message" = "Message reported";
-"live_chat_toast_unreport_message" = "Message unreported";
+"live_chat_toast_report_message" = "Message reported.";
+"live_chat_toast_unreport_message" = "Message unreported.";
 "live_chat_promote_to_moderator" = "Promote to moderator";
 "live_chat_demote_to_member" = "Demote to member";
 "live_chat_mute_user" = "Mute user";
@@ -504,9 +504,9 @@
 "live_chat_unmute_user_desc" = "Are you sure you want to unmute this user? They can now send messages.";
 "live_chat_mute_button" = "Mute";
 "live_chat_unmute_button" = "Unmute";
-"live_chat_mute_user_success_toast" = "User muted";
+"live_chat_mute_user_success_toast" = "User muted.";
 "live_chat_mute_user_failed_toast" = "Failed to mute user. Please try again.";
-"live_chat_unmute_user_success_toast" = "User unmuted";
+"live_chat_unmute_user_success_toast" = "User unmuted.";
 "live_chat_unmute_user_failed_toast" = "Failed to unmute user. Please try again.";
 
 "community_update_success_toast_message" = "Successfully updated community profile.";
@@ -959,11 +959,11 @@
 
 // Buttons
 "amity_social_video_button" = "Video";
-"amity_social_explore_community_button" = "Explore Community";
+"amity_social_explore_community_button" = "Explore community";
 
 // User Profile
-"user_profile_followings" = "Followings";
-"user_profile_followers" = "Followers";
+"user_profile_followings" = "following";
+"user_profile_followers" = "followers";
 "user_profile_following_button" = "Following";
 
 // Community Pending Requests
@@ -1001,8 +1001,8 @@
 "amity_social_share_to" = "Share to";
 
 // Invite Member
-"community_invite_member_title" = "Invite member";
-"community_invite_member_description" = "Invite people to join your community";
+"community_invite_member_title" = "Invite members";
+"community_invite_member_description" = "They will join as members after accepting your invitation.";
  "community_invite_member_button" = "Invite";
  
 // Search
@@ -1611,5 +1611,43 @@
 "amity_chat_dm_action_report_user" = "Report user";
 "amity_chat_dm_action_unreport_user" = "Unreport user";
 
+"amity_clip_permission_camera_and_microphone_message" = "This lets you record videos\nfrom this device.";
+
+"community_invite_member_page_title" = "Invite member";
+"community_invite_member_page_button" = "Invite";
+
+// Event post — embedded event card placeholder
+"amity_social_event_post_no_longer_available" = "This event is no longer available";
+
+// Event post — create ("Post event to feed" entry on the event detail page)
+"amity_social_label_post_event_to_feed" = "Post event to feed";
+
+// Event post — composer banner shown when the target is locked (private-community event)
+"amity_social_event_post_private_target_banner" = "This is a private event, it can only be posted to the community it was created in.";
+
+// Event post — composer body placeholder
+"amity_social_event_post_composer_body_placeholder" = "What's on your mind?";
+
+// Event post — create result toasts
+"amity_social_event_post_created_toast" = "Event posted to feed.";
+"amity_social_event_post_create_failed_toast" = "Failed to create post. Please try again.";
+"amity_social_event_post_blocked_word_toast" = "Your post wasn't posted as it contains an inappropriate word.";
+"amity_social_event_post_blocked_link_toast" = "Your post wasn't posted as it contains a link that is not allowed.";
+
+// Event post — success sheet shown once to the host after an event is created
+"amity_social_event_post_created_success_title" = "Your event was created successfully";
+"amity_social_event_post_created_success_description" = "Post it to a feed so more people can find and join.";
+"amity_social_event_post_created_success_primary" = "Post to feed";
+"amity_social_event_post_created_success_secondary" = "Maybe later";
+
+// Clip feed — shown when a non-member tries to interact with a clip
+"amity_social_clip_join_community_to_interact" = "Join community to interact with this clip.";
+
+// Post composer — community requires post approval
+"amity_social_post_edit_sent_for_review_title" = "Post will be sent for review";
+"amity_social_post_edit_sent_for_review_message" = "Posting in this community requires approval. Your edited post will be published once approved by the community moderator.";
+"amity_social_post_sent_for_review_toast" = "Post sent for review.";
+
 // Community invite member page action button
 "community_invite_member_button" = "Invite";
+

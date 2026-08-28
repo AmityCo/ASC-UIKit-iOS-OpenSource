@@ -10,7 +10,8 @@ import AmitySDK
 import Combine
 
 struct UserModel {
-    var displayName: String
+    // nil omits the display name from the update request
+    var displayName: String?
     var about: String
     var avatar: UIImage?
 }

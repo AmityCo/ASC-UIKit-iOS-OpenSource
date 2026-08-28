@@ -137,14 +137,17 @@ struct AmityPostMediaVideoPlayer: View {
             VStack {
                 HStack {
                     Button(action: { onClose?() }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 18, weight: .regular))
-                            .foregroundColor(.white)
-                            .frame(width: 24, height: 24)
+                        Image(AmityIcon.closeIcon.getImageResource())
+                            .resizable()
+                            .renderingMode(.template)
+                            .aspectRatio(contentMode: .fit)
+                            .frame(size: CGSize(width: 20, height: 20))
+                            .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
+                            .circularBackground(radius: 24, color: Color(viewConfig.defaultLightTheme.baseColorShade4))
                     }
                     Spacer()
                 }
-                .padding(.horizontal, 12)
+                .padding(.horizontal, 16)
                 .padding(.vertical, 16)
 
                 Spacer()
@@ -206,10 +209,13 @@ struct AmityPostMediaVideoPlayer: View {
             Button(action: {
                 onClose?()
             }) {
-                Image(systemName: "xmark")
-                    .font(.system(size: 18, weight: .regular))
-                    .foregroundColor(.white)
-                    .frame(width: 24, height: 24)
+                Image(AmityIcon.closeIcon.getImageResource())
+                    .resizable()
+                    .renderingMode(.template)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(size: CGSize(width: 20, height: 20))
+                    .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
+                    .circularBackground(radius: 24, color: Color(viewConfig.defaultLightTheme.baseColorShade4))
             }
 
             Spacer()
@@ -236,7 +242,7 @@ struct AmityPostMediaVideoPlayer: View {
                 }
             }
         }
-        .padding(.horizontal, 12)
+        .padding(.horizontal, 16)
         .padding(.vertical, 16)
         .background(
             LinearGradient(

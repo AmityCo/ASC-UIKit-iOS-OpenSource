@@ -14,7 +14,7 @@ class TargetFeedClipService: ClipService {
     private let postCollection: AmityCollection<AmityPost>
     private let targetId: String
     private let targetType: AmityPostTargetType
-    private let firstClip: ClipPost?
+    private var firstClip: ClipPost?
     
     var token: AmityNotificationToken?
     var parentPostsToken: AmityNotificationToken?
@@ -54,6 +54,16 @@ class TargetFeedClipService: ClipService {
         self.currentIndex = startIndex
     }
     
+    override func removeClip(id: String) {
+        // Cleared so processSnapshots stops prepending it back onto the list
+        if firstClip?.model.postId == id {
+            firstClip = nil
+        }
+        postsCache.removeValue(forKey: id)
+
+        super.removeClip(id: id)
+    }
+
     override func load() {
         // Notify immediately after opening feed if there is first clip available
         if let firstClip, isFirstLoad {

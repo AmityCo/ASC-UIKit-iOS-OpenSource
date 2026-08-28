@@ -200,6 +200,7 @@ public class AmityPostModel: Identifiable {
         links = post.links
         pinnedProductId = post.pinnedProductId
         eventId = post.eventId
+        event = post.getEvent()
         
         // reactions are ordered by the count. if the count is equal, order by alphabet
         // if the count is 1 and the reaction is the same as current user's first reaction, remove it from the list
@@ -274,7 +275,7 @@ public class AmityPostModel: Identifiable {
         text = data[DataType.text.rawValue] as? String ?? ""
         title = data["title"] as? String ?? ""
         dataTypeInternal = DataType(rawValue: dataType) ?? .unknown
-        
+
         content = .text(value: text)
         
         // Get media data if parent post itself is not text type.
@@ -285,6 +286,17 @@ public class AmityPostModel: Identifiable {
         
         for childPost in childrenPosts {
             prepareData(childPost)
+        }
+
+        // An event post's parent is a `text` post; the event lives in a child post
+        // (dataType "event") and in the parent's `structureType`. The child switch
+        // above already sets `.event` when that child is loaded, but in a live
+        // collection `childrenPosts` can be empty on first emission and resolve
+        // later — while `dataTypeInternal` is computed only once here. `structureType`
+        // is present on the parent immediately, so detect from it to avoid an event
+        // post being stuck as `.text` when it arrives before its child resolves.
+        if structureType == "event" {
+            dataTypeInternal = .event
         }
     }
     
@@ -364,6 +376,8 @@ public class AmityPostModel: Identifiable {
 //                }
         case "poll":
                 dataTypeInternal = .poll
+        case "event":
+                dataTypeInternal = .event
         case "liveStream":
             if let liveStreamData = post.getLiveStreamInfo() {
                 liveStream = liveStreamData

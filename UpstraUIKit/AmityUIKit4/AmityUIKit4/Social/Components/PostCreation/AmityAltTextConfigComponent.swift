@@ -68,7 +68,17 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
                 .foregroundColor(Color(viewConfig.defaultLightTheme.baseColorShade3))
             
             let title = isEditMode ? AmityLocalizedStringSet.Social.altTextEditTitle.localizedString : AmityLocalizedStringSet.Social.altTextTitle.localizedString
-            AmityNavigationBar(title: title, showDivider: true) {
+            AmityNavigationBar(titleView: {
+                VStack(spacing: 2) {
+                    Text(title)
+                        .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+
+                    Text("\(characterCount)/\(maxCharacterCount)")
+                        .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
+                        .accessibilityIdentifier("charCountTextAccessibilityId")
+                }
+                .padding(.bottom, 8)
+            }, leading: {
                 Image(AmityIcon.closeIcon.getImageResource())
                     .renderingMode(.template)
                     .resizable()
@@ -78,7 +88,7 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
                     .onTapGesture {
                         presentationMode.wrappedValue.dismiss()
                     }
-            } trailing: {
+            }, trailing: {
                 let btnTitle = isEditMode ? AmityLocalizedStringSet.Social.saveButton.localizedString : AmityLocalizedStringSet.General.done.localizedString
                 Button(btnTitle) {
                     Task { @MainActor in
@@ -101,7 +111,7 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
                 }
                 .disabled(shouldDisableDoneButton())
                 .foregroundColor(Color(viewConfig.theme.primaryColor.withAlphaComponent(shouldDisableDoneButton() ? 0.3 : 1.0)))
-            }
+            }, showDivider: true)
             
             VStack(spacing: 0) {
                 // Image display
@@ -141,7 +151,7 @@ public struct AmityAltTextConfigComponent: AmityComponentIdentifiable, View {
                             characterCount = maxCharacterCount
                         }
                     }
-                
+
                 Spacer()
             }
             .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())

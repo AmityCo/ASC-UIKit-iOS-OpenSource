@@ -1055,10 +1055,22 @@ public struct AmityLocalizedStringSet {
         static let eventListHappeningNowTitle = "social_button_happening_now"
 
         static let eventDetailPageEditEvent = "amity_social_label_edit_event"
+        static let eventDetailPagePostEventToFeed = "amity_social_label_post_event_to_feed"
+        static let eventPostPrivateTargetBanner = "amity_social_event_post_private_target_banner"
+        static let eventPostComposerBodyPlaceholder = "amity_social_event_post_composer_body_placeholder"
+        static let eventPostCreatedToast = "amity_social_event_post_created_toast"
+        static let eventPostCreateFailedToast = "amity_social_event_post_create_failed_toast"
+        static let eventPostBlockedWordToast = "amity_social_event_post_blocked_word_toast"
+        static let eventPostBlockedLinkToast = "amity_social_event_post_blocked_link_toast"
+        static let eventPostCreatedSuccessTitle = "amity_social_event_post_created_success_title"
+        static let eventPostCreatedSuccessDescription = "amity_social_event_post_created_success_description"
+        static let eventPostCreatedSuccessPrimary = "amity_social_event_post_created_success_primary"
+        static let eventPostCreatedSuccessSecondary = "amity_social_event_post_created_success_secondary"
         static let eventDetailPageDeleteEvent = "event_detail_page_delete_event"
         static let eventDetailPageEventDeleted = "event_detail_page_event_deleted"
         static let eventDetailPageDeleteFailed = "event_detail_page_delete_failed"
         static let eventDetailPageSetupLivestream = "event_detail_page_setup_livestream"
+        static let eventPostNoLongerAvailable = "amity_social_event_post_no_longer_available"
         static let eventDetailCopyEventLink = "event_detail_copy_event_link"
         static let eventDetailFailedToCopyLink = "event_detail_failed_to_copy_link"
 
@@ -1218,6 +1230,7 @@ public struct AmityLocalizedStringSet {
         static let clipAlertTooShortMessage = "amity_clip_alert_too_short_message"
         static let clipAlertDiscardMessage = "amity_clip_alert_discard_message"
         static let clipAlertFailedUploadMessage = "amity_clip_alert_failed_upload_message"
+        static let clipPermissionCameraAndMicrophoneMessage = "amity_clip_permission_camera_and_microphone_message"
         static let seeLess = "amity_social_see_less"
         
         // Community
@@ -1365,6 +1378,8 @@ public struct AmityLocalizedStringSet {
         static let communityInviteMemberTitle = "community_invite_member_title"
         static let communityInviteMemberDescription = "community_invite_member_description"
         static let communityInviteMemberButton = "community_invite_member_button"
+        static let communityInviteMemberPageTitle = "community_invite_member_page_title"
+        static let communityInviteMemberPageButton = "community_invite_member_page_button"
 
         // Search
         static let searchUserPlaceholder = "search_user_placeholder"
@@ -1503,6 +1518,10 @@ public struct AmityLocalizedStringSet {
         static let livestreamRemoveCoHostFailedToast = "livestream_remove_co_host_failed_toast"
         static let livestreamFollowToInteractToast = "livestream_follow_to_interact_toast"
         static let joinCommunityToast = "common_label_join_community_to_interact"
+        static let clipJoinCommunityToast = "amity_social_clip_join_community_to_interact"
+        static let postEditSentForReviewTitle = "amity_social_post_edit_sent_for_review_title"
+        static let postEditSentForReviewMessage = "amity_social_post_edit_sent_for_review_message"
+        static let postEditSentForReviewToast = "amity_social_post_sent_for_review_toast"
         static let livestreamWaitingNetworkToast = "livestream_waiting_network_toast"
 
         // Story

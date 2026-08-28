@@ -56,7 +56,7 @@ public struct AmityEmptyNewsFeedComponent: AmityComponentView {
                     .padding(.leading, 24)
                     
                 Text(exploreCommunityButtonText)
-                    .applyTextStyle(.titleBold(Color(viewConfig.theme.backgroundColor)))
+                    .applyTextStyle(.titleBold(Color(AmityFixedColor.shared.white)))
                     .padding([.top, .bottom], 12)
                     .padding(.trailing, 24)
             }

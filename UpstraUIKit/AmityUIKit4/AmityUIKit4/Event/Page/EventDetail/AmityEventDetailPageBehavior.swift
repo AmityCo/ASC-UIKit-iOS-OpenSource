@@ -55,7 +55,7 @@ open class AmityEventDetailPageBehavior {
 
     open func goToPostDetailPage(context: AmityEventDetailPageBehavior.Context, post: AmityPostModel?, category: AmityPostCategory = .general) {
         if let post = post {
-            let postComponentContext = AmityPostContentComponent.Context(shouldShowPollResults: context.showPollResult, category: category, shouldHideTarget: true)
+            let postComponentContext = AmityPostContentComponent.Context(shouldShowPollResults: context.showPollResult, category: category, shouldHideTarget: true, event: context.event)
             let vc = AmitySwiftUIHostingController(rootView: AmityPostDetailPage(post: post.object, context: postComponentContext))
             let host = context.page.host
             host.controller?.navigationController?.pushViewController(vc, animated: true)
@@ -74,6 +74,15 @@ open class AmityEventDetailPageBehavior {
         navigationController.modalPresentationStyle = .fullScreen
         navigationController.navigationBar.isHidden = true
         
+        context.page.host.controller?.present(navigationController, animated: true)
+    }
+
+    open func goToEventPostToFeed(context: AmityEventDetailPageBehavior.Context) {
+        let page = AmityEventPostTargetSelectionPage(event: context.event)
+        let controller = AmitySwiftUIHostingController(rootView: page)
+        let navigationController = UINavigationController(rootViewController: controller)
+        navigationController.modalPresentationStyle = .fullScreen
+        navigationController.navigationBar.isHidden = true
         context.page.host.controller?.present(navigationController, animated: true)
     }
 

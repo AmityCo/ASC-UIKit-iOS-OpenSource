@@ -13,9 +13,13 @@ struct CommentBottomSheetView: View {
     
     let editAction: ((AmityCommentModel?) -> Void)?
     let reportAction: (AmityCommentModel?) -> Void
-    
-    init(viewModel: CommentBottomSheetViewModel, editingComment: ((AmityCommentModel?) -> Void)? = nil, reportAction: @escaping (AmityCommentModel?) -> Void) {
+
+    /// Padding for toasts this sheet raises itself, set by the surface underneath it.
+    private let toastBottomPadding: CGFloat
+
+    init(viewModel: CommentBottomSheetViewModel, toastBottomPadding: CGFloat = Toast.defaultBottomPadding, editingComment: ((AmityCommentModel?) -> Void)? = nil, reportAction: @escaping (AmityCommentModel?) -> Void) {
         self.viewModel = viewModel
+        self.toastBottomPadding = toastBottomPadding
         self.editAction = editingComment
         self.reportAction = reportAction
     }
@@ -116,7 +120,7 @@ struct CommentBottomSheetView: View {
                                 let reportMessage = isReply ? AmityLocalizedStringSet.Comment.replyReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentReportedMessage.localizedString
                                 let unReportMessage = isReply ? AmityLocalizedStringSet.Comment.replyUnReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentUnReportedMessage.localizedString
                                 
-                                Toast.showToast(style: .success, message: viewModel.isCommentFlaggedByMe ? unReportMessage : reportMessage)
+                                Toast.showToast(style: .success, message: viewModel.isCommentFlaggedByMe ? unReportMessage : reportMessage, bottomPadding: toastBottomPadding)
                             } catch {
                                 Toast.showToast(style: .warning, message: error.localizedDescription)
                             }

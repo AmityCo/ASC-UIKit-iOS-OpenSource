@@ -145,6 +145,15 @@ class LiveStreamConferenceViewModel: ObservableObject {
         return internalCreatedPost
     }
     
+    /// `AmityPost` is an immutable snapshot, so the review state has to be published separately for the UI to react
+    /// when a moderator approves the post mid session.
+    @Published var isPostPendingReview: Bool = false
+    
+    private func updateCreatedPost(_ post: AmityPost?) {
+        internalCreatedPost = post
+        isPostPendingReview = post?.getFeedType() == .reviewing
+    }
+    
     private var internalCreatedRoom: AmityRoom?
     var createdRoom: AmityRoom? {
         internalCreatedRoom
@@ -318,7 +327,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
                     self.internalCreatedRoom = createdEvent.room
                     Log.add(event: .info, "Room associated to event: \(internalCreatedRoom?.roomId ?? "nil")")
                     
-                    self.internalCreatedPost = createdEvent.room?.post
+                    self.updateCreatedPost(createdEvent.room?.post)
                     Log.add(event: .info, "Post associated to event: \(createdPost?.postId ?? "nil")")
                     
                 } else {
@@ -349,7 +358,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
                         productTags: productTagsArray.isEmpty ? nil : productTagsArray,
                         pinnedProductId: pinnedProductId
                     )
-                    self.internalCreatedPost = post
+                    self.updateCreatedPost(post)
                     Log.add(event: .info, "Post Created: \(post.postId)")
                     
                     // Show warning if some tagged products are no longer available
@@ -439,7 +448,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
         
         Task { @MainActor in
             do {
-                self.internalCreatedPost = post.object
+                self.updateCreatedPost(post.object)
                 self.internalCreatedRoom = room
                 Log.add(event: .info, "Post Created: \(post.postId)")
                 
@@ -697,10 +706,13 @@ class LiveStreamConferenceViewModel: ObservableObject {
     
     func subscribePostEventAndObserve(subscribeEvent: Bool) {
         guard let createdPost else { return }
-        let livestreamPost: AmityPost
-        if let childPost = createdPost.childrenPosts.first {
-            livestreamPost = childPost
-            
+        let childPost = createdPost.childrenPosts.first
+        let livestreamPost: AmityPost = childPost ?? createdPost
+        
+        // The review state lives on the parent post, so it has to be refreshed regardless of whether
+        // a child livestream post exists. When there is no child, `livePostToken` below already
+        // observes the parent and takes over the refresh.
+        if childPost != nil {
             parentPostToken = postManager.getPost(withId: createdPost.postId).observe{ [weak self] liveObject, error in
                 guard let self, let snapshot = liveObject.snapshot else { return }
                             
@@ -714,11 +726,10 @@ class LiveStreamConferenceViewModel: ObservableObject {
                     
                     self.endLiveStream(reason: .terminated)
                 }
-                internalCreatedPost = snapshot
+                updateCreatedPost(snapshot)
             }
-        } else {
-            livestreamPost = createdPost
         }
+        
         if subscribeEvent {
             livestreamPost.subscribeEvent(.post, withCompletion: { success, error in
                 Log.add(event: .info, "Subscribing post event status: \(success) Error: \(String(describing: error))")
@@ -752,6 +763,10 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 livePostToken = nil
                 
                 self.endLiveStream(reason: .terminated)
+            }
+            
+            if childPost == nil {
+                updateCreatedPost(snapshot)
             }
         }
     }

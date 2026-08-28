@@ -145,6 +145,7 @@ struct PollDurationSelectionView: View {
                     self.isVisible = false
                 } label: {
                     Text(AmityLocalizedStringSet.Social.pollDurationDoneButton.localizedString)
+                        .applyTextStyle(.body(Color(viewConfig.theme.primaryColor)))
                 }
             }
             
@@ -187,8 +188,7 @@ struct OptionButton: View {
                         .frame(width: 16, height: 16)
                         .opacity(isSelected ? 0 : 1)
                     
-                    Image(AmityIcon.pollRadioIcon.imageResource)
-                        .frame(width: 22, height: 22)
+                    AmityRadioSelectedIndicator(size: 22)
                         .opacity(isSelected ? 1 : 0)
                 }
             }

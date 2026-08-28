@@ -68,14 +68,12 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
         let onSelection: DefaultTapAction
         
         private let mytimelineAvatarURL: URL? = AmityUIKitManagerInternal.shared.client.user?.snapshot?.resolvedAvatarURL
+        private let mytimelineDisplayName: String = AmityUIKitManagerInternal.shared.client.user?.snapshot?.displayName ?? ""
 
         var body: some View {
             VStack(spacing: 10) {
                 HStack(spacing: 0) {
-                    AsyncImage(
-                        placeholderView: { defaultCommunityPlaceholderView(viewConfig: viewConfig, size: 40) },
-                        url: mytimelineAvatarURL
-                            )
+                    AmityUserProfileImageView(displayName: mytimelineDisplayName, avatarURL: mytimelineAvatarURL)
                         .frame(width: 40, height: 40)
                         .clipShape(Circle())
                         .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 12))

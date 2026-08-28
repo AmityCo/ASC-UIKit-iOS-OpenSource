@@ -354,6 +354,7 @@ struct MediaAttachmentView: View {
                 
                 guard let imageData else { return }
                 Log.add(event: .info, "Image Uploaded!!!")
+                media.image = imageData
                 media.state = .uploadedImage(data: imageData)
                 
                 // Trigger objectWillChange to update the button state

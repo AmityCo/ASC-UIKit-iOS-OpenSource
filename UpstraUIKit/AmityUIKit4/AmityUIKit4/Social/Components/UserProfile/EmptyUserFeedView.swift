@@ -26,6 +26,50 @@ enum EmptyUserFeedViewType {
             AmityLocalizedStringSet.Social.communityEmptyFeedNoClips.localizedString
         }
     }
+
+    var privateFeedTitle: String {
+        switch self {
+        case .post:
+            AmityLocalizedStringSet.Social.privateUserFeed.localizedString
+        case .image:
+            AmityLocalizedStringSet.Social.privateUserImageFeed.localizedString
+        case .video, .clip:
+            AmityLocalizedStringSet.Social.privateUserVideoFeed.localizedString
+        }
+    }
+
+    var privateFeedInfo: String {
+        switch self {
+        case .post:
+            AmityLocalizedStringSet.Social.privateUserFeedInfo.localizedString
+        case .image:
+            AmityLocalizedStringSet.Social.privateUserImageFeedInfo.localizedString
+        case .video, .clip:
+            AmityLocalizedStringSet.Social.privateUserVideoFeedInfo.localizedString
+        }
+    }
+
+    var blockedFeedTitle: String {
+        switch self {
+        case .post:
+            AmityLocalizedStringSet.Social.blockedUserFeed.localizedString
+        case .image:
+            AmityLocalizedStringSet.Social.blockedUserImageFeed.localizedString
+        case .video, .clip:
+            AmityLocalizedStringSet.Social.blockedUserVideoFeed.localizedString
+        }
+    }
+
+    var blockedFeedInfo: String {
+        switch self {
+        case .post:
+            AmityLocalizedStringSet.Social.blockedUserFeedInfo.localizedString
+        case .image:
+            AmityLocalizedStringSet.Social.blockedUserImageFeedInfo.localizedString
+        case .video, .clip:
+            AmityLocalizedStringSet.Social.blockedUserVideoFeedInfo.localizedString
+        }
+    }
 }
 
 struct EmptyUserFeedView: View {
@@ -81,12 +125,12 @@ struct EmptyUserFeedView: View {
             
         case .private:
             icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: privateFeedId, key: "image", of: String.self) ?? "")
-            title = viewConfig.getConfig(elementId: privateFeedId, key: "text", of: String.self) ?? ""
-            description = viewConfig.getConfig(elementId: privateFeedInfoId, key: "text", of: String.self) ?? ""
+            title = viewConfig.getConfig(elementId: privateFeedId, key: "text", of: String.self) ?? feedType.privateFeedTitle
+            description = viewConfig.getConfig(elementId: privateFeedInfoId, key: "text", of: String.self) ?? feedType.privateFeedInfo
         case .blocked:
             icon = AmityIcon.getImageResource(named: viewConfig.getConfig(elementId: blockedFeedId, key: "image", of: String.self) ?? "")
-            title = viewConfig.getConfig(elementId: blockedFeedId, key: "text", of: String.self) ?? ""
-            description = viewConfig.getConfig(elementId: blockedFeedInfoId, key: "text", of: String.self) ?? ""
+            title = viewConfig.getConfig(elementId: blockedFeedId, key: "text", of: String.self) ?? feedType.blockedFeedTitle
+            description = viewConfig.getConfig(elementId: blockedFeedInfoId, key: "text", of: String.self) ?? feedType.blockedFeedInfo
         }
     }
     

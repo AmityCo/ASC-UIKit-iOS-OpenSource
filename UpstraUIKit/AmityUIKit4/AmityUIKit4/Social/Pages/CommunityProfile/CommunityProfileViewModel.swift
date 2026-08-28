@@ -40,8 +40,20 @@ public class CommunityProfileViewModel: ObservableObject {
     @Published var startedScrollingToBottom: Bool = false
     @Published var showErrorState = false
 
-    @Published var joinStatus: CommunityJoinState = .notJoined
     @Published var joinRequest: AmityJoinRequest?
+    
+    var joinStatus: CommunityJoinState {
+        guard let community else { return .notJoined }
+        
+        if community.isJoined { return .joined }
+        
+        // Note:
+        // An `.approved` join request does not imply membership. A user who left the
+        // community still has one, so only `isJoined` above can determine that.
+        if community.requiresJoinApproval, joinRequest?.status == .pending { return .requested }
+        
+        return .notJoined
+    }
     
     private let communityManger = CommunityManager()
     private let storyManager = StoryManager()
@@ -61,6 +73,8 @@ public class CommunityProfileViewModel: ObservableObject {
     private var roomPostCollection: AmityCollection<AmityPost>?
     
     @Published var hasStoryManagePermission: Bool = false
+    /// Add-user permission is a prerequisite for approving join requests, so it also grants access to the pending join requests.
+    @Published var hasAddCommunityUserPermission: Bool = false
     @Published var hasCreatePostPermission = false
     @Published var hasCreateEventPermission = false
     
@@ -88,6 +102,7 @@ public class CommunityProfileViewModel: ObservableObject {
         guard let _ = community else { return }
                 
         self.loadPendingInvitations()
+        self.checkAddCommunityUserPermission()
         self.fetchPendingJoinRequests()
         self.fetchMyJoinRequest()
     }
@@ -104,13 +119,14 @@ public class CommunityProfileViewModel: ObservableObject {
             
             guard let communityObject = community.snapshot else { return }
             
+            // Note:
+            // Captured before `self.community` is overwritten below. `joinStatus` is
+            // derived from it, so it would already reflect the new value afterwards.
+            let wasJoined = self.community?.isJoined ?? false
+            
             let community = AmityCommunityModel(object: communityObject)
             self.community = community
             
-            // Update joined status
-            if community.isJoined {
-                self.joinStatus = .joined
-            }
             self.pendingPostCount = community.pendingPostCount
             self.updatePendingBannerState()
 
@@ -141,7 +157,7 @@ public class CommunityProfileViewModel: ObservableObject {
             }
             
             // If the user leave the community after approved the join request, refresh the feed.
-            if self.joinStatus == .joined && community.isJoined == false {
+            if wasJoined && community.isJoined == false {
                 self.refreshFeedAfterUserJoinedCommunityTask.perform {
                     self.refreshFeed()
                 }
@@ -255,12 +271,15 @@ public class CommunityProfileViewModel: ObservableObject {
         let joinResult = try await community.object.join()
         
         switch joinResult {
-        case .pending:
-            self.joinStatus = .requested
+        case .pending(let request):
+            // `joinStatus` derives `.requested` from this.
+            self.joinRequest = request
         case .success:
-            self.joinStatus = .joined
+            // The join response updates `isJoined`, so the community observer drives
+            // `joinStatus` to `.joined`.
+            self.joinRequest = nil
             self.refreshFeed()
-        default:
+        @unknown default:
             break
         }
     }
@@ -272,6 +291,17 @@ public class CommunityProfileViewModel: ObservableObject {
     func loadPendingInvitations() {
         Task { @MainActor in
             self.pendingCommunityInvitation = await community?.object.getInvitation()
+        }
+    }
+    
+    func checkAddCommunityUserPermission() {
+        let communityId = self.communityId
+        
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            
+            self.hasAddCommunityUserPermission = await CommunityPermissionChecker.hasAddCommunityUserPermission(communityId: communityId)
+            self.updatePendingBannerState()
         }
     }
     
@@ -295,7 +325,8 @@ public class CommunityProfileViewModel: ObservableObject {
         }
         let relevantPostCount = community.hasModeratorRole ? pendingPostCount : userPendingPostCount
         let postsContribute = community.isPostReviewEnabled && relevantPostCount > 0
-        let requestsContribute = community.hasModeratorRole && community.requiresJoinApproval && joinRequestCount > 0
+        let canReviewJoinRequests = community.hasModeratorRole || hasAddCommunityUserPermission
+        let requestsContribute = canReviewJoinRequests && community.requiresJoinApproval && joinRequestCount > 0
         self.shouldShowPendingBanner = postsContribute || requestsContribute
     }
     
@@ -304,29 +335,17 @@ public class CommunityProfileViewModel: ObservableObject {
         
         // If it doesnot require join approval, no need to query for join requests
         if !community.requiresJoinApproval {
-            self.joinStatus = community.isJoined ? .joined : .notJoined
+            self.joinRequest = nil
             return
         }
         
         Task { @MainActor in
             do {
-                let result = try await community.object.getMyJoinRequest()
-                self.joinRequest = result
-                                
-                switch result.status {
-                case .approved:
-                    self.joinStatus = .joined
-                case .pending:
-                    self.joinStatus = .requested
-                case .rejected:
-                    self.joinStatus = .notJoined
-                case .cancelled:
-                    break
-                @unknown default:
-                    break
-                }
-                
+                // We only store it here. `joinStatus` is what interprets it.
+                self.joinRequest = try await community.object.getMyJoinRequest()
             } catch {
+                // No request exists for this user, i.e it is gone after leaving the community.
+                self.joinRequest = nil
                 Log.add(event: .error, "Error while querying user join request for this community")
             }
         }
@@ -334,9 +353,16 @@ public class CommunityProfileViewModel: ObservableObject {
     
     @MainActor
     func cancelJoinRequest() async {
-        self.joinStatus = .notJoined
+        // Cleared optimistically so the join button comes back right away.
+        let request = self.joinRequest
+        self.joinRequest = nil
         
-        try? await joinRequest?.cancel()
+        do {
+            try await request?.cancel()
+        } catch {
+            // Restore the real state if the cancellation did not go through.
+            fetchMyJoinRequest()
+        }
     }
     
     deinit {

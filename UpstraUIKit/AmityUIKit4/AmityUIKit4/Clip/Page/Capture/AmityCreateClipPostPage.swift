@@ -38,6 +38,11 @@ public struct AmityCreateClipPostPage: AmityPageView {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .createClipPostPage))
     }
     
+    private var isPermissionGranted: Bool {
+        permissionChecker.cameraPermissionState == .granted
+            && permissionChecker.microphonePermissionState == .granted
+    }
+    
     public var body: some View {
         ZStack(alignment: .top) {
             
@@ -45,13 +50,14 @@ public struct AmityCreateClipPostPage: AmityPageView {
                 .opacity(1)
                 .edgesIgnoringSafeArea(.all)
 
-            CameraPreviewView(cameraManager: viewModel.cameraManager, outputMode: .videoWithMic)
-                .cornerRadius(12)
-                .visibleWhen(permissionChecker.cameraPermissionState == .granted && permissionChecker.microphonePermissionState == .granted)
+            if isPermissionGranted {
+                CameraPreviewView(cameraManager: viewModel.cameraManager, outputMode: .videoWithMic)
+                    .cornerRadius(12)
+            }
             
             VStack {
                 headerView
-                    .opacity(permissionChecker.cameraPermissionState == .notDetermined && permissionChecker.microphonePermissionState == .notDetermined ? 0.5 : 1)
+                    .opacity(isPermissionGranted ? 1 : 0.5)
                 
                 contentView
                 
@@ -75,6 +81,10 @@ public struct AmityCreateClipPostPage: AmityPageView {
                     await permissionChecker.requestAudioPermission()
                 }
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            // User may have changed camera / microphone access in Settings app
+            permissionChecker.checkCameraAndMicrophonePermissionStatus()
         }
         .alert(isPresented: $viewModel.clipPostAlert.isPresented) {
             Alert(title: Text(viewModel.clipPostAlert.alertState.title), message: Text(viewModel.clipPostAlert.alertState.message), dismissButton: viewModel.clipPostAlert.alertState.dismissButton)
@@ -105,9 +115,9 @@ public struct AmityCreateClipPostPage: AmityPageView {
             videoCaptureButton
                 .padding(.bottom, 32)
             
-            let info = LiveStreamPermission(title: AmityLocalizedStringSet.Social.liveStreamPermissionCameraAndMicrophoneTitle.localizedString, message: AmityLocalizedStringSet.Social.liveStreamPermissionCameraAndMicrophoneMessage.localizedString)
+            let info = LiveStreamPermission(title: AmityLocalizedStringSet.Social.liveStreamPermissionCameraAndMicrophoneTitle.localizedString, message: AmityLocalizedStringSet.Social.clipPermissionCameraAndMicrophoneMessage.localizedString)
             LiveStreamPermissionView(info: info)
-                .visibleWhen(permissionChecker.shouldAskForCameraPermission() || permissionChecker.shouldAskForMicrophonePermission())
+                .visibleWhen(!isPermissionGranted)
         }
     }
     
@@ -173,7 +183,7 @@ public struct AmityCreateClipPostPage: AmityPageView {
                         .padding(.vertical, 4)
                 }
                 .buttonStyle(.plain)
-                .disabled(permissionChecker.cameraPermissionState != .granted || permissionChecker.microphonePermissionState != .granted)
+                .disabled(!isPermissionGranted)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 20)
@@ -223,7 +233,7 @@ public struct AmityCreateClipPostPage: AmityPageView {
                         .foregroundColor(Color.white)
                         .padding(4)
                 }
-                .visibleWhen(permissionChecker.cameraPermissionState == .granted && permissionChecker.microphonePermissionState == .granted)
+                .visibleWhen(isPermissionGranted)
             }
         }
         .padding(.horizontal, 16)

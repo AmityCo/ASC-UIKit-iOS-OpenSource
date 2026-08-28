@@ -168,7 +168,7 @@ struct AmityProductTagElement: AmityElementView {
                     // Product Price - hidden when inactive
                     if !isInactive, let price = productTag.object.price, price > 0 {
                         Text(formatPrice(productTag.object))
-                            .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade3)))
+                            .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade1)))
                     }
                     
                     Spacer()

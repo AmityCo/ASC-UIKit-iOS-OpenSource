@@ -28,6 +28,9 @@ class AmityUserFeedComponentViewModel: ObservableObject {
     private var isOwnUser: Bool {
         return AmityUIKitManagerInternal.shared.currentUserId == userId
     }
+
+    /// Feed collection updates must not overwrite the blocked state.
+    private var isBlocked = false
     
     var currentFeedSources: [AmityFeedSource]
     
@@ -50,10 +53,7 @@ class AmityUserFeedComponentViewModel: ObservableObject {
                 .sink(receiveValue: { [weak self] followInfo in
                     guard let followInfo else { return }
                     let model = AmityFollowInfoModel(followInfo)
-                    self?.emptyFeedState = model.status == .blocked ? .blocked : nil
-                    if model.status != .blocked {
-                        self?.loadPosts(feedSources: feedSources)
-                    }
+                    self?.handleFollowStatus(model.status, feedSources: feedSources)
                 })
         } else {
             userFollowInfoObject = userManager.getFollowInfo(withId: userId)
@@ -66,20 +66,35 @@ class AmityUserFeedComponentViewModel: ObservableObject {
                 
                 if let followInfo = liveObject.snapshot {
                     let model = AmityFollowInfoModel(followInfo)
-                    self.emptyFeedState = model.status == .blocked ? .blocked : nil
-                    if model.status != .blocked {
-                        self.loadPosts(feedSources: feedSources)
-                    }
+                    self.handleFollowStatus(model.status, feedSources: feedSources)
                 }
             })
         }
     }
-    
+
+    private func handleFollowStatus(_ status: AmityFollowStatus?, feedSources: [AmityFeedSource]) {
+        isBlocked = status == .blocked
+
+        guard !isBlocked else {
+            // Stop observing the feed so a late collection update cannot replace the blocked state.
+            token?.invalidate()
+            token = nil
+            userFeedCollection = nil
+            posts.removeAll()
+            emptyFeedState = .blocked
+            return
+        }
+
+        emptyFeedState = nil
+        loadPosts(feedSources: feedSources)
+    }
+
     private func loadPosts(feedSources: [AmityFeedSource]) {
         userFeedCollection = feedManager.getUserFeed(userId: userId, feedSources: feedSources)
         token = userFeedCollection?.observe({ [weak self] (collection, error) in
             if let error {
                 self?.debouner.run {
+                    guard self?.isBlocked == false else { return }
                     self?.posts.removeAll()
                     if AmityError(error: error) == .noUserAccessPermission {
                         self?.emptyFeedState = .private
@@ -87,8 +102,10 @@ class AmityUserFeedComponentViewModel: ObservableObject {
                 }
                 return
             }
-            
+
             self?.debouner.run {
+                guard self?.isBlocked == false else { return }
+
                 guard !collection.snapshots.isEmpty else {
                     self?.posts.removeAll()
                     self?.emptyFeedState = .empty

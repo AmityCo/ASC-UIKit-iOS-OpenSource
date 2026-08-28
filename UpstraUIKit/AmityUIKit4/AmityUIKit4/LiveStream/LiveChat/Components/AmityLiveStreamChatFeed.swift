@@ -192,12 +192,12 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                             .resizable()
                             .renderingMode(.template)
                             .aspectRatio(contentMode: .fill)
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                            .foregroundColor(Color(viewConfig.defaultDarkTheme.baseColorShade2))
                             .frame(width: 16, height: 18)
                             .offset(y: -1)
                         
                         Text(AmityLocalizedStringSet.Social.livestreamChatDeletedMessage.localizedString)
-                            .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
+                            .applyTextStyle(.caption(Color(viewConfig.defaultDarkTheme.baseColorShade2)))
                     }
                 } else {
                     Text(message.text)
@@ -254,7 +254,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                         guard let message = viewModel.showBottomSheet.message else { return }
                         viewModel.showBottomSheet.show.toggle()
                         
-                        AmityUserAction.perform(host: host) {
+                        AmityUserAction.perform(host: host, toastBottomPadding: Toast.bottomBarPadding) {
                             if isFlagged {
                                 Task.runOnMainActor {
                                     try await viewModel.unflagMessage(message.id)
@@ -262,7 +262,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                                 }
                             } else {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    let page = AmityContentReportPage(type: .message(id: message.id)).environmentObject(viewConfig)
+                                    let page = AmityContentReportPage(type: .message(id: message.id), toastBottomPadding: Toast.bottomBarPadding).environmentObject(viewConfig)
                                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                     vc.isNavigationBarHidden = true
                                     host.controller?.present(vc, animated: true)
@@ -451,9 +451,14 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
         .padding(.bottom, 48)
     }
     
+    /// System dialogs follow the UIKit theme, which can differ from the device appearance.
+    private var alertInterfaceStyle: UIUserInterfaceStyle {
+        AmityUIKitConfigController.shared.getCurrentThemeStyle() == .dark ? .dark : .light
+    }
+
     private func showErrorActionSheet(message: MessageModel) {
         let alert = UIAlertController(title: AmityLocalizedStringSet.Social.livestreamChatMessageNotSentTitle.localizedString, message: nil, preferredStyle: .actionSheet)
-        alert.overrideUserInterfaceStyle = .dark
+        alert.overrideUserInterfaceStyle = alertInterfaceStyle
 
         let deleteAction = UIAlertAction(title: AmityLocalizedStringSet.General.delete.localizedString, style: .destructive) { _ in
             Task.runOnMainActor {
@@ -495,7 +500,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
     private func showAlert(title: String, message: String, actionTitle: String, isDestructive: Bool = false, action: @escaping () -> Void) {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
             let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-            alert.overrideUserInterfaceStyle = .dark
+            alert.overrideUserInterfaceStyle = alertInterfaceStyle
             let cancelAction = UIAlertAction(title: AmityLocalizedStringSet.General.cancel.localizedString, style: .cancel)
             let workAction = UIAlertAction(title: actionTitle, style: isDestructive ? .destructive : .default) { _ in
                 action()

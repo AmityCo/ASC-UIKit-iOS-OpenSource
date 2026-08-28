@@ -94,25 +94,28 @@ open class AmityGlobalBehavior {
         
         let host: AmitySwiftUIHostWrapper?
         let product: AmityProduct?
+        /// Overrides the toast bottom padding for screens with a bottom bar, such as the livestream compose bar.
+        let toastBottomPadding: CGFloat?
         
-        public init(host: AmitySwiftUIHostWrapper? = nil, product: AmityProduct? = nil) {
+        public init(host: AmitySwiftUIHostWrapper? = nil, product: AmityProduct? = nil, toastBottomPadding: CGFloat? = nil) {
             self.host = host
             self.product = product
+            self.toastBottomPadding = toastBottomPadding
         }
     }
     
     public init() { }
     
     open func handleGuestUserAction(context: Context?) {
-        Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.errorGuestUser.localizedString)
+        Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.errorGuestUser.localizedString, bottomPadding: context?.toastBottomPadding ?? Toast.defaultBottomPadding)
     }
     
     open func handleNonMemberAction(context: Context?) {
-        Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString)
+        Toast.showToast(style: .info, message: AmityLocalizedStringSet.Social.joinCommunityToast.localizedString, bottomPadding: context?.toastBottomPadding ?? Toast.defaultBottomPadding)
     }
     
     open func handleNonFollowerAction(context: Context?) {
-        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamFollowToInteractToast.localizedString)
+        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamFollowToInteractToast.localizedString, bottomPadding: context?.toastBottomPadding ?? Toast.defaultBottomPadding)
     }
     
     open func onPostProductTagClick(context: AmityGlobalBehavior.Context) {

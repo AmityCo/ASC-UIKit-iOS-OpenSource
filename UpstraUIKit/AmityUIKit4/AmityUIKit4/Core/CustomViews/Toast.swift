@@ -113,6 +113,10 @@ extension View {
 /// To use with UIKit way
 public class Toast: UIViewController {
 
+    public static let defaultBottomPadding: CGFloat = 30
+    /// Bottom padding for screens with a bottom bar, such as the livestream compose bar.
+    public static let bottomBarPadding: CGFloat = 60
+
     @IBOutlet weak var content: UIView!
     
     var message: String = ""
@@ -150,7 +154,7 @@ public class Toast: UIViewController {
         return vc.view
     }
     
-    public static func showToast(style: ToastStyle, message: String, bottomPadding: CGFloat = 30, autoHide: Bool = true) {
+    public static func showToast(style: ToastStyle, message: String, bottomPadding: CGFloat = Toast.defaultBottomPadding, autoHide: Bool = true) {
     
         guard Thread.isMainThread else {
             DispatchQueue.main.async {

@@ -29,13 +29,13 @@ public struct AmityPostDetailPage: AmityPageView {
         .postDetailPage
     }
     
-    public init(id: String, commentId: String? = nil, parentId: String? = nil, rootCommentId: String? = nil, showReplyToComment: Bool = false, preloadRepliesOfComment: Bool = false) {
+    public init(id: String, commentId: String? = nil, parentId: String? = nil, rootCommentId: String? = nil, showReplyToComment: Bool = false, preloadRepliesOfComment: Bool = false, event: AmityEvent? = nil) {
         let postDetailViewModel = AmityPostDetailPageViewModel(id: id)
         self.commentId = commentId
         self.showReplyToComment = showReplyToComment
-        self.context = AmityPostContentComponent.Context()
+        self.context = AmityPostContentComponent.Context(event: event)
         self._viewModel = StateObject(wrappedValue: postDetailViewModel)
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId, targetCommentId: commentId, targetCommentParentId: parentId, rootCommentId: rootCommentId, preloadRepliesOfComment: preloadRepliesOfComment))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId, targetCommentId: commentId, targetCommentParentId: parentId, rootCommentId: rootCommentId, preloadRepliesOfComment: preloadRepliesOfComment, event: event))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: id, referenceType: .post, community: postDetailViewModel.post?.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
         
@@ -48,7 +48,7 @@ public struct AmityPostDetailPage: AmityPageView {
     public init(post: AmityPost, context: AmityPostContentComponent.Context?) {
         self.context = context
         self._viewModel = StateObject(wrappedValue: AmityPostDetailPageViewModel(post: post))
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, event: context?.event))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: post.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
         
@@ -123,7 +123,7 @@ public struct AmityPostDetailPage: AmityPageView {
                         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
                                      height: (commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false || commentBottomSheetViewModel.hasDeletePermission) ? .fixed(204) : .fixed(148),
                                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                            CommentBottomSheetView(viewModel: commentBottomSheetViewModel) { comment in
+                            CommentBottomSheetView(viewModel: commentBottomSheetViewModel, toastBottomPadding: Toast.bottomBarPadding) { comment in
                                 commentCoreViewModel.editingComment = comment
                             } reportAction: { comment in
                                 let commentId = comment?.commentId ?? ""
@@ -138,7 +138,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                 }
 
                                 AmityUserAction.perform(host: host) {
-                                    let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil))
+                                    let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil), toastBottomPadding: Toast.bottomBarPadding)
                                         .updateTheme(with: viewConfig)
                                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                     vc.isNavigationBarHidden = true
@@ -212,7 +212,7 @@ public struct AmityPostDetailPage: AmityPageView {
                 .isHidden(viewConfig.isHidden(elementId: .menuButton))
                 .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                     
-                    PostBottomSheetView(isShown: $showBottomSheet, post: postModel) { postAction in
+                    PostBottomSheetView(isShown: $showBottomSheet, post: postModel, toastBottomPadding: Toast.bottomBarPadding) { postAction in
                         
                         switch postAction {
                         case .editPost:
@@ -248,7 +248,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                 
                                 let postId = postModel.postId
                                 
-                                let page = AmityContentReportPage(type: .post(id: postId))
+                                let page = AmityContentReportPage(type: .post(id: postId), toastBottomPadding: Toast.bottomBarPadding)
                                     .updateTheme(with: viewConfig)
                                 let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                 vc.isNavigationBarHidden = true

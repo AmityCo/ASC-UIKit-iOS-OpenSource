@@ -59,31 +59,23 @@ class RecommendedCommunityViewModel: ObservableObject {
         // Filter out joined communities
         let unjoinedCommunities = communities.filter { !$0.isJoined }
         
-        // We consider more than required communities because some of them might be in pending state
-        // which needs to be filtered out.
-        let initialLimit = min(unjoinedCommunities.count, limit * 2)
-        let recommendedCommunities = unjoinedCommunities.prefix(initialLimit)
-        
         // We query join requests for those communities which requires join approval
-        let joinApprovalRequiredCommIds = recommendedCommunities.filter { $0.requiresJoinApproval }.map { $0.communityId }
+        let joinApprovalRequiredCommIds = unjoinedCommunities.filter { $0.requiresJoinApproval }.map { $0.communityId }
         
         if joinApprovalRequiredCommIds.isEmpty {
-            self.communities = recommendedCommunities.prefix(limit).map { AmityCommunityModel(object: $0) }
+            self.communities = unjoinedCommunities.prefix(limit).map { AmityCommunityModel(object: $0) }
             self.queryState = .loaded
         } else {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 self.joinRequestManager.fetchJoinRequests(communityIds: joinApprovalRequiredCommIds) { statusInfo in
-                   
-                    let filteredCommunities = recommendedCommunities.filter {
-                        // Return those communities which are not in pending state or requires join approval
-                        if let joinRequestStatus = $0.joinRequest?.status {
-                            return joinRequestStatus != .pending && joinRequestStatus != .approved
-                        } else {
-                            return !$0.requiresJoinApproval
-                        }
-                    }.prefix(limit)
                     
-                    self.communities = filteredCommunities.prefix(limit).map { AmityCommunityModel(object: $0) }
+                    // Only a pending join request disqualifies a community. Communities requiring
+                    // join approval without a request are still recommended, matching Android.
+                    let filteredCommunities = unjoinedCommunities
+                        .filter { $0.joinRequest?.status != .pending }
+                        .prefix(limit)
+                    
+                    self.communities = filteredCommunities.map { AmityCommunityModel(object: $0) }
                     self.queryState = .loaded
                 }
             }

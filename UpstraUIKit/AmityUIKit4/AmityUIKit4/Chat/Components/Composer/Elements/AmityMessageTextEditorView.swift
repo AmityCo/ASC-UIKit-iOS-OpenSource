@@ -49,6 +49,12 @@ extension AmityMessageTextEditorView: AmityViewBuildable {
     public func displayInlineSuggestionView(_ value: Bool) -> Self {
         mutating(keyPath: \.displayInlineSuggestionView, value: value)
     }
+
+    /// When disabled the suggestion panel keeps `SuggestionOverlayWindow.defaultHeight`
+    /// instead of resizing to the number of suggestions.
+    public func calculateSuggestionViewHeight(_ value: Bool) -> Self {
+        mutating(keyPath: \.calculateSuggestionViewHeight, value: value)
+    }
 }
 
 public struct AmityMessageTextEditorView: View {
@@ -76,7 +82,8 @@ public struct AmityMessageTextEditorView: View {
     private var enableProductMention: Bool = false
     private var scrollEnabled: Bool = true
     private var displayInlineSuggestionView: Bool = true
-    
+    private var calculateSuggestionViewHeight: Bool = true
+
     public init(_ viewModel: AmityTextEditorViewModel, text: Binding<String>, mentionData: Binding<MentionData>, mentionedUsers: Binding<[AmityMentionUserModel]>, links: Binding<[LinkDetail]?>? = nil, textViewHeight: CGFloat, textEditorMaxHeight: CGFloat = 106, placeholderPadding: CGFloat = 5) {
         self._text = text
         self._mentionData = mentionData
@@ -386,6 +393,13 @@ public struct AmityMessageTextEditorView: View {
             content: suggestionView,
             viewConfig: viewConfig
         )
+
+        guard calculateSuggestionViewHeight else {
+            // suggestionHeight is shared across presentations, so reset it in
+            // case a previous caller resized the panel.
+            SuggestionOverlayWindow.updateHeight(SuggestionOverlayWindow.defaultHeight)
+            return
+        }
 
         let rowHeight: CGFloat = 56
         let heightPublisher = suggestionVM.$users

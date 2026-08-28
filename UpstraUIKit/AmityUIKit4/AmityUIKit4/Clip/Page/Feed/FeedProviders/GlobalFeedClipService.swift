@@ -27,8 +27,8 @@ class GlobalFeedClipService: ClipService {
     // For global feed, if user reaches the last available clip, we show the same clip again
     var isEndlessLoopingActive = false
     
-    private let firstClip: ClipPost?
-    
+    private var firstClip: ClipPost?
+
     init(clipPost: ClipPost) {
         self.firstClip = clipPost
         super.init()
@@ -43,6 +43,15 @@ class GlobalFeedClipService: ClipService {
         super.init()
     }
     
+    override func removeClip(id: String) {
+        // Cleared so processSnapshots stops prepending it back onto the list
+        if firstClip?.model.postId == id {
+            firstClip = nil
+        }
+
+        super.removeClip(id: id)
+    }
+
     override func load() {
         Log.add(event: .info, "Loading clip feed data")
         // If the feed is opened after tapping on certain clip, display that clip immediately.

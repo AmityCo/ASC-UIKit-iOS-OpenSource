@@ -217,7 +217,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
     var pendingRequestsBanner: some View {
         let shouldDefinitelyHideBanner = viewConfig.isHidden(elementId: .communityPendingPost) || viewModel.joinStatus != .joined
         
-        if community.hasModeratorRole {
+        if community.hasModeratorRole || viewModel.hasAddCommunityUserPermission {
             let postsCount = community.isPostReviewEnabled ? viewModel.pendingPostCount : 0
             let requestsCount = community.requiresJoinApproval ? viewModel.joinRequestCount : 0
             let totalCount = postsCount + requestsCount

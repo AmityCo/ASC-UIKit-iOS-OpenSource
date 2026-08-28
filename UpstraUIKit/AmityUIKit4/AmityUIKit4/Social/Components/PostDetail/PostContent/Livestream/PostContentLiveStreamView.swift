@@ -220,6 +220,7 @@ struct PostContentLiveStreamView: View {
             }
         }
         .frame(height: contentHeight)
+        .contentShape(Rectangle())
         .onTapGesture {
             guard !isStreamBanned else { return }
             

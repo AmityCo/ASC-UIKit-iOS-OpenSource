@@ -91,7 +91,7 @@ struct LoginConfigModel: Codable, Equatable {
             secureMode: false,
             authSignatureURL: "",
             authSignatureExpiresAt: Date().addingTimeInterval(3600),
-            visitorCanViewClip: false,
+            visitorCanViewClip: true,
             hideExplore: false,
             socialCommunityCreationButtonVisible: true,
             theme: .default,

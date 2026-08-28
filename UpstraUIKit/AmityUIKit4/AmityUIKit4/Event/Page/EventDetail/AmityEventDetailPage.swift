@@ -25,6 +25,8 @@ public struct AmityEventDetailPage: AmityPageView {
     @State var showCreateBottomSheet: Bool = false
     @State var showPollSelectionView: Bool = false
     @State var showShareActivitySheet: Bool = false
+    @State var showEventCreatedSuccessSheet: Bool = false
+    @State private var didTriggerEventCreatedSuccessSheet: Bool = false
     
     @StateObject var alertHandler = EventDetailPageAlert()
     
@@ -69,7 +71,10 @@ public struct AmityEventDetailPage: AmityPageView {
             }, onHeaderStateChange: { isCollapsed in
                 self.isHeaderCollapsed = isCollapsed
             })
-            .visibleWhen(viewModel.event != nil)
+            // A deleted event still yields a snapshot, so `event` stays non-nil while the
+            // page is unavailable. visibleWhen only fades, so without this the stale
+            // event content keeps rendering under the empty state.
+            .visibleWhen(viewModel.event != nil && !viewModel.isEventUnavailable)
             
             VStack {
                 topNavigationView
@@ -123,6 +128,20 @@ public struct AmityEventDetailPage: AmityPageView {
         .updateTheme(with: viewConfig)
         .edgesIgnoringSafeArea(.top)
         .environmentObject(alertHandler)
+        .bottomSheet(isShowing: $showEventCreatedSuccessSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
+            eventCreatedSuccessSheet
+        }
+        .onAppear {
+            showEventCreatedSuccessSheetIfNeeded()
+        }
+    }
+
+    private func showEventCreatedSuccessSheetIfNeeded() {
+        guard context?.isNewEvent == true, !didTriggerEventCreatedSuccessSheet else { return }
+        didTriggerEventCreatedSuccessSheet = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            showEventCreatedSuccessSheet = true
+        }
     }
     
     @ViewBuilder

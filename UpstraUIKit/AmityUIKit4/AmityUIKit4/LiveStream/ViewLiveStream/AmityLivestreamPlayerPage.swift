@@ -196,6 +196,10 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                                     Task {
                                         await viewModel.updateProductTagsAPI(childPost: childPost)
                                     }
+
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastAdded.localizedString, bottomPadding: 60)
+                                    }
                                 }
                             } else {
                                 UIApplication.topViewController()?.dismiss(animated: true)
@@ -228,6 +232,8 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                         // Sync BE response back to manageVM
                         manageVM.taggedProducts = viewModel.taggedProducts
                         manageVM.pinnedProductId = viewModel.pinnedProductId
+
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastRemoved.localizedString, bottomPadding: 60)
                     }
                 }
             )

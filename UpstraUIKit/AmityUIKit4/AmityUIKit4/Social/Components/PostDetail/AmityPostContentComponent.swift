@@ -77,7 +77,7 @@ public struct AmityPostContentComponent: AmityComponentView {
         self.pageId = pageId
         self.category = context.category
         self.context = context
-        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, loadComments: false, existingPost: post))
+        self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, loadComments: false, existingPost: post, event: context.event))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .postContentComponent))
     }
     
@@ -213,7 +213,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     .buttonStyle(PlainButtonStyle())
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
                     .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                        PostBottomSheetView(isShown: $showBottomSheet, post: post) { postAction in
+                        PostBottomSheetView(isShown: $showBottomSheet, post: post, toastBottomPadding: 0) { postAction in
                             
                             switch postAction {
                             case .editPost:
@@ -248,7 +248,8 @@ public struct AmityPostContentComponent: AmityComponentView {
                                     
                                     let postId = post.postId
                                     
-                                    let page = AmityContentReportPage(type: .post(id: postId))
+                                    // Feed has no bottom bar for the toast to clear
+                                    let page = AmityContentReportPage(type: .post(id: postId), toastBottomPadding: 0)
                                         .updateTheme(with: viewConfig)
                                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                     vc.isNavigationBarHidden = true
@@ -291,9 +292,24 @@ public struct AmityPostContentComponent: AmityComponentView {
             switch post.dataTypeInternal {
             case .text:
                 postContentTextView()
-                                
+
                 PreviewLinkView(post: post)
-                
+
+            case .event:
+                // Event post: caption (title/text) + the embedded event card.
+                // Tapping the caption opens the POST detail (the card below opens
+                // the EVENT detail).
+                postContentTextView()
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        let context = Context(category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
+                        onTapAction?(context)
+                    }
+
+                PostContentEventView(post: post) { event in
+                    goToEventDetailPage(event)
+                }
+
             case .image, .video:
                 postContentTextView()
                 
@@ -352,7 +368,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                         .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                
+
                 // Post text content
                 if !post.text.isEmpty {
                     let tapActionContext = AmityPostContentComponent.Context(
@@ -851,13 +867,19 @@ extension AmityPostContentComponent {
             .halfSheetPresentation()
     }
     
+    private func goToEventDetailPage(_ event: AmityEvent) {
+        let eventDetailPage = AmityEventDetailPage(event: event)
+        let vc = AmitySwiftUIHostingController(rootView: eventDetailPage)
+        host.controller?.navigationController?.pushViewController(vc, animated: true)
+    }
+
     private func goToUserProfilePage(_ userId: String) {
         let context = AmityPostContentComponentBehavior.Context(component: self, userId: userId)
         AmityUIKit4Manager.behaviour.postContentComponentBehavior?.goToUserProfilePage(context: context)
     }
     
     private func goToComment(_ commentId: String, showReplyToComment: Bool = false, showReplies: Bool = false) {
-        let page = AmityPostDetailPage(id: post.postId, commentId: commentId, showReplyToComment: showReplyToComment, preloadRepliesOfComment: showReplies)
+        let page = AmityPostDetailPage(id: post.postId, commentId: commentId, showReplyToComment: showReplyToComment, preloadRepliesOfComment: showReplies, event: context?.event)
         let vc = AmitySwiftUIHostingController(rootView: page)
         host.controller?.navigationController?.pushViewController(vc, animated: true)
     }

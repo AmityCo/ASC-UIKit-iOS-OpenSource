@@ -143,6 +143,7 @@ struct MediaViewer: View {
                                             }
                                         }
                                     )
+                                    .opacity((viewModel.isPostDeleted || viewModel.isMediaDeleted(media)) ? 0 : 1) // Hide when post or media is deleted
                                     .environmentObject(host)
                                 }
                             } else {
@@ -206,7 +207,7 @@ struct MediaViewer: View {
                                 
                                 // Message and icon
                                 VStack(spacing: 16) {
-                                    Image(AmityIcon.imageNotAvailableIcon.getImageResource())
+                                    Image(media.type == .image ? AmityIcon.imageNotAvailableIcon.getImageResource() : AmityIcon.videoNotAvailableIcon.getImageResource())
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
                                         .frame(size: CGSize(width: 60, height: 60))
@@ -315,10 +316,15 @@ struct MediaViewer: View {
                 
                 ZStack(alignment: .center) {
                     HStack(spacing: 0) {
-                        Image(AmityIcon.circleCloseIcon.getImageResource())
+                        Image(AmityIcon.closeIcon.getImageResource())
                             .resizable()
+                            .renderingMode(.template)
                             .aspectRatio(contentMode: .fit)
-                            .frame(size: CGSize(width: 32, height: 32))
+                            .frame(size: CGSize(width: 20, height: 20))
+                            .foregroundColor(Color(viewConfig.defaultLightTheme.baseColor))
+                            .circularBackground(radius: 24, color: Color(viewConfig.defaultLightTheme.baseColorShade4))
+                            .frame(width: 32, height: 32, alignment: .leading)
+                            .contentShape(Rectangle())
                             .onTapGesture {
                                 withoutAnimation {
                                     closeAction?()
@@ -347,7 +353,7 @@ struct MediaViewer: View {
                 .padding(.bottom, 15)
                 .background(Color.black.opacity(0.5))
                 .transition(.opacity.combined(with: .scale))
-                .isHidden(!showScaleEffect || medias[page.index].type == .video) // Hide overlay for video media
+                .isHidden(!showScaleEffect || (medias[page.index].type == .video && !(viewModel.isPostDeleted || viewModel.isMediaDeleted(medias[page.index]))))
                 .opacity(backgroundOpacity == 1 ? 1 : 0) // Hide it when dragging
             }
         }
@@ -517,7 +523,15 @@ class MediaViewerViewModel: ObservableObject {
             forName: .didPostLocallyDeleted,
             object: nil,
             queue: .main) { [weak self] notification in
-                self?.deletedFileIds = Set(self?.post?.medias.compactMap({$0.image?.fileId}) ?? [])
+                guard let self else { return }
+                // Another post being deleted must not blank out this viewer
+                guard let deletedPostId = notification.userInfo?["postId"] as? String,
+                      deletedPostId == post?.postId else { return }
+
+                isPostDeleted = true
+                // A video carries its file id on `video`, an image on `image`. Collecting only the
+                // image ids left every video media unmatched in isMediaDeleted.
+                deletedFileIds = Set(post?.medias.compactMap({ $0.image?.fileId ?? $0.video?.fileId }) ?? [])
             }
         
         NotificationCenter.default.addObserver(

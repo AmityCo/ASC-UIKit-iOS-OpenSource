@@ -769,6 +769,8 @@ class SuggestionOverlayWindow {
     static var shared: SuggestionOverlayWindow?
     private static var containerView: UIView = SuggestionOverlayPassthroughView()
     private static var contentView: UIView = UIView()
+    /// Height used when the presenting view opts out of dynamic height updates.
+    static let defaultHeight: CGFloat = 186
     private static var suggestionHeight: CGFloat = 112
     private static var lastCursorRect: CGRect = .zero
     private static var keyboardHeight: CGFloat = 0

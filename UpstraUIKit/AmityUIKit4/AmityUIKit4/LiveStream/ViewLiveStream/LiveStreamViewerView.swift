@@ -582,7 +582,7 @@ struct LiveStreamViewerView: View {
                         if let liveChatViewModel = viewModel.liveStreamChatViewModel {
                             liveChatViewModel.liveReactionViewModel.addReaction(reaction)
                             
-                            AmityUserAction.perform(host: host) {
+                            AmityUserAction.perform(host: host, toastBottomPadding: Toast.bottomBarPadding) {
                                 // Intentionally left empty to show toast only for guest user
                             }
                         }

@@ -219,7 +219,11 @@ class ClipFeedViewController: UIViewController {
     // keeps track of that index.
     var isScrolledToParticularIndex = false
     var isFeedVisible = true
-    
+
+    // Set when the provider updates while the feed is off screen, e.g. a clip deleted from post
+    // detail page. The reload is deferred until we come back.
+    var needsReloadOnAppear = false
+
     override func loadView() {
         view = UIView()
         view.backgroundColor = .white
@@ -231,19 +235,41 @@ class ClipFeedViewController: UIViewController {
         setupViews()
         
         provider.onLoadCompletion = { [weak self] in
-            guard let self, isFeedVisible else { return }
-            
+            guard let self else { return }
+
+            guard isFeedVisible else {
+                needsReloadOnAppear = true
+                return
+            }
+
             Log.add(event: .info, "✅ FeedCollectionView loaded...")
-            
+
             // Load collection view
             collectionView.reloadData()
         }
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
         isFeedVisible = true
+
+        guard needsReloadOnAppear else { return }
+        needsReloadOnAppear = false
+
+        collectionView.reloadData()
+        collectionView.layoutIfNeeded()
+
+        // Items may have been removed while we were away, so the current page can now be out of
+        // bounds. Settle on the clip the provider points at before resuming playback.
+        let itemCount = collectionView.numberOfItems(inSection: 0)
+        guard itemCount > 0 else { return }
+
+        let index = max(0, min(provider.currentIndex, itemCount - 1))
+        collectionView.scrollToItem(at: IndexPath(row: index, section: 0), at: .centeredVertically, animated: false)
+        provider.setActiveClipIndex(index: index)
+
+        autoPlayVideo()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -315,8 +341,9 @@ extension ClipFeedViewController: UICollectionViewDataSource, UICollectionViewDe
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ClipFeedViewCell.identifier, for: indexPath) as! ClipFeedViewCell
-        
-        let clipPost = provider.clips[indexPath.row]
+
+        guard let clipPost = provider.clip(at: indexPath.row) else { return cell }
+
         cell.onTapAction = { [weak self] action in
             guard let self else { return }
             switch action {
@@ -340,7 +367,8 @@ extension ClipFeedViewController: UICollectionViewDataSource, UICollectionViewDe
 
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         let cell = cell as! ClipFeedViewCell
-        let clipPost = provider.clips[indexPath.row]
+        guard let clipPost = provider.clip(at: indexPath.row) else { return }
+
         cell.configure(clip: clipPost)
         
         if indexPath.row == provider.currentIndex && isFeedVisible {

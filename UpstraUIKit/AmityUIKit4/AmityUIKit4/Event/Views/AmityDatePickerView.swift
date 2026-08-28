@@ -53,7 +53,7 @@ struct AmityDatePickerView: View {
                     presentationMode.wrappedValue.dismiss()
                 } label: {
                     Text(AmityLocalizedStringSet.Social.pollDurationDoneButton.localizedString)
-                        .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                        .applyTextStyle(.body(Color(viewConfig.theme.primaryColor)))
                 }
             }
             .navigationBarPadding()

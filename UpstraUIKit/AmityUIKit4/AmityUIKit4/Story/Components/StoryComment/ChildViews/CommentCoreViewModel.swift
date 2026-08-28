@@ -59,6 +59,10 @@ class CommentCoreViewModel: ObservableObject {
     
     var targetMembershipStatus: PostTargetMembershipStatus = .unknown
     
+    /// Event that owns the post these comments are targeted to.
+    /// Nil when the post is not part of an event discussion.
+    let event: AmityEvent?
+    
     init(referenceId: String,
          referenceType: AmityCommentReferenceType,
          hideEmptyText: Bool,
@@ -69,7 +73,8 @@ class CommentCoreViewModel: ObservableObject {
          rootCommentId: String? = nil,
          preloadRepliesOfComment: Bool = false,
          loadComments: Bool = true,
-         existingPost: AmityPost? = nil
+         existingPost: AmityPost? = nil,
+         event: AmityEvent? = nil
     ) {
         self.referenceId = referenceId
         self.referenceType = referenceType
@@ -79,6 +84,7 @@ class CommentCoreViewModel: ObservableObject {
         self.targetCommentParentId = targetCommentParentId
         self.rootCommentId = rootCommentId
         self.preloadRepliesOfComment = preloadRepliesOfComment
+        self.event = event
 
         if referenceType == .post {
             if let existingPost {
@@ -194,6 +200,23 @@ class CommentCoreViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    /// True when the comment author created the event that owns the commented post.
+    func isEventHost(_ comment: AmityCommentModel) -> Bool {
+        guard let event else { return false }
+        return event.userId == comment.userId
+    }
+    
+    /// Resolves the Moderator badge for a comment author.
+    ///
+    /// When the commented post belongs to an event, the role has to come from the community
+    /// that owns that event: the post lives in `event.discussionCommunityId`, so the comment
+    /// only carries the author's roles for that community, which does not inherit the parent
+    /// community's moderators.
+    func isModerator(_ comment: AmityCommentModel) -> Bool {
+        guard let community = event?.targetCommunity else { return comment.isModerator }
+        return community.membership.getMember(withId: comment.userId)?.hasModeratorRole ?? false
     }
     
     func renderCommentFeed() {

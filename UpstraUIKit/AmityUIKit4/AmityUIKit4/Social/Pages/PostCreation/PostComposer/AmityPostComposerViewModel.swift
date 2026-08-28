@@ -15,8 +15,8 @@ class AmityPostComposerViewModel: ObservableObject {
     private let targetId: String?
     private var community: AmityCommunityModel?
     private var communityToken: AmityNotificationToken?
-    private let post: AmityPostModel?
-    private let event: AmityEvent?
+    private(set) var post: AmityPostModel?
+    private(set) var event: AmityEvent?
     
     let mode: AmityPostComposerMode
     let targetType: AmityPostTargetType
@@ -45,6 +45,10 @@ class AmityPostComposerViewModel: ObservableObject {
     var postTitleCount: Int = 0
     @Published var postTitle: String = ""
     @Published var postText: String = ""
+
+    /// True when the composer is creating an **event post** (`dataType: "event"`).
+    /// The event card is the post's payload — no media/product-tag affordances.
+    private(set) var isEventPost: Bool = false
     @Published var mentionData: MentionData = MentionData()
     @Published var mentionedUsers: [AmityMentionUserModel] = []
     private let originalPostText: String
@@ -78,14 +82,18 @@ class AmityPostComposerViewModel: ObservableObject {
         }
     }
     
-    init(targetId: String?, targetType: AmityPostTargetType, community: AmityCommunityModel?, mode: AmityPostComposerMode, event: AmityEvent?) {
+    init(targetId: String?, targetType: AmityPostTargetType, community: AmityCommunityModel?, mode: AmityPostComposerMode, event: AmityEvent?, isEventPost: Bool = false) {
         self.targetId = targetId
         self.targetType = targetType
         self.community = community
         self.mode = mode
         self.post = nil
-        
-        if let event {
+        self.isEventPost = isEventPost
+
+        if isEventPost {
+            // Event post: the nav title is the TARGET (community name / My Timeline), not the event title.
+            self.displayName = targetType == .community ? (community?.displayName ?? "") : AmityLocalizedStringSet.Social.selectPollTargetMyTimeline.localizedString
+        } else if let event {
             self.displayName = event.title
         } else {
             self.displayName = targetType == .community ? community?.displayName ?? "" : AmityLocalizedStringSet.Social.selectPollTargetMyTimeline.localizedString
@@ -94,6 +102,12 @@ class AmityPostComposerViewModel: ObservableObject {
         self.originalMedias = []
         self.originalPostTitle = ""
         self.event = event
+
+        if isEventPost, let event {
+            self.postTitle = event.title
+            self.postText = event.description
+        }
+
         self.originalLinkPreview = nil
         self.originalTextProductTagIds = []
         self.originalMediaProductTagIds = [:]
@@ -113,6 +127,10 @@ class AmityPostComposerViewModel: ObservableObject {
         self.mode = mode
         self.post = post
         self.community = nil
+        // Editing an event post: the parent is a text post whose payload is the
+        // event card. Same event-post UI as create (card preview, "What's on your
+        // mind?" placeholder, no media/product affordances); only title/text change.
+        self.isEventPost = post.dataTypeInternal == .event
         self.displayName = "Edit Post"
         self.postTitle = post.title
         self.postText = post.text
@@ -202,7 +220,8 @@ class AmityPostComposerViewModel: ObservableObject {
             
             if let snapshot = liveObject.snapshot {
                 self.community = AmityCommunityModel(object: snapshot)
-                if event == nil {
+                // For event posts the nav title is the target community (not the event title).
+                if event == nil || isEventPost {
                     self.displayName = snapshot.displayName
                 }
             }
@@ -321,7 +340,22 @@ class AmityPostComposerViewModel: ObservableObject {
         let hashtags = hashtags.map { AmityHashtag(text: $0.text, index: $0.range.location, length: $0.range.length)}
         let metadata = AmityMetadataMapper.metadata(mentions: mentions, hashtags: hashtags)
         let textProductTags = textProductTags?.map { AmityTextProductTag(productId: $0.productId, index: $0.range.location, length: $0.range.length)}
-        
+
+        if isEventPost, let event {
+            // Event Post — the event card is the payload; no media or product tags.
+            let eventPostBuilder = AmityEventPostBuilder(eventId: event.eventId, text: postText)
+            if !postTitle.isEmpty {
+                eventPostBuilder.setTitle(postTitle)
+            }
+
+            let hashtagBuilder = AmityHashtagBuilder()
+            hashtagBuilder.hashtags(hashtags: hashtags.map { $0.text })
+
+            return try await postManager.postRepository.createEventPost(
+                eventPostBuilder, targetId: targetId, targetType: targetType,
+                metadata: metadata, mentionees: mentionData.mentionee, hashtags: hashtagBuilder, links: links)
+        }
+
         if !imagesData.isEmpty {
             // Image Post
             Log.add(event: .info, "Creating image post with \(imagesData.count) images")
@@ -400,9 +434,14 @@ class AmityPostComposerViewModel: ObservableObject {
                   textProductTags: [AmityProductTagModel]? = nil,
                   attachmentProductTags: AmityAttachmentProductTags? = nil) async throws -> AmityPost? {
         var postBuilder: AmityPostBuilder
-        
+
+        if isEventPost, let eventId = post?.eventId {
+            let eventBuilder = AmityEventPostBuilder(eventId: eventId, text: postText)
+            eventBuilder.setTitle(postTitle)
+            postBuilder = eventBuilder
+        }
         // If all media have been removed, use the appropriate empty builder based on original media type
-        if medias.isEmpty && !originalMedias.isEmpty {
+        else if medias.isEmpty && !originalMedias.isEmpty {
             // Directly use the type property of the first original media
             if let firstOriginalMedia = originalMedias.first {
                 switch firstOriginalMedia.type {
@@ -438,7 +477,8 @@ class AmityPostComposerViewModel: ObservableObject {
                 textPostBuilder.setTitle(postTitle)
                 postBuilder = textPostBuilder
             }
-        } else {
+        }
+        else {
             let imagesData = getImagesData(from: medias)
             let videosData = getVideosData(from: medias)
             let filesData = getFilesData(from: files)
