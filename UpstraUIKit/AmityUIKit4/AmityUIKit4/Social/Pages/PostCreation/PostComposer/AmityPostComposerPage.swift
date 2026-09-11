@@ -44,7 +44,7 @@ public struct AmityPostComposerPage: AmityPageView {
     }
     
     @State private var mediaAttatchmentComponentYOffset: CGFloat = 0.0
-    @State private var showSmallComponent: Bool = false
+    @State private var showSmallComponent: Bool = true
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: AmityPostComposerViewModel
     @StateObject private var textEditorViewModel: AmityTextEditorViewModel
@@ -348,15 +348,6 @@ public struct AmityPostComposerPage: AmityPageView {
 //                .background(Color(viewConfig.theme.backgroundColor))
 //                .isHidden(viewModel.mentionedUsers.count == 0, remove: true)
                 
-                // Product Tag Button
-                HStack {
-                    Spacer()
-                    productTagButton
-                        .padding(.trailing, 16)
-                        .padding(.bottom, 12)
-                }
-                .isHidden(viewModel.isInClipComposerMode || viewModel.isEventPost)
-
                 // Media Attatchment View
                 VStack(spacing: 5) {
                     BottomSheetDragIndicator()
@@ -364,10 +355,14 @@ public struct AmityPostComposerPage: AmityPageView {
 
                     if showSmallComponent {
                         AmityMediaAttachmentComponent(
-                            viewModel: mediaAttatchmentViewModel, pageId: id)
+                            viewModel: mediaAttatchmentViewModel,
+                            pageId: id,
+                            onProductTagTap: { presentProductTagList() })
                     } else {
                         AmityDetailedMediaAttachmentComponent(
-                            viewModel: mediaAttatchmentViewModel, pageId: id)
+                            viewModel: mediaAttatchmentViewModel,
+                            pageId: id,
+                            onProductTagTap: { presentProductTagList() })
                     }
                 }
                 .onReceive(keyboardPublisher) { keyboardEvent in
@@ -448,45 +443,14 @@ public struct AmityPostComposerPage: AmityPageView {
         }
     }
 
-    @ViewBuilder
-    var productTagButton: some View {
-        let productTagCount = viewModel.productTags.count
-        if productTagCount > 0 {
-            Button {
-                let component = AmityProductTagListComponent(pageId: .postComposerPage,
-                                                             productTags: viewModel.productTags,
-                                                             sourceId: "") // No postId yet during composition
-
-                let vc = AmitySwiftUIHostingController(rootView: component)
-                host.controller?.present(vc, animated: true)
-            } label: {
-                ZStack(alignment: .topTrailing) {
-                    // Tag icon button
-                    Circle()
-                        .fill(Color(viewConfig.theme.backgroundShade1Color))
-                        .frame(width: 40, height: 40)
-                        .shadow(color: Color.black.opacity(0.18), radius: 4, x: 0, y: 4)
-                        .overlay(
-                            Image(AmityIcon.LiveStream.emptyProductTaggingIcon.imageResource)
-                                .renderingMode(.template)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 32, height: 28)
-                                .foregroundColor(Color(viewConfig.theme.baseColor))
-                        )
-
-                    // Badge with count
-                    Text("\(productTagCount)")
-                        .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(Color(viewConfig.theme.backgroundShade1Color))
-                        .frame(minWidth: 16, minHeight: 16)
-                        .circularBackground(radius: 20, color: Color(viewConfig.theme.baseColor))
-                        .offset(x: 4, y: -4)
-                }
-            }
-        }
+    private func presentProductTagList() {
+        let component = AmityProductTagListComponent(pageId: .postComposerPage,
+                                                     productTags: viewModel.productTags,
+                                                     sourceId: "") // No postId yet during composition
+        let vc = AmitySwiftUIHostingController(rootView: component)
+        host.controller?.present(vc, animated: true)
     }
-    
+
     @ViewBuilder
     private var navigationBarView: some View {
         let editPageTitle = viewConfig.forElement(.editPostTitle).text ?? AmityLocalizedStringSet.Social.editPost.localizedString

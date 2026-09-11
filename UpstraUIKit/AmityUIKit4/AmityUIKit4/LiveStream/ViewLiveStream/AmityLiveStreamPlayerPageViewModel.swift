@@ -22,13 +22,33 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
             handleStateTransition(from: oldValue, to: currentState)
         }
     }
-    @Published var showInvitedAsCoHostSheet: Bool = false
+    @Published var showInvitedAsCoHostSheet: Bool = false {
+        didSet {
+            // While the co-host invitation sheet is visible, PiP must not start
+            // (a floating window would cover the sheet / duplicate the stream).
+            // Suppresses the OS auto-start; re-enabled when the sheet dismisses.
+            PiPState.shared.setAutoPiPSuppressed(showInvitedAsCoHostSheet)
+        }
+    }
+
+    deinit {
+        if showInvitedAsCoHostSheet {
+            PiPState.shared.setAutoPiPSuppressed(false)
+        }
+    }
     
     private var roomManager = RoomManager()
     private var postManager = PostManager()
     private var invitationManager = InvitationManager()
     @Published var post: AmityPostModel?
-    @Published var room: AmityRoom?
+    @Published var room: AmityRoom? {
+        didSet {
+            if room?.status == .live || room?.status == .waitingReconnect {
+                wasEverLive = true
+            }
+        }
+    }
+    @Published private(set) var wasEverLive = false
     private var cancellable: AnyCancellable?
     
     // Watch minute tracking for role transitions
@@ -173,7 +193,16 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                 // Handle UI state accordingly
                 if event.type == .invitationInvited {
                     UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                    
+
+                    // The co-host invitation sheet is about to show on this page —
+                    // close any floating window so it doesn't cover the sheet or
+                    // duplicate the stream. Only while in the foreground: an invite
+                    // arriving while the user watches in background PiP must not
+                    // kill their playback.
+                    if UIApplication.shared.applicationState == .active {
+                        PiPState.shared.stopActivePiPForExcludedSurface()
+                    }
+
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                         self?.showInvitedAsCoHostSheet = true
                     }
@@ -230,6 +259,10 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
             // Stop tracking when user becomes co-host
             watchMinuteTracker.stopTracking()
             Log.add(event: .info, "Watch tracking stopped: User became co-host")
+
+            // Backstage/co-host is a broadcaster surface — excluded from PiP.
+            // Close any floating window carried over from the viewer session.
+            PiPState.shared.stopActivePiPForExcludedSurface()
         }
         
         // User returned to viewer (left co-host role)

@@ -86,6 +86,11 @@ open class AmityNotificationTrayPageBehavior {
     }
     
     open func goToLiveStreamPage(context: AmityNotificationTrayPageBehavior.Context) {
+        if let roomId = context.roomId,
+           PiPState.shared.isPiPActive(forRoomId: roomId) {
+            PiPState.shared.restoreActivePiP()
+            return
+        }
         let livestreamPlayerPage = AmityLivestreamPlayerPage(roomId: context.roomId ?? "",
                                                              displayErrorIfEnded: true,
                                                              isCohostInvited: true
@@ -93,6 +98,8 @@ open class AmityNotificationTrayPageBehavior {
         let hostController = AmitySwiftUIHostingNavigationController(rootView: livestreamPlayerPage)
         hostController.isNavigationBarHidden = true
         hostController.modalPresentationStyle = .overFullScreen
-        context.page.host.controller?.present(hostController, animated: true)
+        PiPState.shared.abandonActivePiP { presenter in
+            presenter?.present(hostController, animated: true)
+        }
     }
 }

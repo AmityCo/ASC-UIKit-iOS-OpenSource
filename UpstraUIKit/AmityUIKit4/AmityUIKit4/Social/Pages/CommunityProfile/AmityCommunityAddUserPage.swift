@@ -48,41 +48,18 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                     .frame(height: 1)
             }
             
-            ScrollView {
-                Color.clear.frame(height: 16)
-                
-                LazyVStack(spacing: 16, content: {
-                    if viewModel.loadingStatus == .loading {
-                        ForEach(0..<3, id: \.self) { _ in
-                            UserCellSkeletonView()
-                                .environmentObject(viewConfig)
-                        }
-                    } else if viewModel.loadingStatus == .loaded && viewModel.searchKeyword.count < 3 && viewModel.searchedUsers.isEmpty {
-                        needEnoughCharToSearchView
-                    } else if viewModel.loadingStatus == .loaded && viewModel.searchedUsers.isEmpty {
-                        emptyView
-                    } else {
-                        ForEach(Array(viewModel.searchedUsers.enumerated()), id: \.element.userId) { index, user in
-                            let isSelected = isSelectedUser(user)
-                            
-                            getUserView(user, isSelected: isSelected)
-                                .onTapGesture {
-                                    if isSelected {
-                                        selectedUsers.remove(at: selectedUsers.firstIndex(of: user) ?? 0)
-                                    } else {
-                                        selectedUsers.append(user)
-                                    }
-                                }
-                                .onAppear {
-                                    if index == viewModel.searchedUsers.count - 1 {
-                                        viewModel.loadMoreUsers()
-                                    }
-                                }
-                        }
-                    }
-                })
+            switch listState {
+            case .loading:
+                scrollingList { skeletonRows }
+            case .users:
+                scrollingList { userRows }
+            case .noUsersAvailable:
+                noUsersAvailableView
+            case .needMoreCharacters:
+                needEnoughCharToSearchView
+            case .noResults:
+                emptyView
             }
-            .padding(.leading, 16)
             
             addUserButtonView
                 .padding(.bottom, 10)
@@ -91,6 +68,63 @@ public struct AmityCommunityAddUserPage: AmityPageView {
         .updateTheme(with: viewConfig)
     }
     
+    private func scrollingList<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        ScrollView {
+            Color.clear.frame(height: 16)
+
+            LazyVStack(spacing: 16, content: content)
+        }
+        .padding(.leading, 16)
+    }
+
+    @ViewBuilder
+    private var skeletonRows: some View {
+        ForEach(0..<3, id: \.self) { _ in
+            UserCellSkeletonView()
+                .environmentObject(viewConfig)
+        }
+    }
+
+    @ViewBuilder
+    private var userRows: some View {
+        ForEach(Array(viewModel.searchedUsers.enumerated()), id: \.element.userId) { index, user in
+            let isSelected = isSelectedUser(user)
+
+            getUserView(user, isSelected: isSelected)
+                .onTapGesture {
+                    if isSelected {
+                        selectedUsers.remove(at: selectedUsers.firstIndex(of: user) ?? 0)
+                    } else {
+                        selectedUsers.append(user)
+                    }
+                }
+                .onAppear {
+                    if index == viewModel.searchedUsers.count - 1 {
+                        viewModel.loadMoreUsers()
+                    }
+                }
+        }
+    }
+
+    private enum ListState {
+        case loading
+        case noUsersAvailable
+        case needMoreCharacters
+        case noResults
+        case users
+    }
+
+    /// Every combination resolves to a state — the previous chain matched none for `.notLoading`
+    /// and fell through to an empty list, which is why the area rendered blank with no explanation.
+    private var listState: ListState {
+        if viewModel.loadingStatus == .loading { return .loading }
+        if !viewModel.searchedUsers.isEmpty { return .users }
+
+        let keyword = viewModel.searchKeyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        if keyword.isEmpty { return .noUsersAvailable }
+        return keyword.count < 3 ? .needMoreCharacters : .noResults
+    }
+
     private var navigationBarView: some View {
         HStack(spacing: 0) {
             Image(AmityIcon.closeIcon.getImageResource())
@@ -264,9 +298,23 @@ public struct AmityCommunityAddUserPage: AmityPageView {
             Text(AmityLocalizedStringSet.Social.searchNoResultsFound.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
         }
-        .padding(.top, 100)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
+    private var noUsersAvailableView: some View {
+        VStack(spacing: 8) {
+            Image(AmityIcon.listRadioIcon.getImageResource())
+                .renderingMode(.template)
+                .frame(width: 60, height: 60)
+                .foregroundColor(Color(viewConfig.theme.baseColorShade4))
+
+            Text(AmityLocalizedStringSet.Social.noUsersAvailable.localizedString)
+                .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
     private var needEnoughCharToSearchView: some View {
         VStack(spacing: 15) {
             Image(AmityIcon.defaultSearchIcon.getImageResource())
@@ -280,7 +328,7 @@ public struct AmityCommunityAddUserPage: AmityPageView {
                 .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColorShade3)))
                 .multilineTextAlignment(.center)
         }
-        .padding(.top, 100)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private func isSelectedUser(_ user: AmityUserModel) -> Bool {
@@ -291,7 +339,9 @@ public struct AmityCommunityAddUserPage: AmityPageView {
 class AmityCommunityAddUserPageViewModel: ObservableObject {
     @Published var searchedUsers: [AmityUserModel] = []
     @Published var searchKeyword: String = ""
-    @Published var loadingStatus: AmityLoadingStatus = .notLoading
+    /// `.loading`, not `.notLoading`: `init` always schedules a search, so the list is pending from
+    /// the moment the page exists and must not read as "no users available" during the debounce.
+    @Published var loadingStatus: AmityLoadingStatus = .loading
     
     private let userManager = UserManager()
     private var userCollection: AmityCollection<AmityUser>?

@@ -1331,6 +1331,7 @@ public struct AmityLocalizedStringSet {
 
         // Buttons
         static let videoButton = "amity_social_video_button"
+        static let tagProductsRow = "amity_social_tag_products_row"
         static let exploreCommunityButton = "amity_social_explore_community_button"
 
         // User Profile

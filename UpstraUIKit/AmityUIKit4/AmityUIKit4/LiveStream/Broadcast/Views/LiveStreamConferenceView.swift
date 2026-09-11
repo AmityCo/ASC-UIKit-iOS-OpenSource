@@ -537,13 +537,6 @@ struct LiveStreamConferenceView: View {
                 Alert(title: Text(liveStreamAlert.alertState.title), message: Text(liveStreamAlert.alertState.message), primaryButton: liveStreamAlert.alertState.primaryButton, secondaryButton: liveStreamAlert.alertState.secondaryButton)
             }
         })
-        .onChange(of: networkMonitor.isConnected) { isConnected in
-            if !isConnected {
-                Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.livestreamWaitingNetworkToast.localizedString, bottomPadding: 60, autoHide: false)
-            } else {
-                Toast.hideToastIfPresented(immediately: true)
-            }
-        }
         .onChange(of: viewModel.currentState) { newValue in
             switch newValue {
             case .ending(reason: .maxDuration):

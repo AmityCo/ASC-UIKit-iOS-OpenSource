@@ -83,6 +83,9 @@ class ForYouFeedViewModel: ObservableObject {
     }
 
     func loadFeed() {
+        /// A reload starts every carousel at frame 1 rather than restoring where it was
+        PostMediaCarouselPositionStore.shared.reset()
+
         fetchGlobalPinnedPost()
 
         let collection = feedManager.getForYouFeedPosts()

@@ -120,16 +120,12 @@ open class AmityGlobalBehavior {
     
     open func onPostProductTagClick(context: AmityGlobalBehavior.Context) {
         guard let url = URL(string: context.product?.productUrl ?? "") else { return }
-        let browserVC = SFSafariViewController(url: url)
-        browserVC.modalPresentationStyle = .pageSheet
-        UIApplication.topViewController()?.present(browserVC, animated: true)
+        AmityInAppBrowser.present(url: url)
     }
-    
+
     open func onLivestreamProductTagClick(context: AmityGlobalBehavior.Context) {
         guard let url = URL(string: context.product?.productUrl ?? "") else { return }
-        let browserVC = SFSafariViewController(url: url)
-        browserVC.modalPresentationStyle = .pageSheet
-        UIApplication.topViewController()?.present(browserVC, animated: true)
+        AmityInAppBrowser.present(url: url)
     }
 
     open func handleVisitorUsageLimitReached() {

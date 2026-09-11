@@ -10,9 +10,13 @@ import SwiftUI
 struct AmityProductTagBadgeView: View {
     let count: Int
 
+    /// The carousel-post surfaces specify the filled tag; the profile media tabs and livestream
+    /// posts keep the outline glyph they were designed with.
+    var icon: AmityIcon = .tagIcon
+
     var body: some View {
         HStack(spacing: 6) {
-            Image(AmityIcon.tagIcon.imageResource)
+            Image(icon.imageResource)
                 .resizable()
                 .renderingMode(.template)
                 .aspectRatio(contentMode: .fit)

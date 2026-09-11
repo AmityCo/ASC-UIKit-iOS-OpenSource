@@ -211,6 +211,67 @@ final class AppManager {
         }
     }
 
+    // MARK: - in-app PiP testing
+
+    /// Forces an in-app navigation to the Social home page on top of whatever is on
+    /// screen. This is the action behind the "In-app PiP Testing" QA switch, which makes
+    /// a product-tag tap inside the livestream player open the home screen instead of the
+    /// product URL, so a tester can check the livestream hands off to the in-app PiP
+    /// window without leaving the app.
+    ///
+    /// The framework starts in-app PiP from its own navigation hooks —
+    /// `AmitySwiftUIHostingNavigationController.pushViewController`, and
+    /// `AmitySwiftUIHostingController.present` for full-screen presentations. (`PiPState`
+    /// is internal to AmityUIKit4, so the SampleApp cannot ask for PiP directly.) So push
+    /// onto the livestream's own navigation controller when there is one, and fall back to
+    /// a full-screen present otherwise: the livestream player is presented both ways
+    /// depending on where it was opened from. The player's own hosting controller is the
+    /// topmost controller while the stream is on screen, so it is the presenter — the
+    /// behaviour `Context` cannot supply it (its `host` is internal to AmityUIKit4).
+    func openHomeForInAppPiPTest() {
+        DispatchQueue.main.async {
+            guard let presenter = AppManager.topmostViewController() else { return }
+
+            // Pushed: the framework's own back button pops back to the livestream.
+            // Presented: it would call `popViewController` on a controller that has no
+            // navigation stack, so it is left off rather than shown dead — the tester
+            // returns by expanding the PiP window, which is the thing being tested.
+            let nav = presenter.navigationController
+            let host = AmitySwiftUIHostingController(
+                rootView: AmitySocialHomePage(showBackButton: nav != nil)
+            )
+
+            if let nav {
+                nav.pushViewController(host, animated: true)
+            } else {
+                // `.fullScreen` matters: the framework only starts PiP for a full-screen
+                // or over-full-screen presentation.
+                host.modalPresentationStyle = .fullScreen
+                presenter.present(host, animated: true)
+            }
+        }
+    }
+
+    /// AmityUIKit4 has its own `UIApplication.topViewController()` but it is internal to
+    /// the framework, so the SampleApp resolves the topmost controller itself.
+    private static func topmostViewController(
+        base: UIViewController? = UIApplication.shared.connectedScenes
+            .flatMap { ($0 as? UIWindowScene)?.windows ?? [] }
+            .first { $0.isKeyWindow }?
+            .rootViewController
+    ) -> UIViewController? {
+        if let nav = base as? UINavigationController {
+            return topmostViewController(base: nav.visibleViewController)
+        }
+        if let tab = base as? UITabBarController, let selected = tab.selectedViewController {
+            return topmostViewController(base: selected)
+        }
+        if let presented = base?.presentedViewController {
+            return topmostViewController(base: presented)
+        }
+        return base
+    }
+
     private func swapWindowRoot(to destination: LoginFlowInitialDestination) {
         DispatchQueue.main.async {
             let root = UIHostingController(rootView: LoginFlowCoordinator(initialDestination: destination))
@@ -283,12 +344,6 @@ final class ModuleNavigationController: UINavigationController {
     }
 }
 
-class CustomV4GlobalBehavior: AmityGlobalBehavior {
-    override func handleVisitorUsageLimitSignIn() {
-        Toast.showToast(style: .warning, message: "Create an account or sign in to continue.")
-        AppManager.shared.unregister()
-    }
-}
 
 extension DateFormatter {
     static func ascDateFromISO8601String(_ dateString: String?) -> Date? {

@@ -155,7 +155,7 @@ class MentionListProvider {
         mentionListToken = nil
         mentionListToken?.invalidate()
         
-        usersCollection = userRepository.searchUsers(displayName, sortBy: .displayName, matchType: .partial)
+        usersCollection = userRepository.searchUsers(displayName, searchBy: [.displayName], sortBy: .displayName, matchType: .partial)
         mentionListToken = usersCollection?.observe { [weak self] liveCollection, error in
             self?.handleSearchResponse(with: liveCollection)
         }

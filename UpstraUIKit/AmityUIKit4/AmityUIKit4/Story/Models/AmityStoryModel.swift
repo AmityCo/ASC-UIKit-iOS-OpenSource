@@ -49,7 +49,9 @@ public struct AmityStoryModel: Identifiable, Equatable, Hashable {
     var creatorName: String
     var creatorAvatarURLStr: String
     var imageURL: URL?
-    var imageDisplayMode: ContentMode = .fill
+    /// `nil` when the story carries no display mode — stories created from the console, REST or
+    /// another platform. Resolved from the image's orientation at render time.
+    var imageDisplayMode: ContentMode?
     var videoURL: URL?
     var viewCount: Int
     var storyItems: [AmityStoryItem]

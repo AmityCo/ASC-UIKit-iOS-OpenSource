@@ -15,11 +15,11 @@ class UserManager {
     let fileRepository = AmityFileRepository()
     
     func searchUsers(keyword: String) -> AmityCollection<AmityUser> {
-        userRepostiory.searchUsers(keyword, sortBy: .displayName, matchType: .partial)
+        userRepostiory.searchUsers(keyword, searchBy: [.displayName], sortBy: .displayName, matchType: .partial)
     }
 
     func searchUsers(keyword: String, sortBy: AmityUserSortOption) -> AmityCollection<AmityUser> {
-        userRepostiory.searchUsers(keyword, sortBy: sortBy)
+        userRepostiory.searchUsers(keyword, searchBy: [.displayName], sortBy: sortBy)
     }
 
     func getUsers(sortBy: AmityUserSortOption = .displayName) -> AmityCollection<AmityUser> {

@@ -27,9 +27,12 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
     @State private var attachedMediaType: AmityMediaType = .none
     @State private var currentType: AmityMediaType? = nil
 
-    public init(viewModel: AmityMediaAttachmentViewModel, pageId: PageId? = nil) {
+    private let onProductTagTap: (() -> Void)?
+
+    public init(viewModel: AmityMediaAttachmentViewModel, pageId: PageId? = nil, onProductTagTap: (() -> Void)? = nil) {
         self.pageId = pageId
         self.viewModel = viewModel
+        self.onProductTagTap = onProductTagTap
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .detailedMediaAttachment))
     }
     
@@ -83,6 +86,10 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
             }
             .isHidden(viewConfig.isHidden(elementId: .videoButton))
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.videoButton)
+
+            if productTagCount > 0 {
+                tagProductsRow
+            }
         }
         .onChange(of: pickerViewModel) { _ in
             
@@ -93,7 +100,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                 return
             }
                                     
-            guard viewModel.medias.count <= 10 else {
+            guard viewModel.medias.count <= PostMediaCap.maximum else {
                 Log.add(event: .error, "Media item count limit reached.")
                 pickerViewModel.reset()
                 
@@ -113,18 +120,35 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                 viewModel.medias.append(media)
             }
             
+            let attachedIdentifiers = Set(viewModel.medias.compactMap { $0.assetIdentifier })
+
             if !pickerViewModel.selectedImages.isEmpty {
-                for image in pickerViewModel.selectedImages {
+                for (offset, image) in pickerViewModel.selectedImages.enumerated() {
+                    let identifier = pickerViewModel.selectedImageIdentifiers.indices.contains(offset)
+                        ? pickerViewModel.selectedImageIdentifiers[offset]
+                        : nil
+
+                    // Re-selecting an already-attached item is skipped silently: no error, no toast.
+                    if let identifier, attachedIdentifiers.contains(identifier) { continue }
+
                     let media = AmityMedia(state: .image(image), type: .image)
                     media.localUIImage = image
+                    media.assetIdentifier = identifier
                     viewModel.medias.append(media)
                 }
             }
             
             if !pickerViewModel.selectedVidoesURLs.isEmpty {
-                for url in pickerViewModel.selectedVidoesURLs {
+                for (offset, url) in pickerViewModel.selectedVidoesURLs.enumerated() {
+                    let identifier = pickerViewModel.selectedVideoIdentifiers.indices.contains(offset)
+                        ? pickerViewModel.selectedVideoIdentifiers[offset]
+                        : nil
+
+                    if let identifier, attachedIdentifiers.contains(identifier) { continue }
+
                     let media = AmityMedia(state: .localURL(url: url), type: .video)
                     media.localUrl = url
+                    media.assetIdentifier = identifier
                     viewModel.medias.append(media)
                 }
             }
@@ -140,7 +164,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                 .ignoresSafeArea()
         }
         .fullScreenCover(isPresented: $showMediaPicker.isShown) {
-            MultiSelectionMediaPicker(viewModel: pickerViewModel, mediaType: $showMediaPicker.type, sourceType: $showMediaPicker.source, selectionLimit: 10 - viewModel.medias.count)
+            MultiSelectionMediaPicker(viewModel: pickerViewModel, mediaType: $showMediaPicker.type, sourceType: $showMediaPicker.source, selectionLimit: PostMediaCap.maximum - viewModel.medias.count)
                 .ignoresSafeArea()
         }
         .padding(.bottom, 10)
@@ -150,9 +174,55 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
     }
     
     
+    /// The only row with a trailing count and chevron; Camera, Photo and Video are icon + label only.
+    /// The file row does not exist in v4 and is not rendered.
+    @ViewBuilder
+    private var tagProductsRow: some View {
+        HStack(spacing: 12) {
+            Rectangle()
+                .fill(Color(viewConfig.theme.backgroundShade1Color))
+                .frame(width: 32, height: 32)
+                .overlay(
+                    Image(AmityIcon.LiveStream.emptyProductTaggingIcon.imageResource)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 28, height: 28)
+                        .foregroundColor(Color(viewConfig.theme.baseColor))
+                )
+                .clipShape(Circle())
+
+            Text(AmityLocalizedStringSet.Social.tagProductsRow.localizedString)
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+
+            Spacer()
+
+            HStack(spacing: 8) {
+                if productTagCount > 0 {
+                    Text("\(productTagCount)")
+                        .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade1)))
+                }
+
+                Image(AmityIcon.arrowIcon.getImageResource())
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 18, height: 18)
+                    .foregroundColor(Color(viewConfig.theme.baseColorShade1))
+            }
+        }
+        .contentShape(Rectangle())
+        .padding(.horizontal, 16)
+        .onTapGesture { onProductTagTap?() }
+    }
+
+    private var productTagCount: Int {
+        viewModel.medias.reduce(0) { $0 + $1.produtTags.count }
+    }
+
     @ViewBuilder
     private func getItemView(image: ImageResource, title: String, isHidden: Bool, onTapAction: @escaping () -> Void) -> some View {
-        let isDisable = viewModel.medias.count >= 10
+        let isDisable = viewModel.medias.count >= PostMediaCap.maximum
         let currentThemeStyle = AmityUIKitConfigController.shared.getCurrentThemeStyle()
         let imageTint = currentThemeStyle == .light ? viewConfig.theme.baseColor : UIColor.white
         HStack(spacing: 12) {
@@ -165,7 +235,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
                         .resizable()
                         .scaledToFill()
                         .foregroundColor(isDisable ? Color(viewConfig.theme.baseColorShade3) : Color(imageTint))
-                        .frame(width: 20, height: 20)
+                        .frame(width: 24, height: 24)
                 )
                 .clipShape(Circle())
             
@@ -175,7 +245,7 @@ public struct AmityDetailedMediaAttachmentComponent: AmityComponentView {
             Spacer()
         }
         .contentShape(Rectangle())
-        .padding(.leading, 25)
+        .padding(.horizontal, 16)
         .disabled(isDisable) 
         .onTapGesture {
             if !isDisable {  

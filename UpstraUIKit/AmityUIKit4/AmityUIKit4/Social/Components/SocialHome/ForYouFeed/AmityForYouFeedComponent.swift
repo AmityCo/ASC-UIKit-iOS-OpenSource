@@ -38,6 +38,7 @@ public struct AmityForYouFeedComponent: AmityComponentView {
             .updateTheme(with: viewConfig)
             .onAppear {
                 viewModel.onFeatureDisabled = onFeatureDisabled
+                discardCarouselPositions()
             }
     }
 
@@ -46,6 +47,7 @@ public struct AmityForYouFeedComponent: AmityComponentView {
         if #available(iOS 15.0, *) {
             getPostListView()
                 .refreshable {
+                    discardCarouselPositions()
                     try? await Task.sleep(nanoseconds: 500_000_000)
                 }
         } else {
@@ -180,5 +182,12 @@ public struct AmityForYouFeedComponent: AmityComponentView {
         let visibleHeight = min(screenHeight, frame.maxY) - max(0, frame.minY)
         let visiblePercentage = max(0, (visibleHeight / frame.height) * 100)
         viewModel.updateVisibility(post: post, visiblePercentage: visiblePercentage)
+    }
+
+    /// `ForYouFeedViewModel` is a `@StateObject`, so its `loadFeed()` reset only ever fires on first
+    /// creation, and this feed's pull-to-refresh reloads no data. Both re-entry and the refresh
+    /// gesture therefore have to discard carousel position here.
+    private func discardCarouselPositions() {
+        PostMediaCarouselPositionStore.shared.reset()
     }
 }

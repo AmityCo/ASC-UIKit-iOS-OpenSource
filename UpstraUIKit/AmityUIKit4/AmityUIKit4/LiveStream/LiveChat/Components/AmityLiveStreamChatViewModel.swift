@@ -14,8 +14,12 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     private(set) var deletedMessageIds: [String: Bool] = [:]
     @Published var loadingStatus: AmityLoadingStatus = .notLoading
     @Published var messageInput: String = ""
-    @Published var showBottomSheet: (show: Bool, message: MessageModel?) = (false, nil)
-    @Published var showModerationBottomSheet: (show: Bool, message: MessageModel?) = (false, nil)
+    @Published var showBottomSheet: (show: Bool, message: MessageModel?) = (false, nil) {
+        didSet { updatePiPSuppression() }
+    }
+    @Published var showModerationBottomSheet: (show: Bool, message: MessageModel?) = (false, nil) {
+        didSet { updatePiPSuppression() }
+    }
     @Published var showReactionBar: Bool = false
     @Published var composeBarState: ComposeBarState = .normal
     @Published var isTextEditorFocused: Bool = false
@@ -80,6 +84,21 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         case disabled
     }
     
+    /// A chat bottom sheet covers the player layer, and iOS auto-starts PiP when that
+    /// happens — putting the stream in a floating window while the viewer is still on
+    /// the livestream page. Suppress for as long as a sheet is up, the same way the
+    /// co-host invitation sheet does (`AmityLiveStreamPlayerPageViewModel`).
+    private func updatePiPSuppression() {
+        PiPState.shared.setAutoPiPSuppressed(showBottomSheet.show || showModerationBottomSheet.show)
+    }
+
+    deinit {
+        // Never leave PiP suppressed if the page goes away with a sheet still open.
+        if showBottomSheet.show || showModerationBottomSheet.show {
+            PiPState.shared.setAutoPiPSuppressed(false)
+        }
+    }
+
     private func updateComposeBarState() {
         let newState = calculateComposeBarState()
         if newState != composeBarState {

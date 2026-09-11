@@ -34,6 +34,18 @@ struct AmityPostMediaVideoPlayer: View {
     var onDelete: (() -> Void)? = nil
     @Binding var liveProductTags: [AmityProductTagModel]
 
+    /// 1-based position and total for the header counter. Defaults hide it on single-video surfaces.
+    var frameIndex: Int = 1
+    var frameTotal: Int = 1
+
+    /// The audio choice for the whole player session, owned by the presenting viewer so it survives a
+    /// swipe. `nil` where there is no session to keep, leaving the controller's unmuted default.
+    private let sessionMute: Binding<Bool>?
+
+    /// Whether this player is the frame currently on screen. The media viewer's pager keeps
+    /// neighbouring frames mounted, so without this they all play at once.
+    private let isActive: Bool
+
     @State private var showBottomSheet: Bool = false
     @State private var showProductTagSheet: Bool = false
 
@@ -55,11 +67,29 @@ struct AmityPostMediaVideoPlayer: View {
             } else if let urlStr = media.video?.fileURL {
                 return URL(string: urlStr)
             }
-            return nil
+            // Composer preview: the video has not been uploaded yet, so play the local file.
+            return media.localUrl
         case .livestream(let room):
             return URL(string: room.recordedData.first?.playbackUrl ?? "")
         case .chat(let url):
             return url
+        }
+    }
+
+    private var livestreamRoomId: String? {
+        if case .livestream(let room) = playerType { return room.roomId }
+        return nil
+    }
+
+    // `static` on purpose: stored as the PiP controller's `onRestoreUI`, so it must
+    // not capture `self` (which would pin the view struct + its bindings → the page
+    // view model). The caller passes the host controller, captured `[weak host]`.
+    private static func revealFromPiP(hostController: UIViewController?) {
+        guard let hostVC = hostController else { return }
+        if hostVC.presentedViewController != nil {
+            hostVC.dismiss(animated: true)
+        } else if let nav = hostVC.navigationController, nav.topViewController !== hostVC {
+            nav.popToViewController(hostVC, animated: true)
         }
     }
 
@@ -75,7 +105,7 @@ struct AmityPostMediaVideoPlayer: View {
         }
     }
 
-    init(pageId: PageId? = nil, post: AmityPostModel?, playerType: VideoPlayerType, hideActionMenu: Bool = true, onClose: (() -> Void)? = nil, onTagProducts: (() -> Void)? = nil, onDownload: (() -> Void)? = nil, onDelete: (() -> Void)? = nil, liveProductTags: Binding<[AmityProductTagModel]> = .constant([])) {
+    init(pageId: PageId? = nil, post: AmityPostModel?, playerType: VideoPlayerType, hideActionMenu: Bool = true, onClose: (() -> Void)? = nil, onTagProducts: (() -> Void)? = nil, onDownload: (() -> Void)? = nil, onDelete: (() -> Void)? = nil, liveProductTags: Binding<[AmityProductTagModel]> = .constant([]), frameIndex: Int = 1, frameTotal: Int = 1, isMuted: Binding<Bool>? = nil, isActive: Bool = true) {
         self.pageId = pageId
         self.post = post
         self.hideActionMenu = hideActionMenu
@@ -85,6 +115,10 @@ struct AmityPostMediaVideoPlayer: View {
         self.onDownload = onDownload
         self.onDelete = onDelete
         self._liveProductTags = liveProductTags
+        self.frameIndex = frameIndex
+        self.frameTotal = frameTotal
+        self.sessionMute = isMuted
+        self.isActive = isActive
         self._deletedStateViewModel = StateObject(wrappedValue: VideoPlayerDeletedStateViewModel(post: post))
     }
 
@@ -99,6 +133,32 @@ struct AmityPostMediaVideoPlayer: View {
         .background(Color.black)
         .onAppear {
             playerController.autoReplay = false
+
+            if let sessionMute {
+                playerController.setMuted(sessionMute.wrappedValue)
+            }
+
+            // enable PiP only for recorded livestream
+            if playerType.isLivestream {
+                playerController.enablePictureInPicture(roomId: livestreamRoomId, onRestore: { [weak host] in
+                    Self.revealFromPiP(hostController: host?.controller)
+                })
+            } else {
+                // Regular video posts are excluded from PiP — close any floating
+                // livestream window so two players never run at once.
+                PiPState.shared.stopActivePiPForExcludedSurface()
+            }
+        }
+        .onChange(of: sessionMute?.wrappedValue) { muted in
+            guard let muted else { return }
+            playerController.setMuted(muted)
+        }
+        .onChange(of: isActive) { isActive in
+            if isActive {
+                playerController.play()
+            } else {
+                playerController.pause()
+            }
         }
         .onChange(of: sliderValue) { newValue in
             if playerController.isSeeking {
@@ -162,7 +222,7 @@ struct AmityPostMediaVideoPlayer: View {
         ZStack {
             // Video player layer
             if let url = videoURL {
-                AmityMediaPlayer(url: url, controller: playerController)
+                AmityMediaPlayer(url: url, controller: playerController, autoPlay: isActive)
                     .onTapGesture {
                         controls.tapOverlay(isPlaying: playerController.isPlaying)
                     }
@@ -223,6 +283,7 @@ struct AmityPostMediaVideoPlayer: View {
             // Volume button
             Button(action: {
                 playerController.toggleMute()
+                sessionMute?.wrappedValue = playerController.isMuted
             }) {
                 Image(systemName: playerController.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
                     .font(.system(size: 18, weight: .regular))
@@ -242,6 +303,13 @@ struct AmityPostMediaVideoPlayer: View {
                 }
             }
         }
+        // Overlaid, not placed inline: the leading and trailing button groups differ in width, so an
+        // inline label would centre on the free space rather than the header.
+        .overlay(
+            Text("\(frameIndex) / \(frameTotal)")
+                .applyTextStyle(.title(.white))
+                .isHidden(frameTotal <= 1)
+        )
         .padding(.horizontal, 16)
         .padding(.vertical, 16)
         .background(
@@ -327,7 +395,7 @@ struct AmityPostMediaVideoPlayer: View {
                 HStack {
                     Spacer()
 
-                    AmityProductTagBadgeView(count: productTags.count)
+                    AmityProductTagBadgeView(count: productTags.count, icon: .productTagFilledIcon)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 18)
                         .onTapGesture {

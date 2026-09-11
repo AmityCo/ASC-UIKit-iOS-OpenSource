@@ -61,6 +61,9 @@ class PostFeedViewModel: ObservableObject {
     func loadFeed(feedType: FeedType) {
         /// Clear out recentlyCreatedPosts on fresh data loading
         recentlyCreatedPosts.removeAll()
+
+        /// A reload starts every carousel at frame 1 rather than restoring where it was
+        PostMediaCarouselPositionStore.shared.reset()
         
         /// Clear stale feed error so the UI reflects the new collection state
         feedError = nil

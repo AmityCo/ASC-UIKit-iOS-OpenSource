@@ -47,14 +47,6 @@ struct ReactionListContent: View {
                                     // Dismiss Screen
                                     dismissScreen.wrappedValue.dismiss()
                                 }
-                            
-                            if index != viewModel.reactedUsers.count - 1 {
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.1))
-                                    .frame(height: 1)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 2)
-                            }
                         }
                         .onAppear {
                             if index == viewModel.reactedUsers.count - 1 {

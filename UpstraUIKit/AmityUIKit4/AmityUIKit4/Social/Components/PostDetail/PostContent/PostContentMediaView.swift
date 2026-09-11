@@ -9,113 +9,122 @@ import Foundation
 import SwiftUI
 import AmitySDK
 
+/// Routes a post's attachments: one renders a single frame, two or more a swipeable carousel. Both are
+/// full-bleed and classified — only the chrome differs.
 struct PostContentMediaView: View {
     @EnvironmentObject private var host: AmitySwiftUIHostWrapper
     @StateObject private var viewModel: PostContentMediaViewModel = PostContentMediaViewModel()
     @ObservedObject var viewConfig: AmityViewConfigController
     let post: AmityPostModel
     var pageId: PageId? = nil
-    
+
+    @State private var currentIndex: Int
+    @State private var availableWidth: CGFloat = UIScreen.main.bounds.width
+    @ObservedObject private var positionStore = PostMediaCarouselPositionStore.shared
+
     init(post: AmityPostModel, viewConfig: AmityViewConfigController, pageId: PageId? = nil) {
         self.post = post
         self.viewConfig = viewConfig
         self.pageId = pageId
+        self._currentIndex = State(
+            initialValue: PostMediaCarouselPositionStore.shared.index(
+                for: post.postId,
+                mediaCount: post.medias.count
+            )
+        )
     }
-    
+
     var body: some View {
-        
-        if !post.medias.isEmpty {
-            getGridView(data: post.medias) { index, media in
-                
-                ZStack(alignment: .bottomTrailing) {
-                    ZStack {
-                        // Handle different media states
-                        Group {
-                            if let url = media.getImageURL() {
-                                Color.clear
-                                    .overlay(Color(viewConfig.theme.baseColorShade4))
-                                    .overlay(
-                                        URLImage(url, content: { image in
-                                            image
-                                                .resizable()
-                                                .scaledToFill()
-                                        })
-                                        .environment(\.urlImageOptions, URLImageOptions.amityOptions)
-                                    )
-                                    .contentShape(Rectangle())
-                                    .applyIf(media.getAltText() != nil) {
-                                        $0.accessibility(children: .ignore, labelKey: "Photo \(index + 1) of \(post.medias.count): \(media.getAltText()!)")
-                                    }
-
-                            } else {
-                                Color(viewConfig.theme.baseColorShade4)
-                            }
-                        }
-
-                        // Display play button if the media is video
-                        if media.type == .video {
-                            Image(AmityIcon.videoControlIcon.imageResource)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 40, height: 40)
-                        }
-
-                        // +X ovelay view if the post has more than 4 medias
-                        if index == 3 && post.medias.count > 4 {
-                            ZStack {
-                                Rectangle()
-                                    .fill(Color.black.opacity(0.25))
-
-                                Text("+\(post.medias.count - 3)")
-                                    .applyTextStyle(.headline(.white))
-                            }
-                            .allowsHitTesting(false)
-                            .applyIf(media.getAltText() != nil) {
-                                $0.accessibility(children: .combine, labelKey: "Activate to view \(post.medias.count - 3) more photos")
-                            }
-                        }
-                    }
-
-                    if !media.produtTags.isEmpty {
-                        AmityProductTagBadgeView(count: media.produtTags.count)
-                            .padding(8)
-                            .onTapGesture {
-                                viewModel.selectedProductTagMedia = media
-                                viewModel.showProductTagSheet = true
-                            }
-                    }
+        if post.medias.isEmpty {
+            EmptyView()
+        } else {
+            content
+                .onChange(of: currentIndex) { index in
+                    PostMediaCarouselPositionStore.shared.setIndex(index, for: post.postId)
                 }
-                .compositingGroup()
-                .clipped()
-                .contentShape(Rectangle())
-                .onTapGesture {
+                /// Drives `TabView(selection:)` back to the first frame on a reload. Rows that are
+                /// off screen are rebuilt later and read the cleared store instead.
+                .onChange(of: positionStore.resetGeneration) { _ in
+                    currentIndex = 0
+                }
+                .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
+                    MediaViewer(
+                        medias: post.medias,
+                        startIndex: viewModel.selectedMediaIndex,
+                        viewConfig: viewConfig,
+                        closeAction: { viewModel.showMediaViewer.toggle() },
+                        showEditAction: post.isOwner,
+                        post: post,
+                        showViewParentPost: false,
+                        pageId: pageId,
+                        alwaysShowsCounter: true,
+                        // Tracked live, so the carousel is already on the right frame when the
+                        // fade-out reveals it. The composer deliberately does not wire this.
+                        onIndexChanged: { viewedIndex in
+                            currentIndex = viewedIndex
+                        }
+                    )
+                }
+                .sheet(isPresented: $viewModel.showProductTagSheet) {
+                    productTagListSheet
+                }
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if post.medias.count == 1 {
+            singleFrame
+        } else {
+            PostMediaCarouselView(
+                viewConfig: viewConfig,
+                medias: post.medias,
+                currentIndex: $currentIndex,
+                onFrameTap: { index in
                     withoutAnimation {
                         viewModel.selectedMediaIndex = index
                         viewModel.showMediaViewer.toggle()
                     }
+                },
+                onProductTagTap: { media in
+                    viewModel.selectedProductTagMedia = media
+                    viewModel.showProductTagSheet = true
                 }
-            }
-            .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
-                MediaViewer(
-                    medias: post.medias,
-                    startIndex: viewModel.selectedMediaIndex,
-                    viewConfig: viewConfig,
-                    closeAction: { viewModel.showMediaViewer.toggle() },
-                    showEditAction: post.isOwner,
-                    post: post,
-                    showViewParentPost: false,
-                    pageId: pageId
-                )
-
-            }
-            .sheet(isPresented: $viewModel.showProductTagSheet) {
-                productTagListSheet
-            }
-        } else {
-            EmptyView()
+            )
+            // The owning component pads 16; a media frame is full post width.
+            .padding(.horizontal, -16)
         }
     }
-    
+
+    /// Drawn exactly like a carousel frame; only the chrome differs. Attachment count changes how many
+    /// frames there are, never how one is drawn.
+    @ViewBuilder
+    private var singleFrame: some View {
+        let ratio = MediaDimensionResolver.lockedRatio(for: post.medias)
+
+        PostMediaFrameView(
+            viewConfig: viewConfig,
+            media: post.medias[0],
+            index: 0,
+            total: 1,
+            onProductTagTap: { media in
+                viewModel.selectedProductTagMedia = media
+                viewModel.showProductTagSheet = true
+            }
+        )
+        .readSize { availableWidth = $0.width }
+        .frame(height: ratio.height(forWidth: availableWidth))
+        .onTapGesture {
+            withoutAnimation {
+                viewModel.selectedMediaIndex = 0
+                viewModel.showMediaViewer.toggle()
+            }
+        }
+        // The owning component pads 16; a media frame is full post width.
+        .padding(.horizontal, -16)
+        .padding(.vertical, 8)
+    }
+
     @ViewBuilder
     private var productTagListSheet: some View {
         if let media = viewModel.selectedProductTagMedia {
@@ -130,39 +139,41 @@ struct PostContentMediaView: View {
                 .halfSheetPresentation()
         }
     }
+}
 
-    @ViewBuilder
-    private func getGridView<Content: View, Data: RandomAccessCollection>(data: Data, @ViewBuilder content: @escaping (Data.Index, Data.Element) -> Content) -> some View where Data.Element: Identifiable {
-        GeometryReader { geometry in
-            VStack(spacing: 4) {
-                if data.count == 0 {
-                    EmptyView()
-                } else if 1...2 ~= data.count {
-                    HStack(spacing: 4) {
-                        ForEach(0..<data.count, id: \.self) { index in
-                            content(index as! Data.Index, data[index as! Data.Index])
-                        }
-                    }
-                } else if 1...data.count ~= data.count {
-                    HStack(spacing: 4) {
-                        content(0 as! Data.Index, data.first!)
-                    }
-                    .frame(height: (geometry.size.height / 2) + 30)
-                    
-                    HStack(spacing: 4) {
-                        ForEach(1..<data.count, id: \.self) { index in
-                            if index < 4 {
-                                content(index as! Data.Index, data[index as! Data.Index])
-                            } else {
-                                EmptyView()
-                            }
-                        }
-                    }
-                    .frame(height: (geometry.size.height / 2) - 30)
+/// Remembers which carousel frame each post is showing.
+///
+/// A feed row's `@State` is destroyed when the post scrolls out of the viewport and rebuilt from
+/// scratch on re-entry, which reset every carousel to frame 1. Position therefore cannot live in the
+/// view; it lives here, keyed by post.
+final class PostMediaCarouselPositionStore: ObservableObject {
+    static let shared = PostMediaCarouselPositionStore()
 
-                }
-            }
-        }
+    /// Bumped by `reset()`. Rows already on screen watch this and return to frame 1.
+    ///
+    /// Clearing `indices` alone is not enough: a reloaded feed keeps each row's `ForEach` identity
+    /// (`PaginatedItem.id` is the post id), so SwiftUI preserves the row's `@State` and never re-runs
+    /// the `init` that reads this store. A reload therefore has to push, not just forget.
+    @Published private(set) var resetGeneration: Int = 0
+
+    private var indices: [String: Int] = [:]
+
+    private init() {}
+
+    /// Clamped on read — a post edited down to fewer attachments must not select a frame that is gone.
+    func index(for postId: String, mediaCount: Int) -> Int {
+        guard mediaCount > 0, let stored = indices[postId] else { return 0 }
+        return min(max(stored, 0), mediaCount - 1)
+    }
+
+    func setIndex(_ index: Int, for postId: String) {
+        indices[postId] = index
+    }
+
+    /// Scroll-recycling is the only thing position survives. A feed reload discards it.
+    func reset() {
+        indices.removeAll()
+        resetGeneration += 1
     }
 }
 

@@ -9,12 +9,13 @@ import SwiftUI
 
 struct StoryImageView: View {
     private let imageURL: URL
-    private let displayMode: ContentMode
+    /// `nil` falls back to the image's own orientation — see `resolvedDisplayMode(for:)`.
+    private let displayMode: ContentMode?
     private let size: CGSize
     private let onLoading: () -> Void
     private let onLoaded: () -> Void
     
-    init(imageURL: URL, displayMode: ContentMode, size: CGSize, onLoading: @escaping () -> Void, onLoaded: @escaping () -> Void) {
+    init(imageURL: URL, displayMode: ContentMode?, size: CGSize, onLoading: @escaping () -> Void, onLoaded: @escaping () -> Void) {
         self.imageURL = imageURL
         self.displayMode = displayMode
         self.size = size
@@ -30,13 +31,15 @@ struct StoryImageView: View {
                 }
             
         } content: { image, imageInfo in
+            let loadedImage = UIImage(cgImage: imageInfo.cgImage)
+
             image
                 .resizable()
-                .aspectRatio(contentMode: displayMode)
+                .aspectRatio(contentMode: resolvedDisplayMode(for: loadedImage))
                 .frame(width: size.width, height: size.height)
                 .background(
                     LinearGradient(
-                        gradient: Gradient(colors: UIImage(cgImage: imageInfo.cgImage).averageGradientColor ?? [.black]),
+                        gradient: Gradient(colors: loadedImage.averageGradientColor ?? [.black]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -47,5 +50,13 @@ struct StoryImageView: View {
                 .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.storyImageView)
         }
         .environment(\.urlImageOptions, URLImageOptions.amityOptions)
+    }
+
+    /// A story that specified its own mode is honoured. Otherwise the orientation decides, matching
+    /// what `AmityDraftStoryPage` picks at creation: portrait fills, landscape fits so a wide image
+    /// is letterboxed rather than cropped.
+    private func resolvedDisplayMode(for image: UIImage) -> ContentMode {
+        if let displayMode { return displayMode }
+        return image.orientation == .portrait ? .fill : .fit
     }
 }

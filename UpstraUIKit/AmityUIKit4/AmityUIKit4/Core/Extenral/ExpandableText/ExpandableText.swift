@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftUI
-import SafariServices
 import AmitySDK
 
 /**
@@ -208,10 +207,7 @@ public struct ExpandableText: View {
                     return .discarded
                 }
 
-                // Open link in in-app browser
-                let browserVC = SFSafariViewController(url: url)
-                browserVC.modalPresentationStyle = .pageSheet
-                UIApplication.topViewController()?.present(browserVC, animated: true)
+                AmityInAppBrowser.present(url: url)
                 return .discarded
             })
         } else {

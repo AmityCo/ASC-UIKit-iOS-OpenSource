@@ -9,458 +9,86 @@ import SwiftUI
 import AVKit
 import AmitySDK
 
+/// Routes the composer's attachments: one renders a full-bleed classified preview, two or more a
+/// peeking carousel.
 struct PostCreationMediaAttachmentPreviewView: View {
-    
+
     @ObservedObject private var postComposerViewModel: AmityPostComposerViewModel
     @ObservedObject private var mediaAttachmentViewModel: AmityMediaAttachmentViewModel
-    
+
+    @StateObject private var viewerViewConfig = AmityViewConfigController(pageId: .postComposerPage)
+    @State private var page: Page = .first()
+    @State private var viewerStart: ViewerStart?
+    @State private var availableWidth: CGFloat = UIScreen.main.bounds.width
+
     init(postComposerViewModel: AmityPostComposerViewModel, viewModel: AmityMediaAttachmentViewModel) {
         self.postComposerViewModel = postComposerViewModel
         self.mediaAttachmentViewModel = viewModel
     }
-    
-    var body: some View {
-        VStack {
-            getGridView()
-        }
-        .padding([.leading, .trailing], 16)
-        .environmentObject(postComposerViewModel)
-        .environmentObject(mediaAttachmentViewModel)
-    }
-    
-    
-    @ViewBuilder
-    private func getGridView() -> some View {
-        let columns = (0..<getColumnCount()).map { _ in GridItem(.flexible(), spacing: 8) }
 
-        LazyVGrid(columns: columns, spacing: 8) {
-            ForEach(Array(mediaAttachmentViewModel.medias.enumerated()), id: \.element.id) { index, media in
-                MediaAttachmentView(
-                    media: media,
-                    removeAction: {
-                        mediaAttachmentViewModel.medias.remove(at: index)
-                    }
+    var body: some View {
+        content
+            .environmentObject(postComposerViewModel)
+            .environmentObject(mediaAttachmentViewModel)
+            // `item:`, not `isPresented:` — the tapped index has to travel *with* the trigger.
+            // Split across two `@State`s, a tap that lands while the product-tag sheet is still
+            // dismissing built the viewer from the pre-tap index.
+            .fullScreenCover(item: $viewerStart) { start in
+                MediaViewer(
+                    medias: mediaAttachmentViewModel.medias,
+                    startIndex: start.index,
+                    viewConfig: viewerViewConfig,
+                    closeAction: { viewerStart = nil }
+                    // No onIndexChanged: the composer returns to the frame originally tapped, not the
+                    // last one viewed. The inverse of the feed, deliberately.
                 )
-                .aspectRatio(1, contentMode: .fill)
             }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if mediaAttachmentViewModel.medias.isEmpty {
+            EmptyView()
+        } else if mediaAttachmentViewModel.medias.count == 1 {
+            singlePreview
+        } else {
+            SelectedMediaCarouselView(
+                mediaViewModel: mediaAttachmentViewModel,
+                page: $page,
+                onFrameTap: openViewer(at:)
+            )
+            .padding(.horizontal, 16)
         }
     }
-    
-    private func getColumnCount() -> Int {
-        switch mediaAttachmentViewModel.medias.count {
-        case 1: return 1
-        default: return 2
-        }
+
+    /// Full-bleed and classified, not a forced square — an inset always-square tile would not preview
+    /// what actually publishes.
+    @ViewBuilder
+    private var singlePreview: some View {
+        let media = mediaAttachmentViewModel.medias[0]
+        let ratio = MediaDimensionResolver.pixelSize(of: media)
+            .map { MediaRatioClassifier.classify(size: $0) } ?? .square
+
+        SelectedMediaFrameView(
+            media: media,
+            index: 0,
+            total: 1,
+            removeAction: { mediaAttachmentViewModel.medias.removeAll() },
+            onTap: { openViewer(at: 0) }
+        )
+        .readSize { availableWidth = $0.width }
+        .frame(height: ratio.height(forWidth: availableWidth))
+        .padding(.vertical, 12)
+    }
+
+    private func openViewer(at index: Int) {
+        viewerStart = ViewerStart(index: index)
     }
 }
 
-
-struct MediaAttachmentView: View {
-    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
-    @EnvironmentObject private var mediaViewModel: AmityMediaAttachmentViewModel
-    @EnvironmentObject private var postComposerViewModel: AmityPostComposerViewModel
-    
-    @StateObject private var media: AmityMedia
-    private let removeAction: () -> Void
-    private let fileRepositoryManager = FileRepositoryManager()
-    @StateObject private var networkMonitor = NetworkMonitor()
-    
-    @State private var showAltTextConfig: Bool = false
-    
-    init(media: AmityMedia, removeAction: @escaping () -> Void) {
-        self._media = StateObject(wrappedValue: media)
-        self.removeAction = removeAction
-    }
-    
-    var body: some View {
-        ZStack(alignment: .topTrailing) {
-            Color.clear
-                .overlay(
-                    ZStack {
-                        if media.type == .image {
-                            if let mediaImage = media.localUIImage {
-                                Image(uiImage: mediaImage)
-                                    .resizable()
-                                    .scaledToFill()
-                            } else if let url = media.getImageURL() {
-                                Color.clear
-                                    .overlay(
-                                        KFImage.url(url)
-                                            .placeholder {
-                                                ProgressView()
-                                                    .progressViewStyle(CircularProgressViewStyle())
-                                            }
-                                            .resizable()
-                                            .fromMemoryCacheOrRefresh()
-                                            .startLoadingBeforeViewAppear()
-                                            .aspectRatio(contentMode: .fill)
-                                    )
-                                    .clipped()
-                                    .contentShape(Rectangle())
-                            } else {
-                                let image = UIImage(contentsOfFile: media.localUrl?.path ?? "")
-                                Image(uiImage: image ?? UIImage())
-                                    .resizable()
-                                    .scaledToFill()
-                            }
-                        }
-                        
-                        
-                        if media.type == .video {
-                            if let thumbnail = media.generatedThumbnailImage {
-                                Image(uiImage: media.generatedThumbnailImage ?? UIImage())
-                                    .resizable()
-                                    .scaledToFill()
-                            } else if let url = media.getImageURL() {
-                                Color.clear
-                                    .overlay(
-                                        KFImage.url(url)
-                                            .placeholder {
-                                                ProgressView()
-                                                    .progressViewStyle(CircularProgressViewStyle())
-                                            }
-                                            .resizable()
-                                            .fromMemoryCacheOrRefresh()
-                                            .startLoadingBeforeViewAppear()
-                                            .aspectRatio(contentMode: .fill)
-                                    )
-                                    .clipped()
-                                    .contentShape(Rectangle())
-                            }
-                            
-                            Image(AmityIcon.videoControlIcon.getImageResource())
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 40, height: 40)
-                        }
-                        
-                        /// Display loading progress view if media.state is uploading...
-                        if case .uploading(let progress) = media.state {
-                            Color.black.opacity(0.5)
-                            getProgressView(progress)
-                        }
-                        
-                        /// Display error view if media.state is error...
-                        if case .error = media.state {
-                            Color.black.opacity(0.5)
-                            Image(AmityIcon.mediaUploadErrorIcon.getImageResource())
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 30, height: 30)
-                        }
-                        
-                        /// Display error view if network is not connected...
-                        if !networkMonitor.isConnected {
-                            Color.black.opacity(0.5)
-                            Image(AmityIcon.mediaUploadErrorIcon.getImageResource())
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 30, height: 30)
-                        }
-                    }
-                )
-                .clipped()
-            
-            Button(action: {
-                removeAction()
-            }, label: {
-                Image(AmityIcon.backgroundedCloseIcon.getImageResource())
-                    .resizable()
-                    .scaledToFill()
-                    .frame(size: CGSize(width: 24, height: 24))
-                    .padding(.all, 10)
-            })
-            
-            ZStack(alignment: .bottomLeading) {
-                // Transparent rectangle to fill the space but not affect the layout
-                Rectangle()
-                    .fill(Color.clear)
-                
-                HStack {
-                    // Display alt text button only if the media is an image and from the local device
-                    if media.isLocal() && media.type == .image {
-                        Button(action: {
-                            guard let imageData = media.image else { return }
-                            
-                            let configMode: AltTextConfigMode
-                            
-                            if let altText = media.altText, !altText.isEmpty {
-                                configMode = .edit(altText, .image(imageData))
-                            } else {
-                                configMode = .create(.image(imageData))
-                            }
-                            
-                            let component = AmityAltTextConfigComponent(mode: configMode) { altText in
-                                media.altText = altText
-                            }
-                            let vc = AmitySwiftUIHostingController(rootView: component)
-                            
-                            host.controller?.present(vc, animated: true)
-                           }) {
-                               HStack(spacing: 4) {
-                                   Text(AmityLocalizedStringSet.Social.altTextButtonTitle.localizedString)
-                                       .applyTextStyle(AmityTextStyle.captionBold(.white))
-                                   
-                                   if let altText = media.altText ?? media.getAltText(hasDefault: false), !altText.isEmpty {
-                                       Image(AmityIcon.checkMarkIcon.getImageResource())
-                                           .resizable()
-                                           .scaledToFill()
-                                           .frame(width: 16, height: 12)
-                                   }
-                               }
-                               .padding(.horizontal, 8)
-                               .padding(.vertical, 4)
-                               .background(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .fill(Color.black.opacity(0.5))
-                               )
-                           }
-                           
-                    }
-                    
-                    Spacer()
-                    
-                    AmityProductTagBadgeView(count: media.produtTags.count)
-                    .isHidden(!postComposerViewModel.isProductCatalogueEnabled || (media.produtTags.isEmpty && postComposerViewModel.productTags.count == postComposerViewModel.productTagLimit))
-                    .onTapGesture {
-                        let initialSelection = media.produtTags.map { $0.object }
-                        let mode: AmityProductTagSelectionMode = media.produtTags.isEmpty ? .create : .edit
-                        var selectedProductTags: [AmityProductTagModel] = media.produtTags
-                        var vc: AmitySwiftUIHostingController<AmityProductTagSelectionComponent>?
-                        
-                        let existingProducts = postComposerViewModel.productTags.map { $0.productId }
-
-                        let component = AmityProductTagSelectionComponent(
-                            mode: mode,
-                            initialSelection: initialSelection,
-                            existingProducts: existingProducts,
-                            onClose: { vc?.dismiss(animated: true) },
-                            onDone: {
-                                media.produtTags = selectedProductTags
-
-                                if let mediaFileId = media.getFileId() {
-                                    let mediaProductTags = selectedProductTags.map { AmityMediaProductTag(productId: $0.productId, product: $0.object) }
-                                    postComposerViewModel.attachmentProductTags.set(fileId: mediaFileId, tags: mediaProductTags)
-                                    postComposerViewModel.updateProductTags(medias: mediaViewModel.medias)
-                                }
-
-                                let message = initialSelection.isEmpty
-                                    ? AmityLocalizedStringSet.Social.productTagsAdded.localizedString
-                                    : AmityLocalizedStringSet.Social.productTagsUpdated.localizedString
-                                Toast.showToast(style: .success, message: message)
-
-                                vc?.dismiss(animated: true)
-                            },
-                            onTagChanges: { products in
-                                selectedProductTags = products.map { AmityProductTagModel(object: $0, range: NSRange(), contentType: .media) }
-                            }
-                        )
-
-                        vc = AmitySwiftUIHostingController(rootView: component)
-                        host.controller?.present(vc!, animated: true)
-                    }
-                }
-                .padding(8)
-            }
-            .visibleWhen(media.isUploaded())
-        }
-        .cornerRadius(6)
-        .contentShape(Rectangle())
-        .onAppear {
-            
-            if case .image(let image) = media.state, media.type == .image {
-                uploadImage(image: image)
-            }
-            
-            if case .localURL(_) = media.state, media.type == .image {
-                uploadImage()
-            }
-            
-            if case .localURL(_) = media.state, media.type == .video {
-                generatedThumbnailAndUploadVideo()
-            }
-        }
-    }
-    
-    
-    func getProgressView(_ progress: CGFloat) -> some View {
-        Circle()
-            .stroke(lineWidth: 3.0)
-            .fill(
-                Color.white
-            )
-            .overlay(
-                Circle()
-                    .trim(from: 0.0, to: progress)
-                    .stroke(
-                        Color(AmityUIKitConfigController.shared.getTheme().primaryColor),
-                        lineWidth: 3.0
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeOut(duration: 0.01), value: progress)
-            )
-            .frame(width: 30, height: 30)
-    }
-    
-    
-    private func uploadImage() {
-        // Note: This is not a fool-proof way to check image file type. Ideally we want to check starting bytes of the file instead. Since these images are selected from photo gallery or captured using device camera, we are sure that its an image file.
-        // So for simplicity, we just check the file extension of the URL for that image.
-        let allowedFormats: Set<String> = ["jpg","jpeg","png"]
-        let imageExtension = media.localUrl?.pathExtension.lowercased() ?? ""
-        let needsConversion = !allowedFormats.contains(imageExtension)
-
-        // Validate file size: reject images over 1 GB
-        let maxImageFileSize: Int64 = 1_073_741_824 // 1 GB
-        if let url = media.localUrl,
-           let fileSize = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize,
-           Int64(fileSize) > maxImageFileSize {
-            media.state = .error
-            mediaViewModel.updateMediaState(media)
-            return
-        }
-
-        // Set uploading state immediately before starting async upload
-        media.state = .uploading(progress: 0)
-        mediaViewModel.updateMediaState(media)
-
-        DispatchQueue.global(qos: .background).async {
-            if needsConversion {
-                if let convertedImageURL = ImageConverter.convertImage(url: media.localUrl ?? URL(fileURLWithPath: "")) {
-                    startImageUpload(imageURL: convertedImageURL)
-                }
-            } else {
-                startImageUpload(imageURL: media.localUrl ?? URL(fileURLWithPath: ""))
-            }
-        }
-    }
-    
-    private func startImageUpload(imageURL: URL) {
-        fileRepositoryManager.fileRepository.uploadImage(with: imageURL, isFullImage: true) { progress in
-            DispatchQueue.main.async {
-                Log.add(event: .info, "Image Upload progress: \(progress)")
-                media.state = .uploading(progress: progress)
-                
-                // Trigger objectWillChange to update the button state
-                self.mediaViewModel.updateMediaState(media)
-            }
-        } completion: { imageData, error in
-            DispatchQueue.main.async {
-                if let error {
-                    media.state = .error
-                    self.mediaViewModel.updateMediaState(media)
-                    return
-                }
-                
-                guard let imageData else { return }
-                Log.add(event: .info, "Image Uploaded!!!")
-                media.image = imageData
-                media.state = .uploadedImage(data: imageData)
-                
-                // Trigger objectWillChange to update the button state
-                self.mediaViewModel.updateMediaState(media)
-            }
-        }
-    }
-    
-    // Note: No need for conversion as png image is extracted from UIImage internally in SDK
-    private func uploadImage(image: UIImage) {
-        // Validate file size: reject images over 1 GB
-        let maxImageFileSize: Int64 = 1_073_741_824 // 1 GB
-        if let imageData = image.jpegData(compressionQuality: 1.0),
-           Int64(imageData.count) > maxImageFileSize {
-            media.state = .error
-            mediaViewModel.updateMediaState(media)
-            return
-        }
-
-        // Set uploading state immediately before starting async upload
-        media.state = .uploading(progress: 0)
-        mediaViewModel.updateMediaState(media)
-
-        Task { @MainActor in
-            do {
-                let imageData = try await fileRepositoryManager.fileRepository.uploadImage(image) { progress in
-
-                    DispatchQueue.main.async {
-                        Log.add(event: .info, "Image Upload progress: \(progress)")
-                        media.state = .uploading(progress: progress)
-
-                        // Update view model state
-                        self.mediaViewModel.updateMediaState(media)
-                    }
-                }
-                
-                Log.add(event: .info, "Image Uploaded!!!")
-                media.image = imageData
-                media.state = .uploadedImage(data: imageData)
-                
-                // Update view model state
-                self.mediaViewModel.updateMediaState(media)
-            } catch {
-                media.state = .error
-                self.mediaViewModel.updateMediaState(media)
-                return
-            }
-        }
-    }
-    
-    private func generatedThumbnailAndUploadVideo() {
-        let originalURL = media.localUrl ?? URL(fileURLWithPath: "")
-        media.state = .uploading(progress: 0.1)
-        
-        generateThumbnail(videoURL: originalURL)
-        
-        let asset = AVAsset(url: originalURL)
-        if VideoConverter.shouldConvertVideo(asset: asset) {
-            Log.add(event: .info, "Converting video to supported type..")
-            VideoConverter.convertVideo(asset: asset) { convertedVideoURL in
-                Log.add(event: .info, "Video Converted! Starting upload process...")
-                startVideoUpload(videoURL: convertedVideoURL ?? URL(fileURLWithPath: ""))
-            }
-            
-        } else {
-            Log.add(event: .info, "Uploading original video..")
-            startVideoUpload(videoURL: originalURL)
-        }
-    }
-    
-    private func generateThumbnail(videoURL: URL) {
-        let asset = AVAsset(url: videoURL)
-        let assetImageGenerator = AVAssetImageGenerator(asset: asset)
-        assetImageGenerator.appliesPreferredTrackTransform = true
-        let time = CMTime(seconds: 1.0, preferredTimescale: 1)
-        var actualTime: CMTime = CMTime.zero
-        do {
-            let imageRef = try assetImageGenerator.copyCGImage(at: time, actualTime: &actualTime)
-            media.generatedThumbnailImage = UIImage(cgImage: imageRef)
-        } catch {
-            print("Unable to generate thumbnail image for kUTTypeMovie.")
-        }
-    }
-    
-    private func startVideoUpload(videoURL: URL) {
-        
-        Task { @MainActor in
-            do {
-                let videoData = try await fileRepositoryManager.fileRepository.uploadVideo(with: videoURL) { progress in
-                    DispatchQueue.main.async {
-                        Log.add(event: .info, "Video Upload progress: \(progress)")
-                        media.state = .uploading(progress: progress)
-                        
-                        // Update view model state
-                        self.mediaViewModel.updateMediaState(media)
-                    }
-                }
-                
-                Log.add(event: .info, "Video Uploaded!!!")
-                media.video = videoData
-                media.state = .uploadedVideo(data: videoData)
-                self.mediaViewModel.updateMediaState(media)
-            } catch let error {
-                media.state = .error
-                self.mediaViewModel.updateMediaState(media)
-            }
-        }
-    }
+/// The frame the full-screen viewer opens on. `Identifiable` so the index is part of the
+/// presentation trigger rather than a second piece of state read at presentation time.
+private struct ViewerStart: Identifiable, Equatable {
+    let index: Int
+    var id: Int { index }
 }

@@ -24,6 +24,7 @@ class LiveStreamViewerViewModel: ObservableObject {
     private var presenceRepository: AmityRoomPresenceRepository?
     private var presenceTimer: Timer?
     @Published var watchingCount: Int = 0
+    @Published var viewerCountVisibility: LiveViewerCountVisibility = .alwaysShow
     
     // Watch minute tracking
     let watchMinuteTracker: WatchMinuteTracker
@@ -51,7 +52,14 @@ class LiveStreamViewerViewModel: ObservableObject {
         }
     }
     @Published var pinnedProductId: String?
-    
+
+    var isViewerRole: Bool {
+        let currentUserId = AmityUIKitManagerInternal.shared.client.currentUserId
+        let isHost = post.postedUserId == currentUserId
+        let isCoHost = coHostUser?.userId == currentUserId
+        return !isHost && !isCoHost
+    }
+
     init(post: AmityPostModel, tracker: WatchMinuteTracker = WatchMinuteTracker()) {
         self.post = post
         self.watchMinuteTracker = tracker
@@ -70,9 +78,11 @@ class LiveStreamViewerViewModel: ObservableObject {
         // Create live stream chat view model
         guard let room = post.room else { return }
         self.room = room
+        PiPState.shared.setActiveRoom(room.roomId)
         self.coHostUser = room.participants.first(where: { $0.type == "coHost" })?.user
         self.presenceRepository = AmityRoomPresenceRepository(roomId: room.roomId)
         observeWatchingCount()
+        fetchViewerCountConfig()
         
         // Start watch minute tracking for viewers in LIVE rooms
         if room.status == .live {
@@ -124,6 +134,18 @@ class LiveStreamViewerViewModel: ObservableObject {
     func stopPresenceHeartbeat() {
         self.presenceRepository?.stopHeartbeat()
     }
+
+    private func fetchViewerCountConfig() {
+        Task { @MainActor [weak self] in
+            do {
+                let config = try await AmityUIKitManagerInternal.shared.client.getLiveViewerCountConfig()
+                self?.viewerCountVisibility = LiveViewerCountVisibility(config: config)
+            } catch {
+                self?.viewerCountVisibility = .alwaysShow
+                Log.add(event: .error, "Failed to fetch live viewer count config: \(error.localizedDescription). Falling back to alwaysShow.")
+            }
+        }
+    }
     
     /// Manually refreshes product tags from the post snapshot (linked objects don't notify observers)
     func getPost() async {
@@ -147,16 +169,23 @@ class LiveStreamViewerViewModel: ObservableObject {
     func observeWatchingCount() {
         self.presenceTimer?.invalidate()
         self.presenceTimer = nil
-        
+
+        // Fetch once immediately so the count appears on join instead of only after the first
+        // 20s tick — otherwise the badge shows LIVE for up to 20s even when the count is already
+        updateWatchingCount()
         self.presenceTimer = Timer.scheduledTimer(withTimeInterval: 20.0, repeats: true, block: { [weak self]  _ in
-            Task.runOnMainActor {
-                do {
-                    self?.watchingCount = try await self?.presenceRepository?.getRoomUserCount() ?? 0
-                } catch {
-                    Log.add(event: .error, "Error while fetching room watching count: \(error.localizedDescription)")
-                }
-            }
+            self?.updateWatchingCount()
         })
+    }
+
+    private func updateWatchingCount() {
+        Task.runOnMainActor { [weak self] in
+            do {
+                self?.watchingCount = try await self?.presenceRepository?.getRoomUserCount() ?? 0
+            } catch {
+                Log.add(event: .error, "Error while fetching room watching count: \(error.localizedDescription)")
+            }
+        }
     }
     
     private func subscribePostEventAndObserve(postId: String) {

@@ -226,11 +226,18 @@ struct PostContentLiveStreamView: View {
             
             switch post.livestreamState {
             case .live, .recorded:
+                if let roomId = post.room?.roomId,
+                   PiPState.shared.isPiPActive(forRoomId: roomId) {
+                    PiPState.shared.restoreActivePiP()
+                    return
+                }
                 let livestreamPlayerPage = AmityLivestreamPlayerPage(post: post.object)
                 let hostController = AmitySwiftUIHostingNavigationController(rootView: livestreamPlayerPage)
                 hostController.isNavigationBarHidden = true
                 hostController.modalPresentationStyle = .overFullScreen
-                self.host.controller?.present(hostController, animated: true)
+                PiPState.shared.abandonActivePiP { presenter in
+                    presenter?.present(hostController, animated: true)
+                }
             default:
                 break
             }

@@ -392,4 +392,6 @@ public enum ElementId: String {
     case productTagListItem = "product_tag"
     // Livestream Pinned Product
     case livestreamPinnedProduct = "livestream_pinned_product"
+    // Livestream Viewer Count
+    case liveViewerCount = "live_viewer_count_element"
 }

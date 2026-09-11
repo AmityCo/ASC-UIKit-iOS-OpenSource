@@ -19,6 +19,11 @@ struct LiveStreamViewerView: View {
     @State private var isPlaying = true
     @State private var isPlaybackActive = true
     @State private var wasPlayingBeforeBackground = false
+
+    @State private var hasPlaybackError = false
+    @State private var hasStreamEnded = false
+    @State private var liveEdgeSeekToken = 0
+    @ObservedObject private var pipState = PiPState.shared
     @StateObject var networkMonitor = NetworkMonitor()
     @State var degreesRotating = 0.0
     
@@ -59,7 +64,8 @@ struct LiveStreamViewerView: View {
                     }
                     .padding(.horizontal, 16)
                     
-                } else if room.status == .ended || room.status == .recorded {
+                } else if (room.status == .ended || room.status == .recorded) && !pipState.isActive {
+                   
                     VStack(alignment: .center) {
                         Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedTitle.localizedString)
                             .applyTextStyle(.titleBold(Color.white))
@@ -74,7 +80,43 @@ struct LiveStreamViewerView: View {
                 } else {
                     ZStack(alignment: .topTrailing) {
                         // Video player fills entire screen                        
-                        LiveStreamPlayerView(streamURL: URL(string: room.livePlaybackUrl ?? "")!, isPlaying: isPlaying, onPlayingChange: { isPlaybackActive = $0 })
+                    
+                        LiveStreamPlayerView(streamURL: URL(string: room.livePlaybackUrl ?? ""), isPlaying: isPlaying, seekToLiveToken: liveEdgeSeekToken,
+                            onPlayingChange: {
+                                isPlaybackActive = $0
+                            },
+                            onRestoreFromPiP: {
+                            // PDT-4387 Story 5: a ban/deletion/termination doesn't change
+                            // room.status (the stream is still .live), so on expand we must
+                            // NOT resume.
+                            let hasPushedTerminalScreen = viewModel.isStreamTerminated
+                            let hasInPageTerminalScreen = viewModel.isPostDeleted
+                                || hasPlaybackError
+                                || hasStreamEnded
+                            let isTerminal = hasPushedTerminalScreen || hasInPageTerminalScreen
+                            if let hostVC = host.controller {
+                                if hostVC.presentedViewController != nil {
+                                    hostVC.dismiss(animated: true)
+                                } else if !hasPushedTerminalScreen, let nav = hostVC.navigationController,
+                                          nav.topViewController !== hostVC {
+                                    nav.popToViewController(hostVC, animated: true)
+                                }
+                            }
+                            if !isTerminal, viewModel.room?.status == .live {
+                                isPlaying = true
+                                liveEdgeSeekToken += 1
+                            }
+                        }, onStopFromPiP: {
+                            isPlaying = false
+                        }, onPlaybackError: {
+                            // PDT-4387 Story 5: stop the window immediately (freeze);
+                            // PiP persists, expand shows the unavailable state.
+                            isPlaying = false
+                            hasPlaybackError = true
+                        }, onPlaybackRecovered: {
+                            if hasPlaybackError { hasPlaybackError = false }
+                            if hasStreamEnded { hasStreamEnded = false }
+                        })
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .clipped()
                             .dismissKeyboardOnDrag()
@@ -88,30 +130,11 @@ struct LiveStreamViewerView: View {
 
                         HStack {
                             // Live badge overlay in original position (top-leading)
-                            HStack(alignment: .center, spacing: 4) {
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 6, height: 6)
-                                
-                                if viewModel.watchingCount > 0 {
-                                    Image(AmityIcon.Chat.membersCount.imageResource)
-                                        .renderingMode(.template)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 16, height: 14)
-                                        .foregroundColor(Color.white)
-                                    
-                                    Text("\(viewModel.watchingCount.formattedCountString)")
-                                        .applyTextStyle(.captionBold(.white))
-                                } else {
-                                    Text(AmityLocalizedStringSet.General.live.localizedString)
-                                        .applyTextStyle(.captionBold(.white))
-                                }
-                            }
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 4)
-                            .background(Color.black.opacity(0.5))
-                            .cornerRadius(4, corners: .allCorners)
+                            LiveViewerCountElement(
+                                pageId: .livestreamPlayerPage,
+                                visibility: viewModel.viewerCountVisibility,
+                                watchingCount: viewModel.watchingCount
+                            )
                             
                             Image(AmityIcon.LiveStream.menu.imageResource)
                                 .resizable()
@@ -130,6 +153,12 @@ struct LiveStreamViewerView: View {
                                     let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .livestream, id: viewModel.post.postId)
                                     ShareActivitySheetView(link: shareLink)
                                 }
+                                .onChange(of: showBottomSheet) { _ in
+                                    PiPState.shared.setAutoPiPSuppressed(showBottomSheet || showShareSheet)
+                                }
+                                .onChange(of: showShareSheet) { _ in
+                                    PiPState.shared.setAutoPiPSuppressed(showBottomSheet || showShareSheet)
+                                }
                                 .onTapGesture {
                                     showBottomSheet.toggle()
                                 }
@@ -143,22 +172,7 @@ struct LiveStreamViewerView: View {
                 // Stream is not available but request to fetch stream is complete.
             }
             else if viewModel.isLoaded {
-                VStack(alignment: .center) {
-                    Image(AmityIcon.livestreamErrorIcon.getImageResource())
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 32, height: 32)
-                        .padding(.bottom, 12)
-                    
-                    Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableTitle.localizedString)
-                        .applyTextStyle(.titleBold(Color.white))
-                        .padding(.bottom, 4)
-                    
-                    Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableMessage.localizedString)
-                        .applyTextStyle(.caption(Color.white))
-                        .multilineTextAlignment(.center)
-                }
-                .padding(.horizontal, 16)
+                livestreamUnavailableView
             }
             
             
@@ -284,8 +298,7 @@ struct LiveStreamViewerView: View {
                                 .foregroundColor(Color.white)
                                 .padding(2)
                                 .onTapGesture {
-                                    viewModel.cleanup()
-                                    host.controller?.dismissOrPop()
+                                    closeLivestream()
                                 }
                             
                             // Community and streamer info
@@ -419,6 +432,55 @@ struct LiveStreamViewerView: View {
                     isPlaying = false
                 }
             }
+
+            ZStack {
+                Color.black.ignoresSafeArea()
+                livestreamUnavailableView
+                // Keep a close affordance — this overlay covers the top bar's ✕.
+                VStack {
+                    HStack {
+                        Image(AmityIcon.LiveStream.close.imageResource)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(Color.white)
+                            .padding(2)
+                            .onTapGesture {
+                                closeLivestream()
+                            }
+                        Spacer()
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+            }
+            .opacity(hasPlaybackError ? 1 : 0)
+            .allowsHitTesting(hasPlaybackError)
+
+            ZStack {
+                Color.black.ignoresSafeArea()
+                livestreamEndedView
+                VStack {
+                    HStack {
+                        Image(AmityIcon.LiveStream.close.imageResource)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(Color.white)
+                            .padding(2)
+                            .onTapGesture {
+                                closeLivestream()
+                            }
+                        Spacer()
+                    }
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+            }
+            .opacity(hasStreamEnded ? 1 : 0)
+            .allowsHitTesting(hasStreamEnded)
         }
         .onChange(of: networkMonitor.isConnected) { isConnected in
             if !isConnected {
@@ -429,7 +491,11 @@ struct LiveStreamViewerView: View {
         }
         .onChange(of: viewModel.isStreamTerminated) { isTerminated in
             guard isTerminated else { return }
-            
+
+            // POC (PDT-4099) #9/#10: do NOT stop PiP on end/termination — leave the
+            // PiP window showing (black / last frame). The user closes or restores
+            // it themselves, then sees the ended/terminated screen.
+
             // Show terminated screen
             let terminatedVc = AmitySwiftUIHostingController(rootView: AmityLivestreamTerminatedPage(type: .watcher, onDismiss: {
                 viewModel.cleanup()
@@ -442,7 +508,7 @@ struct LiveStreamViewerView: View {
         }
         .onChange(of: viewModel.isBannedFromStream) { isBanned in
             guard isBanned else { return }
-            
+
             // unobserve post and stream
             viewModel.cleanup()
             
@@ -461,21 +527,107 @@ struct LiveStreamViewerView: View {
             bannedVC.modalPresentationStyle = .overFullScreen
             self.host.controller?.navigationController?.pushViewController(bannedVC, animated: false)
         }
+        .onChange(of: viewModel.room?.status) { status in
+            // PDT-4387 Story 5: terminal room states stop window playback immediately
+            // (freeze on last frame); PiP persists, expand shows the right screen.
+            // .ended → ended screen; .error → unavailable screen (control-plane
+            // playback failure, Scenario 3). Recorded is a separate surface.
+            if status == .ended {
+                isPlaying = false
+            } else if status == .terminated {
+                isPlaying = false
+                hasStreamEnded = true
+            } else if status == .error {
+                isPlaying = false
+                hasPlaybackError = true
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
             wasPlayingBeforeBackground = isPlaying
-            if isPlaying {
+      
+            let pipContext = PiPEligibility.Context(
+                isViewer: viewModel.isViewerRole,
+                roomStatus: viewModel.room?.status,
+                hasPlayableURL: !(viewModel.room?.livePlaybackUrl ?? "").isEmpty,
+                isLivestreamSurface: true,
+                isDeliberateExit: false // backgrounding is not a deliberate exit
+            )
+            let keepPlayingForPiP = PiPState.shared.isEnabled && PiPEligibility.isAllowed(pipContext)
+            if isPlaying && !keepPlayingForPiP {
                 isPlaying = false
-                viewModel.watchMinuteTracker.pauseTracking()
+            } else if isPlaying {
+                // PDT-4384 Scenario 5: we kept playing so iOS can auto-enter PiP.
+                // If PiP does NOT start (e.g. the viewer turned off "Start Picture
+                // in Picture Automatically" in Settings) iOS never fires
+                // failedToStart — it just doesn't start, and the `audio` background
+                // mode would otherwise keep playing audio-only with no window. So if
+                // PiP hasn't become active shortly after backgrounding, pause.
+                // Guarded so we never pause after the user has returned to foreground.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    if !PiPState.shared.isActive,
+                       UIApplication.shared.applicationState != .active {
+                        isPlaying = false
+                    }
+                }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             guard wasPlayingBeforeBackground else { return }
             isPlaying = true
-            viewModel.watchMinuteTracker.resumeTracking()
+            // POC (PDT-4099) #12: coming back from PiP/background — snap to live
+            // edge so the viewer isn't left watching a delayed position.
+            if viewModel.room?.status == .live {
+                liveEdgeSeekToken += 1
+            }
+        }
+        .onChange(of: isPlaybackActive) { active in
+            // POC (PDT-4099) fix #12: drive watch-minute tracking from the
+            // player's actual play-state so PiP (background) minutes are counted.
+            // A live stream can't be paused in PiP, so it stays "playing"
+            // throughout — no risk of overcounting.
+            if active {
+                viewModel.watchMinuteTracker.resumeTracking()
+            } else {
+                viewModel.watchMinuteTracker.pauseTracking()
+            }
         }
         .environmentObject(viewConfig)
     }
     
+    // The livestream-specific error/unavailable screen. Shown when the stream is
+    // loaded but unplayable, and reused for the PiP playback-error state (PDT-4387).
+    private var livestreamUnavailableView: some View {
+        VStack(alignment: .center) {
+            Image(AmityIcon.livestreamErrorIcon.getImageResource())
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 32, height: 32)
+                .padding(.bottom, 12)
+
+            Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableTitle.localizedString)
+                .applyTextStyle(.titleBold(Color.white))
+                .padding(.bottom, 4)
+
+            Text(AmityLocalizedStringSet.Social.livestreamPlayerUnavailableMessage.localizedString)
+                .applyTextStyle(.caption(Color.white))
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, 16)
+    }
+
+    private var livestreamEndedView: some View {
+        VStack(alignment: .center) {
+            Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedTitle.localizedString)
+                .applyTextStyle(.titleBold(Color.white))
+                .padding(.bottom, 4)
+
+            Text(AmityLocalizedStringSet.Social.livestreamPlayerEndedMessage.localizedString)
+                .applyTextStyle(.caption(Color.white))
+                .multilineTextAlignment(.center)
+        }
+        .padding(.horizontal, 16)
+    }
+
     @ViewBuilder
     private var liveReactionView: some View {
         if let liveChatViewModel = viewModel.liveStreamChatViewModel {
@@ -704,17 +856,20 @@ struct LiveStreamViewerView: View {
         .allowsHitTesting(controls.isVisible)
     }
 
+    /// Leave the livestream on purpose. Stops the floating window too — PiP is for
+    /// navigating away, so it must not outlive a deliberate close.
+    private func closeLivestream() {
+        PiPState.shared.stopActivePiPForDeliberateExit()
+        viewModel.cleanup()
+        host.controller?.dismissOrPop()
+    }
+
     func surfaceTapped() {
         controls.tapOverlay(isPlaying: isPlaying)
     }
 
     func togglePlayPause() {
         isPlaying.toggle()
-        if isPlaying {
-            viewModel.watchMinuteTracker.resumeTracking()
-        } else {
-            viewModel.watchMinuteTracker.pauseTracking()
-        }
         controls.show(autoHide: isPlaying)
     }
 }

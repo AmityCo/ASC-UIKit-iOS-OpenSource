@@ -42,6 +42,11 @@ public struct AmityClipFeedPage: AmityPageView {
     public var body: some View {
         ClipFeedView(clipProvider: provider, onTapAction: onTapAction)
             .updateTheme(with: viewConfig)
+            .onAppear {
+                // Clips are excluded from PiP — close any floating livestream
+                // window so two players never run at once.
+                PiPState.shared.stopActivePiPForExcludedSurface()
+            }
     }
 }
 

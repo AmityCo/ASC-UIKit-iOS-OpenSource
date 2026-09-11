@@ -24,6 +24,9 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
     private var timeObserver: Any?
     private var pendingSeekTarget: Double?
     private var wasPlayingBeforeBackground = false
+    
+    private(set) var isPictureInPictureEnabled = false
+    let pipController = AmityPipController()
 
     func configure(playerLayer: AVPlayerLayer) {
         self.player = playerLayer.player
@@ -39,6 +42,27 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
 
         configureObservers()
         configurePlayerItem()
+
+        if isPictureInPictureEnabled {
+            pipController.attach(to: playerLayer)
+        }
+    }
+
+    func enablePictureInPicture(roomId: String? = nil, onRestore: (() -> Void)? = nil) {
+        isPictureInPictureEnabled = true
+        pipController.onStopUI = { [weak self] in
+            // Deliberate stop (✕ on the window): also clear the resume flag so a
+            // later foreground doesn't resurrect the playback the user stopped.
+            self?.wasPlayingBeforeBackground = false
+            self?.pause()
+        }
+        pipController.onRestoreUI = onRestore
+        if let roomId {
+            PiPState.shared.setActiveRoom(roomId)
+        }
+        if let playerLayer = playerLayer {
+            pipController.attach(to: playerLayer)
+        }
     }
     
     private func configureObservers() {
@@ -74,13 +98,37 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
             name: UIApplication.didBecomeActiveNotification,
             object: nil
         )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDidEnterBackground),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil
+        )
     }
 
     @objc private func handleWillResignActive() {
         wasPlayingBeforeBackground = isPlaying
     }
 
+    @objc private func handleDidEnterBackground() {
+        // Parity with the live viewer: if PiP is enabled but doesn't actually
+        // start (e.g. "Start Picture in Picture Automatically" is off in
+        // Settings), iOS never fires a delegate — it just doesn't start. The
+        // `audio` background mode would otherwise keep the recording playing
+        // audio-only with no window. So if PiP hasn't become active shortly
+        // after backgrounding, pause. Guarded so we never pause once foregrounded.
+        if isPictureInPictureEnabled, isPlaying {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                if !PiPState.shared.isActive,
+                   UIApplication.shared.applicationState != .active {
+                    self?.pause()
+                }
+            }
+        }
+    }
+
     @objc private func handleDidBecomeActive() {
+        if isPictureInPictureEnabled && PiPState.shared.isActive { return }
         if wasPlayingBeforeBackground {
             play()
         }
@@ -162,10 +210,15 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
     }
     
     func toggleMute() {
-        isMuted.toggle()
-        player?.isMuted = isMuted
+        setMuted(!isMuted)
     }
-    
+
+    func setMuted(_ muted: Bool) {
+        guard isMuted != muted else { return }
+        isMuted = muted
+        player?.isMuted = muted
+    }
+
     func mute() {
         isMuted = true
         player?.isMuted = true
@@ -259,7 +312,9 @@ class AmityMediaPlayerController: NSObject, ObservableObject {
     
     func cleanup() {
         pause()
-        
+
+        pipController.detach()
+
         if let timeObserver = timeObserver {
             player?.removeTimeObserver(timeObserver)
             self.timeObserver = nil

@@ -852,6 +852,9 @@
         "livestream_player_page/*/*": {
             "theme": {}
         },
+        "livestream_player_page/*/live_viewer_count_element": {
+            "theme": {}
+        },
         "livestream_player_page/product_tag_list_bottomsheet/*": {
             "theme": {
                 "light": {

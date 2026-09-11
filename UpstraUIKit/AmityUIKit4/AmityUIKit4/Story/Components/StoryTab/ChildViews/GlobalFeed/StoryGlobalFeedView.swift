@@ -33,11 +33,18 @@ struct StoryGlobalFeedView: View {
                     viewModel.loadMoreLiveStreamPostsIfHas(index)
                 }
                 .onTapGesture {
+                    if let roomId = post.room?.roomId,
+                       PiPState.shared.isPiPActive(forRoomId: roomId) {
+                        PiPState.shared.restoreActivePiP()
+                        return
+                    }
                     let livestreamPlayerPage = AmityLivestreamPlayerPage(postModel: post)
                     let hostController = AmitySwiftUIHostingNavigationController(rootView: livestreamPlayerPage)
                     hostController.isNavigationBarHidden = true
                     hostController.modalPresentationStyle = .overFullScreen
-                    storyTabComponent.host.controller?.present(hostController, animated: true)
+                    PiPState.shared.abandonActivePiP { presenter in
+                        presenter?.present(hostController, animated: true)
+                    }
                 }
         }
     }

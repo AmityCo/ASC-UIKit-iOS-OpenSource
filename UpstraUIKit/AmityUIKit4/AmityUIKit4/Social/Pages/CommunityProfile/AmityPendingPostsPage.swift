@@ -156,6 +156,9 @@ class AmityPendingPostPageViewModel: ObservableObject {
     }
     
     func getPendingCommunityFeedPosts() {
+        /// A reload starts every carousel at frame 1 rather than restoring where it was
+        PostMediaCarouselPositionStore.shared.reset()
+
         feedCollection = feedManager.getPendingCommunityFeedPosts(communityId: community.communityId)
         feedCollection?.$snapshots
             .sink(receiveValue: { [weak self] posts in

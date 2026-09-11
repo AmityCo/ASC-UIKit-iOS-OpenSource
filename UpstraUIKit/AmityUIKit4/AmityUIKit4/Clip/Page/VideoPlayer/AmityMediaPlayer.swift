@@ -21,13 +21,16 @@ import AVKit
 /// - Thumbnail generation for current video
 struct AmityMediaPlayer: UIViewRepresentable {
     let url: URL
-    
+
     @ObservedObject
     var controller: AmityMediaPlayerController
-    
-    init(url: URL, controller: AmityMediaPlayerController) {
+
+    let autoPlay: Bool
+
+    init(url: URL, controller: AmityMediaPlayerController, autoPlay: Bool = true) {
         self.url = url
         self.controller = controller
+        self.autoPlay = autoPlay
     }
     
     func makeUIView(context: Context) -> UIView {
@@ -47,8 +50,10 @@ struct AmityMediaPlayer: UIViewRepresentable {
 
         controller.configure(playerLayer: playerLayer)
 
-        DispatchQueue.main.async {
-            controller.play()
+        if autoPlay {
+            DispatchQueue.main.async {
+                controller.play()
+            }
         }
 
         return view

@@ -38,9 +38,7 @@ final class AmityGroupSettingViewModel: ObservableObject {
             guard let self, let ch = obj.snapshot else { return }
             self.channel = ch
             self.displayName = ch.displayName ?? ""
-            if let urlStr = ch.getAvatarInfo()?.mediumFileURL {
-                self.avatarURL = URL(string: urlStr)
-            }
+            self.avatarURL = ch.resolvedChannelAvatarURL(size: .medium)
             let roles = ch.currentMember?.roles ?? []
             self.isModerator = roles.contains("channel-moderator")
             self.isLoading = false

@@ -49,8 +49,8 @@ public class AmityLiveChatHeaderViewModel: ObservableObject {
         let channelMemberCount = channel.memberCount
         self.memberCount = channelMemberCount
         
-        if let fileURL = channel.getAvatarInfo()?.fileURL, let url = URL(string: fileURL) {
-            self.avatarURL = url
-        }
+        /// Gated on `avatarFileId`, not `getAvatarInfo()`: the SDK's cached `avatar` relationship
+        /// can still point at the removed file (PDT-5070), while the id is always current.
+        self.avatarURL = channel.resolvedChannelAvatarURL()
     }
 }

@@ -49,9 +49,7 @@ final class AmityChatPageViewModel: ObservableObject {
             guard let self, let ch = obj.snapshot else { return }
             if ch.channelType != .conversation {
                 self.displayName = ch.displayName ?? ""
-                if let urlStr = ch.getAvatarInfo()?.fileURL {
-                    self.avatarURL = URL(string: urlStr)
-                }
+                self.avatarURL = ch.resolvedChannelAvatarURL()
             }
             self.isMuted = ch.isMuted
         }

@@ -344,6 +344,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case eventAttendeeIcon = "eventAttendeeIcon"
     case eventRSVPBellIcon = "eventRSVPBellIcon"
     case tagIcon = "tagIcon"
+    case productTagFilledIcon = "productTagFilledIcon"
     case livestreamPostPlayerActionButton = "livestream_post_player_action_button"
     case postPlayerActionButton = "video_post_player_action_button"
     case notiLiveBadge = "noti_live_badge"

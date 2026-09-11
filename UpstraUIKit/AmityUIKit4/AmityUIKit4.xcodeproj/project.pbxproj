@@ -429,6 +429,7 @@
 				Core/Extenral/VideoPlayer/GSPlayer/Classes/View/VideoFullscreenTransitioner.swift,
 				Core/Extenral/VideoPlayer/GSPlayer/Classes/View/VideoPlayerView.swift,
 				Core/Extenral/VideoPlayer/VideoPlayer.swift,
+				"Core/Extensions/AmityChannel+AvatarResolution.swift",
 				"Core/Extensions/AmityChannel+Extension.swift",
 				"Core/Extensions/AmityCommunityMember+Extension.swift",
 				"Core/Extensions/AmityCommunityNotificaitonSettings+Extension.swift",
@@ -488,6 +489,7 @@
 				Core/Utilities/AmityDesignSystemIcon.generated.swift,
 				Core/Utilities/AmityFileCache.swift,
 				Core/Utilities/AmityIcon.swift,
+				Core/Utilities/AmityInAppBrowser.swift,
 				Core/Utilities/AmityLocalizedStringSet.swift,
 				Core/Utilities/AmityPreviewLinkWizard.swift,
 				Core/Utilities/AmitySwiftUIHostWrapper.swift,
@@ -505,6 +507,9 @@
 				Core/Utilities/ImpactFeedbackGenerator.swift,
 				Core/Utilities/KeyboardHelper.swift,
 				Core/Utilities/Log.swift,
+				Core/Utilities/Media/MediaAspectRatio.swift,
+				Core/Utilities/Media/MediaDimensionResolver.swift,
+				Core/Utilities/Media/PostMediaCap.swift,
 				Core/Utilities/MessageReactionConfiguration.swift,
 				Core/Utilities/NetworkMonitor.swift,
 				Core/Utilities/PermissionChecker.swift,
@@ -573,6 +578,7 @@
 				LiveStream/LiveStreamAlert.swift,
 				LiveStream/Shared/Component/ManageProductTagListComponent.swift,
 				LiveStream/Shared/Element/LivestreamPinnedProductElement.swift,
+				LiveStream/Shared/Element/LiveViewerCountElement.swift,
 				LiveStream/Shared/Element/ManageProductTagElement.swift,
 				LiveStream/Shared/Element/ProductTaggingButtonElement.swift,
 				LiveStream/ViewLiveStream/AmityLivestreamPlayerPage.swift,
@@ -581,6 +587,8 @@
 				LiveStream/ViewLiveStream/LiveStreamViewerViewModel.swift,
 				LiveStream/ViewLiveStream/Player/LiveStreamPlaybackPlayerView.swift,
 				LiveStream/ViewLiveStream/Player/LiveStreamPlayerView.swift,
+				LiveStream/ViewLiveStream/Player/PiP/AmityPipController.swift,
+				LiveStream/ViewLiveStream/Player/PiP/PiPEligibility.swift,
 				LiveStream/ViewLiveStream/Player/RecordedStreamPlayerView.swift,
 				LiveStream/ViewLiveStream/WatchMinuteTracker.swift,
 				PrivacyInfo.xcprivacy,
@@ -642,6 +650,9 @@
 				Social/Components/PostDetail/PostContent/PostBottomSheetView.swift,
 				Social/Components/PostDetail/PostContent/PostContentEventView.swift,
 				Social/Components/PostDetail/PostContent/PostContentMediaView.swift,
+				Social/Components/PostDetail/PostContent/PostMediaCarouselView.swift,
+				Social/Components/PostDetail/PostContent/PostMediaFrameView.swift,
+				Social/Components/PostDetail/PostContent/PostMediaPaginationIndicator.swift,
 				Social/Components/PostDetail/PostContentSkeletonView.swift,
 				Social/Components/Products/ProductTagList/Components/AmityProductTagListComponent.swift,
 				Social/Components/Products/ProductTagList/Elements/AmityProductTagElement.swift,
@@ -761,6 +772,8 @@
 				Social/Pages/PostCreation/PostComposer/AmityPostComposerPage.swift,
 				Social/Pages/PostCreation/PostComposer/AmityPostComposerViewModel.swift,
 				Social/Pages/PostCreation/PostCreationMediaAttachmentPreviewView.swift,
+				Social/Pages/PostCreation/SelectedMediaCarouselView.swift,
+				Social/Pages/PostCreation/SelectedMediaFrameView.swift,
 				Social/Pages/PostCreation/TargetSelection/AmityEventPostTargetSelectionPage.swift,
 				Social/Pages/PostCreation/TargetSelection/AmityLivestreamPostTargetSelectionPage.swift,
 				Social/Pages/PostCreation/TargetSelection/AmityPollTargetSelectionPage.swift,
@@ -966,7 +979,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				7BFCAB59CA0AADFF7F542E7D /* SharedFrameworks */,
+				57A3752A9B645634F3330046 /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -1018,7 +1031,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				1C5590E9372CC88E7AE895E0 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				388D09A5B0DC404091416B3C /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1376,16 +1389,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		1C5590E9372CC88E7AE895E0 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		388D09A5B0DC404091416B3C /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		7BFCAB59CA0AADFF7F542E7D /* SharedFrameworks */ = {
+		57A3752A9B645634F3330046 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1C5590E9372CC88E7AE895E0 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 388D09A5B0DC404091416B3C /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -53,6 +53,10 @@ public class AmityMedia: Equatable, Hashable, Identifiable, ObservableObject {
     var localUrl: URL?
     
     var localUIImage: UIImage?
+
+    /// The `PHAsset` identifier this media came from, when it came from the photo picker.
+    /// Used to exclude a re-selected item silently.
+    var assetIdentifier: String?
     
     /// Thumbnail image that is generated from local video url.
     ///

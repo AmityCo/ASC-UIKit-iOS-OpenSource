@@ -211,9 +211,7 @@ final class AmityGroupChatPageViewModel: ObservableObject {
             guard let self, let ch = obj.snapshot else { return }
             self.channel = ch
             self.displayName = ch.displayName ?? ""
-            if let urlStr = ch.getAvatarInfo()?.fileURL {
-                self.avatarURL = URL(string: urlStr)
-            }
+            self.avatarURL = ch.resolvedChannelAvatarURL()
             let currentUserId = AmityUIKitManagerInternal.shared.client.currentUserId ?? ""
             let roles = ch.currentMember?.roles ?? []
             self.isModerator = roles.contains("channel-moderator")

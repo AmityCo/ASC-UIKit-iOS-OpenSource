@@ -122,8 +122,6 @@ public struct AmityPendingPostContentComponent: AmityComponentView {
                 postContentTextView()
                 
                 PostContentMediaView(post: post, viewConfig: viewConfig)
-                .frame(height: 328)
-                .clipShape(RoundedCorner(radius: 8))
                 
             case .file:
                 EmptyView()

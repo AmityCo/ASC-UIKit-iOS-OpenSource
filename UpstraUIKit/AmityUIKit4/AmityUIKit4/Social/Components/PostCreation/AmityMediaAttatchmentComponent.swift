@@ -25,28 +25,31 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
     @ObservedObject private var viewModel: AmityMediaAttachmentViewModel
     @State private var attachedMediaType: AmityMediaType = .none
     @State private var currentType: AmityMediaType? = nil
-    
-    public init(viewModel: AmityMediaAttachmentViewModel, pageId: PageId? = nil) {
+
+    private let onProductTagTap: (() -> Void)?
+
+    public init(viewModel: AmityMediaAttachmentViewModel, pageId: PageId? = nil, onProductTagTap: (() -> Void)? = nil) {
         self.pageId = pageId
         self.viewModel = viewModel
+        self.onProductTagTap = onProductTagTap
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .mediaAttachment))
     }
     
     
     public var body: some View {
-        HStack(alignment: .center, spacing: 0) {
-        
-            Spacer()
-                .isHidden(currentType == nil, remove: true)
-             
+        HStack(spacing: 56) {
             let cameraButtonIcon = viewConfig.getConfig(elementId: .cameraButton, key: "image", of: String.self) ?? ""
             getItemView(image: AmityIcon.getImageResource(named: cameraButtonIcon), isHidden: false) {
-                if let currentType = currentType {
+                // Read live rather than from `currentType`, which is only refreshed on the next pass
+                // and would let the camera offer video for an image post.
+                if let currentType = viewModel.medias.first?.type {
                     showCamera.type = currentType == .image ? [UTType.image] : [UTType.movie]
                 } else {
                     showCamera.type = [UTType.image, UTType.movie]
                 }
-                
+
+                pickerViewModel.reset()
+
                 showCamera.source = .camera
                 showCamera.isShown.toggle()
                 hideKeyboard()
@@ -54,11 +57,10 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
             .isHidden(viewConfig.isHidden(elementId: .cameraButton))
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.cameraButton)
 
-            Spacer()
-                .isHidden(currentType == .video, remove: true)
-            
             let imageButtonIcon = viewConfig.getConfig(elementId: .imageButton, key: "image", of: String.self) ?? ""
             getItemView(image: AmityIcon.getImageResource(named: imageButtonIcon), isHidden: viewModel.medias.first?.type ?? .image != .image) {
+                pickerViewModel.reset()
+
                 showMediaPicker.type = .images
                 showMediaPicker.source = .photoLibrary
                 showMediaPicker.isShown.toggle()
@@ -66,12 +68,11 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
             }
             .isHidden(viewConfig.isHidden(elementId: .imageButton))
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.imageButton)
-            
-            Spacer()
-                .isHidden(currentType == .image, remove: true)
-            
+
             let videoButtonIcon = viewConfig.getConfig(elementId: .videoButton, key: "image", of: String.self) ?? ""
             getItemView(image: AmityIcon.getImageResource(named: videoButtonIcon), isHidden: viewModel.medias.first?.type ?? .video != .video) {
+                pickerViewModel.reset()
+
                 showMediaPicker.type = .videos
                 showMediaPicker.source = .photoLibrary
                 showMediaPicker.isShown.toggle()
@@ -79,25 +80,31 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
             }
             .isHidden(viewConfig.isHidden(elementId: .videoButton))
             .accessibilityIdentifier(AccessibilityID.Social.MediaAttachment.videoButton)
-            
-            Spacer()
-                .isHidden(currentType == nil, remove: true)
-            
+
+            if productTagCount > 0 {
+                productTagItem
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding(.bottom, 10)
-        .padding([.leading, .trailing], 25)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 24)
         .onChange(of: pickerViewModel) { _ in
-            guard viewModel.medias.count <= 10 else {
+
+            // Note:
+            // This onChange(of: pickerViewModel) is being called multiple times
+            // leading to app freeze issue.
+            guard pickerViewModel.haveSelection else {
+                return
+            }
+
+            guard viewModel.medias.count <= PostMediaCap.maximum else {
                 Log.add(event: .error, "Media item count limit reached.")
-                pickerViewModel.selectedMedia = nil
-                pickerViewModel.selectedImage = nil
-                pickerViewModel.selectedMediaURL = nil
-                
+                pickerViewModel.reset()
+
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     showMaximumMediaAlert.toggle()
                 }
-                
+
                 return
             }
             currentType = viewModel.medias.first?.type
@@ -105,32 +112,47 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
             // Camera mode
             if let selectedMedia = pickerViewModel.selectedMedia, let url = pickerViewModel.selectedMediaURL {
                 let mediaType: AmityMediaType = selectedMedia == UTType.image.identifier ? .image : .video
-                var media = AmityMedia(state: .localURL(url: url), type: mediaType)
+                let media = AmityMedia(state: .localURL(url: url), type: mediaType)
                 media.localUrl = url
                 viewModel.medias.append(media)
             }
             
+            let attachedIdentifiers = Set(viewModel.medias.compactMap { $0.assetIdentifier })
+
             if !pickerViewModel.selectedImages.isEmpty {
-                for image in pickerViewModel.selectedImages {
+                for (offset, image) in pickerViewModel.selectedImages.enumerated() {
+                    let identifier = pickerViewModel.selectedImageIdentifiers.indices.contains(offset)
+                        ? pickerViewModel.selectedImageIdentifiers[offset]
+                        : nil
+
+                    // Re-selecting an already-attached item is skipped silently: no error, no toast.
+                    if let identifier, attachedIdentifiers.contains(identifier) { continue }
+
                     let media = AmityMedia(state: .image(image), type: .image)
                     media.localUIImage = image
+                    media.assetIdentifier = identifier
                     viewModel.medias.append(media)
                 }
             }
             
             if !pickerViewModel.selectedVidoesURLs.isEmpty {
-                for url in pickerViewModel.selectedVidoesURLs {
+                for (offset, url) in pickerViewModel.selectedVidoesURLs.enumerated() {
+                    let identifier = pickerViewModel.selectedVideoIdentifiers.indices.contains(offset)
+                        ? pickerViewModel.selectedVideoIdentifiers[offset]
+                        : nil
+
+                    if let identifier, attachedIdentifiers.contains(identifier) { continue }
+
                     let media = AmityMedia(state: .localURL(url: url), type: .video)
                     media.localUrl = url
+                    media.assetIdentifier = identifier
                     viewModel.medias.append(media)
                 }
             }
             
-            pickerViewModel.selectedMedia = nil
-            pickerViewModel.selectedVidoesURLs = []
-            pickerViewModel.selectedImages = []
-            pickerViewModel.selectedImage = nil
-            pickerViewModel.selectedMediaURL = nil
+            // Must clear the identifier arrays too — they are read by position against the image/URL
+            // arrays, so clearing only one side leaves every later pick reading the first pick's id.
+            pickerViewModel.reset()
         }
         .onAppear {
             currentType = viewModel.medias.first?.type
@@ -144,15 +166,39 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                 .ignoresSafeArea()
         }
         .fullScreenCover(isPresented: $showMediaPicker.isShown) {
-            MultiSelectionMediaPicker(viewModel: pickerViewModel, mediaType: $showMediaPicker.type, sourceType: $showMediaPicker.source, selectionLimit: 10 - viewModel.medias.count)
+            MultiSelectionMediaPicker(viewModel: pickerViewModel, mediaType: $showMediaPicker.type, sourceType: $showMediaPicker.source, selectionLimit: PostMediaCap.maximum - viewModel.medias.count)
                 .ignoresSafeArea()
         }
     }
     
     
+    /// Counts tags on the frames only. `postComposerViewModel.productTags` also carries tags parsed
+    /// from body text, which would make this disagree with the frames it sits under.
+    private var productTagCount: Int {
+        viewModel.medias.reduce(0) { $0 + $1.produtTags.count }
+    }
+
     @ViewBuilder
-    private func getItemView(image: ImageResource, isHidden: Bool, onTapAction: @escaping () -> Void) -> some View {
-        let isDisable = viewModel.medias.count >= 10
+    private var productTagItem: some View {
+        getItemView(image: AmityIcon.LiveStream.emptyProductTaggingIcon.imageResource, isHidden: false, glyphSize: 28) {
+            onProductTagTap?()
+        }
+        .overlay(
+            Text("\(productTagCount)")
+                .applyTextStyle(.body(.white))
+                .padding(.horizontal, 6)
+                .frame(minWidth: 22, minHeight: 22)
+                .background(Capsule().fill(Color(viewConfig.theme.baseColor)))
+                .offset(x: 8, y: -8),
+            alignment: .topTrailing
+        )
+    }
+
+    @ViewBuilder
+    /// `glyphSize` defaults to the media icons' 24. The tag asset is drawn on a 48pt canvas with only
+    /// 66% ink, so it needs a larger frame to carry the same visual weight.
+    private func getItemView(image: ImageResource, isHidden: Bool, glyphSize: CGFloat = 24, onTapAction: @escaping () -> Void) -> some View {
+        let isDisable = viewModel.medias.count >= PostMediaCap.maximum
         let currentThemeStyle = AmityUIKitConfigController.shared.getCurrentThemeStyle()
         let imageTint = currentThemeStyle == .light ? viewConfig.theme.baseColor : UIColor.white
         Rectangle()
@@ -164,7 +210,7 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
                     .resizable()
                     .scaledToFill()
                     .foregroundColor(isDisable ? Color(viewConfig.theme.baseColorShade3) : Color(imageTint))
-                    .frame(width: 20, height: 20)
+                    .frame(width: glyphSize, height: glyphSize)
             )
             .clipShape(Circle())
             .contentShape(Rectangle())

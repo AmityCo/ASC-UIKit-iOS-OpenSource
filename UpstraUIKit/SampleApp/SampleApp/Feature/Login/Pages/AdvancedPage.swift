@@ -97,6 +97,12 @@ struct AdvancedPage: View {
             LoginToggleCardRow(title: "Hide Explore", isOn: $store.config.hideExplore)
             LoginRowDivider()
             LoginToggleCardRow(title: "Social Community Creation Button", isOn: $store.config.socialCommunityCreationButtonVisible)
+            LoginRowDivider()
+            LoginToggleCardRow(
+                title: "In-app PiP Testing",
+                subtitle: "Click product tag on livestream to force to open home screen",
+                isOn: $store.inAppPipTesting
+            )
         }
     }
 

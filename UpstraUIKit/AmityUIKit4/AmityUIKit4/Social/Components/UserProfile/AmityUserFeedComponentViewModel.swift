@@ -40,6 +40,9 @@ class AmityUserFeedComponentViewModel: ObservableObject {
     }
     
     func loadPostFeed(feedSources: [AmityFeedSource]? = nil) {
+        /// A reload starts every carousel at frame 1 rather than restoring where it was
+        PostMediaCarouselPositionStore.shared.reset()
+
         if let feedSources {
             currentFeedSources = feedSources
         }

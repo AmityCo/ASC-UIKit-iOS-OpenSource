@@ -28,13 +28,40 @@ public class AmitySwiftUIHostingController<Content>: HostingController<ModifiedC
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    public override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {
+        if PiPState.shared.hasActiveController {
+            let style = viewControllerToPresent.modalPresentationStyle
+            if style == .fullScreen || style == .overFullScreen {
+                PiPState.shared.startPiPIfNeeded()
+            }
+        }
+        super.present(viewControllerToPresent, animated: flag, completion: completion)
+    }
+
+    /// Counterpart to the navigate-away starts above: coming BACK to the livestream
+    /// page collapses its floating window again. Handles returning by pop or dismiss,
+    /// which the entry-point restores (feed / story / event / notification tray) do not
+    /// cover — those only fire when the stream is opened afresh. No-ops for every other
+    /// page; `PiPState` identity-checks the registered livestream host.
+    public override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        PiPState.shared.restoreActivePiPIfReturningToLivestream(self)
+    }
 }
 
 public class AmitySwiftUIHostingNavigationController<Content>: UINavigationController where Content: View {
-    
+
     public convenience init(rootView: Content) {
         let hostingController = AmitySwiftUIHostingController(rootView: rootView)
         self.init(rootViewController: hostingController)
+    }
+
+    public override func pushViewController(_ viewController: UIViewController, animated: Bool) {
+        if PiPState.shared.hasActiveController {
+            PiPState.shared.startPiPIfNeeded()
+        }
+        super.pushViewController(viewController, animated: animated)
     }
 }
 
@@ -43,7 +70,7 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
 
     open override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         if let _ = AmityUIKit4Manager.behaviour.swipeToBackGestureBehavior {
             interactivePopGestureRecognizer?.delegate = self
         }

@@ -11,6 +11,7 @@ final class LoginConfigStore: ObservableObject {
     enum DefaultsKey {
         static let config = "asc_sample_login_config"
         static let lastAppliedEnv = "asc_sample_last_applied_env"
+        static let inAppPipTesting = "asc_sample_in_app_pip_testing"
     }
 
     @Published var config: LoginConfigModel {
@@ -19,6 +20,13 @@ final class LoginConfigStore: ObservableObject {
 
     @Published private(set) var lastAppliedEnv: AppliedEnvSnapshot? {
         didSet { persistLastAppliedEnv() }
+    }
+
+    /// QA-only switch. Deliberately kept out of `LoginConfigModel`: that model is decoded
+    /// all-or-nothing, so a new key would make every config persisted by an older build
+    /// fail to decode and silently reset the tester's saved environment.
+    @Published var inAppPipTesting: Bool {
+        didSet { defaults.set(inAppPipTesting, forKey: DefaultsKey.inAppPipTesting) }
     }
 
     private let defaults: UserDefaults
@@ -39,6 +47,7 @@ final class LoginConfigStore: ObservableObject {
         }
         self.config = loaded
         self.lastAppliedEnv = LoginConfigStore.loadAppliedEnv(from: defaults)
+        self.inAppPipTesting = defaults.bool(forKey: DefaultsKey.inAppPipTesting)
     }
 
     // MARK: - Derived

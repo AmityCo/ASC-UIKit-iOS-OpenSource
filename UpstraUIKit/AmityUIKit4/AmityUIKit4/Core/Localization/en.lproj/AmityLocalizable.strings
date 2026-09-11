@@ -1036,7 +1036,7 @@
 "community_setup_add_member_button" = "Add";
 "community_setup_create_button" = "Create community";
 "community_setup_create_success" = "Successfully created community!";
-"community_setup_create_failed" = "Failed to create community";
+"community_setup_create_failed" = "Failed to create community. Please try again.";
 "community_setup_save_failed" = "Failed to save your community profile. Please try again.";
 
 // MARK: - Community Setting Page
@@ -1610,6 +1610,9 @@
 // 1:1 chat action menu (distinct from group "member" wording)
 "amity_chat_dm_action_report_user" = "Report user";
 "amity_chat_dm_action_unreport_user" = "Unreport user";
+
+// Post composer attachment sheet
+"amity_social_tag_products_row" = "Tag products";
 
 "amity_clip_permission_camera_and_microphone_message" = "This lets you record videos\nfrom this device.";
 

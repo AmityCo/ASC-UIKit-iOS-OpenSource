@@ -13,6 +13,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
     @EnvironmentObject var host: AmitySwiftUIHostWrapper
     @StateObject private var viewConfig: AmityViewConfigController
     @StateObject private var viewModel: AmityLiveStreamPlayerPageViewModel
+    @ObservedObject private var pipState = PiPState.shared
     private var displayErrorIfEnded: Bool = false
         
     public var id: PageId {
@@ -55,6 +56,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                 .visibleWhen(!viewModel.isLoading && (viewModel.loadingFailed || ((viewModel.room?.status == .ended || viewModel.room?.status == .recorded || viewModel.room?.status == .terminated) && displayErrorIfEnded)))
         }
         .onAppear {
+            PiPState.shared.setActiveLivestreamHost(host.controller)
             Task {
                 await viewModel.checkProductCatalogueSettings()
             }
@@ -88,7 +90,9 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
     private var contentView: some View {
         switch viewModel.currentState {
         case .viewer:
-            if viewModel.room?.status == .live || viewModel.room?.status == .waitingReconnect {
+            let isThisRoomInPiP = viewModel.room.map { pipState.isPiPActive(forRoomId: $0.roomId) } ?? false
+            if viewModel.room?.status == .live || viewModel.room?.status == .waitingReconnect || viewModel.room?.status == .error || (viewModel.room?.status == .terminated && !displayErrorIfEnded) || (isThisRoomInPiP && viewModel.wasEverLive) {
+               
                 livestreamViewerView
             } else if !displayErrorIfEnded {
                 playbackPlayerView

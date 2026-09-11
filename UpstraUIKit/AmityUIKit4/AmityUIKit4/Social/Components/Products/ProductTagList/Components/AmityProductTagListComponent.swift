@@ -80,6 +80,8 @@ public struct AmityProductTagListComponent: AmityComponentView {
 
     @StateObject private var viewConfig: AmityViewConfigController
 
+    @StateObject private var networkMonitor = NetworkMonitor()
+
     // MARK: - Initialization
 
     /// Creates a new ProductTagListComponent
@@ -123,6 +125,7 @@ public struct AmityProductTagListComponent: AmityComponentView {
             productTagListContent
                 .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
                 .environmentObject(viewConfig)
+                .onChange(of: networkMonitor.isConnected) { _ in syncNetworkToast() }
         }
     }
 
@@ -160,6 +163,23 @@ public struct AmityProductTagListComponent: AmityComponentView {
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Products tagged in this post")
+    }
+
+    /// The livestream surfaces show a reconnecting page while the connection is down, but this sheet
+    /// covers it — so here the toast is the only way to explain why the list has stopped updating.
+    private func syncNetworkToast() {
+        guard renderMode == .livestream else { return }
+
+        if networkMonitor.isConnected {
+            Toast.hideToastIfPresented(immediately: true)
+        } else {
+            Toast.showToast(
+                style: .loading,
+                message: AmityLocalizedStringSet.Social.livestreamWaitingNetworkToast.localizedString,
+                bottomPadding: 60,
+                autoHide: false
+            )
+        }
     }
 
     private var productListView: some View {

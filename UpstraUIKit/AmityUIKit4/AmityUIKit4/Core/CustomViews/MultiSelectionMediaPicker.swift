@@ -32,6 +32,12 @@ struct MultiSelectionMediaPicker: UIViewControllerRepresentable {
         config.filter = mediaType
         config.selectionLimit = selectionLimit
         config.preferredAssetRepresentationMode = .current
+
+        // Numbers the selection badges, and makes "results are in selection order" a documented
+        // guarantee rather than something we rely on incidentally.
+        if #available(iOS 15, *) {
+            config.selection = .ordered
+        }
         
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = context.coordinator
@@ -54,17 +60,33 @@ struct MultiSelectionMediaPicker: UIViewControllerRepresentable {
             self.parent = parent
         }
         
+        private enum PickedItem {
+            case image(UIImage, identifier: String?)
+            case video(url: URL, identifier: String?)
+        }
+
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             let dispatchGroup = DispatchGroup()
-            var images: [UIImage] = []
-            var videos: [URL] = []
-            
+
+            // `results` is in selection order but the loads below finish in any order, so each one
+            // writes to its own slot instead of appending. Order is not cosmetic: the composer locks
+            // the carousel ratio to whichever media ends up first.
+            var picked = [PickedItem?](repeating: nil, count: results.count)
+            let pickedLock = NSLock()
+
+            func store(_ item: PickedItem, at index: Int) {
+                pickedLock.lock()
+                picked[index] = item
+                pickedLock.unlock()
+            }
+
             DispatchQueue.main.async {
                 self.showLoadingOverlay(on: picker.view, message: AmityLocalizedStringSet.Social.mediaProcessing.localizedString)
             }
-            
-            for result in results {
+
+            for (index, result) in results.enumerated() {
                 let itemProvider = result.itemProvider
+                let assetIdentifier = result.assetIdentifier
 
                 // load image from item provider
                 if itemProvider.canLoadObject(ofClass: UIImage.self) {
@@ -72,7 +94,7 @@ struct MultiSelectionMediaPicker: UIViewControllerRepresentable {
                     itemProvider.loadObject(ofClass: UIImage.self) { newImage, error in
                         defer { dispatchGroup.leave() }
                         guard error == nil, let image = newImage as? UIImage else { return }
-                        images.append(image)
+                        store(.image(image, identifier: assetIdentifier), at: index)
                     }
                 } else if itemProvider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
                     // Load video directly from item provider (works with limited photo access)
@@ -87,23 +109,40 @@ struct MultiSelectionMediaPicker: UIViewControllerRepresentable {
                             .appendingPathExtension(url.pathExtension)
                         do {
                             try FileManager.default.copyItem(at: url, to: tempURL)
-                            videos.append(tempURL)
+                            store(.video(url: tempURL, identifier: assetIdentifier), at: index)
                         } catch {
                             Log.add(event: .error, "Failed to copy video: \(error)")
                         }
                     }
                 }
             }
-            
+
             dispatchGroup.notify(queue: .main) {
                 self.hideLoadingOverlay()
-                
-                if self.parent.mediaType == .images {
-                    self.parent.viewModel.selectedImages.append(contentsOf: images)
-                } else {
-                    self.parent.viewModel.selectedVidoesURLs.append(contentsOf: videos)
+
+                // Compacted in slot order, so anything that failed to load drops out without
+                // shifting the items around it.
+                var images: [(image: UIImage, identifier: String?)] = []
+                var videos: [(url: URL, identifier: String?)] = []
+                for item in picked.compactMap({ $0 }) {
+                    switch item {
+                    case .image(let image, let identifier):
+                        images.append((image: image, identifier: identifier))
+                    case .video(let url, let identifier):
+                        videos.append((url: url, identifier: identifier))
+                    }
                 }
-                
+
+                // Identifiers first: the components read both in one onChange, so they must be in
+                // place before the image/URL arrays publish.
+                if self.parent.mediaType == .images {
+                    self.parent.viewModel.selectedImageIdentifiers.append(contentsOf: images.map { $0.identifier })
+                    self.parent.viewModel.selectedImages.append(contentsOf: images.map { $0.image })
+                } else {
+                    self.parent.viewModel.selectedVideoIdentifiers.append(contentsOf: videos.map { $0.identifier })
+                    self.parent.viewModel.selectedVidoesURLs.append(contentsOf: videos.map { $0.url })
+                }
+
                 self.parent.presentationMode.wrappedValue.dismiss()
             }
         }

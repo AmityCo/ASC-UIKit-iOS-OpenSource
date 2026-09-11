@@ -314,8 +314,6 @@ public struct AmityPostContentComponent: AmityComponentView {
                 postContentTextView()
                 
                 PostContentMediaView(post: post, viewConfig: viewConfig, pageId: pageId)
-                    .frame(height: 328)
-                    .clipShape(RoundedCorner(radius: 8))
                 
             case .file:
                 EmptyView()

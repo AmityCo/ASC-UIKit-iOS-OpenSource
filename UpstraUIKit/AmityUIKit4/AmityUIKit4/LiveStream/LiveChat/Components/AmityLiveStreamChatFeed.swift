@@ -262,8 +262,9 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                                 }
                             } else {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    PiPState.shared.setAutoPiPSuppressed(true)
                                     let page = AmityContentReportPage(type: .message(id: message.id), toastBottomPadding: Toast.bottomBarPadding).environmentObject(viewConfig)
-                                    let vc = AmitySwiftUIHostingNavigationController(rootView: page)
+                                    let vc = PiPSuppressingNavigationController(rootView: page)
                                     vc.isNavigationBarHidden = true
                                     host.controller?.present(vc, animated: true)
                                 }
@@ -514,6 +515,18 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
     }
 }
 
+
+/// Holds PiP suppression for as long as its presentation is on screen, then releases it.
+///
+/// Tied to the navigation controller rather than the page's `onDisappear` because the
+/// report flow pushes a second page, and that would fire on the push — releasing
+/// suppression while the flow is still covering the player.
+private final class PiPSuppressingNavigationController<Content: View>: AmitySwiftUIHostingNavigationController<Content> {
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        PiPState.shared.setAutoPiPSuppressed(false)
+    }
+}
 
 private struct NewMessageAnimationModifier: ViewModifier {
     let isAnimating: Bool

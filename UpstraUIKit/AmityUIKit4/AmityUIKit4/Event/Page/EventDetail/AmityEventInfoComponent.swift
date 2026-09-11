@@ -193,15 +193,21 @@ struct AmityEventInfoComponent: View {
                             return
                         }
                         
+                        if PiPState.shared.isPiPActive(forRoomId: room.roomId) {
+                            PiPState.shared.restoreActivePiP()
+                            return
+                        }
                         // attahch room to post model as the post from event does not have child room post
                         let postModel = AmityPostModel(post: post)
                         postModel.room = room
                         postModel.event = event
-                        
+
                         let page = AmityLivestreamPlayerPage(postModel: postModel)
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         vc.modalPresentationStyle = .overFullScreen
-                        host.controller?.present(vc, animated: true)
+                        PiPState.shared.abandonActivePiP { presenter in
+                            presenter?.present(vc, animated: true)
+                        }
                     }
                     .padding(.top, 16)
                     

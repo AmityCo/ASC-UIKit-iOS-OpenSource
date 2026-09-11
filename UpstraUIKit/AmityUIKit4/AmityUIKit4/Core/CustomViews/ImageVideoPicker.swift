@@ -90,6 +90,10 @@ class ImageVideoPickerViewModel: ObservableObject, Identifiable, Equatable {
     @Published var selectedVidoesURLs: [URL] = []
     @Published var selectedImages: [UIImage] = []
 
+    /// Index-aligned with `selectedImages` / `selectedVidoesURLs`.
+    @Published var selectedImageIdentifiers: [String?] = []
+    @Published var selectedVideoIdentifiers: [String?] = []
+
     static func == (lhs: ImageVideoPickerViewModel, rhs: ImageVideoPickerViewModel) -> Bool {
         lhs.id == rhs.id
     }
@@ -100,6 +104,8 @@ class ImageVideoPickerViewModel: ObservableObject, Identifiable, Equatable {
         selectedMediaURL = nil
         selectedVidoesURLs = []
         selectedImages = []
+        selectedImageIdentifiers = []
+        selectedVideoIdentifiers = []
     }
     
     var haveSelection: Bool {
