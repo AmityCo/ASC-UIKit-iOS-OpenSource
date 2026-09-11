@@ -10,11 +10,19 @@ import SwiftUI
 struct MessageAvatarView: View {
 
     @EnvironmentObject private var viewConfig: AmityViewConfigController
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
 
     let message: MessageModel
     let placeholderIcon: ImageResource
 
     var body: some View {
+        Button(action: onTap) {
+            avatar
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var avatar: some View {
         ZStack(alignment: .bottomTrailing) {
             AmityChatUserProfileImageView(displayName: message.displayName, avatarURL: message.avatarURL)
                 .frame(width: 32, height: 32)
@@ -34,6 +42,15 @@ struct MessageAvatarView: View {
                     .offset(x: 6, y: 6)
             }
         }
+    }
+
+    private func onTap() {
+        let context = AmityMessageBubbleBehavior.Context(
+            userId: message.userId,
+            avatarURL: message.avatarURL,
+            sourceViewController: host.controller
+        )
+        AmityUIKit4Manager.behaviour.messageBubbleBehavior?.onAvatarTap(context: context)
     }
 }
 

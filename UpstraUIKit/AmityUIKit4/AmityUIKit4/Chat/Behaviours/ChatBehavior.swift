@@ -66,14 +66,14 @@ open class AmityChatPageBehavior {
 open class AmityMessageBubbleBehavior {
 
     open class Context {
-        /// The user ID whose avatar was tapped.
+        /// The user ID of the tapped avatar or mentioned user.
         public let userId: String
         /// The avatar URL of the user, if available.
         public let avatarURL: URL?
         /// The view controller that is currently presenting the chat page.
         public weak var sourceViewController: UIViewController?
 
-        init(userId: String, avatarURL: URL?, sourceViewController: UIViewController?) {
+        init(userId: String, avatarURL: URL? = nil, sourceViewController: UIViewController?) {
             self.userId = userId
             self.avatarURL = avatarURL
             self.sourceViewController = sourceViewController
@@ -99,5 +99,11 @@ open class AmityMessageBubbleBehavior {
         vc.modalPresentationStyle = .fullScreen
         hostingController = vc
         presenter.present(vc, animated: true)
+    }
+
+    /// Called when a mentioned user is tapped inside a message bubble.
+    /// Does nothing by default — override to route to your own user profile screen.
+    open func onMentionUserTap(context: AmityMessageBubbleBehavior.Context) {
+        Log.add(event: .info, "Tapped UserId: \(context.userId)")
     }
 }

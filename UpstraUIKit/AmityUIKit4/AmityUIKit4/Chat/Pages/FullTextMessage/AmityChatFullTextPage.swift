@@ -4,7 +4,6 @@
 //
 
 import SwiftUI
-import SafariServices
 
 struct AmityChatFullTextPage: View {
 
@@ -71,19 +70,7 @@ struct AmityChatFullTextPage: View {
             let attributedText = TextHighlighter.getAttributedText(from: message, highlightAttributes: mentionAttrs, linkAttributes: linkAttrs)
             Text(attributedText)
                 .applyTextStyle(.title(Color(viewConfig.color(.textChatBubbleInboundMessagesDefault))))
-                .environment(\.openURL, OpenURLAction { url in
-                    let base = url.deletingLastPathComponent().absoluteString
-                    if base == TextHighlighter.mentionURL
-                        || base == TextHighlighter.hashtagURL
-                        || base == TextHighlighter.productTagURL {
-                        return .discarded
-                    }
-                    
-                    let browserVC = SFSafariViewController(url: url)
-                    browserVC.modalPresentationStyle = .pageSheet
-                    UIApplication.topViewController()?.present(browserVC, animated: true)
-                    return .discarded
-                })
+                .handleChatUrlTap(opensLinkInAppBrowser: true)
         } else {
             Text(message.text)
                 .applyTextStyle(.title(Color(viewConfig.color(.textChatBubbleInboundMessagesDefault))))

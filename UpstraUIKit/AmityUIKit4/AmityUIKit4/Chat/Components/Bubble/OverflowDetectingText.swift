@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import SafariServices
 
 // MARK: - Public overflow preference key
 
@@ -94,5 +95,62 @@ struct OverflowDetectingText: View {
                 EmptyView()
             }
         }
+    }
+}
+
+// MARK: - Mention & link tap handling
+
+/// Mentions carry a sentinel `TextHighlighter.mentionURL` link so taps can be intercepted.
+/// Without this the sentinel falls through to the system handler and opens amity.co in Safari.
+@available(iOS 15, *)
+private struct ChatUrlTapModifier: ViewModifier {
+
+    @EnvironmentObject private var host: AmitySwiftUIHostWrapper
+
+    /// Message bubbles hand plain links to the system browser; the full text page opens them in-app.
+    let opensLinkInAppBrowser: Bool
+
+    func body(content: Content) -> some View {
+        content.environment(\.openURL, OpenURLAction { url in
+            let base = url.deletingLastPathComponent().absoluteString
+
+            if base == TextHighlighter.mentionURL {
+                let context = AmityMessageBubbleBehavior.Context(
+                    userId: url.lastPathComponent,
+                    sourceViewController: host.controller
+                )
+                AmityUIKit4Manager.behaviour.messageBubbleBehavior?.onMentionUserTap(context: context)
+                return .discarded
+            }
+            
+            // when @All is tapped, url does not include the userId at the lastPathComponent
+            if url.absoluteString == TextHighlighter.mentionURL {
+                let context = AmityMessageBubbleBehavior.Context(
+                    userId: "",
+                    sourceViewController: host.controller
+                )
+                AmityUIKit4Manager.behaviour.messageBubbleBehavior?.onMentionUserTap(context: context)
+                return .discarded
+            }
+
+            // Hashtag & product tag sentinels have no destination in chat.
+            if base == TextHighlighter.hashtagURL || base == TextHighlighter.productTagURL {
+                return .discarded
+            }
+
+            guard opensLinkInAppBrowser else { return .systemAction }
+
+            let browserVC = SFSafariViewController(url: url)
+            browserVC.modalPresentationStyle = .pageSheet
+            UIApplication.topViewController()?.present(browserVC, animated: true)
+            return .discarded
+        })
+    }
+}
+
+@available(iOS 15, *)
+extension View {
+    func handleChatUrlTap(opensLinkInAppBrowser: Bool = false) -> some View {
+        modifier(ChatUrlTapModifier(opensLinkInAppBrowser: opensLinkInAppBrowser))
     }
 }

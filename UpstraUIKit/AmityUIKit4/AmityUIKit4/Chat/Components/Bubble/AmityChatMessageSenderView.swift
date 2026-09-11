@@ -107,6 +107,7 @@ public struct AmityChatMessageSenderView: AmityElementView {
             ]
             let attributedText = TextHighlighter.getAttributedText(from: message, highlightAttributes: mentionAttrs, linkAttributes: linkAttrs)
             OverflowDetectingText(attributedText: attributedText, maxLines: maxLines)
+                .handleChatUrlTap()
         } else {
             OverflowDetectingText(plainText: message.text, maxLines: maxLines)
         }
