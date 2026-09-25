@@ -45,8 +45,9 @@ struct CommunityMembershipBottomSheetView: View {
                             }
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunityMemberAction.promote)
             }
-            
+
             getItemView(viewModel.isReportedByMe ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource(), text: viewModel.isReportedByMe ? AmityLocalizedStringSet.Social.unreportUser.localizedString : AmityLocalizedStringSet.Social.reportUser.localizedString)
                 .onTapGesture {
                     
@@ -88,6 +89,7 @@ struct CommunityMembershipBottomSheetView: View {
                             }
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunityMemberAction.remove)
             }
         }
         .padding(.bottom, 32)
@@ -144,9 +146,8 @@ class CommunityMembershipBottomSheetViewModel: ObservableObject {
     }
     
     private func setupData() {
-        let isModerator = community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
-        self.shouldShowModeratorItems = canAssignRoles || isModerator
-        self.shouldShowRemoveItem = canRemoveMembers || isModerator
+        self.shouldShowModeratorItems = canAssignRoles
+        self.shouldShowRemoveItem = canRemoveMembers
     }
     
     func promoteToModerator() async throws {

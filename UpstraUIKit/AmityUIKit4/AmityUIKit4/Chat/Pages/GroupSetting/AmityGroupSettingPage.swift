@@ -14,17 +14,33 @@ final class AmityGroupSettingViewModel: ObservableObject {
     @Published var channel: AmityChannel?
     @Published var displayName: String = ""
     @Published var avatarURL: URL?
-    @Published var isModerator: Bool = false
+    @Published var canEditChannel: Bool = false   // EDIT_CHANNEL: profile / notifications / all members
+    @Published var canMuteChannel: Bool = false   // MUTE_CHANNEL: member permissions tile
+    @Published var canBanUser: Bool = false       // BAN_USER_FROM_CHANNEL: banned users tile
     @Published var isLoading: Bool = true
     @Published var isNotificationsEnabled: Bool = true
+    @Published var isModerator: Bool = false      // role-native: gates only the last-moderator leave warning
 
     private let channelId: String
     private let channelManager = ChannelManager()
     private var channelToken: AmityNotificationToken?
 
-    init(channelId: String, isModerator: Bool) {
+    init(channelId: String) {
         self.channelId = channelId
-        self.isModerator = isModerator
+        fetchPermissions()
+    }
+
+    private func fetchPermissions() {
+        Task { [weak self] in
+            guard let self else { return }
+            async let editPermission = ChatPermissionChecker.hasPermission(.editChannel, channelId: channelId)
+            async let mutePermission = ChatPermissionChecker.hasPermission(.muteChannel, channelId: channelId)
+            async let banPermission  = ChatPermissionChecker.hasPermission(.banChannelUser, channelId: channelId)
+            let (edit, mute, ban) = await (editPermission, mutePermission, banPermission)
+            self.canEditChannel = edit
+            self.canMuteChannel = mute
+            self.canBanUser = ban
+        }
     }
 
     deinit {
@@ -87,8 +103,8 @@ public struct AmityGroupSettingPage: AmityPageView {
     @State private var toastMessage: String = ""
     @State private var showToast: Bool = false
 
-    public init(channelId: String, isModerator: Bool) {
-        self._viewModel = StateObject(wrappedValue: AmityGroupSettingViewModel(channelId: channelId, isModerator: isModerator))
+    public init(channelId: String) {
+        self._viewModel = StateObject(wrappedValue: AmityGroupSettingViewModel(channelId: channelId))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .groupSettingPage))
     }
 
@@ -146,7 +162,7 @@ public struct AmityGroupSettingPage: AmityPageView {
                     message: Text(AmityLocalizedStringSet.Chat.GroupSetting.leaveLastModMessage.localizedString),
                     primaryButton: .default(Text(AmityLocalizedStringSet.Chat.GroupSetting.promoteMemberCTA.localizedString)) {
                         guard let channel = viewModel.channel else { return }
-                        let page = AmityGroupMemberListPage(channelId: channel.channelId, isModerator: viewModel.isModerator)
+                        let page = AmityGroupMemberListPage(channelId: channel.channelId)
                         let vc = AmitySwiftUIHostingController(rootView: page)
                         host.controller?.navigationController?.pushViewController(vc, animated: true)
                     },
@@ -210,105 +226,85 @@ public struct AmityGroupSettingPage: AmityPageView {
                 .frame(maxWidth: .infinity)
                 .padding(.bottom, 40)
 
-                if viewModel.isModerator {
+                if viewModel.canEditChannel || viewModel.canMuteChannel || viewModel.canBanUser {
                     sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionGroup.localizedString)
-                    settingTile(icon: AmityIcon.DesignSystem.penS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileProfile.localizedString) {
-                        guard let channel = viewModel.channel else { return }
-                        let page = AmityEditGroupProfilePage(channelId: channel.channelId, displayName: viewModel.displayName, avatarURL: viewModel.avatarURL)
-                        let vc = AmitySwiftUIHostingController(rootView: page)
-                        host.controller?.navigationController?.pushViewController(vc, animated: true)
-                    }
-                    settingTile(icon: AmityIcon.DesignSystem.bellS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileNotifications.localizedString, trailing: notificationModeLabel()) {
-                        guard let channel = viewModel.channel else { return }
-                        let page = AmityEditGroupNotificationPage(channelId: channel.channelId, currentMode: channel.notificationMode.rawValue)
-                        let vc = AmitySwiftUIHostingController(rootView: page)
-                        host.controller?.navigationController?.pushViewController(vc, animated: true)
-                    }
-                    settingTile(icon: AmityIcon.DesignSystem.userLockS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tilePermissions.localizedString) {
-                        guard let channel = viewModel.channel else { return }
-                        let page = AmityEditGroupMemberPermissionsPage(channelId: channel.channelId, isMuted: channel.isMuted)
-                        let vc = AmitySwiftUIHostingController(rootView: page)
-                        host.controller?.navigationController?.pushViewController(vc, animated: true)
-                    }
-                    settingTile(icon: AmityIcon.DesignSystem.userGroupS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileAllMembers.localizedString) {
-                        guard let channel = viewModel.channel else { return }
-                        let page = AmityGroupMemberListPage(channelId: channel.channelId, isModerator: viewModel.isModerator)
-                        let vc = AmitySwiftUIHostingController(rootView: page)
-                        host.controller?.navigationController?.pushViewController(vc, animated: true)
-                    }
-                    settingTile(icon: AmityIcon.DesignSystem.banS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileBanned.localizedString) {
-                        guard let channel = viewModel.channel else { return }
-                        let page = AmityBannedGroupMemberListPage(channelId: channel.channelId, isModerator: viewModel.isModerator)
-                        let vc = AmitySwiftUIHostingController(rootView: page)
-                        host.controller?.navigationController?.pushViewController(vc, animated: true)
-                    }
 
-                    AmityDivider(variant: .post, viewConfig: viewConfig)
-
-                    Spacer().frame(height: 24)
-
-                    sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionPreferences.localizedString)
-                    settingTile(
-                        icon: AmityIcon.DesignSystem.bellS.imageResource,
-                        title: AmityLocalizedStringSet.Chat.GroupSetting.tileMyNotifications.localizedString,
-                        trailing: viewModel.isNotificationsEnabled ? AmityLocalizedStringSet.Chat.GroupSetting.toggleOn.localizedString : AmityLocalizedStringSet.Chat.GroupSetting.toggleOff.localizedString
-                    ) {
-                        guard let channel = viewModel.channel else { return }
-                        let page = AmityGroupNotificationPreferencePage(channelId: channel.channelId, isSilentByModerator: channel.notificationMode == .silent)
-                        let vc = AmitySwiftUIHostingController(rootView: page)
-                        host.controller?.navigationController?.pushViewController(vc, animated: true)
-                    }
-
-                    Spacer().frame(height: 16)
-
-                    Button {
-                        if viewModel.isModerator,
-                           let count = viewModel.channel?.moderatorCount,
-                           count <= 1 {
-                            activeAlert = .lastModerator
-                        } else {
-                            activeAlert = .leaveConfirm
+                    if viewModel.canEditChannel {
+                        settingTile(id: AccessibilityID.Chat.GroupSetting.profile, icon: AmityIcon.DesignSystem.penS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileProfile.localizedString) {
+                            guard let channel = viewModel.channel else { return }
+                            let page = AmityEditGroupProfilePage(channelId: channel.channelId, displayName: viewModel.displayName, avatarURL: viewModel.avatarURL)
+                            let vc = AmitySwiftUIHostingController(rootView: page)
+                            host.controller?.navigationController?.pushViewController(vc, animated: true)
                         }
-                    } label: {
-                        Text(AmityLocalizedStringSet.Chat.GroupSetting.leaveButton.localizedString)
-                            .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDestructiveDefault))))
+                        settingTile(id: AccessibilityID.Chat.GroupSetting.notifications, icon: AmityIcon.DesignSystem.bellS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileNotifications.localizedString, trailing: notificationModeLabel()) {
+                            guard let channel = viewModel.channel else { return }
+                            let page = AmityEditGroupNotificationPage(channelId: channel.channelId, currentMode: channel.notificationMode.rawValue)
+                            let vc = AmitySwiftUIHostingController(rootView: page)
+                            host.controller?.navigationController?.pushViewController(vc, animated: true)
+                        }
                     }
-                    .buttonStyle(.plain)
-                } else {
-                    sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionGroup.localizedString)
-                    settingTile(icon: AmityIcon.DesignSystem.userGroupS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileAllMembers.localizedString) {
-                        guard let channel = viewModel.channel else { return }
-                        let page = AmityGroupMemberListPage(channelId: channel.channelId, isModerator: viewModel.isModerator)
-                        let vc = AmitySwiftUIHostingController(rootView: page)
-                        host.controller?.navigationController?.pushViewController(vc, animated: true)
+
+                    if viewModel.canMuteChannel {
+                        settingTile(id: AccessibilityID.Chat.GroupSetting.memberPermissions, icon: AmityIcon.DesignSystem.userLockS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tilePermissions.localizedString) {
+                            guard let channel = viewModel.channel else { return }
+                            let page = AmityEditGroupMemberPermissionsPage(channelId: channel.channelId, isMuted: channel.isMuted)
+                            let vc = AmitySwiftUIHostingController(rootView: page)
+                            host.controller?.navigationController?.pushViewController(vc, animated: true)
+                        }
+                    }
+
+                    if viewModel.canEditChannel {
+                        settingTile(id: AccessibilityID.Chat.GroupSetting.allMembers, icon: AmityIcon.DesignSystem.userGroupS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileAllMembers.localizedString) {
+                            guard let channel = viewModel.channel else { return }
+                            let page = AmityGroupMemberListPage(channelId: channel.channelId)
+                            let vc = AmitySwiftUIHostingController(rootView: page)
+                            host.controller?.navigationController?.pushViewController(vc, animated: true)
+                        }
+                    }
+
+                    if viewModel.canBanUser {
+                        settingTile(id: AccessibilityID.Chat.GroupSetting.bannedUsers, icon: AmityIcon.DesignSystem.banS.imageResource, title: AmityLocalizedStringSet.Chat.GroupSetting.tileBanned.localizedString) {
+                            guard let channel = viewModel.channel else { return }
+                            let page = AmityBannedGroupMemberListPage(channelId: channel.channelId)
+                            let vc = AmitySwiftUIHostingController(rootView: page)
+                            host.controller?.navigationController?.pushViewController(vc, animated: true)
+                        }
                     }
 
                     AmityDivider(variant: .post, viewConfig: viewConfig)
-
                     Spacer().frame(height: 24)
-
-                    sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionPreferences.localizedString)
-                    settingTile(
-                        icon: AmityIcon.DesignSystem.bellS.imageResource,
-                        title: AmityLocalizedStringSet.Chat.GroupSetting.tileMyNotifications.localizedString,
-                        trailing: viewModel.isNotificationsEnabled ? AmityLocalizedStringSet.Chat.GroupSetting.toggleOn.localizedString : AmityLocalizedStringSet.Chat.GroupSetting.toggleOff.localizedString
-                    ) {
-                        guard let channel = viewModel.channel else { return }
-                        let page = AmityGroupNotificationPreferencePage(channelId: channel.channelId, isSilentByModerator: channel.notificationMode == .silent)
-                        let vc = AmitySwiftUIHostingController(rootView: page)
-                        host.controller?.navigationController?.pushViewController(vc, animated: true)
-                    }
-
-                    Spacer().frame(height: 16)
-
-                    Button {
-                        activeAlert = .leaveConfirm
-                    } label: {
-                        Text(AmityLocalizedStringSet.Chat.GroupSetting.leaveButton.localizedString)
-                            .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDestructiveDefault))))
-                    }
-                    .buttonStyle(.plain)
                 }
+
+                // Preferences + Leave — available to every member.
+                sectionHeader(AmityLocalizedStringSet.Chat.GroupSetting.sectionPreferences.localizedString)
+                settingTile(
+                    id: AccessibilityID.Chat.GroupSetting.myNotifications,
+                    icon: AmityIcon.DesignSystem.bellS.imageResource,
+                    title: AmityLocalizedStringSet.Chat.GroupSetting.tileMyNotifications.localizedString,
+                    trailing: viewModel.isNotificationsEnabled ? AmityLocalizedStringSet.Chat.GroupSetting.toggleOn.localizedString : AmityLocalizedStringSet.Chat.GroupSetting.toggleOff.localizedString
+                ) {
+                    guard let channel = viewModel.channel else { return }
+                    let page = AmityGroupNotificationPreferencePage(channelId: channel.channelId, isSilentByModerator: channel.notificationMode == .silent)
+                    let vc = AmitySwiftUIHostingController(rootView: page)
+                    host.controller?.navigationController?.pushViewController(vc, animated: true)
+                }
+
+                Spacer().frame(height: 16)
+
+                Button {
+                    if viewModel.isModerator,
+                       let count = viewModel.channel?.moderatorCount,
+                       count <= 1 {
+                        activeAlert = .lastModerator
+                    } else {
+                        activeAlert = .leaveConfirm
+                    }
+                } label: {
+                    Text(AmityLocalizedStringSet.Chat.GroupSetting.leaveButton.localizedString)
+                        .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDestructiveDefault))))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier(AccessibilityID.Chat.GroupSetting.leaveButton)
             }
             .padding(16)
         }
@@ -324,7 +320,7 @@ public struct AmityGroupSettingPage: AmityPageView {
         .padding(.bottom, 4)
     }
 
-    private func settingTile(icon: ImageResource, title: String, trailing: String = "", action: @escaping () -> Void) -> some View {
+    private func settingTile(id: String, icon: ImageResource, title: String, trailing: String = "", action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 8) {
                 ZStack {
@@ -360,6 +356,7 @@ public struct AmityGroupSettingPage: AmityPageView {
             .background(Color(viewConfig.color(.surfaceListDefaultDefault)))
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier(id)
     }
 
     private func notificationModeLabel() -> String {

@@ -36,6 +36,9 @@ struct AdvancedPage: View {
                         LoginSectionHeader(title: "Appearance")
                         appearanceCard
 
+                        LoginSectionHeader(title: "Debug")
+                        debugCard
+
                         Spacer().frame(height: 16)
                     }
                 }
@@ -127,6 +130,18 @@ struct AdvancedPage: View {
                 title: "Sync Network Config",
                 subtitle: "Applied after login — overrides settings above when ON",
                 isOn: $store.config.syncNetworkConfig
+            )
+        }
+    }
+
+    // MARK: - Debug
+
+    private var debugCard: some View {
+        LoginGroupedCard {
+            LoginToggleCardRow(
+                title: "Network Log Button",
+                subtitle: "Hides the beacon only — capture keeps running",
+                isOn: $store.networkLogButtonVisible
             )
         }
     }

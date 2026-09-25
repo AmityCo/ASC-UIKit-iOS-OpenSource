@@ -126,6 +126,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                             handlePostMenuAction(type)
                         }
                         .isHidden(!viewModel.hasCreateEventPermission || viewConfig.isHidden(elementId: .createEventButton))
+                        .accessibilityIdentifier(AccessibilityID.Event.CreateMenu.createEventButton)
                 }
             }
         }

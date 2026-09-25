@@ -26,6 +26,7 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
     @State private var lastMessageInViewport: Bool = true
     @State private var showDummyLastMessage: Bool = false
     @State private var lastMessageHeight: CGFloat = 0
+    @State private var pinnedBannerHeight: CGFloat = 0
     
     public init(viewModel: AmityLiveStreamChatViewModel, pageId: PageId? = nil) {
         self.pageId = pageId
@@ -34,6 +35,38 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
     }
     
     public var body: some View {
+        chatStack
+            .overlay(pinnedBannerOverlay, alignment: .top) // iOS 14-safe overlay signature
+            .animation(.easeInOut(duration: 0.2), value: viewModel.pinnedMessage?.messageId)
+            .updateTheme(with: viewConfig)
+    }
+
+    /// Pinned banner overlaid at the top of the chat. Its BOTTOM sits 8px into the chat list (Figma
+    /// overlap); extra height when expanded extends UPWARD over the video, so the chat list below
+    /// never moves. The overlay is not clipped, so the bubble can render above the feed frame.
+    @ViewBuilder
+    private var pinnedBannerOverlay: some View {
+        Group {
+            if let pinnedMessage = viewModel.pinnedMessage {
+                pinnedBanner(pinnedMessage)
+            }
+        }
+        .padding(.horizontal, 16)
+        .background(
+            GeometryReader { geo in
+                Color.clear
+                    .onAppear { pinnedBannerHeight = geo.size.height }
+                    .onChange(of: geo.size.height) { pinnedBannerHeight = $0 }
+            }
+        )
+        // The overlay is top-aligned (banner top at the chat top); shift it up by its own height so
+        // its BOTTOM sits 8px into the chat top. When expanded it gets taller → shifts further up →
+        // grows upward over the video, while the chat list below stays put.
+        .offset(y: -(pinnedBannerHeight - 8))
+        .transition(.move(edge: .top).combined(with: .opacity))
+    }
+
+    private var chatStack: some View {
         ZStack(alignment: .top) {
             // Attaching bottom sheet modifier to the ZStack will effect the new message appear animation
             // This modifier use fullScreenCover internally, and it will try to rebuild the entire view hierarchy when something inside view hierarchy is changed.
@@ -103,9 +136,45 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                 }
             }
         }
-        .updateTheme(with: viewConfig)
     }
-    
+
+    @ViewBuilder
+    private func pinnedBanner(_ pinnedMessage: AmityPinnedMessage) -> some View {
+        let messageText = pinnedMessage.data?["text"] as? String ?? ""
+        let authorId = pinnedMessage.creatorPublicId
+        let currentUserId = AmityUIKitManagerInternal.shared.currentUserId
+        let isMutedAuthor = viewModel.isMuted(userId: authorId)
+            && (viewModel.isStreamer || viewModel.isModerator(userId: currentUserId) || authorId == currentUserId)
+        // A deleted author shows "Deleted user" (same as the chat bubble via MessageModel).
+        let isAuthorDeleted = viewModel.pinnedAuthor?.isDeleted ?? false
+        let displayName = isAuthorDeleted
+            ? AmityLocalizedStringSet.Chat.deletedUser.localizedString
+            : (viewModel.pinnedAuthor?.displayName ?? AmityLocalizedStringSet.Social.livestreamChatUnknownUser.localizedString)
+
+        PinnedMessageBannerView(
+            messageText: messageText,
+            displayName: displayName,
+            isBrand: viewModel.pinnedAuthor?.isBrand ?? false,
+            isHost: viewModel.hostUserId == authorId,
+            isCoHost: viewModel.coHostUserId == authorId,
+            isModerator: viewModel.isModerator(userId: authorId),
+            isMutedAuthor: isMutedAuthor,
+            canPin: viewModel.canPin,
+            onUnpin: {
+                Task.runOnMainActor {
+                    do {
+                        try await viewModel.unpinMessage()
+                    } catch {
+                        // Silent by design: no pin-specific error UI. Pin state is unchanged
+                        // and the banner keeps reflecting the channel live object; the view
+                        // model recomputes canPin on failure.
+                    }
+                }
+            },
+            isExpanded: $viewModel.isPinnedMessageExpanded
+        )
+    }
+
     private var fadeMask: some View {
         VStack(spacing: 0) {
             LinearGradient(
@@ -128,63 +197,38 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
         HStack(alignment: message.syncState == .error ? .center : .top, spacing: 8) {
             // User name and message content
             VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 6) {
-                    Text(message.displayName)
-                        .applyTextStyle(.captionSmall(Color(viewConfig.theme.baseColorShade1)))
-                        .lineLimit(1)
-                        .onTapGesture {
-                            // Host cannot moderate Co-host
-                            // but can remove from livestream
-                            if viewModel.isHost && (isCoHost || viewModel.isWaitingCoHost?().1 == message.userId) {
-                                viewModel.removeCoHostAction?()
-                                return
-                            }
-                            
-                            // Only streamer and moderators can see moderation options
-                            guard viewModel.isStreamer || viewModel.isModerator(userId: AmityUIKitManagerInternal.shared.currentUserId) else { return }
-                            
-                            // Moderation options cannot be applied to host, Co-host and self
-                            guard !isHost && !isCoHost && AmityUIKitManagerInternal.shared.currentUserId != message.userId else { return }
-                            
-                            viewModel.showModerationBottomSheet.message = message
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                viewModel.showModerationBottomSheet.show.toggle()
-                            }
+                let currentUserId = AmityUIKitManagerInternal.shared.currentUserId
+                // Streamer, Cohost, Moderator, Owner message only can see muted badge
+                let shouldShowMutedBadge = isMuted && (viewModel.isStreamer || viewModel.isModerator(userId: currentUserId) || message.isOwner)
+
+                LiveStreamChatBylineView(
+                    displayName: message.displayName,
+                    isBrand: message.user?.isBrand ?? false,
+                    isHost: isHost,
+                    isCoHost: isCoHost,
+                    isModerator: isModerator,
+                    showMutedIcon: shouldShowMutedBadge,
+                    onNameTap: {
+                        // Host cannot moderate Co-host
+                        // but can remove from livestream
+                        if viewModel.isHost && (isCoHost || viewModel.isWaitingCoHost?().1 == message.userId) {
+                            viewModel.removeCoHostAction?()
+                            return
                         }
-                    
-                    let isBrand = message.user?.isBrand ?? false
-                    
-                    if isBrand {
-                        Image(AmityIcon.brandBadge.imageResource)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 16, height: 16)
+
+                        // Only streamer and moderators can see moderation options
+                        guard viewModel.isStreamer || viewModel.isModerator(userId: currentUserId) else { return }
+
+                        // Moderation options cannot be applied to host, Co-host and self
+                        guard !isHost && !isCoHost && currentUserId != message.userId else { return }
+
+                        viewModel.showModerationBottomSheet.message = message
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            viewModel.showModerationBottomSheet.show.toggle()
+                        }
                     }
-                    
-                    if isHost {
-                        HostBadgeView()
-                    } else if isCoHost {
-                        CoHostBadgeView()
-                    } else if isModerator {
-                        ModeratorBadgeView()
-                    }
-                    
-                    let currentUserId = AmityUIKitManagerInternal.shared.currentUserId
-                    let shouldShowMutedBadge = (isMuted && viewModel.isStreamer) ||
-                    (isMuted && (viewModel.isModerator(userId: currentUserId))) ||
-                    (isMuted && message.isOwner)
-                                
-                    // Streamer, Cohost, Moderator, Owner message only can see muted badge
-                    if shouldShowMutedBadge {
-                        Image(AmityIcon.clipMuteIcon.imageResource)
-                            .renderingMode(.template)
-                            .resizable()
-                            .scaledToFill()
-                            .foregroundColor(Color(viewConfig.theme.baseColorShade1))
-                            .frame(width: 16, height: 14)
-                    }
-                }
-                
+                )
+
                 // Message content
                 if viewModel.deletedMessageIds[message.uniqueId] == true {
                     HStack(spacing: 6) {
@@ -233,10 +277,11 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 16, height: 16)
                 }
+                .accessibilityIdentifier(AccessibilityID.Chat.LiveChatFeed.messageMenuButton)
             }
         }
         .padding(.all, 12)
-        .background(Color(viewConfig.defaultDarkTheme.secondaryColorShade1).opacity(0.3))
+        .background(Color(AmityFixedColor.shared.liveStreamChatBubble))
         .cornerRadius(12)
     }
     
@@ -244,7 +289,40 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
     private var bottomSheetView: some View {
         VStack(spacing: 0) {
             let message = viewModel.showBottomSheet.message
-                       
+            let isMessageDeleted = (message?.isDeleted ?? true)
+                || (message.map { viewModel.deletedMessageIds[$0.uniqueId] == true } ?? true)
+
+            // Pin / Unpin — only for users who may pin, and never on a deleted message.
+            // The server owns the pinned state; the banner reflects the result via the channel event.
+            if viewModel.canPin, !isMessageDeleted, let message {
+                let isAlreadyPinned = viewModel.pinnedMessage?.messageId == message.id
+                let title = isAlreadyPinned
+                    ? AmityLocalizedStringSet.LiveChat.unpinMessage.localizedString
+                    : AmityLocalizedStringSet.LiveChat.pinMessage.localizedString
+                let icon = isAlreadyPinned
+                    ? AmityIcon.LiveStream.unpinnedLivestreamMessage.imageResource
+                    : AmityIcon.LiveStream.livestreamPinProductIcon.imageResource
+
+                BottomSheetItemView(icon: icon, text: title)
+                    .accessibilityIdentifier(AccessibilityID.Chat.LiveChatFeed.pinMessageButton)
+                    .onTapGesture {
+                        viewModel.showBottomSheet.show.toggle()
+                        Task.runOnMainActor {
+                            do {
+                                if isAlreadyPinned {
+                                    try await viewModel.unpinMessage(message.id)
+                                } else {
+                                    try await viewModel.pinMessage(message.id)
+                                }
+                            } catch {
+                                // Silent by design: no pin-specific error UI. Pin state is unchanged,
+                                // the menu closes, and the banner keeps reflecting the live object.
+                                // The view model recomputes canPin on failure (e.g. a stale 403).
+                            }
+                        }
+                    }
+            }
+
             if message?.userId != AmityUIKitManagerInternal.shared.currentUserId {
                 let isFlagged = viewModel.showBottomSheet.message?.isFlaggedByMe ?? false
                 let title = isFlagged ? AmityLocalizedStringSet.LiveChat.unreportMessage.localizedString : AmityLocalizedStringSet.LiveChat.reportMessage.localizedString
@@ -258,12 +336,12 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                             if isFlagged {
                                 Task.runOnMainActor {
                                     try await viewModel.unflagMessage(message.id)
-                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.toastUnReportMessage.localizedString, bottomPadding: 60)
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.toastUnReportMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                 }
                             } else {
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                                     PiPState.shared.setAutoPiPSuppressed(true)
-                                    let page = AmityContentReportPage(type: .message(id: message.id), toastBottomPadding: Toast.bottomBarPadding).environmentObject(viewConfig)
+                                    let page = AmityContentReportPage(type: .message(id: message.id), bottomBarHeight: viewModel.composeBarHeight).environmentObject(viewConfig)
                                     let vc = PiPSuppressingNavigationController(rootView: page)
                                     vc.isNavigationBarHidden = true
                                     host.controller?.present(vc, animated: true)
@@ -349,12 +427,12 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                             Task.runOnMainActor {
                                 do {
                                     try await viewModel.inviteAsCoHost(userId: message?.userId ?? "")
-                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationSentToast.localizedString, bottomPadding: 60)
+                                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationSentToast.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                     if let user = message?.user {
                                         viewModel.didFinishCoHostInvitationAction?(AmityUserModel(user: user))
                                     }
                                 } catch {
-                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationSendFailedToast.localizedString, bottomPadding: 60)
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationSendFailedToast.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                 }
                             }
                         }
@@ -375,10 +453,10 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                                     do {
                                         if let userId = message?.userId {
                                             try await viewModel.demoteModerator(userId: userId)
-                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.demoteSuccessToastMessage.localizedString, bottomPadding: 60)
+                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.demoteSuccessToastMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                         }
                                     } catch {
-                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.LiveChat.demoteFailedToastMessage.localizedString, bottomPadding: 60)
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.LiveChat.demoteFailedToastMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                     }
                                 }
                             }
@@ -394,10 +472,10 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                                     do {
                                         if let userId = message?.userId {
                                             try await viewModel.promoteModerator(userId: userId)
-                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.promoteSuccessToastMessage.localizedString, bottomPadding: 60)
+                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.promoteSuccessToastMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                         }
                                     } catch {
-                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.LiveChat.promoteFailedToastMessage.localizedString, bottomPadding: 60)
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.LiveChat.promoteFailedToastMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                     }
                                 }
                             }
@@ -418,10 +496,10 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                                     do {
                                         if let userId = message?.userId {
                                             try await viewModel.unmuteMember(userId: userId)
-                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.unmuteSuccessToastMessage.localizedString, bottomPadding: 60)
+                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.unmuteSuccessToastMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                         }
                                     } catch {
-                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.LiveChat.unmuteFailedToastMessage.localizedString, bottomPadding: 60)
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.LiveChat.unmuteFailedToastMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                     }
                                 }
                             }
@@ -438,10 +516,10 @@ public struct AmityLiveStreamChatFeed: AmityComponentView {
                                     do {
                                         if let userId = message?.userId {
                                             try await viewModel.muteMember(userId: userId)
-                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.muteSuccessToastMessage.localizedString, bottomPadding: 60)
+                                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.LiveChat.muteSuccessToastMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                         }
                                     } catch {
-                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.LiveChat.muteFailedToastMessage.localizedString, bottomPadding: 60)
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.LiveChat.muteFailedToastMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                                     }
                                 }
                             }

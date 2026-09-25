@@ -23,18 +23,18 @@ let package = Package(
             dependencies: []),
         .binaryTarget(
                     name: "AmitySDK",
-                    url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.28.0/AmitySDK.xcframework.zip",
-                    checksum: "2a084e3996a9a92e22675fa143ba5d6e313c0597bbc2c7eeb79338fb4d072d5c"
+                    url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.29.0/AmitySDK.xcframework.zip",
+                    checksum: "aecea1740169c1600c5a65b36c967ea61ebf0caf968262ae33793bfbbb84db31"
                 ),
         .binaryTarget(
                     name: "AmityLiveVideoBroadcastKit",
-                    url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.28.0/AmityLiveVideoBroadcastKit.xcframework.zip",
-                    checksum: "18a4a4b09222009f8e8cf7bca9e58325872dd0bfb6000c86f5cfa0747c8b797b"
+                    url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.29.0/AmityLiveVideoBroadcastKit.xcframework.zip",
+                    checksum: "c48e6f5eb6a090cdb4599fea6376bc003375f1bd512c0c20ff1eca93d1389c9d"
                 ),
         .binaryTarget(
                     name: "AmityVideoPlayerKit",
-                    url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.28.0/AmityVideoPlayerKit.xcframework.zip",
-                    checksum: "77e826774794568ef93d5437d2ebcac20074a8f94fb55121310411b8f4a50799"
+                    url: "https://sdk.amity.co/sdk-release/ios-uikit-frameworks/4.29.0/AmityVideoPlayerKit.xcframework.zip",
+                    checksum: "6948ec8a5a395cc011476cf6e7a6d7b020b5c6dc7007dd96dd0f32ea5cbc2cbf"
                 ),
         .binaryTarget(
                     name: "MobileVLCKit",

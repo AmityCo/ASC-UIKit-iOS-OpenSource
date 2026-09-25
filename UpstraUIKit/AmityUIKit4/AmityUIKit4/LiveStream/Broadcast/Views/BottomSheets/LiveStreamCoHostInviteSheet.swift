@@ -99,17 +99,17 @@ struct LiveStreamCoHostInviteSheet: View {
                         // Remove co-host if already accepted invitation
                         do {
                             try await self.viewModel.removeCoHostFromStream(userId: user.userId)
-                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostRemovedToast.localizedString, bottomPadding: 60)
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostRemovedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                         } catch {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamRemoveCoHostFailedToast.localizedString, bottomPadding: 60)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamRemoveCoHostFailedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                         }
                     } else {
                         // Decline co-host invitation if not yet accepted
                         do {
                             try await self.viewModel.declineAsCoHost(user: user)
-                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelledToast.localizedString, bottomPadding: 60)
+                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelledToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                         } catch {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelFailedToast.localizedString, bottomPadding: 60)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelFailedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                         }
                     }
                 }
@@ -145,9 +145,9 @@ struct LiveStreamCoHostInviteSheet: View {
                                 Task.runOnMainActor {
                                     do {
                                         try await self.viewModel.inviteAsCoHost(user: userModel)
-                                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationSentToast.localizedString, bottomPadding: 60)
+                                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationSentToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                                     } catch {
-                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationSendFailedToast.localizedString, bottomPadding: 60)
+                                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationSendFailedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                                     }
                                 }
                             }

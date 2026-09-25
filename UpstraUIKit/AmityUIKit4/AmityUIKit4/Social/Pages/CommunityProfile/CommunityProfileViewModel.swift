@@ -75,6 +75,8 @@ public class CommunityProfileViewModel: ObservableObject {
     @Published var hasStoryManagePermission: Bool = false
     /// Add-user permission is a prerequisite for approving join requests, so it also grants access to the pending join requests.
     @Published var hasAddCommunityUserPermission: Bool = false
+    /// REVIEW_COMMUNITY_POST — grants seeing all pending posts and the pending-posts banner.
+    @Published var hasReviewPermission: Bool = false
     @Published var hasCreatePostPermission = false
     @Published var hasCreateEventPermission = false
     
@@ -301,6 +303,7 @@ public class CommunityProfileViewModel: ObservableObject {
             guard let self else { return }
             
             self.hasAddCommunityUserPermission = await CommunityPermissionChecker.hasAddCommunityUserPermission(communityId: communityId)
+            self.hasReviewPermission = await CommunityPermissionChecker.hasReviewCommunityPostPermission(communityId: communityId)
             self.updatePendingBannerState()
         }
     }
@@ -323,9 +326,9 @@ public class CommunityProfileViewModel: ObservableObject {
             self.shouldShowPendingBanner = false
             return
         }
-        let relevantPostCount = community.hasModeratorRole ? pendingPostCount : userPendingPostCount
+        let relevantPostCount = hasReviewPermission ? pendingPostCount : userPendingPostCount
         let postsContribute = community.isPostReviewEnabled && relevantPostCount > 0
-        let canReviewJoinRequests = community.hasModeratorRole || hasAddCommunityUserPermission
+        let canReviewJoinRequests = hasAddCommunityUserPermission
         let requestsContribute = canReviewJoinRequests && community.requiresJoinApproval && joinRequestCount > 0
         self.shouldShowPendingBanner = postsContribute || requestsContribute
     }

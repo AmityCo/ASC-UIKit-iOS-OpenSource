@@ -52,13 +52,12 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
     }
     
     private func setupData() {
-        let isModerator = community.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId)?.hasModeratorRole ?? false
-        self.shouldShowEditProfile = hasEditCommunityPermission || isModerator
-        self.shouldShowPendingInvitations = hasEditCommunityPermission || isModerator
+        self.shouldShowEditProfile = hasEditCommunityPermission
+        self.shouldShowPendingInvitations = hasEditCommunityPermission
         self.shouldShowNotifications = isSocialUserNotificationEnabled && isSocialNetworkEnabled
-        self.shouldShowPostPermissions = hasEditCommunityPermission || isModerator
-        self.shouldShowStoryComments = hasEditCommunityPermission || isModerator
-        self.shouldShowCloseCommunity = hasDeleteCommunityPermission || isModerator
+        self.shouldShowPostPermissions = hasEditCommunityPermission
+        self.shouldShowStoryComments = hasEditCommunityPermission
+        self.shouldShowCloseCommunity = hasDeleteCommunityPermission
     }
     
     private func hasEditCommunityPermisison() async {

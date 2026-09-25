@@ -20,6 +20,7 @@ extension AmityEventDetailPage {
                     
                     AmityUIKitManagerInternal.shared.behavior.eventDetailPageBehavior?.goToPostComposerPage(context: .init(page: self, event: event))
                 }
+                .isHidden(viewConfig.isHidden(elementId: .createPostButton))
             
             BottomSheetItemView(icon: AmityIcon.createPollMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.pollLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
                 .onTapGesture {
@@ -28,6 +29,7 @@ extension AmityEventDetailPage {
                     
                     showPollSelectionView.toggle()
                 }
+                .isHidden(viewConfig.isHidden(elementId: .createPollButton))
             
             BottomSheetItemView(icon: AmityIcon.createLivestreamMenuIcon.imageResource, text: AmityLocalizedStringSet.Social.liveStreamLabel.localizedString, iconSize: CGSize(width: 20, height: 20))
                 .onTapGesture {
@@ -38,6 +40,7 @@ extension AmityEventDetailPage {
                     
                     AmityUIKitManagerInternal.shared.behavior.eventDetailPageBehavior?.goToDiscussionLivestreamComposerPage(context: .init(page: self, event: event))
                 }
+                .isHidden(viewConfig.isHidden(elementId: .createLivestreamButton))
         }
         .padding(.bottom, 32)
     }
@@ -108,7 +111,7 @@ extension AmityEventDetailPage {
     var menuOptionSheet: some View {
         VStack(spacing: 0) {
             
-            if viewModel.isEventHost {
+            if viewModel.isEventHost || viewModel.hasUpdatePermission {
                 BottomSheetItemView(icon: AmityIcon.editCommentIcon.imageResource, text: AmityLocalizedStringSet.Social.eventDetailPageEditEvent.localizedString)
                     .onTapGesture {
                         // Dismiss
@@ -128,8 +131,9 @@ extension AmityEventDetailPage {
                         
                         AmityUIKit4Manager.behaviour.eventDetailPageBehavior?.goToEventSetupPage(context: .init(page: self, event: event))
                     }
+                    .accessibilityIdentifier(AccessibilityID.Event.EventDetailPage.editButton)
             }
-            
+
             // "Post event to feed" — create an event post referencing this event.
             // Visible to host / moderator / member of the event's community.
             let canPostEventToFeed = viewModel.isEventHost || (viewModel.event?.targetCommunity?.isJoined ?? false)
@@ -222,17 +226,21 @@ extension AmityEventDetailPage {
                             }))
                         }
                     }
+                    .accessibilityIdentifier(AccessibilityID.Event.EventDetailPage.deleteButton)
             }
         }
         .padding(.bottom, 32)
     }
-    
+
     func shouldShowEventMenuOption() -> Bool {
         // Host can edit, delete, add to calendar, share
         if viewModel.isEventHost { return true }
 
         // Moderator can delete
         if viewModel.hasDeletePermission { return true }
+
+        // UPDATE_EVENT holder can edit
+        if viewModel.hasUpdatePermission { return true }
 
         // Members (and hosts) can post the event to a feed — must match the
         let canPostEventToFeed = viewModel.isEventHost || (viewModel.event?.targetCommunity?.isJoined ?? false)

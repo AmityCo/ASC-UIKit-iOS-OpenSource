@@ -217,7 +217,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
     var pendingRequestsBanner: some View {
         let shouldDefinitelyHideBanner = viewConfig.isHidden(elementId: .communityPendingPost) || viewModel.joinStatus != .joined
         
-        if community.hasModeratorRole || viewModel.hasAddCommunityUserPermission {
+        if viewModel.hasReviewPermission || viewModel.hasAddCommunityUserPermission {
             let postsCount = community.isPostReviewEnabled ? viewModel.pendingPostCount : 0
             let requestsCount = community.requiresJoinApproval ? viewModel.joinRequestCount : 0
             let totalCount = postsCount + requestsCount
@@ -231,6 +231,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
 
                     onPendingRequestBannerTap?(selectedTab)
                 }
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityProfile.pendingRequestsBanner)
         } else {
             let pendingRequestTitle = viewModel.pendingPostCount == 1
                 ? AmityLocalizedStringSet.Social.communityPendingRequestSingular.localizedString
@@ -240,6 +241,7 @@ public struct AmityCommunityHeaderComponent: AmityComponentView {
                 .onTapGesture {
                     onPendingRequestBannerTap?(.pendingPosts)
                 }
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityProfile.pendingReviewBanner)
         }
     }
     

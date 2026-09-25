@@ -92,7 +92,7 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                     do {
                         try await viewModel.sendMessage()
                     } catch {
-                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamChatSendFailedMessage.localizedString, bottomPadding: 60)
+                        Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamChatSendFailedMessage.localizedString, aboveBottomBarHeight: viewModel.composeBarHeight)
                     }
                     
                     viewModel.messageInput.removeAll()
@@ -105,6 +105,7 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                     .frame(width: 32, height: 32)
                     .padding(.bottom, 8)
             }
+            .accessibilityIdentifier(AccessibilityID.Chat.LiveChatFeed.composerSendButton)
         }
         else if viewModel.isStreamer && viewModel.participantRole != .viewer {
             // Only host can invite co-host
@@ -180,6 +181,7 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                         hideKeyboard()
                     }
                 }
+                .accessibilityIdentifier(AccessibilityID.Chat.LiveChatFeed.composerTextField)
         } else {
             ExpandableTextEditorView(isTextEditorFocused: .constant(true), input: $viewModel.messageInput)
                 .placeholder(placeholder)
@@ -187,6 +189,7 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                 .maxCharCount(maxCharCount)
                 .lineLimit(1)
                 .disableNewlines(true)
+                .accessibilityIdentifier(AccessibilityID.Chat.LiveChatFeed.composerTextField)
         }
     }
     

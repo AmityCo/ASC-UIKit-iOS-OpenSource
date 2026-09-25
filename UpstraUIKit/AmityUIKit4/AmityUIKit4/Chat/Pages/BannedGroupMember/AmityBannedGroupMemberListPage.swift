@@ -18,18 +18,25 @@ final class AmityBannedGroupMemberListViewModel: ObservableObject {
     @Published var selectedMember: AmityChannelMember?
 
     private let channelId: String
-    private let isModerator: Bool
+    @Published var canUnban: Bool = false
     private let channelManager = ChannelManager()
 
     private var collection: AmityCollection<AmityChannelMember>?
     private var token: AmityNotificationToken?
     private var cancellables = Set<AnyCancellable>()
 
-    init(channelId: String, isModerator: Bool) {
+    init(channelId: String) {
         self.channelId = channelId
-        self.isModerator = isModerator
         loadBannedMembers(query: "")
         observeSearch()
+        fetchPermissions()
+    }
+
+    private func fetchPermissions() {
+        Task { [weak self] in
+            guard let self else { return }
+            self.canUnban = await ChatPermissionChecker.hasPermission(.banChannelUser, channelId: channelId)
+        }
     }
 
     private func loadBannedMembers(query: String) {
@@ -75,7 +82,7 @@ final class AmityBannedGroupMemberListViewModel: ObservableObject {
         try await channelManager.unbanMembers(channelId: channelId, userIds: [userId])
     }
 
-    var canModerate: Bool { isModerator }
+    var canModerate: Bool { canUnban }
 }
 
 // MARK: - Page
@@ -92,8 +99,8 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
     @State private var showToast: Bool = false
     @State private var toastStyle: ToastStyle = .success
 
-    public init(channelId: String, isModerator: Bool = false) {
-        self._viewModel = StateObject(wrappedValue: AmityBannedGroupMemberListViewModel(channelId: channelId, isModerator: isModerator))
+    public init(channelId: String) {
+        self._viewModel = StateObject(wrappedValue: AmityBannedGroupMemberListViewModel(channelId: channelId))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .bannedGroupMemberListPage))
     }
 
@@ -238,6 +245,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 }
                 .buttonStyle(.plain)
                 .padding(.trailing, 4)
+                .accessibilityIdentifier(AccessibilityID.Chat.BannedMemberList.actionButton)
             } else {
                 Color.clear.frame(width: 16, height: 24)
             }
@@ -280,6 +288,7 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier(AccessibilityID.Chat.BannedMemberList.unbanButton)
         }
         .background(Color(viewConfig.color(.surfaceSheetsBackgroundGeneral)))
         .updateTheme(with: viewConfig)

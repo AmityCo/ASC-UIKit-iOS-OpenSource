@@ -100,7 +100,19 @@ class ChatManager {
     func unflagMessage(messageId: String) async throws {
         return try await repository.unflagMessage(withId: messageId)
     }
-    
+
+    @MainActor
+    @discardableResult
+    func pinMessage(messageId: String) async throws -> AmityChannel {
+        return try await repository.pinMessage(withId: messageId)
+    }
+
+    @MainActor
+    @discardableResult
+    func unpinMessage(messageId: String) async throws -> AmityChannel {
+        return try await repository.unpinMessage(withId: messageId)
+    }
+
     func getChannel(channelId: String) -> AmityChannel? {
         return channelRepository.getChannel(channelId).snapshot
     }

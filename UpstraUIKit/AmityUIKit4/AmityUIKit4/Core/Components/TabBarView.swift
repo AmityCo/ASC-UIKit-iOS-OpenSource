@@ -12,9 +12,12 @@ struct TabBarView: View {
     @Namespace var namespace
     
     @Binding var tabBarOptions: [String]
-    
+
     private var selectedTabColor: UIColor = .blue
-    
+    // Optional per-tab accessibilityIdentifiers (index-aligned with tabBarOptions).
+    // Empty by default so existing call sites are unaffected.
+    private var accessibilityIDs: [String] = []
+
     init(currentTab: Binding<Int>, tabBarOptions: Binding<[String]>) {
         self._currentTab = currentTab
         self._tabBarOptions = tabBarOptions
@@ -32,8 +35,9 @@ struct TabBarView: View {
                                namespace: namespace.self,
                                tabBarItemName: name,
                                tab: index,
-                               selectedTabColor: selectedTabColor)
-                    
+                               selectedTabColor: selectedTabColor,
+                               accessibilityID: index < accessibilityIDs.count ? accessibilityIDs[index] : "")
+
                 })
             }
         }
@@ -46,7 +50,8 @@ struct TabBarView: View {
         var tabBarItemName: String
         var tab: Int
         var selectedTabColor: UIColor
-        
+        var accessibilityID: String = ""
+
         var body: some View {
             Button {
                 self.currentTab = tab
@@ -68,6 +73,7 @@ struct TabBarView: View {
                 .animation(.easeInOut(duration: 0.1), value: self.currentTab)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier(accessibilityID)
         }
     }
 }
@@ -75,5 +81,10 @@ struct TabBarView: View {
 extension TabBarView: AmityViewBuildable {
     func selectedTabColor(_ value: UIColor) -> Self {
         self.mutating(keyPath: \.selectedTabColor, value: value)
+    }
+
+    // Provide accessibilityIdentifiers for the tabs (index-aligned with tabBarOptions).
+    func tabBarAccessibilityIDs(_ value: [String]) -> Self {
+        self.mutating(keyPath: \.accessibilityIDs, value: value)
     }
 }

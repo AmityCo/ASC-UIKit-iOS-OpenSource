@@ -27,12 +27,32 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     // Channel moderation related data
     @Published var moderators: [String] = []
     @Published var mutedMembers: [String] = []
+
+    
+    @Published var pinnedMessage: AmityPinnedMessage?
+    @Published var pinnedAuthor: AmityUser?
+    @Published var canPin: Bool = false
+
+    @Published var isPinnedMessageExpanded: Bool = false {
+        didSet {
+            guard let channelId = channel?.channelId else { return }
+            PinnedBannerExpansionStore.shared.setExpanded(
+                isPinnedMessageExpanded, channelId: channelId, messageId: pinnedMessage?.messageId)
+        }
+    }
     
     private let channelManager = ChannelManager()
     private let chatManager = ChatManager()
     private let streamManager = StreamManager()
+    private let userManager = UserManager()
     private var streamToken: AmityNotificationToken?
     private var channelToken: AmityNotificationToken?
+    private var pinnedAuthorToken: AmityNotificationToken?
+    private var currentUserToken: AmityNotificationToken?
+    /// The current user we subscribed the `.user` topic on, held so we can unsubscribe on cleanup.
+    private var subscribedCurrentUser: AmityUser?
+    /// Public user id currently resolved into `pinnedAuthor`, to avoid re-fetching on every channel emission.
+    private var pinnedAuthorId: String?
     private var channel: AmityChannel?
     private var collectionCancellable: AnyCancellable?
     private var loadingStatusCancellable: AnyCancellable?
@@ -58,6 +78,11 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     @Published var isProductTagEnabled: Bool = false
     
     let room: AmityRoom
+    /// Latest observed room status. `room` is an immutable snapshot frozen at init (often pre-`live`
+    /// for a host, whose VM is built during stream setup), so its `.status` never advances. The room
+    /// live-object observer feeds fresh status here via `refreshHostAndCoHostId`, and `recomputeCanPin`
+    /// reads this — not `room.status` — so the pin gate opens once the stream actually goes live.
+    private var currentRoomStatus: AmityRoomStatus
     @Published var hostUserId: String = ""
     @Published var coHostUserId: String = ""
     
@@ -72,6 +97,15 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     
     let participantRole: LiveStreamParticipantRole
     let liveReactionViewModel: LiveReactionViewModel
+
+    /// Compose bar heights (points, above the bottom safe area), passed to
+    /// `Toast.showToast(aboveBottomBarHeight:)` so a toast sits above the bar. The broadcaster bar is
+    /// taller than the viewer bar because of its extra vertical padding.
+    static let viewerComposeBarHeight: CGFloat = 50
+    static let broadcasterComposeBarHeight: CGFloat = 78
+    var composeBarHeight: CGFloat {
+        isStreamer ? Self.broadcasterComposeBarHeight : Self.viewerComposeBarHeight
+    }
     
     enum ComposeBarState {
         // Normal state that allows user to send messages and reactions
@@ -133,6 +167,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
     
     public init(room: AmityRoom, participantRole: LiveStreamParticipantRole = .viewer) {
         self.room = room
+        self.currentRoomStatus = room.status
         self.participantRole = participantRole
         
         let hostId = room.creatorId ?? ""
@@ -147,7 +182,11 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         self.liveReactionViewModel = LiveReactionViewModel(room: room)
         
         guard let channel else { return }
-        
+
+        // Observe the current user so a network-scoped PIN_MESSAGE change (delivered via
+        // `user.updated`, which the channel role events do not carry) recomputes `canPin`.
+        observeCurrentUser()
+
         // If the user is streamer, we don't need to change compose bar state during live stream
         // because the streamer can always send messages and reactions
         // Also the streamer has already joined the channel since channel is created by the streamer
@@ -270,7 +309,23 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
             if let mutedMembers = channel.metadata?["mutedMembers"] as? [String] {
                 self.mutedMembers = mutedMembers
             }
-            
+
+            // Pinned message (server-owned; nil when nothing is pinned).
+            let newPinned = channel.pinnedMessage
+            self.pinnedMessage = newPinned
+
+            PinnedBannerExpansionStore.shared.syncPinnedMessage(
+                channelId: channel.channelId, messageId: newPinned?.messageId)
+
+            // Restore the banner's expanded state from the shared store
+            let restoredExpanded = PinnedBannerExpansionStore.shared.isExpanded(
+                channelId: channel.channelId, messageId: newPinned?.messageId)
+            if self.isPinnedMessageExpanded != restoredExpanded {
+                self.isPinnedMessageExpanded = restoredExpanded
+            }
+            self.resolvePinnedAuthor(newPinned)
+            self.recomputeCanPin()
+
             // update ComposeBar State only for cohost, viewer
             if participantRole != .host {
                 self.isChannelEnabled = !channel.isMuted
@@ -294,9 +349,28 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
                 guard let member else { return }
                 self?.isUserMuted = member.isMuted
                 self?.updateComposeBarState()
+                self?.recomputeCanPin()
             })
     }
-    
+
+    /// Observes the current user's live object and subscribes its `.user` topic so a network-scoped
+    /// permission change flips `canPin`. `hasPermission(.pinMessage, forChannel:)` unions the user's
+    /// NETWORK permissions (`CDUser.permissions`) with the channel ones (`CDChannelUser`). A channel
+    /// role change reaches `canPin` through `myMembership()`, but a network-scoped grant / revoke
+    /// (made from the Console) arrives only on `user.updated` → `CDUser`, which `myMembership()` does
+    /// not observe. The SDK does not auto-subscribe the user topic, so subscribe it here for the
+    /// lifetime of this chat and recompute when the user object emits.
+    private func observeCurrentUser() {
+        currentUserToken = AmityUIKitManagerInternal.shared.client.user?.observe { [weak self] liveObject, _ in
+            guard let self else { return }
+            if self.subscribedCurrentUser == nil, let user = liveObject.snapshot {
+                self.subscribedCurrentUser = user
+                user.subscribeEvent(.user) { _, _ in }
+            }
+            self.recomputeCanPin()
+        }
+    }
+
     private func observeMessages(_ channel: AmityChannel) {
         let queryOptions = AmityMessageQueryOptions(subChannelId: channel.channelId, type: .text, sortOption: .lastCreated)
         messageCollection = chatManager.queryMessages(options: queryOptions)
@@ -377,7 +451,7 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         }
         
         builder.setMetadata(metadata)
-        
+
         try await channelManager.removeRole(channelId: channel.channelId, userId: userId, role: AmityChannelRole.channelModerator.rawValue)
         self.channel = try await channelManager.updateChannel(builder: builder)
     }
@@ -426,16 +500,26 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         let previousTask = refreshTask
         
         refreshTask = Task { @MainActor [weak self] in
-            await previousTask?.value
-            
             guard let self = self else { return }
-            
+
             let newHostUserId = room.creatorId ?? ""
             let newCoHost = room.participants.first(where: { $0.type == "coHost" })
             let newCoHostUserId = newCoHost?.userId ?? ""
 
+            // Flip the pin gate immediately from the fresh snapshot — the room's live status AND the
+            // current user's host/co-host status — before awaiting the previous refresh task or the
+            // co-host promote/demote network calls below. Otherwise the host's "Pin message" action
+            // shows late: the gate needs `isStreamer` to be true at this point, not only after the
+            // await chain (which sets it at the end) completes.
+            self.currentRoomStatus = room.status
+            self.isHost = AmityUIKitManagerInternal.shared.currentUserId == newHostUserId
+            self.isCoHost = AmityUIKitManagerInternal.shared.currentUserId == newCoHostUserId
+            self.recomputeCanPin()
+
+            await previousTask?.value
+
             canCoHostManageProduct = newCoHost?.canManageProductTags ?? false
-            
+
             if participantRole == .host {
                 do {
                     if !newCoHostUserId.isEmpty && !self.isModerator(userId: newCoHostUserId) {
@@ -448,13 +532,76 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
                     Log.add(event: .error, "Error updating moderator status for co-host: \(error.localizedDescription)")
                 }
             }
-            
+
             self.hostUserId = newHostUserId
             self.coHostUserId = newCoHostUserId
-            self.isHost = AmityUIKitManagerInternal.shared.currentUserId == newHostUserId
-            self.isCoHost = AmityUIKitManagerInternal.shared.currentUserId == newCoHostUserId
+            // Fresh snapshot carries the live status; the stored `room` is frozen at init.
+            self.currentRoomStatus = room.status
+            self.recomputeCanPin()
         }
     }
+
+    func recomputeCanPin() {
+        guard currentRoomStatus == .live, let channelId = channel?.channelId else {
+            canPin = false
+            return
+        }
+        if isStreamer {
+            canPin = true
+            return
+        }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            let allowed = await AmityUIKitManagerInternal.shared.client.hasPermission(.pinMessage, forChannel: channelId)
+            self.canPin = allowed && self.currentRoomStatus == .live
+        }
+    }
+    /// Resolves the pinned message's author into `pinnedAuthor` (display name + brand badge).
+    /// Re-fetches only when the author id changes; clears when nothing is pinned.
+    private func resolvePinnedAuthor(_ pinnedMessage: AmityPinnedMessage?) {
+        guard let pinnedMessage else {
+            pinnedAuthorToken?.invalidate()
+            pinnedAuthorToken = nil
+            pinnedAuthorId = nil
+            pinnedAuthor = nil
+            return
+        }
+        let authorId = pinnedMessage.creatorPublicId
+        guard authorId != pinnedAuthorId else { return }
+        pinnedAuthorId = authorId
+        pinnedAuthorToken?.invalidate()
+        pinnedAuthorToken = userManager.getUser(withId: authorId).observe { [weak self] object, _ in
+            guard let self else { return }
+            self.pinnedAuthor = object.snapshot
+        }
+    }
+
+    /// Pins a message. The server broadcasts the new pin over the channel event; `pinnedMessage`
+    /// updates through `observeChannel`, so nothing is set locally here. On failure (e.g. a 403
+    /// because the local `canPin` was stale) the gate is recomputed silently — no user-facing toast.
+    @MainActor
+    func pinMessage(_ messageId: String) async throws {
+        do {
+            try await chatManager.pinMessage(messageId: messageId)
+        } catch {
+            recomputeCanPin()
+            throw error
+        }
+    }
+
+    /// Unpins the current pinned message (or `messageId` when given). Like pin, the channel event
+    /// clears `pinnedMessage`; a failure recomputes the gate silently.
+    @MainActor
+    func unpinMessage(_ messageId: String? = nil) async throws {
+        guard let id = messageId ?? pinnedMessage?.messageId else { return }
+        do {
+            try await chatManager.unpinMessage(messageId: id)
+        } catch {
+            recomputeCanPin()
+            throw error
+        }
+    }
+
     func inviteAsCoHost(userId: String) async throws {
         try await room.createInvitation(userId)
     }
@@ -484,7 +631,16 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
         
         channelToken?.invalidate()
         channelToken = nil
-        
+
+        pinnedAuthorToken?.invalidate()
+        pinnedAuthorToken = nil
+
+        currentUserToken?.invalidate()
+        currentUserToken = nil
+
+        subscribedCurrentUser?.unsubscribeEvent(.user) { _, _ in }
+        subscribedCurrentUser = nil
+
         // Clear collection
         messageCollection = nil
         
@@ -508,6 +664,40 @@ public class AmityLiveStreamChatViewModel: ObservableObject {
             await MainActor.run {
                 self.isProductTagEnabled = false
             }
+        }
+    }
+}
+
+/// Remembers which pinned message the current user has expanded, per channel, for the lifetime of the
+/// app session. The livestream chat view model is rebuilt when the user's role changes (viewer ⇄
+/// co-host), which resets its in-memory expanded flag; persisting the expanded message id here lets a
+/// fresh view model restore the banner's expanded state for the SAME pinned message, while a newly
+/// pinned message (not in the store) starts collapsed. Only one message per channel can be the
+/// "expanded" one, so this holds a single id per channel.
+final class PinnedBannerExpansionStore {
+    static let shared = PinnedBannerExpansionStore()
+    private init() {}
+
+    private var expandedMessageIdByChannel: [String: String] = [:]
+
+    func isExpanded(channelId: String, messageId: String?) -> Bool {
+        guard let messageId else { return false }
+        return expandedMessageIdByChannel[channelId] == messageId
+    }
+
+    func setExpanded(_ expanded: Bool, channelId: String, messageId: String?) {
+        guard let messageId else { return }
+        if expanded {
+            expandedMessageIdByChannel[channelId] = messageId
+        } else if expandedMessageIdByChannel[channelId] == messageId {
+            expandedMessageIdByChannel[channelId] = nil
+        }
+    }
+
+    func syncPinnedMessage(channelId: String, messageId: String?) {
+        guard let messageId else { return }
+        if expandedMessageIdByChannel[channelId] != messageId {
+            expandedMessageIdByChannel[channelId] = nil
         }
     }
 }

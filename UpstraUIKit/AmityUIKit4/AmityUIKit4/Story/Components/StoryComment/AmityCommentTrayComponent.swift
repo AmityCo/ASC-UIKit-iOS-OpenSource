@@ -74,7 +74,7 @@ public struct AmityCommentTrayComponent: AmityComponentView {
         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
                      height: (commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false || commentBottomSheetViewModel.hasDeletePermission) ? .fixed(204) : .fixed(148),
                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-            CommentBottomSheetView(viewModel: commentBottomSheetViewModel, toastBottomPadding: Toast.bottomBarPadding) { comment in
+            CommentBottomSheetView(viewModel: commentBottomSheetViewModel, bottomBarHeight: Toast.bottomBarHeight) { comment in
                 commentCoreViewModel.editingComment = comment
             } reportAction: { comment in
 
@@ -86,7 +86,7 @@ public struct AmityCommentTrayComponent: AmityComponentView {
                 }
 
                 AmityUserAction.perform(host: host) {
-                    let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil), toastBottomPadding: Toast.bottomBarPadding)
+                    let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil), bottomBarHeight: Toast.bottomBarHeight)
                         .updateTheme(with: viewConfig)
                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                     vc.isNavigationBarHidden = true

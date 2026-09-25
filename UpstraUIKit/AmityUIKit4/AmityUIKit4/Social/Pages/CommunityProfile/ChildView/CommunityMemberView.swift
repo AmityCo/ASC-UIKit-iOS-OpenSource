@@ -57,6 +57,7 @@ struct CommunityMemberView: View {
                         .foregroundColor(Color(viewConfig.theme.baseColor))
                         .frame(width: 24, height: 18)
                 }
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityMember.menuButton)
             }
         }
         .contentShape(Rectangle())

@@ -369,8 +369,10 @@ public struct AmityEditGroupProfilePage: AmityPageView {
 
                 // Placeholder
                 if viewModel.displayName.isEmpty {
+                    // The bare `Placeholder/Enabled` token — the `-Filled` modifier below it is the
+                    // *value* colour, so using it here painted the hint in full-strength body text.
                     Text(AmityLocalizedStringSet.Chat.EditGroupProfile.namePlaceholder.localizedString)
-                        .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
+                        .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabled))))
                         .padding(.top, 8)
                         .padding(.leading, 4)
                         .allowsHitTesting(false)
@@ -381,9 +383,15 @@ public struct AmityEditGroupProfilePage: AmityPageView {
                     .transparentBackground()
                     .background(Color.clear)
                     .onChange(of: viewModel.displayName) { newValue in
+                        // A group name is one line of content even when it wraps onto several, so
+                        // Return must not leave a break behind: strip it the moment it lands and the
+                        // key becomes a no-op. The character cap then applies to the unbroken text.
+                        // `AmityCreateGroupChatPage` does the same on its copy of this field.
                         let limit = 100
-                        if newValue.count > limit {
-                            viewModel.displayName = String(newValue.prefix(limit))
+                        let unbroken = newValue.replacingOccurrences(of: "\n", with: "")
+                        let clamped = unbroken.count > limit ? String(unbroken.prefix(limit)) : unbroken
+                        if clamped != newValue {
+                            viewModel.displayName = clamped
                         }
                     }
             }

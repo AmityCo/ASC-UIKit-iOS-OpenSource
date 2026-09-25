@@ -100,10 +100,4 @@ public struct AmityCommunityModel: Identifiable {
         return object.getPostCount(feedType: .declined)
     }
     
-    var hasModeratorRole: Bool {
-        if let communityMember = object.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
-            return communityMember.hasModeratorRole
-        }
-        return false
-    }
 }

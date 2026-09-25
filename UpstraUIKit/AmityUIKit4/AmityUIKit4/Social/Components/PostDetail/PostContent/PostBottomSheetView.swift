@@ -39,7 +39,7 @@ struct PostBottomSheetView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            if post.hasModeratorPermission {
+            if viewModel.hasDeletePermission {
                 moderatorView
             } else {
                 memberView
@@ -199,8 +199,9 @@ struct PostBottomSheetView: View {
                     onConfirm: deletePost
                 )
             }
+            .accessibilityIdentifier(AccessibilityID.Social.PostMenu.delete)
     }
-    
+
     private var flagSheetButton: some View {
         BottomSheetItemView(icon: viewModel.isPostFlaggedByMe ? AmityIcon.unflagIcon.imageResource : AmityIcon.flagIcon.imageResource, text: viewModel.isPostFlaggedByMe ? AmityLocalizedStringSet.Social.unreportPostBottomSheetTitle.localizedString : AmityLocalizedStringSet.Social.reportPostBottomSheetTitle.localizedString)
             .onTapGesture {
@@ -241,6 +242,7 @@ struct PostBottomSheetView: View {
             .onTapGesture {
                 action?(.editPost)
             }
+            .accessibilityIdentifier(AccessibilityID.Social.PostMenu.edit)
     }
     
     @ViewBuilder

@@ -40,7 +40,7 @@ public struct AmityPendingPostListComponent: AmityComponentView {
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                     .padding([.leading, .trailing], 16)
                 )
-                .isHidden(!community.hasModeratorRole)
+                .isHidden(!viewModel.canReview)
 
             if viewModel.showEmpty {
                 getEmptyView()

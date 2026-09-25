@@ -30,11 +30,6 @@ struct ChatMessageActionView: View {
     let dismissAction: () -> Void
     @StateObject var viewModel: ChatMessageBubbleViewModel
 
-    /// Save video is temporarily disabled: transcoded videos are served as an HLS
-    /// stream that can't be reliably saved to Photos. The `onSaveVideo` handler
-    /// stays wired — set this to `true` to re-enable the "Save video" action.
-    private let isSaveVideoEnabled = false
-
     init(message: MessageModel, messageAction: AmityMessageAction, dismissAction: @escaping () -> Void) {
         self.message = message
         self.messageAction = messageAction
@@ -88,7 +83,7 @@ struct ChatMessageActionView: View {
                     messageAction.onEdit?(message)
                     dismissAction()
                 }
-                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.editButton.localizedString)
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageAction.edit)
             }
 
             ActionButton(title: AmityLocalizedStringSet.Chat.replyButton.localizedString,
@@ -97,7 +92,7 @@ struct ChatMessageActionView: View {
                 dismissAction()
             }
             .isHidden(message.syncState == .error)
-            .accessibilityIdentifier(AmityLocalizedStringSet.Chat.replyButton.localizedString)
+            .accessibilityIdentifier(AccessibilityID.Chat.MessageAction.reply)
 
             if message.type != .image && message.type != .video {
                 ActionButton(title: AmityLocalizedStringSet.Chat.copyButton.localizedString,
@@ -105,7 +100,7 @@ struct ChatMessageActionView: View {
                     messageAction.onCopy?(message)
                     dismissAction()
                 }
-                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.copyButton.localizedString)
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageAction.copy)
             }
 
             if message.type == .image,
@@ -116,11 +111,10 @@ struct ChatMessageActionView: View {
                     messageAction.onSaveImage?(message)
                     dismissAction()
                 }
-                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.SaveMedia.saveImageAction.localizedString)
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageAction.saveImage)
             }
 
-            if isSaveVideoEnabled,
-               message.type == .video,
+            if message.type == .video,
                messageAction.onSaveVideo != nil,
                message.syncState == .synced {
                 ActionButton(title: AmityLocalizedStringSet.Chat.SaveMedia.saveVideoAction.localizedString,
@@ -128,7 +122,7 @@ struct ChatMessageActionView: View {
                     messageAction.onSaveVideo?(message)
                     dismissAction()
                 }
-                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.SaveMedia.saveVideoAction.localizedString)
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageAction.saveVideo)
             }
 
             if !message.isOwner {
@@ -145,17 +139,17 @@ struct ChatMessageActionView: View {
                     }
                     dismissAction()
                 }
-                .accessibilityIdentifier(isFlaggedByOwner ? AmityLocalizedStringSet.Chat.unReportButton.localizedString : AmityLocalizedStringSet.Chat.reportButton.localizedString)
+                .accessibilityIdentifier(isFlaggedByOwner ? AccessibilityID.Chat.MessageAction.unreport : AccessibilityID.Chat.MessageAction.report)
             }
 
-            if message.isOwner || message.hasModeratorPermissionInChannel {
+            if message.isOwner || (messageAction.canDeleteOtherMessage?() ?? false) {
                 ActionButton(title: AmityLocalizedStringSet.Chat.deleteButton.localizedString,
                              image: AmityIcon.Chat.deletedMessageIcon.imageResource,
                              isDestructive: true) {
                     messageAction.onDelete?(message)
                     dismissAction()
                 }
-                .accessibilityIdentifier(AmityLocalizedStringSet.Chat.deleteButton.localizedString)
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageAction.delete)
             }
         }
         .onAppear {

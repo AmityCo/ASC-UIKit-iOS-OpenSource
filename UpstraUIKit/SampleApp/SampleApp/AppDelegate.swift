@@ -9,6 +9,7 @@
 import UIKit
 import SwiftUI
 import AmitySDK
+import AmityUIKit4
 #if DISTRIBUTION
 import Firebase
 #endif
@@ -26,6 +27,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Setup AmityUIKit
         AppManager.shared.setupAmityUIKit()
+
+        // Subscribe during application init, not when the overlay is first shown: the stream
+        // has no replay, so a later subscription silently loses the whole login burst.
+        AmityNetworkLogOverlayController.shared.startCapturing(client: AmityUIKit4Manager.client)
 
         if #available(iOS 13.0, *) {
             // on newer 13.0 version, the window setup finished on `SceneDelegate`

@@ -24,6 +24,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
         self.window = window
         window.makeKeyAndVisible()
+
+        // A dedicated window above the app window. AmityPageView is a bare protocol with no
+        // shared container, so there is nothing else for the panel to attach to.
+        AmityNetworkLogOverlayController.shared.attach(to: windowScene)
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {}

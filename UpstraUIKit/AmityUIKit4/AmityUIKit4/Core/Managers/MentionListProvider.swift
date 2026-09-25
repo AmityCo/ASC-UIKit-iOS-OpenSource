@@ -61,10 +61,8 @@ class MentionListProvider {
     }
     
     func checkMentionPermission() {
-        if case let .message(subChannelId)  = mentionType {
-            Task {
-                self.canMentionAll = await ChatPermissionChecker.hasModeratorPermission(for: subChannelId ?? "")
-            }
+        if case .message = mentionType {
+            canMentionAll = mentionConfiguration?.isMentionAllEnabled ?? false
         }
     }
     

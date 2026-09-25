@@ -106,7 +106,6 @@ public class AmityPostModel: Identifiable {
     
     var dataTypeInternal: DataType = .unknown
     var isModerator: Bool = false
-    var hasModeratorPermission: Bool = false
     let parentPostId: String?
     let latestComments: [AmityCommentModel]
     let postAsModerator: Bool = false
@@ -252,10 +251,6 @@ public class AmityPostModel: Identifiable {
         isTargetOfficialCommunity = post.targetCommunity?.isOfficial ?? false
         if let communityMember = targetCommunity?.membership.getMember(withId: postedUserId) {
             isModerator = communityMember.hasModeratorRole
-        }
-        
-        if let communityMember = targetCommunity?.membership.getMember(withId: AmityUIKitManagerInternal.shared.currentUserId) {
-            hasModeratorPermission = communityMember.hasModeratorRole
         }
         
         if post.targetType == "user" {

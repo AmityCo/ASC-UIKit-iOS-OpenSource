@@ -458,6 +458,7 @@
 				Core/Localization/QALocaleVerification.swift,
 				Core/Managers/CommentManager.swift,
 				Core/Managers/CommunityManager.swift,
+				Core/Managers/CuratedContentManager.swift,
 				Core/Managers/EventCalendarManager.swift,
 				Core/Managers/EventManager.swift,
 				Core/Managers/FeedManager.swift,
@@ -478,6 +479,7 @@
 				Core/Managers/StreamManager.swift,
 				Core/Managers/TextHighlighter.swift,
 				Core/Managers/UserManager.swift,
+				Core/Networking/AmityUIKitNetworkCapture.swift,
 				Core/Protocols/AmityComponentView.swift,
 				Core/Protocols/AmityElementView.swift,
 				Core/Protocols/AmityPageView.swift,
@@ -577,9 +579,11 @@
 				LiveStream/LiveChat/Components/AmityLiveStreamChatViewModel.swift,
 				LiveStream/LiveStreamAlert.swift,
 				LiveStream/Shared/Component/ManageProductTagListComponent.swift,
+				LiveStream/Shared/Element/LiveStreamChatBylineView.swift,
 				LiveStream/Shared/Element/LivestreamPinnedProductElement.swift,
 				LiveStream/Shared/Element/LiveViewerCountElement.swift,
 				LiveStream/Shared/Element/ManageProductTagElement.swift,
+				LiveStream/Shared/Element/PinnedMessageBannerView.swift,
 				LiveStream/Shared/Element/ProductTaggingButtonElement.swift,
 				LiveStream/ViewLiveStream/AmityLivestreamPlayerPage.swift,
 				LiveStream/ViewLiveStream/AmityLiveStreamPlayerPageViewModel.swift,
@@ -599,6 +603,7 @@
 				Social/Behaviors/AmityCommunitySearchResultComponentBehavior.swift,
 				Social/Behaviors/AmityCommunitySettingPageBehavior.swift,
 				Social/Behaviors/AmityCommunitySetupPageBehavior.swift,
+				Social/Behaviors/AmityDiscoveryWidgetComponentBehavior.swift,
 				Social/Behaviors/AmityCreatePostMenuComponentBehavior.swift,
 				Social/Behaviors/AmityGlobalFeedComponentBehavior.swift,
 				Social/Behaviors/AmityJoinRequestContentComponentBehavior.swift,
@@ -634,6 +639,21 @@
 				Social/Components/CommunityProfile/EmptyCommunityFeedView.swift,
 				Social/Components/CommunityProfile/MediaFeedViewModel.swift,
 				Social/Components/CommunityProfile/PrivateCommunityFeedView.swift,
+				Social/Components/DiscoveryWidget/AmityDiscoveryWidgetComponent.swift,
+				Social/Components/DiscoveryWidget/Card/AmityDiscoveryWidgetPostCardComponent.swift,
+				Social/Components/DiscoveryWidget/Card/DiscoveryWidgetCardHeaderView.swift,
+				Social/Components/DiscoveryWidget/Card/DiscoveryWidgetCardMediaView.swift,
+				Social/Components/DiscoveryWidget/Card/DiscoveryWidgetCardTextView.swift,
+				Social/Components/DiscoveryWidget/Card/DiscoveryWidgetEngagementBarView.swift,
+				Social/Components/DiscoveryWidget/Card/DiscoveryWidgetLinkPreviewView.swift,
+				Social/Components/DiscoveryWidget/Card/Poll/DiscoveryWidgetPollImageOptionView.swift,
+				Social/Components/DiscoveryWidget/Card/Poll/DiscoveryWidgetPollResults.swift,
+				Social/Components/DiscoveryWidget/Card/Poll/DiscoveryWidgetPollTextOptionView.swift,
+				Social/Components/DiscoveryWidget/Card/Poll/DiscoveryWidgetPollView.swift,
+				Social/Components/DiscoveryWidget/DiscoveryWidgetHeaderView.swift,
+				Social/Components/DiscoveryWidget/DiscoveryWidgetLayout.swift,
+				Social/Components/DiscoveryWidget/DiscoveryWidgetSkeletonView.swift,
+				Social/Components/DiscoveryWidget/DiscoveryWidgetViewModel.swift,
 				Social/Components/ImageFeedComponent.swift,
 				Social/Components/PendingRequests/AmityJoinRequestContentComponent.swift,
 				Social/Components/PendingRequests/AmityPendingPostListComponent.swift,
@@ -979,7 +999,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				57A3752A9B645634F3330046 /* SharedFrameworks */,
+				43B9BF6605EEC90E8087152D /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -1031,7 +1051,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				388D09A5B0DC404091416B3C /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				49A70DBD007E7A93E6C5954F /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1187,6 +1207,7 @@
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				__DIAGNOSE_INVALID_DEPLOYMENT_TARGET_AS_ERROR = NO;
 			};
 			name = Debug;
 		};
@@ -1246,6 +1267,7 @@
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
+				__DIAGNOSE_INVALID_DEPLOYMENT_TARGET_AS_ERROR = NO;
 			};
 			name = Release;
 		};
@@ -1389,16 +1411,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		388D09A5B0DC404091416B3C /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		49A70DBD007E7A93E6C5954F /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		57A3752A9B645634F3330046 /* SharedFrameworks */ = {
+		43B9BF6605EEC90E8087152D /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 388D09A5B0DC404091416B3C /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 49A70DBD007E7A93E6C5954F /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

@@ -480,6 +480,11 @@
 
 // Live Chat
 "live_chat_delete_message" = "Delete message";
+"live_chat_pin_message" = "Pin message";
+"live_chat_unpin_message" = "Unpin message";
+"live_chat_pinned_message_badge" = "Pinned";
+"live_chat_pinned_message_more" = "more";
+"live_chat_pinned_message_less" = "less";
 "live_chat_report_message" = "Report message";
 "live_chat_unreport_message" = "UnReport message";
 "live_chat_toast_report_message" = "Message reported.";
@@ -1654,3 +1659,8 @@
 // Community invite member page action button
 "community_invite_member_button" = "Invite";
 
+
+// Discovery Widget (Social Proof)
+"amity_social_status_poll_ended" = "Ended";
+"amity_social_label_poll_voters_count" = "%@ voters";
+"amity_social_label_reaction_count_plural" = "%@ reactions";

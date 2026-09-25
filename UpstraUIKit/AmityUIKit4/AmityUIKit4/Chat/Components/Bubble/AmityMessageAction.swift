@@ -31,6 +31,8 @@ public class AmityMessageAction {
     var showReaction: MessageAction?
     var onSeeMoreReplied: ((MessageModel) -> Void)?
 
+    var canDeleteOtherMessage: (() -> Bool)?
+
     public init(onCopy: MessageAction?, onReply: MessageAction?, onDelete: MessageAction?, onReport: MessageAction?, onUnReport: MessageAction?, onSaveImage: MessageAction? = nil, onSaveVideo: MessageAction? = nil, onSeeMore: ((MessageModel) -> Void)? = nil, onResend: MessageAction? = nil) {
         self.onCopy = onCopy
         self.onReply = onReply

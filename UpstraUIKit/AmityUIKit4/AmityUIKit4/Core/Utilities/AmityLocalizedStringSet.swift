@@ -560,6 +560,11 @@ public struct AmityLocalizedStringSet {
         static let demoteToMember = "live_chat_demote_to_member"
         static let muteUser = "live_chat_mute_user"
         static let unmuteUser = "live_chat_unmute_user"
+        static let pinMessage = "live_chat_pin_message"
+        static let unpinMessage = "live_chat_unpin_message"
+        static let pinnedMessageBadge = "live_chat_pinned_message_badge"
+        static let pinnedMessageMore = "live_chat_pinned_message_more"
+        static let pinnedMessageLess = "live_chat_pinned_message_less"
         static let promoteToModeratorTitle = "live_chat_promote_to_moderator_title"
         static let promoteToModeratorDesc = "live_chat_promote_to_moderator_desc"
         static let demoteToMemberTitle = "live_chat_demote_to_member_title"
@@ -1672,5 +1677,10 @@ public struct AmityLocalizedStringSet {
         static let visitorUsageLimitSubtitle = "amity_social_visitor_limit_subtitle"
         static let visitorUsageLimitSignIn = "amity_social_visitor_limit_sign_in"
         static let visitorUsageLimitToast = "amity_social_visitor_limit_toast"
+
+        // Discovery Widget (Social Proof)
+        static let discoveryWidgetPollEnded = "amity_social_status_poll_ended"
+        static let discoveryWidgetPollVotersCount = "amity_social_label_poll_voters_count"
+        static let discoveryWidgetReactionCountPlural = "amity_social_label_reaction_count_plural"
     }
 }

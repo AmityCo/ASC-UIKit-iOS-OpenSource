@@ -58,6 +58,7 @@ class AmityPostComposerViewModel: ObservableObject {
     private let originalTextProductTagIds: [String]
     private let originalMediaProductTagIds: [String: [String]]
     
+    @Published var canReviewPost: Bool = false
     @Published var didRemoveLinkPreview = false
     @Published var previewedLink: LinkDetail? // The link being previewed in composer
     @Published var links: [LinkDetail]? = []
@@ -170,6 +171,16 @@ class AmityPostComposerViewModel: ObservableObject {
 
         self.observeLinkChanges()
         self.getProductCatalogueFeatureSetting()
+        self.loadReviewPermission()
+    }
+
+    /// Resolve REVIEW_COMMUNITY_POST for the edited post's community — a reviewer's edit
+    /// bypasses the admin re-approval confirmation.
+    private func loadReviewPermission() {
+        guard let communityId = post?.targetCommunity?.communityId else { return }
+        Task { @MainActor [weak self] in
+            self?.canReviewPost = await CommunityPermissionChecker.hasReviewCommunityPostPermission(communityId: communityId)
+        }
     }
 
     func observeLinkChanges() {

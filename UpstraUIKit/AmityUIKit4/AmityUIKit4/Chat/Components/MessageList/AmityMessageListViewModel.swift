@@ -47,7 +47,22 @@ public class AmityMessageListViewModel: ObservableObject {
 
     @Published var selectedMessage: MessageModel?
     
-    var hasModeratorPermission = false
+    /// Holds `DELETE_MESSAGE` — may delete other users' messages (own messages are always deletable via `isOwner`).
+    @Published var canDeleteMessage = false
+    /// Holds `MUTE_CHANNEL` — may type while the channel is muted. Does NOT override a personal mute.
+    @Published var canBypassMute = false
+
+    /// Whether the composer is muted for the current user.
+    /// A personal mute (`.user` / `member.isMuted`) always blocks typing; the `MUTE_CHANNEL` bypass
+    /// (`canBypassMute`) only exempts a channel-level mute (`.channel` / `channel.isMuted`).
+    var isComposerMuted: Bool {
+        switch muteState {
+        case .user: return true
+        case .channel: return !canBypassMute
+        case .none: return false
+        }
+    }
+
     var delegate: AmityClientDelegate?
     
     enum QueryState {
@@ -79,11 +94,7 @@ public class AmityMessageListViewModel: ObservableObject {
     public init(subChannelId: String, aroundMessageId: String? = nil) {
         self.subChannelId = subChannelId
         self.pendingAroundMessageId = aroundMessageId
-        
-        Task {
-            self.hasModeratorPermission = await ChatPermissionChecker.hasModeratorPermission(for: subChannelId)
-        }
-        
+
         self.delegate = AmityUIKit4Manager.client.delegate
     }
     
@@ -95,7 +106,23 @@ public class AmityMessageListViewModel: ObservableObject {
         token?.invalidate()
         jumpTimeoutTask?.cancel()
     }
-    
+
+    /// Resolve the per-channel permissions that gate message delete and the channel-mute bypass —
+    /// permission checks (not role-name checks): `DELETE_MESSAGE` and `MUTE_CHANNEL`. Both are read
+    /// live at use-time (delete via the message-action callback, mute via `isComposerMuted`).
+    private func fetchPermissions() {
+        Task { [weak self] in
+            guard let self else { return }
+            async let canDelete = ChatPermissionChecker.hasPermission(.deleteMessage, channelId: self.subChannelId)
+            async let canBypass = ChatPermissionChecker.hasPermission(.muteChannel, channelId: self.subChannelId)
+            let (delete, bypass) = await (canDelete, canBypass)
+            await MainActor.run {
+                self.canDeleteMessage = delete
+                self.canBypassMute = bypass
+            }
+        }
+    }
+
     public func queryMessages() {
         
         let channel = AmityChannelRepository().getChannel(subChannelId).snapshot
@@ -119,7 +146,9 @@ public class AmityMessageListViewModel: ObservableObject {
         }
 
         messageCollection = chatManager.queryMessages(options: options)
-        
+
+        fetchPermissions()
+
         token?.invalidate()
         token = nil
         token = messageCollection?.observe({ [weak self] collection, error in
@@ -164,7 +193,7 @@ public class AmityMessageListViewModel: ObservableObject {
             let messages = collection.snapshots
             var messageModels = [MessageModel]()
             for message in messages {
-                let messageModel = MessageModel(message: message, hasModeratorPermission: hasModeratorPermission)
+                let messageModel = MessageModel(message: message)
                 messageModels.append(messageModel)
             }
             messageModels.reverse()

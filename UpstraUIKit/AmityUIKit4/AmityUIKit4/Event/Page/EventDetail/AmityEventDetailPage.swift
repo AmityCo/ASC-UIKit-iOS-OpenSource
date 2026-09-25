@@ -207,6 +207,7 @@ public struct AmityEventDetailPage: AmityPageView {
                     showMenuBottomSheet.toggle()
                 }
                 .opacity(shouldShowEventMenuOption() ? 1 : 0)
+                .accessibilityIdentifier(AccessibilityID.Event.EventDetailPage.menuButton)
         }
         .padding(.horizontal, 16)
         .padding(.top, 16)

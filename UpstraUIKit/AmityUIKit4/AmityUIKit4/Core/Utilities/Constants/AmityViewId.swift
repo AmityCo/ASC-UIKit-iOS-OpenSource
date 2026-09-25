@@ -162,6 +162,10 @@ public enum ComponentId: String {
     
     case manageProductTagList = "manage_product_tag_list"
 
+    // Discovery Widget (Social Proof)
+    case discoveryWidgetComponent = "discovery_widget_component"
+    case discoveryWidgetPostCardComponent = "discovery_widget_post_card_component"
+
 }
 
 public enum ElementId: String {
@@ -392,6 +396,10 @@ public enum ElementId: String {
     case productTagListItem = "product_tag"
     // Livestream Pinned Product
     case livestreamPinnedProduct = "livestream_pinned_product"
+    case pinnedMessageBanner = "pinned_message_banner"
     // Livestream Viewer Count
     case liveViewerCount = "live_viewer_count_element"
+
+    // Discovery Widget (Social Proof)
+    case discoveryWidgetTitle = "discovery_widget_title"
 }

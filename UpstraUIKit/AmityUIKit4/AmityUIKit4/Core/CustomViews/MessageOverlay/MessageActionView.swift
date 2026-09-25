@@ -152,7 +152,7 @@ struct MessageActionView: View {
                 .accessibilityIdentifier(isFlaggedByOwner ? AmityLocalizedStringSet.Chat.unReportButton.localizedString : AmityLocalizedStringSet.Chat.reportButton.localizedString)
             }
             
-            if message.isOwner || message.hasModeratorPermissionInChannel {
+            if message.isOwner || (messageAction.canDeleteOtherMessage?() ?? false) {
                 
                 Divider()
                     .frame(maxWidth: .infinity)

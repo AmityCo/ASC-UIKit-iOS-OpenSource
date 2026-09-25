@@ -92,6 +92,7 @@ struct AmityMentionUserItemView: View {
                 }
             }
         })
+        .accessibilityIdentifier(user.isChannelMention ? AccessibilityID.Chat.MentionList.notifyEveryone : AccessibilityID.Chat.MentionList.userDisplayName)
         .frame(height: 52)
         .padding(.horizontal, 10)
         //.padding(10) // Height for each row is 52

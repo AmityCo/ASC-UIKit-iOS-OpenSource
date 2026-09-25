@@ -113,9 +113,17 @@ extension View {
 /// To use with UIKit way
 public class Toast: UIViewController {
 
+    /// Bottom padding for pages with no bottom bar.
     public static let defaultBottomPadding: CGFloat = 30
-    /// Bottom padding for screens with a bottom bar, such as the livestream compose bar.
+    /// Bottom padding for pages that have a bottom bar / text field.
     public static let bottomBarPadding: CGFloat = 60
+    public static let bottomBarHeight: CGFloat = 60
+    /// Gap between the visible toast pill and the top of the bottom bar, used by the
+    /// `aboveBottomBarHeight:` overload. Toast-owned styling, not feature data.
+    static let bottomBarGap: CGFloat = 12
+    /// Empty space below the visible pill inside the toast's nib frame; subtracted so the gap above the
+    /// bar is measured from the pill rather than the frame.
+    static let toastContentBottomInset: CGFloat = 10
 
     @IBOutlet weak var content: UIView!
     
@@ -155,7 +163,7 @@ public class Toast: UIViewController {
     }
     
     public static func showToast(style: ToastStyle, message: String, bottomPadding: CGFloat = Toast.defaultBottomPadding, autoHide: Bool = true) {
-    
+
         guard Thread.isMainThread else {
             DispatchQueue.main.async {
                 showToast(style: style, message: message, bottomPadding: bottomPadding, autoHide: autoHide)
@@ -164,18 +172,47 @@ public class Toast: UIViewController {
         }
         let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
         guard let window = keyWindow else { return }
-        
+
         let safeAreaPadding = window.safeAreaInsets.bottom
         let padding = safeAreaPadding > bottomPadding ? safeAreaPadding + 10 : bottomPadding
-        
+
         let toastView = Toast.makeView(style: style, message: message)
         toastView.tag = ToastView.toastViewTag
         toastView.frame = CGRect(x: 0, y: CGFloat(UIScreen.main.bounds.height - ((padding) * UIScreen.main.scale)), width: UIScreen.main.bounds.width, height: toastView.frame.height)
+
+        present(toastView, in: window, autoHide: autoHide)
+    }
+
+    /// Positions the toast above a bottom bar (text field / compose bar) of `bottomBarHeight`,
+    /// measured from the live safe-area inset so it is consistent across devices and screen scales.
+    /// The bar height is supplied by the caller — Toast stores no feature-specific layout values.
+    public static func showToast(style: ToastStyle, message: String, aboveBottomBarHeight bottomBarHeight: CGFloat, autoHide: Bool = true) {
+
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async {
+                showToast(style: style, message: message, aboveBottomBarHeight: bottomBarHeight, autoHide: autoHide)
+            }
+            return
+        }
+        let keyWindow = UIApplication.shared.connectedScenes.flatMap { ($0 as? UIWindowScene)?.windows ?? [] }.first { $0.isKeyWindow }
+        guard let window = keyWindow else { return }
+
+        let toastView = Toast.makeView(style: style, message: message)
+        toastView.tag = ToastView.toastViewTag
+        // Place the visible pill's bottom edge `bottomBarGap` above the top of the bottom bar;
+        // `toastContentBottomInset` cancels the empty space the nib leaves below the pill.
+        let originY = UIScreen.main.bounds.height - window.safeAreaInsets.bottom - bottomBarHeight - bottomBarGap - toastView.frame.height + toastContentBottomInset
+        toastView.frame = CGRect(x: 0, y: originY, width: UIScreen.main.bounds.width, height: toastView.frame.height)
+
+        present(toastView, in: window, autoHide: autoHide)
+    }
+
+    private static func present(_ toastView: UIView, in window: UIWindow, autoHide: Bool) {
         toastView.alpha = 0.0
-        
+
         hideToastIfPresented()
         window.addSubview(toastView)
-        
+
         UIView.animate(withDuration: 0.5, delay: 0.0, options: .curveEaseInOut, animations: {
             toastView.alpha = 1.0
         }) { _ in
@@ -188,7 +225,7 @@ public class Toast: UIViewController {
             }
         }
     }
-    
+
     public static func hideToastIfPresented(immediately: Bool = false) {
         guard Thread.isMainThread else {
             DispatchQueue.main.async { hideToastIfPresented(immediately: immediately) }

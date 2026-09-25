@@ -131,10 +131,10 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                                 if let invitation, invitation.status == .pending  {
                                     self.showInvitedAsCoHostSheet = true
                                 } else if let invitation, invitation.status == .canceled ||  invitation.status == .rejected {
-                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, bottomPadding: 60)
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                                 }
                               else if isCohostInvited, invitation == nil {
-                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, bottomPadding: 60)
+                                    Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationNoLongerValid.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                                 }
                             }
                         }
@@ -176,12 +176,12 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                 // we can assume that the current user is co-host if they are in backstage
                 if event.type == .coHostRemoved && self?.currentState == .inBackstage {
                     self?.currentState = .viewer
-                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamLeftStageToast.localizedString, bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamLeftStageToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                 }
                 
                 // Display co-host left toast if the user is a viewer when co-host left
                 if event.type == .coHostLeft && self?.currentState == .viewer && event.room.status == .live {
-                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftToast.localizedString, bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                 }
                 
                 // Ensure the invitation is for the current user since BE is sending events to all users in the room
@@ -220,7 +220,7 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
                 try await self.coHostInvitation?.accept()
                 self.currentState = .inBackstage
             } catch {
-                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamAcceptInvitationFailed.localizedString, bottomPadding: 60)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamAcceptInvitationFailed.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
             }
         }
     }
@@ -230,9 +230,9 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
             do {
                 self.showInvitedAsCoHostSheet = false
                 try await self.coHostInvitation?.reject()
-                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationDeclinedToast.localizedString, bottomPadding: 60)
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationDeclinedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
             } catch {
-                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamDeclineInvitationFailed.localizedString, bottomPadding: 60)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamDeclineInvitationFailed.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
             }
         }
     }
@@ -240,7 +240,7 @@ public class AmityLiveStreamPlayerPageViewModel: ObservableObject {
     func leaveRoom() {
         Task.runOnMainActor {
             do {
-                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamLeftStageToast.localizedString, bottomPadding: 60)
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamLeftStageToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                 try await self.roomManager.leaveRoom(roomId: self.room?.roomId ?? "")
             } catch {
                 Log.add(event: .error, "Error when levaing the room: \(error.localizedDescription)")

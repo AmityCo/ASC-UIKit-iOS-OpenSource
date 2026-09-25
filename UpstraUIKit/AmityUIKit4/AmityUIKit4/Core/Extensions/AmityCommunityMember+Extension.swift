@@ -29,9 +29,3 @@ extension AmityCommunityMember {
     }
 }
 
-extension AmityUser {
-    
-    var hasModeratorRole: Bool {
-        return self.roles.contains { $0 == AmityCommunityRole.moderator.rawValue || $0 == AmityCommunityRole.communityModerator.rawValue }
-    }
-}

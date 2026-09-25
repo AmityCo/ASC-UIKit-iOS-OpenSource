@@ -107,6 +107,7 @@ public struct AmityCommunityMembershipPage: AmityPageView {
                         goToAddUserPage()
                     }
                 }
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityMember.addMemberButton)
         }
     }
     

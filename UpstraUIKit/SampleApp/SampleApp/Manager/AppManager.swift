@@ -194,6 +194,13 @@ final class AppManager {
         presentModule(host, title: "Chat", showCustomBackBarButton: false)
     }
 
+    /// Present the Discovery Widget test screen. The widget is embeddable rather than a module, so it
+    /// gets the standard back bar button rather than a page-owned back affordance.
+    func openDiscoveryWidgetTestPage() {
+        let host = AmitySwiftUIHostingController(rootView: DiscoveryWidgetTestPage())
+        presentModule(host, title: "Discovery Widget", showCustomBackBarButton: true)
+    }
+
     private func presentModule(_ root: UIViewController, title: String, showCustomBackBarButton: Bool) {
         DispatchQueue.main.async {
             root.title = title

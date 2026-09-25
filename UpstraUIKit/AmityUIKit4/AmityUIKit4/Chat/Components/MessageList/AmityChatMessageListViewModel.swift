@@ -53,7 +53,17 @@ public final class AmityChatMessageListViewModel: ObservableObject {
 
     @Published var selectedMessage: MessageModel?
 
-    @Published var hasModeratorPermission = false
+    @Published var canDeleteMessage = false
+    @Published var canBypassMute = false
+
+    var isComposerMuted: Bool {
+        switch muteState {
+        case .user: return true
+        case .channel: return !canBypassMute
+        case .none: return false
+        }
+    }
+
     var delegate: AmityClientDelegate?
 
     enum QueryState {
@@ -130,6 +140,7 @@ public final class AmityChatMessageListViewModel: ObservableObject {
 
         observeChannelForMidSessionBan()
         observeChannelModerators()
+        fetchPermissions()
 
         token?.invalidate()
         token = nil
@@ -182,7 +193,6 @@ public final class AmityChatMessageListViewModel: ObservableObject {
             for message in messages {
                 var messageModel = MessageModel(
                     message: message,
-                    hasModeratorPermission: hasModeratorPermission,
                     isGroupChat: isGroupChat,
                     isSenderModerator: mods.contains(message.userId)
                 )
@@ -231,6 +241,19 @@ public final class AmityChatMessageListViewModel: ObservableObject {
         }
     }
 
+    private func fetchPermissions() {
+        Task { [weak self] in
+            guard let self else { return }
+            async let canDelete = ChatPermissionChecker.hasPermission(.deleteMessage, channelId: self.subChannelId)
+            async let canBypass = ChatPermissionChecker.hasPermission(.muteChannel, channelId: self.subChannelId)
+            let (delete, bypass) = await (canDelete, canBypass)
+            // Both flags are read live at use-time — canDeleteMessage via the message-action
+            // callback, canBypassMute via `isComposerMuted` — so no message rebuild is needed.
+            self.canDeleteMessage = delete
+            self.canBypassMute = bypass
+        }
+    }
+
     private func observeChannelModerators() {
         moderatorsToken?.invalidate()
         moderatorsToken = nil
@@ -260,7 +283,6 @@ public final class AmityChatMessageListViewModel: ObservableObject {
         for message in snapshots {
             var model = MessageModel(
                 message: message,
-                hasModeratorPermission: hasModeratorPermission,
                 isGroupChat: isGroupChat,
                 isSenderModerator: mods.contains(message.userId)
             )
@@ -279,8 +301,9 @@ public final class AmityChatMessageListViewModel: ObservableObject {
             guard let channel = liveObject.snapshot else { return }
             guard let currentMember = channel.currentMember else { return }
 
-            let isModerator = currentMember.roles.contains(AmityChannelRole.channelModerator.rawValue)
-            if self.hasModeratorPermission != isModerator { self.hasModeratorPermission = isModerator }
+            // Permissions ride the membership record, which updates through this same channel
+            // observer — re-resolve so the gates become correct once permissions sync.
+            self.fetchPermissions()
 
             if currentMember.isBanned, self.initialQueryState != .banned {
                 self.initialQueryState = .banned

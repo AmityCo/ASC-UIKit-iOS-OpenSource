@@ -123,7 +123,7 @@ public struct AmityPostDetailPage: AmityPageView {
                         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
                                      height: (commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false || commentBottomSheetViewModel.hasDeletePermission) ? .fixed(204) : .fixed(148),
                                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {
-                            CommentBottomSheetView(viewModel: commentBottomSheetViewModel, toastBottomPadding: Toast.bottomBarPadding) { comment in
+                            CommentBottomSheetView(viewModel: commentBottomSheetViewModel, bottomBarHeight: Toast.bottomBarHeight) { comment in
                                 commentCoreViewModel.editingComment = comment
                             } reportAction: { comment in
                                 let commentId = comment?.commentId ?? ""
@@ -138,7 +138,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                 }
 
                                 AmityUserAction.perform(host: host) {
-                                    let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil), toastBottomPadding: Toast.bottomBarPadding)
+                                    let page = AmityContentReportPage(type: .comment(id: commentId, isReply: comment?.parentId != nil), bottomBarHeight: Toast.bottomBarHeight)
                                         .updateTheme(with: viewConfig)
                                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                     vc.isNavigationBarHidden = true
@@ -248,7 +248,7 @@ public struct AmityPostDetailPage: AmityPageView {
                                 
                                 let postId = postModel.postId
                                 
-                                let page = AmityContentReportPage(type: .post(id: postId), toastBottomPadding: Toast.bottomBarPadding)
+                                let page = AmityContentReportPage(type: .post(id: postId), bottomBarHeight: Toast.bottomBarHeight)
                                     .updateTheme(with: viewConfig)
                                 let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                 vc.isNavigationBarHidden = true

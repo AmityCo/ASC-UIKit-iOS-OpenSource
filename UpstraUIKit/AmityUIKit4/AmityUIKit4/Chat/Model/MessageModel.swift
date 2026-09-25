@@ -126,7 +126,6 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
     public let reactions: [String: Int]?
     public let myReactions: [String]
     public let syncState: AmitySyncState
-    public let hasModeratorPermissionInChannel: Bool
     public let flagCount: Int
     public var isFlaggedByMe: Bool?
     public var reactionCount: Int
@@ -185,10 +184,6 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
 
     public var videoPlaybackURL: URL? {
         guard let info = message?.getVideoInfo() else { return nil }
-        return URL(string: info.fileURL)
-    }
-    public var videoDownloadURL: URL? {
-        guard let info = message?.getVideoInfo() else { return nil }
         let preferred: [AmityVideoResolution] = [.res_1080p, .res_720p, .res_480p, .res_360p, .original]
         for res in preferred {
             if let urlStr = info.getVideo(resolution: res), let url = URL(string: urlStr) {
@@ -197,8 +192,12 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         }
         return nil
     }
+    public var videoDownloadURL: URL? {
+        guard let info = message?.getVideoInfo() else { return nil }
+        return URL(string: info.fileURL)
+    }
     
-    public init(message: AmityMessage, hasModeratorPermission: Bool = false, isGroupChat: Bool = false, isSenderModerator: Bool = false) {
+    public init(message: AmityMessage, isGroupChat: Bool = false, isSenderModerator: Bool = false) {
         self.message = message
         self.id = message.messageId
         self.uniqueId = message.uniqueId
@@ -222,7 +221,6 @@ public struct MessageModel: Identifiable, CustomDebugStringConvertible {
         self.reactions = message.reactions as? [String: Int]
         self.myReactions = message.myReactions
         self.syncState = message.syncState
-        self.hasModeratorPermissionInChannel = hasModeratorPermission
         self.flagCount = message.flagCount
         self.isFlaggedByMe = message.flagCount > 0 ? MessageCache.shared.isFlaggedByMe(messageId: message.messageId) : false
         self.isGroupChat = isGroupChat
@@ -312,7 +310,6 @@ extension MessageModel {
         self.mentionees = []
         self.reactions = [:]
         self.syncState = .default
-        self.hasModeratorPermissionInChannel = false
         self.flagCount = 0
         self.isFlaggedByMe = false
         self.myReactions = []

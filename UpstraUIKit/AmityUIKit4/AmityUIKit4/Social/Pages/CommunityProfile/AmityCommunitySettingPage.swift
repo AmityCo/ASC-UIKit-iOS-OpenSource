@@ -56,7 +56,8 @@ public struct AmityCommunitySettingPage: AmityPageView {
                     .onTapGesture {
                         AmityUIKitManagerInternal.shared.behavior.communitySettingPageBehavior?.goToPendingInvitationsPage(getPageBehaviorContext())
                     }
-                
+                    .accessibilityIdentifier(AccessibilityID.Social.CommunitySettings.pendingInvitations)
+
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
                     .frame(height: 1)

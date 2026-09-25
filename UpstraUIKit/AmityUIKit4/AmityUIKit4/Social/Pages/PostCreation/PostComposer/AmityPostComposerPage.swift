@@ -689,7 +689,7 @@ public struct AmityPostComposerPage: AmityPageView {
     private var needsReviewConfirmation: Bool {
         guard !viewModel.isInCreateMode, let post = viewModel.post,
               post.targetCommunity != nil else { return false }
-        return post.targetCommunity?.postSettings == .adminReviewPostRequired && !post.hasModeratorPermission
+        return post.targetCommunity?.postSettings == .adminReviewPostRequired && !viewModel.canReviewPost
     }
 
     private func showReviewConfirmationAlert() {

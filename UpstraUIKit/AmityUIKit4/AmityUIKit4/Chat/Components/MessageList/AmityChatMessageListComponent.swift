@@ -321,9 +321,10 @@ public struct AmityChatMessageListComponent: AmityComponentView {
                 .padding(.vertical, 16)
                 .padding(.horizontal, 16)
                 .background(Color(viewConfig.color(.surfaceBannerSubdueGeneral)))
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageComposer.muteBanner)
         }
         .opacity(vm.initialQueryState != .success ? 0 : 1)
-        .isHidden(vm.muteState == .none || vm.hasModeratorPermission)
+        .isHidden(!vm.isComposerMuted)
     }
 
     // MARK: - FAB & banner
@@ -543,6 +544,7 @@ public struct AmityChatMessageListComponent: AmityComponentView {
             vm.selectedMessage = msg
             vm.showingReactionSheet = true
         }
+        actions.canDeleteOtherMessage = { [weak vm] in vm?.canDeleteMessage ?? false }
         actions.onSeeMoreReplied = { pushFullText($0, AmityLocalizedStringSet.Chat.Bubble.repliedMessage.localizedString) }
         actions.onEdit = { msg in
             chatVM.composer.action = .edit(msg)

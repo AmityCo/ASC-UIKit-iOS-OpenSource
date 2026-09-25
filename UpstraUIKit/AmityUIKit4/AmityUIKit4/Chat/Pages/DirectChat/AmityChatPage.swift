@@ -220,7 +220,7 @@ public struct AmityChatPage: AmityPageView {
                         AmityChatMessageComposeBar(viewModel: liveChatViewModel)
                             // Visible during initial load too (Figma 12041:242294); hidden only on error/banned or when muted without permission.
                             .isHidden((messageViewModel.initialQueryState != .success && messageViewModel.initialQueryState != .loading)
-                                      || (messageViewModel.muteState != .none && !messageViewModel.hasModeratorPermission))
+                                      || messageViewModel.isComposerMuted)
                     }
                 }
             }

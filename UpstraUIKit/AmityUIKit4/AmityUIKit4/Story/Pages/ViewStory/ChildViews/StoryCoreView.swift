@@ -452,7 +452,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                     .padding(.trailing, -4)
             }
             .foregroundColor(.white)
-            .isHidden(!(story.isModerator || story.isCreator))
+            .isHidden(!(story.isCreator || hasStoryManagePermission))
             .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.reachButton)
             .isHidden(viewConfig.isHidden(elementId: .impressionIconElement), remove: false)
             
@@ -694,6 +694,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
                         host.controller?.present(alertController, animated: true)
                     }
                 }
+                .accessibilityIdentifier(AccessibilityID.Story.AmityViewStoryPage.BottomSheet.deleteButton)
         }
         .padding(.bottom, 32)
     }

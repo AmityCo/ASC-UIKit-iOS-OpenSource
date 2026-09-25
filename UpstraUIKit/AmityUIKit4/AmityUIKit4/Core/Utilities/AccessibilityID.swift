@@ -121,7 +121,41 @@ struct AccessibilityID {
     }
     
     struct Chat {
-        
+
+        struct GroupChatHeader {
+            static let container = "group_chat_header/*"
+            static let settingsButton = "group_chat_header/settings_button"
+        }
+
+        struct GroupSetting {
+            static let profile = "group_setting/profile"
+            static let notifications = "group_setting/notifications"
+            static let memberPermissions = "group_setting/member_permissions"
+            static let allMembers = "group_setting/all_members"
+            static let bannedUsers = "group_setting/banned_users"
+            static let myNotifications = "group_setting/my_notifications"
+            static let leaveButton = "group_setting/leave_button"
+        }
+
+        struct GroupMemberList {
+            static let addButton = "group_member_list/add_button"
+        }
+
+        struct GroupMemberAction {
+            static let promote = "group_member_action/promote"
+            static let demote = "group_member_action/demote"
+            static let mute = "group_member_action/mute"
+            static let unmute = "group_member_action/unmute"
+            static let report = "group_member_action/report"
+            static let ban = "group_member_action/ban"
+            static let remove = "group_member_action/remove"
+        }
+
+        struct BannedMemberList {
+            static let actionButton = "banned_member_list/action_button"
+            static let unbanButton = "banned_member_list/unban_button"
+        }
+
         struct MessageList {
             static let container = "message_list/*"
             static let senderTextView = "message_list/message_bubble_sender_text_text_view"
@@ -165,12 +199,25 @@ struct AccessibilityID {
             static let container = "message_composer/*"
             static let sendButton = "message_composer/send_button"
             static let textField = "message_composer/text_field"
+            static let muteBanner = "message_composer/mute_banner"
         }
-        
+
+        struct MessageAction {
+            static let edit = "message_action/edit"
+            static let reply = "message_action/reply"
+            static let copy = "message_action/copy"
+            static let saveImage = "message_action/save_image"
+            static let saveVideo = "message_action/save_video"
+            static let report = "message_action/report"
+            static let unreport = "message_action/unreport"
+            static let delete = "message_action/delete"
+        }
+
         struct MentionList {
             static let container = "mention_list/*"
             static let userAvatar = "mention_list/user_avatar"
             static let userDisplayName = "mention_list/user_display_name"
+            static let notifyEveryone = "mention_list/notify_everyone"
         }
         
         struct ReplyPanel {
@@ -185,6 +232,21 @@ struct AccessibilityID {
             static let userAvatarView = "reaction_list/user_avatar_view"
             static let userDisplayName = "reaction_list/user_display_name"
             static let reactionImageView = "reaction_list/reaction_image_view"
+        }
+
+        struct LivePinnedMessage {
+            static let container = "pinned_message_banner/*"
+            static let messageText = "pinned_message_banner/message_text"
+            static let pinnedPill = "pinned_message_banner/pinned_pill"
+            static let expandToggle = "pinned_message_banner/expand_toggle"
+            static let unpinButton = "pinned_message_banner/unpin_button"
+        }
+
+        struct LiveChatFeed {
+            static let pinMessageButton = "live_chat_feed/pin_message_button"
+            static let messageMenuButton = "live_chat_feed/message_menu_button"
+            static let composerTextField = "live_chat_feed/composer_text_field"
+            static let composerSendButton = "live_chat_feed/composer_send_button"
         }
     }
     
@@ -298,6 +360,8 @@ struct AccessibilityID {
         struct CommunityProfileTab {
             static let communityFeedTabButton = "community_feed_tab_button"
             static let communityPinTabButton = "community_pin_tab_button"
+            static let communityEventTabButton = "community_event_tab_button"
+            static let communityMediaTabButton = "community_media_tab_button"
         }
         
         struct CommunitySetup {
@@ -333,6 +397,39 @@ struct AccessibilityID {
             static let leaveCommunity = "leave_community"
             static let closeCommunity = "close_community"
             static let closeCommunityDescription = "close_community_description"
+            static let pendingInvitations = "community_setting/pending_invitations"
+        }
+
+        struct CommunitiesTab {
+            static let explore = "communities_tab/explore"
+            static let myCommunities = "communities_tab/my_communities"
+        }
+
+        struct CommunityProfile {
+            static let menuButton = "community_profile/menu_button"
+            static let settingsButton = "community_profile/settings_button"   // manage variant ("Community settings")
+            static let infoButton = "community_profile/info_button"           // view variant ("Community information")
+            static let copyLink = "community_profile/copy_link"
+            static let shareLink = "community_profile/share_link"
+            static let pendingRequestsBanner = "community_profile/pending_requests_banner"
+            static let pendingReviewBanner = "community_profile/pending_review_banner"
+            static let createButton = "community_profile/create_button"
+        }
+
+        struct CommunityMemberAction {
+            static let promote = "community_member_action/promote"
+            static let remove = "community_member_action/remove"
+        }
+
+        struct CommunityMember {
+            static let addMemberButton = "community_member/add_member_button"
+            static let menuButton = "community_member/menu_button"
+        }
+
+        struct PostMenu {
+            static let button = "post_menu/button"
+            static let delete = "post_menu/delete"
+            static let edit = "post_menu/edit"
         }
         
         struct UserProfile {
@@ -376,6 +473,21 @@ struct AccessibilityID {
             static let privateUserVideoFeedInfo = "private_user_video_feed_info"
             static let blockedUserVideoFeed = "blocked_user_video_feed"
             static let blockedUserVideoFeedInfo = "blocked_user_video_feed_info"
+        }
+    }
+
+    // PDT-4637 QA ids (roles->permissions). The Event domain had no accessibility ids.
+    struct Event {
+        struct EventDetailPage {
+            static let menuButton = "event_detail/menu_button"
+            static let editButton = "event_detail/edit_button"
+            static let deleteButton = "event_detail/delete_button"
+        }
+        struct CreateMenu {
+            static let createEventButton = "event_create/menu_button"
+        }
+        struct AttendeesPage {
+            static let moderatorBadge = "event_attendee/moderator_badge"
         }
     }
 }

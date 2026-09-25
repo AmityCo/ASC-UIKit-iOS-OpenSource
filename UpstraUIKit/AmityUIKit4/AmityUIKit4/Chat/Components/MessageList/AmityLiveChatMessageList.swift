@@ -116,7 +116,8 @@ public struct AmityLiveChatMessageList: AmityComponentView {
                 }
                 .padding(.bottom, 16)
                 .opacity(messageListViewModel.initialQueryState != .success ? 0 : 1)
-                .isHidden(messageListViewModel.muteState == .none || messageListViewModel.hasModeratorPermission)
+                .isHidden(!messageListViewModel.isComposerMuted)
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageComposer.muteBanner)
             }
             .alert(isPresented: $showDeleteAlert, content: {
                 Alert(title: Text(AmityLocalizedStringSet.Chat.deleteAlertTitle.localizedString), message: Text(AmityLocalizedStringSet.Chat.deleteAlertMessage.localizedString), primaryButton: .cancel(), secondaryButton: .destructive(Text(AmityLocalizedStringSet.Chat.deleteButton.localizedString), action: {
@@ -193,7 +194,12 @@ public struct AmityLiveChatMessageList: AmityComponentView {
             self.messageListViewModel.selectedMessage = message
             self.showReactionSheet.toggle()
         }
-        
+        // Read the delete permission live from the view model at tap time (avoids the stale
+        // per-message flag). Gated on DELETE_MESSAGE.
+        defaultActions.canDeleteOtherMessage = { [weak messageListViewModel] in
+            messageListViewModel?.canDeleteMessage ?? false
+        }
+
         messageListViewModel.messageAction = defaultActions
     }
 }

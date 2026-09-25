@@ -107,7 +107,7 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
                             .padding(.bottom, 6)
                     }
                     .buttonStyle(.plain)
-                    .disabled(chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission)
+                    .disabled(chatPageViewModel.messageList.isComposerMuted)
                 }
 
                 // Default UITextView height should be Initial Text Height + Text Container Top Inset + Text Container Bottom Inset
@@ -119,8 +119,8 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
                     .background(RoundedRectangle(cornerRadius: 22) // Initial height is
                         .fill(Color(viewConfig.theme.baseColorShade4))
                     )
-                    .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.textField)
-                    .disabled(chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission)
+                    .accessibilityIdentifier(AccessibilityID.Chat.MessageComposer.textField)
+                    .disabled(chatPageViewModel.messageList.isComposerMuted)
                     .onChange(of: input) { _ in
                         if showMediaSection {
                             withAnimation(.easeInOut(duration: 0.2)) {
@@ -317,7 +317,7 @@ public struct AmityLiveChatMessageComposeBar: AmityComponentView {
             }
         }
         .buttonStyle(.plain)
-        .disabled(chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission)
+        .disabled(chatPageViewModel.messageList.isComposerMuted)
     }
 
     struct Configuration: UIKitConfigurable {

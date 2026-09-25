@@ -49,6 +49,7 @@ open class AmityUIKitBehaviour {
     public var blockedUsersPageBehavior: AmityBlockedUsersPageBehavior?
     public var pendingPostContentComponentBehavior: AmityPendingPostContentComponentBehavior?    
     public var livestreamBehavior: AmityLivestreamBehavior?
+    public var discoveryWidgetComponentBehavior: AmityDiscoveryWidgetComponentBehavior? = AmityDiscoveryWidgetComponentBehavior()
     
     // We want swipe to back gesture behavior available by default.
     public var swipeToBackGestureBehavior: AmitySwipeToBackGestureBehavior? = AmitySwipeToBackGestureBehavior()

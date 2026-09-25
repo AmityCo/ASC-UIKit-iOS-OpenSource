@@ -28,8 +28,12 @@ struct AmityCommunitiesPageContainer: View {
                 VStack(spacing: 0) {
                     TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
                         .selectedTabColor(viewConfig.theme.primaryColor)
+                        .tabBarAccessibilityIDs([
+                            AccessibilityID.Social.CommunitiesTab.explore,
+                            AccessibilityID.Social.CommunitiesTab.myCommunities
+                        ])
                         .onChange(of: tabIndex) { value in
-                            
+
                         }
                         .padding(.leading, 16)
                     

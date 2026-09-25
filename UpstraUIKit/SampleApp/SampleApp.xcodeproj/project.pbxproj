@@ -20,6 +20,14 @@
 		ED32E6FA2EE03F5A00AACA20 /* LiveKitWebRTC.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDD02EA8ED09005D6788 /* LiveKitWebRTC.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		ED32E6FB2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; };
 		ED32E6FC2EE03F5A00AACA20 /* AmityLiveKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 68FFFDCF2EA8ED09005D6788 /* AmityLiveKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		ED450600B0000000000NL01 /* AmityNetworkLogEntryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED450600A0000000000NL01 /* AmityNetworkLogEntryTests.swift */; };
+		ED450601B0000000000NL01 /* AmityNetworkLogRingBufferTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED450601A0000000000NL01 /* AmityNetworkLogRingBufferTests.swift */; };
+		ED450602B0000000000NL01 /* AmityNetworkLogCurlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED450602A0000000000NL01 /* AmityNetworkLogCurlTests.swift */; };
+		ED450603B0000000000NL01 /* AmityNetworkLogViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED450603A0000000000NL01 /* AmityNetworkLogViewModelTests.swift */; };
+		ED450604B0000000000NL01 /* AmityNetworkLogCollectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED450604A0000000000NL01 /* AmityNetworkLogCollectorTests.swift */; };
+		ED450612B0000000000NL01 /* NetworkLogBodyFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED450612A0000000000NL01 /* NetworkLogBodyFormatterTests.swift */; };
+		ED450620B0000000000NL01 /* NetworkLogOverlayUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED450620A0000000000NL01 /* NetworkLogOverlayUITests.swift */; };
+		ED450622B0000000000NL01 /* NetworkLogLargeBodyUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED450622A0000000000NL01 /* NetworkLogLargeBodyUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +96,14 @@
 		B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppUITests.swift; sourceTree = "<group>"; };
 		B78DA49C24BED7DA00EE902B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D45B3A93264A840300F6FF52 /* Realm.xcframework */ = {isa = PBXFileReference; expectedSignature = "AppleDeveloperProgram:37Z583JR6K:Amity Technologies (Thailand) Co., Ltd."; lastKnownFileType = wrapper.xcframework; name = Realm.xcframework; path = ../Shared/Realm.xcframework; sourceTree = "<group>"; };
+		ED450600A0000000000NL01 /* AmityNetworkLogEntryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityNetworkLogEntryTests.swift; sourceTree = "<group>"; };
+		ED450601A0000000000NL01 /* AmityNetworkLogRingBufferTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityNetworkLogRingBufferTests.swift; sourceTree = "<group>"; };
+		ED450602A0000000000NL01 /* AmityNetworkLogCurlTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityNetworkLogCurlTests.swift; sourceTree = "<group>"; };
+		ED450603A0000000000NL01 /* AmityNetworkLogViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityNetworkLogViewModelTests.swift; sourceTree = "<group>"; };
+		ED450604A0000000000NL01 /* AmityNetworkLogCollectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityNetworkLogCollectorTests.swift; sourceTree = "<group>"; };
+		ED450612A0000000000NL01 /* NetworkLogBodyFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogBodyFormatterTests.swift; sourceTree = "<group>"; };
+		ED450620A0000000000NL01 /* NetworkLogOverlayUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogOverlayUITests.swift; sourceTree = "<group>"; };
+		ED450622A0000000000NL01 /* NetworkLogLargeBodyUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLogLargeBodyUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -198,6 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				B78DA48F24BED7DA00EE902B /* SampleAppTests.swift */,
+				ED450699C0000000000NL01 /* NetworkLog */,
 				B78DA49124BED7DA00EE902B /* Info.plist */,
 			);
 			path = SampleAppTests;
@@ -207,6 +224,7 @@
 			isa = PBXGroup;
 			children = (
 				B78DA49A24BED7DA00EE902B /* SampleAppUITests.swift */,
+				ED450620C0000000000NL01 /* NetworkLog */,
 				B78DA49C24BED7DA00EE902B /* Info.plist */,
 			);
 			path = SampleAppUITests;
@@ -227,6 +245,28 @@
 				D45B3A93264A840300F6FF52 /* Realm.xcframework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		ED450620C0000000000NL01 /* NetworkLog */ = {
+			isa = PBXGroup;
+			children = (
+				ED450620A0000000000NL01 /* NetworkLogOverlayUITests.swift */,
+				ED450622A0000000000NL01 /* NetworkLogLargeBodyUITests.swift */,
+			);
+			path = NetworkLog;
+			sourceTree = "<group>";
+		};
+		ED450699C0000000000NL01 /* NetworkLog */ = {
+			isa = PBXGroup;
+			children = (
+				ED450600A0000000000NL01 /* AmityNetworkLogEntryTests.swift */,
+				ED450612A0000000000NL01 /* NetworkLogBodyFormatterTests.swift */,
+				ED450601A0000000000NL01 /* AmityNetworkLogRingBufferTests.swift */,
+				ED450602A0000000000NL01 /* AmityNetworkLogCurlTests.swift */,
+				ED450603A0000000000NL01 /* AmityNetworkLogViewModelTests.swift */,
+				ED450604A0000000000NL01 /* AmityNetworkLogCollectorTests.swift */,
+			);
+			path = NetworkLog;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -277,7 +317,7 @@
 			);
 			name = SampleApp;
 			packageProductDependencies = (
-				4104C8BF4B731D4A3778F518 /* SharedFrameworks */,
+				56E5419835B9CCDEA8A5A2E4 /* SharedFrameworks */,
 			);
 			productName = SampleApp;
 			productReference = B78DA47524BED7D300EE902B /* SampleApp.app */;
@@ -354,7 +394,7 @@
 			mainGroup = B78DA46C24BED7D300EE902B;
 			packageReferences = (
 				92DBE89F2ACA98BB007D873C /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				FF1E3ACACBCA993575C4F611 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				122410091560BC02F97023DE /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			productRefGroup = B78DA47624BED7D300EE902B /* Products */;
 			projectDirPath = "";
@@ -478,6 +518,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				B78DA49024BED7DA00EE902B /* SampleAppTests.swift in Sources */,
+				ED450600B0000000000NL01 /* AmityNetworkLogEntryTests.swift in Sources */,
+				ED450612B0000000000NL01 /* NetworkLogBodyFormatterTests.swift in Sources */,
+				ED450601B0000000000NL01 /* AmityNetworkLogRingBufferTests.swift in Sources */,
+				ED450602B0000000000NL01 /* AmityNetworkLogCurlTests.swift in Sources */,
+				ED450603B0000000000NL01 /* AmityNetworkLogViewModelTests.swift in Sources */,
+				ED450604B0000000000NL01 /* AmityNetworkLogCollectorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -486,6 +532,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B78DA49B24BED7DA00EE902B /* SampleAppUITests.swift in Sources */,
+				ED450620B0000000000NL01 /* NetworkLogOverlayUITests.swift in Sources */,
+				ED450622B0000000000NL01 /* NetworkLogLargeBodyUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -623,6 +671,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				__DIAGNOSE_INVALID_DEPLOYMENT_TARGET_AS_ERROR = NO;
 			};
 			name = Debug;
 		};
@@ -678,6 +727,7 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
+				__DIAGNOSE_INVALID_DEPLOYMENT_TARGET_AS_ERROR = NO;
 			};
 			name = Release;
 		};
@@ -861,7 +911,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		FF1E3ACACBCA993575C4F611 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		122410091560BC02F97023DE /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
@@ -887,9 +937,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4104C8BF4B731D4A3778F518 /* SharedFrameworks */ = {
+		56E5419835B9CCDEA8A5A2E4 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FF1E3ACACBCA993575C4F611 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 122410091560BC02F97023DE /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 		92DBE8A32ACA98CF007D873C /* FirebaseCrashlytics */ = {

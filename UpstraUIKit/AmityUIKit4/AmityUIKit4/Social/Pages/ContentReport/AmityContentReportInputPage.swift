@@ -72,7 +72,7 @@ struct AmityContentReportInputPage: View {
                                     self.host.controller?.dismiss(animated: true)
                                     
                                     let toastMessage = AmityLocalizedStringSet.Social.reportReasonSuccessToastMessage.localized(arguments: viewModel.type.description)
-                                    Toast.showToast(style: .success, message: toastMessage, bottomPadding: viewModel.toastBottomPadding)
+                                    viewModel.showResultToast(style: .success, message: toastMessage)
                                 }
                             }
                         }

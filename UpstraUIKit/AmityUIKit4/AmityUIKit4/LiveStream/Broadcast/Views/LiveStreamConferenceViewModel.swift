@@ -365,7 +365,7 @@ class LiveStreamConferenceViewModel: ObservableObject {
                     if !productTagsArray.isEmpty {
                         let returnedTagCount = post.childrenPosts.first?.getMediaProductTags().count ?? 0
                         if returnedTagCount != productTagsArray.count {
-                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postComposerProductsUnavailableToast.localizedString, bottomPadding: 60)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.postComposerProductsUnavailableToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                         }
                     }
                 }
@@ -571,18 +571,18 @@ class LiveStreamConferenceViewModel: ObservableObject {
                 // Update invited co-host waiting status if invitation is rejected and co-host left from back-stage or stage
                 if event.type == .invitationRejected {
                     self?.invitedCoHost = (false, nil, false)
-                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostDeclinedToast.localizedString, bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostDeclinedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                 } else if event.type == .invitationAccepted {
                     self?.invitedCoHost.invitationAccepted = true
-                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostAcceptedToast.localizedString, bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostAcceptedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                 } else if event.type == .coHostStageLeft {
                     if self?.invitedCoHost.invitationAccepted == true {
-                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftStageToast.localizedString, bottomPadding: 60)
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftStageToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                     }
                     self?.invitedCoHost = (false, nil, false)
                 } else if event.type == .coHostLeft {
                     self?.invitedCoHost = (false, nil, false)
-                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftToast.localizedString, bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostLeftToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
                 } else if event.type == .coHostRemoved {
                     if self?.participantRole == .host {
                         self?.invitedCoHost = (false, nil, false)
@@ -615,9 +615,9 @@ class LiveStreamConferenceViewModel: ObservableObject {
         if let createdRoom, let coHostInvitation {
             do {
                 try await createdRoom.cancelInvitation(coHostInvitation.invitationId)
-                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelledToast.localizedString, bottomPadding: 60)
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelledToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
             } catch {
-                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelFailedToast.localizedString, bottomPadding: 60)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamInvitationCancelFailedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
             }
         }
     }
@@ -627,9 +627,9 @@ class LiveStreamConferenceViewModel: ObservableObject {
         if let createdRoom {
             do {
                 try await roomManager.removeCohost(roomId: createdRoom.roomId, userId: userId)
-                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostRemovedToast.localizedString, bottomPadding: 60)
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamCoHostRemovedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
             } catch {
-                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamRemoveCoHostFailedToast.localizedString, bottomPadding: 60)
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.livestreamRemoveCoHostFailedToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.broadcasterComposeBarHeight)
             }
         }
     }

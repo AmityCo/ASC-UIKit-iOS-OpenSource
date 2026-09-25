@@ -12,6 +12,7 @@ final class LoginConfigStore: ObservableObject {
         static let config = "asc_sample_login_config"
         static let lastAppliedEnv = "asc_sample_last_applied_env"
         static let inAppPipTesting = "asc_sample_in_app_pip_testing"
+        static let networkLogButtonVisible = "asc_sample_network_log_button_visible"
     }
 
     @Published var config: LoginConfigModel {
@@ -27,6 +28,16 @@ final class LoginConfigStore: ObservableObject {
     /// fail to decode and silently reset the tester's saved environment.
     @Published var inAppPipTesting: Bool {
         didSet { defaults.set(inAppPipTesting, forKey: DefaultsKey.inAppPipTesting) }
+    }
+
+    /// QA-only switch for the network log beacon, kept out of `LoginConfigModel` for the same
+    /// reason as `inAppPipTesting`.
+    ///
+    /// The setting persists on toggle rather than on login: a tester who flips it and backs
+    /// out without logging in must not lose it, and the live overlay must never disagree with
+    /// what is stored.
+    @Published var networkLogButtonVisible: Bool {
+        didSet { AmityNetworkLogOverlayController.shared.isButtonVisible = networkLogButtonVisible }
     }
 
     private let defaults: UserDefaults
@@ -48,6 +59,10 @@ final class LoginConfigStore: ObservableObject {
         self.config = loaded
         self.lastAppliedEnv = LoginConfigStore.loadAppliedEnv(from: defaults)
         self.inAppPipTesting = defaults.bool(forKey: DefaultsKey.inAppPipTesting)
+        // Defaults to on, so bool(forKey:) returning false for a missing key is not usable.
+        self.networkLogButtonVisible = defaults.object(forKey: DefaultsKey.networkLogButtonVisible) == nil
+            ? true
+            : defaults.bool(forKey: DefaultsKey.networkLogButtonVisible)
     }
 
     // MARK: - Derived

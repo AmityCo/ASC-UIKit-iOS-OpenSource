@@ -15,18 +15,13 @@ struct VideoMessageFullScreenView: View {
     /// the current user cannot delete (e.g. received messages).
     var onDelete: (() -> Void)? = nil
 
-    /// Save-to-device is temporarily disabled: transcoded videos are served as an
-    /// HLS stream the Photos library can't reliably save. `saveVideo` stays wired
-    /// — set this to `true` to re-enable the download control.
-    private let isSaveVideoEnabled = false
-
     var body: some View {
         AmityPostMediaVideoPlayer(
             post: nil,
             playerType: .chat(url: videoURL),
             hideActionMenu: true,
             onClose: onClose,
-            onDownload: (isSaveVideoEnabled && downloadURL != nil) ? saveVideo : nil,
+            onDownload: downloadURL != nil ? saveVideo : nil,
             onDelete: onDelete
         )
         .environmentObject(viewConfig)

@@ -41,10 +41,12 @@ public struct AmityCommunityProfileTabComponent: AmityComponentView {
             let eventTabIcon = AmityIcon.createEventMenuIcon.imageResource
             let eventTabItem = TabItem(index: 2, image: eventTabIcon)
             TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: eventTabItem)
-            
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityProfileTab.communityEventTabButton)
+
             let videoFeedTabIcon = AmityIcon.mediaFeedIcon.imageResource
             let videoFeedTabItem = TabItem(index: 3, image: videoFeedTabIcon)
             TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: videoFeedTabItem)
+                .accessibilityIdentifier(AccessibilityID.Social.CommunityProfileTab.communityMediaTabButton)
         }
         .padding(.horizontal)
         .padding(.top, 8)

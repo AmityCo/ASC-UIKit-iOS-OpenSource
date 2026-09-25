@@ -65,8 +65,9 @@ public struct AmityEventAttendeesPage: AmityPageView {
                             .frame(width: 40, height: 40)
                             .clipShape(Circle())
                         
-                        if user.hasModeratorRole {
+                        if viewModel.moderatorUserIds.contains(user.userId) {
                             AmityModeratorAvatarBadge(viewConfig: viewConfig)
+                                .accessibilityIdentifier(AccessibilityID.Event.AttendeesPage.moderatorBadge)
                         }
                     }
                     
@@ -99,9 +100,14 @@ class AmityEventAttendeesPageViewModel: ObservableObject {
     private var eventToken: AmityNotificationToken?
     private var rsvpToken: AmityNotificationToken?
     private var rsvpCollection: AmityCollection<AmityEventResponse>?
-    
+    private var moderatorsToken: AmityNotificationToken?
+    private var moderatorsCollection: AmityCollection<AmityCommunityMember>?
+
     @Published var rsvpUsers = [AmityUser]()
     @Published var rsvpQueryState: QueryState = .idle
+    /// User ids of the event community's moderators — the attendee badge reads the community
+    /// member role (not the user's global roles).
+    @Published var moderatorUserIds: Set<String> = []
     
     init(eventId: String) {
         self.eventId = eventId
@@ -128,7 +134,9 @@ class AmityEventAttendeesPageViewModel: ObservableObject {
     
     func loadAttendees() {
         guard let event else { return }
-        
+
+        loadCommunityModerators()
+
         rsvpQueryState = .loading
         rsvpCollection = event.getRSVPs(status: .going)
         rsvpToken = rsvpCollection?.observe({ [weak self] liveCollection, error in
@@ -157,8 +165,22 @@ class AmityEventAttendeesPageViewModel: ObservableObject {
     
     func loadMore() {
         guard let rsvpCollection, rsvpCollection.hasNext else { return }
-        
+
         rsvpQueryState = .loading
         rsvpCollection.nextPage()
+    }
+
+    /// Collect the event community's moderator user ids so the attendee badge reflects the
+    /// community member role rather than the attendee's global user roles.
+    private func loadCommunityModerators() {
+        guard let community = event?.targetCommunity else { return }
+        moderatorsCollection = community.membership.getMembers(
+            filter: .member,
+            roles: [AmityCommunityRole.communityModerator.rawValue],
+            sortBy: .lastCreated
+        )
+        moderatorsToken = moderatorsCollection?.observe { [weak self] collection, _ in
+            self?.moderatorUserIds = Set(collection.snapshots.map { $0.userId })
+        }
     }
 }

@@ -26,8 +26,8 @@ struct AmityContentReportPage: View {
         .falseInformation
     ]
         
-    init(type: ContentReportType, toastBottomPadding: CGFloat = Toast.defaultBottomPadding) {
-        self._viewModel = StateObject(wrappedValue: AmityContentReportPageViewModel(type: type, toastBottomPadding: toastBottomPadding))
+    init(type: ContentReportType, bottomBarHeight: CGFloat? = nil) {
+        self._viewModel = StateObject(wrappedValue: AmityContentReportPageViewModel(type: type, bottomBarHeight: bottomBarHeight))
     }
     
     var body: some View {
@@ -115,7 +115,7 @@ struct AmityContentReportPage: View {
                                 self.host.controller?.dismiss(animated: true)
                                 
                                 let toastMessage = AmityLocalizedStringSet.Social.reportReasonSuccessToastMessage.localized(arguments: viewModel.type.description)
-                                Toast.showToast(style: .success, message: toastMessage, bottomPadding: viewModel.toastBottomPadding)
+                                viewModel.showResultToast(style: .success, message: toastMessage)
                             }
                         }
                         

@@ -484,7 +484,7 @@ struct LiveStreamViewerView: View {
         }
         .onChange(of: networkMonitor.isConnected) { isConnected in
             if !isConnected {
-                Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.livestreamWaitingNetworkToast.localizedString, bottomPadding: 60, autoHide: false)
+                Toast.showToast(style: .loading, message: AmityLocalizedStringSet.Social.livestreamWaitingNetworkToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight, autoHide: false)
             } else {
                 Toast.hideToastIfPresented(immediately: true)
             }
@@ -762,7 +762,7 @@ struct LiveStreamViewerView: View {
                 UIPasteboard.general.string = shareLink
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventInfoLinkCopied.localizedString, bottomPadding: 60)
+                    Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.eventInfoLinkCopied.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                 }
             }
         

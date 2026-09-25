@@ -202,7 +202,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                                     }
 
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastAdded.localizedString, bottomPadding: 60)
+                                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastAdded.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                                     }
                                 }
                             } else {
@@ -237,7 +237,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                         manageVM.taggedProducts = viewModel.taggedProducts
                         manageVM.pinnedProductId = viewModel.pinnedProductId
 
-                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastRemoved.localizedString, bottomPadding: 60)
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.productTagToastRemoved.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                     }
                 }
             )
@@ -308,7 +308,7 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
                 .onAppear {
                     conferenceViewModel.didCoHostLeave = { [weak viewModel] in
                         viewModel?.currentState = .viewer
-                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamLeftStageToast.localizedString, bottomPadding: 60)
+                        Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.livestreamLeftStageToast.localizedString, aboveBottomBarHeight: AmityLiveStreamChatViewModel.viewerComposeBarHeight)
                     }
                     
                     conferenceViewModel.didCoHostJoined = { [weak viewModel] success in

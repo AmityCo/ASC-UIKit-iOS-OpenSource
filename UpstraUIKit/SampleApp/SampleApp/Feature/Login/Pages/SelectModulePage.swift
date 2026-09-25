@@ -150,6 +150,10 @@ struct SelectModulePage: View {
 
     private var debugCard: some View {
         LoginGroupedCard {
+            LoginChevronRow(title: "Discovery Widget") {
+                AppManager.shared.openDiscoveryWidgetTestPage()
+            }
+            LoginRowDivider()
             Button(action: resyncNetworkConfig) {
                 HStack {
                     Text("Re-sync Network Config")

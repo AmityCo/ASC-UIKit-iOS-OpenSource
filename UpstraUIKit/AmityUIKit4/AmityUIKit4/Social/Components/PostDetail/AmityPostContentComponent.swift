@@ -211,6 +211,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                             .frame(width: 24, height: 24)
                     })
                     .buttonStyle(PlainButtonStyle())
+                    .accessibilityIdentifier(AccessibilityID.Social.PostMenu.button)
                     .isHidden(viewConfig.isHidden(elementId: .menuButton))
                     .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
                         PostBottomSheetView(isShown: $showBottomSheet, post: post, toastBottomPadding: 0) { postAction in
@@ -226,7 +227,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                                 if category == .global
                                     && post.targetCommunity != nil
                                     && post.targetCommunity?.postSettings == .adminReviewPostRequired
-                                    && !post.hasModeratorPermission {
+                                    && !viewModel.canReviewPost {
                                     showEditAlert.toggle()
                                 } else {
                                     showPostEditScreen()
@@ -249,7 +250,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                                     let postId = post.postId
                                     
                                     // Feed has no bottom bar for the toast to clear
-                                    let page = AmityContentReportPage(type: .post(id: postId), toastBottomPadding: 0)
+                                    let page = AmityContentReportPage(type: .post(id: postId))
                                         .updateTheme(with: viewConfig)
                                     let vc = AmitySwiftUIHostingNavigationController(rootView: page)
                                     vc.isNavigationBarHidden = true
@@ -940,21 +941,24 @@ class AmityPostContentComponentViewModel: ObservableObject {
     private let permissionChecker = CommunityPermissionChecker()
     
     @Published var hasDeletePermission: Bool = false
-    
+    /// REVIEW_COMMUNITY_POST — a reviewer's edit bypasses the admin re-approval flow.
+    @Published var canReviewPost: Bool = false
+
     var reactionBarFrame: CGRect = .zero
-    
+
     init() {}
-    
+
     func checkPermissions(post: AmityPostModel) {
         if post.isOwner {
             hasDeletePermission = true
-            return
         }
-        
-        if let communityId = post.targetCommunity?.communityId {
-            Task { @MainActor in
+
+        guard let communityId = post.targetCommunity?.communityId else { return }
+        Task { @MainActor in
+            if !post.isOwner {
                 hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
             }
+            canReviewPost = await CommunityPermissionChecker.hasReviewCommunityPostPermission(communityId: communityId)
         }
     }
     

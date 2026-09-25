@@ -373,6 +373,8 @@ enum AmityIcon: String, ImageResourceProvider {
         case productTagImagePlaceholderIcon = "productTagImagePlaceholderIcon"
         case livestreamPinProductIcon = "livestreamPinProductIcon"
         case livestreamFilledPinProductIcon = "livestreamFilledPinProductIcon"
+        case pinnedLivestreamMessage = "pinned_livestream_message"
+        case unpinnedLivestreamMessage = "unpinned_livestream_message"
         case livestreamAddThumbnailButtonIcon = "livestreamAddThumbnailButtonIcon"
         case playIcon = "ic_play"
         case pauseIcon = "ic_pause"

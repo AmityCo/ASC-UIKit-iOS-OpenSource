@@ -284,23 +284,14 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                     .applyTextStyle(.caption(Color(viewConfig.color(.textInputTextInputTextCountDefault))))
             }
 
-            TextField(
-                AmityLocalizedStringSet.Chat.CreateGroup.namePlaceholder.localizedString,
-                text: $groupName
-            )
-            .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
-            .padding(.vertical, 8)
-            .overlay(
-                Rectangle()
-                    .frame(height: 1)
-                    .foregroundColor(Color(viewConfig.color(.lineInputTextInputUnderlinedDefault))),
-                alignment: .bottom
-            )
-            .onChange(of: groupName) { newValue in
-                if newValue.count > 100 {
-                    groupName = String(newValue.prefix(100))
-                }
-            }
+            nameField
+                .padding(.bottom, 4)
+                .overlay(
+                    Rectangle()
+                        .frame(height: 1)
+                        .foregroundColor(Color(viewConfig.color(.lineInputTextInputUnderlinedDefault))),
+                    alignment: .bottom
+                )
 
             if let error = errorMessage {
                 Text(error)
@@ -309,6 +300,57 @@ public struct AmityCreateGroupChatPage: AmityPageView {
             }
         }
     }
+
+    /// Grows downward instead of scrolling sideways, so a name wider than the field stays fully
+    /// readable.
+    ///
+    /// A `TextEditor` rather than a `TextField`: `TextField` only wraps via `axis:`, which is iOS
+    /// 16+, and this field has to wrap everywhere. It is the same composition
+    /// `AmityEditGroupProfilePage` uses for the *same* field, so creating a group and renaming one
+    /// wrap identically — a `TextEditor` has no intrinsic height, so an invisible copy of the text
+    /// sizes the stack and the placeholder is an overlay rather than a built-in.
+    ///
+    /// Not `AmityInput(variant: .text)`: that variant is fixed at `lineLimit(1)`, and only `.boxed`
+    /// accepts `multiline`. Worth an atom follow-up if a third underlined field needs to wrap.
+    private var nameField: some View {
+        ZStack(alignment: .topLeading) {
+            Text(groupName.isEmpty ? " " : groupName)
+                .applyTextStyle(.body(Color.clear))
+                .padding(.vertical, 8)
+                .padding(.horizontal, 4)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            if groupName.isEmpty {
+                // The bare `Placeholder/Enabled` token — the `-Filled` modifier below it is the
+                // *value* colour, so using it here painted the hint in full-strength body text.
+                Text(AmityLocalizedStringSet.Chat.CreateGroup.namePlaceholder.localizedString)
+                    .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabled))))
+                    .padding(.top, 8)
+                    .padding(.leading, 4)
+                    .allowsHitTesting(false)
+            }
+
+            TextEditor(text: $groupName)
+                .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
+                .transparentBackground()
+                .background(Color.clear)
+                .onChange(of: groupName) { newValue in
+                    // A group name is one line of content even when it wraps onto several, so Return
+                    // must not leave a break behind: strip it the moment it lands and the key becomes
+                    // a no-op. The character cap then applies to the unbroken text.
+                    // `AmityEditGroupProfilePage` does the same on its copy of this field.
+                    let unbroken = newValue.replacingOccurrences(of: "\n", with: "")
+                    let clamped = unbroken.count > groupNameCharacterLimit
+                        ? String(unbroken.prefix(groupNameCharacterLimit))
+                        : unbroken
+                    if clamped != newValue {
+                        groupName = clamped
+                    }
+                }
+        }
+    }
+
+    private let groupNameCharacterLimit = 100
 
     // MARK: - Privacy section
 

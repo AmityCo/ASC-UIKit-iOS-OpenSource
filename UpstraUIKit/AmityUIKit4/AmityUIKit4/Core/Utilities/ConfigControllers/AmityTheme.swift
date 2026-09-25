@@ -411,6 +411,9 @@ class AmityFixedColor {
     let black = UIColor.black
     let greyShade4 = UIColor(hex: "#EBECEF")
     let greyShade1 = UIColor(hex: "#636878")
+    let pinMessageBubble = UIColor(hex: "#636878").withAlphaComponent(0.5)
+    let liveStreamChatBubble = UIColor(hex: "#636878").withAlphaComponent(0.3)
+    let liveStreamChatBubblePinned = UIColor(hex: "#292B32").withAlphaComponent(0.3)
 
     /// Toast background — dark surface in both modes so white toast text stays readable.
     var toastBackground: UIColor {

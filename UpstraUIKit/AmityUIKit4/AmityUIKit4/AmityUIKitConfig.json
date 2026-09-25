@@ -1114,6 +1114,7 @@
             "text": ""
         },
         "*/livestream_chat_feed/*": {},
+        "*/livestream_chat_feed/pinned_message_banner": {},
         "*/livestream_chat_compose_bar/*": {},
         "pending_request_page/*/*": {},
         "pending_request_page/*/back_button": {

@@ -64,7 +64,7 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
     private let chatManager = ChatManager()
 
     private var isMuteBlocked: Bool {
-        chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission
+        chatPageViewModel.messageList.isComposerMuted
     }
 
     // Bottom-aligns the 32pt accessory buttons to the boxed input with an 8pt inset.
@@ -105,7 +105,7 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
                         style: .filled,
                         iconSize: .size32,
                         icon: showMediaSection ? .crossR : .plusR,
-                        isDisabled: chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission,
+                        isDisabled: chatPageViewModel.messageList.isComposerMuted,
                         viewConfig: viewConfig
                     ) {
                         if showMediaSection {
@@ -130,8 +130,8 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
                     .background(RoundedRectangle(cornerRadius: 24)
                         .fill(Color(viewConfig.color(.surfaceInputBoxedInputDefault)))
                     )
-                    .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.CommentComposer.textField)
-                    .disabled(chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission)
+                    .accessibilityIdentifier(AccessibilityID.Chat.MessageComposer.textField)
+                    .disabled(chatPageViewModel.messageList.isComposerMuted)
                     .onChange(of: input) { _ in
                         if showMediaSection {
                             withAnimation(.easeInOut(duration: 0.2)) {
@@ -392,7 +392,7 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
             }
         }
         .buttonStyle(.plain)
-        .disabled(chatPageViewModel.messageList.muteState != .none && !chatPageViewModel.messageList.hasModeratorPermission)
+        .disabled(chatPageViewModel.messageList.isComposerMuted)
     }
 
     struct Configuration: UIKitConfigurable {

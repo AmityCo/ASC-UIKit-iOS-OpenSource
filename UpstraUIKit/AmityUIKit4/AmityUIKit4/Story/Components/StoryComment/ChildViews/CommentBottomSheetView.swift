@@ -14,12 +14,12 @@ struct CommentBottomSheetView: View {
     let editAction: ((AmityCommentModel?) -> Void)?
     let reportAction: (AmityCommentModel?) -> Void
 
-    /// Padding for toasts this sheet raises itself, set by the surface underneath it.
-    private let toastBottomPadding: CGFloat
+    /// Height of the comment bar under this sheet, so toasts it raises sit above the bar.
+    private let bottomBarHeight: CGFloat
 
-    init(viewModel: CommentBottomSheetViewModel, toastBottomPadding: CGFloat = Toast.defaultBottomPadding, editingComment: ((AmityCommentModel?) -> Void)? = nil, reportAction: @escaping (AmityCommentModel?) -> Void) {
+    init(viewModel: CommentBottomSheetViewModel, bottomBarHeight: CGFloat, editingComment: ((AmityCommentModel?) -> Void)? = nil, reportAction: @escaping (AmityCommentModel?) -> Void) {
         self.viewModel = viewModel
-        self.toastBottomPadding = toastBottomPadding
+        self.bottomBarHeight = bottomBarHeight
         self.editAction = editingComment
         self.reportAction = reportAction
     }
@@ -120,7 +120,7 @@ struct CommentBottomSheetView: View {
                                 let reportMessage = isReply ? AmityLocalizedStringSet.Comment.replyReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentReportedMessage.localizedString
                                 let unReportMessage = isReply ? AmityLocalizedStringSet.Comment.replyUnReportedMessage.localizedString : AmityLocalizedStringSet.Comment.commentUnReportedMessage.localizedString
                                 
-                                Toast.showToast(style: .success, message: viewModel.isCommentFlaggedByMe ? unReportMessage : reportMessage, bottomPadding: toastBottomPadding)
+                                Toast.showToast(style: .success, message: viewModel.isCommentFlaggedByMe ? unReportMessage : reportMessage, aboveBottomBarHeight: bottomBarHeight)
                             } catch {
                                 Toast.showToast(style: .warning, message: error.localizedDescription)
                             }

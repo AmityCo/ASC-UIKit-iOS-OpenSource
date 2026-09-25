@@ -15,7 +15,6 @@ final class AmityGroupMemberListViewModel: ObservableObject {
     @Published var isLoading: Bool = true
     @Published var searchText: String = ""
     @Published var activeTab: MemberTab = .members
-    @Published var isModerator: Bool = false
     @Published var flaggedByMeCache: [String: Bool] = [:]
     @Published var showActionSheet: Bool = false
 
@@ -36,9 +35,8 @@ final class AmityGroupMemberListViewModel: ObservableObject {
     private var token: AmityNotificationToken?
     private var cancellables = Set<AnyCancellable>()
 
-    init(channelId: String, isModerator: Bool) {
+    init(channelId: String) {
         self.channelId = channelId
-        self.isModerator = isModerator
         loadMembers()
         observeSearch()
         loadModerationPermissions()
@@ -215,9 +213,9 @@ public struct AmityGroupMemberListPage: AmityPageView {
 
     private let channelId: String
 
-    public init(channelId: String, isModerator: Bool) {
+    public init(channelId: String) {
         self.channelId = channelId
-        self._viewModel = StateObject(wrappedValue: AmityGroupMemberListViewModel(channelId: channelId, isModerator: isModerator))
+        self._viewModel = StateObject(wrappedValue: AmityGroupMemberListViewModel(channelId: channelId))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .groupMemberListPage))
     }
 
@@ -331,6 +329,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
                     }
                     .buttonStyle(.plain)
                     .padding(.trailing, 4)
+                    .accessibilityIdentifier(AccessibilityID.Chat.GroupMemberList.addButton)
                 }
             }
         }
@@ -435,7 +434,9 @@ public struct AmityGroupMemberListPage: AmityPageView {
     private func memberRow(_ member: AmityChannelMember) -> some View {
         let currentUserId = AmityUIKitManagerInternal.shared.client.currentUserId ?? ""
         let isCurrentUser = member.userId == currentUserId
-        let isMemberModerator = member.roles.contains("channel-moderator")
+        // Badge reflects the named `channel-moderator` role only (display, role-native) — a
+        // custom-role moderator won't show a badge though they can still moderate via permissions.
+        let hasChannelModeratorRole = member.roles.contains("channel-moderator")
         let displayName = member.user?.displayName ?? member.userId
 
         return HStack(spacing: 8) {
@@ -444,7 +445,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
                 .frame(width: 40, height: 40)
                 .clipShape(Circle())
 
-                if isMemberModerator {
+                if hasChannelModeratorRole {
                     AmityBadge(variant: .icon,
                                icon: .shieldCheckS,
                                size: .size16,
@@ -477,7 +478,7 @@ public struct AmityGroupMemberListPage: AmityPageView {
                         .fixedSize()
                         .padding(.leading, 4)
                 }
-                if viewModel.isModerator && member.isMuted {
+                if viewModel.canMute && member.isMuted {
                     Image(AmityIcon.DesignSystem.volumeSlashR.imageResource)
                         .renderingMode(.template)
                         .resizable()
