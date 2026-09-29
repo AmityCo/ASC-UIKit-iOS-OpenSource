@@ -18,10 +18,40 @@ enum PostMenuType: String, CaseIterable, Identifiable {
     case story = "Story"
     case clip = "Clip"
     case event = "Event"
+
+    /// The element each item asks the gate about, under `create_post_menu`.
+    /// The menu and the "+" that opens it both read this, so the two cannot
+    /// disagree about which items the gate lets through.
+    var elementId: ElementId {
+        switch self {
+        case .post: .createPostButton
+        case .poll: .createPollButton
+        case .liveStream: .createLivestreamButton
+        case .story: .createStoryButton
+        case .clip: .createClipButton
+        case .event: .createEventButton
+        }
+    }
 }
 
 class AmityCreatePostMenuViewModel: ObservableObject {
+    /// `false` until the SDK answers. A "+" that only the event item would
+    /// keep open therefore stays hidden until the permission is known, rather
+    /// than drawing and then disappearing.
     @Published var hasCreateEventPermission: Bool = false
+
+    /// The network's story setting. Read on every ask rather than once: the
+    /// top navigation builds this model before social settings may have loaded.
+    var allowsStoryCreation: Bool {
+        AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
+    }
+
+    /// The items the menu shows under `menuConfig`, with this user's inputs.
+    func shownItems(_ menuConfig: AmityViewConfigController) -> [PostMenuType] {
+        AmityCreatePostMenuComponent.shownItems(menuConfig,
+                                                allowsStoryCreation: allowsStoryCreation,
+                                                canCreateEvent: hasCreateEventPermission)
+    }
     
     init() {
         // Event Permission
@@ -39,18 +69,46 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
     
     @StateObject private var viewConfig: AmityViewConfigController
     @Binding private var isPresented: Bool
-    @StateObject private var viewModel = AmityCreatePostMenuViewModel()
+    @StateObject private var viewModel: AmityCreatePostMenuViewModel
     
     @State private var showPostCreationMenuScaleEffect: Bool = false
-    private let allowAllUserToCreateStory = AmityUIKitManagerInternal.shared.client.getSocialSettings()?.story?.allowAllUserToCreateStory ?? false
     
     public var id: ComponentId {
         .createPostMenu
     }
-    
+
+    /// The items the menu shows: the ones the module gate (and the
+    /// customer's `excludes`) lets through under `menuConfig` — a view config
+    /// for `create_post_menu` — that this user can also create.
+    ///
+    /// The one answer to "what is in the menu". The menu draws exactly these,
+    /// and the "+" that opens it is drawn only while this is not empty
+    /// (module-availability §10.1, PDT-5867): the menu belongs to no module,
+    /// each item keeps its own owner, and a menu with nothing in it is not
+    /// drawn. Story also needs the network's story setting, Event the
+    /// create-event permission.
+    static func shownItems(_ menuConfig: AmityViewConfigController,
+                           allowsStoryCreation: Bool,
+                           canCreateEvent: Bool) -> [PostMenuType] {
+        PostMenuType.allCases.filter { type in
+            guard !menuConfig.isHidden(elementId: type.elementId) else { return false }
+            switch type {
+            case .story: return allowsStoryCreation
+            case .event: return canCreateEvent
+            case .post, .poll, .liveStream, .clip: return true
+            }
+        }
+    }
+
     public init(isPresented: Binding<Bool>? = nil, pageId: PageId? = nil) {
+        self.init(isPresented: isPresented, pageId: pageId, viewModel: AmityCreatePostMenuViewModel())
+    }
+
+    /// With the model the "+" decided on, so the menu opens on the same items.
+    init(isPresented: Binding<Bool>?, pageId: PageId?, viewModel: AmityCreatePostMenuViewModel) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .createPostMenu))
         self._isPresented = isPresented ?? Binding.constant(false)
+        self._viewModel = StateObject(wrappedValue: viewModel)
     }
     
     public var body: some View {
@@ -72,11 +130,16 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
         .onTapGesture {
             toggleScaleEffect()
         }
+    
+        // Applies the theme and, with it, AmityModuleGate. The menu itself is
+        // unowned, so the gate passes it through; each item asks for itself.
+        .updateTheme(with: viewConfig)
     }
     
     
     @ViewBuilder
     private func getMenuView() -> some View {
+        let shown = viewModel.shownItems(viewConfig)
         VStack(spacing: 24) {
             ForEach(postTypes) { type in
                 switch type {
@@ -87,7 +150,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
-                        .isHidden(viewConfig.isHidden(elementId: .createPostButton))
+                        .isHidden(!shown.contains(type))
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createPostButton)
                 case .story:
                     let createStoryButton = viewConfig.getConfig(elementId: .createStoryButton, key: "image", of: String.self) ?? ""
@@ -96,7 +159,7 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
-                        .isHidden(!allowAllUserToCreateStory || viewConfig.isHidden(elementId: .createStoryButton))
+                        .isHidden(!shown.contains(type))
                         .accessibilityIdentifier(AccessibilityID.Social.CreatePostMenu.createStoryButton)
                 case .poll:
                     let icon = AmityIcon.createPollMenuIcon
@@ -104,28 +167,28 @@ public struct AmityCreatePostMenuComponent: AmityComponentView {
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
-                        .isHidden(viewConfig.isHidden(elementId: .createPollButton))
+                        .isHidden(!shown.contains(type))
                 case .liveStream:
                     let icon = AmityIcon.createLivestreamMenuIcon
                     getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeLiveStream.localizedString)
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
-                        .isHidden(viewConfig.isHidden(elementId: .createLivestreamButton))
+                        .isHidden(!shown.contains(type))
                 case .clip:
                     let icon = AmityIcon.createClipMenuIcon
                     getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeClip.localizedString, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
-                        .isHidden(viewConfig.isHidden(elementId: .createClipButton))
+                        .isHidden(!shown.contains(type))
                 case .event:
                     let icon = AmityIcon.createEventMenuIcon
                     getItemView(image: icon.imageResource, title: AmityLocalizedStringSet.Social.postMenuTypeEvent.localizedString, imageSize: CGSize(width: 18, height: 18))
                         .onTapGesture {
                             handlePostMenuAction(type)
                         }
-                        .isHidden(!viewModel.hasCreateEventPermission || viewConfig.isHidden(elementId: .createEventButton))
+                        .isHidden(!shown.contains(type))
                         .accessibilityIdentifier(AccessibilityID.Event.CreateMenu.createEventButton)
                 }
             }

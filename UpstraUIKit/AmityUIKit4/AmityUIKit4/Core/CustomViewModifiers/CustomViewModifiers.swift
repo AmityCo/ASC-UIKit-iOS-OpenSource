@@ -53,9 +53,17 @@ extension View {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
     
-    // Assigns
+    // Assigns.
+    //
+    // Also gates the module. iOS has no page scaffold to hang this on — every
+    // isHidden() call in the framework passes an elementId, so nothing ever
+    // asked isExcluded("pageId/*/*") and a switched-off module hid the elements
+    // that happened to ask while the page around them still rendered. This is
+    // the one thing every page applies to its content with its own view config,
+    // so it is where the page-level question gets asked.
     func updateTheme(with config: AmityViewConfigController) -> some View {
         return self.modifier(ThemeUpdater(viewConfig: config))
+            .modifier(AmityModuleGate(viewConfig: config))
     }
     
     // Keyboard appear, disappear event
@@ -142,6 +150,25 @@ extension Button {
       }
 }
 
+
+/// Renders nothing when the module owning this page or component is switched
+/// off, so a disabled feature is indistinguishable from one that was never
+/// built rather than a page with its buttons missing.
+struct AmityModuleGate: ViewModifier {
+
+    let viewConfig: AmityViewConfigController
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        let configId = "\(viewConfig.pageId?.rawValue ?? "*")/"
+            + "\(viewConfig.componentId?.rawValue ?? "*")/*"
+        if AmityUIKitConfigController.shared.isExcluded(configId: configId) {
+            EmptyView()
+        } else {
+            content
+        }
+    }
+}
 
 struct ThemeUpdater: ViewModifier {
     
@@ -440,3 +467,20 @@ struct CaptureWindowFrameModifier: ViewModifier {
     }
 }
 
+
+/// Page-level gate for the pages that do not route their content through
+/// `updateTheme(with:)`. Same question, asked where the modifier cannot reach:
+/// a module switched off renders nothing rather than a page with holes in it.
+struct AmityModuleGateView<Content: View>: View {
+
+    let pageId: PageId
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        if AmityUIKitConfigController.shared.isExcluded(configId: "\(pageId.rawValue)/*/*") {
+            EmptyView()
+        } else {
+            content()
+        }
+    }
+}

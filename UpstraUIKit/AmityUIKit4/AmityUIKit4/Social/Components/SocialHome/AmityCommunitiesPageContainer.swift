@@ -13,16 +13,29 @@ struct AmityCommunitiesPageContainer: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
     
     @State private var tabIndex: Int = 0
-    @State private var tabs: [String] = [
-        AmityLocalizedStringSet.Social.socialHomeExploreTab.localizedString,
-        AmityLocalizedStringSet.Social.socialHomeMyCommunitiesTab.localizedString
-    ]
-    
+    @State private var tabs: [String] = []
+
     public init() { }
-    
+
+    /// Explore belongs to Discovery, My Communities to Community, and this bar
+    /// had neither gate — Discovery off left the Explore tab selected and its
+    /// categories, trending and recommended rows drawing underneath.
+    private var exploreVisible: Bool { !viewConfig.isHidden(elementId: .exploreButton) }
+
+    private var tabTitles: [String] {
+        var t: [String] = []
+        if exploreVisible { t.append(AmityLocalizedStringSet.Social.socialHomeExploreTab.localizedString) }
+        t.append(AmityLocalizedStringSet.Social.socialHomeMyCommunitiesTab.localizedString)
+        return t
+    }
+
     var body: some View {
         if AmityUIKitManagerInternal.shared.isGuestUser {
-            AmityExplorePageContainer()
+            if exploreVisible { AmityExplorePageContainer() }
+        } else if !exploreVisible {
+            // One tab left, so the bar and its rule go too: a two-tab bar showing
+            // one tab is the seam rule 3 exists to remove.
+            AmityMyCommunitiesComponent(pageId: .socialHomePage)
         } else {
             VStack(spacing: 0) {
                 VStack(spacing: 0) {
@@ -52,6 +65,7 @@ struct AmityCommunitiesPageContainer: View {
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 .padding(.top, 8)
             }
+            .onAppear { tabs = tabTitles }
             .onReceive(NotificationCenter.default.publisher(for: .showExploreCommunities)) { _ in
                 tabIndex = 0
             }

@@ -46,6 +46,11 @@ public struct AmityEventDetailPage: AmityPageView {
     }
     
     public var body: some View {
+        // Post's doors on this page. A Discussion selection the gate has since
+        // taken away shows the Event tab instead.
+        let doors = EventDetailPostDoors()
+        let visibleTab = doors.visibleTab(currentTab)
+
         ZStack(alignment: .top) {
             CollapseableScrollView(expanded: {
                 expandedHeaderView
@@ -57,17 +62,17 @@ public struct AmityEventDetailPage: AmityPageView {
                     setupLivestreamButton
                 }
                 
-                EventDetailTabBarView(currentTab: $currentTab)
+                EventDetailTabBarView(currentTab: visibleTabBinding)
                 
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
                     .frame(height: 1)
             }, content: {
                 AmityEventInfoComponent(viewModel: viewModel)
-                    .isHidden(currentTab != 0)
+                    .isHidden(visibleTab != EventDetailPostDoors.eventTab)
                 
                 AmityEventDiscussionFeedComponent(viewModel: viewModel, page: self)
-                    .isHidden(currentTab != 1)
+                    .isHidden(visibleTab != EventDetailPostDoors.discussionTab)
             }, onHeaderStateChange: { isCollapsed in
                 self.isHeaderCollapsed = isCollapsed
             })
@@ -98,7 +103,7 @@ public struct AmityEventDetailPage: AmityPageView {
                         .padding(.bottom, 32)
                 }
             }
-            .isHidden(currentTab != 1 || !hasPermissionToCreate)
+            .isHidden(visibleTab != EventDetailPostDoors.discussionTab || !hasPermissionToCreate || !doors.showsDiscussionCreatePost)
             
             PostDetailEmptyStateView(action: {
                 if let context, context.isNewEvent {
@@ -134,6 +139,13 @@ public struct AmityEventDetailPage: AmityPageView {
         .onAppear {
             showEventCreatedSuccessSheetIfNeeded()
         }
+    }
+
+    /// The selection as the tab row should draw it: what `EventDetailPostDoors`
+    /// lets through, written back as the user picks.
+    private var visibleTabBinding: Binding<Int> {
+        Binding(get: { EventDetailPostDoors().visibleTab(currentTab) },
+                set: { currentTab = $0 })
     }
 
     private func showEventCreatedSuccessSheetIfNeeded() {
@@ -325,7 +337,7 @@ public struct AmityEventDetailPage: AmityPageView {
             .padding(16)
             
             VStack(spacing: 0) {
-                EventDetailTabBarView(currentTab: $currentTab)
+                EventDetailTabBarView(currentTab: visibleTabBinding)
                 
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
@@ -358,5 +370,41 @@ extension AmityEventDetailPage {
         init(isNewEvent: Bool) {
             self.isNewEvent = isNewEvent
         }
+    }
+}
+
+/// The doors on the event detail page that open onto Post. The page is Events',
+/// but §10.2 gives the discussion tab, its create-post button and "Post event
+/// to feed" to Post, so each one asks the gate on its own.
+struct EventDetailPostDoors {
+    static let eventTab = 0
+    static let discussionTab = 1
+
+    let showsDiscussion: Bool
+    let showsDiscussionCreatePost: Bool
+    let showsPostToFeed: Bool
+
+    init(pageId: PageId = .eventDetailPage) {
+        let gate = AmityUIKitConfigController.shared
+        let page = pageId.rawValue
+        let discussion = ComponentId.eventDiscussion.rawValue
+        showsDiscussion = !gate.isExcluded(configId: "\(page)/\(discussion)/*")
+        // The button lives inside the tab, so the tab going takes it too.
+        showsDiscussionCreatePost = showsDiscussion
+            && !gate.isExcluded(configId: "\(page)/\(discussion)/\(ElementId.eventDiscussionCreatePostButton.rawValue)")
+        // Asked with componentId `*`, as Web asks it: the menu item and the
+        // success sheet's prompt are the same door onto the same composer.
+        showsPostToFeed = !gate.isExcluded(configId: "\(page)/*/\(ElementId.createEventPostButton.rawValue)")
+    }
+
+    /// The tabs the row draws, in order.
+    var tabs: [Int] {
+        showsDiscussion ? [Self.eventTab, Self.discussionTab] : [Self.eventTab]
+    }
+
+    /// The tab actually shown. A selection the gate has since taken away falls
+    /// back to the Event tab rather than leaving the page on nothing.
+    func visibleTab(_ selected: Int) -> Int {
+        tabs.contains(selected) ? selected : Self.eventTab
     }
 }

@@ -169,6 +169,15 @@ public struct AmityMediaAttachmentComponent: AmityComponentView {
             MultiSelectionMediaPicker(viewModel: pickerViewModel, mediaType: $showMediaPicker.type, sourceType: $showMediaPicker.source, selectionLimit: PostMediaCap.maximum - viewModel.medias.count)
                 .ignoresSafeArea()
         }
+    
+    
+        // Applies the theme and, with it, AmityModuleGate — this component
+    
+    
+        // built a view config carrying its componentId and never asked.
+    
+    
+        .updateTheme(with: viewConfig)
     }
     
     

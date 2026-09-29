@@ -169,6 +169,7 @@ public class CommunityProfileViewModel: ObservableObject {
         // Note:
         // `pendingPostCount` in community model includes pending posts from other members in that community.
         // So we query for "our" pending posts & determine whether to show banner or not based on its count.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.post) else { return }
         pendingPostToken = nil
         pendingPostToken = feedManager.getPendingCommunityFeedPosts(communityId: communityId).observe{ [weak self] collection, error in
             if let _ = error {
@@ -181,6 +182,10 @@ public class CommunityProfileViewModel: ObservableObject {
     }
     
     func loadStories() {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.story) else {
+            loadLiveRoomPosts()
+            return
+        }
         storyToken = nil
         storyCollection = storyManager.getActiveStories(in: communityId)
         storyToken = storyCollection?.observe({ [weak self] collection, error in
@@ -195,6 +200,11 @@ public class CommunityProfileViewModel: ObservableObject {
             })
             .store(in: &cancellable)
         
+        loadLiveRoomPosts()
+    }
+
+    private func loadLiveRoomPosts() {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.live) else { return }
         roomPostsToken = nil
         roomPostCollection = postManager.getCommunityLiveRoomPosts(communityId: communityId)
         roomPostsToken = roomPostCollection?.observe { [weak self] collection, error in
@@ -237,7 +247,11 @@ public class CommunityProfileViewModel: ObservableObject {
             
             self?.pinnedFeedLoadingStatus = collection.loadingStatus
             for pinnedpost in collection.snapshots {
-                if let post = pinnedpost.post, !post.childrenPosts.contains(where: { $0.dataType == "file" }), !post.isDeleted {
+                // The pin endpoint takes no type filter, so a pinned poll or
+                // livestream survives its module being switched off and reaches the
+                // feed as a header with nothing under it.
+                if let post = pinnedpost.post, !post.childrenPosts.contains(where: { $0.dataType == "file" }), !post.isDeleted,
+                   AmityUIKitSupportedPostTypes.allows(post) {
                     if pinnedpost.placement == AmityPinPlacement.announcement.rawValue {
                         self?.announcementPost = AmityPostModel(post: post)
                     } else {

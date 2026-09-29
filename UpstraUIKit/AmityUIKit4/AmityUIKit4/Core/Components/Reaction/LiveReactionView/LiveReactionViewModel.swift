@@ -43,8 +43,19 @@ class LiveReactionViewModel {
     // Track whether animations are in progress for each lane
     private var isAnimatingLane = [Bool](repeating: false, count: 5)
     
+    /// Whether the livestream live-reaction surface renders at all.
+    ///
+    /// Rule 6: a module switched off makes no request. This view model both
+    /// subscribes to the live-reaction event and creates reactions, so asking here
+    /// once covers the read and the write — and the hosts read it to drop the
+    /// overlay's 100x320 frame with it, which is rule 3.
+    let isEnabled: Bool = !AmityUIKitConfigController.shared.isExcluded(
+        configId: "live_stream_page/*/\(ElementId.livestreamReaction.rawValue)"
+    )
+
     init(room: AmityRoom) {
         self.room = room
+        guard isEnabled else { return }
         getReactionDataFromConfig()
         subscribeLiveReactionEvent(room)
         observeLiveReactions(room)
@@ -52,6 +63,7 @@ class LiveReactionViewModel {
     
     /// Add a reaction to the container view and animate it
     func addReaction(_ reaction: AmityLiveReactionModel) {
+        guard isEnabled else { return }
         let newReaction = ReactionAnimationModel(
             icon: reaction.icon,
             name: reaction.reactionName,

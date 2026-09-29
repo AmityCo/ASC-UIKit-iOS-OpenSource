@@ -120,9 +120,21 @@ public struct AmityForYouFeedComponent: AmityComponentView {
         .listStyle(.plain)
     }
 
+    /// Whether the story tab draws anything at all.
+    ///
+    /// The component gates itself and renders nothing, but this row wraps it in a
+    /// fixed 118pt frame and follows it with an 8pt separator — so Story off left
+    /// a band and a rule where the ring had been, which is rule 3: a container
+    /// disappears with its last visible child, and takes its separator with it.
+    private var storyTabVisible: Bool {
+        !AmityUIKitConfigController.shared.isExcluded(
+            configId: "\(pageId?.rawValue ?? "*")/\(ComponentId.storyTabComponent.rawValue)/*"
+        )
+    }
+
     @ViewBuilder
     private var storyTabRow: some View {
-        if (!viewModel.storyTargets.isEmpty || !viewModel.roomPosts.isEmpty) {
+        if storyTabVisible && (!viewModel.storyTargets.isEmpty || !viewModel.roomPosts.isEmpty) {
             VStack(spacing: 0) {
                 AmityStoryTabComponent(type: .globalFeed, pageId: pageId)
                     .frame(height: 118)
@@ -133,7 +145,7 @@ public struct AmityForYouFeedComponent: AmityComponentView {
             }
             .listRowInsets(EdgeInsets())
             .modifier(HiddenListSeparator())
-        } else if viewModel.isStoryTabLoading {
+        } else if storyTabVisible && viewModel.isStoryTabLoading {
             VStack(spacing: 0) {
                 SkeletonStoryTabComponent(radius: 64)
                     .frame(height: 118)

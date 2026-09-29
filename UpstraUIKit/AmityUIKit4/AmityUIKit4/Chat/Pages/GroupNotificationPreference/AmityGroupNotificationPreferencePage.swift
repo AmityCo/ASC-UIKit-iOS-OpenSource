@@ -77,6 +77,11 @@ public struct AmityGroupNotificationPreferencePage: AmityPageView {
     }
 
     public var body: some View {
+        AmityModuleGateView(pageId: .groupNotificationPreferencePage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         VStack(spacing: 0) {
             navBar
 

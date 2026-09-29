@@ -42,6 +42,19 @@ public struct AmityViewStoryPage: AmityPageView {
     
    
     public var body: some View {
+    
+   
+        AmityModuleGateView(pageId: .storyPage) { gatedBody }
+    
+   
+    }
+
+    
+   
+    @ViewBuilder
+    
+   
+    private var gatedBody: some View {
         ZStack {
             Color.clear
                 .overlay (

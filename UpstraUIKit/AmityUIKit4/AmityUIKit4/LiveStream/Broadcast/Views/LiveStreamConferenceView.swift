@@ -1065,7 +1065,10 @@ struct LiveStreamConferenceView: View {
     
     @ViewBuilder
     private var liveReactionView: some View {
-        if let liveChatViewModel = viewModel.liveStreamChatViewModel {
+        // Rule 3: the frame goes with the overlay. Rendering an empty
+        // LiveReactionView would still reserve 100x320 over the broadcast.
+        if let liveChatViewModel = viewModel.liveStreamChatViewModel,
+           liveChatViewModel.liveReactionViewModel.isEnabled {
             LiveReactionView(viewModel: liveChatViewModel.liveReactionViewModel)
                 .frame(width: liveChatViewModel.liveReactionViewModel.width, height: liveChatViewModel.isTextEditorFocused ? 0.1 : liveChatViewModel.liveReactionViewModel.height)
                 .visibleWhen(viewModel.createdRoom?.targetType == "community" && viewModel.currentState != .setup)

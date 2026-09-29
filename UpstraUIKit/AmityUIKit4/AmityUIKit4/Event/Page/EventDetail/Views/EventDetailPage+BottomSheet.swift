@@ -62,7 +62,12 @@ extension AmityEventDetailPage {
     }
     
     var eventCreatedSuccessSheet: some View {
-        VStack(spacing: 16) {
+        // Everything under the title is the post-to-feed prompt. With Post off
+        // the sheet keeps only the confirmation (PO, PDT-5616): icon and title,
+        // closed by tapping outside or dragging down, as on Web.
+        let showsPostToFeed = EventDetailPostDoors().showsPostToFeed
+
+        return VStack(spacing: 16) {
             Image(AmityIcon.DesignSystem.calendarStarL.imageResource)
                 .renderingMode(.template)
                 .resizable()
@@ -77,33 +82,37 @@ extension AmityEventDetailPage {
                     .applyTextStyle(.headline(Color(viewConfig.theme.baseColor)))
                     .multilineTextAlignment(.center)
                 
-                Text(AmityLocalizedStringSet.Social.eventPostCreatedSuccessDescription.localizedString)
-                    .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade1)))
-                    .multilineTextAlignment(.center)
+                if showsPostToFeed {
+                    Text(AmityLocalizedStringSet.Social.eventPostCreatedSuccessDescription.localizedString)
+                        .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade1)))
+                        .multilineTextAlignment(.center)
+                }
             }
             .padding(.horizontal, 16)
 
-            Rectangle()
-                .fill(Color(viewConfig.theme.baseColorShade4))
-                .frame(height: 1)
+            if showsPostToFeed {
+                Rectangle()
+                    .fill(Color(viewConfig.theme.baseColorShade4))
+                    .frame(height: 1)
 
-            VStack(spacing: 12) {
+                VStack(spacing: 12) {
                 
-                Button(AmityLocalizedStringSet.Social.eventPostCreatedSuccessPrimary.localizedString) {
-                    showEventCreatedSuccessSheet = false
-                    host.controller?.dismiss(animated: false)
+                    Button(AmityLocalizedStringSet.Social.eventPostCreatedSuccessPrimary.localizedString) {
+                        showEventCreatedSuccessSheet = false
+                        host.controller?.dismiss(animated: false)
 
-                    guard let event = viewModel.event else { return }
-                    AmityUIKit4Manager.behaviour.eventDetailPageBehavior?.goToEventPostToFeed(context: .init(page: self, event: event))
-                }
-                .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig, size: .expanded))
+                        guard let event = viewModel.event else { return }
+                        AmityUIKit4Manager.behaviour.eventDetailPageBehavior?.goToEventPostToFeed(context: .init(page: self, event: event))
+                    }
+                    .buttonStyle(AmityPrimaryButtonStyle(viewConfig: viewConfig, size: .expanded))
 
-                Button(AmityLocalizedStringSet.Social.eventPostCreatedSuccessSecondary.localizedString) {
-                    showEventCreatedSuccessSheet = false
+                    Button(AmityLocalizedStringSet.Social.eventPostCreatedSuccessSecondary.localizedString) {
+                        showEventCreatedSuccessSheet = false
+                    }
+                    .buttonStyle(AmityLineButtonStyle(viewConfig: viewConfig, size: .expanded))
                 }
-                .buttonStyle(AmityLineButtonStyle(viewConfig: viewConfig, size: .expanded))
+                .padding(.horizontal, 16)
             }
-            .padding(.horizontal, 16)
         }
         .padding(.bottom, 32)
     }
@@ -136,7 +145,9 @@ extension AmityEventDetailPage {
 
             // "Post event to feed" — create an event post referencing this event.
             // Visible to host / moderator / member of the event's community.
-            let canPostEventToFeed = viewModel.isEventHost || (viewModel.event?.targetCommunity?.isJoined ?? false)
+            // It opens a post composer, so it goes with Post as well.
+            let canPostEventToFeed = EventDetailPostDoors().showsPostToFeed
+                && (viewModel.isEventHost || (viewModel.event?.targetCommunity?.isJoined ?? false))
             if canPostEventToFeed {
                 BottomSheetItemView(icon: AmityIcon.editPostEvent.imageResource, text: AmityLocalizedStringSet.Social.eventDetailPagePostEventToFeed.localizedString)
                     .onTapGesture {
@@ -242,8 +253,10 @@ extension AmityEventDetailPage {
         // UPDATE_EVENT holder can edit
         if viewModel.hasUpdatePermission { return true }
 
-        // Members (and hosts) can post the event to a feed — must match the
-        let canPostEventToFeed = viewModel.isEventHost || (viewModel.event?.targetCommunity?.isJoined ?? false)
+        // Members (and hosts) can post the event to a feed while Post is on —
+        // must match the menu item's own condition in `menuOptionSheet`.
+        let canPostEventToFeed = EventDetailPostDoors().showsPostToFeed
+            && (viewModel.isEventHost || (viewModel.event?.targetCommunity?.isJoined ?? false))
         if canPostEventToFeed { return true }
 
         // Any user (member / non-member / visitor) can copy or share when sharing is enabled

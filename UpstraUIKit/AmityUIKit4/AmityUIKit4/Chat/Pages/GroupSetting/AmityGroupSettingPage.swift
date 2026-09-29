@@ -109,6 +109,11 @@ public struct AmityGroupSettingPage: AmityPageView {
     }
 
     public var body: some View {
+        AmityModuleGateView(pageId: .groupSettingPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         VStack(spacing: 0) {
             navBar
 

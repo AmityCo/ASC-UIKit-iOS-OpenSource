@@ -55,9 +55,16 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                 .isHidden(viewConfig.isHidden(elementId: .userDescription) || user.about.isEmpty)
                 .accessibilityIdentifier(AccessibilityID.Social.UserProfileHeader.userDescription)
             
-            userRelationshipView
-                .frame(height: 20)
-                .padding(.top, 6)
+            // Rule 3: the row asks whether either count survives before it draws
+            // itself. Hiding the two counts inside left the row's own frame and
+            // top padding in place — a 26 point band of nothing where the numbers
+            // had been, which is what the evidence round caught on all three
+            // platforms.
+            if relationshipRowVisible {
+                userRelationshipView
+                    .frame(height: 20)
+                    .padding(.top, 6)
+            }
             
             if let followInfo = viewModel.followInfo, let status = followInfo.status, !isOwnProfile {
                 Group {
@@ -131,6 +138,10 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
         }
     }
     
+    private var relationshipRowVisible: Bool {
+        !(viewConfig.isHidden(elementId: .userFollowing) && viewConfig.isHidden(elementId: .userFollower))
+    }
+
     private var userRelationshipView: some View {
         HStack(spacing: 0) {
             Group {
@@ -341,6 +352,7 @@ public struct AmityUserProfileHeaderComponent: AmityComponentView {
                         }
                     }
                 }
+                .isHidden(viewConfig.isHidden(elementId: .unfollowUserButton))
         }
         .padding(.bottom, 32)
     }

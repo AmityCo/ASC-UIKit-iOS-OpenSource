@@ -31,12 +31,21 @@ public struct AmityChatHomePage: AmityPageView {
 
     public init(onBack: (() -> Void)? = nil) {
         self.onBack = onBack
+        // .chatHomePage, not .socialHomePage. This page identified itself as the
+        // social home, so every config id it resolved — its own page gate
+        // included — was answered for a page Chat does not own. Chat off left the
+        // whole channel list, its filters and its composer drawing.
         self._viewConfig = StateObject(
-            wrappedValue: AmityViewConfigController(pageId: .socialHomePage)
+            wrappedValue: AmityViewConfigController(pageId: .chatHomePage)
         )
     }
 
     public var body: some View {
+        if viewConfig.isHidden() {
+            // A module switched off renders nothing, so a stale route or a deep
+            // link lands on emptiness rather than a page with holes in it.
+            EmptyView()
+        } else {
         VStack(spacing: 0) {
             // MARK: Navigation bar
             navigationBar
@@ -68,6 +77,7 @@ public struct AmityChatHomePage: AmityPageView {
                 message: Text(AmityLocalizedStringSet.Chat.Archive.limitMessage.localizedString),
                 dismissButton: .default(Text(AmityLocalizedStringSet.Chat.okButton.localizedString))
             )
+        }
         }
     }
 

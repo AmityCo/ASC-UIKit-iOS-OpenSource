@@ -54,7 +54,15 @@ class AmityCommunitySettingPageViewModel: ObservableObject {
     private func setupData() {
         self.shouldShowEditProfile = hasEditCommunityPermission
         self.shouldShowPendingInvitations = hasEditCommunityPermission
+        // Every row that page can offer belongs to one of these three modules, so
+        // with all three switched off it opens on a toggle and nothing to toggle
+        // for. The network conditions above are unchanged.
+        let config = AmityUIKitConfigController.shared
+        let anyNotifiableModuleOn = config.isFeatureEnabled(AmityUIKitFeature.post)
+            || config.isFeatureEnabled(AmityUIKitFeature.comment)
+            || config.isFeatureEnabled(AmityUIKitFeature.story)
         self.shouldShowNotifications = isSocialUserNotificationEnabled && isSocialNetworkEnabled
+            && anyNotifiableModuleOn
         self.shouldShowPostPermissions = hasEditCommunityPermission
         self.shouldShowStoryComments = hasEditCommunityPermission
         self.shouldShowCloseCommunity = hasDeleteCommunityPermission

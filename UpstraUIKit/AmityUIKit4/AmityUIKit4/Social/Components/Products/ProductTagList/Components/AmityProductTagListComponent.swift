@@ -119,14 +119,20 @@ public struct AmityProductTagListComponent: AmityComponentView {
     // MARK: - Body
 
     public var body: some View {
-        if productTags.isEmpty {
-            EmptyView()
-        } else {
-            productTagListContent
-                .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
-                .environmentObject(viewConfig)
-                .onChange(of: networkMonitor.isConnected) { _ in syncNetworkToast() }
+        // A modifier cannot attach to a bare if/else in a ViewBuilder body, so
+        // the branch moves inside and the whole thing takes the theme — and
+        // with it AmityModuleGate, which this component never applied.
+        Group {
+            if productTags.isEmpty {
+                EmptyView()
+            } else {
+                productTagListContent
+                    .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
+                    .environmentObject(viewConfig)
+                    .onChange(of: networkMonitor.isConnected) { _ in syncNetworkToast() }
+            }
         }
+        .updateTheme(with: viewConfig)
     }
 
     // MARK: - Private Views

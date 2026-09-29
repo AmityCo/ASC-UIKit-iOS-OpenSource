@@ -11,7 +11,9 @@ import AmitySDK
 struct AmityCommentAdComponent: View {
     @Environment(\.openURL) var openURL
     
-    @StateObject private var viewConfig: AmityViewConfigController = AmityViewConfigController(pageId: nil, componentId: .postContentComponent)
+    @StateObject private var viewConfig: AmityViewConfigController = // Ads owned only the story ad. Scoping this to post_content meant
+    // switching Ads off left it on screen, and switching Post off took it away.
+    AmityViewConfigController(pageId: nil, componentId: .commentAd)
     
     let ad: AmityAd
     

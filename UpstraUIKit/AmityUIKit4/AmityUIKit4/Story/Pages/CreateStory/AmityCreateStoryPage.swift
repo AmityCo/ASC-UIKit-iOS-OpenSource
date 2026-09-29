@@ -49,6 +49,15 @@ public struct AmityCreateStoryPage: AmityPageView {
     }
     
     public var body: some View {
+    
+        AmityModuleGateView(pageId: .cameraPage) { gatedBody }
+    
+    }
+
+    
+    @ViewBuilder
+    
+    private var gatedBody: some View {
         AmityView(configId: configId, config: { configDict in
             //
         }) { config in

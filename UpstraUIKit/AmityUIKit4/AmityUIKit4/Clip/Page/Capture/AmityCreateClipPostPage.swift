@@ -44,6 +44,17 @@ public struct AmityCreateClipPostPage: AmityPageView {
     }
     
     public var body: some View {
+        // A disabled feature must be indistinguishable from one that was
+        // never built: the page renders nothing, so a deep link or a stale
+        // navigation entry lands on emptiness, not a half-working screen.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.post) else {
+            return AnyView(EmptyView())
+        }
+        return AnyView(gatedBody)
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         ZStack(alignment: .top) {
             
             Color.black

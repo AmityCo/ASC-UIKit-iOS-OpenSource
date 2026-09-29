@@ -177,6 +177,9 @@ struct ClipFeedItemOverlayView: View {
                                     .foregroundColor(.white)
                             }
                             .padding(.bottom, 24)
+                            // Comment owns the button and its count; it is the
+                            // only door into the comment tray from a clip.
+                            .isHidden(viewConfig.isHidden(elementId: .commentButton))
                         }
                         
                         // Mute/Unmute button

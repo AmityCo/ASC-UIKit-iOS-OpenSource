@@ -28,11 +28,15 @@ struct AmityEventLocationView: View {
     
     @State private var draft: EventLocation
     @State private var isInputValid: Bool = false
-    
+
+    private let platformOptions: EventPlatformOptions
+
     init(selection: EventLocation?, onSaveAction: @escaping (EventLocation) -> Void) {
+        let platformOptions = EventPlatformOptions()
         self.selection = selection
         self.onSaveAction = onSaveAction
-        self.draft = selection ?? EventLocation()
+        self.platformOptions = platformOptions
+        self._draft = State(initialValue: platformOptions.opening(selection))
     }
     
     var body: some View {
@@ -104,12 +108,17 @@ struct AmityEventLocationView: View {
                         .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
                         .padding(.top, 8)
                     
-                    EventPlatformRadioButtonView(isSelected: draft.platform == .livestream, icon: AmityIcon.createLivestreamMenuIcon.imageResource, title: AmityLocalizedStringSet.Social.eventPlatformLivestream.localizedString, description: AmityLocalizedStringSet.Social.eventPlatformLivestreamDescription.localizedString)
-                        .onTapGesture {
-                            draft.platform = .livestream
+                    // Live's option (PDT-5613). With it gone External stands alone,
+                    // and the spacing sits on this row so no gap is left behind.
+                    if platformOptions.platforms.contains(.livestream) {
+                        EventPlatformRadioButtonView(isSelected: draft.platform == .livestream, icon: AmityIcon.createLivestreamMenuIcon.imageResource, title: AmityLocalizedStringSet.Social.eventPlatformLivestream.localizedString, description: AmityLocalizedStringSet.Social.eventPlatformLivestreamDescription.localizedString)
+                            .onTapGesture {
+                                draft.platform = .livestream
 
-                            validateLocationInputs()
-                        }
+                                validateLocationInputs()
+                            }
+                            .padding(.bottom, 16)
+                    }
 
                     EventPlatformRadioButtonView(isSelected: draft.platform == .external, icon: AmityIcon.externalPlatformIcon.imageResource, title: AmityLocalizedStringSet.Social.eventPlatformExternal.localizedString, description: AmityLocalizedStringSet.Social.eventPlatformExternalDescription.localizedString)
                         .onTapGesture {
@@ -117,7 +126,6 @@ struct AmityEventLocationView: View {
                             
                             validateLocationInputs()
                         }
-                        .padding(.top, 16)
                     
                     VStack(alignment: .trailing) {
                         TextField("Event link", text: $externalLink) // l10n:ok placeholder text for URL input field — technical label not requiring localization

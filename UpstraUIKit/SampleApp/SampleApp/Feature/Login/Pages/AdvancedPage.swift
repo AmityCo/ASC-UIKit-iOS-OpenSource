@@ -15,6 +15,8 @@ struct AdvancedPage: View {
     var onClose: () -> Void
     var onLoginRequested: () -> Void
 
+    @State private var isModuleFlagsShown = false
+
     var body: some View {
         ZStack {
             LoginTheme.background.ignoresSafeArea()
@@ -36,6 +38,9 @@ struct AdvancedPage: View {
                         LoginSectionHeader(title: "Appearance")
                         appearanceCard
 
+                        LoginSectionHeader(title: "Phase 1 Modules")
+                        moduleFlagsCard
+
                         LoginSectionHeader(title: "Debug")
                         debugCard
 
@@ -45,6 +50,10 @@ struct AdvancedPage: View {
 
                 footer
             }
+        }
+        .fullScreenCover(isPresented: $isModuleFlagsShown) {
+            ModuleFlagsPage(onClose: { isModuleFlagsShown = false })
+                .environmentObject(store)
         }
     }
 
@@ -134,6 +143,36 @@ struct AdvancedPage: View {
         }
     }
 
+    // MARK: - Phase 1 modules
+
+    private var moduleFlagsCard: some View {
+        let off = ModuleFlags.order.filter { !ModuleFlags.isAvailable($0) }.count
+        return LoginGroupedCard {
+            Button {
+                isModuleFlagsShown = true
+            } label: {
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Phase 1 Modules")
+                            .font(LoginTheme.rowTitleFont)
+                            .foregroundColor(LoginTheme.primaryText)
+                        Text(off == 0
+                             ? "All \(ModuleFlags.order.count) on"
+                             : "\(off) of \(ModuleFlags.order.count) off")
+                            .font(LoginTheme.rowSubtitleFont)
+                            .foregroundColor(LoginTheme.muted)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(LoginTheme.placeholder)
+                }
+                .padding(.horizontal, LoginTheme.rowHorizontalPadding)
+                .padding(.vertical, LoginTheme.rowVerticalPadding)
+            }
+        }
+    }
+
     // MARK: - Debug
 
     private var debugCard: some View {
@@ -159,3 +198,4 @@ struct AdvancedPage: View {
         .background(LoginTheme.background)
     }
 }
+

@@ -105,35 +105,51 @@ public class ReactionOverlayController {
         let screenThreshold = (screenBounds.height - 50) * 0.7
         let isInLowerPortion = messageFrame.origin.y > screenThreshold
 
-        // ── Hover view model for drag-to-react ───────────────────────────────
-        let hoverVM = ChatReactionPickerViewModel()
-        hoverVM.showTooltipBelow = !isInLowerPortion && (messageFrame.origin.y - 60 < window.safeAreaInsets.top + 40)
-        chatHoverVM = hoverVM
+        // Reaction off has to leave this overlay looking like an overlay that never
+        // had a picker: the row is built here as its own window subview, so gating
+        // inside ChatReactionPickerView would still add a view and still push the
+        // action menu down by its height and the gap. Rule 3 wants the space gone
+        // with the row, which means not building it at all — and chatHoverVM stays
+        // nil so drag-to-react has nothing to commit.
+        let reactionEnabled = AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.reaction)
 
-        let viewConfig = AmityViewConfigController(pageId: .liveChatPage, componentId: .messageList)
-        let reactionVC: UIViewController = AmitySwiftUIHostingController(rootView:
-            ChatReactionPickerView(message: message, hoverVM: hoverVM, dismissAction: { dismissChatDimView() })
-                .environmentObject(viewConfig)
-        )
-        reactionVC.view.backgroundColor = .clear
-        reactionVC.view.alpha = 0
-        let reactionSize = reactionVC.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
-        // Own (outgoing) messages are right-aligned, so anchor the overlay to the
-        // bubble's right edge; incoming messages anchor to the left edge.
-        let reactionX = message.isOwner
-            ? clampedX(from: messageFrame.maxX - reactionSize.width, width: reactionSize.width)
-            : clampedX(from: messageFrame.origin.x, width: reactionSize.width)
-        let reactionFinalY = max(
-            window.safeAreaInsets.top + 4,
-            messageFrame.origin.y - reactionSize.height - gap
-        )
-        reactionVC.view.frame = CGRect(x: reactionX, y: messageFrame.origin.y - 40, width: reactionSize.width, height: reactionSize.height)
-        containerView.addSubview(reactionVC.view)
+        var reactionVC: UIViewController?
+        var reactionFinalY = messageFrame.origin.y
+
+        if reactionEnabled {
+            // ── Hover view model for drag-to-react ───────────────────────────────
+            let hoverVM = ChatReactionPickerViewModel()
+            hoverVM.showTooltipBelow = !isInLowerPortion && (messageFrame.origin.y - 60 < window.safeAreaInsets.top + 40)
+            chatHoverVM = hoverVM
+
+            let viewConfig = AmityViewConfigController(pageId: .liveChatPage, componentId: .messageList)
+            let vc: UIViewController = AmitySwiftUIHostingController(rootView:
+                ChatReactionPickerView(message: message, hoverVM: hoverVM, dismissAction: { dismissChatDimView() })
+                    .environmentObject(viewConfig)
+            )
+            vc.view.backgroundColor = .clear
+            vc.view.alpha = 0
+            let reactionSize = vc.view.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+            // Own (outgoing) messages are right-aligned, so anchor the overlay to the
+            // bubble's right edge; incoming messages anchor to the left edge.
+            let reactionX = message.isOwner
+                ? clampedX(from: messageFrame.maxX - reactionSize.width, width: reactionSize.width)
+                : clampedX(from: messageFrame.origin.x, width: reactionSize.width)
+            reactionFinalY = max(
+                window.safeAreaInsets.top + 4,
+                messageFrame.origin.y - reactionSize.height - gap
+            )
+            vc.view.frame = CGRect(x: reactionX, y: messageFrame.origin.y - 40, width: reactionSize.width, height: reactionSize.height)
+            containerView.addSubview(vc.view)
+            reactionVC = vc
+        } else {
+            chatHoverVM = nil
+        }
 
         // ── 2. Action menu ─────────────────────────
         let actionVC: UIViewController = AmitySwiftUIHostingController(rootView:
             ChatActionMenuView(message: message, messageAction: messageAction, dismissAction: { dismissChatDimView() })
-                .environmentObject(viewConfig)
+                .environmentObject(AmityViewConfigController(pageId: .liveChatPage, componentId: .messageList))
         )
         actionVC.view.backgroundColor = .clear
         actionVC.view.alpha = 0
@@ -174,8 +190,8 @@ public class ReactionOverlayController {
 
         // ── Spring entrance ──
         UIView.animate(withDuration: 0.25, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0.5, options: [.curveEaseOut]) {
-            reactionVC.view.frame.origin.y = reactionFinalY
-            reactionVC.view.alpha = 1.0
+            reactionVC?.view.frame.origin.y = reactionFinalY
+            reactionVC?.view.alpha = 1.0
             actionVC.view.frame.origin.y = actionFinalY
             actionVC.view.alpha = 1.0
         }

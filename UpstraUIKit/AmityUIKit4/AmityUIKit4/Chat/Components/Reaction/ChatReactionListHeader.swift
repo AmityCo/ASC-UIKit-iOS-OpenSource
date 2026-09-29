@@ -15,18 +15,36 @@ struct ChatReactionListHeader: View {
     @Binding var tabBarItems: [ReactionTabItem]
     @EnvironmentObject private var viewConfig: AmityViewConfigController
 
-    var body: some View {
-        ZStack(alignment: .bottom) {
-            ChatReactionTabBarView(currentTab: $currentTab, tabBarOptions: $tabBarItems)
-                .frame(height: 30)
-                .zIndex(1)
-                .accessibilityIdentifier(AccessibilityID.Chat.ReactionList.reactionListTab)
+        /// Reaction can be switched off while Chat stays on — it needs only one of
 
-            Rectangle()
-                .frame(height: 1)
-                .foregroundColor(Color(viewConfig.color(.lineDividerPostDefault)))
-                .offset(y: -1)
+    /// post, comment, chat or story. These surfaces thread no page or component
+
+    /// context, so they ask the module rather than an element id.
+
+    private var reactionEnabled: Bool {
+
+        AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.reaction)
+
+    }
+
+
+    var body: some View {
+
+        if reactionEnabled {
+            ZStack(alignment: .bottom) {
+                ChatReactionTabBarView(currentTab: $currentTab, tabBarOptions: $tabBarItems)
+                    .frame(height: 30)
+                    .zIndex(1)
+                    .accessibilityIdentifier(AccessibilityID.Chat.ReactionList.reactionListTab)
+
+                Rectangle()
+                    .frame(height: 1)
+                    .foregroundColor(Color(viewConfig.color(.lineDividerPostDefault)))
+                    .offset(y: -1)
+            }
+    
         }
+
     }
 }
 

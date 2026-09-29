@@ -18,27 +18,45 @@ public struct AmityChatMessageQuickReaction: View {
         self.viewModel = QuickReactionViewModel(message: message)
     }
     
+        /// Reaction can be switched off while Chat stays on — it needs only one of
+    
+    /// post, comment, chat or story. These surfaces thread no page or component
+    
+    /// context, so they ask the module rather than an element id.
+    
+    private var reactionEnabled: Bool {
+    
+        AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.reaction)
+    
+    }
+
+    
     public var body: some View {
-        if let quickReaction = viewModel.getQuickReaction(viewConfig: viewConfig) {
-            let isAvailable = message.myReactions.isEmpty && message.syncState == .synced
+    
+        if reactionEnabled {
+            if let quickReaction = viewModel.getQuickReaction(viewConfig: viewConfig) {
+                let isAvailable = message.myReactions.isEmpty && message.syncState == .synced
             
-            Button {
-                Task {
-                    await viewModel.addQuickReaction(reaction: quickReaction)
+                Button {
+                    Task {
+                        await viewModel.addQuickReaction(reaction: quickReaction)
+                    }
+                } label: {
+                    Image(AmityIcon.Chat.messageBubbleAddReactionIcon.imageResource)
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                        .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 }
-            } label: {
-                Image(AmityIcon.Chat.messageBubbleAddReactionIcon.imageResource)
-                    .renderingMode(.template)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 20, height: 20)
-                    .foregroundColor(Color(viewConfig.theme.baseColorShade2))
+                .padding(.bottom, 6)
+                .padding(.leading, 6)
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageList.quickReaction)
+                .isHidden(!isAvailable)
             }
-            .padding(.bottom, 6)
-            .padding(.leading, 6)
-            .accessibilityIdentifier(AccessibilityID.Chat.MessageList.quickReaction)
-            .isHidden(!isAvailable)
+        
         }
+    
     }
 }
 

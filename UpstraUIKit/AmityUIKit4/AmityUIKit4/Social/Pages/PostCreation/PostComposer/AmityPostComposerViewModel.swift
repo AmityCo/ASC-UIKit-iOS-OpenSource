@@ -630,6 +630,13 @@ class AmityPostComposerViewModel: ObservableObject {
     }
 
     func getProductCatalogueFeatureSetting() {
+        // The console setting answers "does this network sell"; the module answers
+        // "does this build show product UI". Reading only the first left the product
+        // tab in the mention sheet on a build with `product` switched off.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.product) else {
+            isProductCatalogueEnabled = false
+            return
+        }
         Task.runOnMainActor {
             do {
                 self.isProductCatalogueEnabled = try await AmityUIKit4Manager.client.getProductCatalogueSetting().enabled

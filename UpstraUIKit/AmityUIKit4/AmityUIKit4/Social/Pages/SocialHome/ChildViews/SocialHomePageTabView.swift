@@ -38,28 +38,9 @@ struct SocialHomePageTabView: View {
     }
 
     static func makeTabItems(selectedTab: AmitySocialHomePageTab, isForYouEnabled: Bool) -> [TabItem] {
-        let clipViewAccess = AmityUIKitConfigController.shared.featureFlag?.post.clip.canViewTab ?? .signedInUserOnly
-
-        var items: [TabItem] = []
-        if AmityUIKitManagerInternal.shared.isGuestUser {
-            items.append(TabItem(tab: .communities, selected: selectedTab == .communities)) // myCommunities
-            items.append(TabItem(tab: .events, selected: selectedTab == .events)) // Events
-
-            if clipViewAccess == .all {
-                items.append(TabItem(tab: .clips, selected: selectedTab == .clips))
-            }
-        } else {
-            var tabs: [AmitySocialHomePageTab] = []
-            if isForYouEnabled {
-                tabs.append(.forYou)
-            }
-            tabs.append(contentsOf: [.newsFeed, .communities, .events, .clips])
-
-            items = tabs.map { tab in
-                TabItem(tab: tab, selected: tab == selectedTab)
-            }
+        SocialHomeTabs(isForYouEnabled: isForYouEnabled).visible.map { tab in
+            TabItem(tab: tab, selected: tab == selectedTab)
         }
-        return items
     }
 
     var body: some View {
@@ -87,42 +68,21 @@ struct SocialHomePageTabView: View {
         }
         .onChange(of: isForYouEnabled) { newValue in
             tabItems = Self.makeTabItems(selectedTab: selectedTab, isForYouEnabled: newValue)
-            applyConfigFilter()
         }
         .onAppear {
             applyConfigFilter()
         }
+        // A module switched on or off while the page is up changes the row.
+        .onReceive(NotificationCenter.default.publisher(for: .configDidUpdate).receive(on: DispatchQueue.main)) { _ in
+            applyConfigFilter()
+        }
     }
 
-    /// Filter out tabs whose element is excluded via config.
+    /// Rebuilds the row from `SocialHomeTabs`, which already drops every tab
+    /// whose element the config or the module gate excludes — the same list
+    /// the page lands on and the pager pages over.
     private func applyConfigFilter() {
-        tabItems = tabItems.compactMap({ item in
-            if viewConfig.isHidden(elementId: .newsFeedButton) && item.tab == .newsFeed {
-                return nil
-            }
-            
-            if viewConfig.isHidden(elementId: .exploreButton) && item.tab == .explore {
-                return nil
-            }
-            
-            if viewConfig.isHidden(elementId: .myCommunitiesButton) && item.tab == .myCommunities {
-                return nil
-            }
-            
-            if viewConfig.isHidden(elementId: .clipsFeedButton) && item.tab == .clips {
-                return nil
-            }
-
-            if viewConfig.isHidden(elementId: .clipsFeedButton) && item.tab == .clips {
-                return nil
-            }
-            
-            if viewConfig.isHidden(elementId: .eventsButton) && item.tab == .events {
-                return nil
-            }
-
-            return item
-        })
+        tabItems = Self.makeTabItems(selectedTab: selectedTab, isForYouEnabled: isForYouEnabled)
     }
 
     private func getTitle(tab: AmitySocialHomePageTab) -> String {
@@ -204,5 +164,75 @@ private struct TabButtonView: View {
             buttonWidth = title.size(usingFont: .systemFont(ofSize: 17, weight: .semibold)).width + 25
         }
 
+    }
+}
+
+
+/// The tabs Social Home shows, in order, and the one it lands on. The tab row,
+/// the page's selection and the pager all read this one list, so a tab the
+/// gate takes away goes from all three at once.
+///
+/// PDT-5561: the row used to filter itself while the selection and the pager
+/// did not. Feed off (Post off takes Feed with it) hid For You and Following
+/// but left the page selected on one of them, and left that tab first in the
+/// pager — rendering as `EmptyView` under `AmityModuleGate`, zero wide, while
+/// the pager still offset for it. Communities and Events then drew half a
+/// screen to the left.
+struct SocialHomeTabs {
+    let visible: [AmitySocialHomePageTab]
+
+    init(isForYouEnabled: Bool,
+         isGuest: Bool = AmityUIKitManagerInternal.shared.isGuestUser,
+         clipViewAccess: AccessLevel = AmityUIKitConfigController.shared.featureFlag?.post.clip.canViewTab ?? .signedInUserOnly,
+         pageId: PageId = .socialHomePage) {
+        var tabs: [AmitySocialHomePageTab]
+        if isGuest {
+            tabs = [.communities, .events]
+            if clipViewAccess == .all {
+                tabs.append(.clips)
+            }
+        } else {
+            tabs = isForYouEnabled ? [.forYou] : []
+            tabs.append(contentsOf: [.newsFeed, .communities, .events, .clips])
+        }
+        visible = tabs.filter { !Self.isGated($0, pageId: pageId) }
+    }
+
+    /// The element the tab's button is, as the config and the gate know it.
+    static func elementId(_ tab: AmitySocialHomePageTab) -> ElementId {
+        switch tab {
+        case .forYou: .forYouButton
+        case .newsFeed: .newsFeedButton
+        case .explore: .exploreButton
+        case .myCommunities: .myCommunitiesButton
+        case .communities: .communitiesButton
+        case .events: .eventsButton
+        case .clips: .clipsFeedButton
+        }
+    }
+
+    /// Whether the config or the module gate excludes this tab's button. For
+    /// You and Following are Feed's (§10.2), and Feed requires Post.
+    static func isGated(_ tab: AmitySocialHomePageTab, pageId: PageId = .socialHomePage) -> Bool {
+        AmityUIKitConfigController.shared.isExcluded(configId: "\(pageId.rawValue)/*/\(elementId(tab).rawValue)")
+    }
+
+    /// The tab to show for `selected`: itself while it is still in the row,
+    /// otherwise the first tab left. Clips is never landed on — it leaves the
+    /// page (REQ-013). So For You disabled lands on Following (REQ-006), a
+    /// visitor on Communities (REQ-007), and a signed-in user with For You and
+    /// Following both gated on Communities (PO decision on PDT-5561).
+    func landing(from selected: AmitySocialHomePageTab) -> AmitySocialHomePageTab {
+        let landable = visible.filter { $0 != .clips }
+        if landable.contains(selected) { return selected }
+        return landable.first ?? selected
+    }
+
+    /// The pages the pager holds: `loaded` without any tab the gate now
+    /// excludes, since a gated page renders nothing and the pager's offsets
+    /// would still count it.
+    static func pagerTabs(_ loaded: [AmitySocialHomePageTab], pageId: PageId = .socialHomePage) -> [AmitySocialHomePageTab] {
+        let shown = loaded.filter { !isGated($0, pageId: pageId) }
+        return shown.isEmpty ? loaded : shown
     }
 }

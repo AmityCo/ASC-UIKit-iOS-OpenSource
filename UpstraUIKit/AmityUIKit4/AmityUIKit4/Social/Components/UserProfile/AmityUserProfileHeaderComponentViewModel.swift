@@ -29,6 +29,9 @@ class AmityUserProfileHeaderComponentViewModel: ObservableObject {
     }
     
     func load() {
+        // Follow info, and the pending-follower count, are userRelationship's
+        // own endpoints (/api/v5/users/{id}/followInfo, /api/v4/me/followers).
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.userRelationship) else { return }
         if isOwnUser {
             myFollowInfoObject = userManager.getMyFollowInfo()
             myFollowInfoObject?.$snapshot

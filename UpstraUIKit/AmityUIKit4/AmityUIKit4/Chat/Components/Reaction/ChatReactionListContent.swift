@@ -24,67 +24,85 @@ struct ChatReactionListContent: View {
         self.parentViewModel = parentViewModel
     }
 
+        /// Reaction can be switched off while Chat stays on — it needs only one of
+
+    /// post, comment, chat or story. These surfaces thread no page or component
+
+    /// context, so they ask the module rather than an element id.
+
+    private var reactionEnabled: Bool {
+
+        AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.reaction)
+
+    }
+
+
     var body: some View {
-        ZStack {
-            ScrollView {
-                LazyVStack(spacing: 0) {
-                    ForEach(Array(viewModel.reactedUsers.enumerated()), id: \.element.uniqueId) { index, user in
-                        ChatReactionListRowItem(user: user)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                guard user.isLoggedInUser else {
-                                    /// Dismiss the presented view controller(s) before navigating in the
-                                    /// underlying UINavigationController (mirrors ReactionListContent).
-                                    host.controller?.navigationController?.presentedViewController?.dismiss(animated: false)
-                                    host.controller?.navigationController?.presentedViewController?.dismiss(animated: false)
-                                    goToUserProfilePage(user.userId)
-                                    return
-                                }
 
-                                guard !parentViewModel.isParentDeleted else { return }
+        if reactionEnabled {
+            ZStack {
+                ScrollView {
+                    LazyVStack(spacing: 0) {
+                        ForEach(Array(viewModel.reactedUsers.enumerated()), id: \.element.uniqueId) { index, user in
+                            ChatReactionListRowItem(user: user)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .contentShape(Rectangle())
+                                .onTapGesture {
+                                    guard user.isLoggedInUser else {
+                                        /// Dismiss the presented view controller(s) before navigating in the
+                                        /// underlying UINavigationController (mirrors ReactionListContent).
+                                        host.controller?.navigationController?.presentedViewController?.dismiss(animated: false)
+                                        host.controller?.navigationController?.presentedViewController?.dismiss(animated: false)
+                                        goToUserProfilePage(user.userId)
+                                        return
+                                    }
 
-                                viewModel.removeReaction(reactionName: user.reactionName)
-                                dismissScreen.wrappedValue.dismiss()
-                            }
-                            .onAppear {
-                                if index == viewModel.reactedUsers.count - 1 {
-                                    viewModel.loadMore()
+                                    guard !parentViewModel.isParentDeleted else { return }
+
+                                    viewModel.removeReaction(reactionName: user.reactionName)
+                                    dismissScreen.wrappedValue.dismiss()
                                 }
-                            }
+                                .onAppear {
+                                    if index == viewModel.reactedUsers.count - 1 {
+                                        viewModel.loadMore()
+                                    }
+                                }
+                        }
                     }
                 }
-            }
-            .zIndex(1)
-            .opacity(showsEmptyState ? 0 : 1)
+                .zIndex(1)
+                .opacity(showsEmptyState ? 0 : 1)
 
-            // Shimmer loading state
-            if viewModel.initialQueryState == .loading && !parentViewModel.isParentDeleted {
-                loadingState
-                    .zIndex(2)
-            }
+                // Shimmer loading state
+                if viewModel.initialQueryState == .loading && !parentViewModel.isParentDeleted {
+                    loadingState
+                        .zIndex(2)
+                }
 
-            Group {
-                if emptyStateImage == AmityIcon.emptyReaction.rawValue {
-                    reactionEmptyState
-                } else {
-                    // Error / unable-to-load state (with retry) — not covered by the Figma;
-                    // reuse the shared empty-state view to preserve behavior.
-                    AmityEmptyStateView(configuration: viewModel.emptyStateConfiguration)
+                Group {
+                    if emptyStateImage == AmityIcon.emptyReaction.rawValue {
+                        reactionEmptyState
+                    } else {
+                        // Error / unable-to-load state (with retry) — not covered by the Figma;
+                        // reuse the shared empty-state view to preserve behavior.
+                        AmityEmptyStateView(configuration: viewModel.emptyStateConfiguration)
+                    }
+                }
+                .zIndex(3)
+                .opacity(showsEmptyState ? 1 : 0)
+            }
+            .onAppear(perform: {
+                viewModel.getReactedUsers()
+            })
+            .onChange(of: parentViewModel.isParentDeleted) { isDeleted in
+                if isDeleted {
+                    viewModel.clearForParentDeletion()
                 }
             }
-            .zIndex(3)
-            .opacity(showsEmptyState ? 1 : 0)
+    
         }
-        .onAppear(perform: {
-            viewModel.getReactedUsers()
-        })
-        .onChange(of: parentViewModel.isParentDeleted) { isDeleted in
-            if isDeleted {
-                viewModel.clearForParentDeletion()
-            }
-        }
+
     }
 
     // MARK: - Empty-state derivation

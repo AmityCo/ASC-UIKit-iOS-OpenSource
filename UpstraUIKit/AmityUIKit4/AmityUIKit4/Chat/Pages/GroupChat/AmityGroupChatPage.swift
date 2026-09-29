@@ -32,6 +32,11 @@ public struct AmityGroupChatPage: AmityPageView {
     }
 
     public var body: some View {
+        AmityModuleGateView(pageId: .groupChatPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         VStack(spacing: 0) {
             // MARK: Group header (tappable → settings)
             groupHeader

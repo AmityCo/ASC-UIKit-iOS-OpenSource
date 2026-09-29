@@ -44,6 +44,11 @@ public struct AmityDraftStoryPage: AmityPageView {
     }
     
     public var body: some View {
+        AmityModuleGateView(pageId: .storyCreationPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         AmityView(configId: configId, config: { configDict in
             
         }) { config in

@@ -116,12 +116,16 @@ class AmitySocialHomePageViewModel: ObservableObject {
         if AmityUIKitManagerInternal.shared.isGuestUser {
             isForYouEnabled = false
             selectedTab = .communities
+            resolveLandingTab()
         } else {
             selectedTab = .forYou
             isForYouSettingLoading = true
             fetchForYouFeedSetting()
         }
         NotificationCenter.default.addObserver(self, selector: #selector(didPostCreated(_:)), name: .didPostCreated, object: nil)
+        // A module switched on or off while the page is up can take the
+        // selected tab away with it.
+        NotificationCenter.default.addObserver(self, selector: #selector(configDidUpdate(_:)), name: .configDidUpdate, object: nil)
     }
 
     private func fetchForYouFeedSetting() {
@@ -131,17 +135,33 @@ class AmitySocialHomePageViewModel: ObservableObject {
             if !enabled {
                 self.handleForYouDisabled()
             }
+            // Before the pager is built: it starts on whatever this lands on.
+            self.resolveLandingTab()
             self.isForYouSettingLoading = false
         }
     }
 
     func handleForYouDisabled() {
         isForYouEnabled = false
-        if selectedTab == .forYou {
-            selectedTab = .newsFeed
+        resolveLandingTab()
+    }
+
+    /// Re-points the selection at a tab the row actually shows (PDT-5561).
+    /// The row filtered out gated tabs; the selection never followed it.
+    private func resolveLandingTab() {
+        let landing = SocialHomeTabs(isForYouEnabled: isForYouEnabled).landing(from: selectedTab)
+        if landing != selectedTab {
+            selectedTab = landing
         }
     }
-    
+
+    @objc private func configDidUpdate(_ notification: Notification) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self, !self.isForYouSettingLoading else { return }
+            self.resolveLandingTab()
+        }
+    }
+
     deinit {
         NotificationCenter.default.removeObserver(self)
     }

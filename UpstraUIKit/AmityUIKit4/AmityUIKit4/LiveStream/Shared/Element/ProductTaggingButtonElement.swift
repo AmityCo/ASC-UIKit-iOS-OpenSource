@@ -27,6 +27,16 @@ struct ProductTaggingButtonElement: AmityElementView {
     }
     
     var body: some View {
+        // Product tags render on a livestream, so the Live page gate cannot
+        // reach them — Product is a module of its own and has to be asked here.
+        if viewConfig.isHidden(elementId: .productTaggingButton) {
+            EmptyView()
+        } else {
+            content
+        }
+    }
+
+    private var content: some View {
         Button {
             onClick()
         } label: {

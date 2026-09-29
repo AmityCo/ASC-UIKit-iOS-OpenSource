@@ -86,10 +86,20 @@ public struct AmityNewsFeedComponent: AmityComponentView {
         }
     }
     
+    /// Whether the story tab draws anything at all. Same reason as ForYouFeed:
+    /// the component gates itself and renders nothing, but this row wraps it in a
+    /// fixed 118pt frame and follows it with an 8pt separator, so Story off left a
+    /// band and a rule behind — rule 3.
+    private var storyTabVisible: Bool {
+        !AmityUIKitConfigController.shared.isExcluded(
+            configId: "\(pageId?.rawValue ?? "*")/\(ComponentId.storyTabComponent.rawValue)/*"
+        )
+    }
+
     @ViewBuilder
     func getPostListView() -> some View {
         List {
-            if (!viewModel.storyTargets.isEmpty || !viewModel.roomPosts.isEmpty) {
+            if storyTabVisible && (!viewModel.storyTargets.isEmpty || !viewModel.roomPosts.isEmpty) {
                 VStack(spacing: 0) {
                     AmityStoryTabComponent(type: .globalFeed, pageId: pageId)
                         .frame(height: 118)
@@ -100,7 +110,7 @@ public struct AmityNewsFeedComponent: AmityComponentView {
                 }
                 .listRowInsets(EdgeInsets())
                 .modifier(HiddenListSeparator())
-            } else if viewModel.isStoryTabLoading {
+            } else if storyTabVisible && viewModel.isStoryTabLoading {
                 VStack(spacing: 0) {
                     SkeletonStoryTabComponent(radius: 64)
                         .frame(height: 118)
@@ -218,6 +228,7 @@ class AmityNewsFeedComponentViewModel: ObservableObject {
     }
     
     func loadStoryTargets() {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.story) else { return }
         storyTargetCollection = storyManager.getGlobaFeedStoryTargets(options: .smart)
         storyTargetCancellable = storyTargetCollection?.$snapshots
             .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
@@ -233,6 +244,11 @@ class AmityNewsFeedComponentViewModel: ObservableObject {
     }
     
     func loadRoomPosts() {
+        // The live-room rail belongs to Live. It sits inside the story rail and
+        // the feed, so with those on and Live off this kept polling
+        // /api/v1/rooms/lives every twenty seconds or so for rooms it would
+        // never draw. Android had the identical leak in getLives().
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.live) else { return }
         roomPostCollection = postManager.getGlobalLiveRoomPosts()
         roomPostCancellable = roomPostCollection?.$snapshots
             .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)

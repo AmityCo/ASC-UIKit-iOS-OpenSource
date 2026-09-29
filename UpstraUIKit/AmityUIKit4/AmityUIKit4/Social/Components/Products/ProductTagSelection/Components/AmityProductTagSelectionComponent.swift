@@ -409,6 +409,7 @@ class ProductTagSelectionViewModel: ObservableObject {
     }
 
     private func searchProducts(_ keyword: String) {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.product) else { return }
         guard keyword.count >= 2 else {
             products = []
             collectionCancellables.removeAll()

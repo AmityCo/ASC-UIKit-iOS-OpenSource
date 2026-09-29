@@ -255,6 +255,12 @@ struct ManageProductTagListComponent: AmityComponentView {
         .onDisappear {
             onClose(viewModel.taggedProducts)
         }
+    
+        // Applies the theme and, with it, AmityModuleGate — this component
+    
+        // built a view config carrying its componentId and never asked.
+    
+        .updateTheme(with: viewConfig)
     }
 }
 

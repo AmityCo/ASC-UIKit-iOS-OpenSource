@@ -39,6 +39,12 @@ public struct AmityInvitationSection: AmityComponentView {
                     }
             }
         }
+    
+        // Applies the theme and, with it, AmityModuleGate — this component
+    
+        // built a view config carrying its componentId and never asked.
+    
+        .updateTheme(with: viewConfig)
     }
     
     private func goToCommunityProfilePage(communityId: String) {

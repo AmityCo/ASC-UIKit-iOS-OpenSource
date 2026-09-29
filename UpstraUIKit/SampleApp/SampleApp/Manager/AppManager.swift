@@ -37,6 +37,19 @@ final class AppManager {
             )
         )
 
+        // ponytail: temporary — records what the SDK actually sends, so a module
+        // switched off can be checked against the wire. Remove with ApiTrace.swift.
+        //
+        // Immediately after setup, which is the earliest legal point: reading
+        // AmityUIKit4Manager.client before setup trips an assertionFailure inside
+        // the SDK and kills the app on launch. Anything the SDK sends during setup
+        // itself is therefore invisible here — unlike Android, where the tracer can
+        // start on the first line of the process.
+        // Loading the store applies the QA module overrides, which have to be in
+        // before anything asks the gate — the tracer included.
+        _ = LoginConfigStore.shared
+        ApiTrace.start(modulesOff: ModuleFlags.order.filter { !ModuleFlags.isAvailable($0) })
+
         RemoteConfig.setup(apiKey: endpointConfig.apiKey, httpEndpoint: endpointConfig.httpEndpoint)
 
         // Apply the Local Custom toggles (theme, excludes, feature flags) by writing a

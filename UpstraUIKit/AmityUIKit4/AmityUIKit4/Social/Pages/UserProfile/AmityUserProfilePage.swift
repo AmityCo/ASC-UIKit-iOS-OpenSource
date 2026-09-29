@@ -272,6 +272,10 @@ public struct AmityUserProfilePage: AmityPageView {
                         }
                     }
                 }
+                // The only door to blocked_users_page, which userRelationship
+                // already withholds — without its own id it stayed, and did
+                // nothing when tapped (PDT-5564).
+                .isHidden(viewConfig.isHidden(elementId: .manageBlockedUsersButton))
             
             if AmityUIKitManagerInternal.shared.canShareLink(for: .user) {
                 shareableLinkItemView
@@ -352,6 +356,12 @@ public struct AmityUserProfilePage: AmityPageView {
                     
                     
                 }
+                // One row, two jobs: the id follows the job, so Block and
+                // Unblock are gated as themselves (§10.2). Report above is
+                // moderation, not a relationship, and stays.
+                .isHidden(isBlockedUser
+                          ? viewConfig.isHidden(elementId: .unblockUserButton)
+                          : viewConfig.isHidden(elementId: .blockUserButton))
             
             if AmityUIKitManagerInternal.shared.canShareLink(for: .user) {
                 shareableLinkItemView

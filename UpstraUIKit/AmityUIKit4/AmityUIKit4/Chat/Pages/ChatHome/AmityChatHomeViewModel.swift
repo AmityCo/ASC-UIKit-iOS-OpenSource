@@ -84,6 +84,11 @@ final class AmityChatHomeViewModel: ObservableObject {
     // MARK: - Push Notification Settings
 
     private func fetchPushNotificationSettings() {
+        // Read from the view model, so constructing the chat home page is enough
+        // to ask — no screen has to be drawn. With Push Notification off there is
+        // nothing this can be used for. Android had the same read in the same
+        // place and needed the same guard.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.pushNotification) else { return }
         Task {
             do {
                 let manager = AmityUIKitManagerInternal.shared.client.notificationManager
@@ -100,6 +105,10 @@ final class AmityChatHomeViewModel: ObservableObject {
     // MARK: - Query observers
 
     private func startObservingAll() {
+        // Chat off means no channel query. The page is unreachable in a host that
+        // respects the flag, but the page must not depend on that: the sample's
+        // debug entry reaches it regardless, and so would any host that forgets.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.chat) else { return }
         let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.conversation, AmityChannelQueryType.community], filter: .userIsMember, includeDeleted: false, excludeArchives: true)
         allCollection = channelManager.getChannels(with: query)
         allToken = allCollection?.observe { [weak self] collection, _ in
@@ -110,6 +119,7 @@ final class AmityChatHomeViewModel: ObservableObject {
     }
 
     private func startObservingDirect() {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.chat) else { return }
         let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.conversation], filter: .userIsMember, includeDeleted: false, excludeArchives: true)
         directCollection = channelManager.getChannels(with: query)
         directToken = directCollection?.observe { [weak self] collection, _ in
@@ -119,6 +129,7 @@ final class AmityChatHomeViewModel: ObservableObject {
     }
 
     private func startObservingGroup() {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.chat) else { return }
         let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.community], filter: .userIsMember, includeDeleted: false, excludeArchives: true)
         groupCollection = channelManager.getChannels(with: query)
         groupToken = groupCollection?.observe { [weak self] collection, _ in

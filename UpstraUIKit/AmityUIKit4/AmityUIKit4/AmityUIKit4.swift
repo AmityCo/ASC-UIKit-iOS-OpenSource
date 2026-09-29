@@ -167,6 +167,64 @@ public final class AmityUIKit4Manager {
     /// ```
     ///
     /// - Parameter filePath: The absolute file path to the configuration JSON file.
+    // MARK: Phase 1 module flags
+
+    /// The Phase 1 modules and what each is sold with.
+    ///
+    /// A host that offers its own module switches has to render the bundle rules
+    /// — "Post needs Community" — and the alternative was a second copy of the
+    /// graph in the sample app. These are the catalog's rules, from the network's
+    /// module settings, the same ones the gate applies: with no settings row yet
+    /// every entry is empty, because nothing cascades until the rules arrive.
+    public static var moduleRequirements: [String: (all: [String], any: [String])] {
+        Dictionary(uniqueKeysWithValues: AmityUIKitFeature.allCases.map {
+            ($0.rawValue, AmityUIKitConfigController.shared.moduleRequirement($0.rawValue))
+        })
+    }
+
+    // MARK: Public
+
+    /// Whether a module resolves on under the given switches, the catalog's bundle
+    /// rules applied — none until the network's module settings have been read.
+    ///
+    /// A pure function over a flag set the caller supplies, for a host rendering
+    /// its own switches. It knows nothing of grants and feeds nothing into the
+    /// gate; `isModuleAvailable` is the gate's answer (REQ-020).
+    public static func isModuleEnabled(_ key: String, under flags: [String: Bool]) -> Bool {
+        AmityUIKitConfigController.shared.resolveFeature(key, flags: flags)
+    }
+
+    /// Whether a module is available in this app.
+    ///
+    /// The network's plan is the only source that can withhold one — nothing
+    /// local can withhold or grant a module. This is the resolved answer over
+    /// the entitlement, with the catalog's prerequisite rules applied, which is
+    /// the same question every gated page, component and element already asks.
+    /// So a host reading it sees exactly what the UIKit will do.
+    ///
+    /// Synchronous and free of I/O by contract (REQ-019): it is read while views
+    /// are being built, and it never reads the store — the snapshot is rebuilt
+    /// when the SDK posts `AmityModuleSettings.didUpdateNotification`.
+    ///
+    /// Distinct from `isModuleEnabled(_:under:)`, which is a pure function over
+    /// flags a caller supplies and knows nothing of entitlements — for a host
+    /// rendering its own switches.
+    public static func isModuleAvailable(_ feature: AmityUIKitFeature) -> Bool {
+        AmityUIKitConfigController.shared.isFeatureEnabled(feature)
+    }
+
+    /// The same answer with its reason. `notGranted` is about this module;
+    /// `prerequisiteUnavailable` is about another one, and names every
+    /// prerequisite that would have satisfied it.
+    public static func moduleAvailability(_ feature: AmityUIKitFeature) -> AmityUIKitModuleAvailability {
+        AmityUIKitConfigController.shared.moduleAvailability(feature)
+    }
+
+    /// Every module this UIKit gates, for a host rendering a settings screen.
+    public static var moduleAvailability: [AmityUIKitModuleAvailability] {
+        AmityUIKitConfigController.shared.moduleAvailabilities()
+    }
+
     public static func setConfigFile(_ filePath: String) {
         AmityUIKitConfigController.shared.setConfigFile(filePath)
     }
@@ -199,6 +257,11 @@ final class AmityUIKitManagerInternal: NSObject {
         }
         return client
     }
+
+    /// The client if `setup(_:)` has run, nil otherwise — for reads that are
+    /// legitimately reachable before setup and must answer "unknown" then,
+    /// not crash. `client` above is for code that cannot run without one.
+    var clientIfSetUp: AmityClient? { _client }
     
     var env: [String: Any] = [:]
     
@@ -253,6 +316,14 @@ final class AmityUIKitManagerInternal: NSObject {
                 Log.warn("Remote config error: \(error)")
             }
         }
+        // Every setup path lands here, which makes it the one place the gate can
+        // read the network's entitlements: the client exists by now. After the
+        // stale-network cleanup above, not before — a gate built from the
+        // previous network's answer would hold it for the whole launch. This
+        // registers for AmityModuleSettings.didUpdateNotification (once per
+        // process — a re-setup or network switch re-reads, it does not
+        // subscribe twice) and then reads. The UIKit never fetches this.
+        AmityUIKitConfigController.shared.refreshModuleEntitlements()
     }
     
     func syncNetworkConfig() async throws {

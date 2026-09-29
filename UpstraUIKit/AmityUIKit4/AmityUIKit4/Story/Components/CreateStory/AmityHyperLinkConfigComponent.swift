@@ -117,6 +117,12 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
         .onChange(of: colorScheme) { value in
             viewConfig.updateTheme()
         }
+    
+        // Applies the theme and, with it, AmityModuleGate — this component
+    
+        // built a view config carrying its componentId and never asked.
+    
+        .updateTheme(with: viewConfig)
     }
 
     private var navigationBar: some View {

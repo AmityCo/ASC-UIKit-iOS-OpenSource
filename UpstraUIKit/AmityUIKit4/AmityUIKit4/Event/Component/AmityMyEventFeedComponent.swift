@@ -59,6 +59,12 @@ public struct AmityMyEventFeedComponent: AmityComponentView {
             upcomingEventFeedViewModel.loadEvents(eventStatus: .scheduled, originId: nil, onlyMyEvents: true, initialLimit: 5)
             pastEventFeedViewModel.loadEvents(eventStatus: .ended, originId: nil, onlyMyEvents: true, initialLimit: 5, orderBy: .descending)
         }
+    
+        // Applies the theme and, with it, AmityModuleGate — this component
+    
+        // built a view config carrying its componentId and never asked.
+    
+        .updateTheme(with: viewConfig)
     }
 }
 

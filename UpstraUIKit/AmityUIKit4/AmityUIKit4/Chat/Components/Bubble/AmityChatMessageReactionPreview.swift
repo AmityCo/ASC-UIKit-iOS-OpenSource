@@ -19,34 +19,52 @@ public struct AmityChatMessageReactionPreview: View {
         self.action = tapAction
     }
     
+        /// Reaction can be switched off while Chat stays on — it needs only one of
+    
+    /// post, comment, chat or story. These surfaces thread no page or component
+    
+    /// context, so they ask the module rather than an element id.
+    
+    private var reactionEnabled: Bool {
+    
+        AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.reaction)
+    
+    }
+
+    
     public var body: some View {
-        Button(action: {
-            action?()
-        }, label: {
-            HStack(spacing: 2) {
+    
+        if reactionEnabled {
+            Button(action: {
+                action?()
+            }, label: {
+                HStack(spacing: 2) {
                 
-                ForEach(Array(viewModel.topThreeReactions.enumerated()), id: \.element.id) { index, reaction in
-                    ReactionLabel(image: reaction.image)
-                        .padding(EdgeInsets(top: 4, leading: index == 0 ? 6 : -10, bottom: 4, trailing: 0))
-                        .zIndex(Double(viewModel.topThreeReactions.count - index))
+                    ForEach(Array(viewModel.topThreeReactions.enumerated()), id: \.element.id) { index, reaction in
+                        ReactionLabel(image: reaction.image)
+                            .padding(EdgeInsets(top: 4, leading: index == 0 ? 6 : -10, bottom: 4, trailing: 0))
+                            .zIndex(Double(viewModel.topThreeReactions.count - index))
+                    }
+                
+                    Text("\(message.reactionCount.formattedCountString)")
+                        .applyTextStyle(.custom(13, .medium, message.myReactions.isEmpty ? Color(viewConfig.theme.baseInverseColor) : .white))
+                        .padding(.trailing, 8)
+                        .padding(.leading, 2)
                 }
-                
-                Text("\(message.reactionCount.formattedCountString)")
-                    .applyTextStyle(.custom(13, .medium, message.myReactions.isEmpty ? Color(viewConfig.theme.baseInverseColor) : .white))
-                    .padding(.trailing, 8)
-                    .padding(.leading, 2)
-            }
-            .frame(height: 28)
-            .background(message.myReactions.isEmpty ? Color(viewConfig.theme.backgroundShade1Color) : Color(viewConfig.theme.highlightColor))
-            .clipped()
-            .cornerRadius(14)
-            .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(Color(viewConfig.theme.baseColorShade4), lineWidth: 1)
-            )
-            .accessibilityIdentifier(AccessibilityID.Chat.MessageList.reactionPreview)
-        })
-        .buttonStyle(.plain)
+                .frame(height: 28)
+                .background(message.myReactions.isEmpty ? Color(viewConfig.theme.backgroundShade1Color) : Color(viewConfig.theme.highlightColor))
+                .clipped()
+                .cornerRadius(14)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14)
+                        .stroke(Color(viewConfig.theme.baseColorShade4), lineWidth: 1)
+                )
+                .accessibilityIdentifier(AccessibilityID.Chat.MessageList.reactionPreview)
+            })
+            .buttonStyle(.plain)
+        
+        }
+    
     }
     
     struct ReactionLabel: View {

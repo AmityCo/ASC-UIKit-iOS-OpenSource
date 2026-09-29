@@ -18,15 +18,38 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
     @StateObject private var viewConfig: AmityViewConfigController
     
     @State private var tabIndex: Int = 0
-    @State private var tabs: [String] = [
-        AmityLocalizedStringSet.Social.socialSearchPostsTab.localizedString,
-        AmityLocalizedStringSet.Social.socialHomeCommunitiesTab.localizedString,
-        AmityLocalizedStringSet.Social.socialSearchUsersTab.localizedString
-    ]
+
+    // A tab searching for something this build cannot display is an offer the app
+    // cannot keep: with `post` off the Posts tab opened selected and permanently
+    // empty. User search has no module of its own beyond `discovery`, which owns
+    // the whole page, so it is always here.
+    private let searchTypes: [SearchType] = AmitySocialGlobalSearchPage.availableSearchTypes()
+
+    static func availableSearchTypes() -> [SearchType] {
+        let config = AmityUIKitConfigController.shared
+        var types: [SearchType] = []
+        if config.isFeatureEnabled(AmityUIKitFeature.post) { types.append(.posts) }
+        if config.isFeatureEnabled(AmityUIKitFeature.community) { types.append(.community) }
+        types.append(.user)
+        return types
+    }
+
+    private static func tabTitle(for type: SearchType) -> String {
+        switch type {
+        case .posts: return AmityLocalizedStringSet.Social.socialSearchPostsTab.localizedString
+        case .community: return AmityLocalizedStringSet.Social.socialHomeCommunitiesTab.localizedString
+        default: return AmityLocalizedStringSet.Social.socialSearchUsersTab.localizedString
+        }
+    }
+
+    @State private var tabs: [String] = AmitySocialGlobalSearchPage.availableSearchTypes()
+        .map { AmitySocialGlobalSearchPage.tabTitle(for: $0) }
     
     public init(searchKeyword: String? = nil) {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .socialGlobalSearchPage))
-        self._viewModel = StateObject(wrappedValue: AmityGlobalSearchViewModel(searchType: .posts, searchKeyword: searchKeyword))
+        // The first tab that survived the gate, not always posts.
+        let initialType = AmitySocialGlobalSearchPage.availableSearchTypes().first ?? .user
+        self._viewModel = StateObject(wrappedValue: AmityGlobalSearchViewModel(searchType: initialType, searchKeyword: searchKeyword))
     }
     
     public var body: some View {
@@ -39,17 +62,11 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
                 TabBarView(currentTab: $tabIndex, tabBarOptions: $tabs)
                     .selectedTabColor(viewConfig.theme.primaryColor)
                     .onChange(of: tabIndex) { value in
-                        
-                        switch value {
-                        case 0:
-                            viewModel.searchType = .posts
-                        case 1:
-                            viewModel.searchType = .community
-                        case 2:
-                            viewModel.searchType = .user
-                        default:
-                            viewModel.searchType = .community
-                        }
+                        // Read from the gated list, never from a fixed index:
+                        // dropping a tab shifts every index after it.
+                        viewModel.searchType = searchTypes.indices.contains(value)
+                            ? searchTypes[value]
+                            : (searchTypes.first ?? .user)
                         
                         viewModel.searchKeyword = viewModel.searchKeyword
                     }
@@ -63,14 +80,19 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
             
             ZStack(alignment: .top) {
                 TabView(selection: $tabIndex) {
-                    AmityPostSearchResultComponent(viewModel: viewModel, pageId: id)
-                        .tag(0)
-                    
-                    AmityCommunitySearchResultComponent(viewModel: viewModel, pageId: id)
-                        .tag(1)
-                    
-                    AmityUserSearchResultComponent(viewModel: viewModel, pageId: id)
-                        .tag(2)
+                    ForEach(Array(searchTypes.enumerated()), id: \.offset) { index, type in
+                        switch type {
+                        case .posts:
+                            AmityPostSearchResultComponent(viewModel: viewModel, pageId: id)
+                                .tag(index)
+                        case .community:
+                            AmityCommunitySearchResultComponent(viewModel: viewModel, pageId: id)
+                                .tag(index)
+                        default:
+                            AmityUserSearchResultComponent(viewModel: viewModel, pageId: id)
+                                .tag(index)
+                        }
+                    }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
             }

@@ -44,6 +44,11 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
     }
         
     public var body: some View {
+        AmityModuleGateView(pageId: .livestreamPlayerPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         ZStack(alignment: .bottom) {
             // background loading view
             backgroundLoadingView

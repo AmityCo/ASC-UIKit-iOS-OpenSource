@@ -326,6 +326,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                     let context = Context(shouldShowPollResults: actionType == PollAction.viewDetailWithResults, category: category, shouldHideTarget: hideTarget, shouldHideMenuButton: hideMenuButton)
                     onTapAction?(context)
                 }
+                .isHidden(viewConfig.isHidden(elementId: .postPoll))
                 
             case .liveStream:
                 livestreamPostContentTextView()
@@ -379,7 +380,7 @@ public struct AmityPostContentComponent: AmityComponentView {
                                    defaultAction: {onTapAction?(tapActionContext)},
                                    metadata: post.metadata,
                                    mentionees: post.mentionees,
-                                   productTags: post.textProductTags,
+                                   productTags: productTagsVisible ? post.textProductTags : nil,
                                    highlightedText: context?.searchKeyword,
                                    links: post.links,
                                    fadeTruncatedText: false,
@@ -492,9 +493,19 @@ public struct AmityPostContentComponent: AmityComponentView {
         }
     }
     
+    /// Whether this post's product surface draws at all.
+    ///
+    /// Nothing on iOS asked: Product off left the tagged run blue and tappable in
+    /// the sentence, the "Products tagged" header above the row, and the card and
+    /// its price inside it. Android carried half of this and Web the other half;
+    /// this is the same question all three now ask.
+    private var productTagsVisible: Bool {
+        !viewConfig.isHidden(elementId: .productTagListItem)
+    }
+
     @ViewBuilder
     private func postProductCarouselView(_ post: AmityPostModel) -> some View {
-        if !post.allProductTags.isEmpty {
+        if productTagsVisible, !post.allProductTags.isEmpty {
             AmityProductCarouselView(allProductTags: post.allProductTags, postId: post.postId, pageId: pageId)
                 .environmentObject(viewConfig)
                 .environmentObject(host)
@@ -532,14 +543,14 @@ public struct AmityPostContentComponent: AmityComponentView {
                         showReactionList.toggle()
                     }
                 }
-                .isHidden(post.allReactions.count == 0)
+                .isHidden(post.allReactions.count == 0 || viewConfig.isHidden(elementId: .reactionButton))
                 
                 let commentCountText = post.allCommentCount == 1
                     ? AmityLocalizedStringSet.Social.postCommentCountSingular.localized(arguments: post.allCommentCount.formattedCountString)
                     : AmityLocalizedStringSet.Social.postCommentCountPlural.localized(arguments: post.allCommentCount.formattedCountString)
                 Text(commentCountText)
                     .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade2)))
-                    .isHidden(post.allCommentCount == 0)
+                    .isHidden(post.allCommentCount == 0 || viewConfig.isHidden(elementId: .commentButton))
                 
                 Spacer()
                     .isHidden(post.allReactions.count != 0)
@@ -550,15 +561,27 @@ public struct AmityPostContentComponent: AmityComponentView {
         .sheet(isPresented: $showReactionList) {
             reactionListSheet
         }
-        .isHidden(post.allCommentCount == 0 && post.allReactions.count == 0)
+        // Counting only the numbers left the summary band standing when Reaction
+        // and Comment were switched off — a row with a height and nothing in it.
+        .isHidden(!hasEngagementSummary(post))
     }
-    
+
+    /// Whether anything in the summary row would render.
+    private func hasEngagementSummary(_ post: AmityPostModel) -> Bool {
+        let showsReactions = post.allReactions.count > 0 && !viewConfig.isHidden(elementId: .reactionButton)
+        let showsComments = post.allCommentCount > 0 && !viewConfig.isHidden(elementId: .commentButton)
+        return showsReactions || showsComments
+    }
+
     @ViewBuilder
     private func postEngagementActionView(_ post: AmityPostModel) -> some View {
         VStack(alignment: .leading, spacing: 12) {
+            // The rule belongs to the row under it. With React and Comment gone
+            // it was drawing a line above an empty band.
             Rectangle()
                 .fill(Color(viewConfig.theme.baseColorShade4))
                 .frame(height: 1)
+                .isHidden(!hasEngagementSummary(post))
             
             // We do not show "Join community to interact" view anymore
             HStack(spacing: 4) {
@@ -664,7 +687,10 @@ public struct AmityPostContentComponent: AmityComponentView {
     
     @ViewBuilder
     private func postInlineCommentView(_ post: AmityPostModel) -> some View {
-        if style == .feed, let comment = post.inlineComment {
+        // The latest-comment preview under a post in the feed renders a comment,
+        // its reactions and a Reply. None of it carried an id of its own.
+        if style == .feed, let comment = post.inlineComment,
+           !viewConfig.isHidden(elementId: .commentButton) {
             VStack(spacing: 0) {
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))

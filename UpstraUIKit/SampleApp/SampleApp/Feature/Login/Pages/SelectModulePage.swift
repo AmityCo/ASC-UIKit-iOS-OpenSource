@@ -14,6 +14,7 @@ struct SelectModulePage: View {
     @EnvironmentObject var store: LoginConfigStore
     @State private var isSyncing = false
     @State private var syncMessage: SyncMessage?
+    @State private var isModuleFlagsShown = false
 
     var body: some View {
         ZStack {
@@ -34,6 +35,10 @@ struct SelectModulePage: View {
                         debugCard
 
                         Spacer().frame(height: 16)
+                        // Reachable after login too, because the point of a runtime
+                        // flag is flipping it and looking at the app, not restarting.
+                        moduleFlagsCard
+                        Spacer().frame(height: 12)
                         changeUserCard
 
                         if let message = syncMessage {
@@ -51,6 +56,39 @@ struct SelectModulePage: View {
                 footer
             }
         }
+        .fullScreenCover(isPresented: $isModuleFlagsShown) {
+            ModuleFlagsPage(onClose: { isModuleFlagsShown = false })
+                .environmentObject(store)
+        }
+    }
+
+    private var moduleFlagsCard: some View {
+        let off = ModuleFlags.order.filter { !ModuleFlags.isAvailable($0) }.count
+        return LoginGroupedCard {
+            Button {
+                isModuleFlagsShown = true
+            } label: {
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Phase 1 Modules")
+                            .font(LoginTheme.rowTitleFont)
+                            .foregroundColor(LoginTheme.primaryText)
+                        Text(off == 0
+                             ? "All \(ModuleFlags.order.count) on"
+                             : "\(off) of \(ModuleFlags.order.count) off")
+                            .font(LoginTheme.rowSubtitleFont)
+                            .foregroundColor(LoginTheme.muted)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(LoginTheme.placeholder)
+                }
+                .padding(.horizontal, LoginTheme.rowHorizontalPadding)
+                .padding(.vertical, LoginTheme.rowVerticalPadding)
+            }
+        }
+        .padding(.horizontal, LoginTheme.cardSidePadding)
     }
 
     // MARK: - Greeting (with env badge)

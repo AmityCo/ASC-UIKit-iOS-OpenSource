@@ -41,6 +41,11 @@ public struct AmityCreateLivestreamPage: AmityPageView {
     }
     
     public var body: some View {
+        AmityModuleGateView(pageId: .createLivestreamPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         LiveStreamConferenceView(viewModel: viewModel, broadcasterViewModel: broadcasterViewModel)
             .environmentObject(viewConfig)
             .environmentObject(host)

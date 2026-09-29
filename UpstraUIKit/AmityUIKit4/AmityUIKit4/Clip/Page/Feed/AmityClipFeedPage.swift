@@ -40,13 +40,20 @@ public struct AmityClipFeedPage: AmityPageView {
     }
     
     public var body: some View {
-        ClipFeedView(clipProvider: provider, onTapAction: onTapAction)
-            .updateTheme(with: viewConfig)
-            .onAppear {
-                // Clips are excluded from PiP — close any floating livestream
-                // window so two players never run at once.
-                PiPState.shared.stopActivePiPForExcludedSurface()
-            }
+        // A disabled feature must be indistinguishable from one that was
+        // never built: the page renders nothing, so a deep link or a stale
+        // navigation entry lands on emptiness, not a half-working screen.
+        if !AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.post) {
+            EmptyView()
+        } else {
+            ClipFeedView(clipProvider: provider, onTapAction: onTapAction)
+                .updateTheme(with: viewConfig)
+                .onAppear {
+                    // Clips are excluded from PiP — close any floating livestream
+                    // window so two players never run at once.
+                    PiPState.shared.stopActivePiPForExcludedSurface()
+                }
+        }
     }
 }
 

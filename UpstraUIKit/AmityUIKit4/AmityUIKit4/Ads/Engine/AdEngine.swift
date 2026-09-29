@@ -73,6 +73,15 @@ class AdEngine {
     
     @MainActor
     func start() async {
+        // Ads off means no ad request. This sits here rather than at the render
+        // site because the fetch is driven by the session reaching .established,
+        // not by a screen: with no gate the app asked the server for ads it would
+        // never be allowed to show, on every login. Android had the same defect
+        // and the same fix.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.ads) else {
+            Log.ads.debug("Ads module is off — not fetching network ads")
+            return
+        }
         do {
             let networkAds = try await adRepo.getNetworkAds()
             self.ads = networkAds.ads

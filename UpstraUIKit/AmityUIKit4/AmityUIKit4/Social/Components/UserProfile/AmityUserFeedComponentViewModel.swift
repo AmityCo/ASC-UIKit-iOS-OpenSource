@@ -50,6 +50,13 @@ class AmityUserFeedComponentViewModel: ObservableObject {
     }
     
     private func loadFollowInfo(feedSources: [AmityFeedSource]) {
+        // The feed waits on follow info only to learn whether it is blocked.
+        // With userRelationship off there is nobody to ask, so load the posts
+        // rather than leave the feed empty forever.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.userRelationship) else {
+            loadPosts(feedSources: feedSources)
+            return
+        }
         if isOwnUser {
             myFollowInfoObject = userManager.getMyFollowInfo()
             cancellable = myFollowInfoObject?.$snapshot
@@ -93,7 +100,9 @@ class AmityUserFeedComponentViewModel: ObservableObject {
     }
 
     private func loadPosts(feedSources: [AmityFeedSource]) {
-        userFeedCollection = feedManager.getUserFeed(userId: userId, feedSources: feedSources)
+        // The Android UIKit gates the user profile feeds on POST.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.post) else { return }
+        userFeedCollection = feedManager.getUserFeed(userId: userId, feedSources: feedSources, dataTypes: AmityUIKitSupportedPostTypes.current)
         token = userFeedCollection?.observe({ [weak self] (collection, error) in
             if let error {
                 self?.debouner.run {

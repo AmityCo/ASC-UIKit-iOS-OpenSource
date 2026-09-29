@@ -13,18 +13,24 @@ struct EventDetailTabBarView: View {
     @Namespace var namespace
     @StateObject var viewConfig: AmityViewConfigController
     
-    public init(currentTab: Binding<Int>, pageId: PageId = .communityProfilePage) {
+    private let pageId: PageId
+
+    public init(currentTab: Binding<Int>, pageId: PageId = .eventDetailPage) {
+        self.pageId = pageId
         self._currentTab = currentTab
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: nil))
     }
     
     var body: some View {
         HStack(spacing: 20) {
-            let eventItem = TabItem(index: 0, image: AmityIcon.createEventMenuIcon.imageResource)
+            let eventItem = TabItem(index: EventDetailPostDoors.eventTab, image: AmityIcon.createEventMenuIcon.imageResource)
             TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: eventItem)
             
-            let feedItem = TabItem(index: 1, image: AmityIcon.eventDiscussionTabIcon.imageResource)
-            TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: feedItem)
+            // Discussion is a feed of posts — Post's, on a page Events owns.
+            if EventDetailPostDoors(pageId: pageId).showsDiscussion {
+                let feedItem = TabItem(index: EventDetailPostDoors.discussionTab, image: AmityIcon.eventDiscussionTabIcon.imageResource)
+                TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: feedItem)
+            }
         }
         .padding(.horizontal)
         .padding(.top, 16)

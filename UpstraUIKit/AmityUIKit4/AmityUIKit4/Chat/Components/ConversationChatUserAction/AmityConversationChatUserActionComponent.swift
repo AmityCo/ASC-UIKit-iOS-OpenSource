@@ -73,7 +73,12 @@ public struct AmityConversationChatUserActionComponent: AmityComponentView {
                 )
             }
 
-            if config.isChatUserActionEnabled("block") {
+            // ANDed with userRelationship, not replaced by it (§10.2): the
+            // customer's chat action switch and the module both have to allow it.
+            if config.isChatUserActionEnabled("block"),
+               !(isBlocked
+                 ? viewConfig.isHidden(elementId: .unblockUserButton)
+                 : viewConfig.isHidden(elementId: .blockUserButton)) {
                 actionRow(
                     iconResource: AmityIcon.DesignSystem.userSlashR.imageResource,
                     title: isBlocked

@@ -31,6 +31,11 @@ public struct AmityLiveChatPage: AmityPageView {
     }
     
     public var body: some View {
+        AmityModuleGateView(pageId: .liveChatPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         VStack(spacing: 0) {
             // Header
             AmityLiveChatHeader(viewModel: viewModel)

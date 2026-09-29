@@ -78,6 +78,12 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                 rightButton
             }
         }
+    
+        // Applies the theme and, with it, AmityModuleGate — this component
+    
+        // built a view config carrying its componentId and never asked.
+    
+        .updateTheme(with: viewConfig)
     }
     
     /// Right button that shows different actions based on the state of the chat compose bar.
@@ -142,7 +148,9 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
                     .circularBackground(radius: 40, color: Color(viewConfig.defaultDarkTheme.baseColorShade4))
             }
         }
-        else {
+        else if !viewConfig.isHidden(elementId: .livestreamReaction) {
+            // Reaction off takes the composer's reaction tap target with the
+            // overlay; the camera-swap branch above belongs to Live, not Reaction.
             Image(AmityIcon.Reaction.like.imageResource)
                 .resizable()
                 .aspectRatio(contentMode: .fit)

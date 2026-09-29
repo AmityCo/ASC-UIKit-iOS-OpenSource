@@ -91,6 +91,7 @@ class AmityStoryTabComponentViewModel: ObservableObject {
     }
     
     private func loadGlobalFeedStoryTargets() {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.story) else { return }
         globalFeedCollection = storyManager.getGlobaFeedStoryTargets(options: .smart)
         cancellable = nil
         cancellable = globalFeedCollection?.$snapshots
@@ -103,6 +104,7 @@ class AmityStoryTabComponentViewModel: ObservableObject {
     }
     
     private func loadCommunityStoryTarget(_ communityId: String) {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.story) else { return }
         storyTargetObject = storyManager.getStoryTarget(targetType: .community, targetId: communityId)
         cancellable = nil
         cancellable = storyTargetObject?.$snapshot
@@ -139,11 +141,21 @@ class AmityStoryTabComponentViewModel: ObservableObject {
     }
     
     private func loadGlobalLiveStreamPosts() {
+        // The live-room rail belongs to Live. It sits inside the story rail and
+        // the feed, so with those on and Live off this kept polling
+        // /api/v1/rooms/lives every twenty seconds or so for rooms it would
+        // never draw. Android had the identical leak in getLives().
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.live) else { return }
         liveStreamPostCollection = postManager.getGlobalLiveRoomPosts()
         observeRoomPosts(liveStreamPostCollection)
     }
     
     private func loadCommunityLiveStreamPosts(_ communityId: String) {
+        // The live-room rail belongs to Live. It sits inside the story rail and
+        // the feed, so with those on and Live off this kept polling
+        // /api/v1/rooms/lives every twenty seconds or so for rooms it would
+        // never draw. Android had the identical leak in getLives().
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.live) else { return }
         liveStreamPostCollection = postManager.getCommunityLiveRoomPosts(communityId: communityId)
         observeRoomPosts(liveStreamPostCollection)
     }

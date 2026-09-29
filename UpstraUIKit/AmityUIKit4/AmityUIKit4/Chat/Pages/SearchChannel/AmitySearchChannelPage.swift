@@ -25,6 +25,11 @@ public struct AmitySearchChannelPage: AmityPageView {
     }
 
     public var body: some View {
+        AmityModuleGateView(pageId: .searchChannelPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         VStack(spacing: 0) {
             searchBar
                 .padding(.horizontal, 16)

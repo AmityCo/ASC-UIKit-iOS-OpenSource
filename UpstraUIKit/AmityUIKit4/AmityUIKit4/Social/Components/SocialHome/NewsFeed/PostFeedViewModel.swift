@@ -83,6 +83,11 @@ class PostFeedViewModel: ObservableObject {
             fetchGlobalPinnedPost()
             
             // Fetch normal posts in global feed
+            // No dataTypes here on purpose. /api/v4/me/global-feeds takes a media-type
+            // filter, not a post-type filter: naming the full list returns 422
+            // (the app's own trace), and the list cannot name `text`, so there is
+            // no way to say "everything except clip". Passing a filter would drop
+            // every text post from the feed to exclude one type.
             collection = feedManager.getGlobalFeedPosts()
         }
         
@@ -338,6 +343,9 @@ extension PostFeedViewModel {
     
     private func canRenderPost(post: AmityPost) -> Bool {
         guard !post.isDeleted else { return false }
+        // A post whose module is off is as unrenderable as one whose type this
+        // UIKit never supported; neither endpoint above can exclude it for us.
+        guard AmityUIKitSupportedPostTypes.allows(post) else { return false }
         let filterCondition = !post.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" }
         return filterCondition
     }

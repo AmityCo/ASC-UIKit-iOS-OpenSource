@@ -25,8 +25,19 @@ struct CommentComposerView: View {
         self.onReplyCreated = onReplyCreated
     }
     
+    /// §10.2: the composer bar is Comment's wherever it mounts — post detail,
+    /// and the comment tray that stories and the clip feed open. It carried no
+    /// id and never asked, so switching Comment off took the count and the
+    /// list away and left the composer standing (PDT-5563).
+    static func isShown(on pageId: PageId?) -> Bool {
+        !AmityUIKitConfigController.shared.isExcluded(
+            configId: "\(pageId?.rawValue ?? "*")/\(ComponentId.commentComposerBar.rawValue)/*")
+    }
+
     var body: some View {
-        contentView
+        if Self.isShown(on: viewConfig.pageId) {
+            contentView
+        }
     }
     
     @ViewBuilder

@@ -18,6 +18,10 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
     }
     
     @StateObject private var viewConfig: AmityViewConfigController
+    /// The menu the "+" opens, asked here so the "+" follows its items.
+    @StateObject private var postMenuConfig: AmityViewConfigController
+    /// The menu's per-user inputs, shared with the menu when it opens.
+    @StateObject private var postMenuViewModel = AmityCreatePostMenuViewModel()
     @State private var showPostCreationMenu: Bool = false
     private let selectedTab: AmitySocialHomePageTab
     
@@ -36,6 +40,26 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
         self.searchButtonAction = searchButtonAction
         self.notificationButtonAction = notificationButtonAction
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .socialHomePageTopNavigationComponent))
+        self._postMenuConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .createPostMenu))
+    }
+
+    /// Whether the create-content "+" is drawn, given the top navigation's
+    /// view config, the view config of the menu it opens, and the menu's
+    /// per-user inputs.
+    ///
+    /// The "+" belongs to no module (module-availability §10.1, PDT-5867): it
+    /// was Post's, so a network with Events but not Post lost event creation
+    /// from the Event Hub. It is drawn while the customer has not excluded it
+    /// and the menu would show at least one item — the menu's own
+    /// `shownItems`, so the "+" never opens an empty menu.
+    static func showsPostCreationButton(navigation: AmityViewConfigController,
+                                        menu: AmityViewConfigController,
+                                        allowsStoryCreation: Bool,
+                                        canCreateEvent: Bool) -> Bool {
+        !navigation.isHidden(elementId: .postCreationButton)
+            && !AmityCreatePostMenuComponent.shownItems(menu,
+                                                        allowsStoryCreation: allowsStoryCreation,
+                                                        canCreateEvent: canCreateEvent).isEmpty
     }
     
     public var body: some View {
@@ -73,17 +97,19 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
             .isHidden(viewConfig.isHidden(elementId: .globalSearchButton), remove: true)
             
             // Add Button
-            if selectedTab != .explore && !AmityUIKitManagerInternal.shared.isGuestUser {
+            if selectedTab != .explore && !AmityUIKitManagerInternal.shared.isGuestUser
+                && Self.showsPostCreationButton(navigation: viewConfig, menu: postMenuConfig,
+                                                allowsStoryCreation: postMenuViewModel.allowsStoryCreation,
+                                                canCreateEvent: postMenuViewModel.hasCreateEventPermission) {
                 TopNavigationIconButton(elementId: .postCreationButton) {
                     withoutAnimation {
                         showPostCreationMenu.toggle()
                     }
                 }
                 .fullScreenCover(isPresented: $showPostCreationMenu) {
-                    AmityCreatePostMenuComponent(isPresented: $showPostCreationMenu, pageId: pageId)
+                    AmityCreatePostMenuComponent(isPresented: $showPostCreationMenu, pageId: pageId, viewModel: postMenuViewModel)
                         .background(ClearBackgroundView())
                 }
-                .isHidden(viewConfig.isHidden(elementId: .postCreationButton), remove: true)
             }
         }
         .padding([.leading, .trailing], 16)
@@ -126,6 +152,15 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
         }
         
         var body: some View {
+            // Every icon in this row carries an element id and none of them asked,
+            // so switching a module off left its own door standing here. The plus
+            // belongs to no module: it follows the menu it opens, and the row
+            // above only draws it while showsPostCreationButton says so.
+            // An `if` rather than .isHidden(remove:) so the HStack's 10pt spacing
+            // goes with the button — rule 3.
+            if viewConfig.isHidden(elementId: elementId) {
+                EmptyView()
+            } else {
             Button {
                 action()
             } label: {
@@ -142,6 +177,7 @@ public struct AmitySocialHomeTopNavigationComponent: AmityComponentView {
                 .accessibilityIdentifier(getAccessibilityID(elementId: elementId))
             }
             .buttonStyle(.plain)
+            }
         }
         
         private func getAccessibilityID(elementId: ElementId) -> String {

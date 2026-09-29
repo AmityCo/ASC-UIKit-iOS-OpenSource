@@ -106,6 +106,10 @@ class MediaFeedViewModel: ObservableObject {
     }
     
     private func loadFollowInfo(userId: String, queryOptions: AmityPostQueryOptions, isClipFeed: Bool) {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.userRelationship) else {
+            loadPosts(queryOptions, isClipFeed: isClipFeed)
+            return
+        }
         if AmityUIKitManagerInternal.shared.currentUserId == userId {
             myFollowInfoObject = userManager.getMyFollowInfo()
             cancellable = myFollowInfoObject?.$snapshot
@@ -121,6 +125,10 @@ class MediaFeedViewModel: ObservableObject {
     }
     
     private func loadUserFollowInfo(userId: String, dataTypes: [AmityPostDataType], isClipFeed: Bool) {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.userRelationship) else {
+            loadUserPosts(userId: userId, isClipFeed: isClipFeed, dataTypes: dataTypes)
+            return
+        }
         userFollowInfoObject = userManager.getFollowInfo(withId: userId)
         userFollowInfoToken = userFollowInfoObject?.observe({ [weak self] liveObject, error in
             guard let self else { return }

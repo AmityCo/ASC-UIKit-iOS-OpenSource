@@ -21,10 +21,19 @@ struct CommentCoreView<Content>: View where Content:View {
         self.commentButtonAction = commentButtonAction
     }
     
+    /// Comment can be switched off while the post around it stays on, and this
+    /// view renders the post as its own header — so the module is asked here
+    /// rather than around the whole view. Switching Comment off removed the
+    /// count and the button and left every comment on the post still
+    /// readable. The composer asks for itself (`CommentComposerView.isShown`).
+    private var commentEnabled: Bool {
+        AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.comment)
+    }
+
     var body: some View {
         ZStack {
             CommentListView(headerView: headerView,
-                            commentItems: viewModel.commentItems,
+                            commentItems: commentEnabled ? viewModel.commentItems : [],
                             hideCommentButtons: viewModel.hideCommentButtons,
                             commentButtonAction: commentButtonAction ?? { _ in })
             .environmentObject(viewModel)
@@ -33,7 +42,9 @@ struct CommentCoreView<Content>: View where Content:View {
                 .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
                 .isHidden(viewModel.commentItems.count != 0)
                 .accessibilityIdentifier(AccessibilityID.AmityCommentTrayComponent.emptyTextView)
-                .visibleWhen(!viewModel.hideEmptyText && viewModel.commentItems.isEmpty && viewModel.loadingStatus == .loaded)
+                // With Comment off the surface does not exist, so it must not
+                // read as "no comments yet" either.
+                .visibleWhen(commentEnabled && !viewModel.hideEmptyText && viewModel.commentItems.isEmpty && viewModel.loadingStatus == .loaded)
         }
     }
 }

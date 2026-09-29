@@ -32,44 +32,62 @@ public struct AmityLiveChatMessageReactionPicker: AmityElementView {
         self.dismissAction = tapAction
     }
     
+        /// Reaction can be switched off while Chat stays on — it needs only one of
+    
+    /// post, comment, chat or story. These surfaces thread no page or component
+    
+    /// context, so they ask the module rather than an element id.
+    
+    private var reactionEnabled: Bool {
+    
+        AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.reaction)
+    
+    }
+
+    
     public var body: some View {
-        HStack(spacing: 4) {
-            ForEach(MessageReactionConfiguration.shared.allReactions, id: \.id) { reaction in
+    
+        if reactionEnabled {
+            HStack(spacing: 4) {
+                ForEach(MessageReactionConfiguration.shared.allReactions, id: \.id) { reaction in
                 
-                Button(action: {
-                    ImpactFeedbackGenerator.impactFeedback(style: .medium)
+                    Button(action: {
+                        ImpactFeedbackGenerator.impactFeedback(style: .medium)
                     
-                    // Message should be synced before adding reaction
-                    guard message.syncState == .synced else { return }
+                        // Message should be synced before adding reaction
+                        guard message.syncState == .synced else { return }
                     
-                    if viewModel.message.myReactions.contains(where: {$0 == reaction.name}) {
-                        viewModel.removeRaction(reaction: reaction.name)
-                    } else {
-                        viewModel.addReaction(reaction: reaction.name)
-                    }
-                    dismissAction?()
-                }, label: {
-                    ZStack {
-                        Color(viewConfig.theme.baseColorShade2)
-                            .frame(width: 42, height: 42)
-                            .clipShape(Circle())
-                            .opacity(viewModel.message.myReactions.contains(where: {$0 == reaction.name}) ? 1 : 0)
+                        if viewModel.message.myReactions.contains(where: {$0 == reaction.name}) {
+                            viewModel.removeRaction(reaction: reaction.name)
+                        } else {
+                            viewModel.addReaction(reaction: reaction.name)
+                        }
+                        dismissAction?()
+                    }, label: {
+                        ZStack {
+                            Color(viewConfig.theme.baseColorShade2)
+                                .frame(width: 42, height: 42)
+                                .clipShape(Circle())
+                                .opacity(viewModel.message.myReactions.contains(where: {$0 == reaction.name}) ? 1 : 0)
                         
-                        Image(reaction.image)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 32, height: 32)
-                    }
-                })
-                .accessibilityIdentifier(reaction.accessibilityId)
+                            Image(reaction.image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32, height: 32)
+                        }
+                    })
+                    .accessibilityIdentifier(reaction.accessibilityId)
+                }
             }
-        }
-        .font(.title)
-        .padding(.vertical, 6)
-        .padding(.horizontal, 8)
-        .background(Color(viewConfig.theme.baseColorShade4))
-        .cornerRadius(30)
+            .font(.title)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 8)
+            .background(Color(viewConfig.theme.baseColorShade4))
+            .cornerRadius(30)
         
+        
+        }
+    
     }
 }
 

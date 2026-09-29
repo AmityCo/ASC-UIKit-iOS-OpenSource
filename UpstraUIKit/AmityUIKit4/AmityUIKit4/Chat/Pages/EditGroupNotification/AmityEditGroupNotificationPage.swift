@@ -57,6 +57,11 @@ public struct AmityEditGroupNotificationPage: AmityPageView {
     private var hasChanged: Bool { selectedMode != originalMode }
 
     public var body: some View {
+        AmityModuleGateView(pageId: .editGroupNotificationPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         VStack(spacing: 0) {
             navBar
 

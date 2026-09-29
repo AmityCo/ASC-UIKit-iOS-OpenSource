@@ -170,9 +170,16 @@ class AmityCommunityNotificationSettingPageViewModel: ObservableObject {
     }
     
     func updateState(settings: AmityCommunityNotificationSettings?) {
+        // Either source can withhold a row: the network switches the events off,
+        // and so does the customer switching the module off. A row offered for a
+        // module the app never renders is a setting for nothing.
+        let config = AmityUIKitConfigController.shared
         self.isNotificationEnabled = settings?.isEnabled ?? false
-        self.isPostNetworkNotificationEnabled = settings?.isPostNetworkEnabled ?? false
-        self.isCommentNetworkNotificationEnabled = settings?.isCommentNetworkEnabled ?? false
-        self.isStoryNetworkNotificaitonEnabled = settings?.isStoryNetworkEnabled ?? false
+        self.isPostNetworkNotificationEnabled = (settings?.isPostNetworkEnabled ?? false)
+            && config.isFeatureEnabled(AmityUIKitFeature.post)
+        self.isCommentNetworkNotificationEnabled = (settings?.isCommentNetworkEnabled ?? false)
+            && config.isFeatureEnabled(AmityUIKitFeature.comment)
+        self.isStoryNetworkNotificaitonEnabled = (settings?.isStoryNetworkEnabled ?? false)
+            && config.isFeatureEnabled(AmityUIKitFeature.story)
     }
 }

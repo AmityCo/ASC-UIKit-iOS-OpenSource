@@ -24,6 +24,11 @@ public struct AmityArchivedChatPage: AmityPageView {
     }
 
     public var body: some View {
+        AmityModuleGateView(pageId: .archivedChatPage) { gatedBody }
+    }
+
+    @ViewBuilder
+    private var gatedBody: some View {
         VStack(spacing: 0) {
             // MARK: Nav bar
             navBar

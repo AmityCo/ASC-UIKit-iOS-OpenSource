@@ -61,6 +61,14 @@ public struct AmityCommentView: View {
     private let highlightColor: Color?
     @State var showSheet: Bool = false
     @State var showReactionSheet: Bool = false
+
+    /// Reaction can be switched off while Comment stays on — it needs only one of
+    /// post, comment, chat or story. The chip and the react control on a comment
+    /// carried no gate of their own, so switching Reaction off removed the Like
+    /// on the post and left every comment showing both.
+    private var reactionEnabled: Bool {
+        AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.reaction)
+    }
     
     @EnvironmentObject var viewConfig: AmityViewConfigController
     @EnvironmentObject var commentCoreViewModel: CommentCoreViewModel
@@ -218,9 +226,11 @@ public struct AmityCommentView: View {
                     .sheet(isPresented: $showReactionSheet, content: {
                         reactionListSheet
                     })
-                    .isHidden(comment.reactionsCount == 0)
+                    .isHidden(!reactionEnabled || comment.reactionsCount == 0)
                 }
-                .padding(.bottom, comment.reactionsCount == 0 ? 0 : 16)
+                // The padding is the chip's space. Leaving it reserved when the
+                // chip is gone is the same defect one layer out.
+                .padding(.bottom, (!reactionEnabled || comment.reactionsCount == 0) ? 0 : 16)
     
                 HStack(spacing: 0) {
                     Color.clear
@@ -237,6 +247,7 @@ public struct AmityCommentView: View {
                         Text(comment.myReaction != nil ? AmityStringProvider.common.resolveReactionDisplayName(comment.myReaction!.name) : AmityLocalizedStringSet.Comment.reactButtonText.localizedString)
                             .applyTextStyle(.captionBold(comment.myReaction != nil ? Color(viewConfig.theme.baseColor) : Color(viewConfig.theme.baseColorShade2)))
                             .lineLimit(1)
+                            .isHidden(!reactionEnabled)
                             .tapAndDragSimutaneousGesture(longPressSensitivity: 150, tapAction: {
                                 ImpactFeedbackGenerator.impactFeedback(style: .light)
                                 

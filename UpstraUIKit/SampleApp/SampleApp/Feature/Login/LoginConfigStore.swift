@@ -5,6 +5,7 @@
 
 import Foundation
 import Combine
+import AmityUIKit4
 
 final class LoginConfigStore: ObservableObject {
 
@@ -63,6 +64,10 @@ final class LoginConfigStore: ObservableObject {
         self.networkLogButtonVisible = defaults.object(forKey: DefaultsKey.networkLogButtonVisible) == nil
             ? true
             : defaults.bool(forKey: DefaultsKey.networkLogButtonVisible)
+        // Older builds stored the module screen's QA overrides here. The
+        // backend's module settings are now the only source, so drop the
+        // entry once rather than leave it on a QA device.
+        defaults.removeObject(forKey: "asc_sample_modules_withheld")
     }
 
     // MARK: - Derived

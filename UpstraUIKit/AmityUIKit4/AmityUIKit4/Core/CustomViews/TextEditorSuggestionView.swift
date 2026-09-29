@@ -63,6 +63,7 @@ public class TextEditorSuggestionViewModel: ObservableObject {
 
     // MARK: - Product Search
     private func searchProducts(_ keyword: String) {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.product) else { return }
         productCancellables.removeAll()
 
         let queryOptions = AmityProductQueryOptions(keyword: keyword, isActive: true, isDeleted: false)

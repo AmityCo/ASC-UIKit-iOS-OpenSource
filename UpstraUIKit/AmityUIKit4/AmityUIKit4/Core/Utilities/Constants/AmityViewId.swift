@@ -100,6 +100,10 @@ public enum ComponentId: String {
     case storyTabComponent = "story_tab_component"
     case hyperLinkConfigComponent = "hyper_link_config_component"
     case commentTrayComponent = "comment_tray_component"
+    // §10.2: Comment owns the composer bar wherever it mounts (post detail,
+    // the comment tray). Web names it the same; without an id iOS could not
+    // ask the gate about it (PDT-5563).
+    case commentComposerBar = "comment_composer_bar"
     
     // MARK: - Chat
     case messageComposer = "message_composer"
@@ -118,6 +122,11 @@ public enum ComponentId: String {
     case forYouFeedComponent = "amity_for_you_feed_component"
     case feedCaughtUpComponent = "amity_feed_caught_up_component"
     case postContentComponent = "post_content"
+    // Ads owned only the story ad. The feed ad and the comment ad scoped
+    // themselves to post_content, so switching Ads off left both on screen and
+    // switching Post off took them with it.
+    case postAd = "post_ad"
+    case commentAd = "comment_ad"
     case globalFeedComponent = "global_feed_component"
     case myCommunitiesComponent = "my_communities"
     case topSearchBarComponent = "top_search_bar"
@@ -161,6 +170,10 @@ public enum ComponentId: String {
     case productTagSelectionBottomsheet = "product_tag_selection_bottomsheet"
     
     case manageProductTagList = "manage_product_tag_list"
+
+    // EventDetailPage — §10.2 gives the discussion tab to Post. It had no id,
+    // so Post off left the tab standing on a page Events owns.
+    case eventDiscussion = "event_discussion"
 
     // Discovery Widget (Social Proof)
     case discoveryWidgetComponent = "discovery_widget_component"
@@ -209,6 +222,10 @@ public enum ElementId: String {
     
     // Reaction
     case messageReactionPicker = "message_reaction_picker"
+    /// The livestream live-reaction overlay and the composer's reaction tap target.
+    /// Reaction reaches six kinds of surface and this was the one with no id at all,
+    /// so no host could switch the overlay off while leaving the stream itself on.
+    case livestreamReaction = "livestream_reaction"
     case messageQuickReaction = "message_quick_reaction"
     
     // MARK: - Social
@@ -223,6 +240,9 @@ public enum ElementId: String {
     case clipsFeedButton = "clipsfeed_button"
     case clipsButton = "clips_button"
     case eventsButton = "events_button"
+    /// The top-level Communities tab. Android declares it and iOS did not, so
+    /// Community off left the tab standing with nothing behind it.
+    case communitiesButton = "communities_button"
     case myCommunitiesButton = "my_communities_button"
     
     // EmptyNewsFeed
@@ -271,6 +291,14 @@ public enum ElementId: String {
     // CommunityProfileTab
     case communityFeedTabButton = "community_feed_tab_button"
     case communityPinTabButton = "community_pin_tab_button"
+    // The events and media tabs had no id, so Events off and Post off each left
+    // their tab standing on a page Community owns.
+    case eventButton = "event_button"
+    case communityMediaTabButton = "community_media_tab_button"
+    // Poll's declared surface was the composer and the target picker. The poll
+    // inside a post that already exists had no id, so a customer without Poll
+    // still saw polls and could still vote.
+    case postPoll = "post_poll"
     
     // CreatePostMenu
     case createPostButton = "create_post_button"
@@ -279,6 +307,8 @@ public enum ElementId: String {
     case createLivestreamButton = "create_livestream_button"
     case createClipButton = "create_clip_button"
     case createEventButton = "create_event_button"
+    /// The community page's floating "+", onto its create sheet (PDT-5617).
+    case communityCreatePostButton = "community_create_post_button"
     
     // PostTargetSelectionPage
     case myTimelineAvatar = "my_timeline_avatar"
@@ -341,6 +371,13 @@ public enum ElementId: String {
     
     // UserProfilePage
     case userFeedTabButton = "user_feed_tab_button"
+    // The `…` menu's relationship rows, and the chat sheet's block row. Owned
+    // by userRelationship (module-availability §10.2): without an id the gate
+    // could not reach them, and Manage blocked users stood on a page the
+    // module had already withheld (PDT-5564).
+    case blockUserButton = "block_user_button"
+    case manageBlockedUsersButton = "manage_blocked_users_button"
+    case unfollowUserButton = "unfollow_user_button"
     case userImageFeedTabButton = "user_image_feed_tab_button"
     case userVideoFeedTabButton = "user_video_feed_tab_button"
     
@@ -396,6 +433,13 @@ public enum ElementId: String {
     case productTagListItem = "product_tag"
     // Livestream Pinned Product
     case livestreamPinnedProduct = "livestream_pinned_product"
+
+    // EventDetailPage — both doors onto a post composer are Post's (§10.2).
+    // "Post event to feed" in the menu and the success sheet's prompt share
+    // one id, as on Web: they open the same page.
+    case createEventPostButton = "create_event_post_button"
+    case eventDiscussionCreatePostButton = "event_discussion_create_post_button"
+
     case pinnedMessageBanner = "pinned_message_banner"
     // Livestream Viewer Count
     case liveViewerCount = "live_viewer_count_element"

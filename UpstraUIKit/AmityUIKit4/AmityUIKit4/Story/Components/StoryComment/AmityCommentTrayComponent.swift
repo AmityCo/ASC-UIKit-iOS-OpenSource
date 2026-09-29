@@ -58,7 +58,9 @@ public struct AmityCommentTrayComponent: AmityComponentView {
             
             CommentCoreView(viewModel: commentCoreViewModel, commentButtonAction: self.commentButtonAction(_:))
             
-            if !AmityUIKitManagerInternal.shared.isGuestUser {
+            // The divider belongs to the composer: without it, a line is left
+            // under the list where the composer was.
+            if !AmityUIKitManagerInternal.shared.isGuestUser && CommentComposerView.isShown(on: pageId) {
                 Rectangle()
                     .frame(height: 1)
                     .foregroundColor(Color(viewConfig.theme.baseColorShade4))

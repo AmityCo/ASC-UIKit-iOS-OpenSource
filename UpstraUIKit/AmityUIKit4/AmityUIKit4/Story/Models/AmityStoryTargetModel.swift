@@ -62,6 +62,7 @@ public class AmityStoryTargetModel: ObservableObject, Identifiable, Equatable {
     }
     
     func fetchStory(totalSeenStoryCount: Int = 0) {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.story) else { return }
         storyCollection = storyManager.getActiveStories(in: targetId)
         
         prepareDatasource(totalSeenStoryCount)

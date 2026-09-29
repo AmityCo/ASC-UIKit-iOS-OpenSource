@@ -83,6 +83,12 @@ class ForYouFeedViewModel: ObservableObject {
     }
 
     func loadFeed() {
+        // The For You feed belongs to Feed. The tab disappearing with the module
+        // does not stop this view model being constructed and asking, so the
+        // question has to be here — Android found the same thing and needed the
+        // same fix.
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.feed) else { return }
+
         /// A reload starts every carousel at frame 1 rather than restoring where it was
         PostMediaCarouselPositionStore.shared.reset()
 
@@ -186,6 +192,7 @@ class ForYouFeedViewModel: ObservableObject {
     // MARK: - Stories rail (global stories + live rooms)
 
     func loadStoryTargets() {
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.story) else { return }
         storyTargetCollection = storyManager.getGlobaFeedStoryTargets(options: .smart)
         storyTargetCancellable = storyTargetCollection?.$snapshots
             .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
@@ -201,6 +208,11 @@ class ForYouFeedViewModel: ObservableObject {
     }
 
     func loadRoomPosts() {
+        // The live-room rail belongs to Live. It sits inside the story rail and
+        // the feed, so with those on and Live off this kept polling
+        // /api/v1/rooms/lives every twenty seconds or so for rooms it would
+        // never draw. Android had the identical leak in getLives().
+        guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.live) else { return }
         roomPostCollection = postManager.getGlobalLiveRoomPosts()
         roomPostCancellable = roomPostCollection?.$snapshots
             .debounce(for: .milliseconds(350), scheduler: DispatchQueue.main)
@@ -288,6 +300,7 @@ class ForYouFeedViewModel: ObservableObject {
 
     private func canRenderPost(post: AmityPost) -> Bool {
         guard !post.isDeleted else { return false }
+        guard AmityUIKitSupportedPostTypes.allows(post) else { return false }
         return !post.childrenPosts.contains { $0.dataType == "file" || $0.dataType == "audio" || $0.structureType == "mixed" }
     }
 
