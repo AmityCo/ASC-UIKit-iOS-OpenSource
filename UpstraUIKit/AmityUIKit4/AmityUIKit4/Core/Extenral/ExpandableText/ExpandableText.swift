@@ -189,21 +189,19 @@ public struct ExpandableText: View {
             .frame(alignment: .leading)
             .environment(\.openURL, OpenURLAction { url in
                 // Tapping on mention user attribute
-                if url.deletingLastPathComponent().absoluteString == TextHighlighter.mentionURL {
-                    let userId = url.lastPathComponent
-                    onTapMentionee?(userId)
-                    return .discarded
-                }
-
-                if url.deletingLastPathComponent().absoluteString == TextHighlighter.hashtagURL {
-                    let hashtag = url.lastPathComponent
-                    onTapHashtag?(hashtag)
-                    return .discarded
-                }
-
-                if url.deletingLastPathComponent().absoluteString == TextHighlighter.productTagURL {
-                    let productId = url.lastPathComponent
-                    onTapProductTag?(productId)
+                if AmityInternalLink.isInternal(url) {
+                    switch AmityInternalLink(url: url) {
+                    case .mention(let userId)?:
+                        if !userId.isEmpty {
+                            onTapMentionee?(userId)
+                        }
+                    case .hashtag(let hashtag)?:
+                        onTapHashtag?(hashtag)
+                    case .productTag(let productId)?:
+                        onTapProductTag?(productId)
+                    case nil:
+                        break
+                    }
                     return .discarded
                 }
 

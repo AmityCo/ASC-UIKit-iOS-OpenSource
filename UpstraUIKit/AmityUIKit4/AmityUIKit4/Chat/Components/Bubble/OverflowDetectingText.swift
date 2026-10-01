@@ -100,8 +100,23 @@ struct OverflowDetectingText: View {
 
 // MARK: - Mention & link tap handling
 
-/// Mentions carry a sentinel `TextHighlighter.mentionURL` link so taps can be intercepted.
-/// Without this the sentinel falls through to the system handler and opens amity.co in Safari.
+enum ChatInternalLinkRouter {
+    /// Consumes every `AmityInternalLink` and returns true; returns false for genuine web links.
+    static func handle(_ url: URL, sourceViewController: UIViewController?) -> Bool {
+        guard AmityInternalLink.isInternal(url) else { return false }
+
+        // Hashtag & product tag links have no destination in chat.
+        if case .mention(let userId)? = AmityInternalLink(url: url) {
+            let context = AmityMessageBubbleBehavior.Context(
+                userId: userId,
+                sourceViewController: sourceViewController
+            )
+            AmityUIKit4Manager.behaviour.messageBubbleBehavior?.onMentionUserTap(context: context)
+        }
+        return true
+    }
+}
+
 @available(iOS 15, *)
 private struct ChatUrlTapModifier: ViewModifier {
 
@@ -112,29 +127,7 @@ private struct ChatUrlTapModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content.environment(\.openURL, OpenURLAction { url in
-            let base = url.deletingLastPathComponent().absoluteString
-
-            if base == TextHighlighter.mentionURL {
-                let context = AmityMessageBubbleBehavior.Context(
-                    userId: url.lastPathComponent,
-                    sourceViewController: host.controller
-                )
-                AmityUIKit4Manager.behaviour.messageBubbleBehavior?.onMentionUserTap(context: context)
-                return .discarded
-            }
-            
-            // when @All is tapped, url does not include the userId at the lastPathComponent
-            if url.absoluteString == TextHighlighter.mentionURL {
-                let context = AmityMessageBubbleBehavior.Context(
-                    userId: "",
-                    sourceViewController: host.controller
-                )
-                AmityUIKit4Manager.behaviour.messageBubbleBehavior?.onMentionUserTap(context: context)
-                return .discarded
-            }
-
-            // Hashtag & product tag sentinels have no destination in chat.
-            if base == TextHighlighter.hashtagURL || base == TextHighlighter.productTagURL {
+            if ChatInternalLinkRouter.handle(url, sourceViewController: host.controller) {
                 return .discarded
             }
 

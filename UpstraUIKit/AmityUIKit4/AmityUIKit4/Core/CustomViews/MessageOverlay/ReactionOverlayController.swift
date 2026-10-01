@@ -27,12 +27,18 @@ public class ReactionOverlayController {
         window.addSubview(blurEffectView)
         
         let actionMenuWidth: CGFloat = 245
-        
+
+        // The overlay is a bare subview, so mention taps in `content` present from the page beneath it.
+        let hostWrapper = AmitySwiftUIHostWrapper()
+        hostWrapper.controller = UIApplication.topViewController()
+
         let overlayView = MessageActionOverlayView(isMenuActive: true, message: message, messageAction: messageAction, namespace: nameSpace, actionMenuWidth: actionMenuWidth , content: {
             content()
         },  dismissAction: {
             dismissBlurView()
-        }).environmentObject(AmityViewConfigController(pageId: .liveChatPage, componentId: .messageList))
+        })
+        .environmentObject(AmityViewConfigController(pageId: .liveChatPage, componentId: .messageList))
+        .environmentObject(hostWrapper)
         
         let hostingController = UIHostingController(rootView: AnyView(overlayView))
         hostingController.view.backgroundColor = .clear

@@ -39,6 +39,7 @@ public struct AmityLiveChatMessageSenderView: AmityElementView {
         if #available(iOS 15, *) {
             let attributedText = TextHighlighter.getAttributedText(from: message)
             Text(attributedText)
+                .handleChatUrlTap()
         } else {
             Text(message.text)
         }

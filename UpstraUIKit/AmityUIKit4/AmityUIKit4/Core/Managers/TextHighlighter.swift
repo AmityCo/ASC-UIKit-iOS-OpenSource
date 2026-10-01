@@ -10,13 +10,65 @@ import AmitySDK
 import UIKit
 import SwiftUI
 
+/// Link attached to a mention, hashtag or product tag so taps on it can be intercepted.
+/// It uses a private scheme so a tap that slips past an interceptor never opens a real website.
+enum AmityInternalLink: Equatable {
+    /// `userId` is empty for @All.
+    case mention(userId: String)
+    case hashtag(String)
+    case productTag(productId: String)
+
+    static let scheme = "amity-uikit"
+
+    // Values are escaped by hand: `URLComponents.queryItems` leaves `&`, `=` and `+` unescaped on older iOS.
+    private static let valueAllowedCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-._~"))
+
+    static func isInternal(_ url: URL) -> Bool {
+        url.scheme?.lowercased() == scheme
+    }
+
+    var url: URL? {
+        let (host, name, value): (String, String, String) = switch self {
+        case .mention(let userId): ("mention", "userId", userId)
+        case .hashtag(let hashtag): ("hashtag", "text", hashtag)
+        case .productTag(let productId): ("producttag", "productId", productId)
+        }
+        guard let encodedValue = value.addingPercentEncoding(withAllowedCharacters: Self.valueAllowedCharacters) else { return nil }
+
+        var components = URLComponents()
+        components.scheme = Self.scheme
+        components.host = host
+        components.percentEncodedQueryItems = [URLQueryItem(name: name, value: encodedValue)]
+        return components.url
+    }
+
+    init?(url: URL) {
+        guard Self.isInternal(url),
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+
+        func value(_ name: String) -> String? {
+            components.queryItems?.first { $0.name == name }?.value
+        }
+
+        switch components.host?.lowercased() {
+        case "mention":
+            guard let userId = value("userId") else { return nil }
+            self = .mention(userId: userId)
+        case "hashtag":
+            guard let hashtag = value("text") else { return nil }
+            self = .hashtag(hashtag)
+        case "producttag":
+            guard let productId = value("productId") else { return nil }
+            self = .productTag(productId: productId)
+        default:
+            return nil
+        }
+    }
+}
+
 /// Highlights mentions & links and returns AttributedString
 @available(iOS 15, *)
 class TextHighlighter {
-    public static let mentionURL: String = "https://www.amity.co/mentionuser/"
-    public static let hashtagURL: String = "https://www.amity.co/hashtag/"
-    public static let productTagURL: String = "https://www.amity.co/producttag/"
-    
     // Helper Method
     public static func getAttributedText(from message: MessageModel, highlightAttributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemBlue, .font: UIFont.systemFont(ofSize: 15)], linkAttributes: [NSAttributedString.Key: Any]? = nil) -> AttributedString {
         let messageText = message.text
@@ -73,9 +125,7 @@ class TextHighlighter {
 
             if range.location != NSNotFound && (range.location + range.length) <= attributedString.string.utf8.count {
                 var updatedAttributes = highlightAttributes
-                if let encodedId = productTag.productId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) {
-                    updatedAttributes[.link] = URL(string: "\(TextHighlighter.productTagURL)\(encodedId)")
-                }
+                updatedAttributes[.link] = AmityInternalLink.productTag(productId: productTag.productId).url
 
                 attributedString.addAttributes(updatedAttributes, range: range)
             }
@@ -114,8 +164,7 @@ class TextHighlighter {
             }
             
             // Add link attribute for hashtag tap handling
-            let hashtagURL = URL(string: "\(TextHighlighter.hashtagURL)\(hashtag.text)")
-            if let url = hashtagURL {
+            if let url = AmityInternalLink.hashtag(hashtag.text).url {
                 attributedString.addAttribute(.link, value: url, range: range)
             }
         }
@@ -219,7 +268,7 @@ class TextHighlighter {
                 // Update link attribute of mention users to handle tap event
                 // SwiftUI need valid url so provide it
                 var updatedAttributes = mentionAttr.attributes
-                updatedAttributes[.link] = URL(string: "\(TextHighlighter.mentionURL)\(mentionAttr.userId)")
+                updatedAttributes[.link] = AmityInternalLink.mention(userId: mentionAttr.userId).url
                 
                 attributedString.addAttributes(updatedAttributes, range: mentionAttr.range)
             }
