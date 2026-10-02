@@ -653,13 +653,16 @@ public struct AmityCreateGroupChatPage: AmityPageView {
                         nav.pushViewController(chatVC, animated: true)
                     }
                 } else {
-                    chatVC.modalPresentationStyle = .fullScreen
+                    // Own nav stack so pushes from the chat (settings, full text, profile) still work.
+                    let modalNav = AmitySwiftUIHostingNavigationController(rootView: chatPage)
+                    modalNav.isNavigationBarHidden = true
+                    modalNav.modalPresentationStyle = .fullScreen
                     internalNav?.dismiss(animated: true) {
                         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                            let root = scene.windows.first(where: { $0.isKeyWindow })?.rootViewController {
                             var top = root
                             while let presented = top.presentedViewController { top = presented }
-                            top.present(chatVC, animated: true)
+                            top.present(modalNav, animated: true)
                         }
                     }
                 }

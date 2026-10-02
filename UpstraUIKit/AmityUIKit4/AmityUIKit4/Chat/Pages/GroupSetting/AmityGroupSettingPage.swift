@@ -145,10 +145,13 @@ public struct AmityGroupSettingPage: AmityPageView {
                                 // whatever presented it (the chat list) — independent of the host
                                 // page type, so wrapped hosts (e.g. SampleApp's HostedChatHomePage)
                                 // don't fall through to a single pop back to the chat room.
-                                if let stack = navVC?.viewControllers,
-                                   let roomIndex = stack.lastIndex(where: { $0 is AmitySwiftUIHostingController<AmityGroupChatPage> }),
-                                   roomIndex > 0 {
+                                // If the room is the root of a stack that is itself presented (create-group
+                                // fallback), there is nothing beneath it, so close the whole modal.
+                                let roomIndex = navVC?.viewControllers.lastIndex(where: { $0 is AmitySwiftUIHostingController<AmityGroupChatPage> })
+                                if let roomIndex, roomIndex > 0, let stack = navVC?.viewControllers {
                                     navVC?.popToViewController(stack[roomIndex - 1], animated: true)
+                                } else if roomIndex == 0, navVC?.presentingViewController?.presentedViewController === navVC {
+                                    navVC?.dismiss(animated: true)
                                 } else {
                                     navVC?.popViewController(animated: true)
                                 }

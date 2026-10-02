@@ -87,7 +87,12 @@ public struct AmityGroupChatPage: AmityPageView {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Button {
-                    host.controller?.navigationController?.popViewController(animated: true)
+                    if let nav = host.controller?.navigationController,
+                       nav.viewControllers.count > 1 {
+                        nav.popViewController(animated: true)
+                    } else {
+                        host.controller?.dismissOrPop()
+                    }
                 } label: {
                     Image(AmityIcon.DesignSystem.chevronLeft.imageResource)
                         .renderingMode(.template)
