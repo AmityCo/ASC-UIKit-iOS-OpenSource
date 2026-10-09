@@ -35,6 +35,9 @@ struct AdvancedPage: View {
                         LoginSectionHeader(title: "Behaviour")
                         behaviourCard
 
+                        LoginSectionHeader(title: "Chat")
+                        chatCard
+
                         LoginSectionHeader(title: "Appearance")
                         appearanceCard
 
@@ -115,6 +118,35 @@ struct AdvancedPage: View {
                 subtitle: "Click product tag on livestream to force to open home screen",
                 isOn: $store.inAppPipTesting
             )
+        }
+    }
+
+    // MARK: - Chat
+
+    private var chatCard: some View {
+        LoginGroupedCard {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Chat List Sort")
+                    .font(LoginTheme.segLabelFont)
+                    .foregroundColor(LoginTheme.fieldLabel)
+                    .padding(.horizontal, LoginTheme.rowHorizontalPadding)
+                    .padding(.top, 11)
+                LoginOptionSegmentedControl(selection: $store.channelListSortBy, title: \.title)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+            }
+
+            if store.channelListSortBy == .custom {
+                LoginRowDivider()
+                LoginInlineField("Custom Value (sent as is, may be empty)") {
+                    TextField("e.g. foo", text: $store.channelListSortByCustomValue)
+                        .font(LoginTheme.fieldMonoFont)
+                        .foregroundColor(LoginTheme.primaryText)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .accessibilityIdentifier("advanced/chat_list_sort_custom_value")
+                }
+            }
         }
     }
 

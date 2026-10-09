@@ -67,10 +67,21 @@ struct AmityChatListComponent: View {
     let onLoadMore: () -> Void
     var onArchive: ((String) -> Void)? = nil
     var onCreateChat: (() -> Void)? = nil
+    var sortBy: AmityChannelSortBy = .lastActivity
+    /// The query was rejected because of the sort (422, code 500000). Shown instead of Empty,
+    /// because a failed query has no channels either.
+    var isSortUnavailable: Bool = false
 
     var body: some View {
         if isLoading {
             skeletonList
+        } else if isSortUnavailable {
+            VStack(spacing: 0) {
+                if !isPushNotificationEnabled {
+                    pushNotificationsBanner
+                }
+                errorState
+            }
         } else if channels.isEmpty {
             VStack(spacing: 0) {
                 if !isPushNotificationEnabled {
@@ -119,7 +130,7 @@ struct AmityChatListComponent: View {
                         viewConfig: viewConfig,
                         action: { onArchive?(channel.channelId) }
                     ) {
-                        AmityChatListItemView(channel: channel, viewConfig: viewConfig)
+                        AmityChatListItemView(channel: channel, sortBy: sortBy, viewConfig: viewConfig)
                             .contentShape(Rectangle())
                             .onTapGesture { onChannelTap(channel) }
                     }
@@ -173,6 +184,28 @@ struct AmityChatListComponent: View {
         // 40 pt avatar + 12 pt top/bottom padding = 64 pt row (Figma node 12041:242258).
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
+    }
+
+    // MARK: - Error state
+
+    /// Laid out like the Empty state, with its own copy and no call to action: nothing the user
+    /// can do fixes it, and the page does not retry.
+    private var errorState: some View {
+        VStack {
+            Spacer()
+
+            AmityEmptyState(
+                variant: .illustration,
+                image: AmityIcon.Chat.emptyStateIcon.imageResource,
+                title: AmityLocalizedStringSet.Chat.Home.errorTitle.localizedString,
+                description: AmityLocalizedStringSet.Chat.Home.errorDescription.localizedString,
+                viewConfig: viewConfig
+            )
+
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(viewConfig.color(.surfacePageBackgroundDefault)))
     }
 
     // MARK: - Empty state

@@ -77,6 +77,8 @@ public struct AmityTextEditorView: View {
 
     @State private var hidePlaceholder: Bool = false
 
+    @State private var hasAutoFocused: Bool = false
+
     @StateObject private var viewModel: AmityTextEditorViewModel
 
     private var placeholder: String = ""
@@ -125,7 +127,9 @@ public struct AmityTextEditorView: View {
                             applyLinkHighlight(to: viewModel.textView)
                         }
                         
-                        if autoFocusTextEditor {
+                        // Lazy containers re-fire onAppear when a row is recycled; refocusing then loops the keyboard.
+                        if autoFocusTextEditor && !hasAutoFocused {
+                            hasAutoFocused = true
                             DispatchQueue.main.async {
                                 viewModel.textView.becomeFirstResponder()
                                 let endPosition = viewModel.textView.endOfDocument

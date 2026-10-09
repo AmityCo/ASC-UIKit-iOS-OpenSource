@@ -130,19 +130,24 @@ class PreviewLinkViewModel: ObservableObject {
     }
     
     convenience init(post: AmityPostModel) {
+        self.init(text: PreviewLinkViewModel.previewSourceText(for: post))
+    }
+
+    /// Text to detect the preview link from. Empty when the post should show no preview.
+    static func previewSourceText(for post: AmityPostModel) -> String {
         // For old posts which has link in their text content, but do not contain dedicated [AmityLink] payload, we will extract & highlight it again.
-        guard !post.links.isEmpty else {
-            self.init(text: post.text)
-            return
-        }
-        
+        guard !post.links.isEmpty else { return post.text }
+
         // If post has links, highlight only if renderPreview is true
         if let firstLink = post.links.first, firstLink.renderPreview {
-            self.init(text: firstLink.url)
-        } else {
-            // No need to show preview in this case.
-            self.init(text: "")
+            return firstLink.url
         }
+        return ""
+    }
+
+    static func hasPreviewLink(for post: AmityPostModel) -> Bool {
+        let text = previewSourceText(for: post)
+        return !text.isEmpty && !AmityPreviewLinkWizard.shared.detectLinks(text: text).isEmpty
     }
     
     @MainActor

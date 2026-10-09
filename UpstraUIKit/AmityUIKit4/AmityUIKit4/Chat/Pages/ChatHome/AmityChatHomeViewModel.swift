@@ -49,8 +49,10 @@ final class AmityChatHomeViewModel: ObservableObject {
     @Published private(set) var groupChannels: [AmityChannel] = []
     @Published var isLoading = true
     @Published var isPushNotificationEnabled: Bool = true
+    @Published private(set) var isSortUnavailable = false
 
     let visibleTabs: [ChatHomeTab]
+    let sortBy: AmityChannelSortBy
 
     // MARK: SDK
     private let channelManager = ChannelManager()
@@ -62,7 +64,8 @@ final class AmityChatHomeViewModel: ObservableObject {
     private var directToken: AmityNotificationToken?
     private var groupToken: AmityNotificationToken?
 
-    init() {
+    init(sortBy: AmityChannelSortBy = AmityUIKitConfigController.shared.channelListSortBy()) {
+        self.sortBy = sortBy
         let tabs = ChatHomeTab.visibleTabs()
         self.visibleTabs = tabs
         self.selectedTab = tabs.first ?? .all
@@ -109,10 +112,14 @@ final class AmityChatHomeViewModel: ObservableObject {
         // respects the flag, but the page must not depend on that: the sample's
         // debug entry reaches it regardless, and so would any host that forgets.
         guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.chat) else { return }
-        let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.conversation, AmityChannelQueryType.community], filter: .userIsMember, includeDeleted: false, excludeArchives: true)
+        let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.conversation, AmityChannelQueryType.community], filter: .userIsMember, includeDeleted: false, excludeArchives: true, sortBy: sortBy)
         allCollection = channelManager.getChannels(with: query)
-        allToken = allCollection?.observe { [weak self] collection, _ in
+        allToken = allCollection?.observe { [weak self] collection, error in
             guard let self else { return }
+            if let error {
+                self.handleQueryError(error)
+                return
+            }
             self.allChannels = collection.snapshots
             self.isLoading = false
         }
@@ -120,22 +127,48 @@ final class AmityChatHomeViewModel: ObservableObject {
 
     private func startObservingDirect() {
         guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.chat) else { return }
-        let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.conversation], filter: .userIsMember, includeDeleted: false, excludeArchives: true)
+        let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.conversation], filter: .userIsMember, includeDeleted: false, excludeArchives: true, sortBy: sortBy)
         directCollection = channelManager.getChannels(with: query)
-        directToken = directCollection?.observe { [weak self] collection, _ in
+        directToken = directCollection?.observe { [weak self] collection, error in
             guard let self else { return }
+            if let error {
+                self.handleQueryError(error)
+                return
+            }
             self.directChannels = collection.snapshots
         }
     }
 
     private func startObservingGroup() {
         guard AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.chat) else { return }
-        let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.community], filter: .userIsMember, includeDeleted: false, excludeArchives: true)
+        let query = AmityChannelQueryOptions(types: [AmityChannelQueryType.community], filter: .userIsMember, includeDeleted: false, excludeArchives: true, sortBy: sortBy)
         groupCollection = channelManager.getChannels(with: query)
-        groupToken = groupCollection?.observe { [weak self] collection, _ in
+        groupToken = groupCollection?.observe { [weak self] collection, error in
             guard let self else { return }
+            if let error {
+                self.handleQueryError(error)
+                return
+            }
             self.groupChannels = collection.snapshots
         }
+    }
+
+    // MARK: - Query errors
+
+    private func handleQueryError(_ error: Error) {
+        isLoading = false
+        guard Self.isSortUnavailableError(error), !isSortUnavailable else { return }
+        isSortUnavailable = true
+        Log.warn(Self.sortUnavailableMessage(sortBy: sortBy, endpoint: RemoteConfig.httpEndpoint))
+    }
+
+    static func isSortUnavailableError(_ error: Error) -> Bool {
+        error.isAmityErrorCode(.business)
+    }
+
+    static func sortUnavailableMessage(sortBy: AmityChannelSortBy, endpoint: String) -> String {
+        "Chat home could not load channels: the server rejected sortBy=\(sortBy.rawValue) (code 500000) on \(endpoint.isEmpty ? "this environment" : endpoint). "
+            + "The backend lastMessage sort is probably not enabled here. Set feature_flags.chat.channel_list_sort_by to \"lastActivity\" in the UIKit config."
     }
 
     // MARK: - Pagination

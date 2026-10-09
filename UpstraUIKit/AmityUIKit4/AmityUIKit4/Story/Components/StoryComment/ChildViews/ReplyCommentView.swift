@@ -442,7 +442,8 @@ struct ReplyCommentListView<Content>: View where Content: View {
     }
     
     var body: some View {
-        LazyVStack(spacing: 0) {
+        // Not lazy: a reply being edited must stay mounted while the keyboard covers it, or its editor loses focus.
+        VStack(spacing: 0) {
             headerView()
             if viewModel.comments.isEmpty && viewModel.collection.loadingStatus != .loaded {
                 getReplySkeletonView()

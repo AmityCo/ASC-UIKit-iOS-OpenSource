@@ -110,6 +110,7 @@ public struct AmityGroupChatPage: AmityPageView {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier(AccessibilityID.Chat.GroupChatHeader.backButton)
                 .padding(.leading, -10)
                 .padding(.trailing, 2)
 

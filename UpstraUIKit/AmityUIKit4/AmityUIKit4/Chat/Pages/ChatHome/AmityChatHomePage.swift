@@ -219,7 +219,9 @@ public struct AmityChatHomePage: AmityPageView {
                 } else {
                     presentCreateConversation()
                 }
-            }
+            },
+            sortBy: viewModel.sortBy,
+            isSortUnavailable: viewModel.isSortUnavailable
         )
     }
 

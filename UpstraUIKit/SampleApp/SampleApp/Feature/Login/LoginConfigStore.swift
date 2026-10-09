@@ -14,6 +14,8 @@ final class LoginConfigStore: ObservableObject {
         static let lastAppliedEnv = "asc_sample_last_applied_env"
         static let inAppPipTesting = "asc_sample_in_app_pip_testing"
         static let networkLogButtonVisible = "asc_sample_network_log_button_visible"
+        static let channelListSortBy = "asc_sample_channel_list_sort_by"
+        static let channelListSortByCustomValue = "asc_sample_channel_list_sort_by_custom"
     }
 
     @Published var config: LoginConfigModel {
@@ -41,6 +43,22 @@ final class LoginConfigStore: ObservableObject {
         didSet { AmityNetworkLogOverlayController.shared.isButtonVisible = networkLogButtonVisible }
     }
 
+    /// Chat home sort written to `feature_flags.chat.channel_list_sort_by` at login. Kept out of
+    /// `LoginConfigModel` for the same reason as `inAppPipTesting`.
+    @Published var channelListSortBy: ChannelListSortOption {
+        didSet { defaults.set(channelListSortBy.rawValue, forKey: DefaultsKey.channelListSortBy) }
+    }
+
+    /// The raw value written when `channelListSortBy` is `.custom`, empty string included.
+    @Published var channelListSortByCustomValue: String {
+        didSet { defaults.set(channelListSortByCustomValue, forKey: DefaultsKey.channelListSortByCustomValue) }
+    }
+
+    /// What login writes to `feature_flags.chat.channel_list_sort_by`.
+    var channelListSortByConfigValue: String {
+        channelListSortBy.configValue ?? channelListSortByCustomValue
+    }
+
     private let defaults: UserDefaults
 
     static let shared = LoginConfigStore()
@@ -60,6 +78,9 @@ final class LoginConfigStore: ObservableObject {
         self.config = loaded
         self.lastAppliedEnv = LoginConfigStore.loadAppliedEnv(from: defaults)
         self.inAppPipTesting = defaults.bool(forKey: DefaultsKey.inAppPipTesting)
+        self.channelListSortBy = defaults.string(forKey: DefaultsKey.channelListSortBy)
+            .flatMap(ChannelListSortOption.init(rawValue:)) ?? .lastActivity
+        self.channelListSortByCustomValue = defaults.string(forKey: DefaultsKey.channelListSortByCustomValue) ?? ""
         // Defaults to on, so bool(forKey:) returning false for a missing key is not usable.
         self.networkLogButtonVisible = defaults.object(forKey: DefaultsKey.networkLogButtonVisible) == nil
             ? true

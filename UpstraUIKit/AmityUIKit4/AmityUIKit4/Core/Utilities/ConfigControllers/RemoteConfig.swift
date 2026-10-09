@@ -10,7 +10,7 @@ public class RemoteConfig {
     static let shared = RemoteConfig()
     
     private static var apiKey = ""
-    private static var httpEndpoint = ""
+    private(set) static var httpEndpoint = ""
     
     public static func setup(apiKey: String, httpEndpoint: String) {
         RemoteConfig.apiKey = shared.hashApiKey(apiKey)

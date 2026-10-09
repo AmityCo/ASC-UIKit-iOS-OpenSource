@@ -1664,3 +1664,7 @@
 "amity_social_status_poll_ended" = "Ended";
 "amity_social_label_poll_voters_count" = "%@ voters";
 "amity_social_label_reaction_count_plural" = "%@ reactions";
+
+// Chat home — sort not available (REQ-022)
+"amity_chat_home_error_title" = "Couldn't load chats";
+"amity_chat_home_error_description" = "Something went wrong. Please try again later.";

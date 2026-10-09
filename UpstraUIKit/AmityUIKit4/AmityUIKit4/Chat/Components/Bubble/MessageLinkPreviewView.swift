@@ -4,12 +4,19 @@
 //
 
 import SwiftUI
-import LinkPresentation
+import AmitySDK
 
 // MARK: - Detector
 
+struct MessageLink: Equatable {
+    /// The link as detected in the text; the key Social uses to fetch and cache preview metadata.
+    let raw: String
+    /// `raw` with a scheme added when it has none, so it can be opened.
+    let url: URL
+}
+
 enum MessageLinkDetector {
-    static func firstURL(in text: String) -> URL? {
+    static func firstLink(in text: String) -> MessageLink? {
         guard !text.isEmpty else { return nil }
         // Use the shared link detector so Chat and Social agree on what counts as a link.
         guard let urlString = AmityPreviewLinkWizard.shared.detectLinks(text: text).first else { return nil }
@@ -17,46 +24,7 @@ enum MessageLinkDetector {
         if url.scheme == nil {
             url = URL(string: "https://\(urlString)") ?? url
         }
-        return url
-    }
-}
-
-// MARK: - Metadata cache
-
-final class MessageLinkMetadataCache {
-    static let shared = MessageLinkMetadataCache()
-    private var store: [String: LPLinkMetadata] = [:]
-    private var failed: Set<String> = []
-    private var inFlight: Set<String> = []
-    private let queue = DispatchQueue(label: "amity.chat.linkpreview.cache")
-
-    func cached(for url: URL) -> LPLinkMetadata? {
-        queue.sync { store[url.absoluteString] }
-    }
-
-    func didFail(for url: URL) -> Bool {
-        queue.sync { failed.contains(url.absoluteString) }
-    }
-
-    func set(_ metadata: LPLinkMetadata, for url: URL) {
-        queue.sync { store[url.absoluteString] = metadata }
-    }
-
-    func markFailed(for url: URL) {
-        queue.sync { _ = failed.insert(url.absoluteString) }
-    }
-
-    func shouldFetch(for url: URL) -> Bool {
-        queue.sync {
-            let key = url.absoluteString
-            guard store[key] == nil, !failed.contains(key), !inFlight.contains(key) else { return false }
-            inFlight.insert(key)
-            return true
-        }
-    }
-
-    func finishedFetch(for url: URL) {
-        queue.sync { _ = inFlight.remove(url.absoluteString) }
+        return MessageLink(raw: urlString, url: url)
     }
 }
 
@@ -65,13 +33,12 @@ final class MessageLinkMetadataCache {
 struct MessageLinkPreviewView: View {
     @EnvironmentObject private var viewConfig: AmityViewConfigController
 
-    let url: URL
+    let link: MessageLink
     let isOwner: Bool
 
-    @State private var metadata: LPLinkMetadata?
-    @State private var thumbnail: UIImage?
+    @State private var metadata: AmityLinkPreviewMetadata?
     @State private var isLoading: Bool = true
-    @State private var didFail: Bool = false
+    @State private var didImageFail: Bool = false
 
     // Layout
     private var previewWidth: CGFloat {
@@ -94,7 +61,7 @@ struct MessageLinkPreviewView: View {
         Group {
             if isLoading {
                 skeleton
-            } else if didFail || metadata == nil {
+            } else if metadata == nil {
                 fallback
             } else {
                 content
@@ -104,7 +71,7 @@ struct MessageLinkPreviewView: View {
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .contentShape(Rectangle())
         .onTapGesture { open() }
-        .onAppear(perform: load)
+        .onAppear { Task { await load() } }
     }
 
     // MARK: Sections
@@ -112,7 +79,7 @@ struct MessageLinkPreviewView: View {
     private var content: some View {
         HStack(spacing: 0) {
             imageSection
-            textSection(title: metadata?.title, host: displayHost(url), background: cardBackground)
+            textSection(title: metadata?.title, host: metadata?.domain ?? displayHost(link.url), background: cardBackground)
         }
     }
 
@@ -159,10 +126,11 @@ struct MessageLinkPreviewView: View {
 
     @ViewBuilder
     private var imageSection: some View {
-        if let thumb = thumbnail {
-            Image(uiImage: thumb)
-                .resizable()
-                .scaledToFill()
+        if let imageUrl = URL(string: metadata?.imageUrl ?? ""), !didImageFail {
+            AsyncImage(placeholderView: { loadedImageBackground }, url: imageUrl)
+                .onLoaded { success in
+                    if !success { didImageFail = true }
+                }
                 .frame(width: imageWidth, height: cardHeight)
                 .clipped()
                 .background(loadedImageBackground)
@@ -215,69 +183,15 @@ struct MessageLinkPreviewView: View {
     }
 
     private func open() {
-        UIApplication.shared.open(url)
+        UIApplication.shared.open(link.url)
     }
 
     // MARK: Loading
 
-    private func load() {
-        if let cached = MessageLinkMetadataCache.shared.cached(for: url) {
-            metadata = cached
-            isLoading = false
-            renderThumbnail(from: cached)
-            return
-        }
-        if MessageLinkMetadataCache.shared.didFail(for: url) {
-            didFail = true
-            isLoading = false
-            return
-        }
-        guard MessageLinkMetadataCache.shared.shouldFetch(for: url) else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { settleAfterSiblingFetch() }
-            return
-        }
-
-        let provider = LPMetadataProvider()
-        provider.timeout = 8
-        provider.startFetchingMetadata(for: url) { meta, error in
-            MessageLinkMetadataCache.shared.finishedFetch(for: url)
-            if let meta, error == nil {
-                MessageLinkMetadataCache.shared.set(meta, for: url)
-                DispatchQueue.main.async {
-                    self.metadata = meta
-                    self.isLoading = false
-                    self.renderThumbnail(from: meta)
-                }
-            } else {
-                MessageLinkMetadataCache.shared.markFailed(for: url)
-                DispatchQueue.main.async {
-                    self.didFail = true
-                    self.isLoading = false
-                }
-            }
-        }
-    }
-
-    private func settleAfterSiblingFetch() {
-        if let cached = MessageLinkMetadataCache.shared.cached(for: url) {
-            self.metadata = cached
-            self.isLoading = false
-            self.renderThumbnail(from: cached)
-        } else if MessageLinkMetadataCache.shared.didFail(for: url) {
-            self.didFail = true
-            self.isLoading = false
-        } else {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { settleAfterSiblingFetch() }
-        }
-    }
-
-    private func renderThumbnail(from meta: LPLinkMetadata) {
-        let provider = meta.imageProvider ?? meta.iconProvider
-        provider?.loadObject(ofClass: UIImage.self) { object, _ in
-            guard let image = object as? UIImage else { return }
-            DispatchQueue.main.async {
-                self.thumbnail = image
-            }
-        }
+    @MainActor
+    private func load() async {
+        metadata = await AmityPreviewLinkWizard.shared.fetchLinkMetadata(url: link.raw)
+        didImageFail = false
+        isLoading = false
     }
 }

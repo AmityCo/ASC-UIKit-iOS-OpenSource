@@ -1633,3 +1633,7 @@
 "social_home_for_you_tab" = "สำหรับคุณ";
 "amity_social_feed_caught_up_title" = "คุณดูครบหมดแล้ว";
 "amity_social_feed_caught_up_cta" = "ดูกำลังติดตาม";
+
+// Chat home — sort not available (REQ-022)
+"amity_chat_home_error_title" = "ไม่สามารถโหลดแชทได้";
+"amity_chat_home_error_description" = "เกิดข้อผิดพลาด โปรดลองอีกครั้งในภายหลัง";

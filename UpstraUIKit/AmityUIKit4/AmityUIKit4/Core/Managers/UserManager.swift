@@ -51,7 +51,28 @@ class UserManager {
     }
     
     func isUserFlaggedByMe(withId: String) async throws -> Bool {
-        try await userRepostiory.isUserFlaggedByMe(withId: withId)
+        let user = try await loadUser(withId: withId)
+        return try await user.getUserFlagsByMe().isFlagByMe
+    }
+
+    private func loadUser(withId userId: String) async throws -> AmityUser {
+        let liveObject = userRepostiory.getUser(userId)
+        var token: AmityNotificationToken?
+        defer { token?.invalidate() }
+
+        return try await withCheckedThrowingContinuation { continuation in
+            var resumed = false
+            token = liveObject.observe { object, error in
+                guard !resumed else { return }
+                if let user = object.snapshot {
+                    resumed = true
+                    continuation.resume(returning: user)
+                } else if let error {
+                    resumed = true
+                    continuation.resume(throwing: error)
+                }
+            }
+        }
     }
     
     func getMyFollowInfo() -> AmityObject<AmityMyFollowInfo> {

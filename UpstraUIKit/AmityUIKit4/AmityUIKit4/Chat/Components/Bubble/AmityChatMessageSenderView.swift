@@ -55,8 +55,8 @@ public struct AmityChatMessageSenderView: AmityElementView {
                         .accessibilityIdentifier(AccessibilityID.Chat.MessageList.senderText)
 
                     if message.syncState != .error,
-                       let url = MessageLinkDetector.firstURL(in: message.text) {
-                        MessageLinkPreviewView(url: url, isOwner: true)
+                       let link = MessageLinkDetector.firstLink(in: message.text) {
+                        MessageLinkPreviewView(link: link, isOwner: true)
                             .padding(.top, 12)
                     }
                 }

@@ -212,6 +212,8 @@ public struct AmityLocalizedStringSet {
             static let tabGroups = "amity_chat_tab_groups"
             static let createNew = "amity_chat_create_new_chat"
             static let emptyTitle = "amity_chat_home_empty_title"
+            static let errorTitle = "amity_chat_home_error_title"
+            static let errorDescription = "amity_chat_home_error_description"
             static let notificationsDisabled = "amity_chat_notifications_disabled"
         }
 

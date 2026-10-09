@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07FB896FAF0F4635AACD1E12 /* ChatListRowTimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A830DC07B745B3D14B30D359 /* ChatListRowTimeTests.swift */; };
 		684AE0FC2B0C5B0200FD7270 /* AmityUIKit4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */; };
 		684AE1012B0C5B0200FD7270 /* AmityUIKit4Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684AE1002B0C5B0200FD7270 /* AmityUIKit4Tests.swift */; };
 		685F16C22BFCABAD0016685F /* AmityReactionList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685F16C12BFCABAD0016685F /* AmityReactionList.swift */; };
@@ -14,6 +15,7 @@
 		68AA10012F00000000000011 /* AmityModuleFlagTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AA10012F00000000000001 /* AmityModuleFlagTests.swift */; };
 		68AA10012F00000000000012 /* AmityModuleAvailabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AA10012F00000000000002 /* AmityModuleAvailabilityTests.swift */; };
 		68AA10012F00000000000013 /* AmityInternalLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AA10012F00000000000003 /* AmityInternalLinkTests.swift */; };
+		7C57F3184E3A0906CC62576B /* ChannelListSortByConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06B5D340F57A7CB300CC920 /* ChannelListSortByConfigTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +49,8 @@
 		68AA10012F00000000000003 /* AmityInternalLinkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityInternalLinkTests.swift; sourceTree = "<group>"; };
 		926C522D2CB91DA40085CA64 /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = ../Shared/MobileVLCKit.xcframework; sourceTree = "<group>"; };
 		926C52312CB91DAA0085CA64 /* AmityVideoPlayerKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityVideoPlayerKit.xcframework; path = ../Shared/AmityVideoPlayerKit.xcframework; sourceTree = "<group>"; };
+		A830DC07B745B3D14B30D359 /* ChatListRowTimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config/ChatListRowTimeTests.swift; sourceTree = "<group>"; };
+		C06B5D340F57A7CB300CC920 /* ChannelListSortByConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config/ChannelListSortByConfigTests.swift; sourceTree = "<group>"; };
 		ED84C3732D7AB16C006FD1DA /* AmityLiveVideoBroadcastKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = AmityLiveVideoBroadcastKit.xcframework; path = ../Shared/AmityLiveVideoBroadcastKit.xcframework; sourceTree = "<group>"; };
 		ED8C1C392DF1493A00F4AE80 /* AmityJoinRequestContentComponentBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmityJoinRequestContentComponentBehavior.swift; sourceTree = "<group>"; };
 		EDA3AF992E24C3DF00473F1E /* ShareActivitySheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareActivitySheetView.swift; sourceTree = "<group>"; };
@@ -947,6 +951,8 @@
 				68AA10012F00000000000002 /* AmityModuleAvailabilityTests.swift */,
 				68AA10012F00000000000003 /* AmityInternalLinkTests.swift */,
 				684AE1002B0C5B0200FD7270 /* AmityUIKit4Tests.swift */,
+				A830DC07B745B3D14B30D359 /* ChatListRowTimeTests.swift */,
+				C06B5D340F57A7CB300CC920 /* ChannelListSortByConfigTests.swift */,
 			);
 			path = AmityUIKit4Tests;
 			sourceTree = "<group>";
@@ -1012,7 +1018,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				1E7D380C3FE215F3D623E703 /* SharedFrameworks */,
+				7336023332FCEE2C32740B40 /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -1064,7 +1070,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				FAC522AD042E384AFC62D56E /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				7E604615C108E07752E5FA22 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1146,6 +1152,8 @@
 				68AA10012F00000000000012 /* AmityModuleAvailabilityTests.swift in Sources */,
 				68AA10012F00000000000013 /* AmityInternalLinkTests.swift in Sources */,
 				684AE1012B0C5B0200FD7270 /* AmityUIKit4Tests.swift in Sources */,
+				07FB896FAF0F4635AACD1E12 /* ChatListRowTimeTests.swift in Sources */,
+				7C57F3184E3A0906CC62576B /* ChannelListSortByConfigTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1427,16 +1435,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		FAC522AD042E384AFC62D56E /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		7E604615C108E07752E5FA22 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1E7D380C3FE215F3D623E703 /* SharedFrameworks */ = {
+		7336023332FCEE2C32740B40 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FAC522AD042E384AFC62D56E /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = 7E604615C108E07752E5FA22 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

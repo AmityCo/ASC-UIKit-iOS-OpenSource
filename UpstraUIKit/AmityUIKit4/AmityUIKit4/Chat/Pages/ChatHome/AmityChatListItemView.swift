@@ -14,6 +14,8 @@ struct AmityChatListItemView: View {
     let searchQuery: String
     let isArchived: Bool
     let searchMessage: AmityMessage?
+    /// The list's sort, which decides the row's time (see `rowTime(for:sortBy:)`).
+    let sortBy: AmityChannelSortBy
 
     let viewConfig: AmityViewConfigController
 
@@ -22,12 +24,14 @@ struct AmityChatListItemView: View {
         searchQuery: String = "",
         isArchived: Bool = false,
         searchMessage: AmityMessage? = nil,
+        sortBy: AmityChannelSortBy = .lastActivity,
         viewConfig: AmityViewConfigController
     ) {
         self.channel = channel
         self.searchQuery = searchQuery
         self.isArchived = isArchived
         self.searchMessage = searchMessage
+        self.sortBy = sortBy
         self.viewConfig = viewConfig
     }
 
@@ -129,10 +133,26 @@ struct AmityChatListItemView: View {
 
     // MARK: - Right column (timestamp + badges)
 
+    /// The time a row shows follows the list's sort, so a row's time and its position agree.
+    /// With `.lastMessage`, a member change moves neither.
+    static func rowTime(for channel: AmityChannel, sortBy: AmityChannelSortBy) -> Date {
+        rowTime(lastActivity: channel.lastActivity, lastMessageAt: channel.lastMessageAt,
+                createdAt: channel.createdAt, updatedAt: channel.updatedAt, sortBy: sortBy)
+    }
+
+    static func rowTime(lastActivity: Date?, lastMessageAt: Date?, createdAt: Date, updatedAt: Date?, sortBy: AmityChannelSortBy) -> Date {
+        switch sortBy {
+        case .lastMessage:
+            return lastMessageAt ?? createdAt
+        case .lastActivity:
+            return lastActivity ?? updatedAt ?? Date()
+        }
+    }
+
     @ViewBuilder
     private var rightColumn: some View {
         VStack(alignment: .trailing, spacing: 10) {
-            Text(formattedDate(channel.lastActivity ?? channel.updatedAt ?? Date()))
+            Text(formattedDate(Self.rowTime(for: channel, sortBy: sortBy)))
                 .applyTextStyle(.caption(Color(viewConfig.color(.textListTrailingSubtextDefault))))
                 .lineLimit(1)
                 .fixedSize()

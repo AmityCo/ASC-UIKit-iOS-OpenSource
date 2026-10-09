@@ -124,6 +124,7 @@ struct AccessibilityID {
 
         struct GroupChatHeader {
             static let container = "group_chat_header/*"
+            static let backButton = "group_chat_header/back_button"
             static let settingsButton = "group_chat_header/settings_button"
         }
 

@@ -143,7 +143,7 @@ class MentionListProvider {
         mentionListToken = nil
         mentionListToken?.invalidate()
         
-        channelMembersCollection = channelMembersRepo?.searchMembers(displayName: displayName, filterBuilder: builder, roles: [], includeDeleted: false)
+        channelMembersCollection = channelMembersRepo?.searchMembers(displayName: displayName, searchBy: [.displayName], filterBuilder: builder, roles: [], includeDeleted: false)
         mentionListToken = channelMembersCollection?.observe({ [weak self] liveCollection, error in
             self?.handleSearchResponse(with: liveCollection)
         })

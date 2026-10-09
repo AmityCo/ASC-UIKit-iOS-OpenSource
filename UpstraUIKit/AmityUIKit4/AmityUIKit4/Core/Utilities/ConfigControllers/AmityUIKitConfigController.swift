@@ -8,6 +8,7 @@
 import Foundation
 import AmitySDK
 import UIKit
+import AmitySDK
 
 class AmityUIKitConfigController {
     static let shared = AmityUIKitConfigController()
@@ -633,6 +634,16 @@ class AmityUIKitConfigController {
         return known.isEmpty ? [.conversation, .community] : known
     }
 
+    /// Sort for the chat home channel list, from `feature_flags.chat.channel_list_sort_by`.
+    /// Only `"lastMessage"` selects `.lastMessage`; a missing or unknown value keeps `.lastActivity`.
+    func channelListSortBy() -> AmityChannelSortBy {
+        Self.channelListSortBy(from: featureFlag?.chat.channelListSortBy)
+    }
+
+    static func channelListSortBy(from raw: String?) -> AmityChannelSortBy {
+        raw == AmityChannelSortBy.lastMessage.rawValue ? .lastMessage : .lastActivity
+    }
+
     func isChatUserActionEnabled(_ name: String) -> Bool {
         guard let actions = featureFlag?.chat.conversationChatUserActions else {
             return true
@@ -735,16 +746,21 @@ enum AccessLevel: String, Codable, CaseIterable {
 struct ChatFeatures: Codable {
     let enabledChannelTypes: [String]
     let conversationChatUserActions: [AmityChatUserActionFlag]?
+    /// Raw `channel_list_sort_by` value: `"lastActivity"` or `"lastMessage"`. Nil when the key is missing.
+    let channelListSortBy: String?
 
     enum CodingKeys: String, CodingKey {
         case enabledChannelTypes = "enabled_channel_types"
         case conversationChatUserActions = "conversation_chat_user_actions"
+        case channelListSortBy = "channel_list_sort_by"
     }
 
     init(enabledChannelTypes: [String] = [],
-         conversationChatUserActions: [AmityChatUserActionFlag]? = nil) {
+         conversationChatUserActions: [AmityChatUserActionFlag]? = nil,
+         channelListSortBy: String? = nil) {
         self.enabledChannelTypes = enabledChannelTypes
         self.conversationChatUserActions = conversationChatUserActions
+        self.channelListSortBy = channelListSortBy
     }
 
     init(from decoder: Decoder) throws {
@@ -753,6 +769,7 @@ struct ChatFeatures: Codable {
             try container.decodeIfPresent([String].self, forKey: .enabledChannelTypes) ?? []
         self.conversationChatUserActions =
             try container.decodeIfPresent([AmityChatUserActionFlag].self, forKey: .conversationChatUserActions)
+        self.channelListSortBy = try? container.decodeIfPresent(String.self, forKey: .channelListSortBy)
     }
 }
 

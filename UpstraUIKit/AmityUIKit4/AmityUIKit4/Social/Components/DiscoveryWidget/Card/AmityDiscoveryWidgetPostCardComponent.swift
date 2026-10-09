@@ -29,13 +29,8 @@ enum DiscoveryWidgetCardVariant {
         case .image:
             return .image
         default:
-            return post.links.isEmpty && !containsURL(post.text) ? .text : .link
+            return PreviewLinkViewModel.hasPreviewLink(for: post) ? .link : .text
         }
-    }
-
-    private static func containsURL(_ text: String) -> Bool {
-        guard !text.isEmpty else { return false }
-        return !AmityPreviewLinkWizard.shared.detectLinks(text: text).isEmpty
     }
 
     var hasMediaOrPollBlock: Bool {

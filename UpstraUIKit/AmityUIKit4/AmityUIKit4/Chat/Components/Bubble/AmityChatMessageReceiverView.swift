@@ -48,8 +48,8 @@ public struct AmityChatMessageReceiverView: AmityElementView {
                         .accessibilityIdentifier(AccessibilityID.Chat.MessageList.receiverText)
 
                     if message.syncState != .error,
-                       let url = MessageLinkDetector.firstURL(in: message.text) {
-                        MessageLinkPreviewView(url: url, isOwner: false)
+                       let link = MessageLinkDetector.firstLink(in: message.text) {
+                        MessageLinkPreviewView(link: link, isOwner: false)
                             .padding(.top, 12)
                     }
                 }

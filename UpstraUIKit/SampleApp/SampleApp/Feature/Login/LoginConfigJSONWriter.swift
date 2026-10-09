@@ -66,6 +66,11 @@ enum LoginConfigJSONWriter {
         clip["can_view_tab"] = toggles.visitorCanViewClip ? "all" : "signed_in_user_only"
         post["clip"] = clip
         featureFlags["post"] = post
+
+        // feature_flags.chat.channel_list_sort_by: "lastActivity" | "lastMessage" | a custom value
+        var chat = (featureFlags["chat"] as? [String: Any]) ?? [:]
+        chat["channel_list_sort_by"] = store.channelListSortByConfigValue
+        featureFlags["chat"] = chat
         config["feature_flags"] = featureFlags
 
         // excludes[]: dedupe via Set, then sort for stable diffs.
