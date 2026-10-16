@@ -15,16 +15,10 @@ struct AmityContentReportPage: View {
     @EnvironmentObject var viewConfig: AmityViewConfigController
     
     @StateObject private var viewModel: AmityContentReportPageViewModel
-    @State private var reasons: [AmityContentFlagReason] = [
-        .communityGuidelines,
-        .harassmentOrBullying,
-        .selfHarmOrSuicide,
-        .violenceOrThreateningContent,
-        .sellingRestrictedItems,
-        .sexualContentOrNudity,
-        .spamOrScams,
-        .falseInformation
-    ]
+    /// Read from the SDK each time the page renders, in the SDK's order, without Others (its own row).
+    private var reasons: [AmityContentFlagReasonType] {
+        AmityContentFlagReasonType.allCases.filter { $0 != .others }
+    }
         
     init(type: ContentReportType, bottomBarHeight: CGFloat? = nil) {
         self._viewModel = StateObject(wrappedValue: AmityContentReportPageViewModel(type: type, bottomBarHeight: bottomBarHeight))
@@ -68,8 +62,8 @@ struct AmityContentReportPage: View {
                                 .applyTextStyle(.caption(Color(viewConfig.theme.baseColorShade1)))
                                 .padding(.vertical, 12)
                             
-                            ForEach(reasons, id: \.description) { item in
-                                OptionButton(title: item.localizedDescription, isSelected: viewModel.selectedReason?.isEqual(item: item) ?? false) {
+                            ForEach(reasons, id: \.key) { item in
+                                OptionButton(title: AmityStringProvider.social.resolveReportReasonLabel(item), isSelected: viewModel.selectedReason == item) {
                                     viewModel.selectedReason = item
                                 }
                             }
@@ -81,8 +75,7 @@ struct AmityContentReportPage: View {
                                 self.host.controller?.navigationController?.pushViewController(vc, animated: true)
                             }, label: {
                                 HStack {
-                                    let otherReason = AmityContentFlagReason.others("")
-                                    Text(otherReason.localizedDescription)
+                                    Text(AmityLocalizedStringSet.Social.reportReasonOthersPageTitle.localizedString)
                                         .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
                                     
                                     Spacer()
@@ -132,37 +125,5 @@ struct AmityContentReportPage: View {
             }
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
-    }
-}
-
-extension AmityContentFlagReason {
-    
-    func isEqual(item: AmityContentFlagReason) -> Bool {
-        return self.description == item.description
-    }
-    
-    var localizedDescription: String {
-        switch self {
-        case .communityGuidelines:
-            return AmityLocalizedStringSet.Social.reportReasonCommunityGuidelines.localizedString
-        case .harassmentOrBullying:
-            return AmityLocalizedStringSet.Social.reportReasonHarassmentOrBullying.localizedString
-        case .selfHarmOrSuicide:
-            return AmityLocalizedStringSet.Social.reportReasonSelfHarmOrSuicide.localizedString
-        case .violenceOrThreateningContent:
-            return AmityLocalizedStringSet.Social.reportReasonViolenceOrThreatening.localizedString
-        case .sellingRestrictedItems:
-            return AmityLocalizedStringSet.Social.reportReasonSellingRestricted.localizedString
-        case .sexualContentOrNudity:
-            return AmityLocalizedStringSet.Social.reportReasonSexualContentOrNudity.localizedString
-        case .spamOrScams:
-            return AmityLocalizedStringSet.Social.reportReasonSpamOrScams.localizedString
-        case .falseInformation:
-            return AmityLocalizedStringSet.Social.reportReasonFalseInformation.localizedString
-        case .others:
-            return AmityLocalizedStringSet.Social.reportReasonOthersPageTitle.localizedString
-        @unknown default:
-            return self.description
-        }
     }
 }

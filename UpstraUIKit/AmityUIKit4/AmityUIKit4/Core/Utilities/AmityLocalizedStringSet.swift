@@ -956,6 +956,7 @@ public struct AmityLocalizedStringSet {
         static let reportReasonContentTypeComment = "report_reason_content_type_comment"
         static let reportReasonContentTypeReply = "report_reason_content_type_reply"
         static let reportReasonContentTypeMessage = "report_reason_content_type_message"
+        static let reportReasonChildEndangerment = "social_label_report_reason_child_endangerment"
         static let reportReasonCommunityGuidelines = "social_label_report_reason_community_guidelines"
         static let reportReasonFalseInformation = "social_label_report_reason_false_information"
         static let reportReasonHarassmentOrBullying = "social_label_report_reason_harassment_or_bullying"

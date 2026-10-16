@@ -44,7 +44,7 @@ class AmityChatContentReportPageViewModel: ObservableObject {
 
     let type: ChatContentReportType
 
-    @Published var selectedReason: AmityContentFlagReason?
+    @Published var selectedReason: AmityContentFlagReasonType?
     @Published var submissionState: ChatContentReportSubmissionState = .none
 
     init(type: ChatContentReportType) {
@@ -52,18 +52,18 @@ class AmityChatContentReportPageViewModel: ObservableObject {
     }
 
     @MainActor
-    func flagContent(reason: AmityContentFlagReason) async throws {
+    func flagContent(reason: AmityContentFlagReasonType, detail: String? = nil) async throws {
         self.submissionState = .submitting
 
         do {
             switch type {
             case .message(id: let id):
-                try await chatManager.flagMessage(messageId: id, reason: reason)
+                try await chatManager.flagMessage(messageId: id, reason: reason, detail: detail)
                 MessageCache.shared.setFlagStatus(messageId: id, value: true)
             case .post(let id):
-                try await postManager.flagPost(withId: id, reason: reason)
+                try await postManager.flagPost(withId: id, reason: reason, detail: detail)
             case .comment(let id, _):
-                try await commentManager.flagComment(withId: id, reason: reason)
+                try await commentManager.flagComment(withId: id, reason: reason, detail: detail)
             }
 
             self.submissionState = .success

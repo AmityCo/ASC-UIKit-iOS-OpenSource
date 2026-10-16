@@ -5,6 +5,7 @@
 
 import Foundation
 import Combine
+import AmitySDK
 
 /// Provides localized strings through a 5-level resolution chain:
 /// 1. Config text (remote override)
@@ -159,6 +160,15 @@ public class AmityStringProvider: ObservableObject {
             return reactionName.prefix(1).uppercased() + reactionName.dropFirst()
         }
         return resolved
+    }
+
+    /// Label for a report reason row: `social_label_report_reason_<key>`, or the SDK's English
+    /// `defaultLabel` when no string exists for the key, so a reason added in a newer SDK still
+    /// shows a readable row.
+    public func resolveReportReasonLabel(_ reason: AmityContentFlagReasonType) -> String {
+        let key = "social_label_report_reason_\(reason.key)"
+        let resolved = resolveRaw(key: key)
+        return resolved == key ? reason.defaultLabel : resolved
     }
 
     public func resolveChatReactionDisplayName(_ reactionName: String) -> String {

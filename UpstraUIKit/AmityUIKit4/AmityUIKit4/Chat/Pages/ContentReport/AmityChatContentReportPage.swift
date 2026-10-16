@@ -16,16 +16,10 @@ struct AmityChatContentReportPage: View {
     @EnvironmentObject var viewConfig: AmityViewConfigController
 
     @StateObject private var viewModel: AmityChatContentReportPageViewModel
-    @State private var reasons: [AmityContentFlagReason] = [
-        .communityGuidelines,
-        .harassmentOrBullying,
-        .selfHarmOrSuicide,
-        .violenceOrThreateningContent,
-        .sellingRestrictedItems,
-        .sexualContentOrNudity,
-        .spamOrScams,
-        .falseInformation
-    ]
+    /// Read from the SDK each time the page renders, in the SDK's order, without Others (its own row).
+    private var reasons: [AmityContentFlagReasonType] {
+        AmityContentFlagReasonType.allCases.filter { $0 != .others }
+    }
 
     /// Called with the success message after the report sheet dismisses, so the
     /// caller can present the toast in its own context (e.g. above the chat's
@@ -59,7 +53,7 @@ struct AmityChatContentReportPage: View {
                                 .applyTextStyle(.caption(Color(viewConfig.color(.textListTextDescriptionDefaultDefault))))
                                 .padding(.vertical, 12)
 
-                            ForEach(reasons, id: \.description) { item in
+                            ForEach(reasons, id: \.key) { item in
                                 reasonRow(item)
                             }
 
@@ -96,18 +90,18 @@ struct AmityChatContentReportPage: View {
         }
     }
 
-    private func reasonRow(_ item: AmityContentFlagReason) -> some View {
+    private func reasonRow(_ item: AmityContentFlagReasonType) -> some View {
         Button {
             viewModel.selectedReason = item
         } label: {
             HStack(spacing: 12) {
-                Text(item.localizedDescription)
+                Text(AmityStringProvider.social.resolveReportReasonLabel(item))
                     .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
 
                 Spacer()
 
                 AmitySelection(variant: .radio,
-                               isSelected: viewModel.selectedReason?.isEqual(item: item) ?? false,
+                               isSelected: viewModel.selectedReason == item,
                                viewConfig: viewConfig) { _, _ in }
                     .allowsHitTesting(false)
             }
@@ -125,7 +119,7 @@ struct AmityChatContentReportPage: View {
             self.host.controller?.navigationController?.pushViewController(vc, animated: true)
         } label: {
             HStack {
-                Text(AmityContentFlagReason.others("").localizedDescription)
+                Text(AmityLocalizedStringSet.Social.reportReasonOthersPageTitle.localizedString)
                     .applyTextStyle(.bodyBold(Color(viewConfig.color(.textListHeaderDefaultDefault))))
 
                 Spacer()

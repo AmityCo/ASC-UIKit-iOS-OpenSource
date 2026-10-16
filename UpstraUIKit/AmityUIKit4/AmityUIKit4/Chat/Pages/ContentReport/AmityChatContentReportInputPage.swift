@@ -181,7 +181,7 @@ struct AmityChatContentReportInputPage: View {
     private var submitButton: some View {
         Button {
             Task { @MainActor in
-                try await viewModel.flagContent(reason: .others(text))
+                try await viewModel.flagContent(reason: .others, detail: text)
 
                 if viewModel.submissionState == .success {
                     let toastMessage = AmityLocalizedStringSet.Social.reportReasonSuccessToastMessage.localized(arguments: viewModel.type.description)

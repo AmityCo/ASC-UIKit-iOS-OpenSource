@@ -19,7 +19,7 @@ class UserManager {
     }
 
     func searchUsers(keyword: String, sortBy: AmityUserSortOption) -> AmityCollection<AmityUser> {
-        userRepostiory.searchUsers(keyword, searchBy: [.displayName], sortBy: sortBy)
+        userRepostiory.searchUsers(keyword, searchBy: [.displayName], sortBy: sortBy, matchType: .partial)
     }
 
     func getUsers(sortBy: AmityUserSortOption = .displayName) -> AmityCollection<AmityUser> {

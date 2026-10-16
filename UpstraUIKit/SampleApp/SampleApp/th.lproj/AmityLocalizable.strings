@@ -503,6 +503,7 @@
 "report_reason_content_type_reply" = "การตอบกลับ";
 "report_reason_content_type_message" = "ข้อความ";
 
+"social_label_report_reason_child_endangerment" = "การเป็นอันตรายต่อเด็ก";
 "social_label_report_reason_community_guidelines" = "ขัดต่อแนวทางชุมชน";
 "social_label_report_reason_false_information" = "ข้อมูลเท็จหรือข้อมูลที่ผิด";
 "social_label_report_reason_harassment_or_bullying" = "การคุกคามหรือการกลั่นแกล้ง";

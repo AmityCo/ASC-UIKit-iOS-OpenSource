@@ -47,7 +47,7 @@ class AmityContentReportPageViewModel: ObservableObject {
     /// dismissed. `nil` when the underlying screen has no bottom bar (standard placement).
     let bottomBarHeight: CGFloat?
 
-    @Published var selectedReason: AmityContentFlagReason?
+    @Published var selectedReason: AmityContentFlagReasonType?
     @Published var submissionState: ContentReportSubmissionState = .none
 
     init(type: ContentReportType, bottomBarHeight: CGFloat? = nil) {
@@ -66,18 +66,18 @@ class AmityContentReportPageViewModel: ObservableObject {
     }
     
     @MainActor
-    func flagContent(reason: AmityContentFlagReason) async throws {
+    func flagContent(reason: AmityContentFlagReasonType, detail: String? = nil) async throws {
         self.submissionState = .submitting
         
         do {
             switch type {
             case .message(id: let id):
-                try await chatManager.flagMessage(messageId: id, reason: reason)
+                try await chatManager.flagMessage(messageId: id, reason: reason, detail: detail)
                 MessageCache.shared.setFlagStatus(messageId: id, value: true)
             case .post(let id):
-                try await postManager.flagPost(withId: id, reason: reason)
+                try await postManager.flagPost(withId: id, reason: reason, detail: detail)
             case .comment(let id, let isReply):
-                try await commentManager.flagComment(withId: id, reason: reason)
+                try await commentManager.flagComment(withId: id, reason: reason, detail: detail)
             }
             
             self.submissionState = .success

@@ -66,7 +66,7 @@ struct AmityContentReportInputPage: View {
                         
                         Button(AmityLocalizedStringSet.Social.reportPageSubmitButton.localizedString) {
                             Task { @MainActor in
-                                try await viewModel.flagContent(reason: .others(text))
+                                try await viewModel.flagContent(reason: .others, detail: text)
                                 
                                 if viewModel.submissionState == .success {
                                     self.host.controller?.dismiss(animated: true)

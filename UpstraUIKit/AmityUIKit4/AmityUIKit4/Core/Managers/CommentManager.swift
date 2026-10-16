@@ -43,8 +43,8 @@ class CommentManager {
         try await commentRepository.flagComment(withId: commentId)
     }
     
-    func flagComment(withId: String, reason: AmityContentFlagReason) async throws {
-        try await commentRepository.flagComment(withId: withId, reason: reason)
+    func flagComment(withId: String, reason: AmityContentFlagReasonType, detail: String? = nil) async throws {
+        try await commentRepository.flagComment(withId: withId, reason: reason, detail: detail)
     }
     
     @MainActor

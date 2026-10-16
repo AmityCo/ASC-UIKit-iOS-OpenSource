@@ -469,6 +469,7 @@
 "report_reason_content_type_reply" = "Reply";
 "report_reason_content_type_message" = "Message";
 
+"social_label_report_reason_child_endangerment" = "Child endangerment";
 "social_label_report_reason_community_guidelines" = "Against community guidelines";
 "social_label_report_reason_false_information" = "False information or misinformation";
 "social_label_report_reason_harassment_or_bullying" = "Harassment or bullying";

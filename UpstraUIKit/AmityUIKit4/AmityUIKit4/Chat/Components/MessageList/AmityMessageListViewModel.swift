@@ -300,6 +300,22 @@ public class AmityMessageListViewModel: ObservableObject {
         }
     }
 
+    /// Reports a message with a category from `AmityContentFlagReasonType` and optional detail text.
+    @MainActor
+    public func reportMessage(messageId: String, reason: AmityContentFlagReasonType, detail: String? = nil) {
+        Task {
+            do {
+                try await chatManager.flagMessage(messageId: messageId, reason: reason, detail: detail)
+                MessageCache.shared.setFlagStatus(messageId: messageId, value: true)
+                updateLocalMessageModel(messageId: messageId, isReported: true)
+                toastState = .init(style: .success, message: AmityLocalizedStringSet.Chat.toastReportMessage.localizedString)
+            } catch {
+                toastState = .init(style: .warning, message: AmityLocalizedStringSet.Chat.toastReportMessageError.localizedString)
+            }
+        }
+    }
+
+    @available(*, deprecated, message: "Use reportMessage(messageId:reason:detail:) with AmityContentFlagReasonType. For .others(text), pass reason: .others, detail: text.")
     @MainActor
     public func reportMessage(messageId: String, reason: AmityContentFlagReason) {
         Task {

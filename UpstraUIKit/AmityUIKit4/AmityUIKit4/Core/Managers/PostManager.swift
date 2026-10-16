@@ -37,8 +37,8 @@ class PostManager {
         try await postRepository.flagPost(withId: withId, reason: .communityGuidelines)
     }
     
-    func flagPost(withId: String, reason: AmityContentFlagReason) async throws {
-        try await postRepository.flagPost(withId: withId, reason: reason)
+    func flagPost(withId: String, reason: AmityContentFlagReasonType, detail: String? = nil) async throws {
+        try await postRepository.flagPost(withId: withId, reason: reason, detail: detail)
     }
     
     func unflagPost(withId: String) async throws {

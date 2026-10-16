@@ -95,6 +95,11 @@ class ChatManager {
     func flagMessage(messageId: String, reason: AmityContentFlagReason) async throws {
         return try await repository.flagMessage(withId: messageId, reason: reason)
     }
+
+    @MainActor
+    func flagMessage(messageId: String, reason: AmityContentFlagReasonType, detail: String? = nil) async throws {
+        try await repository.flagMessage(withId: messageId, reason: reason, detail: detail)
+    }
     
     @MainActor
     func unflagMessage(messageId: String) async throws {

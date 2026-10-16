@@ -13,6 +13,7 @@ class AmityEventDetailPageViewModel: ObservableObject {
     private let eventManager = EventManager()
     private let feedManager = FeedManager()
     private let calendarManager = EventCalendarManager()
+    private let communityManager = CommunityManager()
     private let eventId: String
     
     @Published var event: AmityEvent?
@@ -32,6 +33,7 @@ class AmityEventDetailPageViewModel: ObservableObject {
     
     var eventToken: AmityNotificationToken?
     var feedToken: AmityNotificationToken?
+    var targetCommunityToken: AmityNotificationToken?
     var feedCollection: AmityCollection<AmityPost>?
     var eventResponse: AmityEventResponse?
     var community: AmityCommunity?
@@ -93,6 +95,8 @@ class AmityEventDetailPageViewModel: ObservableObject {
     deinit {
         eventToken?.invalidate()
         eventToken = nil
+        targetCommunityToken?.invalidate()
+        targetCommunityToken = nil
     }
     
     func loadDiscussionFeed() {
@@ -143,10 +147,23 @@ class AmityEventDetailPageViewModel: ObservableObject {
         
         Task { @MainActor in
             self.hasCreatePermission = await AmityUIKit4Manager.client.hasPermission(.createEvent)
-            
-            self.hasUpdatePermission = await AmityUIKit4Manager.client.hasPermission(.updateEvent)
-            
-            self.hasDeletePermission = await AmityUIKit4Manager.client.hasPermission(.deleteEvent)
+        }
+
+        guard let communityId = event?.targetCommunity?.communityId else {
+            Task { @MainActor in
+                self.hasUpdatePermission = await AmityUIKit4Manager.client.hasPermission(.updateEvent)
+                self.hasDeletePermission = await AmityUIKit4Manager.client.hasPermission(.deleteEvent)
+            }
+            return
+        }
+
+        guard targetCommunityToken == nil else { return }
+        targetCommunityToken = communityManager.getCommunity(withId: communityId).observe { [weak self] _, _ in
+            Task { @MainActor in
+                guard let self else { return }
+                self.hasUpdatePermission = await AmityUIKit4Manager.client.hasPermission(.updateEvent, forCommunity: communityId)
+                self.hasDeletePermission = await AmityUIKit4Manager.client.hasPermission(.deleteEvent, forCommunity: communityId)
+            }
         }
     }
     
