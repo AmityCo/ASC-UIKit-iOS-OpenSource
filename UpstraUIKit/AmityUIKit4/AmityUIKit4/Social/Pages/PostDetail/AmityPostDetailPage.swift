@@ -38,10 +38,7 @@ public struct AmityPostDetailPage: AmityPageView {
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: id, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: postDetailViewModel.post?.targetCommunity?.communityId, targetCommentId: commentId, targetCommentParentId: parentId, rootCommentId: rootCommentId, preloadRepliesOfComment: preloadRepliesOfComment, event: event))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: id, referenceType: .post, community: postDetailViewModel.post?.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
-        
-        let bottomSheetVM = CommentBottomSheetViewModel()
-        bottomSheetVM.checkDeletePermission(communityId: postDetailViewModel.post?.targetCommunity?.communityId)
-        self._commentBottomSheetViewModel = StateObject(wrappedValue: bottomSheetVM)
+        self._commentBottomSheetViewModel = StateObject(wrappedValue: CommentBottomSheetViewModel())
     }
     
     // Post with context
@@ -51,10 +48,7 @@ public struct AmityPostDetailPage: AmityPageView {
         self._commentCoreViewModel = StateObject(wrappedValue: CommentCoreViewModel(referenceId: post.postId, referenceType: .post, hideEmptyText: true, hideCommentButtons: false, communityId: post.targetCommunity?.communityId, event: context?.event))
         self._commentComposerViewModel = StateObject(wrappedValue: CommentComposerViewModel(referenceId: post.postId, referenceType: .post, community: post.targetCommunity, allowCreateComment: true))
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: .postDetailPage))
-        
-        let bottomSheetVM = CommentBottomSheetViewModel()
-        bottomSheetVM.checkDeletePermission(communityId: post.targetCommunity?.communityId)
-        self._commentBottomSheetViewModel = StateObject(wrappedValue: bottomSheetVM)
+        self._commentBottomSheetViewModel = StateObject(wrappedValue: CommentBottomSheetViewModel())
     }
     
     public var body: some View {
@@ -276,6 +270,7 @@ public struct AmityPostDetailPage: AmityPageView {
         case .meatball(let comment):
             hideKeyboard()
             
+            commentBottomSheetViewModel.hasDeletePermission = viewModel.hasDeleteCommentPermission
             commentBottomSheetViewModel.sheetState.isShown.toggle()
             commentBottomSheetViewModel.sheetState.comment = comment
         case .userProfile(let userId):

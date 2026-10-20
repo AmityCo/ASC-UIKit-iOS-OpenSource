@@ -312,10 +312,9 @@ class PostBottomSheetViewModel: ObservableObject {
             return
         }
         
-        if let communityId = post.targetCommunity?.communityId {
-            Task { @MainActor in
-                hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
-            }
+        let communityId = post.targetCommunity?.communityId
+        Task { @MainActor in
+            hasDeletePermission = await PostPermissionChecker.hasDeletePostPermission(communityId: communityId)
         }
     }
 }

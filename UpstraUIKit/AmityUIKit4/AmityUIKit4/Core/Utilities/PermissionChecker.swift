@@ -22,6 +22,30 @@ class ChatPermissionChecker {
     }
 }
 
+class CommentPermissionChecker {
+
+    /// Whether a non-author can delete a comment: community comments need the community's
+    /// delete permission, any other target needs the global user feed one.
+    static func hasDeleteCommentPermission(communityId: String?) async -> Bool {
+        guard let communityId else {
+            return await AmityUIKitManagerInternal.shared.client.hasPermission(.deleteUserFeedComment)
+        }
+        return await CommunityPermissionChecker.hasDeleteCommunityCommentPermission(communityId: communityId)
+    }
+}
+
+class PostPermissionChecker {
+
+    /// Whether a non-author can delete a post: community posts need the community's
+    /// delete permission, any other target needs the global user feed one.
+    static func hasDeletePostPermission(communityId: String?) async -> Bool {
+        guard let communityId else {
+            return await AmityUIKitManagerInternal.shared.client.hasPermission(.deleteUserFeedPost)
+        }
+        return await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
+    }
+}
+
 class CommunityPermissionChecker {
     
     static func hasDeleteCommunityPostPermission(communityId: String) async -> Bool {

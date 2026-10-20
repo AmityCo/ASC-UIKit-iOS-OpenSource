@@ -979,11 +979,12 @@ class AmityPostContentComponentViewModel: ObservableObject {
             hasDeletePermission = true
         }
 
-        guard let communityId = post.targetCommunity?.communityId else { return }
+        let communityId = post.targetCommunity?.communityId
         Task { @MainActor in
             if !post.isOwner {
-                hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
+                hasDeletePermission = await PostPermissionChecker.hasDeletePostPermission(communityId: communityId)
             }
+            guard let communityId else { return }
             canReviewPost = await CommunityPermissionChecker.hasReviewCommunityPostPermission(communityId: communityId)
         }
     }

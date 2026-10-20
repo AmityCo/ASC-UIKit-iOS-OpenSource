@@ -18,6 +18,7 @@ class AmityPostDetailPageViewModel: ObservableObject {
     @Published var isPostDeleted = false
     @Published var isLoading = false
     @Published var hasDeletePermission = false
+    @Published var hasDeleteCommentPermission = false
     
     var token: AmityNotificationToken?
     
@@ -39,6 +40,7 @@ class AmityPostDetailPageViewModel: ObservableObject {
     init(post: AmityPost) {
         self.postId = post.postId
         self.post = AmityPostModel(post: post)
+        checkCommentDeletePermission(communityId: post.targetCommunity?.communityId)
                 
         observePost(postId: post.postId)
         
@@ -77,11 +79,14 @@ class AmityPostDetailPageViewModel: ObservableObject {
                 
                 if self.post?.isOwner ?? false {
                     self.hasDeletePermission = true
-                } else if let communityId = snapshot.targetCommunity?.communityId {
+                } else {
+                    let communityId = snapshot.targetCommunity?.communityId
                     Task { @MainActor in
-                        self.hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityPostPermission(communityId: communityId)
+                        self.hasDeletePermission = await PostPermissionChecker.hasDeletePostPermission(communityId: communityId)
                     }
                 }
+                
+                self.checkCommentDeletePermission(communityId: snapshot.targetCommunity?.communityId)
 
                 if !self.didReportMeaningfulView, !self.isPostDeleted {
                     self.didReportMeaningfulView = true
@@ -89,5 +94,11 @@ class AmityPostDetailPageViewModel: ObservableObject {
                 }
             }
         })
+    }
+    
+    private func checkCommentDeletePermission(communityId: String?) {
+        Task { @MainActor in
+            self.hasDeleteCommentPermission = await CommentPermissionChecker.hasDeleteCommentPermission(communityId: communityId)
+        }
     }
 }

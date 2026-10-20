@@ -450,7 +450,7 @@ extension ClipFeedViewController {
             shouldAllowInteraction = false
         }
         
-        let trayUI = AmityCommentTrayComponent(referenceId: post.postId, referenceType: .post, shouldAllowInteraction: shouldAllowInteraction ,shouldAllowCreation: true)
+        let trayUI = AmityCommentTrayComponent(referenceId: post.postId, referenceType: .post, community: post.targetCommunity, shouldAllowInteraction: shouldAllowInteraction ,shouldAllowCreation: true)
         let hostingController = AmitySwiftUIHostingController(rootView: trayUI)
         hostingController.modalPresentationStyle = .pageSheet
         

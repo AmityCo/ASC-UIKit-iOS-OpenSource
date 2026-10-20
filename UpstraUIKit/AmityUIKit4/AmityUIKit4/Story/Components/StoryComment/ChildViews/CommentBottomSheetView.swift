@@ -154,9 +154,8 @@ class CommentBottomSheetViewModel: ObservableObject {
     private let commentManager = CommentManager()
     
     func checkDeletePermission(communityId: String?) {
-        guard let communityId = communityId else { return }
         Task { @MainActor in
-            hasDeletePermission = await CommunityPermissionChecker.hasDeleteCommunityCommentPermission(communityId: communityId)
+            hasDeletePermission = await CommentPermissionChecker.hasDeleteCommentPermission(communityId: communityId)
         }
     }
     
