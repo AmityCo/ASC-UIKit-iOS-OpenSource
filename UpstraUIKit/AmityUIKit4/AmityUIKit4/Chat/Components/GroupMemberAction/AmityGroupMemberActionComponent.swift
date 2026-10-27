@@ -66,9 +66,9 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
         self._viewConfig = StateObject(wrappedValue: AmityViewConfigController(pageId: pageId, componentId: .groupMemberActionComponent))
     }
 
-    // Whether the member holds the `channel-moderator` role specifically — used only to pick the
-    // Promote vs Demote label (that button toggles this exact role). NOT an effective-moderator
-    // check: a custom-role moderator returns false here yet can still moderate via permissions.
+    // Whether the member holds the `channel-moderator` role specifically — picks the Promote vs
+    // Demote label (that button toggles this exact role) and hides Mute/Unmute for moderators.
+    // NOT an effective-moderator check: a custom-role moderator returns false here.
     private var hasChannelModeratorRole: Bool {
         member.roles.contains("channel-moderator")
     }
@@ -100,7 +100,7 @@ public struct AmityGroupMemberActionComponent: AmityComponentView {
                     }
                 }
 
-                if canMute {
+                if canMute && !hasChannelModeratorRole {
                     if member.isMuted {
                         if onUnmute != nil {
                             actionRow(

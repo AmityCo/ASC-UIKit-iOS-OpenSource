@@ -31,13 +31,7 @@ struct PostContentPollView: View {
     @State private var isPollOptionExpanded = false
     let minimumVisibleAnswersCount: Int = 4
     let maximumVisibleAnswersCount: Int = 10
-    
-    // Image Poll
-    private let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
-    ]
-    
+
     init(style: AmityPostContentComponentStyle,
          post: AmityPostModel,
          showPollResults: Bool = false,
@@ -68,11 +62,9 @@ struct PostContentPollView: View {
                     let highestVote = sortedAnswers.first?.voteCount ?? 0
                     
                     if poll.isImagePoll {
-                        LazyVGrid(columns: columns, spacing: 8) {
-                            ForEach(options, id: \.id) { answer in
-                                PollVoteImageOptionView(mode: .result, answer: answer, totalVote: poll.voteCount, highestVote: highestVote, isSelected: selectedAnswers.contains(answer.id), allowMultiSelection: poll.canVoteMultipleOptions, isSelectionDisabled: isInPendingFeed, onSelection: nil) {
-                                    openImageInMediaViewer(answer: answer)
-                                }
+                        PollImageOptionGrid(answers: options) { answer in
+                            PollVoteImageOptionView(mode: .result, answer: answer, totalVote: poll.voteCount, highestVote: highestVote, isSelected: selectedAnswers.contains(answer.id), allowMultiSelection: poll.canVoteMultipleOptions, isSelectionDisabled: isInPendingFeed, onSelection: nil) {
+                                openImageInMediaViewer(answer: answer)
                             }
                         }
 //                        .transition(.opacity.combined(with: .scale))
@@ -88,16 +80,14 @@ struct PostContentPollView: View {
                     let options = style == .feed && !isInPendingFeed ? Array(poll.answers.prefix(prefixLimit)) : poll.answers
                     
                     if poll.isImagePoll {
-                        LazyVGrid(columns: columns, spacing: 8) {
-                            ForEach(options, id: \.id) { answer in
-                                PollVoteImageOptionView(mode: .vote, answer: answer, totalVote: 0, highestVote: 0, isSelected: selectedAnswers.contains(answer.id), allowMultiSelection: poll.canVoteMultipleOptions, isSelectionDisabled: isInPendingFeed) {
+                        PollImageOptionGrid(answers: options) { answer in
+                            PollVoteImageOptionView(mode: .vote, answer: answer, totalVote: 0, highestVote: 0, isSelected: selectedAnswers.contains(answer.id), allowMultiSelection: poll.canVoteMultipleOptions, isSelectionDisabled: isInPendingFeed) {
 
-                                    guard !poll.isVoted || !poll.isClosed else { return }
+                                guard !poll.isVoted || !poll.isClosed else { return }
 
-                                    selectAnswer(answer: answer)
-                                } onExpand: {
-                                    openImageInMediaViewer(answer: answer)
-                                }
+                                selectAnswer(answer: answer)
+                            } onExpand: {
+                                openImageInMediaViewer(answer: answer)
                             }
                         }
 //                        .transition(.opacity.combined(with: .scale))
@@ -256,6 +246,34 @@ struct PostContentPollView: View {
         
         viewModel.expandedImage = image
         showMediaViewer = true
+    }
+}
+
+/// Two-column grid built from plain stacks. A `LazyVGrid` here sits inside the post detail
+/// comment list's `LazyVStack`, and with a short viewport (iPhone SE + keyboard) the two lazy
+/// containers kept re-showing and hiding a row at the edge, hanging the main thread (PDT-6364).
+/// Rows are keyed by position, so an option re-sorted into another row is rebuilt.
+private struct PollImageOptionGrid<Cell: View>: View {
+    let answers: [AmityPostModel.PollModel.Answer]
+    let cell: (AmityPostModel.PollModel.Answer) -> Cell
+
+    var body: some View {
+        VStack(spacing: 8) {
+            ForEach(Array(stride(from: 0, to: answers.count, by: 2)), id: \.self) { rowStart in
+                HStack(spacing: 8) {
+                    ForEach(answers[rowStart..<min(rowStart + 2, answers.count)], id: \.id) { answer in
+                        cell(answer)
+                            .frame(maxWidth: .infinity)
+                    }
+
+                    // A Spacer would yield to the cell's infinite max width and leave it full-width.
+                    if rowStart + 1 == answers.count {
+                        Color.clear.frame(maxWidth: .infinity, maxHeight: 0)
+                    }
+                }
+                .fixedSize(horizontal: false, vertical: true)
+            }
+        }
     }
 }
 
