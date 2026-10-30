@@ -368,6 +368,10 @@ public class AmityTextEditorViewModel: ObservableObject {
             self?.productTags = tags
         }
 
+        self.mentionManager.mentionProvider.didChangeLoadingState = { [weak self] isLoading in
+            self?.suggestionViewModel.userLoadingStatus = isLoading ? .loading : .loaded
+        }
+
         // Observe keyboard notifications
         setupKeyboardObservers()
     }

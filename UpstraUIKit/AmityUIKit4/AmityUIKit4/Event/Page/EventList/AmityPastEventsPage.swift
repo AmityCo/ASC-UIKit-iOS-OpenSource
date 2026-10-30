@@ -45,15 +45,20 @@ public struct AmityPastEventsPage: AmityPageView {
                 .padding(.top, 16)
             }
             
-            TabView(selection: $tabIndex) {
+            if allEventFeed.hasCreatePermission {
+                TabView(selection: $tabIndex) {
+                    allEventList
+                        .tag(0)
+                    
+                    hostingEventList
+                        .tag(1)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .padding(.top, 8)
+            } else {
                 allEventList
-                    .tag(0)
-                
-                hostingEventList
-                    .tag(1)
+                    .padding(.top, 8)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .padding(.top, 8)
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
@@ -65,6 +70,7 @@ public struct AmityPastEventsPage: AmityPageView {
                 tabs = [AmityLocalizedStringSet.Social.eventListTabAll.localizedString, AmityLocalizedStringSet.Social.eventListTabHosting.localizedString]
             } else {
                 tabs = [AmityLocalizedStringSet.Social.eventListTabAll.localizedString]
+                tabIndex = 0
             }
         }
     }
@@ -88,7 +94,7 @@ public struct AmityPastEventsPage: AmityPageView {
         ScrollView(.vertical, showsIndicators: false) {
             HostingEventComponent(viewModel: hostingEventFeed)
                 .onAppear {
-                    hostingEventFeed.loadEvents(eventStatus: .ended, originId: nil, orderBy: .descending)
+                    hostingEventFeed.loadEvents(eventStatus: .ended, originId: nil, userId: AmityUIKit4Manager.client.currentUserId, orderBy: .descending)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)

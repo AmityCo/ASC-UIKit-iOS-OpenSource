@@ -7,6 +7,7 @@
 
 import Foundation
 import AmitySDK
+import Combine
 
 // Work In Progress: Decoupled class which provides list of users to mention from live collection.
 class MentionListProvider {
@@ -38,9 +39,20 @@ class MentionListProvider {
     // If sdk is searching for provided display name
     public var mentionList: [AmityMentionUserModel] = []
     private var currentSearchText: String = ""
-    
+
+    // True from the moment a search is issued until its first page settles.
+    public private(set) var isLoading = false {
+        didSet {
+            guard isLoading != oldValue else { return }
+            didChangeLoadingState?(isLoading)
+        }
+    }
+    private var loadingGeneration = 0
+    private var loadingStatusCancellable: AnyCancellable?
+
     // Callback
     public var didGetMentionList: (([AmityMentionUserModel]) -> Void)?
+    public var didChangeLoadingState: ((Bool) -> Void)?
 
     public init(type: MentionManagerType) {
         self.mentionType = type
@@ -118,6 +130,33 @@ class MentionListProvider {
         channelMembersCollection = nil
         usersCollection = nil
         communityMembersCollection = nil
+
+        loadingGeneration += 1
+        loadingStatusCancellable = nil
+        isLoading = false
+    }
+
+    private func trackLoading<T>(of collection: AmityCollection<T>?) {
+        loadingGeneration += 1
+        let generation = loadingGeneration
+        isLoading = collection != nil
+
+        // A new collection reports `.notLoading` until its request starts, so wait for `.loading` first.
+        // Settling on the status covers searches that end without an `observe` callback (errors, and
+        // empty results for an empty keyword), which would otherwise leave the skeleton up.
+        loadingStatusCancellable = collection?.$loadingStatus
+            .drop(while: { $0 != .loading })
+            .first(where: { $0 != .loading })
+            .sink { [weak self] _ in
+                // The page's results reach `observe` one main-queue hop after the status settles;
+                // hop past them so the list never renders empty in between.
+                DispatchQueue.main.async {
+                    DispatchQueue.main.async {
+                        guard let self, self.loadingGeneration == generation else { return }
+                        self.isLoading = false
+                    }
+                }
+            }
     }
     
     private func setupCommunity(withId communityId: String) {
@@ -147,6 +186,7 @@ class MentionListProvider {
         mentionListToken = channelMembersCollection?.observe({ [weak self] liveCollection, error in
             self?.handleSearchResponse(with: liveCollection)
         })
+        trackLoading(of: channelMembersCollection)
     }
     
     private func searchUsers(with displayName: String) {
@@ -157,6 +197,7 @@ class MentionListProvider {
         mentionListToken = usersCollection?.observe { [weak self] liveCollection, error in
             self?.handleSearchResponse(with: liveCollection)
         }
+        trackLoading(of: usersCollection)
     }
     
     private func searchCommunityMembers(with displayName: String, communityId: String) {
@@ -167,6 +208,7 @@ class MentionListProvider {
         mentionListToken = communityMembersCollection?.observe { [weak self] liveCollection, error in
             self?.handleSearchResponse(with: liveCollection)
         }
+        trackLoading(of: communityMembersCollection)
     }
     
     private func handleSearchResponse<T>(with collection: AmityCollection<T>) {

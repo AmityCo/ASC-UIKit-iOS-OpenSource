@@ -117,12 +117,14 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
     /// Every combination resolves to a state — the previous chain matched none for `.notLoading`
     /// and fell through to an empty list, which is why the area rendered blank with no explanation.
     private var listState: ListState {
-        if viewModel.loadingStatus == .loading { return .loading }
-        if !viewModel.searchedUsers.isEmpty { return .users }
-
         let keyword = viewModel.searchKeyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        // A 1–2 character search keeps the hint instead of flashing the skeleton.
+        let isShortKeyword = !keyword.isEmpty && keyword.count < 3
+
+        if viewModel.loadingStatus == .loading && !isShortKeyword { return .loading }
+        if !viewModel.searchedUsers.isEmpty { return .users }
         if keyword.isEmpty { return .noUsersAvailable }
-        return keyword.count < 3 ? .needMoreCharacters : .noResults
+        return isShortKeyword ? .needMoreCharacters : .noResults
     }
 
     private var navigationBarView: some View {
@@ -348,10 +350,21 @@ class AmityCommunityInviteMemberPageViewModel: ObservableObject {
     private var userCancellable: AnyCancellable?
     private var searchKeywordCancellable: AnyCancellable?
     private var loadingStatusCancellable: AnyCancellable?
+    private var pendingSearchCancellable: AnyCancellable?
     
     init() {
-        searchKeywordCancellable = $searchKeyword
-            .removeDuplicates()
+        let keyword = $searchKeyword.removeDuplicates()
+
+        // The search is pending from the keystroke, not from the debounce, and a late status for
+        // the previous keyword must not settle it as "No results found".
+        pendingSearchCancellable = keyword
+            .dropFirst()
+            .sink(receiveValue: { [weak self] _ in
+                self?.loadingStatusCancellable = nil
+                self?.loadingStatus = .loading
+            })
+
+        searchKeywordCancellable = keyword
             .debounce(for: 0.5, scheduler: DispatchQueue.main)
             .sink(receiveValue: { [weak self] value in
                 guard let self else { return }
@@ -369,7 +382,9 @@ class AmityCommunityInviteMemberPageViewModel: ObservableObject {
                 self?.searchedUsers = users.map { AmityUserModel(user: $0) }
             })
         
+        // A new collection reports `.notLoading` until its first request starts.
         loadingStatusCancellable = userCollection?.$loadingStatus
+            .drop(while: { $0 != .loading })
             .sink(receiveValue: { [weak self] status in
                 self?.loadingStatus = status
             })

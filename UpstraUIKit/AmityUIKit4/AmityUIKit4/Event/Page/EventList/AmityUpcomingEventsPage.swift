@@ -55,15 +55,20 @@ public struct AmityUpcomingEventsPage: AmityPageView {
                 .padding(.top, 16)
             }
             
-            TabView(selection: $tabIndex) {
+            if allEventFeed.hasCreatePermission {
+                TabView(selection: $tabIndex) {
+                    allEventList
+                        .tag(0)
+                    
+                    hostingEventList
+                        .tag(1)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .padding(.top, 8)
+            } else {
                 allEventList
-                    .tag(0)
-                
-                hostingEventList
-                    .tag(1)
+                    .padding(.top, 8)
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .padding(.top, 8)
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
@@ -75,6 +80,7 @@ public struct AmityUpcomingEventsPage: AmityPageView {
                 tabs = [AmityLocalizedStringSet.Social.eventListTabAll.localizedString, AmityLocalizedStringSet.Social.eventListTabHosting.localizedString]
             } else {
                 tabs = [AmityLocalizedStringSet.Social.eventListTabAll.localizedString]
+                tabIndex = 0
             }
         }
     }
