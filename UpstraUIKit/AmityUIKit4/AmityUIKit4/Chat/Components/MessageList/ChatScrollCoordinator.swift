@@ -56,7 +56,12 @@ final class ChatScrollCoordinator: ObservableObject {
     private var userIsDragging = false
     private var isPrepending = false
     private var lastBoundsHeight: CGFloat = 0
+    private var lastContentHeight: CGFloat = 0
     private var settleWorkItems: [DispatchWorkItem] = []
+    /// One follow per runloop turn. Several triggers (size + bounds + settle) can
+    /// fire in the same frame; queueing a scrollTo for each made them land on
+    /// different LazyVStack height estimates and flip the list (SLE-1342).
+    private var isFollowQueued = false
 
     /// The single source of truth for "stick to the bottom?".
     private var autoFollow: Bool { !hasUserScrolled || isNearBottom }
@@ -89,6 +94,7 @@ final class ChatScrollCoordinator: ObservableObject {
 
         scrollView = sv
         lastBoundsHeight = sv.bounds.height
+        lastContentHeight = sv.contentSize.height
 
         sv.panGestureRecognizer.addTarget(self, action: #selector(handlePan(_:)))
 
@@ -97,9 +103,17 @@ final class ChatScrollCoordinator: ObservableObject {
             self?.offsetChanged(sv)
         }
         // contentSize grows (new message / media bubble settle) → re-follow.
-        sizeObs = sv.observe(\.contentSize, options: [.new]) { [weak self] _, _ in
-            self?.followIfNeeded()
-            self?.scheduleSettleFollow()
+        // KVO fires on every contentSize ASSIGNMENT, not only on change. On iOS 18
+        // each proxy.scrollTo makes SwiftUI re-assign the same contentSize, so
+        // reacting to unchanged values was a self-sustaining scroll loop (~60 Hz,
+        // SLE-1342). Only a real height change counts.
+        sizeObs = sv.observe(\.contentSize, options: [.new]) { [weak self] sv, _ in
+            guard let self else { return }
+            let h = sv.contentSize.height
+            guard abs(h - self.lastContentHeight) > 0.5 else { return }
+            self.lastContentHeight = h
+            self.followIfNeeded()
+            self.scheduleSettleFollow()
         }
         // viewport height changes (keyboard avoidance, rotation) → re-follow.
         boundsObs = sv.observe(\.bounds, options: [.new]) { [weak self] sv, _ in
@@ -161,7 +175,40 @@ final class ChatScrollCoordinator: ObservableObject {
 
     private func followIfNeeded() {
         guard autoFollow, !userIsDragging, !isPrepending else { return }
-        requestScrollToBottom?(false)
+        guard !isFollowQueued else { return }
+        isFollowQueued = true
+        // Decide on the next runloop turn, after this layout pass has settled,
+        // and skip the scroll entirely when the viewport is already at the bottom.
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.isFollowQueued = false
+            guard self.autoFollow, !self.userIsDragging, !self.isPrepending else { return }
+            guard let sv = self.scrollView else {
+                self.requestScrollToBottom?(false)
+                return
+            }
+            let distance = self.distanceFromBottom(sv)
+            if distance <= 1 { return }
+            if distance < sv.bounds.height {
+                // The bottom rows are already realized, so the raw bottom offset is
+                // exact. proxy.scrollTo here re-resolves the anchor against
+                // LazyVStack's ESTIMATED heights and on iOS 18 first lands hundreds
+                // of points up before snapping back — the visible flip (SLE-1342).
+                self.pinToBottom(sv)
+            } else {
+                // Far from the bottom (cold load, rebuild): rows are unrealized, so
+                // let the proxy realize the target row (raw offset would blank).
+                self.requestScrollToBottom?(false)
+            }
+        }
+    }
+
+    private func pinToBottom(_ sv: UIScrollView) {
+        let inset = sv.adjustedContentInset
+        let maxY = sv.contentSize.height + inset.bottom - sv.bounds.height
+        let y = max(-inset.top, maxY)
+        guard abs(sv.contentOffset.y - y) > 0.5 else { return }
+        sv.setContentOffset(CGPoint(x: sv.contentOffset.x, y: y), animated: false)
     }
 
     /// Bounded, re-arming re-follow. Each call cancels the prior schedule so the

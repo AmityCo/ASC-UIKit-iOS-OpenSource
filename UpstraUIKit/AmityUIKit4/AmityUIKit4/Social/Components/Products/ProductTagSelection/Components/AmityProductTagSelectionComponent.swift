@@ -173,7 +173,7 @@ public struct AmityProductTagSelectionComponent: AmityComponentView {
                                 componentId: id
                             )
                             .padding(.top, keyboardHeight > 0 ? max(16, 150 - keyboardHeight) : 150)
-                        } else if viewModel.loadingStatus == .loading && viewModel.products.isEmpty {
+                        } else if viewModel.isLoading && viewModel.products.isEmpty {
                             // Loading state
                             ForEach(0..<5, id: \.self) { _ in
                                 ProductItemSkeletonView()
@@ -369,7 +369,7 @@ class ProductTagSelectionViewModel: ObservableObject {
     private let productManager = ProductManager()
     private var productCollection: AmityCollection<AmityProduct>?
     private var collectionCancellables = Set<AnyCancellable>()
-    private var searchCancellable: AnyCancellable? = nil
+    private var searchCancellables = Set<AnyCancellable>()
     private let initialSelection: [AmityProduct]
     private let existingProducts: Set<String>
     private let mode: AmityProductTagSelectionMode
@@ -377,7 +377,7 @@ class ProductTagSelectionViewModel: ObservableObject {
     @Published var searchKeyword: String = ""
     @Published var products: [AmityProduct] = []
     @Published var selectedProducts: [AmityProduct] = []
-    @Published var loadingStatus: AmityLoadingStatus = .notLoading
+    @Published var isLoading: Bool = false
 
     var maxSelectionLimit: Int {
         switch mode {
@@ -400,12 +400,29 @@ class ProductTagSelectionViewModel: ObservableObject {
         self.mode = mode
         self.selectedProducts = initialSelection
 
-        searchCancellable = $searchKeyword
+        let keyword = $searchKeyword
+            .removeDuplicates()
+            .dropFirst()
+
+        // Show the loading state on every keystroke so the previous result can't flash "No results" during the debounce.
+        keyword
+            .sink { [weak self] keyword in
+                guard let self, keyword.count >= 2,
+                      AmityUIKitConfigController.shared.isFeatureEnabled(AmityUIKitFeature.product) else { return }
+                self.collectionCancellables.removeAll()
+                self.productCollection = nil
+                self.products = []
+                self.isLoading = true
+            }
+            .store(in: &searchCancellables)
+
+        keyword
             .debounce(for: 0.3, scheduler: DispatchQueue.main)
             .sink { [weak self] keyword in
                 guard let self else { return }
                 self.searchProducts(keyword)
             }
+            .store(in: &searchCancellables)
     }
 
     private func searchProducts(_ keyword: String) {
@@ -414,6 +431,7 @@ class ProductTagSelectionViewModel: ObservableObject {
             products = []
             collectionCancellables.removeAll()
             productCollection = nil
+            isLoading = false
             return
         }
         
@@ -430,9 +448,12 @@ class ProductTagSelectionViewModel: ObservableObject {
             }
             .store(in: &collectionCancellables)
 
+        // A new collection reports .notLoading before its first request, so only a finished request ends loading.
         productCollection?.$loadingStatus
             .sink { [weak self] status in
-                self?.loadingStatus = status
+                guard let self, status == .loaded || status == .error else { return }
+                self.products = self.productCollection?.snapshots ?? self.products
+                self.isLoading = false
             }
             .store(in: &collectionCancellables)
     }

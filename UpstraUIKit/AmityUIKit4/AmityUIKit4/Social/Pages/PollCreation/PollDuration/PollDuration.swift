@@ -263,11 +263,17 @@ class Formatters {
         return AmityLocalizedStringSet.Social.eventDateTimeFormat.localized(arguments: dateString, timeString)
     }
 
+    /// Hour and minute pattern that follows the device's 12/24-hour setting
+    /// (e.g. "h:mm a" or "HH:mm"). The "j" template symbol resolves to the user's preferred hour format.
+    private static var eventTimePattern: String {
+        DateFormatter.dateFormat(fromTemplate: "jmm", options: 0, locale: Locale.current) ?? "HH:mm"
+    }
+
     static var eventTimeFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.current
         dateFormatter.timeZone = TimeZone.current
-        dateFormatter.dateFormat = "HH:mm" // 24 Sep at 9:41 AM
+        dateFormatter.dateFormat = eventTimePattern // 9:41 AM or 09:41
         return dateFormatter
     }()
     
@@ -275,7 +281,7 @@ class Formatters {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale.current
         dateFormatter.timeZone = TimeZone.current
-        dateFormatter.dateFormat = "d MMM yyyy, HH:mm" // 24 Sep at 9:41 AM
+        dateFormatter.dateFormat = "d MMM yyyy, \(eventTimePattern)" // 24 Sep 2026, 9:41 AM
         return dateFormatter
     }()
  }

@@ -39,11 +39,12 @@ public struct AmityAddGroupMemberPage: AmityPageView {
                 AmityDivider(variant: .post, viewConfig: viewConfig)
             }
 
-            if viewModel.isLoading && viewModel.users.isEmpty {
-                skeletonList
-            } else if viewModel.users.isEmpty {
+            if viewModel.users.isEmpty {
                 let trimmed = viewModel.searchKeyword.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmed.count < 3 {
+                // A 1–2 character search keeps the hint instead of flashing the skeleton.
+                if viewModel.isLoading && (trimmed.isEmpty || trimmed.count >= 3) {
+                    skeletonList
+                } else if trimmed.count < 3 {
                     initialSearchState
                 } else {
                     emptyState
@@ -327,11 +328,24 @@ final class AmityAddGroupMemberViewModel: ObservableObject {
     }
 
     private func observeKeyword() {
-        $searchKeyword
+        let keyword = $searchKeyword
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .removeDuplicates()
+            .dropFirst()
+
+        // The search is pending from the keystroke, not from the debounce, and a late response
+        // for the previous keyword must not settle it as "No results found".
+        keyword
+            .sink { [weak self] _ in
+                self?.token?.invalidate()
+                self?.isLoading = true
+            }
+            .store(in: &cancellables)
+
+        keyword
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { [weak self] keyword in
+            .sink { [weak self] trimmed in
                 guard let self else { return }
-                let trimmed = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
                 self.collection = trimmed.isEmpty
                     ? self.userManager.getUsers()
                     : self.userManager.searchUsers(keyword: trimmed, sortBy: .displayName)

@@ -15,7 +15,7 @@ final class AmityChatPageViewModel: ObservableObject {
     @Published var avatarURL: URL?
     @Published var otherUserId: String?
     @Published var isBlocked: Bool = false
-    @Published var isMuted: Bool = false
+    @Published var isNotificationsEnabled: Bool = true
     @Published var isReportedByMe: Bool = false
     @Published var isLoadingHeader: Bool = true
     @Published var isOtherUserDeleted: Bool = false
@@ -51,8 +51,8 @@ final class AmityChatPageViewModel: ObservableObject {
                 self.displayName = ch.displayName ?? ""
                 self.avatarURL = ch.resolvedChannelAvatarURL()
             }
-            self.isMuted = ch.isMuted
         }
+        loadNotificationStatus()
 
         let currentUserId = AmityUIKitManagerInternal.shared.client.currentUserId ?? ""
         let membersCollection = channelManager.getMembers(channelId: channelId)
@@ -137,16 +137,27 @@ final class AmityChatPageViewModel: ObservableObject {
 
     // MARK: - Mute / Unmute
 
+    // AmityChannel.isMuted is the moderator mute, not this user's notification setting.
+    private func loadNotificationStatus() {
+        let manager = channelManager.notificationManager(channelId: channelId)
+        Task {
+            do {
+                let settings = try await manager.getSettings()
+                self.isNotificationsEnabled = settings.isEnabled
+            } catch { }
+        }
+    }
+
     func muteChannel() async throws {
         let manager = channelManager.notificationManager(channelId: channelId)
         try await manager.disable()
-        isMuted = true
+        isNotificationsEnabled = false
     }
 
     func unmuteChannel() async throws {
         let manager = channelManager.notificationManager(channelId: channelId)
         try await manager.enable()
-        isMuted = false
+        isNotificationsEnabled = true
     }
 
     // MARK: - Report / Unreport user
@@ -236,13 +247,13 @@ public struct AmityChatPage: AmityPageView {
         }
         .bottomSheet(isShowing: $showActionSheet, height: .contentSize, backgroundColor: Color(viewConfig.color(.surfaceSheetsBackgroundGeneral))) {
             AmityConversationChatUserActionComponent(
-                isMuted: pageViewModel.isMuted,
+                isMuted: !pageViewModel.isNotificationsEnabled,
                 isReportedByMe: pageViewModel.isReportedByMe,
                 isBlocked: pageViewModel.isBlocked,
                 pageId: .chatPage,
                 onMuteUnmute: {
                     showActionSheet = false
-                    if pageViewModel.isMuted {
+                    if !pageViewModel.isNotificationsEnabled {
                         Task {
                             do {
                                 try await pageViewModel.unmuteChannel()

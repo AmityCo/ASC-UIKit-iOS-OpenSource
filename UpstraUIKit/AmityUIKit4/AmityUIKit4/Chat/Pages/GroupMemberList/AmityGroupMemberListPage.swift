@@ -61,15 +61,31 @@ final class AmityGroupMemberListViewModel: ObservableObject {
         filterBuilder.add(filter: .member)
         filterBuilder.add(filter: .mute)
         collection = channelManager.searchMembers(channelId: channelId, displayName: "", filterBuilder: filterBuilder, roles: roles)
-        observeCollection()
+        observeCollection(keyword: "")
     }
 
     private func observeSearch() {
-        $searchText
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { [weak self] keyword in
+        let keyword = $searchText
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .removeDuplicates()
+            .dropFirst()
+
+        // The search is pending from the keystroke, not from the debounce, and a late response
+        // for the previous keyword must not settle it as "No results found".
+        keyword
+            .sink { [weak self] _ in
                 guard let self else { return }
-                self.performSearch(keyword: keyword.trimmingCharacters(in: .whitespacesAndNewlines))
+                self.token?.invalidate()
+                self.members = []
+                self.isLoading = true
+            }
+            .store(in: &cancellables)
+
+        keyword
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { [weak self] trimmed in
+                guard let self else { return }
+                self.performSearch(keyword: trimmed)
             }
             .store(in: &cancellables)
     }
@@ -81,10 +97,10 @@ final class AmityGroupMemberListViewModel: ObservableObject {
         filterBuilder.add(filter: .member)
         filterBuilder.add(filter: .mute)
         collection = channelManager.searchMembers(channelId: channelId, displayName: keyword, filterBuilder: filterBuilder, roles: roles)
-        observeCollection()
+        observeCollection(keyword: keyword)
     }
 
-    private func observeCollection() {
+    private func observeCollection(keyword: String) {
         token?.invalidate()
         token = collection?.observe { [weak self] col, _ in
             guard let self else { return }
@@ -98,7 +114,8 @@ final class AmityGroupMemberListViewModel: ObservableObject {
                 if self.activeTab == .moderators && !synth.roles.contains("channel-moderator") { return nil }
                 return synth
             }()
-            let me = meFromSnapshot ?? synthEligible
+            // While searching, the current user is listed only if the search returned them.
+            let me = meFromSnapshot ?? (keyword.isEmpty ? synthEligible : nil)
             self.members = (me.map { [$0] } ?? []) + others
             self.isLoading = false
         }

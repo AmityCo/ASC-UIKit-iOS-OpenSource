@@ -396,6 +396,16 @@ extension View {
             self
         }
     }
+
+    /// Lets the user drag the keyboard down by scrolling. iOS 16+ only; no-op on earlier versions.
+    @ViewBuilder
+    func dismissKeyboardOnScroll() -> some View {
+        if #available(iOS 16.0, *) {
+            self.scrollDismissesKeyboard(.interactively)
+        } else {
+            self
+        }
+    }
 }
 
 class WindowFrameCaptureUIView: UIView {

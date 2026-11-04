@@ -53,12 +53,25 @@ final class AmityBannedGroupMemberListViewModel: ObservableObject {
     }
 
     private func observeSearch() {
-        $searchText
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+        let keyword = $searchText
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .removeDuplicates()
-            .sink { [weak self] keyword in
+            .dropFirst()
+
+        // The search is pending from the keystroke, not from the debounce, and a late response
+        // for the previous keyword must not settle it as "No results found".
+        keyword
+            .sink { [weak self] _ in
+                self?.token?.invalidate()
+                self?.isLoading = true
+            }
+            .store(in: &cancellables)
+
+        keyword
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { [weak self] trimmed in
                 guard let self else { return }
-                self.loadBannedMembers(query: keyword.trimmingCharacters(in: .whitespacesAndNewlines))
+                self.loadBannedMembers(query: trimmed)
             }
             .store(in: &cancellables)
     }

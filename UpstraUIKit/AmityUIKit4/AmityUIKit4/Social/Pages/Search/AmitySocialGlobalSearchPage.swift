@@ -64,11 +64,9 @@ public struct AmitySocialGlobalSearchPage: AmityPageView {
                     .onChange(of: tabIndex) { value in
                         // Read from the gated list, never from a fixed index:
                         // dropping a tab shifts every index after it.
-                        viewModel.searchType = searchTypes.indices.contains(value)
+                        viewModel.changeSearchType(searchTypes.indices.contains(value)
                             ? searchTypes[value]
-                            : (searchTypes.first ?? .user)
-                        
-                        viewModel.searchKeyword = viewModel.searchKeyword
+                            : (searchTypes.first ?? .user))
                     }
                     .padding(.horizontal)
                 

@@ -110,7 +110,7 @@ public struct AmityCommunityCommentsNotificationSettingPage: AmityPageView {
                                 host.controller?.navigationController?.popViewController(animated: true)
                             }
                         } catch {
-                            Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityProfileUpdateFailedToast.localizedString)
+                            Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityProfileUpdateFailedToast.localizedString)
                         }
                     }
                 }

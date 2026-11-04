@@ -30,10 +30,8 @@ public struct AmityCommunityNotificationSettingPage: AmityPageView {
             navigationBarView
                 .padding([.top, .bottom], 16)
             
-            SettingToggleButtonView(isEnabled: $viewModel.isNotificationEnabled, title: AmityLocalizedStringSet.Social.communityNotificationSettingTitle.localizedString, description: AmityLocalizedStringSet.Social.communityNotificationSettingDescription.localizedString)
-                .onChange(of: viewModel.isNotificationEnabled) { _ in
-                    viewModel.updateSetting()
-                }
+            // Save from the binding's setter, not onChange: onChange also fires when the fetched setting lands.
+            SettingToggleButtonView(isEnabled: Binding(get: { viewModel.isNotificationEnabled }, set: { viewModel.updateSetting(isEnabled: $0) }), title: AmityLocalizedStringSet.Social.communityNotificationSettingTitle.localizedString, description: AmityLocalizedStringSet.Social.communityNotificationSettingDescription.localizedString)
             
             Rectangle()
                 .frame(height: 1)
@@ -148,12 +146,18 @@ class AmityCommunityNotificationSettingPageViewModel: ObservableObject {
         }
     }
     
-    func updateSetting() {
+    func updateSetting(isEnabled: Bool) {
+        isNotificationEnabled = isEnabled
         Task {
-            if isNotificationEnabled {
-                try? await notificationManger.enableNotificationSetting(withId: community.communityId, events: [])
-            } else {
-                try? await notificationManger.disableNotificationSetting(withId: community.communityId)
+            do {
+                if isEnabled {
+                    try await notificationManger.enableNotificationSetting(withId: community.communityId, events: [])
+                } else {
+                    try await notificationManger.disableNotificationSetting(withId: community.communityId)
+                }
+                Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.communityUpdateSuccessToastMessage.localizedString)
+            } catch {
+                Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.communityProfileUpdateFailedToast.localizedString)
             }
             
             try await self.isSocialNetworkEnabled()

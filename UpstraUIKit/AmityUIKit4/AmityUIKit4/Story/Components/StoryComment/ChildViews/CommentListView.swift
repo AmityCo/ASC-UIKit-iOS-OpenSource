@@ -50,6 +50,7 @@ struct CommentListView<Content>: View where Content: View {
                 }
             }
             .coordinateSpace(name: "scroll")
+            .dismissKeyboardOnScroll()
             .onPreferenceChange(ScrollOffsetKey.self) { offsetY in
                 if commentCoreViewModel.hasScrolledToTop != (offsetY < -1) {
                     commentCoreViewModel.hasScrolledToTop.toggle()

@@ -87,11 +87,25 @@ final class AmitySearchChannelViewModel: ObservableObject {
     // MARK: - Debounced keyword
 
     private func observeKeyword() {
-        $searchKeyword
+        let keyword = $searchKeyword
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .removeDuplicates()
+            .dropFirst()
+
+        // The search is pending from the keystroke, not from the debounce, and a late response
+        // for the previous keyword must not settle it as "No results found".
+        keyword
+            .sink { [weak self] trimmed in
+                guard let self, trimmed.count >= 3 else { return }
+                self.cleanup()
+                self.isLoading = true
+            }
+            .store(in: &cancellables)
+
+        keyword
             .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { [weak self] keyword in
+            .sink { [weak self] trimmed in
                 guard let self else { return }
-                let trimmed = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
                 if trimmed.isEmpty || trimmed.count < 3 {
                     self.cleanup()
                     self.channels = []
