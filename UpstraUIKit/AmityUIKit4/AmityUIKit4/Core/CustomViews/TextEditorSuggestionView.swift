@@ -199,6 +199,7 @@ public struct TextEditorSuggestionView: View {
             // Results state
             ForEach(Array(viewModel.users.enumerated()), id: \.element.userId) { index, user in
                 UserSuggestionRow(user: user)
+                    .accessibilityIdentifier(AccessibilityID.MentionSuggestion.userRow)
                     .onTapGesture {
                         viewModel.onUserSelected(user)
                     }

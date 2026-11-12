@@ -256,6 +256,7 @@ public struct AmityChatMessageComposeBar: AmityComponentView {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .keyboardTapOutsideSkip()
         .updateTheme(with: viewConfig)
         .onChange(of: isEditing) { editing in
             if editing && showMediaSection {

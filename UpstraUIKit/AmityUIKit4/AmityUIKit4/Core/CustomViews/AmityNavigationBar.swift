@@ -129,6 +129,7 @@ struct AmityNavigationBar: View {
                         .padding(.horizontal, 8)
                         .lineLimit(1)
                         .layoutPriority(2)
+                        .accessibilityIdentifier(AccessibilityID.NavigationBar.title)
                 }
 
                 HStack {
@@ -153,6 +154,7 @@ struct AmityNavigationBar: View {
                     .padding(.horizontal, -16)
             }
         }
+        .keyboardTapOutsideSkip()
     }
     
     struct BackButton: View {

@@ -78,6 +78,11 @@ struct AmityChatContentReportInputPage: View {
     }
 
     private var navBar: some View {
+        navBarContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var navBarContent: some View {
         VStack(spacing: 0) {
             ZStack {
                 Text(AmityLocalizedStringSet.Social.reportReasonOthersPageTitle.localizedString)

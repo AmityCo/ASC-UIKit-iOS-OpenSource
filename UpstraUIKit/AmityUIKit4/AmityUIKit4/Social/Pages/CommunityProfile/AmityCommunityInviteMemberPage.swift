@@ -128,6 +128,11 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
     }
 
     private var navigationBarView: some View {
+        navigationBarContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var navigationBarContent: some View {
         HStack(spacing: 0) {
             Image(AmityIcon.closeIcon.getImageResource())
                 .renderingMode(.template)
@@ -154,6 +159,11 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
     
     
     private var searchUserView: some View {
+        searchUserViewBox
+            .keyboardTapOutsideSkip()
+    }
+
+    private var searchUserViewBox: some View {
         HStack(spacing: 8) {
             Image(AmityIcon.searchIcon.getImageResource())
                 .renderingMode(.template)
@@ -162,10 +172,12 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 .frame(width: 20, height: 16)
                 .padding(.leading, 12)
+                .accessibilityIdentifier(AccessibilityID.SearchBar.icon)
             
             ZStack(alignment: .trailing) {
                 TextField(AmityLocalizedStringSet.Social.searchUserPlaceholder.localizedString, text: $viewModel.searchKeyword)
                     .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                    .accessibilityIdentifier(AccessibilityID.SearchBar.textField)
                 
                 Button(
                     action: {

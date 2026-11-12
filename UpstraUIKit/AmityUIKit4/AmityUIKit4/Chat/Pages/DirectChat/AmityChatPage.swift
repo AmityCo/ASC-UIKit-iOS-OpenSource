@@ -362,6 +362,11 @@ public struct AmityChatPage: AmityPageView {
     }
 
     private var dmHeader: some View {
+        dmHeaderContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var dmHeaderContent: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Button {

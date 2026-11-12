@@ -94,6 +94,7 @@ public struct AmityEventSetupPage: AmityPageView {
                 case .edit:
                     Text(AmityLocalizedStringSet.Social.eventSetupEditEventTitle.localizedString)
                         .applyTextStyle(.titleBold(Color(viewConfig.theme.baseColor)))
+                        .accessibilityIdentifier(AccessibilityID.NavigationBar.title)
                 }
             }, leading: {
                 switch mode {
@@ -216,6 +217,7 @@ public struct AmityEventSetupPage: AmityPageView {
         }
         .sheet(isPresented: $sheetHandler.isSheetEnabled, content: {
             sheetHandler.getDestination()
+                .dismissKeyboardOnTapOutside()
         })
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)

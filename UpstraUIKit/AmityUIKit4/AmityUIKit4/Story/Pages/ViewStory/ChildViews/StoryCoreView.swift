@@ -143,6 +143,7 @@ struct StoryCoreView: View, AmityViewIdentifiable {
         .padding(.bottom, 25)
         .sheet(isPresented: $showCommentTray) {
             getCommentSheetView()
+                .dismissKeyboardOnTapOutside()
         }
         .bottomSheet(isShowing: $showBottomSheet, height: .contentSize, sheetContent: {
             getBottomSheetView()

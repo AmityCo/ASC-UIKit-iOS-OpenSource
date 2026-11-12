@@ -36,6 +36,7 @@ struct AmityMentionUserListView: View {
             }
         }
         .frame(height: listHeight)
+        .keyboardTapOutsideSkip()
     }
     
     struct Configuration: UIKitConfigurable {

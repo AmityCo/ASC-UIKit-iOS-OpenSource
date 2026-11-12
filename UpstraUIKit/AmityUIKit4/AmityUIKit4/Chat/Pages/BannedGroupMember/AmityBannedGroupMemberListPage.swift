@@ -149,6 +149,11 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
     // MARK: - Nav Bar
 
     private var navBar: some View {
+        navBarContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var navBarContent: some View {
         HStack(spacing: 10) {
             Button {
                 host.controller?.navigationController?.popViewController(animated: true)
@@ -181,6 +186,11 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
     // MARK: - Search Bar
 
     private var searchBar: some View {
+        searchBarBox
+            .keyboardTapOutsideSkip()
+    }
+
+    private var searchBarBox: some View {
         HStack(spacing: 8) {
             Image(AmityIcon.DesignSystem.searchR.imageResource)
                 .renderingMode(.template)
@@ -188,8 +198,10 @@ public struct AmityBannedGroupMemberListPage: AmityPageView {
                 .scaledToFit()
                 .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                 .frame(width: 14, height: 14)
+                .accessibilityIdentifier(AccessibilityID.SearchBar.icon)
             TextField(AmityLocalizedStringSet.Chat.BannedMembers.searchPlaceholder.localizedString, text: $viewModel.searchText)
                 .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
+                .accessibilityIdentifier(AccessibilityID.SearchBar.textField)
             if !viewModel.searchText.isEmpty {
                 Button { viewModel.searchText = "" } label: {
                     Image(AmityIcon.DesignSystem.crossR.imageResource)

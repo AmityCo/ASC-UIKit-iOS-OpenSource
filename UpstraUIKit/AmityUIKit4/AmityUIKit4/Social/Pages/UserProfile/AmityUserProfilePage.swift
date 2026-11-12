@@ -185,6 +185,7 @@ public struct AmityUserProfilePage: AmityPageView {
                     .foregroundColor(Color(viewConfig.theme.baseColor))
                     .frame(width: 24, height: 24)
             }
+            .accessibilityIdentifier(AccessibilityID.Social.UserProfile.menuButton)
         }
     }
     

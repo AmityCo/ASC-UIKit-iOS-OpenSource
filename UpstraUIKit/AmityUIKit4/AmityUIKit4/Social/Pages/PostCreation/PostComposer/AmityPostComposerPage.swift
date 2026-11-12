@@ -302,6 +302,7 @@ public struct AmityPostComposerPage: AmityPageView {
                     textEditorViewModel.suggestionViewModel.taggedProductIds = Set(productTags.map { $0.productId })
                 }
                 .onAppear {
+                    textEditorViewModel.textView.accessibilityIdentifier = AccessibilityID.Social.PostComposer.textField
                     // Set up product tag limit check closure
                     textEditorViewModel.canAddProductTag = { [weak viewModel] in
                         viewModel?.canAddMoreProductTags ?? false

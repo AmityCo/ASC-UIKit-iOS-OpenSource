@@ -241,6 +241,11 @@ public struct AmityEditGroupProfilePage: AmityPageView {
     }
 
     private var navBar: some View {
+        navBarContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var navBarContent: some View {
         ZStack {
             // Centered title
             Text(AmityLocalizedStringSet.Chat.EditGroupProfile.navbarTitle.localizedString)

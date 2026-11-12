@@ -31,7 +31,7 @@ public struct AmityPostTargetSelectionPage: AmityPageView {
     public var body: some View {
         VStack {
             let closeButton = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
-            HeaderView(title: viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? "", closeIcon: closeButton) {
+            HeaderView(title: viewConfig.getConfig(elementId: .title, key: "text", of: String.self).flatMap { $0.isEmpty ? nil : $0 } ?? AmityLocalizedStringSet.Social.postTo.localizedString, closeIcon: closeButton) {
                 if let navigationController = host.controller?.navigationController {
                     navigationController.dismiss(animated: true)
                 } else {

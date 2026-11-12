@@ -8,6 +8,20 @@
 import Foundation
 
 struct AccessibilityID {
+    struct MentionSuggestion {
+        static let userRow = "mention_suggestion/user_row"
+        static let commentUserRow = "comment_mention_list/user_row"
+    }
+
+    struct SearchBar {
+        static let icon = "search_bar/search_icon"
+        static let textField = "search_bar/text_field"
+    }
+
+    struct NavigationBar {
+        static let title = "navigation_bar/title"
+    }
+
     
     struct Story {
         struct AmityStoryTabComponent {
@@ -121,6 +135,11 @@ struct AccessibilityID {
     }
     
     struct Chat {
+
+        struct ChatHome {
+            static let searchButton = "chat_home/search_button"
+            static let createButton = "chat_home/create_button"
+        }
 
         struct GroupChatHeader {
             static let container = "group_chat_header/*"
@@ -338,6 +357,12 @@ struct AccessibilityID {
             static let createNewPostButton = "create_new_post_button"
             static let editPostButton = "edit_post_button"
             static let editPostTitle = "edit_post_title"
+            static let textField = "post_composer/text_field"
+        }
+
+        struct PollComposer {
+            static let questionField = "poll_composer/question_field"
+            static let optionField = "poll_composer/option_field"
         }
         
         struct MediaAttachment {
@@ -437,6 +462,7 @@ struct AccessibilityID {
             static let userFeedTabButton = "user_feed_tab_button"
             static let userImageFeedTabButton = "user_image_feed_tab_button"
             static let userVideoFeedTabButton = "user_video_feed_tab_button"
+            static let menuButton = "user_profile/menu_button"
         }
         
         struct UserProfileHeader {

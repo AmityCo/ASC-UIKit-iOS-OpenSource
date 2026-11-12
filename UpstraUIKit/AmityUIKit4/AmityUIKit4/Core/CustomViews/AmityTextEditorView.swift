@@ -206,6 +206,7 @@ public struct AmityTextEditorView: View {
                                                 .padding([.leading, .trailing], 15)
                                                 .padding([.top, .bottom], 10)
                                                 .contentShape(Rectangle())
+                                                .accessibilityIdentifier(AccessibilityID.MentionSuggestion.commentUserRow)
                                                 .onTapGesture {
                                                     viewModel.selectMentionUser(user: user)
 
@@ -224,6 +225,7 @@ public struct AmityTextEditorView: View {
                                 }
                                 .frame(width: UIScreen.main.bounds.width, height: listHeight)
                                 .background(Color(backgroundColor))
+                                .keyboardTapOutsideSkip()
                                 .offset(y: getOverlayOffset(size: geometry.size, listHeight: listHeight, position: mentionListPosition))
                                 .isHidden(mentionedUsers.count == 0)
                             }
@@ -245,6 +247,10 @@ public struct AmityTextEditorView: View {
             }
         }
         .frame(height: textEditorHeight)
+        // Like the chat list: the mention list closes with the keyboard.
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            mentionedUsers = []
+        }
         .alert(isPresented: $viewModel.reachMentionLimit) {
             Alert(title: Text(AmityLocalizedStringSet.Social.reachMentionLimitTitle.localizedString),
                   message: Text(AmityLocalizedStringSet.Social.reachMentionLimitMessage.localizedString),
@@ -391,8 +397,9 @@ public class AmityTextEditorViewModel: ObservableObject {
             forName: UIResponder.keyboardWillHideNotification,
             object: nil,
             queue: .main
-        ) { _ in
+        ) { [weak self] _ in
             SuggestionOverlayWindow.updateKeyboardHeight(0)
+            self?.hideSuggestionView()
         }
     }
 

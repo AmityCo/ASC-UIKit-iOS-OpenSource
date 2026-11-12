@@ -20,6 +20,11 @@ struct AmityProductTagSelectionSearchBarElement: AmityElementView {
     @Binding var searchText: String
 
     var body: some View {
+        searchBarBox
+            .keyboardTapOutsideSkip()
+    }
+
+    private var searchBarBox: some View {
         AmityView(configId: configId,
                   config: { configDict -> String in
             let placeholder = configDict["placeholder"] as? String ?? AmityLocalizedStringSet.Social.searchByProductName.localizedString

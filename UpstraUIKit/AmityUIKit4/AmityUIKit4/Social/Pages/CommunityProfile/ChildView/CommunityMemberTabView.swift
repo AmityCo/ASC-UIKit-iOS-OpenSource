@@ -60,6 +60,11 @@ struct CommunityMemberTabView: View {
     }
     
     private var searchMemberView: some View {
+        searchMemberViewBox
+            .keyboardTapOutsideSkip()
+    }
+
+    private var searchMemberViewBox: some View {
         HStack(spacing: 8) {
             Image(AmityIcon.searchIcon.getImageResource())
                 .renderingMode(.template)
@@ -68,9 +73,11 @@ struct CommunityMemberTabView: View {
                 .foregroundColor(Color(viewConfig.theme.baseColorShade2))
                 .frame(width: 20, height: 16)
                 .padding(.leading, 12)
+                .accessibilityIdentifier(AccessibilityID.SearchBar.icon)
             
             TextField(AmityLocalizedStringSet.Social.searchMemberPlaceholder.localizedString, text: $viewModel.searchKeyword)
                 .applyTextStyle(.body(Color(viewConfig.theme.baseColor)))
+                .accessibilityIdentifier(AccessibilityID.SearchBar.textField)
         }
         .frame(height: 40)
         .background(Color(viewConfig.theme.baseColorShade4))

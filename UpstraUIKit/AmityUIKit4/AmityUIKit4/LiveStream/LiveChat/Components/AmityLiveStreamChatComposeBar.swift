@@ -84,6 +84,7 @@ public struct AmityLiveStreamChatComposeBar: AmityComponentView {
         // built a view config carrying its componentId and never asked.
     
         .updateTheme(with: viewConfig)
+        .keyboardTapOutsideSkip()
     }
     
     /// Right button that shows different actions based on the state of the chat compose bar.

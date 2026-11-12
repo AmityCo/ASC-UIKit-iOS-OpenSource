@@ -130,9 +130,11 @@ public struct AmityChatHomePage: AmityPageView {
                 nav.modalTransitionStyle = .coverVertical
                 host.controller?.present(nav, animated: true)
             }
+            .accessibilityIdentifier(AccessibilityID.Chat.ChatHome.searchButton)
             .padding(.trailing, 8)
 
             createChannelButton
+                .accessibilityIdentifier(AccessibilityID.Chat.ChatHome.createButton)
 
             Button {
                 withAnimation(.easeOut(duration: 0.15)) { activeNavMenu = .overflow }

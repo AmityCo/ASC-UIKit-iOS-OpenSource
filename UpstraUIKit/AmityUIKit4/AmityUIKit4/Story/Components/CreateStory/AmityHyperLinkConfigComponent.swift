@@ -165,6 +165,7 @@ public struct AmityHyperLinkConfigComponent: AmityComponentView {
             .isHidden(viewConfig.isHidden(elementId: .doneButtonElement))
         }
         .frame(height: 38)
+        .keyboardTapOutsideSkip()
     }
     
     func getRemoveLinkButton() -> some View {

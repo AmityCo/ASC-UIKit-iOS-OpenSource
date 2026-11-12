@@ -98,6 +98,11 @@ public struct AmityAddGroupMemberPage: AmityPageView {
     }
 
     private var navBar: some View {
+        navBarContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var navBarContent: some View {
         ZStack {
             Text(AmityLocalizedStringSet.Chat.AddGroupMember.navbarTitle.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))
@@ -170,6 +175,11 @@ public struct AmityAddGroupMemberPage: AmityPageView {
     }
 
     private var searchBar: some View {
+        searchBarBox
+            .keyboardTapOutsideSkip()
+    }
+
+    private var searchBarBox: some View {
         HStack(spacing: 8) {
             Image(AmityIcon.DesignSystem.searchR.imageResource)
                 .renderingMode(.template)
@@ -177,8 +187,10 @@ public struct AmityAddGroupMemberPage: AmityPageView {
                 .scaledToFit()
                 .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                 .frame(width: 20, height: 20)
+                .accessibilityIdentifier(AccessibilityID.SearchBar.icon)
             TextField(AmityLocalizedStringSet.Chat.AddGroupMember.searchPlaceholder.localizedString, text: $viewModel.searchKeyword)
                 .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
+                .accessibilityIdentifier(AccessibilityID.SearchBar.textField)
             if !viewModel.searchKeyword.isEmpty {
                 Button { viewModel.searchKeyword = "" } label: {
                     Image(AmityIcon.DesignSystem.clearR.imageResource)

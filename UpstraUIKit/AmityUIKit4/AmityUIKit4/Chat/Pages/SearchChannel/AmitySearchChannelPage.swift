@@ -59,6 +59,11 @@ public struct AmitySearchChannelPage: AmityPageView {
     // MARK: - Search bar
 
     private var searchBar: some View {
+        searchBarBox
+            .keyboardTapOutsideSkip()
+    }
+
+    private var searchBarBox: some View {
         HStack(spacing: 10) {
             HStack(spacing: 8) {
                 Image(AmityIcon.DesignSystem.searchR.imageResource)
@@ -67,15 +72,18 @@ public struct AmitySearchChannelPage: AmityPageView {
                     .scaledToFit()
                     .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                     .frame(width: 20, height: 20)
+                    .accessibilityIdentifier(AccessibilityID.SearchBar.icon)
 
                 Group {
                     if #available(iOS 15.0, *) {
                         TextField(AmityLocalizedStringSet.Chat.Search.placeholder.localizedString, text: $viewModel.searchKeyword)
                             .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
                             .submitLabel(.search)
+                            .accessibilityIdentifier(AccessibilityID.SearchBar.textField)
                     } else {
                         TextField(AmityLocalizedStringSet.Chat.Search.placeholder.localizedString, text: $viewModel.searchKeyword)
                             .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
+                            .accessibilityIdentifier(AccessibilityID.SearchBar.textField)
                     }
                 }
 

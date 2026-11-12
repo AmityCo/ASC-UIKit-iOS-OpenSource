@@ -388,6 +388,7 @@ struct MediaViewer: View {
                     media.altText = altText
                     Toast.showToast(style: .success, message: AmityLocalizedStringSet.Social.altTextUpdated.localizedString)
                 })
+                .dismissKeyboardOnTapOutside()
             }
         }
         .sheet(item: $selectedProductTagMedia) { media in

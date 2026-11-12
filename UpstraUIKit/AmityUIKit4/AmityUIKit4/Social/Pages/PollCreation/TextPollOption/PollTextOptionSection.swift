@@ -76,6 +76,7 @@ struct PollTextOptionView: View {
                 AmityMessageTextEditorView(viewModel, text: $option.text, mentionData: $mentionData, mentionedUsers: .constant([]), textViewHeight: 35)
                     .placeholder("\(AmityLocalizedStringSet.Social.pollOptionLabel.localizedString) \(option.index + 1)")
                     .characterLimit(maxCharCount)
+                    .accessibilityIdentifier(AccessibilityID.Social.PollComposer.optionField)
                     .padding([.horizontal], 12)
                     .padding([.vertical], 4)
                     .background(Color(viewConfig.theme.baseColorShade4))

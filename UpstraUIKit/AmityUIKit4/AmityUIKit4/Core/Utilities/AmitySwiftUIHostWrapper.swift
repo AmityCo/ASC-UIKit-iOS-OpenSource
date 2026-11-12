@@ -17,7 +17,9 @@ public class AmitySwiftUIHostWrapper: ObservableObject {
 }
 
 public class AmitySwiftUIHostingController<Content>: HostingController<ModifiedContent<Content,SwiftUI._EnvironmentKeyWritingModifier<AmitySwiftUIHostWrapper?>>> where Content : View {
-    
+
+    private let keyboardTapDismisser = AmityKeyboardTapDismisser()
+
     public init(rootView: Content) {
         let container = AmitySwiftUIHostWrapper()
         let modified = rootView.environmentObject(container) as! ModifiedContent<Content, _EnvironmentKeyWritingModifier<AmitySwiftUIHostWrapper?>>
@@ -27,6 +29,12 @@ public class AmitySwiftUIHostingController<Content>: HostingController<ModifiedC
   
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    /// Tapping anywhere except an input field or the navigation bar closes the keyboard.
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        keyboardTapDismisser.attach(to: view)
     }
 
     public override func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)? = nil) {

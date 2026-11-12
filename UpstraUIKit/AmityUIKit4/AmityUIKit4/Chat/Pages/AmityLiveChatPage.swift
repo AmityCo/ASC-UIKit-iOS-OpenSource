@@ -40,6 +40,7 @@ public struct AmityLiveChatPage: AmityPageView {
             // Header
             AmityLiveChatHeader(viewModel: viewModel)
                 .accessibilityIdentifier(AccessibilityID.Chat.LiveChatHeader.container)
+                .keyboardTapOutsideSkip()
             
             ZStack {
                 // List & composer

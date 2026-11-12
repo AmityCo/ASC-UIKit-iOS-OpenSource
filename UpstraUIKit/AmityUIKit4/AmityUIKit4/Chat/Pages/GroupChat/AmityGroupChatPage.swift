@@ -84,6 +84,11 @@ public struct AmityGroupChatPage: AmityPageView {
     }
 
     private var groupHeader: some View {
+        groupHeaderContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var groupHeaderContent: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 Button {

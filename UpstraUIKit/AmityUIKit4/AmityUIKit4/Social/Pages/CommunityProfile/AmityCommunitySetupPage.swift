@@ -367,6 +367,11 @@ public struct AmityCommunitySetupPage: AmityPageView {
     }
     
     private var navigationBarView: some View {
+        navigationBarContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var navigationBarContent: some View {
         HStack(spacing: 0) {
             Image(AmityIcon.closeIcon.getImageResource())
                 .renderingMode(.template)

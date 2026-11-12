@@ -170,6 +170,7 @@ public struct AmityPollPostComposerPage: AmityPageView {
                                 .enableHashtagHighlighting(true)
                                 .maxHashtagCount(30)
                                 .displayInlineSuggestionView(false)
+                                .accessibilityIdentifier(AccessibilityID.Social.PollComposer.questionField)
                                 .onChange(of: question) { newValue in
                                     validateInputs()
                                 }

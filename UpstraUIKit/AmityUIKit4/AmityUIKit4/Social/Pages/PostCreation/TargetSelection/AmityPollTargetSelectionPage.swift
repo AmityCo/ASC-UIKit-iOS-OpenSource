@@ -25,7 +25,7 @@ public struct AmityPollTargetSelectionPage: AmityPageView {
     
     public var body: some View {
         VStack {
-            let navTitle = viewConfig.getConfig(elementId: .title, key: "text", of: String.self) ?? ""
+            let navTitle = viewConfig.getConfig(elementId: .title, key: "text", of: String.self).flatMap { $0.isEmpty ? nil : $0 } ?? AmityLocalizedStringSet.Social.postTo.localizedString
             let closeIcon = viewConfig.getConfig(elementId: .closeButtonElement, key: "image", of: String.self) ?? ""
             AmityPostTargetSelectionPage.HeaderView(title: navTitle, closeIcon: closeIcon) {
                 if let navigationController = host.controller?.navigationController {

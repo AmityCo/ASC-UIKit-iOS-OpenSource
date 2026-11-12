@@ -114,8 +114,6 @@ public struct AmityPostDetailPage: AmityPageView {
                                 }
                             }
                         },viewModel: commentCoreViewModel, commentButtonAction: self.commentButtonAction(_:))
-                        // Simultaneous so it doesn't steal taps from buttons inside the list.
-                        .simultaneousGesture(TapGesture().onEnded { hideKeyboard() })
                         .bottomSheet(isShowing: $commentBottomSheetViewModel.sheetState.isShown,
                                      height: (commentBottomSheetViewModel.sheetState.comment?.isOwner ?? false || commentBottomSheetViewModel.hasDeletePermission) ? .fixed(204) : .fixed(148),
                                      backgroundColor: Color(viewConfig.theme.backgroundColor)) {

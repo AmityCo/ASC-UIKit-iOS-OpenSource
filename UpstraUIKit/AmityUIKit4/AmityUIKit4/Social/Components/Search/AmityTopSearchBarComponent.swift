@@ -29,6 +29,11 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
     }
     
     public var body: some View {
+        searchBarBox
+            .keyboardTapOutsideSkip()
+    }
+
+    private var searchBarBox: some View {
         HStack(spacing: 12) {
             AmityNavigationBar.BackButton(action: {
                 if let nav = host.controller?.navigationController {
@@ -58,6 +63,7 @@ public struct AmityTopSearchBarComponent: AmityComponentView {
                             .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade2)))
                     })
                     .focused()
+                    .accessibilityIdentifier(AccessibilityID.SearchBar.textField)
                 
                 if !viewModel.searchKeyword.isEmpty {
                     Button(

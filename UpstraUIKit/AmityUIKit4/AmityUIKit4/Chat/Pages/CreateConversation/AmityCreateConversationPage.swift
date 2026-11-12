@@ -143,6 +143,11 @@ public struct AmityCreateConversationPage: AmityPageView {
     // MARK: - Nav bar
 
     private var navBar: some View {
+        navBarContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var navBarContent: some View {
         VStack(spacing: 0) {
             ZStack {
                 Text(AmityLocalizedStringSet.Chat.CreateConversation.navbarTitle.localizedString)
@@ -179,9 +184,11 @@ public struct AmityCreateConversationPage: AmityPageView {
                     .scaledToFit()
                     .foregroundColor(Color(viewConfig.color(.iconInputTextInputDefault)))
                     .frame(width: 14, height: 14)
+                    .accessibilityIdentifier(AccessibilityID.SearchBar.icon)
 
                 TextField(AmityLocalizedStringSet.Chat.CreateConversation.searchPlaceholder.localizedString, text: $viewModel.searchKeyword)
                     .applyTextStyle(.body(Color(viewConfig.color(.textInputTextInputPlaceholderEnabledFilled))))
+                    .accessibilityIdentifier(AccessibilityID.SearchBar.textField)
 
                 if !viewModel.searchKeyword.isEmpty {
                     Button { viewModel.searchKeyword = "" } label: {
@@ -199,6 +206,7 @@ public struct AmityCreateConversationPage: AmityPageView {
             .padding(.vertical, 8)
             .background(Color(viewConfig.color(.surfaceInputBoxedInputDefault)))
             .clipShape(RoundedRectangle(cornerRadius: 8))
+            .keyboardTapOutsideSkip()
             .padding(.horizontal, 16)
             .padding(.bottom, 10)
         }

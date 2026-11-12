@@ -37,6 +37,7 @@ struct CommentComposerView: View {
     var body: some View {
         if Self.isShown(on: viewConfig.pageId) {
             contentView
+                .keyboardTapOutsideSkip()
         }
     }
     

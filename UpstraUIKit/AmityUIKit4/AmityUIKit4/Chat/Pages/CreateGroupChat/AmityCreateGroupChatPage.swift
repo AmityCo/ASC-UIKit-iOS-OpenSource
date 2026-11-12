@@ -179,6 +179,11 @@ public struct AmityCreateGroupChatPage: AmityPageView {
     // MARK: - Nav bar
 
     private var navBar: some View {
+        navBarContent
+            .keyboardTapOutsideSkip()
+    }
+
+    private var navBarContent: some View {
         ZStack {
             Text(AmityLocalizedStringSet.Chat.CreateGroup.title.localizedString)
                 .applyTextStyle(.titleBold(Color(viewConfig.color(.textSheetsHeaderTitleDefault))))

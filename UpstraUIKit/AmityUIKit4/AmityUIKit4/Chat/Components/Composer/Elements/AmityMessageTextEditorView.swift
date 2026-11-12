@@ -215,6 +215,10 @@ public struct AmityMessageTextEditorView: View {
         .onDisappear {
             SuggestionOverlayWindow.dismiss()
         }
+        // Pages that show their own list from mentionedUsers (the poll composer) close it with the keyboard too.
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in
+            mentionedUsers = []
+        }
         .onReceive(viewConfig.$theme, perform: { value in
             viewModel.updateAttributes(hightlightColor: value.primaryColor, textColor: value.baseColor)
             
