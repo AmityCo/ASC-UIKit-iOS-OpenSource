@@ -8,6 +8,7 @@
 import Foundation
 import AmityLiveKit
 import AVFoundation
+import Network
 
 enum LiveStreamBroadcasterState: Int, Equatable {
     case disconnected
@@ -84,12 +85,34 @@ class LiveStreamBroadcasterViewModel: ObservableObject {
     var role: LiveStreamParticipantRole
     private var url: String = ""
     private var token: String = ""
-    
+
+    /// True from `startBroadcast` to `stopBroadcast`: a disconnect in between is a lost connection, not an end.
+    private var isBroadcasting = false
+    /// True while a rejoin after a lost connection is in progress, so only one runs at a time.
+    private var isRejoining = false
+    /// LiveKit gives up after its reconnect attempts, which a few seconds offline use up. When the network is
+    /// back the broadcaster joins the room again, until the conference gives up after its own wait.
+    private let pathMonitor = NWPathMonitor()
+    private var isNetworkAvailable = true
+
     init(role: LiveStreamParticipantRole = .host) {
         self.role = role
         self.room = Room(connectOptions: ConnectOptions(reconnectAttempts: 10),
                         roomOptions: RoomOptions())
         self.room.add(delegate: self)
+
+        pathMonitor.pathUpdateHandler = { [weak self] path in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.isNetworkAvailable = path.status == .satisfied
+                if self.isNetworkAvailable { self.rejoinIfNeeded() }
+            }
+        }
+        pathMonitor.start(queue: DispatchQueue(label: "amity.livestream.broadcaster.network"))
+    }
+
+    deinit {
+        pathMonitor.cancel()
     }
     
     // Toggle camera position between front and back
@@ -130,6 +153,9 @@ class LiveStreamBroadcasterViewModel: ObservableObject {
     // Start broadcasting the live stream
     func startBroadcast(url: String, token: String, captureRatio: LiveStreamBroadcasterCameraRatio) {
         currentCaptureRatio = captureRatio
+        self.url = url
+        self.token = token
+        isBroadcasting = true
         
         Task {
             let captureOptions = CameraCaptureOptions(position: cameraPosition, dimensions: captureRatio.getDimensions())
@@ -159,8 +185,38 @@ class LiveStreamBroadcasterViewModel: ObservableObject {
     
     // Stop broadcasting the live stream
     func stopBroadcast() {
+        isBroadcasting = false
         Task {
             await room.disconnect()
+        }
+    }
+
+    /// Joins the room again after LiveKit gave up on a lost connection, once the network is available, and
+    /// publishes the camera and microphone as before. Does nothing after the host ended the broadcast.
+    private func rejoinIfNeeded() {
+        guard isBroadcasting, !isRejoining, isNetworkAvailable, !url.isEmpty,
+              room.connectionState == .disconnected else { return }
+        isRejoining = true
+        Log.add(event: .info, "Rejoining the live stream after the connection was lost")
+        let captureOptions = CameraCaptureOptions(position: cameraPosition, dimensions: currentCaptureRatio.getDimensions())
+        let publishesCamera = enabledCamera
+        let publishesMicrophone = enableMicrophone
+        Task {
+            do {
+                try await room.connect(url: url, token: token,
+                                       roomOptions: RoomOptions(defaultCameraCaptureOptions: captureOptions))
+                if publishesCamera { try await room.localParticipant.setCamera(enabled: true, captureOptions: captureOptions) }
+                if publishesMicrophone { try await room.localParticipant.setMicrophone(enabled: true) }
+            } catch {
+                Log.add(event: .error, "Rejoining the live stream failed: \(error.localizedDescription)")
+            }
+            DispatchQueue.main.async {
+                self.isRejoining = false
+                // Still not connected (the network dropped again, or the server refused): try again shortly.
+                if self.room.connectionState == .disconnected {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in self?.rejoinIfNeeded() }
+                }
+            }
         }
     }
 }
@@ -197,6 +253,8 @@ extension LiveStreamBroadcasterViewModel: RoomDelegate {
     
     func room(_ room: AmityLiveKit.Room, didDisconnectWithError error: AmityLiveKit.LiveKitError?) {
         Log.add(event: .info, "Room disconnected with error: \(String(describing: error))")
+        // LiveKit gave up reconnecting: join again once the network is back.
+        DispatchQueue.main.async { [weak self] in self?.rejoinIfNeeded() }
     }
 }
 

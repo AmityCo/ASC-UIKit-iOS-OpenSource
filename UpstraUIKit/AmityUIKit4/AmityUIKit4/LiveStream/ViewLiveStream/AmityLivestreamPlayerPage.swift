@@ -89,6 +89,8 @@ public struct AmityLivestreamPlayerPage: AmityPageView {
         }
         .environmentObject(viewConfig)
         .environmentObject(host)
+        // The player opens over the feed, so the feed's preview of this or any other video stops underneath.
+        .suspendsFeedAutoPlay(true)
     }
     
     @ViewBuilder

@@ -50,9 +50,14 @@ struct AmityPostMediaVideoPlayer: View {
     @State private var showProductTagSheet: Bool = false
 
     @StateObject private var playerController = AmityMediaPlayerController()
+    /// The recording playing, for a recorded room with several.
+    @State private var recordingIndex = 0
     @StateObject private var deletedStateViewModel: VideoPlayerDeletedStateViewModel
     @State private var sliderValue: Double = 0
     @StateObject private var controls = PlayerControlsVisibility()
+    /// Set once this player has played, so a neighbouring page that never played does not overwrite the
+    /// position the feed saved for its video.
+    @State private var hasPlayed = false
 
     private var isDeleted: Bool {
         deletedStateViewModel.isPostDeleted || deletedStateViewModel.isVideoDeleted(videoURL)
@@ -69,11 +74,45 @@ struct AmityPostMediaVideoPlayer: View {
             }
             // Composer preview: the video has not been uploaded yet, so play the local file.
             return media.localUrl
-        case .livestream(let room):
-            return URL(string: room.recordedData.first?.playbackUrl ?? "")
+        case .livestream:
+            return recordingURLs.isEmpty ? nil : recordingURLs[min(recordingIndex, recordingURLs.count - 1)]
         case .chat(let url):
             return url
         }
+    }
+
+    /// The video a post's full player shares with the feed: its position, whether it ended, and the session
+    /// sound state. A recorded live post's player shares them too. Chat and the composer keep their own.
+    private var feedPlaybackURL: URL? {
+        guard post != nil else { return nil }
+        switch playerType {
+        case .video, .livestream:
+            return videoURL
+        case .chat:
+            return nil
+        }
+    }
+
+    /// A recorded room's recordings: the player continues at the one the feed reached and plays the rest in
+    /// order.
+    private var recordingURLs: [URL] {
+        guard case .livestream(let room) = playerType else { return [] }
+        return room.recordedData.compactMap { $0.playbackUrl.isEmpty ? nil : URL(string: $0.playbackUrl) }
+    }
+
+    /// At the end of a recording followed by another, plays the next in the same player. Returns false at the
+    /// last one.
+    private func playNextRecording() -> Bool {
+        let urls = recordingURLs
+        guard recordingIndex < urls.count - 1 else { return false }
+        let store = FeedAutoPlayStore.shared
+        if post != nil { store.setPosition(0, for: urls[recordingIndex]) }
+        let next = recordingIndex + 1
+        playerController.replaceItem(with: urls[next])
+        recordingIndex = next
+        if post != nil { store.setRecordingIndex(next, forRoom: livestreamRoomId) }
+        playerController.play()
+        return true
     }
 
     private var livestreamRoomId: String? {
@@ -120,6 +159,15 @@ struct AmityPostMediaVideoPlayer: View {
         self.sessionMute = isMuted
         self.isActive = isActive
         self._deletedStateViewModel = StateObject(wrappedValue: VideoPlayerDeletedStateViewModel(post: post))
+        if post != nil, case .livestream(let room) = playerType {
+            // Continue at the recording the feed reached; from the first when the last one had ended.
+            let store = FeedAutoPlayStore.shared
+            let urls = room.recordedData.compactMap { $0.playbackUrl.isEmpty ? nil : URL(string: $0.playbackUrl) }
+            if urls.count > 1, store.hasEnded(urls.last) {
+                store.restartRecordings(urls, forRoom: room.roomId)
+            }
+            self._recordingIndex = State(initialValue: store.recordingIndex(forRoom: room.roomId))
+        }
     }
 
     var body: some View {
@@ -137,6 +185,7 @@ struct AmityPostMediaVideoPlayer: View {
             if let sessionMute {
                 playerController.setMuted(sessionMute.wrappedValue)
             }
+            continueFromFeed()
 
             // enable PiP only for recorded livestream
             if playerType.isLivestream {
@@ -152,6 +201,26 @@ struct AmityPostMediaVideoPlayer: View {
         .onChange(of: sessionMute?.wrappedValue) { muted in
             guard let muted else { return }
             playerController.setMuted(muted)
+        }
+        // The state is handed back as it changes, not on close: the feed takes over during the closing
+        // animation, before this view disappears.
+        .onChange(of: playerController.isPlaying) { isPlaying in
+            if isPlaying {
+                hasPlayed = true
+            }
+            handBackToFeed()
+        }
+        .onChange(of: playerController.hasEnded) { ended in
+            if ended, playNextRecording() { return }
+            // At the end the controls stay, with Watch again in the centre.
+            if ended { controls.show(autoHide: false) }
+            handBackToFeed()
+        }
+        .onChange(of: playerController.currentTime) { _ in
+            handBackToFeed()
+        }
+        .onDisappear {
+            handBackToFeed()
         }
         .onChange(of: isActive) { isActive in
             if isActive {
@@ -175,6 +244,43 @@ struct AmityPostMediaVideoPlayer: View {
         })
         .sheet(isPresented: $showProductTagSheet) {
             productTagListSheet
+        }
+    }
+
+    // MARK: - Shared with the feed
+
+    /// Opens where the feed left the video, already playing: from the start if it had ended or never played,
+    /// from the feed's point otherwise; in the session sound state.
+    private func continueFromFeed() {
+        guard let url = feedPlaybackURL else { return }
+        let store = FeedAutoPlayStore.shared
+        if store.hasEnded(url) {
+            store.setEnded(false, for: url)
+            store.setPosition(0, for: url)
+        } else {
+            let start = store.position(for: url)
+            if start > 0 {
+                playerController.seek(to: start)
+            }
+        }
+        // The session mute applies only while auto-play is on: with it off the member never sees the feed's
+        // sound button, so the player opens with sound.
+        guard store.isAutoPlayOn else { return }
+        playerController.setMuted(store.isMuted)
+        sessionMute?.wrappedValue = store.isMuted
+    }
+
+    /// Back in the feed the video continues from where the player stopped (a pause is not kept), or shows
+    /// Watch again if it played to the end here.
+    private func handBackToFeed() {
+        guard hasPlayed, isActive, let url = feedPlaybackURL else { return }
+        let store = FeedAutoPlayStore.shared
+        if playerController.hasEnded {
+            store.setEnded(true, for: url)
+            store.setPosition(0, for: url)
+        } else {
+            store.setEnded(false, for: url)
+            store.setPosition(playerController.currentTime, for: url)
         }
     }
 
@@ -238,6 +344,12 @@ struct AmityPostMediaVideoPlayer: View {
                     )
             }
 
+            // The same ring as the feed, while the video loads or stalls; not after it failed.
+            if videoURL != nil && playerController.isLoading && !playerController.hasFailed {
+                FeedVideoLoadingRing()
+                    .allowsHitTesting(false)
+            }
+
             Color.black.opacity(controls.isVisible ? 0.5 : 0)
                 .ignoresSafeArea()
                 .allowsHitTesting(false)
@@ -284,12 +396,17 @@ struct AmityPostMediaVideoPlayer: View {
             Button(action: {
                 playerController.toggleMute()
                 sessionMute?.wrappedValue = playerController.isMuted
+                if feedPlaybackURL != nil, FeedAutoPlayStore.shared.isAutoPlayOn {
+                    FeedAutoPlayStore.shared.setMuted(playerController.isMuted)
+                }
             }) {
                 Image(systemName: playerController.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
                     .font(.system(size: 18, weight: .regular))
                     .foregroundColor(.white)
                     .frame(width: 24, height: 24)
             }
+            .accessibilityIdentifier(AccessibilityID.Social.VideoPlayer.soundButton)
+            .accessibilityValue(playerController.isMuted ? "muted" : "sound_on") // l10n:ok test value
 
             // More options button
             if !hideActionMenu {
@@ -325,11 +442,42 @@ struct AmityPostMediaVideoPlayer: View {
     }
 
     // MARK: - Center Play/Pause Button (reuses the shared PlayPauseButton)
+    /// Play or pause; once the video has ended, Watch again in its place (Figma 220:2087).
+    @ViewBuilder
     private var centerPlayPauseButton: some View {
-        Button(action: { togglePlayPause() }) {
-            PlayPauseButton(isPlaying: playerController.isPlaying)
+        if playerController.hasEnded {
+            watchAgainButton
+        } else {
+            Button(action: { togglePlayPause() }) {
+                PlayPauseButton(isPlaying: playerController.isPlaying)
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    /// The feed's Watch again at the full player's size: a 48 × 48 black-at-50% circle with the 24 pt
+    /// rotate-left icon and the label under it. A tap replays from the start.
+    private var watchAgainButton: some View {
+        Button(action: {
+            playerController.restart()
+            controls.show(autoHide: true)
+        }) {
+            VStack(spacing: 4) {
+                Image(AmityIcon.watchAgainIcon.imageResource)
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 24, height: 24)
+                    .foregroundColor(.white)
+                    .frame(width: 48, height: 48)
+                    .background(Circle().fill(Color.black.opacity(0.5)))
+
+                Text(AmityLocalizedStringSet.Social.feedVideoWatchAgain.localizedString)
+                    .applyTextStyle(.captionBold(.white))
+            }
         }
         .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
     }
 
     private func togglePlayPause() {
@@ -393,18 +541,20 @@ struct AmityPostMediaVideoPlayer: View {
             let productTags = getMediaProductTags()
             if !productTags.isEmpty {
                 HStack {
-                    Spacer()
-
                     AmityProductTagBadgeView(count: productTags.count, icon: .productTagFilledIcon)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 18)
                         .onTapGesture {
                             if onTagProducts != nil {
                                 onTagProducts?()
+                            } else if playerType.isLivestream {
+                                presentProductTagListForRecordedLive() //to open in-app pip
                             } else {
                                 showProductTagSheet = true
                             }
                         }
+
+                    Spacer()
                 }
             }
 
@@ -567,6 +717,28 @@ struct AmityPostMediaVideoPlayer: View {
                 .environmentObject(host)
                 .halfSheetPresentation()
         }
+    }
+
+    private func presentProductTagListForRecordedLive() {
+        let productTags = getMediaProductTags()
+        guard !productTags.isEmpty else { return }
+        let component = AmityProductTagListComponent(
+            pageId: pageId,
+            productTags: productTags,
+            renderMode: .livestream,
+            sourceId: post?.postId ?? "",
+            onClose: {
+                UIApplication.topViewController()?.dismiss(animated: true)
+            })
+        let vc = AmitySwiftUIHostingController(rootView: component
+            .environmentObject(host)
+            .ignoresSafeArea(edges: .bottom))
+        vc.modalPresentationStyle = .pageSheet
+        if #available(iOS 15.0, *), let sheet = vc.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.selectedDetentIdentifier = .medium
+        }
+        host.controller?.present(vc, animated: true)
     }
 
     // MARK: - Helper Functions

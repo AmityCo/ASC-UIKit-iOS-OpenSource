@@ -47,6 +47,9 @@ struct PostContentMediaView: View {
                 .onChange(of: positionStore.resetGeneration) { _ in
                     currentIndex = 0
                 }
+                // The full player and the product tag list cover the feed without making its rows
+                // disappear, so the inline video underneath is stopped explicitly.
+                .suspendsFeedAutoPlay(viewModel.showMediaViewer || viewModel.showProductTagSheet)
                 .fullScreenCover(isPresented: $viewModel.showMediaViewer) {
                     MediaViewer(
                         medias: post.medias,
@@ -80,6 +83,7 @@ struct PostContentMediaView: View {
                 viewConfig: viewConfig,
                 medias: post.medias,
                 currentIndex: $currentIndex,
+                playbackKeyPrefix: post.postId,
                 onFrameTap: { index in
                     withoutAnimation {
                         viewModel.selectedMediaIndex = index
@@ -110,7 +114,8 @@ struct PostContentMediaView: View {
             onProductTagTap: { media in
                 viewModel.selectedProductTagMedia = media
                 viewModel.showProductTagSheet = true
-            }
+            },
+            playbackKey: "\(post.postId)#0"
         )
         .readSize { availableWidth = $0.width }
         .frame(height: ratio.height(forWidth: availableWidth))

@@ -27,6 +27,15 @@ public struct AmityGlobalFeedComponent: AmityComponentView {
     }
     
     public var body: some View {
+        // The list scrolls within its own frame: a post scrolled above its top is not visible.
+        feedContent
+            .limitsFeedAutoPlayViewport(.top)
+            .hostsFeedAutoPlay()
+            .feedAutoPlayViewport()
+    }
+
+    @ViewBuilder
+    private var feedContent: some View {
         List {
             ForEach(Array(postFeedViewModel.postItems.enumerated()), id: \.element.id) { index, item in
                 VStack(spacing: 0) {

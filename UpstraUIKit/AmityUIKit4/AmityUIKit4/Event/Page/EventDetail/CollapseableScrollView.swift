@@ -120,6 +120,7 @@ struct CollapseableScrollView<ExpandedHeader: View, CollapsedHeader: View, Stick
                 }
             }
             .coordinateSpace(name: "scroll")
+            .limitsFeedAutoPlayViewport(.top)
             
             VStack(spacing: 0) {
                 // CollapsedView
@@ -135,8 +136,11 @@ struct CollapseableScrollView<ExpandedHeader: View, CollapsedHeader: View, Stick
                         .background(Color.yellow)
                 }
             }
+            // Drawn over the content: a feed inside is visible only below the collapsed and pinned headers.
+            .limitsFeedAutoPlayViewport(.bottom)
         }
         .edgesIgnoringSafeArea(.top)
+        .feedAutoPlayViewport()
     }
     
     // Updates sticky view pinned state

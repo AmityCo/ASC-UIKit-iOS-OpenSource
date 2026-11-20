@@ -22,6 +22,8 @@ struct PostMediaCarouselView: View {
     let medias: [AmityMedia]
     /// The visible frame. Owned by the caller so the full-screen viewer can track it and write back.
     @Binding var currentIndex: Int
+    /// The post id, so each video page gets its own auto-play key; nil turns auto-play off.
+    var playbackKeyPrefix: String? = nil
 
     let onFrameTap: (Int) -> Void
     let onProductTagTap: (AmityMedia) -> Void
@@ -47,7 +49,8 @@ struct PostMediaCarouselView: View {
                         media: medias[index],
                         index: index,
                         total: medias.count,
-                        onProductTagTap: onProductTagTap
+                        onProductTagTap: onProductTagTap,
+                        playbackKey: playbackKeyPrefix.map { "\($0)#\(index)" }
                     )
                     .onTapGesture { onFrameTap(index) }
                     .tag(index)

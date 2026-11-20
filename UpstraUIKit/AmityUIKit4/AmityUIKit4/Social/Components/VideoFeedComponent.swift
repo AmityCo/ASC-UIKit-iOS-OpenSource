@@ -280,20 +280,20 @@ struct VideoFeedComponent: View {
             VStack {
                 Spacer()
                 HStack(alignment: .bottom) {
-                    Text("\(duration.formattedDurationString ?? "0:00")")
-                        .applyTextStyle(.caption(.white))
-                        .padding(.all, 4)
-                        .background(Color.black.opacity(0.7))
-                        .cornerRadius(4)
-
-                    Spacer()
-
                     if !media.produtTags.isEmpty {
                         AmityProductTagBadgeView(count: media.produtTags.count)
                             .onTapGesture {
                                 selectedProductTagMedia = media
                             }
                     }
+
+                    Spacer()
+
+                    Text("\(duration.formattedDurationString ?? "0:00")")
+                        .applyTextStyle(.caption(.white))
+                        .padding(.all, 4)
+                        .background(Color.black.opacity(0.7))
+                        .cornerRadius(4)
                 }
                 .padding(8)
             }
@@ -327,20 +327,20 @@ struct VideoFeedComponent: View {
             VStack {
                 Spacer()
                 HStack(alignment: .bottom) {
-                    Text("\(duration.formattedDurationString ?? "0:00")")
-                        .applyTextStyle(.caption(.white))
-                        .padding(.all, 4)
-                        .background(Color.black.opacity(0.7))
-                        .cornerRadius(4)
-
-                    Spacer()
-
                     if !media.produtTags.isEmpty {
                         AmityProductTagBadgeView(count: media.produtTags.count)
                             .onTapGesture {
                                 selectedProductTagMedia = media
                             }
                     }
+
+                    Spacer()
+
+                    Text("\(duration.formattedDurationString ?? "0:00")")
+                        .applyTextStyle(.caption(.white))
+                        .padding(.all, 4)
+                        .background(Color.black.opacity(0.7))
+                        .cornerRadius(4)
                 }
                 .padding(8)
             }

@@ -116,15 +116,13 @@ struct ClipFeedItemOverlayView: View {
                                                 } catch let error {
                                                     // Clip Deleted
                                                     if error.isAmityErrorCode(.itemNotFound) {
-                                                        // Stop playing
-                                                        playerController.pause()
-                                                        
                                                         viewModel.localIsClipDeleted = true
-                                                        
-                                                        // Forcefully update the cache
-                                                        viewModel.updatePostCache(postId: post.postId)
                                                     }
                                                 }
+
+                                                // The post owner and admins can still react to a deleted post,
+                                                // so the reaction call alone can't tell us the clip is gone.
+                                                viewModel.updatePostCache(postId: post.postId)
                                             }
                                             
                                             /// Send didPostReacted event to update global feed data source
@@ -143,8 +141,10 @@ struct ClipFeedItemOverlayView: View {
                                             let frame = CGRect(origin: CGPoint(x: viewModel.reactionBarFrame.origin.x + 16, y: viewModel.reactionBarFrame.origin.y), size: viewModel.reactionBarFrame.size)
                                             let reactionPickerViewModel = AmitySocialReactionPickerViewModel(referenceType: .post, referenceId: post.postId, currentReaction: viewModel.myReaction?.name, onReactionAdded: { name in
                                                 viewModel.updateLocalDataOnReactionAdded(name)
+                                                viewModel.updatePostCache(postId: post.postId)
                                             }, onReactionRemoved: { name in
                                                 viewModel.updateLocalDataOnReactionRemoved()
+                                                viewModel.updatePostCache(postId: post.postId)
                                             })
                                             AmitySocialReactionPickerOverlay.shared.show(frame: frame, viewModel: reactionPickerViewModel, alignRight: true)
                                         }
@@ -266,6 +266,11 @@ struct ClipFeedItemOverlayView: View {
                 onTapAction?(.watchNextClip)
             }
             .visibleWhen(post.isDeleted || viewModel.localIsClipDeleted)
+        }
+        .onChange(of: viewModel.localIsClipDeleted) { isDeleted in
+            if isDeleted {
+                playerController.pause()
+            }
         }
         .bottomSheet(isShowing: $showMoreOption, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor)) {
             VStack(spacing: 0) {
@@ -535,12 +540,17 @@ class ClipFeedOverlayViewModel: ObservableObject {
     // If your navigation stack / action is
     // Posts Feed - Clip Feed - Post Detail - Clip Feed - Delete Post
     // You may want to update the post cache when post is deleted so that previous stack can reflect the value and show deleted state.
-    // So we forcefully update the cache.
+    // So we forcefully update the cache. The fresh post also tells us if the clip was deleted.
+    // getPost(withId:) returns the cached post until its TTL expires, so query by id, which always hits the server.
     func updatePostCache(postId: String) {
-        token = postManager.getPost(withId: postId).observe({ [weak self] liveObject, error in
-            
-            guard liveObject.dataStatus == .fresh || liveObject.dataStatus == .error else { return }
-            
+        token = postManager.getPosts(ids: [postId]).observe({ [weak self] liveCollection, error in
+
+            guard liveCollection.dataStatus == .fresh || error != nil else { return }
+
+            if liveCollection.snapshots.first(where: { $0.postId == postId })?.isDeleted == true {
+                self?.localIsClipDeleted = true
+            }
+
             self?.token?.invalidate()
         })
     }

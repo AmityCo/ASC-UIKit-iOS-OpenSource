@@ -16,6 +16,11 @@ struct PostContentLiveStreamView: View {
     @State private var taggedProducts: [AmityProduct] = []
     @State private var previousProductCount: Int = 0
     @State private var showProductTagSheet: Bool = false
+
+    @Environment(\.feedAutoPlayHost) private var feedAutoPlayHost
+    @ObservedObject private var autoPlay = FeedAutoPlayStore.shared
+    /// The same post can be on screen twice, so each instance reports under its own key.
+    @State private var autoPlayInstanceId = UUID()
     
     let post: AmityPostModel
     let room: AmityRoom?
@@ -129,6 +134,28 @@ struct PostContentLiveStreamView: View {
                 case .idle, .live, .recorded:
                     
                     AsyncImage(placeholder: AmityIcon.livestreamPlaceholderGray.imageResource, url: URL(string: resolvedThumbnailURL ?? ""), contentMode: .fill)
+
+                    // Plays in place without counting: no viewer heartbeat, no watch session. A tap outside the
+                    // sound button still opens the live player, where counting starts.
+                    if isAutoPlayActive, let url = autoPlayURL {
+                        FeedInlineVideoView(
+                            url: url,
+                            isLive: post.livestreamState == .live,
+                            isReconnecting: room?.status == .waitingReconnect,
+                            onReachedEnd: nextRecordingAction,
+                            onWatchAgain: watchAgainAction
+                        )
+                        // Each recording is its own player.
+                        .id(url)
+                    } else if feedAutoPlayHost {
+                        // Not playing: the frame reads as the thumbnail, or as the fallback when playback failed
+                        // or the post is an old-protocol live stream, which never plays in the feed.
+                        Color.clear
+                            .allowsHitTesting(false)
+                            .accessibilityElement()
+                            .accessibilityIdentifier(AccessibilityID.Social.FeedPostVideo.frame)
+                            .accessibilityValue(isFallback ? "fallback" : "thumbnail") // l10n:ok test value
+                    }
                     
                     VStack(alignment: .leading) {
                         HStack {
@@ -147,19 +174,19 @@ struct PostContentLiveStreamView: View {
                         
                         Spacer()
                         
-                        // Tag badge on bottom-right - tappable to open product tag list
+                        // Tag badge on bottom-left - tappable to open product tag list
                         let childPost = post.childrenPosts.first
                         let productCount = childPost?.getMediaProductTags().count ?? 0
                         
                         if productCount > 0 {
                             HStack {
-                                Spacer()
-                                
                                 AmityProductTagBadgeView(count: productCount)
                                     .padding(12)
                                     .onTapGesture {
                                         showProductTagSheet = true
                                     }
+                                
+                                Spacer()
                             }
                         }
                     }
@@ -168,7 +195,8 @@ struct PostContentLiveStreamView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
-                        .isHidden(post.livestreamState == .idle)
+                        .isHidden(post.livestreamState == .idle || isAutoPlayActive || (autoPlay.isAutoPlayOn && autoPlayKey != nil))
+                        .feedPlayButtonAccessibility(feedAutoPlayHost && !(post.livestreamState == .idle || isAutoPlayActive || (autoPlay.isAutoPlayOn && autoPlayKey != nil)))
                     
                 case .ended:
                     VStack(alignment: .center) {
@@ -221,6 +249,14 @@ struct PostContentLiveStreamView: View {
         }
         .frame(height: contentHeight)
         .contentShape(Rectangle())
+        .reportsFeedAutoPlayVisibility(key: autoPlayKey)
+        .onAppear {
+            // A recording keeps a position; deleting the post drops it.
+            guard feedAutoPlayHost, post.livestreamState == .recorded else { return }
+            for url in recordingURLs {
+                autoPlay.noteVideo(url, inPost: post.postId)
+            }
+        }
         .onTapGesture {
             guard !isStreamBanned else { return }
             
@@ -242,11 +278,71 @@ struct PostContentLiveStreamView: View {
                 break
             }
         }
+        .suspendsFeedAutoPlay(showProductTagSheet)
         .sheet(isPresented: $showProductTagSheet) {
             productTagListSheet
         }
     }
     
+    /// The live stream while the room is live (or reconnecting), the recording once it is recorded.
+    private var autoPlayURL: URL? {
+        let urlString: String?
+        switch post.livestreamState {
+        case .live:
+            urlString = room?.livePlaybackUrl
+        case .recorded:
+            return recordingURLs.isEmpty ? nil : recordingURLs[currentRecordingIndex]
+        default:
+            urlString = nil
+        }
+        guard let urlString, !urlString.isEmpty else { return nil }
+        return URL(string: urlString)
+    }
+
+    /// A recorded room's recordings, played back to back in the feed.
+    private var recordingURLs: [URL] {
+        (room?.recordedData ?? []).compactMap { data in
+            data.playbackUrl.isEmpty ? nil : URL(string: data.playbackUrl)
+        }
+    }
+
+    /// The recording the feed has reached this session.
+    private var currentRecordingIndex: Int {
+        min(autoPlay.recordingIndex(forRoom: room?.roomId), max(recordingURLs.count - 1, 0))
+    }
+
+    /// At the end of a recording followed by another, the next one plays.
+    private var nextRecordingAction: (() -> Void)? {
+        guard post.livestreamState == .recorded, currentRecordingIndex < recordingURLs.count - 1 else { return nil }
+        let next = currentRecordingIndex + 1
+        let roomId = room?.roomId
+        return { FeedAutoPlayStore.shared.setRecordingIndex(next, forRoom: roomId) }
+    }
+
+    /// Watch again on a room with several recordings starts from the first.
+    private var watchAgainAction: (() -> Void)? {
+        guard post.livestreamState == .recorded, recordingURLs.count > 1 else { return nil }
+        let urls = recordingURLs
+        let roomId = room?.roomId
+        return { FeedAutoPlayStore.shared.restartRecordings(urls, forRoom: roomId) }
+    }
+
+    private var autoPlayKey: String? {
+        guard feedAutoPlayHost, !isStreamDeleted, !isStreamBanned, let url = autoPlayURL, !autoPlay.hasFailed(url),
+              let roomId = room?.roomId else { return nil }
+        return "\(roomId)#\(autoPlayInstanceId.uuidString)"
+    }
+
+    private var isAutoPlayActive: Bool {
+        guard let autoPlayKey else { return false }
+        return autoPlay.activeKey == autoPlayKey
+    }
+
+    /// An old-protocol live stream never plays in the feed; a room whose stream failed falls back too.
+    private var isFallback: Bool {
+        post.dataTypeInternal == .liveStream || autoPlay.hasFailed(autoPlayURL)
+    }
+
     @ViewBuilder
     private var productTagListSheet: some View {
         if let childPost = post.childrenPosts.first {

@@ -59,6 +59,8 @@ public struct AmityPostDetailPage: AmityPageView {
             
             VStack(spacing: 0) {
                 navigationBarView
+                    // The post scrolls below the navigation bar.
+                    .limitsFeedAutoPlayViewport(.bottom)
                 
                 Rectangle()
                     .fill(Color(viewConfig.theme.baseColorShade4))
@@ -106,6 +108,8 @@ public struct AmityPostDetailPage: AmityPageView {
                                             }
                                         }
                                     }, pageId: id)
+                                    // The post's video plays here by the feed's rules, from where the feed left it.
+                                    .hostsFeedAutoPlay()
                                     Rectangle()
                                         .fill(Color(viewConfig.theme.baseColorShade4))
                                         .frame(height: 1)
@@ -170,6 +174,9 @@ public struct AmityPostDetailPage: AmityPageView {
         }
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
+        .feedAutoPlayViewport()
+        // The page's menu, comment and share sheets cover the post, so its video stops underneath.
+        .suspendsFeedAutoPlay(showBottomSheet || showShareSheet || commentBottomSheetViewModel.sheetState.isShown)
         .onChange(of: networkMonitor.isConnected) { isConnected in
             if !isConnected {
                 Toast.showToast(style: .warning, message: AmityLocalizedStringSet.Social.noInternetConnection.localizedString)

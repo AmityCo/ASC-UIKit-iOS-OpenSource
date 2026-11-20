@@ -23,6 +23,12 @@ struct AmityEventDiscussionFeedComponent: View {
     }
     
     var body: some View {
+        feedContent
+            .hostsFeedAutoPlay()
+    }
+
+    @ViewBuilder
+    private var feedContent: some View {
         ZStack(alignment: .top) {
             
             loadingState

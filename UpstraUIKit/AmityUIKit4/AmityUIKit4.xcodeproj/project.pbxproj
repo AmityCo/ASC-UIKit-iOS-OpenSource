@@ -686,6 +686,10 @@
 				Social/Components/PostDetail/PostContent/PostContentEventView.swift,
 				Social/Components/PostDetail/PostContent/PostContentMediaView.swift,
 				Social/Components/PostDetail/PostContent/PostMediaCarouselView.swift,
+				Social/Components/PostDetail/PostContent/FeedAutoPlaySetting.swift,
+				Social/Components/PostDetail/PostContent/FeedAutoPlayStore.swift,
+				Social/Components/PostDetail/PostContent/FeedAutoPlaySwitch.swift,
+				Social/Components/PostDetail/PostContent/FeedInlineVideoView.swift,
 				Social/Components/PostDetail/PostContent/PostMediaFrameView.swift,
 				Social/Components/PostDetail/PostContent/PostMediaPaginationIndicator.swift,
 				Social/Components/PostDetail/PostContentSkeletonView.swift,
@@ -1019,7 +1023,7 @@
 			);
 			name = AmityUIKit4;
 			packageProductDependencies = (
-				CC889E73F7883FD3C49CD854 /* SharedFrameworks */,
+				344C8D866EB03AF3A8FD61D4 /* SharedFrameworks */,
 			);
 			productName = AmityUIKit4;
 			productReference = 684AE0F12B0C5B0200FD7270 /* AmityUIKit4.framework */;
@@ -1071,7 +1075,7 @@
 			);
 			mainGroup = 684AE0E72B0C5B0100FD7270;
 			packageReferences = (
-				FE3D78DB342FB84A44F158D1 /* XCLocalSwiftPackageReference "SharedFrameworks" */,
+				E13CF699B8FB6D41D297AE4E /* XCLocalSwiftPackageReference "SharedFrameworks" */,
 			);
 			preferredProjectObjectVersion = 56;
 			productRefGroup = 684AE0F22B0C5B0200FD7270 /* Products */;
@@ -1436,16 +1440,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		FE3D78DB342FB84A44F158D1 /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
+		E13CF699B8FB6D41D297AE4E /* XCLocalSwiftPackageReference "SharedFrameworks" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../SharedFrameworks;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		CC889E73F7883FD3C49CD854 /* SharedFrameworks */ = {
+		344C8D866EB03AF3A8FD61D4 /* SharedFrameworks */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FE3D78DB342FB84A44F158D1 /* XCLocalSwiftPackageReference "SharedFrameworks" */;
+			package = E13CF699B8FB6D41D297AE4E /* XCLocalSwiftPackageReference "SharedFrameworks" */;
 			productName = SharedFrameworks;
 		};
 /* End XCSwiftPackageProductDependency section */

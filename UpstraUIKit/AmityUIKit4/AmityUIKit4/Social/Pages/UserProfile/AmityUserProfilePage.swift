@@ -25,6 +25,8 @@ public struct AmityUserProfilePage: AmityPageView {
     @State private var showBottomSheet: Bool = false
     @State private var postCreationBottomSheet: Bool = false
     @State private var showPostFilterBottomSheet: Bool = false
+    @State private var showAutoPlaySettingSheet: Bool = false
+    @ObservedObject private var autoPlaySetting = FeedAutoPlaySetting.shared
     @State private var isUserReported: Bool = false
     private let userId: String
     
@@ -96,6 +98,8 @@ public struct AmityUserProfilePage: AmityPageView {
                         Color.clear.preference(key: ScrollOffsetKey.self, value: geometry.frame(in: .named("scroll")).minY)
                     })
                 }
+                // The feed is visible only below the navigation bar and sticky tabs above the scroll view.
+                .limitsFeedAutoPlayViewport(.top)
                 
                 if let user = viewModel.user {
                     createPostView
@@ -139,6 +143,9 @@ public struct AmityUserProfilePage: AmityPageView {
         .bottomSheet(isShowing: $showPostFilterBottomSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
             postFilterBottomSheetView
         })
+        // The profile's sheets cover the user feed, so its video stops underneath.
+        .suspendsFeedAutoPlay(showBottomSheet || showPostFilterBottomSheet || showAutoPlaySettingSheet)
+        .feedAutoPlayViewport()
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .environmentObject(host)
@@ -250,6 +257,8 @@ public struct AmityUserProfilePage: AmityPageView {
     
     private var ownerBottomSheet: some View {
         VStack(spacing: 0) {
+            bottomSheetSectionTitle(AmityLocalizedStringSet.Social.autoPlaySettingAccountSection.localizedString)
+
             BottomSheetItemView(icon: AmityIcon.editCommentIcon.getImageResource(), text: AmityLocalizedStringSet.Social.editProfile.localizedString)
                 .onTapGesture {
                     showBottomSheet.toggle()
@@ -281,10 +290,55 @@ public struct AmityUserProfilePage: AmityPageView {
             if AmityUIKitManagerInternal.shared.canShareLink(for: .user) {
                 shareableLinkItemView
             }
+
+            bottomSheetSectionTitle(AmityLocalizedStringSet.Social.autoPlaySettingSection.localizedString)
+
+            autoPlaySettingRow
         }
         .padding(.bottom, 32)
+        // Presented from the menu itself, since a sheet is a full-screen cover and the page cannot present a
+        // second one while the menu is up. Closing it, by a choice or a tap outside, returns to the menu.
+        .bottomSheet(isShowing: $showAutoPlaySettingSheet, height: .contentSize, backgroundColor: Color(viewConfig.theme.backgroundColor), sheetContent: {
+            AmityFeedAutoPlaySettingSheet(onSelect: { showAutoPlaySettingSheet = false })
+                .environmentObject(viewConfig)
+        })
     }
-    
+
+    private func bottomSheetSectionTitle(_ title: String) -> some View {
+        Text(title)
+            .applyTextStyle(.captionBold(Color(viewConfig.theme.baseColorShade1)))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(EdgeInsets(top: 12, leading: 20, bottom: 4, trailing: 20))
+    }
+
+    /// Autoplay in feed, with the member's current choice on the right; it opens the options sheet.
+    private var autoPlaySettingRow: some View {
+        HStack(spacing: 12) {
+            Image(AmityIcon.DesignSystem.circlePlayR.imageResource)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 20, height: 24)
+                .foregroundColor(Color(viewConfig.theme.baseColor))
+
+            Text(AmityLocalizedStringSet.Social.autoPlaySettingRow.localizedString)
+                .applyTextStyle(.bodyBold(Color(viewConfig.theme.baseColor)))
+
+            Spacer()
+
+            Text(autoPlaySetting.preference.title)
+                .applyTextStyle(.body(Color(viewConfig.theme.baseColorShade1)))
+        }
+        .contentShape(Rectangle())
+        .padding(EdgeInsets(top: 12, leading: 20, bottom: 12, trailing: 20))
+        .onTapGesture {
+            showAutoPlaySettingSheet = true
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityIdentifier(AccessibilityID.Social.AutoPlaySetting.menuRow)
+    }
+
     private var nonOwnerBottomSheet: some View {
         VStack(spacing: 0) {
             BottomSheetItemView(icon: isUserReported ? AmityIcon.unflagIcon.getImageResource() : AmityIcon.flagIcon.getImageResource(), text: isUserReported ? AmityLocalizedStringSet.Social.unreportUser.localizedString : AmityLocalizedStringSet.Social.reportUser.localizedString)

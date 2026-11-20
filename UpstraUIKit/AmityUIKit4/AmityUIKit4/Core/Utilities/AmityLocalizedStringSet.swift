@@ -1685,5 +1685,23 @@ public struct AmityLocalizedStringSet {
         static let discoveryWidgetPollEnded = "amity_social_status_poll_ended"
         static let discoveryWidgetPollVotersCount = "amity_social_label_poll_voters_count"
         static let discoveryWidgetReactionCountPlural = "amity_social_label_reaction_count_plural"
+
+        // Feed video auto-play
+        static let feedVideoWatchAgain = "amity_social_feed_video_replay"
+        static let feedVideoSoundOn = "amity_social_feed_video_unmute"
+        static let feedVideoSoundOff = "amity_social_feed_video_mute"
+
+        // Feed auto-play setting
+        static let autoPlaySettingAccountSection = "amity_social_autoplay_setting_account_section"
+        static let autoPlaySettingSection = "amity_social_autoplay_setting_section"
+        static let autoPlaySettingRow = "amity_social_autoplay_setting_row"
+        static let autoPlaySettingWifiAndData = "amity_social_autoplay_setting_wifi_and_data"
+        static let autoPlaySettingWifiOnly = "amity_social_autoplay_setting_wifi_only"
+        static let autoPlaySettingNever = "amity_social_autoplay_setting_never"
+
+        // Content Widget (Social Proof)
+        static let contentWidgetPollEnded = "amity_social_status_poll_ended"
+        static let contentWidgetPollVotersCount = "amity_social_button_content_widget_poll_voters"
+        static let contentWidgetReactionCountPlural = "amity_social_button_content_widget_reaction_count_plural"
     }
 }

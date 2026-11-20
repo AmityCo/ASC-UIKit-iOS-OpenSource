@@ -45,7 +45,10 @@ public struct AmityViewStoryPage: AmityPageView {
     
    
         AmityModuleGateView(pageId: .storyPage) { gatedBody }
-    
+            // Stories open over the feed and keep the feed on screen underneath, so the feed's video pauses
+            // while a story is open and resumes when it closes.
+            .suspendsFeedAutoPlay(true)
+
    
     }
 

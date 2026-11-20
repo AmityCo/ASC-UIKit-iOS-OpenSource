@@ -117,6 +117,12 @@ public struct AmityCommunityFeedComponent: AmityComponentView {
     }
     
     public var body: some View {
+        feedContent
+            .hostsFeedAutoPlay()
+    }
+
+    @ViewBuilder
+    private var feedContent: some View {
         ZStack(alignment: .top) {
             getPostListView()
                 .isHidden(postFeedViewModel.postItems.isEmpty && postFeedViewModel.feedLoadingStatus == .loaded)

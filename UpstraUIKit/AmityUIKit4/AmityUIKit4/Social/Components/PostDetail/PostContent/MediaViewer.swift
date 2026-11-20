@@ -47,15 +47,17 @@ struct MediaViewer: View {
     private var url: URL? = nil
     private var showEditAction: Bool = false
     private let fileRepositoryManager = FileRepositoryManager()
-    private let post: AmityPostModel?
+    private let fixedPost: AmityPostModel?
+    /// Set when the medias come from several posts (profile media grid), so each frame resolves its own parent.
+    private let postForMedia: ((AmityMedia) -> AmityPostModel?)?
     private let showViewParentPost: Bool
     private let pageId: PageId?
 
     private let onDelete: (() -> Void)?
     private let saveImageURL: URL?
 
-    /// A single-attachment post still reads `1 / 1`. Viewers handed one media out of a larger set
-    /// (profile media grid), or no set at all (chat bubble, avatar, poll image), show no counter.
+    /// A single-attachment post still reads `1 / 1`. Viewers with no set at all (chat bubble, avatar,
+    /// poll image) show no counter.
     private let alwaysShowsCounter: Bool
 
     @State private var bottomBarToastMessage: String = ""
@@ -66,6 +68,15 @@ struct MediaViewer: View {
         onDelete != nil || saveImageURL != nil
     }
     
+    /// The parent post of the frame on screen.
+    private var post: AmityPostModel? {
+        page.index < medias.count ? post(for: medias[page.index]) : fixedPost
+    }
+
+    private func post(for media: AmityMedia) -> AmityPostModel? {
+        postForMedia?(media) ?? fixedPost
+    }
+
     private var canEditAltText: Bool {
         guard let post else { return false }
         
@@ -90,7 +101,7 @@ struct MediaViewer: View {
     }
     
 
-    init(medias: [AmityMedia], startIndex: Int, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, showEditAction: Bool = false, post: AmityPostModel? = nil, showViewParentPost: Bool = true, pageId: PageId? = nil, alwaysShowsCounter: Bool = false, onIndexChanged: ((Int) -> Void)? = nil) {
+    init(medias: [AmityMedia], startIndex: Int, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, showEditAction: Bool = false, post: AmityPostModel? = nil, showViewParentPost: Bool = true, pageId: PageId? = nil, alwaysShowsCounter: Bool = false, postForMedia: ((AmityMedia) -> AmityPostModel?)? = nil, onIndexChanged: ((Int) -> Void)? = nil) {
         self._page = State(initialValue: Page.withIndex(startIndex))
         self._pageIndex = State(initialValue: startIndex + 1)
         self.medias = medias
@@ -98,13 +109,15 @@ struct MediaViewer: View {
         self.onIndexChanged = onIndexChanged
         self.viewConfig = viewConfig
         self.showEditAction = showEditAction
-        self.post = post
+        self.fixedPost = post
+        self.postForMedia = postForMedia
         self.showViewParentPost = showViewParentPost
         self.pageId = pageId
         self.onDelete = nil
         self.saveImageURL = nil
         self.alwaysShowsCounter = alwaysShowsCounter
-        self._viewModel = StateObject(wrappedValue: MediaViewerViewModel(post: post))
+        let mediaPosts = postForMedia.map { lookup in medias.compactMap(lookup) } ?? []
+        self._viewModel = StateObject(wrappedValue: MediaViewerViewModel(post: post, mediaPosts: mediaPosts))
     }
 
     init(url: URL?, viewConfig: AmityViewConfigController, closeAction: (() -> Void)?, pageId: PageId? = nil, saveImageURL: URL? = nil, onDelete: (() -> Void)? = nil) {
@@ -116,7 +129,8 @@ struct MediaViewer: View {
         self.closeAction = closeAction
         self.onIndexChanged = nil
         self.viewConfig = viewConfig
-        self.post = nil
+        self.fixedPost = nil
+        self.postForMedia = nil
         self.showViewParentPost = true
         self.pageId = pageId
         self.onDelete = onDelete
@@ -150,7 +164,7 @@ struct MediaViewer: View {
                                 // No `post` in the composer, and the player takes an optional one.
                                 AmityPostMediaVideoPlayer(
                                         pageId: pageId,
-                                        post: post,
+                                        post: post(for: media),
                                         playerType: .video(media),
                                         hideActionMenu: !showViewParentPost,
                                         onClose: {
@@ -175,13 +189,13 @@ struct MediaViewer: View {
                                         Image(uiImage: localImage)
                                             .resizable()
                                             .aspectRatio(contentMode: .fit)
-                                            .overlay(productTagBadge(for: media), alignment: .bottomTrailing)
+                                            .overlay(productTagBadge(for: media), alignment: .bottomLeading)
                                             .adaptiveVerticalPadding(top: 35, bottom: 35)
                                     } else if let url = media.localUrl {
                                         Image(uiImage: media.type == .image ?  UIImage(contentsOfFile: url.path) ?? UIImage() : media.generatedThumbnailImage ?? UIImage())
                                             .resizable()
                                             .aspectRatio(contentMode: .fit)
-                                            .overlay(productTagBadge(for: media), alignment: .bottomTrailing)
+                                            .overlay(productTagBadge(for: media), alignment: .bottomLeading)
                                             .adaptiveVerticalPadding(top: 35, bottom: 35)
                                     } else if let url = media.getImageURL() {
                                         URLImage(url, empty: {
@@ -203,7 +217,7 @@ struct MediaViewer: View {
                                             image
                                                 .resizable()
                                                 .aspectRatio(contentMode: .fit)
-                                                .overlay(productTagBadge(for: media), alignment: .bottomTrailing)
+                                                .overlay(productTagBadge(for: media), alignment: .bottomLeading)
                                         })
                                         .environment(\.urlImageOptions, skipAuthHeader ? URLImageOptions.defaultImageOptions : URLImageOptions.amityOptions)
                                         .id(skipAuthHeader)
@@ -396,7 +410,7 @@ struct MediaViewer: View {
             let component = AmityProductTagListComponent(
                 productTags: media.produtTags,
                 renderMode: renderMode,
-                sourceId: post?.postId ?? ""
+                sourceId: post(for: media)?.postId ?? ""
             )
             component
                 .environmentObject(host)
@@ -529,6 +543,8 @@ class MediaViewerViewModel: ObservableObject {
     @Published var deletedFileIds: Set<String> = []
     
     private var post: AmityPostModel?
+    /// Parents of a multi-post set. Deleting one hides only its own medias, not the whole viewer.
+    private var mediaPosts: [String: AmityPostModel] = [:]
     
     // Check if a specific media is deleted
     func isMediaDeleted(_ media: AmityMedia) -> Bool {
@@ -544,8 +560,9 @@ class MediaViewerViewModel: ObservableObject {
         return false
     }
     
-    init(post: AmityPostModel? = nil) {
+    init(post: AmityPostModel? = nil, mediaPosts: [AmityPostModel] = []) {
         self.post = post
+        self.mediaPosts = Dictionary(mediaPosts.map { ($0.postId, $0) }, uniquingKeysWith: { first, _ in first })
         setupNotificationObservers()
     }
     
@@ -557,8 +574,14 @@ class MediaViewerViewModel: ObservableObject {
             queue: .main) { [weak self] notification in
                 guard let self else { return }
                 // Another post being deleted must not blank out this viewer
-                guard let deletedPostId = notification.userInfo?["postId"] as? String,
-                      deletedPostId == post?.postId else { return }
+                guard let deletedPostId = notification.userInfo?["postId"] as? String else { return }
+
+                if let deletedPost = mediaPosts[deletedPostId] {
+                    deletedFileIds.formUnion(deletedPost.medias.compactMap({ $0.image?.fileId ?? $0.video?.fileId }))
+                    return
+                }
+
+                guard deletedPostId == post?.postId else { return }
 
                 isPostDeleted = true
                 // A video carries its file id on `video`, an image on `image`. Collecting only the

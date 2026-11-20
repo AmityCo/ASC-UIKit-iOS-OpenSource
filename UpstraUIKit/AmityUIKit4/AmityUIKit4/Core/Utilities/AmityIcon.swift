@@ -212,6 +212,7 @@ enum AmityIcon: String, ImageResourceProvider {
     case commentActionIcon = "commentActionIcon"
     case shareActionIcon = "shareActionIcon"
     case videoControlIcon = "videoControlIcon"
+    case watchAgainIcon = "watchAgainIcon"
     case circleCloseIcon = "circleCloseIcon"
     case previewLinkDefaultIcon = "previewLinkDefaultIcon"
     case triangleErrorIcon = "triangleErrorIcon"

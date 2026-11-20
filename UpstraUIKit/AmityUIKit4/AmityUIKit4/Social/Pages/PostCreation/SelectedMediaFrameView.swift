@@ -157,15 +157,15 @@ struct SelectedMediaFrameView: View {
     private var bottomControls: some View {
         VStack {
             Spacer()
-            HStack {
+            HStack(alignment: .bottom, spacing: 0) {
+                productTagBadge
+                Spacer()
                 if showsAltText {
                     altTextButton
+                        .padding(8)
                 }
-                Spacer()
-                productTagBadge
             }
         }
-        .padding(8)
     }
 
     /// Images only, and only for media added in this session — media already published on the post gets
@@ -205,13 +205,19 @@ struct SelectedMediaFrameView: View {
         }
     }
 
+    /// The badge is only ~24pt, so the 8pt inset around it and a further 4pt outside count as part of the
+    /// button: the hit area reaches ~48pt without moving the badge.
     private var productTagBadge: some View {
-        AmityProductTagBadgeView(count: media.produtTags.count,
-                                 icon: media.produtTags.isEmpty ? .tagIcon : .productTagFilledIcon)
-            .isHidden(!postComposerViewModel.isProductCatalogueEnabled
-                      || (media.produtTags.isEmpty
-                          && postComposerViewModel.productTags.count == postComposerViewModel.productTagLimit))
-            .onTapGesture { presentProductTagSelection() }
+        Button(action: presentProductTagSelection) {
+            AmityProductTagBadgeView(count: media.produtTags.count,
+                                     icon: media.produtTags.isEmpty ? .tagIcon : .productTagFilledIcon)
+                .padding(8)
+                .contentShape(Rectangle().inset(by: -4))
+        }
+        .buttonStyle(.plain)
+        .isHidden(!postComposerViewModel.isProductCatalogueEnabled
+                  || (media.produtTags.isEmpty
+                      && postComposerViewModel.productTags.count == postComposerViewModel.productTagLimit))
     }
 
     private func presentProductTagSelection() {

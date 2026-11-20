@@ -270,6 +270,8 @@ public struct AmityPostContentComponent: AmityComponentView {
                 self.showPostEditScreen()
             }), secondaryButton: .cancel(Text(AmityLocalizedStringSet.General.cancel.localizedString)))
         })
+        // The post's menu, share and reaction sheets cover the feed, so its video stops underneath.
+        .suspendsFeedAutoPlay(showBottomSheet || showShareSheet || showShareBottomSheet || showReactionList)
         .sheet(isPresented: $showShareSheet) {
             let shareLink = AmityUIKitManagerInternal.shared.generateShareableLink(for: .post, id: post.postId)
             ShareActivitySheetView(link: shareLink)

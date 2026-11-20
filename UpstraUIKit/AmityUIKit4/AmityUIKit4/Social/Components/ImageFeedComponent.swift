@@ -76,6 +76,7 @@ struct ImageFeedComponent: View {
                                             .onTapGesture {
                                                 selectedProductTagMedia = media
                                             }
+                                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                                     }
                                 }
                                 .frame(maxWidth: .infinity)
@@ -100,20 +101,21 @@ struct ImageFeedComponent: View {
                 .padding(.horizontal, 16)
                 .onChange(of: viewModel.showMediaViewer) { _ in
                     if viewModel.showMediaViewer {
-                        // Get the selected media
-                        let selectedMedia = viewModel.medias[viewModel.selectedMediaIndex]
-                        // Get the parent post from cache if available
-                        
-                        var parentPostModel: AmityPostModel?
-                        if let parentPost = selectedMedia.parentPostId.flatMap({ viewModel.postsCache[$0] }) {
-                            parentPostModel = AmityPostModel(post: parentPost)
+                        // The viewer gets the whole loaded grid so it can swipe and count; each frame
+                        // resolves its own parent post from the cache.
+                        let medias = viewModel.medias
+                        var parentPostModels: [String: AmityPostModel] = [:]
+                        for postId in Set(medias.compactMap(\.parentPostId)) {
+                            if let parentPost = viewModel.postsCache[postId] {
+                                parentPostModels[postId] = AmityPostModel(post: parentPost)
+                            }
                         }
                         
                         let nav = UINavigationController()
                         nav.navigationBar.isHidden = true
                         
                         let view = MediaViewer(
-                            medias: [viewModel.medias[viewModel.selectedMediaIndex]],
+                            medias: medias,
                             startIndex: viewModel.selectedMediaIndex,
                             viewConfig: viewConfig,
                             closeAction: {
@@ -121,8 +123,10 @@ struct ImageFeedComponent: View {
                                     viewModel.showMediaViewer = false
                                 }
                             },
-                            post: parentPostModel,
-                            pageId: viewConfig.pageId
+                            pageId: viewConfig.pageId,
+                            postForMedia: { media in
+                                media.parentPostId.flatMap { parentPostModels[$0] }
+                            }
                         )
                             .environmentObject(viewConfig)
                         

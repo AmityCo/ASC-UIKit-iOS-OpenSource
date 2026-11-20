@@ -30,6 +30,12 @@ public struct AmityUserFeedComponent: AmityComponentView {
     }
     
     public var body: some View {
+        feedContent
+            .hostsFeedAutoPlay()
+    }
+
+    @ViewBuilder
+    private var feedContent: some View {
         ZStack(alignment: .top) {
             userFeedView
                 .isHidden(viewModel.emptyFeedState != nil)

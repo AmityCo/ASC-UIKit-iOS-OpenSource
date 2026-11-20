@@ -25,11 +25,13 @@ struct EventDetailTabBarView: View {
         HStack(spacing: 20) {
             let eventItem = TabItem(index: EventDetailPostDoors.eventTab, image: AmityIcon.createEventMenuIcon.imageResource)
             TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: eventItem)
+                .accessibilityIdentifier(AccessibilityID.Event.EventDetailPage.eventTab)
             
             // Discussion is a feed of posts — Post's, on a page Events owns.
             if EventDetailPostDoors(pageId: pageId).showsDiscussion {
                 let feedItem = TabItem(index: EventDetailPostDoors.discussionTab, image: AmityIcon.eventDiscussionTabIcon.imageResource)
                 TabItemView(currentTab: $currentTab, namespace: namespace.self, tabItem: feedItem)
+                    .accessibilityIdentifier(AccessibilityID.Event.EventDetailPage.discussionTab)
             }
         }
         .padding(.horizontal)

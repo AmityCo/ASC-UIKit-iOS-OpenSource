@@ -457,6 +457,27 @@ struct AccessibilityID {
             static let delete = "post_menu/delete"
             static let edit = "post_menu/edit"
         }
+
+        /// The video frame's value is its state: thumbnail, loading, playing_muted, playing_sound, ended or fallback.
+        struct FeedPostVideo {
+            static let frame = "feed_post_video"
+            static let soundButton = "feed_post_video/sound_button"
+            static let replayButton = "feed_post_video/replay_button"
+            /// The play icon on the thumbnail, shown while auto-play is off or playback failed.
+            static let playButton = "feed_post_video/play_button"
+        }
+
+        struct VideoPlayer {
+            static let soundButton = "video_player/sound_button"
+        }
+
+        /// The chosen option's value is "selected".
+        struct AutoPlaySetting {
+            static let menuRow = "user_menu/autoplay_setting"
+            static let never = "autoplay_setting/never"
+            static let wifiOnly = "autoplay_setting/wifi_only"
+            static let wifiAndData = "autoplay_setting/wifi_and_data"
+        }
         
         struct UserProfile {
             static let userFeedTabButton = "user_feed_tab_button"
@@ -509,6 +530,8 @@ struct AccessibilityID {
             static let menuButton = "event_detail/menu_button"
             static let editButton = "event_detail/edit_button"
             static let deleteButton = "event_detail/delete_button"
+            static let eventTab = "event_detail/event_tab"
+            static let discussionTab = "event_detail/discussion_tab"
         }
         struct CreateMenu {
             static let createEventButton = "event_create/menu_button"

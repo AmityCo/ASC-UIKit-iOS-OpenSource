@@ -522,6 +522,7 @@ final class AmityUIKitManagerInternal: NSObject {
     }
     
     func unregisterDevice() {
+        endAutoPlay()
         AmityFileCache.shared.clearCache()
         AmityVisitorUsageLimitObserver.shared.stop()
         self._client?.logout()
@@ -578,7 +579,19 @@ final class AmityUIKitManagerInternal: NSObject {
         
     }
     
+    /// A login (or a client set up already logged in) starts a new session for the feed auto-play switch.
+    private func startAutoPlay() {
+        Task { @MainActor in FeedAutoPlaySwitch.shared.startSession() }
+    }
+    
+    /// Logout ends the feed auto-play session; auto-play stays off until the next login.
+    private func endAutoPlay() {
+        Task { @MainActor in FeedAutoPlaySwitch.shared.endSession() }
+    }
+    
     func didUpdateClient() {
+        startAutoPlay()
+
         // Update file repository to use in file service.
         fileService.fileRepository = AmityFileRepository()
         messageMediaService.fileRepository = AmityFileRepository()

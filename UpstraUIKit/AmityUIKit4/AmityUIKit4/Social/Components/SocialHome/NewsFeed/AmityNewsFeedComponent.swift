@@ -35,6 +35,15 @@ public struct AmityNewsFeedComponent: AmityComponentView {
     }
     
     public var body: some View {
+        // The list scrolls within its own frame: a post scrolled above its top is not visible.
+        feedContent
+            .limitsFeedAutoPlayViewport(.top)
+            .hostsFeedAutoPlay()
+            .feedAutoPlayViewport()
+    }
+
+    @ViewBuilder
+    private var feedContent: some View {
         ZStack(alignment: .top) {
             getContentView()
                 .opacity(isCurrentFeedEmpty ? 0 : 1)

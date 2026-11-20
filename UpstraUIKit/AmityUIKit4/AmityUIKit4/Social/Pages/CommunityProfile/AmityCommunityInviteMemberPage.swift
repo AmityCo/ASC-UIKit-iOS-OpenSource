@@ -121,8 +121,9 @@ public struct AmityCommunityInviteMemberPage: AmityPageView {
         // A 1–2 character search keeps the hint instead of flashing the skeleton.
         let isShortKeyword = !keyword.isEmpty && keyword.count < 3
 
-        if viewModel.loadingStatus == .loading && !isShortKeyword { return .loading }
+        // Results first: a next-page load must keep the list, or the scroll view is rebuilt at the top.
         if !viewModel.searchedUsers.isEmpty { return .users }
+        if viewModel.loadingStatus == .loading && !isShortKeyword { return .loading }
         if keyword.isEmpty { return .noUsersAvailable }
         return isShortKeyword ? .needMoreCharacters : .noResults
     }
@@ -372,6 +373,9 @@ class AmityCommunityInviteMemberPageViewModel: ObservableObject {
         pendingSearchCancellable = keyword
             .dropFirst()
             .sink(receiveValue: { [weak self] _ in
+                // Drop the previous keyword's results so the list shows the skeleton, not stale users.
+                self?.userCancellable = nil
+                self?.searchedUsers = []
                 self?.loadingStatusCancellable = nil
                 self?.loadingStatus = .loading
             })

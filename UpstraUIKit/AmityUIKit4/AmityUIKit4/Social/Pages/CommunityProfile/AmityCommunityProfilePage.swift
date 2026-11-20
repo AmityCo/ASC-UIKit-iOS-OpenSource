@@ -90,6 +90,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
                 })
             }
             .coordinateSpace(name: "scroll")
+            .limitsFeedAutoPlayViewport(.top)
             .onPreferenceChange(ScrollOffsetKey.self) { offsetY in
                 guard headerComponentHeight != 0.0 else { return }
                 
@@ -209,6 +210,7 @@ public struct AmityCommunityProfilePage: AmityPageView {
         .background(Color(viewConfig.theme.backgroundColor).ignoresSafeArea())
         .updateTheme(with: viewConfig)
         .edgesIgnoringSafeArea(.vertical)
+        .feedAutoPlayViewport()
     }
         
     /// One id per tab, in tab order — Feed belongs to Feed, Pinned to Community,
@@ -263,6 +265,16 @@ public struct AmityCommunityProfilePage: AmityPageView {
     
     private var stickyHeaderView: some View {
         VStack(spacing: 0) {
+            stickyHeaderContent
+                // Drawn over the feed: the feed is visible only below it.
+                .limitsFeedAutoPlayViewport(.bottom)
+
+            Spacer()
+        }
+    }
+
+    private var stickyHeaderContent: some View {
+        VStack(spacing: 0) {
             ZStack {
                 if let community = viewModel.community {
                     AsyncImage(placeholder: AmityIcon.communityProfilePlaceholder.imageResource, url: URL(string: community.largeAvatarURL) , contentMode: .fill)
@@ -305,8 +317,6 @@ public struct AmityCommunityProfilePage: AmityPageView {
 
             }
             .background(Color(viewConfig.theme.backgroundColor))
-
-            Spacer()
         }
     }
 }

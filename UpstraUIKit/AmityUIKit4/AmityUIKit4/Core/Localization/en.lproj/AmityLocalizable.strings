@@ -1669,3 +1669,16 @@
 // Chat home — sort not available (REQ-022)
 "amity_chat_home_error_title" = "Couldn't load chats";
 "amity_chat_home_error_description" = "Something went wrong. Please try again later.";
+
+// Feed video auto-play
+"amity_social_feed_video_replay" = "Watch again";
+"amity_social_feed_video_unmute" = "Turn sound on";
+"amity_social_feed_video_mute" = "Turn sound off";
+
+// Feed auto-play setting
+"amity_social_autoplay_setting_account_section" = "Account";
+"amity_social_autoplay_setting_section" = "Settings";
+"amity_social_autoplay_setting_row" = "Autoplay in feed";
+"amity_social_autoplay_setting_wifi_and_data" = "on Wi-Fi and mobile data";
+"amity_social_autoplay_setting_wifi_only" = "on Wi-Fi only";
+"amity_social_autoplay_setting_never" = "Never";

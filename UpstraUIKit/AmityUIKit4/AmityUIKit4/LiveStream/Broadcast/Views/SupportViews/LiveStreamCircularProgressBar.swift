@@ -22,7 +22,7 @@ struct LiveStreamCircularProgressBar: View {
     var body: some View {
         ProgressBar(progress: $progress, config: self.config)
             .rotationEffect(Angle(degrees: isRotating ? 360 : 0))
-            .animation(isRotating ? Animation.linear(duration: 2.0).repeatForever(autoreverses: false) : .default, value: isRotating)
+            .animation(isRotating ? Animation.linear(duration: config.rotationDuration).repeatForever(autoreverses: false) : .default, value: isRotating)
             .onAppear {
                 withAnimation {
                     isRotating = config.shouldAutoRotate
@@ -57,12 +57,15 @@ extension LiveStreamCircularProgressBar {
         let foregroundColor: UIColor
         let strokeWidth: Double
         let shouldAutoRotate: Bool
+        /// Seconds per turn.
+        let rotationDuration: Double
         
-        init(backgroundColor: UIColor = .gray.withAlphaComponent(0.5), foregroundColor: UIColor = .white, strokeWidth: Double = 2, shouldAutoRotate: Bool = true) {
+        init(backgroundColor: UIColor = .gray.withAlphaComponent(0.5), foregroundColor: UIColor = .white, strokeWidth: Double = 2, shouldAutoRotate: Bool = true, rotationDuration: Double = 2.0) {
             self.backgroundColor = backgroundColor
             self.foregroundColor = foregroundColor
             self.strokeWidth = strokeWidth
             self.shouldAutoRotate = shouldAutoRotate
+            self.rotationDuration = rotationDuration
         }
     }
 }
